@@ -51,8 +51,7 @@ MATHG_PROVIDER=trapi .venv/bin/python validate_masked.py outputs_bulk PAPER_ID
 ## Gold vs. Extracted Results
 
 We evaluated hypothesis-related content extracted from seven papers against each paper's
-author-written abstract. The extractor processed full text without seeing the abstract;
-an LLM judge then scored agreement on a 1-5 scale.
+author-written abstract. An LLM judge scored agreement on a 1-5 scale.
 
 | Metric | Mean score |
 | --- | ---: |
@@ -62,12 +61,52 @@ an LLM judge then scored agreement on a 1-5 scale.
 | Overall (all 21 ratings) | 4.81/5 |
 
 Four of seven papers received a perfect 15/15. All seven received 5/5 for keyword
-matching; the lowest individual dimension score was 4/5. These results indicate strong
-agreement with abstract-level concepts, properties, and entities on this small benchmark.
-They are a sanity check rather than an independent ground-truth evaluation: abstracts are
-used as a gold proxy, the sample contains only seven papers, and scoring is LLM-based.
+matching; the lowest individual dimension score was 4/5.
+
+### Evaluation procedure
+
+1. Seven open-access arXiv PDFs were converted to text with the column-aware PyMuPDF
+  converter in `pdf_convert.py`.
+2. `run_extraction.py` split each full paper into detected sections and sent every section
+  through the 11-role prompt in [`prompts/extraction.md`](prompts/extraction.md). The same
+  model then reconciled near-duplicate items for each role across the paper. The evaluated
+  records are in [`outputs_v2/`](outputs_v2/).
+3. `compare_with_gold.py` constructed the extracted side from up to eight reconciled items
+  from each of `hypothesis_statement`, `causal_claim`, and `mechanism_principle`, falling
+  back to raw items when a role had no reconciled output. This is a collection of
+  hypothesis-related claims, not one separately generated hypothesis.
+4. The gold side was the paper's author-written abstract stored in
+  [`results/gold_abstracts.json`](results/gold_abstracts.json). The judge received the gold
+  abstract and extracted claim collection together, then independently returned
+  `concept_overlap`, `property_overlap`, and `keyword_matching` scores from 1 to 5 plus a
+  one-sentence justification. The exact judge template is in
+  [`prompts/gold-comparison-judge.md`](prompts/gold-comparison-judge.md).
+5. Extraction, reconciliation, and judging all used Microsoft TRAPI deployment
+  `gpt-5.4_2026-03-05`, API version `2025-04-01-preview`, with JSON-constrained responses.
+  Extraction allowed up to 8,000 completion tokens per call; judging allowed 600. Failed
+  judge calls were retried up to five times with exponential backoff.
+
+Reproduce the comparison with:
+
+```bash
+MATHG_PROVIDER=trapi .venv/bin/python compare_with_gold.py \
+  results/gold_abstracts.json outputs_v2
+```
+
 Per-paper scores and judge justifications are in
 [`results/gold_comparison_v2.json`](results/gold_comparison_v2.json).
+
+### Interpretation and limitations
+
+These scores indicate strong agreement with abstract-level concepts, properties, and
+entities on this small benchmark, but they are a sanity check rather than an independent
+ground-truth evaluation. The full-text inputs used for extraction included each paper's
+Abstract section, so this was **not a blinded abstract-recovery test** and lexical overlap
+may be inflated. The same LLM deployment performed extraction and judging, which adds
+self-evaluation bias. The abstract is only a proxy for a gold hypothesis, the sample has
+seven papers, and no human or independently trained judge calibrated the scores. A stronger
+evaluation should remove abstracts from extractor input, use an independent judge or human
+raters, and report agreement over a larger held-out corpus.
 
 ## Prompts
 
