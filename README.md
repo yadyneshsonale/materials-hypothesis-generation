@@ -176,8 +176,7 @@ matching; the lowest individual dimension score was 4/5.
   `concept_overlap`, `property_overlap`, and `keyword_matching` scores from 1 to 5 plus a
   one-sentence justification. The exact judge template is in
   [`prompts/gold-comparison-judge.md`](prompts/gold-comparison-judge.md).
-5. Extraction, reconciliation, and judging all used Microsoft TRAPI deployment
-  `gpt-5.4_2026-03-05`, API version `2025-04-01-preview`, with JSON-constrained responses.
+5. Extraction, reconciliation, and judging all used `GPT 5.4`, with JSON-constrained responses.
   Extraction allowed up to 8,000 completion tokens per call; judging allowed 600. Failed
   judge calls were retried up to five times with exponential backoff.
 
