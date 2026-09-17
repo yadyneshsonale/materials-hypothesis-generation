@@ -10,9 +10,9 @@ A materials-science hypothesis generation pipeline that extracts argumentative r
 4. Retrieve, compose, refine, merge, and critique hypotheses with `hypothesis_agent.py`.
 5. Evaluate extraction and generation with abstract comparison, audits, and masked-paper recovery.
 
-## Proposed Agent Pipeline
+## Adaptive Agent Workflow
 
-The long-term system scales the extraction stage to a broad materials-science corpus and
+The target system scales the extraction stage to a broad materials-science corpus and
 treats each **atomic extracted claim** as an independently retrievable entity. An entity is
 not an arbitrary text fragment: it stores a stable ID, argumentative role, normalized claim,
 verbatim evidence, source paper and section, extraction confidence, and links to related
@@ -71,6 +71,36 @@ flowchart TD
    Y --> Z
 ```
 
+### Easy overview
+
+1. The user describes the kind of hypothesis they want.
+2. The decomposer turns that request into connected literature questions, such as relevant
+  mechanisms, possible interventions, constraints, and conflicting evidence.
+3. The retriever finds claim entities for each question and follows cross-paper graph,
+  citation, and comparison relations when available.
+4. The sufficiency assessor decides whether to accept the evidence, reason with a stated
+  caveat, search a narrower question, ask the user for a missing constraint, or leave the
+  question unresolved.
+5. The synthesizer combines the resolved findings into cited hypotheses. Critics score each
+  candidate, and the complete task, retrieval, decision, conflict, and citation history is
+  saved for the user.
+
+### Agent responsibilities
+
+The current implementation keeps these as separate logical agents in one process, which
+makes their inputs and outputs auditable without requiring a different model deployment for
+every role.
+
+| Agent | Responsibility |
+| --- | --- |
+| Orchestrator | Select ready tasks, enforce dependencies, and write the execution trace |
+| Decomposer | Create structured retrieval questions and narrower child questions |
+| Retriever | Combine lexical and role matching with graph and typed-relation expansion |
+| Sufficiency assessor | Route evidence to accept, caveat, decompose, ask-user, or unresolved |
+| Evidence adjudicator | Classify contradictions while preserving both claims and conditions |
+| Hypothesis synthesizer | Produce cited mechanisms, predictions, boundary conditions, and falsifiers |
+| Critics | Score plausibility, novelty, and feasibility |
+
 ### Agent stages
 
 1. **Ingest and index:** continuously process papers into grounded claim entities. Use
@@ -99,11 +129,19 @@ flowchart TD
   boundary conditions, falsifying experiment, uncertainties, evidence citations, rejected
   alternatives, unresolved gaps, task graph, retrieval decisions, and revision lineage.
 
-The current implementation is a prototype of stages 1, 5, 6, and 7: it creates typed claim
-nodes, retrieves cross-paper neighbors, generates and branches candidates, applies three
-critics, and records cited nodes and parent IDs. Goal clarification, recursive task planning,
-sufficiency routing, user questions, hybrid retrieval, and a complete execution trace remain
-to be implemented.
+`adaptive_agent.py` now implements dependency-aware decomposition, claim retrieval with graph
+expansion, sufficiency routing, one-level recursive gap decomposition, user-question recording,
+conflict adjudication, cited synthesis, criticism, and a complete JSON execution trace. The
+existing `hypothesis_agent.py` remains the simpler direct retrieval and beam-search baseline.
+
+The next ingestion step is extracting citation and table/figure comparisons at corpus scale.
+`evidence_model.py` already validates these as typed relations such as `cites`, `supports`,
+`contradicts`, `compares_with`, `outperforms`, and `underperforms`. Each relation records the
+linked entity IDs, source paper and element, verbatim evidence, metric, values, units,
+conditions, and confidence. Pass a JSONL relation file with `--relations`; the retriever will
+follow those links and record the exact relation in `retrieval_reason`. A semantic vector index
+and the extraction pipeline that populates these relations from citations and tables remain to
+be implemented; current seed retrieval is lexical plus role-aware.
 
 ## Setup
 
@@ -136,6 +174,19 @@ MATHG_PROVIDER=trapi .venv/bin/python hypothesis_agent.py \
   "your materials research goal" outputs_bulk registry.json \
   --search --rounds 2 --beam 2
 ```
+
+Run the adaptive, traceable workflow:
+
+```bash
+MATHG_PROVIDER=trapi .venv/bin/python adaptive_agent.py \
+  "Improve stability of lithium-metal solid-electrolyte interfaces" \
+  outputs_bulk results/adaptive_run.json --max-depth 1
+```
+
+Add `--relations path/to/relations.jsonl` when a typed relation file is available. The output
+JSON contains the task graph, evidence returned for
+each task, sufficiency decisions, child questions, unresolved gaps, conflict assessments,
+ranked candidates, critic results, and cited entity IDs.
 
 Run masked-paper recovery:
 
