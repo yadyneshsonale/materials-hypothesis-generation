@@ -218,18 +218,24 @@ judge prompts are documented in [`prompts/`](prompts/README.md), including the c
 
 Downloaded PDFs, extracted full paper text, credentials, virtual environments, and caches are intentionally excluded. Corpus identifiers and discovery metadata are included so source papers can be retrieved independently.
 
-## The pipeline extracts 11 argumentative roles:
+### Argumentative Roles
 
- 1.⁠ ⁠*⁠ problem_motivation ⁠*: The gap or need addressed by the paper.
- 2.⁠ ⁠*⁠ prior_approach ⁠*: An existing method or approach cited as prior work.
- 3.⁠ ⁠*⁠ prior_limitation ⁠*: A stated weakness of a prior approach.
- 4.⁠ ⁠*⁠ rejected_alternative ⁠*: An approach considered but not used, including contrastive choices such as “rather than X, we...”, plus the reason.
- 5.⁠ ⁠*⁠ inspiration_source ⁠*: An analogy, prior finding, or borrowed method that shaped the new approach.
- 6.⁠ ⁠*⁠ causal_claim ⁠*: A claim that one factor caused, increased, or decreased another, including conditions or magnitude when stated.
- 7.⁠ ⁠*⁠ mechanism_principle ⁠*: The physical or chemical reasoning underlying a causal claim.
- 8.⁠ ⁠*⁠ hypothesis_statement ⁠*: An explicit or implicit statement of the paper’s central proposal or expectation.
- 9.⁠ ⁠*⁠ evidence_result ⁠*: A measured result supporting or refuting a claim.
-10.⁠ ⁠*⁠ constraint ⁠*: A limitation or boundary condition that the solution must satisfy.
-11.⁠ ⁠*⁠ contradiction ⁠*: A finding that conflicts with a prior claim in the literature.
+The pipeline extracts **11 argumentative roles** from scientific papers:
 
-These are defined in ⁠ roles.py ⁠. Each extracted item also records a concise paraphrase and a verbatim evidence span.
+1. **`problem_motivation`**: The gap or need addressed by the paper.
+2. **`prior_approach`**: An existing method or approach cited as prior work.
+3. **`prior_limitation`**: A stated weakness or limitation of a prior approach.
+4. **`rejected_alternative`**: An approach considered but not used, including contrastive choices such as “rather than X, we...”, along with the reason.
+5. **`inspiration_source`**: An analogy, prior finding, or borrowed method that influenced the new approach.
+6. **`causal_claim`**: A claim that one factor caused, increased, or decreased another, including conditions or magnitude when stated.
+7. **`mechanism_principle`**: The physical or chemical reasoning underlying a causal claim.
+8. **`hypothesis_statement`**: An explicit or implicit statement of the paper's central proposal or expectation.
+9. **`evidence_result`**: A measured result that supports or refutes a claim.
+10. **`constraint`**: A limitation or boundary condition that the solution must satisfy.
+11. **`contradiction`**: A finding that conflicts with a prior claim in the literature.
+
+These roles are defined in [`roles.py`](roles.py). Each extracted item also contains:
+
+* **Concise paraphrase** of the extracted information.
+* **Verbatim evidence span** from the source text supporting the extraction.
+
