@@ -48,6 +48,33 @@ Run masked-paper recovery:
 MATHG_PROVIDER=trapi .venv/bin/python validate_masked.py outputs_bulk PAPER_ID
 ```
 
+## Gold vs. Extracted Results
+
+We evaluated hypothesis-related content extracted from seven papers against each paper's
+author-written abstract. The extractor processed full text without seeing the abstract;
+an LLM judge then scored agreement on a 1-5 scale.
+
+| Metric | Mean score |
+| --- | ---: |
+| Concept overlap | 4.86/5 |
+| Property overlap | 4.57/5 |
+| Keyword matching | 5.00/5 |
+| Overall (all 21 ratings) | 4.81/5 |
+
+Four of seven papers received a perfect 15/15. All seven received 5/5 for keyword
+matching; the lowest individual dimension score was 4/5. These results indicate strong
+agreement with abstract-level concepts, properties, and entities on this small benchmark.
+They are a sanity check rather than an independent ground-truth evaluation: abstracts are
+used as a gold proxy, the sample contains only seven papers, and scoring is LLM-based.
+Per-paper scores and judge justifications are in
+[`results/gold_comparison_v2.json`](results/gold_comparison_v2.json).
+
+## Prompts
+
+All extraction, reconciliation, generation, critique, refinement, merge, and evaluation
+judge prompts are documented in [`prompts/`](prompts/README.md), including the complete
+11-role extraction taxonomy and runtime user-message templates.
+
 ## Included Results
 
 - `outputs_bulk/`: role extractions for 67 open-access materials-science papers.
