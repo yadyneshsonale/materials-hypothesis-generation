@@ -1,0 +1,1338 @@
+{
+  "paper_id": "2609.11869",
+  "chunks_processed": 6,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "It is often unclear whether calibration data truly identify corrosion-model parameters or merely do not contradict them, especially for sparse datasets and extrapolative service-life predictions.",
+        "evidence_span": "do the calibration data determine the model\u2019s parameters, or merely fail to contradict them?"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "AISI 347 passive oxide evolution in reactor-representative hydrothermal water lacks a mechanistic predictive model.",
+        "evidence_span": "yet the evolution of its passive oxide film under reactor-representative hydrothermal water has so far had no mechanistic predictive model"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "There is a recurring methodological gap in PDM parameter estimation: lack of formal identifiability characterization.",
+        "evidence_span": "The question this paper is built around is a methodological gap that recurs across four decades of PDM parameter estimation."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The difference between fitting data and actually constraining parameters matters when extrapolating beyond calibration data.",
+        "evidence_span": "The distinction between \u201cthe model fits\u201d and \u201cthe data constrain the parameters\u201d becomes consequential exactly when the fitted model is meant to extrapolate beyond its calibration window"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The recurring core issue is too few independent exposure times.",
+        "evidence_span": "Too few independent exposure times is the paper\u2019s recurring finding"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The uncoupled formulation has too many rates to be determined by only three exposure times.",
+        "evidence_span": "Written this way the two layers are still independent, and the six rates in Eqs. (5) and (7) are far more than three exposure times can determine."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "With six observations and a five-parameter model, good fit alone cannot show parameter identifiability.",
+        "evidence_span": "Six layer means at three exposure times against a five-parameter model is the ratio that dictates both the objective below and the identifiability machinery carried alongside it: at this sample size a good fit is not evidence that the parameters are determined, and the two questions have to be asked separately."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Three exposure times cannot distinguish oxide production from oxide loss",
+        "evidence_span": "The correct statement is therefore not that the identification disagrees with stoichiometry, but that three exposure times cannot separate oxide production from oxide loss."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Additional coolant mass balance or more exposure times are needed to decide the iron-loss prediction",
+        "evidence_span": "A coolant mass balance, or outer-layer thicknesses at more exposure times, would decide it."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Demonstrating a stabilization effect would require matched stabilized/unstabilized exposures not present in this dataset",
+        "evidence_span": "Distinguishing a genuine stabilization effect would require the comparison this dataset does not contain: matched exposures of stabilized and unstabilized grades"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Constant-field closure should be directly tested by solving Poisson\u2019s equation self-consistently instead of imposing the field",
+        "evidence_span": "that closure can be tested directly by solving Poisson\u2019s equation together with the defect transport instead of imposing the field on it."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Neural methods would be needed for self-consistent potential/defect transport, moving-boundary inversion, and unknown mobility closures",
+        "evidence_span": "The problems that would need it are visible from this study. Two lie inside the present model: solving the potential distribution self-consistently with defect transport instead of imposing the constant-field assumption, and inverting the moving-boundary transient for kinetic parameters and defect fields together... A third is sharper: the nickel zone rejects every constant-mobility description these data can test, so the quantity actually wanted is a mobility function of unknown form"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Identifiability limitations consistently arise from too few independent exposure times",
+        "evidence_span": "Every identifiability limitation encountered here (the zero-dimensional profile analysis, the residual-leverage imbalance, the spatial gate and the nickel-closure gate) traces to too few independent exposure times."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Current predictions rely on threshold water-chemistry criteria based on ECP and dissolved oxygen.",
+        "evidence_span": "Current practice for predicting oxide behavior on light-water-reactor internals relies either on operational water-chemistry criteria framed around threshold electrochemical corrosion potential (ECP) and dissolved-oxygen levels [1\u20134]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Current predictions also use data-driven machine-learning models of crack-growth rate.",
+        "evidence_span": "or on data-driven machine-learning models of crack-growth rate [5]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "The point defect model is the standard mechanistic description for passive-film growth.",
+        "evidence_span": "the point defect model (PDM) of Chao, Lin, and Macdonald [13\u201316], in the tradition of high-field oxidation theory [17], provides the standard mechanistic description"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Li et al. extended the PDM framework to supercritical water.",
+        "evidence_span": "Li et al. [18] extended this framework to supercritical water"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Veile et al. characterized the duplex oxide in simulated BWR hydrothermal water using EDX depth profiling.",
+        "evidence_span": "Veile et al. [19] recently provided the first detailed characterization of the duplex oxide developed in simulated BWR hydrothermal water, resolving Cr-rich barrier and Fe-rich outer layers by energy-dispersive X-ray (EDX) depth profiling at three exposure times"
+      },
+      {
+        "role": "prior_approach",
+        "content": "PDMs have routinely been calibrated to impedance spectra or depth-profile data with several parameters and very few data points.",
+        "evidence_span": "Whether calibrated against electrochemical impedance spectra [20\u201322] or against depth-profile data, four-to-six-parameter models are routinely fit to three-to-six data points"
+      },
+      {
+        "role": "prior_approach",
+        "content": "The authors' prior work applied this framework to synthetic benchmarked PDM data and identified four training-time failure modes.",
+        "evidence_span": "Our prior work demonstrated this machinery on the PDM against synthetic benchmarked data, cataloging four training-time failure modes [32]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "The model is derived from Li et al.'s supercritical-water point defect model and adapted here.",
+        "evidence_span": "The model identified in this paper is a reduced form of the point defect model in the formulation Li et al. [18] developed for supercritical water, adapted here to subcritical hydrothermal water."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Veile et al. previously characterized the duplex oxide scale on this alloy.",
+        "evidence_span": "The oxide Veile et al. [19] characterize on X6CrNiNb18-10 is a duplex scale"
+      },
+      {
+        "role": "prior_approach",
+        "content": "The point defect model assumes a constant electric field in the barrier layer and linear outer potential drop.",
+        "evidence_span": "The PDM postulates that the electric field inside the barrier layer is constant at \u03b5f , independent of both V and Lbl , and that the outer drop is linear in potential and pH"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Following Li et al., the full barrier-layer destruction rate is assigned as supply to the outer layer.",
+        "evidence_span": "Following Ref. [18], the whole of kd is credited to the outer layer"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Veile et al. measured element-resolved oxide thicknesses after 72, 168, and 480 h exposures using FIB cross-sections with EDX line scans.",
+        "evidence_span": "Veile et al. [19] exposed X6CrNiNb18-10 coupons to simulated BWR hydrothermal water (240\u25e6 C, 7 MPa, 0.4 ppm dissolved O2 ) for 72, 168, and 480 h and measured element-resolved oxide layer thicknesses by focused-ion-beam cross-sections with EDX line scans."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The physics-informed solver uses the neural spectral-element method.",
+        "evidence_span": "The physics-informed forward and inverse solves use the neural spectral-element method (NSEM) [31]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "The solver had been applied to the PDM family in the authors' prior work.",
+        "evidence_span": "The solver was applied to the PDM family in our prior work [32]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Veile et al. used a power-law description with fitted exponents",
+        "evidence_span": "Veile et al.\u2019s fitted exponents that the power-law description cannot offer"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Reported corrosion-product release for stainless steels in high-temperature water provides a comparison point",
+        "evidence_span": "a magnitude consistent with the corrosion-product release reported for stainless steels in high-temperature water [12]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Li et al. previously fit \u03b13=0.12 for a ferritic steel in supercritical water",
+        "evidence_span": "At the reference value \u03b13 = 0.12 fit by Li et al. [18] for a ferritic steel in supercritical water"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Mixed-potential estimates in oxygenated 288\u00b0C BWR water are around 0 to +150 mV SHE",
+        "evidence_span": "mixed-potential estimates of the corrosion potential in oxygenated 288\u25e6 C BWR water are of order 0 to +150 mV on the standard hydrogen electrode (SHE) scale at 0.2\u20130.4 ppm O2 [1, 2]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior studies reported similar inner-layer thicknesses, duplex morphology, inner spinel chemistry, and near-parabolic growth for related stainless steels",
+        "evidence_span": "The inner-layer thickness trajectory recovered here (41 nm at 72 h to 135 nm at 480 h) is of the same order as inner-layer thicknesses reported for 304/316 stainless steels in oxygenated 288\u25e6 C water at comparable times [9, 11], and the duplex morphology, inner-layer spinel chemistry, and near-parabolic inner growth match the established picture for austenitic steels in this environment [6\u20138]."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "These water-chemistry criteria do not predict oxide thickness or composition.",
+        "evidence_span": "which say nothing about oxide thickness or composition"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "These machine-learning crack-growth models do not address underlying oxide chemistry.",
+        "evidence_span": "which are equally silent on the underlying oxide chemistry"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Veile et al.'s analysis remained empirical and did not provide a shared physical parameterization or extrapolation assessment.",
+        "evidence_span": "their analysis stops at empirical per-element power-law fits, with no shared physical parameter set connecting the layers and no assessment of how far those fits can be extrapolated"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Formal profile-likelihood or bootstrap identifiability analyses appear to be absent from prior PDM fitting studies.",
+        "evidence_span": "we are not aware of a formal profile-likelihood or bootstrap identifiability characterization of a PDM fit"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Earlier analysis incorrectly treated 1.05 as the stoichiometric spinel/magnetite value",
+        "evidence_span": "An earlier version of this analysis placed a prior on it centered on 1.05 and described that center as the stoichiometric spinel/magnetite value. It is not."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "This dataset lacks coolant chemistry and outer-layer data are too scattered to demonstrate the iron-loss prediction",
+        "evidence_span": "Nothing measured here demonstrates it: this dataset contains no coolant chemistry, and the outer layer\u2019s scan-to-scan scatter is so large that it carries only 5% of the fit statistic (Table 4)."
+      }
+    ],
+    "rejected_alternative": [],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The work borrows identifiability tools already mature in adjacent fields such as systems biology and battery modeling.",
+        "evidence_span": "We close this gap with tools mature in adjacent fields [24\u201326], standard in systems biology [27] and increasingly applied to battery models [28]"
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The diagnosis is informed by recognized loss-balancing pathologies in physics-informed training and a contemporaneous related study.",
+        "evidence_span": "Loss-balancing pathologies of this general kind are a recognized theme in physics-informed training [33, 34], and a contemporaneous study reports a closely related diagnosis in an unrelated domain [35]"
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Sparse data imply that the determined quantity is the gap between mechanistic and empirical ten-year extrapolations, not the ten-year thickness itself.",
+        "evidence_span": "The consequence is that the quantity these data determine is not the ten-year thickness but the separation between the mechanistic and empirical extrapolations (a factor of 3.5 to 6.3 at ten years)"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Reanalyzing the same three exposures cannot improve the extrapolation uncertainty, but one designed exposure around 3000 h would.",
+        "evidence_span": "and that no reanalysis of three exposures can sharpen it, while one designed exposure of roughly 3000 hours would."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using the identified kinetics in a spatially extended model predicts the measured composition profile without adding free parameters.",
+        "evidence_span": "Extended spatially with no additional free parameters, the identified kinetics predict the measured composition profile"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Solving Poisson's equation together with defect transport shows that the constant-field closure is not self-consistent at implied defect concentrations.",
+        "evidence_span": "solving Poisson\u2019s equation together with the defect transport, rather than imposing the field, shows that the constant-field closure on which the PDM\u2019s field strength rests is not self-consistent at the defect concentrations the model implies"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The thickness equations include only the four boundary-moving reaction rates.",
+        "evidence_span": "The thickness equations therefore contain only these four rates."
+      },
+      {
+        "role": "causal_claim",
+        "content": "As the film thickens, the potential available to drive metal/barrier-layer reactions decreases linearly.",
+        "evidence_span": "The term that carries the kinetics is \u2212\u03b5f Lbl : the potential available to drive the metal/barrier-layer reactions falls linearly as the film thickens."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Reactions at the metal/barrier interface inherit thickness dependence, unlike those at other interfaces.",
+        "evidence_span": "Reactions at bl/ol and at the outer surface see \u03d5bl/e , which by Eq. (1) carries no Lbl dependence, so bi = 0 for all of them. The m/bl reactions see \u03d5m/bl and therefore inherit Eq. (2)"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Negative b3 means growth slows exponentially with film thickness, producing direct-logarithmic kinetics and possibly a finite steady state.",
+        "evidence_span": "The negative sign is the kinetic content of the model: growth decelerates exponentially in the film\u2019s own thickness, which is what produces direct-logarithmic kinetics and, whenever a destruction term is nonzero, a finite steady-state thickness."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Substituting the constant-volume condition eliminates cation fluxes and makes outer-layer growth an affine function of barrier-layer growth.",
+        "evidence_span": "Substituting Eq. (8) into Eq. (7), the two destruction terms combine exactly... leaving the cation fluxes eliminated and the outer-layer growth rate an exact affine function of the barrier-layer growth rate"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Tying the two layers to one growth law is what causes mechanistic and empirical descriptions to extrapolate differently.",
+        "evidence_span": "This is the step that ties the two layers to one growth law, and it is what makes the mechanistic and empirical descriptions extrapolate differently in Section 3.3."
+      },
+      {
+        "role": "causal_claim",
+        "content": "When Cbl approaches zero, the barrier-layer solution reduces to the direct-logarithmic law; when Cbl is positive, thickness saturates finitely.",
+        "evidence_span": "which for Cbl \u2192 0 reduces to the direct-logarithmic law... and for Cbl > 0 saturates at a finite Lbl,ss"
+      },
+      {
+        "role": "causal_claim",
+        "content": "In the hard inverse configuration, differentiable Runge\u2013Kutta integration makes the reduced ODEs exactly satisfied by construction.",
+        "evidence_span": "a \u201chard\u201d zero-dimensional inverse, in which the kinetic parameters are the only learnable quantities and the trajectories are generated by differentiable Runge\u2013Kutta integration, so Eqs. (10)\u2013(11) are satisfied exactly by construction"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Coupling, not fit quality, causes 10-year predictions to differ by a factor of 3.5 to 6.3 between descriptions",
+        "evidence_span": "it is the coupling behind it, not \u03c72 , that separates the two descriptions\u2019 ten-year predictions by a factor of 3.5 to 6.3"
+      },
+      {
+        "role": "causal_claim",
+        "content": "M1 and M2 reach PBReff=2.43 because they lie on the same flat direction without initial precipitate population",
+        "evidence_span": "the M1 and M2 variants, which lack the initial precipitate population, reach PBReff = 2.43; they are simply at a different point on the same flat direction."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Maintaining field uniformity within 10% would require defect diffusivities six orders of magnitude above assumed values or defect concentrations below about 10^14 cm^-3",
+        "evidence_span": "holding the field within 10% of uniform would require defect diffusivities near 10\u22129 \u201310\u221210 cm2 /s, some six orders of magnitude above the assumed values, or equivalently defect concentrations below about 1014 cm\u22123"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Convergence of four analyses on the same cause constitutes the methodological result",
+        "evidence_span": "The convergence of four unrelated analyses on one cause is the methodological result"
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Composition data are fundamentally unable to constrain defect diffusivity, regardless of how many such data are collected.",
+        "evidence_span": "a structural argument shows why composition data cannot constrain the defect diffusivity however many of them are taken"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Differentiability, not the neural representation itself, is what enables affordable profile likelihoods, bootstrap, prior scans, and dense operating-envelope evaluation.",
+        "evidence_span": "the property doing the statistical work is differentiability rather than the neural representation: exact parameter gradients through a vectorized solver are what make profile likelihood, a thousand-member bootstrap, prior-relaxation scans and a dense operating-envelope grid affordable"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This pathology is revealed by re-solving the recovered parameters with an exact forward solver.",
+        "evidence_span": "exposed only by re-solving the recovered parameters through an exact forward solve"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Thickness dependence of interfacial rate constants comes from activated-complex theory with partial charge transfer and the interfacial potential drops they experience.",
+        "evidence_span": "Activated-complex theory with partial charge transfer gives every interfacial rate constant the form"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Marker experiments indicate oxide grows into the metal, motivating the constant-volume condition.",
+        "evidence_span": "Marker experiments place the bl/ol interface at the original metal surface, so the oxide grows into the metal rather than outward from it"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "At open circuit, constant V and pH make some physical factors inseparable from rate constants in thickness-time data, so only lumped apparent parameters are identifiable.",
+        "evidence_span": "At open circuit V and pH are constant over an exposure... the factor e a3 V +c3 pH in Eq. (6) is a constant multiplier that thickness-versus-time data cannot separate from k30 . The same is true of the molar volumes and porosity corrections. What the data can determine is therefore not the elementary rate constants but the lumped groups"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Fixed-node spectral differentiation yields a deterministic loss that allows L-BFGS to reduce residuals below the floor of random-collocation training.",
+        "evidence_span": "each field is evaluated only at fixed Legendre\u2013Gauss\u2013Lobatto quadrature nodes and derivatives are taken with precomputed spectral differentiation matrices, giving a deterministic loss that L-BFGS can drive to residuals well below the accuracy floor of random-collocation training"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Near-parabolic chromium exponent indicates barrier-layer growth under near-zero dissolution in ultrapure water",
+        "evidence_span": "The near-parabolic chromium exponent (n \u2248 0.50) is the signature of a barrier layer growing under near-zero dissolution in ultrapure water"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Sub-parabolic iron exponent reflects deposition constrained by constant-volume coupling from an initial precipitate population, not independent iron-layer kinetics",
+        "evidence_span": "the sub-parabolic iron exponent (n \u2248 0.22) reflects deposition constrained by constant-volume coupling to the barrier layer from a substantial initial precipitate population, rather than independent iron-layer kinetics"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The 1.05 closure is invalid because it requires more chromium in the barrier layer than the alloy contains",
+        "evidence_span": "The constant-volume closure that yields 1.05 requires the barrier layer to draw approximately 30 at% chromium from an alloy containing 18.8 at%, which the alloy cannot supply."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "2.05 is not a bound because it depends on the chosen phase assignment",
+        "evidence_span": "The first is that 2.05 is not a bound but one value of a phase-dependent quantity."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Mass balance and fitted PBReff differ because one measures oxide production while the accepted model measures net accumulation with Cx fixed to zero",
+        "evidence_span": "A mass balance fixes the rate at which barrier growth produces outer-layer oxide. The accepted model pins Cx = 0, so its PBReff measures net accumulation instead, and the two differ by whatever oxide leaves for the coolant."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Lack of preference for PBReff is structural because the outer-layer equation has three parameters for exactly three observations when Lbl(t) is fixed",
+        "evidence_span": "The reason is structural rather than statistical: with Lbl (t) fixed, the outer-layer solution Lol (t) = Lol,0 + PBReff (Lbl \u2212 L0 ) + Cx t, with Cx \u2264 0 as in Eq. (11), carries three parameters against exactly three outer-layer observations, so it is saturated and no combination is preferred."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Nickel transport at the receding interface must exceed lattice diffusion and thus be short-circuit or defect-flux mediated",
+        "evidence_span": "places whatever transports nickel at the receding metal/barrier-layer interface well above lattice diffusion: it must be short-circuit or defect-flux mediated."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "A mechanism whose mobility decays as interface structure coarsens naturally explains the flat zone widths that defeat the constant-mobility model",
+        "evidence_span": "That is also the class of mechanism whose mobility would decay as the interface structure coarsens, which is the natural explanation for the flat measured zone widths that defeat the constant-mobility model"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Comparison to mixed-potential estimates favors the lower end of the derived field range, so \u03b5f should be treated as order-of-magnitude only",
+        "evidence_span": "which favors the lower end of the derived range and is one more reason to treat \u03b5f here as an order-of-magnitude quantity."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "A two-species charged-defect model cannot sustain constant field at the implied concentrations; electronic charge compensation is required",
+        "evidence_span": "The implication is not that the field distribution is merely non-uniform but that a two-species charged-defect description cannot produce a constant field at the concentrations the model itself implies: charge compensation by electronic carriers, which the PDM does not carry, is required."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper adapts the supercritical-water PDM to subcritical hydrothermal water and identifies kinetics from the Veile dataset using a differentiable physics-informed inversion framework.",
+        "evidence_span": "This paper adapts the supercritical-water PDM formulation [18] to the subcritical hydrothermal-water regime and identifies its kinetics from the Veile et al. dataset with a differentiable, physics-informed inversion framework."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Only four reactions move interfaces, so only those rates should appear in the thickness equations.",
+        "evidence_span": "Of the fourteen reactions in the network (eleven numbered, three of them with primed variants), only four displace a boundary."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Only non-conservative reactions should determine barrier-layer thickness evolution.",
+        "evidence_span": "Only the non-conservative reactions of Step 1 move the barrier layer\u2019s boundaries, so its thickness obeys"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper fits an apparent-parameter reduced system rather than elementary rate constants.",
+        "evidence_span": "giving the apparent-parameter system fitted in this paper"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "If the barrier is FeCr2O4 and stoichiometry holds, the outer layer should lose about 9 \u00b5g/dm\u00b2/h of iron",
+        "evidence_span": "If the barrier is FeCr2 O4 and stoichiometry holds, the outer layer must lose about 9 \u00b5g of iron per square decimeter per hour"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The claim is only that this is the first mechanistic identification for this alloy/environment, not that the mechanism is unique to the stabilized grade",
+        "evidence_span": "The claim we make is therefore that this is the first mechanistic identification for this alloy in this environment, not that the mechanism identified is peculiar to the stabilized grade."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The 10-year prediction should be treated as testable rather than validated",
+        "evidence_span": "the prediction should be read as a testable statement, not a validated one."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The bounded claim is that the framework is trustworthy on real sparse data after self-consistency checking, not that it was necessary here",
+        "evidence_span": "it bounds the claim to this: the framework is trustworthy on real sparse data once the self-consistency check of Section 3.6 is applied, not that it was needed here."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "An exposure near 3000 h would separate mechanistic and power-law predictions at 2\u03c3 and sharpen weakly constrained parameters",
+        "evidence_span": "a designed exposure near 3000 h would separate the mechanistic prediction from the power-law extrapolation at 2\u03c3 against the full error budget, and would sharpen every weakly constrained parameter at the same time."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "Only some parameters are identifiable from the three exposure times, while others depend on priors or remain uncertain by an order of magnitude.",
+        "evidence_span": "Of the five parameters the model needs, three exposure times determine three, though the third is sharp in profile and not under resampling; one is set by its prior and one only to within an order of magnitude."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Most of the fit statistic is dominated by chromium data, especially one point, and residuals show systematic curvature tied to extrapolation.",
+        "evidence_span": "Ninety-five percent of the fit statistic rests on the three chromium points and eighty percent on one of them, and the residual pattern is systematic in precisely the curvature that governs extrapolation."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Spatial extension, candidate mobility models, and nickel-zone closure all fail identifiability or shape tests.",
+        "evidence_span": "The spatial extension and the two candidate mobility models each fail an identifiability test for the same reason, and the nickel-zone closure fails on shape for it too."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The neural inversion and a classical least-squares solver agree closely on recovered parameters and chi-squared.",
+        "evidence_span": "a classical least-squares solver is an independent reference, and the two agree to within 0.6% on every parameter and to identical \u03c72"
+      },
+      {
+        "role": "evidence_result",
+        "content": "In real sparse-data training, joint field-and-parameter optimization can converge to data-fitting equilibria that only approximately satisfy governing equations.",
+        "evidence_span": "joint field-and-parameter training can settle into an equilibrium that satisfies the data loss while leaving the governing equation only approximately satisfied"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The closed-form solutions match numerical integration extremely closely.",
+        "evidence_span": "The closed-form solutions (13)\u2013(14) agree with Radau numerical integration of Eqs. (10)\u2013(11) to better than 6 \u00d7 10\u221211 nm"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The affine outer-layer solution agrees extremely closely with the closed form from Li et al.",
+        "evidence_span": "the affine outer-layer form (14) agrees with the algebraically heavier closed form of Ref. [18] to better than 1 \u00d7 10\u221210 nm"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Digitized chromium data reproduce Veile et al.'s published empirical fit coefficients to four significant figures.",
+        "evidence_span": "a scan-level linear-space least-squares refit of L = k tn to our digitized chromium data reproduces their published coefficients to four significant figures (k = 6.522 versus their 6.521, n = 0.4964 versus 0.4964)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The hard-mode physics-informed inversion and classical optimization converge to the same optimum.",
+        "evidence_span": "The two are independent routes to the same optimum rather than a primary and a check, and Section 3.6 reports how closely they agree; the deterministic parameter values and curves given throughout (Figs. 3\u20136) are the converged optimum common to both."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Both neural backbones met the acceptance criterion of relative infinity-norm error at or below 0.5% against the closed form.",
+        "evidence_span": "Two neural backbones, a multilayer perceptron (MLP) and a Kolmogorov\u2013Arnold network (KAN) [36], are evaluated in the same harness to test backbone sensitivity, both to the same acceptance criterion (relative L\u221e error \u2264 0.5% against the closed form)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "An automated 25-test suite verifies parity among closed-form, Newton, and neural solutions.",
+        "evidence_span": "All results are backed by an automated test suite (25 tests) checking parity between closed-form, Newton, and neural solutions"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Mass balance gives PBReff of 2.05 or 2.16 depending on nickel routing assumption",
+        "evidence_span": "A chromium mass balance on X6CrNiNb18-10 with an FeCr2 O4 barrier gives PBReff = 2.05 if every iron atom not retained in the nickel-enriched zone reports to the outer layer, and 2.16 if the nickel routing fraction of Section 3.5 is used in place of complete rejection."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Likelihood identifies the parameter near 1.10, about 1.9 times below 2.05",
+        "evidence_span": "The likelihood puts the parameter at 1.10, a factor of 1.9 below that figure."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Stoichiometrically admissible PBReff range across spinels and nickel-routing assumptions is 0.52 to 3.79, containing 1.10",
+        "evidence_span": "Taken over both routing assumptions the stoichiometrically admissible range is [0.52, 3.79], and the identified 1.10 lies inside it."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Imposing stoichiometric FeCr2O4 PBReff=2.05 barely changes fit quality but requires outer-layer loss and a smaller initial precipitate population",
+        "evidence_span": "imposing the FeCr2 O4 value of 2.05 changes \u03c72 from 5.79 to 5.67, a decrease of 0.12 (Table 8), paid for by an outer-layer loss rate of 0.24 nm/h and a smaller initial precipitate population, 94 nm against the 120 nm the same Cx -free family returns at the fitted ratio (Table 8)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Profiling PBReff from 0.5 to 8 changes chi-squared by only 0.89, so the whole scanned range lies within the \u0394\u03c72=1 interval",
+        "evidence_span": "Profiling PBReff from 0.5 to 8 in this family moves \u03c72 by 0.89 in total, so the \u2206\u03c72 = 1 interval is the entire scanned range."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Intervals on likely Nb-sensitive parameters are wide enough that moderate stabilization effects would be invisible",
+        "evidence_span": "Both are reported here with intervals wide enough that a moderate stabilization effect would be invisible."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Using \u03b13=0.12 gives \u03b5f=1.7\u00d710^4 V/cm; plausible \u03b13 range gives 4.1\u00d710^3 to 2.1\u00d710^4 V/cm",
+        "evidence_span": "At the reference value \u03b13 = 0.12 fit by Li et al. [18] for a ferritic steel in supercritical water, \u03b5f = 1.7 \u00d7 104 V/cm; over the physically defensible range \u03b13 \u2208 [0.1, 0.5] the derived field spans 4.1\u00d7103 to 2.1\u00d7104 V/cm."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Implied potential drop across the 480 h barrier layer is 0.06\u20130.28 V",
+        "evidence_span": "The implied potential drop across the 480-h barrier layer, \u03b5f L, is correspondingly 0.06\u20130.28 V"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Recovered inner-layer thickness grows from 41 nm at 72 h to 135 nm at 480 h",
+        "evidence_span": "The inner-layer thickness trajectory recovered here (41 nm at 72 h to 135 nm at 480 h)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The self-consistent solve reproduces the analytic constant-field solution when space charge is off",
+        "evidence_span": "with the space charge switched off it reproduces the analytic constant-field solution to 1 \u00d7 10\u221215"
+      },
+      {
+        "role": "evidence_result",
+        "content": "With space charge on, the self-consistent solve does not support the constant-field closure",
+        "evidence_span": "Switched on, it does not support the closure (Fig. 10)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "At identified kinetics the space-charge parameter is 10^4\u201310^5 and Debye length is about 0.06 nm",
+        "evidence_span": "At the identified kinetics and the transport constants assumed in Section 3.4, the dimensionless space-charge parameter is of order 104 \u2013105 and the corresponding Debye length is approximately 0.06 nm"
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "The neural representation is only needed when no closed-form or cheap forward solution exists.",
+        "evidence_span": "The neural representation becomes necessary only where no closed form or cheap forward solve exists"
+      },
+      {
+        "role": "constraint",
+        "content": "The nickel zone is not modeled kinetically and is used only as a consistency check.",
+        "evidence_span": "The kinetics derived here treat that nickel zone as an inert consistency check; a dedicated transport model for it is developed in Section 3.5."
+      },
+      {
+        "role": "constraint",
+        "content": "The dense-oxide convention sets both porosity corrections to unity.",
+        "evidence_span": "Writing Eq. (8) without that factor is therefore the dense-oxide convention \u03c10bl /\u03c1bl = \u03c10ol /\u03c1ol = 1"
+      },
+      {
+        "role": "constraint",
+        "content": "Recovering field strength requires assuming the transfer coefficient \u03b13, which the thickness data cannot provide.",
+        "evidence_span": "Only the first requires an assumption the thickness data cannot supply, the transfer coefficient \u03b13"
+      },
+      {
+        "role": "constraint",
+        "content": "All parameter inference is limited by the single available experimental dataset for this alloy/environment.",
+        "evidence_span": "everything that can be asked of them is set by the one dataset that exists for this alloy in this environment"
+      },
+      {
+        "role": "constraint",
+        "content": "No synthetic data are used for kinetic identification; synthetic data are only used in a labeled recovery test.",
+        "evidence_span": "No synthetic or simulated data enters the kinetic identification; synthetic data appears only as an explicitly labeled recovery test (Section 3.6)."
+      },
+      {
+        "role": "constraint",
+        "content": "A Gaussian prior on initial barrier thickness is included because exposure-time data alone give no interior optimum for L0.",
+        "evidence_span": "It is the only prior in the objective, and it is carried because the exposure-time data give L0 no interior optimum at all: without it the estimate runs to zero (Section 3.2)."
+      },
+      {
+        "role": "constraint",
+        "content": "No prior is imposed on PBReff; it is determined solely by the likelihood.",
+        "evidence_span": "In particular no prior is placed on PBReff , which is determined by the likelihood alone throughout"
+      },
+      {
+        "role": "constraint",
+        "content": "Because one parameter is prior-set and another weakly determined, the effective number of data-determined parameters lies between three and five.",
+        "evidence_span": "Because one parameter is prior-set and a second only weakly determined, the number of data-determined parameters is between three and five"
+      },
+      {
+        "role": "constraint",
+        "content": "Goodness-of-fit must be reported over a bracket of residual degrees of freedom from 1 to 3.",
+        "evidence_span": "the residual degrees of freedom for the accepted five-parameter model are correspondingly between 1 and 3 for the six data points. Goodness-of-fit statements are therefore given for both endpoints of this bracket rather than a single nominal degree-of-freedom count."
+      },
+      {
+        "role": "constraint",
+        "content": "For the spatial extension, no differentiable-integrator shortcut exists, so soft-mode field representation is the only option.",
+        "evidence_span": "the spatial extension of Section 3.4, where no differentiable-integrator shortcut exists and the soft-mode field representation is the only option"
+      },
+      {
+        "role": "constraint",
+        "content": "Nickel routing fraction is only usable as a bound because it comes from a rejected closure",
+        "evidence_span": "That second figure inherits the caveat of Section 3.5: the routing fraction comes from a closure the shape test rejects, so it is admissible here only as a bound on the range, never as an estimate."
+      },
+      {
+        "role": "constraint",
+        "content": "Distinguishing among short-circuit mechanisms requires exposure-time resolution absent from this dataset",
+        "evidence_span": "distinguishing candidate short-circuit mechanisms requires exposure-time resolution this dataset does not have"
+      },
+      {
+        "role": "constraint",
+        "content": "Rejected constant-mobility fit means its incorporation ratio and model comparison cannot be used as evidence",
+        "evidence_span": "the constant-mobility fit is rejected by the data in shape, so neither its incorporation ratio nor its nested-model comparison against a re-precipitation-only outer-layer supply picture can be offered as evidence either way."
+      },
+      {
+        "role": "constraint",
+        "content": "No identified parameter can be attributed to niobium stabilization because the fitted reaction network contains nothing niobium-specific",
+        "evidence_span": "The reaction network fitted here contains nothing niobium-specific, and none of the five identified parameters can be attributed to Nb stabilization on the evidence presented."
+      },
+      {
+        "role": "constraint",
+        "content": "Converting the field exponent to field strength requires transfer coefficient \u03b13, which thickness data cannot provide",
+        "evidence_span": "Converting the identified field exponent through Eq. (15) requires the growth-reaction transfer coefficient \u03b13 , which single-temperature thickness data cannot supply."
+      },
+      {
+        "role": "constraint",
+        "content": "The 10-year thickness prediction lacks direct validation data for AISI 347 in BWR conditions",
+        "evidence_span": "The ten-year prediction of 535 nm has no direct validation data for AISI 347; we are not aware of published long-term harvested-component oxide thicknesses for this alloy in BWR conditions"
+      },
+      {
+        "role": "constraint",
+        "content": "This inconsistency bounds only the interpretation of \u03b5f, not the fitted apparent parameters or predictions from them",
+        "evidence_span": "This leaves the fitted apparent parameters and every prediction drawn from them untouched, since the identification is of b3 and not of \u03b5f . What it bounds is the interpretation: \u03b5f should be read as an apparent field-related grouping"
+      },
+      {
+        "role": "constraint",
+        "content": "Operating-envelope projections are based on one temperature and one dissolved-oxygen level, so they are assumption-based forward projections rather than validation",
+        "evidence_span": "the kinetics rest on a single temperature and a single dissolved-oxygen level, so the operating-envelope results of Section 3.3 are forward projections under sourced assumptions, not validation against multi-condition data"
+      },
+      {
+        "role": "constraint",
+        "content": "Temperature channel assumes a single rate-determining step and temperature-independent field strength",
+        "evidence_span": "Their temperature channel additionally assumes a single rate-determining step with a temperature-independent field strength"
+      },
+      {
+        "role": "constraint",
+        "content": "The oxygen channel is modeled as an ideal-Nernst shift and therefore gives only a lower bound on true oxygen sensitivity",
+        "evidence_span": "Their oxygen channel is an ideal-Nernst shift of the growth prefactor, and measured corrosion-potential\u2013oxygen curves in BWR-relevant chemistry are steeper than Nernstian in the parts-per-billion transition region [2], so the mapped oxygen sensitivity is a lower bound on the true response."
+      },
+      {
+        "role": "constraint",
+        "content": "Model omits irradiation and flow effects known to alter oxide structure, thickness, growth, and dissolution",
+        "evidence_span": "the exposures are unirradiated and static, while radiolysis products, H2 O2 in particular, are known to alter oxide structure and thickness on stainless steels relative to O2 at comparable corrosion potential [11], and flow affects outer-layer growth and dissolution through solubility and mass transfer [12]; neither channel is in the model."
+      },
+      {
+        "role": "constraint",
+        "content": "Initial-film parameters depend on surface finish, so identified Lol,0 is specific to Veile et al.\u2019s coupon preparation",
+        "evidence_span": "surface finish conditions the initial film and the early precipitate population, the parameters L0 and Lol,0 here, and mechanical surface treatments are documented to change oxide properties on 304L in simulated BWR and PWR water [39], so the identified Lol,0 = 116 nm is specific to Veile et al.\u2019s coupon preparation."
+      },
+      {
+        "role": "constraint",
+        "content": "EDX layer thicknesses are not total oxide mass, so composition comparison is only a shape/plateau cross-check, not a mass-balance validation",
+        "evidence_span": "EDX-derived layer thicknesses are not total oxide mass, so the composition comparison of Section 3.4 is a shape and plateau-composition cross-check rather than a mass-balance validation"
+      },
+      {
+        "role": "constraint",
+        "content": "Physical conclusions do not require the neural solver because exact and classical references already exist here",
+        "evidence_span": "Nothing in this paper\u2019s physical conclusions requires the neural solver: the kinetics have a closed form, the steady transport problem has an analytic reference, and the classical methods used to check the neural results would have produced the same numbers, faster, and in the spatial case to eleven more digits."
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "A central methodological motivation is the recurring lack of formal identifiability characterization in PDM parameter estimation: a good fit to sparse calibration data does not show that model parameters are actually constrained, especially when the model is used for extrapolative service-life prediction beyond the calibration window.",
+        "evidence_spans": [
+          "do the calibration data determine the model\u2019s parameters, or merely fail to contradict them?",
+          "The question this paper is built around is a methodological gap that recurs across four decades of PDM parameter estimation.",
+          "The distinction between \u201cthe model fits\u201d and \u201cthe data constrain the parameters\u201d becomes consequential exactly when the fitted model is meant to extrapolate beyond its calibration window",
+          "Six layer means at three exposure times against a five-parameter model is the ratio that dictates both the objective below and the identifiability machinery carried alongside it: at this sample size a good fit is not evidence that the parameters are determined, and the two questions have to be asked separately."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The paper is motivated by the absence of a mechanistic predictive model for the evolution of the passive oxide film on AISI 347 in reactor-representative hydrothermal water.",
+        "evidence_spans": [
+          "yet the evolution of its passive oxide film under reactor-representative hydrothermal water has so far had no mechanistic predictive model"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A recurring practical source of the identifiability problem is that there are too few independent exposure times: three exposure times are insufficient to determine the many rates in the uncoupled formulation, cannot separate oxide production from oxide loss, and broadly underlie the identifiability limitations encountered in the study.",
+        "evidence_spans": [
+          "Too few independent exposure times is the paper\u2019s recurring finding",
+          "Written this way the two layers are still independent, and the six rates in Eqs. (5) and (7) are far more than three exposure times can determine.",
+          "The correct statement is therefore not that the identification disagrees with stoichiometry, but that three exposure times cannot separate oxide production from oxide loss.",
+          "Every identifiability limitation encountered here (the zero-dimensional profile analysis, the residual-leverage imbalance, the spatial gate and the nickel-closure gate) traces to too few independent exposure times."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The dataset is insufficient to resolve key physical questions; for example, deciding the iron-loss prediction would require coolant mass balance data or more exposure times, and demonstrating a stabilization effect would require matched stabilized/unstabilized exposures that are not present.",
+        "evidence_spans": [
+          "A coolant mass balance, or outer-layer thicknesses at more exposure times, would decide it.",
+          "Distinguishing a genuine stabilization effect would require the comparison this dataset does not contain: matched exposures of stabilized and unstabilized grades"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The work is also motivated by unresolved model-closure limitations: the constant-field assumption should be tested by solving Poisson\u2019s equation self-consistently with defect transport, and more flexible methods may be needed for self-consistent potential/defect transport, moving-boundary inversion, and unknown mobility closures.",
+        "evidence_spans": [
+          "that closure can be tested directly by solving Poisson\u2019s equation together with the defect transport instead of imposing the field on it.",
+          "The problems that would need it are visible from this study. Two lie inside the present model: solving the potential distribution self-consistently with defect transport instead of imposing the constant-field assumption, and inverting the moving-boundary transient for kinetic parameters and defect fields together... A third is sharper: the nickel zone rejects every constant-mobility description these data can test, so the quantity actually wanted is a mobility function of unknown form"
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Current approaches for predicting oxide behavior/crack growth on light-water-reactor internals rely on operational water-chemistry threshold criteria based on electrochemical corrosion potential (ECP) and dissolved oxygen, or on data-driven machine-learning models of crack-growth rate.",
+        "evidence_spans": [
+          "Current practice for predicting oxide behavior on light-water-reactor internals relies either on operational water-chemistry criteria framed around threshold electrochemical corrosion potential (ECP) and dissolved-oxygen levels [1\u20134]",
+          "or on data-driven machine-learning models of crack-growth rate [5]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The point defect model (PDM), in the high-field oxidation tradition, is the standard mechanistic description for passive-film growth; in this paper the model is a reduced form adapted from Li et al.'s supercritical-water PDM to subcritical hydrothermal water.",
+        "evidence_spans": [
+          "the point defect model (PDM) of Chao, Lin, and Macdonald [13\u201316], in the tradition of high-field oxidation theory [17], provides the standard mechanistic description",
+          "Li et al. [18] extended this framework to supercritical water",
+          "The model identified in this paper is a reduced form of the point defect model in the formulation Li et al. [18] developed for supercritical water, adapted here to subcritical hydrothermal water."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Within the prior PDM formulation, the barrier layer is assumed to have a constant electric field and a linear outer potential drop in potential and pH; following Li et al., the full barrier-layer destruction rate is assigned as supply to the outer layer.",
+        "evidence_spans": [
+          "The PDM postulates that the electric field inside the barrier layer is constant at \u03b5f , independent of both V and Lbl , and that the outer drop is linear in potential and pH",
+          "Following Ref. [18], the whole of kd is credited to the outer layer"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior experimental work by Veile et al. provided detailed characterization of the duplex oxide scale on X6CrNiNb18-10 in simulated BWR hydrothermal water, resolving Cr-rich barrier and Fe-rich outer layers and measuring element-resolved oxide thicknesses after 72, 168, and 480 h using FIB cross-sections with EDX depth/line profiling.",
+        "evidence_spans": [
+          "Veile et al. [19] recently provided the first detailed characterization of the duplex oxide developed in simulated BWR hydrothermal water, resolving Cr-rich barrier and Fe-rich outer layers by energy-dispersive X-ray (EDX) depth profiling at three exposure times",
+          "The oxide Veile et al. [19] characterize on X6CrNiNb18-10 is a duplex scale",
+          "Veile et al. [19] exposed X6CrNiNb18-10 coupons to simulated BWR hydrothermal water (240\u25e6 C, 7 MPa, 0.4 ppm dissolved O2 ) for 72, 168, and 480 h and measured element-resolved oxide layer thicknesses by focused-ion-beam cross-sections with EDX line scans."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A common prior practice in PDM studies is to calibrate four-to-six-parameter models to very sparse data, such as impedance spectra or depth profiles with only three-to-six data points.",
+        "evidence_spans": [
+          "Whether calibrated against electrochemical impedance spectra [20\u201322] or against depth-profile data, four-to-six-parameter models are routinely fit to three-to-six data points"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Veile et al. also used a power-law description with fitted exponents for oxide growth.",
+        "evidence_spans": [
+          "Veile et al.\u2019s fitted exponents that the power-law description cannot offer"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The authors' prior work applied the neural spectral-element method (NSEM) to the PDM family on synthetic benchmarked data and identified four training-time failure modes.",
+        "evidence_spans": [
+          "The physics-informed forward and inverse solves use the neural spectral-element method (NSEM) [31]",
+          "The solver was applied to the PDM family in our prior work [32].",
+          "Our prior work demonstrated this machinery on the PDM against synthetic benchmarked data, cataloging four training-time failure modes [32]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior literature provides comparison baselines for this environment: reported corrosion-product release magnitudes for stainless steels in high-temperature water, mixed-potential estimates of about 0 to +150 mV SHE in oxygenated 288 \u00b0C BWR water at 0.2\u20130.4 ppm O2, Li et al.'s fitted value \u03b13 = 0.12 for a ferritic steel in supercritical water, and established observations for related stainless steels of similar inner-layer thicknesses, duplex morphology, inner spinel chemistry, and near-parabolic inner-layer growth.",
+        "evidence_spans": [
+          "a magnitude consistent with the corrosion-product release reported for stainless steels in high-temperature water [12]",
+          "mixed-potential estimates of the corrosion potential in oxygenated 288\u25e6 C BWR water are of order 0 to +150 mV on the standard hydrogen electrode (SHE) scale at 0.2\u20130.4 ppm O2 [1, 2]",
+          "At the reference value \u03b13 = 0.12 fit by Li et al. [18] for a ferritic steel in supercritical water",
+          "The inner-layer thickness trajectory recovered here (41 nm at 72 h to 135 nm at 480 h) is of the same order as inner-layer thicknesses reported for 304/316 stainless steels in oxygenated 288\u25e6 C water at comparable times [9, 11], and the duplex morphology, inner-layer spinel chemistry, and near-parabolic inner growth match the established picture for austenitic steels in this environment [6\u20138]."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "Prior water-chemistry criteria and machine-learning crack-growth models are limited in that they do not predict oxide thickness or composition and are silent on the underlying oxide chemistry.",
+        "evidence_spans": [
+          "which say nothing about oxide thickness or composition",
+          "which are equally silent on the underlying oxide chemistry"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Veile et al.'s analysis remained empirical, using per-element power-law fits without a shared physical parameterization connecting layers or an assessment of extrapolation range.",
+        "evidence_spans": [
+          "their analysis stops at empirical per-element power-law fits, with no shared physical parameter set connecting the layers and no assessment of how far those fits can be extrapolated"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior PDM fitting studies appear to lack formal identifiability characterization, such as profile-likelihood or bootstrap analyses.",
+        "evidence_spans": [
+          "we are not aware of a formal profile-likelihood or bootstrap identifiability characterization of a PDM fit"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "An earlier version of the analysis incorrectly treated 1.05 as the stoichiometric spinel/magnetite value.",
+        "evidence_spans": [
+          "An earlier version of this analysis placed a prior on it centered on 1.05 and described that center as the stoichiometric spinel/magnetite value. It is not."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The present dataset cannot demonstrate the iron-loss prediction because it lacks coolant-chemistry measurements and the outer-layer data are too scattered to be informative.",
+        "evidence_spans": [
+          "Nothing measured here demonstrates it: this dataset contains no coolant chemistry, and the outer layer\u2019s scan-to-scan scatter is so large that it carries only 5% of the fit statistic (Table 4)."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [],
+    "inspiration_source": [
+      {
+        "content": "The work is inspired by established methods and observations from adjacent areas: it borrows identifiability tools mature in neighboring fields\u2014especially systems biology and battery modeling\u2014and is further motivated by recognized loss-balancing pathologies in physics-informed training, including a contemporaneous related diagnosis in another domain.",
+        "evidence_spans": [
+          "We close this gap with tools mature in adjacent fields [24\u201326], standard in systems biology [27] and increasingly applied to battery models [28]",
+          "Loss-balancing pathologies of this general kind are a recognized theme in physics-informed training [33, 34], and a contemporaneous study reports a closely related diagnosis in an unrelated domain [35]"
+        ],
+        "conflicting": false
+      }
+    ],
+    "causal_claim": [
+      {
+        "content": "Sparse data mean the observations constrain not the ten-year thickness itself but the separation between mechanistic and empirical ten-year extrapolations; this divergence is caused by the coupling that ties the two layers to one growth law, not by fit quality, yielding a factor-of-3.5-to-6.3 difference in 10-year predictions.",
+        "evidence_spans": [
+          "The consequence is that the quantity these data determine is not the ten-year thickness but the separation between the mechanistic and empirical extrapolations (a factor of 3.5 to 6.3 at ten years)",
+          "This is the step that ties the two layers to one growth law, and it is what makes the mechanistic and empirical descriptions extrapolate differently in Section 3.3.",
+          "it is the coupling behind it, not \u03c72 , that separates the two descriptions\u2019 ten-year predictions by a factor of 3.5 to 6.3"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Reanalyzing the same three exposures cannot reduce extrapolation uncertainty, whereas a purpose-designed exposure of roughly 3000 h could sharpen it.",
+        "evidence_spans": [
+          "and that no reanalysis of three exposures can sharpen it, while one designed exposure of roughly 3000 hours would."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using the identified kinetics in a spatially extended model predicts the measured composition profile without introducing additional free parameters.",
+        "evidence_spans": [
+          "Extended spatially with no additional free parameters, the identified kinetics predict the measured composition profile"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Solving Poisson\u2019s equation together with defect transport shows that the constant-field closure is not self-consistent at the defect concentrations implied by the model; maintaining field uniformity within 10% would require defect diffusivities about six orders of magnitude larger than assumed or defect concentrations below roughly 10^14 cm^-3.",
+        "evidence_spans": [
+          "solving Poisson\u2019s equation together with the defect transport, rather than imposing the field, shows that the constant-field closure on which the PDM\u2019s field strength rests is not self-consistent at the defect concentrations the model implies",
+          "holding the field within 10% of uniform would require defect diffusivities near 10\u22129 \u201310\u221210 cm2 /s, some six orders of magnitude above the assumed values, or equivalently defect concentrations below about 1014 cm\u22123"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "As the film thickens, the potential driving metal/barrier-layer reactions decreases linearly, so reactions at the metal/barrier interface inherit thickness dependence whereas reactions at the barrier/outer-layer and outer surface do not; consequently, negative b3 makes growth slow exponentially with thickness, producing direct-logarithmic kinetics and, when destruction is nonzero, a finite steady state.",
+        "evidence_spans": [
+          "The term that carries the kinetics is \u2212\u03b5f Lbl : the potential available to drive the metal/barrier-layer reactions falls linearly as the film thickens.",
+          "Reactions at bl/ol and at the outer surface see \u03d5bl/e , which by Eq. (1) carries no Lbl dependence, so bi = 0 for all of them. The m/bl reactions see \u03d5m/bl and therefore inherit Eq. (2)",
+          "The negative sign is the kinetic content of the model: growth decelerates exponentially in the film\u2019s own thickness, which is what produces direct-logarithmic kinetics and, whenever a destruction term is nonzero, a finite steady-state thickness."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The thickness equations depend only on the four boundary-moving reaction rates; imposing the constant-volume condition eliminates cation fluxes and makes outer-layer growth an exact affine function of barrier-layer growth.",
+        "evidence_spans": [
+          "The thickness equations therefore contain only these four rates.",
+          "Substituting Eq. (8) into Eq. (7), the two destruction terms combine exactly... leaving the cation fluxes eliminated and the outer-layer growth rate an exact affine function of the barrier-layer growth rate"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "When Cbl approaches zero, the barrier-layer solution reduces to the direct-logarithmic law; when Cbl is positive, the thickness approaches a finite saturation value.",
+        "evidence_spans": [
+          "which for Cbl \u2192 0 reduces to the direct-logarithmic law... and for Cbl > 0 saturates at a finite Lbl,ss"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the hard inverse configuration, differentiable Runge\u2013Kutta integration generates trajectories that satisfy the reduced ODEs exactly by construction.",
+        "evidence_spans": [
+          "a \u201chard\u201d zero-dimensional inverse, in which the kinetic parameters are the only learnable quantities and the trajectories are generated by differentiable Runge\u2013Kutta integration, so Eqs. (10)\u2013(11) are satisfied exactly by construction"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "M1 and M2 reach PBReff = 2.43 because, without an initial precipitate population, they lie at different points along the same flat direction.",
+        "evidence_spans": [
+          "the M1 and M2 variants, which lack the initial precipitate population, reach PBReff = 2.43; they are simply at a different point on the same flat direction."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The methodological result is that four independent analyses converge on the same underlying cause.",
+        "evidence_spans": [
+          "The convergence of four unrelated analyses on one cause is the methodological result"
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "Composition data are structurally unable to constrain defect diffusivity, regardless of how many such data are collected; this non-identifiability/pathology is exposed when the recovered parameters are re-solved with an exact forward solver.",
+        "evidence_spans": [
+          "a structural argument shows why composition data cannot constrain the defect diffusivity however many of them are taken",
+          "exposed only by re-solving the recovered parameters through an exact forward solve"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Differentiability, rather than the neural representation itself, is the key enabler of affordable statistical analyses and dense evaluation because exact parameter gradients through a vectorized solver make profile likelihoods, large bootstraps, prior-relaxation scans, and operating-envelope grids tractable.",
+        "evidence_spans": [
+          "the property doing the statistical work is differentiability rather than the neural representation: exact parameter gradients through a vectorized solver are what make profile likelihood, a thousand-member bootstrap, prior-relaxation scans and a dense operating-envelope grid affordable"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using fixed Legendre\u2013Gauss\u2013Lobatto nodes with spectral differentiation makes the loss deterministic, allowing L-BFGS to reduce residuals below the floor reached by random-collocation training.",
+        "evidence_spans": [
+          "each field is evaluated only at fixed Legendre\u2013Gauss\u2013Lobatto quadrature nodes and derivatives are taken with precomputed spectral differentiation matrices, giving a deterministic loss that L-BFGS can drive to residuals well below the accuracy floor of random-collocation training"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Thickness dependence of interfacial rate constants arises from activated-complex theory with partial charge transfer and the interfacial potential drops experienced by the complexes.",
+        "evidence_spans": [
+          "Activated-complex theory with partial charge transfer gives every interfacial rate constant the form"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Marker experiments place the barrier-layer/outer-layer interface at the original metal surface, implying the oxide grows into the metal; this motivates the constant-volume condition.",
+        "evidence_spans": [
+          "Marker experiments place the bl/ol interface at the original metal surface, so the oxide grows into the metal rather than outward from it"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "At open circuit, with constant voltage and pH, thickness-time data cannot separate elementary interfacial rate constants from constant multiplicative physical factors (including voltage/pH terms, molar volumes, and porosity corrections), so only lumped apparent parameter groups are identifiable.",
+        "evidence_spans": [
+          "At open circuit V and pH are constant over an exposure... the factor e a3 V +c3 pH in Eq. (6) is a constant multiplier that thickness-versus-time data cannot separate from k30 . The same is true of the molar volumes and porosity corrections. What the data can determine is therefore not the elementary rate constants but the lumped groups"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A near-parabolic chromium growth exponent indicates barrier-layer growth under near-zero dissolution in ultrapure water.",
+        "evidence_spans": [
+          "The near-parabolic chromium exponent (n \u2248 0.50) is the signature of a barrier layer growing under near-zero dissolution in ultrapure water"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The sub-parabolic iron exponent reflects deposition constrained by constant-volume coupling to barrier-layer growth from an initial precipitate population, rather than independent iron-layer kinetics.",
+        "evidence_spans": [
+          "the sub-parabolic iron exponent (n \u2248 0.22) reflects deposition constrained by constant-volume coupling to the barrier layer from a substantial initial precipitate population, rather than independent iron-layer kinetics"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The constant-volume closure giving 1.05 is invalid because it requires the barrier layer to contain more chromium than the alloy can supply.",
+        "evidence_spans": [
+          "The constant-volume closure that yields 1.05 requires the barrier layer to draw approximately 30 at% chromium from an alloy containing 18.8 at%, which the alloy cannot supply."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The value 2.05 is not a true bound, because it depends on the chosen phase assignment and is only one phase-dependent value.",
+        "evidence_spans": [
+          "The first is that 2.05 is not a bound but one value of a phase-dependent quantity."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Mass-balance-derived oxide production and fitted PBReff differ because the former measures barrier-growth production of outer-layer oxide, whereas the accepted model with Cx fixed to zero makes PBReff measure net accumulation after any oxide loss to coolant.",
+        "evidence_spans": [
+          "A mass balance fixes the rate at which barrier growth produces outer-layer oxide. The accepted model pins Cx = 0, so its PBReff measures net accumulation instead, and the two differ by whatever oxide leaves for the coolant."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The lack of preference for PBReff is structural rather than statistical: when Lbl(t) is fixed, the outer-layer model is saturated, with three parameters for exactly three outer-layer observations, so no parameter combination is preferred.",
+        "evidence_spans": [
+          "The reason is structural rather than statistical: with Lbl (t) fixed, the outer-layer solution Lol (t) = Lol,0 + PBReff (Lbl \u2212 L0 ) + Cx t, with Cx \u2264 0 as in Eq. (11), carries three parameters against exactly three outer-layer observations, so it is saturated and no combination is preferred."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Nickel transport at the receding interface must be faster than lattice diffusion, implying a short-circuit or defect-flux-mediated transport mechanism.",
+        "evidence_spans": [
+          "places whatever transports nickel at the receding metal/barrier-layer interface well above lattice diffusion: it must be short-circuit or defect-flux mediated."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A transport mechanism whose mobility decays as interface structure coarsens naturally explains the observed flat zone widths that defeat the constant-mobility model.",
+        "evidence_spans": [
+          "That is also the class of mechanism whose mobility would decay as the interface structure coarsens, which is the natural explanation for the flat measured zone widths that defeat the constant-mobility model"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Comparison with mixed-potential estimates favors the lower end of the derived field range, so the electric field \u03b5f should be treated only as an order-of-magnitude estimate.",
+        "evidence_spans": [
+          "which favors the lower end of the derived range and is one more reason to treat \u03b5f here as an order-of-magnitude quantity."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A two-species charged-defect model cannot maintain a constant field at the implied defect concentrations; electronic charge compensation is required.",
+        "evidence_spans": [
+          "The implication is not that the field distribution is merely non-uniform but that a two-species charged-defect description cannot produce a constant field at the concentrations the model itself implies: charge compensation by electronic carriers, which the PDM does not carry, is required."
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "The paper adapts the supercritical-water point defect model to the subcritical hydrothermal-water regime and identifies an apparent-parameter reduced kinetic system from the Veile dataset using a differentiable, physics-informed inversion framework.",
+        "evidence_spans": [
+          "This paper adapts the supercritical-water PDM formulation [18] to the subcritical hydrothermal-water regime and identifies its kinetics from the Veile et al. dataset with a differentiable, physics-informed inversion framework.",
+          "giving the apparent-parameter system fitted in this paper"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Only the non-conservative reactions that displace interfaces should determine barrier-layer thickness evolution; among the network reactions, only four move a boundary, so only those rates should appear in the thickness equations.",
+        "evidence_spans": [
+          "Of the fourteen reactions in the network (eleven numbered, three of them with primed variants), only four displace a boundary.",
+          "Only the non-conservative reactions of Step 1 move the barrier layer\u2019s boundaries, so its thickness obeys"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "If the barrier layer is FeCr2O4 and stoichiometry holds, the outer layer should lose about 9 \u00b5g/dm\u00b2/h of iron.",
+        "evidence_spans": [
+          "If the barrier is FeCr2 O4 and stoichiometry holds, the outer layer must lose about 9 \u00b5g of iron per square decimeter per hour"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The paper claims only that this is the first mechanistic identification for this alloy/environment, not that the mechanism is unique to the stabilized grade.",
+        "evidence_spans": [
+          "The claim we make is therefore that this is the first mechanistic identification for this alloy in this environment, not that the mechanism identified is peculiar to the stabilized grade."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The 10-year prediction should be treated as a testable statement rather than a validated result.",
+        "evidence_spans": [
+          "the prediction should be read as a testable statement, not a validated one."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The framework's bounded claim is that it is trustworthy on real sparse data once the self-consistency check is applied, not that the check was necessary in this case.",
+        "evidence_spans": [
+          "it bounds the claim to this: the framework is trustworthy on real sparse data once the self-consistency check of Section 3.6 is applied, not that it was needed here."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A designed exposure near 3000 h would distinguish the mechanistic prediction from the power-law extrapolation at 2\u03c3 and simultaneously sharpen weakly constrained parameters.",
+        "evidence_spans": [
+          "a designed exposure near 3000 h would separate the mechanistic prediction from the power-law extrapolation at 2\u03c3 against the full error budget, and would sharpen every weakly constrained parameter at the same time."
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "Only some model parameters are identifiable from the three exposure times; of the five parameters, three are constrained by the data (with one of those not robust under resampling), while one is effectively set by its prior and another remains uncertain by about an order of magnitude.",
+        "evidence_spans": [
+          "Of the five parameters the model needs, three exposure times determine three, though the third is sharp in profile and not under resampling; one is set by its prior and one only to within an order of magnitude."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The fit statistic is dominated by the chromium data\u2014especially a single point\u2014and the residuals show systematic curvature in the same direction that controls extrapolation.",
+        "evidence_spans": [
+          "Ninety-five percent of the fit statistic rests on the three chromium points and eighty percent on one of them, and the residual pattern is systematic in precisely the curvature that governs extrapolation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Alternative formulations involving spatial extension, the two candidate mobility models, and nickel-zone closure all fail identifiability or shape tests.",
+        "evidence_spans": [
+          "The spatial extension and the two candidate mobility models each fail an identifiability test for the same reason, and the nickel-zone closure fails on shape for it too."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The neural inversion / hard-mode physics-informed inversion and a classical least-squares optimization converge to the same optimum, agreeing to within 0.6% on every recovered parameter and with identical \u03c72.",
+        "evidence_spans": [
+          "a classical least-squares solver is an independent reference, and the two agree to within 0.6% on every parameter and to identical \u03c72",
+          "The two are independent routes to the same optimum rather than a primary and a check, and Section 3.6 reports how closely they agree; the deterministic parameter values and curves given throughout (Figs. 3\u20136) are the converged optimum common to both."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In sparse-data training on real data, joint field-and-parameter optimization can converge to equilibria that fit the data while only approximately satisfying the governing equations.",
+        "evidence_spans": [
+          "joint field-and-parameter training can settle into an equilibrium that satisfies the data loss while leaving the governing equation only approximately satisfied"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The closed-form solutions match numerical integration extremely closely, agreeing with Radau integration to better than 6\u00d710\u221211 nm.",
+        "evidence_spans": [
+          "The closed-form solutions (13)\u2013(14) agree with Radau numerical integration of Eqs. (10)\u2013(11) to better than 6 \u00d7 10\u221211 nm"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The affine outer-layer solution agrees extremely closely with the prior closed form of Li et al., to better than 1\u00d710\u221210 nm.",
+        "evidence_spans": [
+          "the affine outer-layer form (14) agrees with the algebraically heavier closed form of Ref. [18] to better than 1 \u00d7 10\u221210 nm"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Digitized chromium data reproduce Veile et al.'s published empirical fit coefficients to four significant figures.",
+        "evidence_spans": [
+          "a scan-level linear-space least-squares refit of L = k tn to our digitized chromium data reproduces their published coefficients to four significant figures (k = 6.522 versus their 6.521, n = 0.4964 versus 0.4964)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Both tested neural backbones (MLP and KAN) satisfied the acceptance criterion of relative L\u221e error \u2264 0.5% against the closed form.",
+        "evidence_spans": [
+          "Two neural backbones, a multilayer perceptron (MLP) and a Kolmogorov\u2013Arnold network (KAN) [36], are evaluated in the same harness to test backbone sensitivity, both to the same acceptance criterion (relative L\u221e error \u2264 0.5% against the closed form)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "An automated 25-test suite verifies parity among the closed-form, Newton, and neural solutions.",
+        "evidence_spans": [
+          "All results are backed by an automated test suite (25 tests) checking parity between closed-form, Newton, and neural solutions"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Mass balance gives PBReff = 2.05 or 2.16 depending on the nickel-routing assumption, whereas likelihood identification places the parameter near 1.10; however, the broader stoichiometrically admissible PBReff range is 0.52 to 3.79, which includes 1.10.",
+        "evidence_spans": [
+          "A chromium mass balance on X6CrNiNb18-10 with an FeCr2 O4 barrier gives PBReff = 2.05 if every iron atom not retained in the nickel-enriched zone reports to the outer layer, and 2.16 if the nickel routing fraction of Section 3.5 is used in place of complete rejection.",
+          "The likelihood puts the parameter at 1.10, a factor of 1.9 below that figure.",
+          "Taken over both routing assumptions the stoichiometrically admissible range is [0.52, 3.79], and the identified 1.10 lies inside it."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Imposing the stoichiometric FeCr2O4 value PBReff = 2.05 barely changes fit quality (\u03c72 changes from 5.79 to 5.67), but this requires an outer-layer loss term and a smaller initial precipitate population; moreover, profiling PBReff from 0.5 to 8 changes \u03c72 by only 0.89, so the full scanned range lies within the \u0394\u03c72 = 1 interval.",
+        "evidence_spans": [
+          "imposing the FeCr2 O4 value of 2.05 changes \u03c72 from 5.79 to 5.67, a decrease of 0.12 (Table 8), paid for by an outer-layer loss rate of 0.24 nm/h and a smaller initial precipitate population, 94 nm against the 120 nm the same Cx -free family returns at the fitted ratio (Table 8).",
+          "Profiling PBReff from 0.5 to 8 in this family moves \u03c72 by 0.89 in total, so the \u2206\u03c72 = 1 interval is the entire scanned range."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Intervals on the likely Nb-sensitive parameters are broad enough that moderate stabilization effects would not be detectable.",
+        "evidence_spans": [
+          "Both are reported here with intervals wide enough that a moderate stabilization effect would be invisible."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using \u03b13 = 0.12 gives \u03b5f = 1.7\u00d710^4 V/cm; over the plausible range \u03b13 \u2208 [0.1, 0.5], \u03b5f spans 4.1\u00d710^3 to 2.1\u00d710^4 V/cm, implying a 480 h barrier-layer potential drop of 0.06\u20130.28 V.",
+        "evidence_spans": [
+          "At the reference value \u03b13 = 0.12 fit by Li et al. [18] for a ferritic steel in supercritical water, \u03b5f = 1.7 \u00d7 104 V/cm; over the physically defensible range \u03b13 \u2208 [0.1, 0.5] the derived field spans 4.1\u00d7103 to 2.1\u00d7104 V/cm.",
+          "The implied potential drop across the 480-h barrier layer, \u03b5f L, is correspondingly 0.06\u20130.28 V"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The recovered inner-layer thickness increases from 41 nm at 72 h to 135 nm at 480 h.",
+        "evidence_spans": [
+          "The inner-layer thickness trajectory recovered here (41 nm at 72 h to 135 nm at 480 h)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The self-consistent solver reproduces the analytic constant-field solution when space charge is turned off (to 1\u00d710\u221215), but with space charge included it does not support the constant-field closure.",
+        "evidence_spans": [
+          "with the space charge switched off it reproduces the analytic constant-field solution to 1 \u00d7 10\u221215",
+          "Switched on, it does not support the closure (Fig. 10)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "At the identified kinetics, the dimensionless space-charge parameter is of order 10^4\u201310^5 and the corresponding Debye length is about 0.06 nm.",
+        "evidence_spans": [
+          "At the identified kinetics and the transport constants assumed in Section 3.4, the dimensionless space-charge parameter is of order 104 \u2013105 and the corresponding Debye length is approximately 0.06 nm"
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "Neural/soft-mode representations are only justified where no closed-form, cheap forward solve, or differentiable-integrator shortcut exists; in this paper the physical conclusions do not require the neural solver because exact, analytic, or classical references already exist for the solved cases, while the spatial extension is the case where soft-mode field representation is the only available option.",
+        "evidence_spans": [
+          "The neural representation becomes necessary only where no closed form or cheap forward solve exists",
+          "the spatial extension of Section 3.4, where no differentiable-integrator shortcut exists and the soft-mode field representation is the only option",
+          "Nothing in this paper\u2019s physical conclusions requires the neural solver: the kinetics have a closed form, the steady transport problem has an analytic reference, and the classical methods used to check the neural results would have produced the same numbers, faster, and in the spatial case to eleven more digits."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The nickel zone is not kinetically identified here and serves only as a consistency check; nickel-routing quantities are further constrained because they come from a rejected closure, so the routing fraction is admissible only as a bound, not as an estimate.",
+        "evidence_spans": [
+          "The kinetics derived here treat that nickel zone as an inert consistency check; a dedicated transport model for it is developed in Section 3.5.",
+          "That second figure inherits the caveat of Section 3.5: the routing fraction comes from a closure the shape test rejects, so it is admissible here only as a bound on the range, never as an estimate."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using Eq. (8) without the porosity factor corresponds to the dense-oxide convention, i.e. both porosity corrections are set to unity.",
+        "evidence_spans": [
+          "Writing Eq. (8) without that factor is therefore the dense-oxide convention \u03c10bl /\u03c1bl = \u03c10ol /\u03c1ol = 1"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Recovering or converting field strength from the identified field exponent requires assuming the growth-reaction transfer coefficient \u03b13, which single-temperature thickness data cannot supply; therefore only the apparent grouped parameter is identified, and the limitation affects interpretation of \u03b5f rather than the fitted apparent parameters or predictions made from them.",
+        "evidence_spans": [
+          "Only the first requires an assumption the thickness data cannot supply, the transfer coefficient \u03b13",
+          "Converting the identified field exponent through Eq. (15) requires the growth-reaction transfer coefficient \u03b13 , which single-temperature thickness data cannot supply.",
+          "This leaves the fitted apparent parameters and every prediction drawn from them untouched, since the identification is of b3 and not of \u03b5f . What it bounds is the interpretation: \u03b5f should be read as an apparent field-related grouping"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Parameter inference is constrained by the fact that only one experimental dataset exists for this alloy/environment.",
+        "evidence_spans": [
+          "everything that can be asked of them is set by the one dataset that exists for this alloy in this environment"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "No synthetic or simulated data are used for kinetic identification; synthetic data appear only in an explicitly labeled recovery test.",
+        "evidence_spans": [
+          "No synthetic or simulated data enters the kinetic identification; synthetic data appears only as an explicitly labeled recovery test (Section 3.6)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A Gaussian prior is imposed on the initial barrier thickness L0 because the exposure-time data alone provide no interior optimum for L0 and would drive its estimate to zero; by contrast, no prior is imposed on PBReff, which is identified from the likelihood alone.",
+        "evidence_spans": [
+          "It is the only prior in the objective, and it is carried because the exposure-time data give L0 no interior optimum at all: without it the estimate runs to zero (Section 3.2).",
+          "In particular no prior is placed on PBReff , which is determined by the likelihood alone throughout"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because one parameter is effectively prior-set and another is only weakly determined, the effective number of data-determined parameters is between three and five; correspondingly, for six data points the residual degrees of freedom are bracketed between 1 and 3, so goodness-of-fit must be reported over that bracket rather than at a single nominal value.",
+        "evidence_spans": [
+          "Because one parameter is prior-set and a second only weakly determined, the number of data-determined parameters is between three and five",
+          "the residual degrees of freedom for the accepted five-parameter model are correspondingly between 1 and 3 for the six data points. Goodness-of-fit statements are therefore given for both endpoints of this bracket rather than a single nominal degree-of-freedom count."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The dataset lacks the exposure-time resolution needed to distinguish among candidate short-circuit mechanisms.",
+        "evidence_spans": [
+          "distinguishing candidate short-circuit mechanisms requires exposure-time resolution this dataset does not have"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because the constant-mobility fit is rejected on shape, neither its incorporation ratio nor its nested-model comparison against a re-precipitation-only outer-layer supply model can be used as evidence.",
+        "evidence_spans": [
+          "the constant-mobility fit is rejected by the data in shape, so neither its incorporation ratio nor its nested-model comparison against a re-precipitation-only outer-layer supply picture can be offered as evidence either way."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "No identified parameter can be attributed to niobium stabilization, because the fitted reaction network contains nothing niobium-specific.",
+        "evidence_spans": [
+          "The reaction network fitted here contains nothing niobium-specific, and none of the five identified parameters can be attributed to Nb stabilization on the evidence presented."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The ten-year thickness prediction for AISI 347 in BWR conditions lacks direct validation data.",
+        "evidence_spans": [
+          "The ten-year prediction of 535 nm has no direct validation data for AISI 347; we are not aware of published long-term harvested-component oxide thicknesses for this alloy in BWR conditions"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Operating-envelope projections are assumption-based forward projections rather than validation, because the kinetics are identified at only one temperature and one dissolved-oxygen level. The temperature channel assumes a single rate-determining step and temperature-independent field strength, while the oxygen channel is modeled as an ideal-Nernst shift and therefore provides only a lower bound on the true oxygen sensitivity.",
+        "evidence_spans": [
+          "the kinetics rest on a single temperature and a single dissolved-oxygen level, so the operating-envelope results of Section 3.3 are forward projections under sourced assumptions, not validation against multi-condition data",
+          "Their temperature channel additionally assumes a single rate-determining step with a temperature-independent field strength",
+          "Their oxygen channel is an ideal-Nernst shift of the growth prefactor, and measured corrosion-potential\u2013oxygen curves in BWR-relevant chemistry are steeper than Nernstian in the parts-per-billion transition region [2], so the mapped oxygen sensitivity is a lower bound on the true response."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The model omits irradiation and flow effects, even though these are known to alter oxide structure, thickness, growth, and dissolution.",
+        "evidence_spans": [
+          "the exposures are unirradiated and static, while radiolysis products, H2 O2 in particular, are known to alter oxide structure and thickness on stainless steels relative to O2 at comparable corrosion potential [11], and flow affects outer-layer growth and dissolution through solubility and mass transfer [12]; neither channel is in the model."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Initial-film parameters depend on surface finish, so the identified initial outer-layer thickness Lol,0 is specific to Veile et al.\u2019s coupon preparation.",
+        "evidence_spans": [
+          "surface finish conditions the initial film and the early precipitate population, the parameters L0 and Lol,0 here, and mechanical surface treatments are documented to change oxide properties on 304L in simulated BWR and PWR water [39], so the identified Lol,0 = 116 nm is specific to Veile et al.\u2019s coupon preparation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "EDX-derived layer thicknesses are not measures of total oxide mass, so the composition comparison can only serve as a shape/plateau cross-check, not as a mass-balance validation.",
+        "evidence_spans": [
+          "EDX-derived layer thicknesses are not total oxide mass, so the composition comparison of Section 3.4 is a shape and plateau-composition cross-check rather than a mass-balance validation"
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

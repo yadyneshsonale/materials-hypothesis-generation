@@ -1,0 +1,918 @@
+{
+  "paper_id": "2608.10059",
+  "chunks_processed": 3,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Identifying a minimal local-orbital set that still captures dispersion, symmetry, and quantum geometry is difficult.",
+        "evidence_span": "Identifying a minimal set of local orbitals that fulfills these criteria, however, is a nontrivial task."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The key problem is finding the appropriate real-space orbitals for chosen target bands.",
+        "evidence_span": "The central problem is therefore to determine the appropriate real-space orbitals corresponding to a set of target bands."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Periodic natural orbitals in the noninteracting limit have not been explored.",
+        "evidence_span": "Although natural orbitals have been known for decades [27], their periodic counterpart in the non-interacting limit, CNOs, have remained unexplored."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Wannier obstruction in topological bands has motivated multiple recent approaches.",
+        "evidence_span": "The goal of constructing real-space models for topological bands has motivated several recent approaches to overcoming the associated Wannier obstruction."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Accurate real-space models are needed for many-body methods applied to twisted TMDs.",
+        "evidence_span": "Methods such as Dynamical Mean Field Theory (DMFT) [86, 87] and functional Renormalization Group (fRG) [88\u201392], for example, rely on accurate real-space models in order to treat the many-body problem."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Existing methods use trial orbitals and optimize overlap with target bands.",
+        "evidence_span": "Most existing approaches use a set of trial orbitals and then optimize their overlap with the target bands [18]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Maximally localized Wannier functions provide localized orbitals.",
+        "evidence_span": "Maximally localized Wannier functions yield localized orbitals [19]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Disentanglement methods extend Wannier construction to entangled bands.",
+        "evidence_span": "while disentanglement methods extend this construction to entangled band manifolds [20]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Automated SCDM-like methods avoid requiring physically motivated initial projections.",
+        "evidence_span": "Automated approaches such as SCDM remove the need for physically motivated initial projections [21\u201323]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Topological quantum chemistry classifies bands using elementary band representations from localized orbitals at Wyckoff positions.",
+        "evidence_span": "A complementary route is offered by topological quantum chemistry [24, 25], which classifies bands according to elementary band representations (EBRs) induced from localized orbitals at specific Wyckoff positions."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior approaches overcome Wannier obstruction by relaxing symmetries, enlarging Hilbert space with auxiliary orbitals, or using compact molecular orbitals.",
+        "evidence_span": "These include relaxing symmetry requirements, like translational symetry [28\u201330] or valley conservation [31, 32], enlarging the Hilbert space by introducing auxiliary orbitals outside the target manifold [33\u201335], as explored in heavy-fermion-like models [36, 37], and compact molecular orbitals [38\u201342]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The resulting Wannier model is similar to previous models of twisted WSe2.",
+        "evidence_span": "The Wannier model produced here is similar to ones in previous works [15, 94]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Conventionally, local orbitals are inferred from local quantum chemistry or EBRs based on symmetry eigenvalues at high-symmetry points.",
+        "evidence_span": "Conventionally, such orbitals are inferred from the local quantum chemistry of the material or from EBRs based on symmetry eigenvalues of the wavefunction at the high symmetry points."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Quantum embedding methods like dynamical mean-field theory and density-matrix embedding require choosing a correlated subspace for projection.",
+        "evidence_span": "Methods such as dynamical\nmean-field theory [87] and density-matrix embedding [95]\nrequire a correlated subspace onto which the many-body\nproblem is projected [96]."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "These methods still require choosing the number of Wannier orbitals and thus do not optimize the minimal local Hilbert space.",
+        "evidence_span": "However, these methods still require specifying the number of Wannier orbitals, and therefore do not optimize the minimal local Hilbert space required by the bands itself."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Topological quantum chemistry does not identify which local orbitals best overlap the target-band wavefunctions.",
+        "evidence_span": "While it identifies symmetry-compatible atomic limits [26], it does not identify which local orbitals have the most overlap with the wavefunctions over the target bands."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than prior obstruction-handling routes, the work uses CNOs as Wannierization trial states.",
+        "evidence_span": "In this work, we address this challenge by using CNOs as trials for Wannierization"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The authors position their model-building against approaches guided mainly by dispersion fitting, arguing wavefunction reproduction is the stronger criterion.",
+        "evidence_span": "Reproduc- ing the dispersion is a weaker test than reproducing the wavefunctions, so we also compare the quantum geome- try of the truncated model against the continuum result."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than inferring orbitals from chemistry or EBR symmetry data, the authors reverse the procedure and rank orbitals by spectral weight using CNOs.",
+        "evidence_span": "The CNO construction reverses this procedure and gives orbitals ranked by their spectral weight."
+      }
+    ],
+    "inspiration_source": [],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Correlation phenomena depend on Bloch-wavefunction momentum dependence, not just band energies.",
+        "evidence_span": "Recent advances in moir\u00b4e materials [4, 5] and growing interest in flat-band physics [6] have emphasized that correlation phenomena depend not only on the band energies but also on the momentum dependence of the Bloch wavefunctions themselves."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Strong momentum variation in orbital composition makes quantum geometry physically important.",
+        "evidence_span": "Although quantum geometry is ubiquitous in materials, it becomes physically important when the orbital composition of the low-energy states varies strongly across momentum space [12]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Quantum geometry centrally determines effective interactions and low-energy physics in such systems.",
+        "evidence_span": "In such systems, quantum geometry plays a central role in determining the effective interactions [13, 14] and low- energy physics [15\u201317]"
+      },
+      {
+        "role": "causal_claim",
+        "content": "A dominant single CNO occupation means one orbital suffices, while fractional occupations indicate multiple orbitals are needed.",
+        "evidence_span": "Dominant occupation of a single CNO indicates that the set of bands is well described by a single orbital, while a fractional occupation spectrum reveals the necessity of multiple orbitals."
+      },
+      {
+        "role": "causal_claim",
+        "content": "These topology-enforced zeros prevent any single compact orbital from spanning the Chern-band manifold.",
+        "evidence_span": "These irremovable zeros prevent any single compact orbital from spanning the band manifold and provide a real-space manifestation of topological obstruction."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Incompatible Wyckoff positions can also generate zeros in obstructed atomic insulators.",
+        "evidence_span": "Other than topology, zeros can arise from incompatible Wyckoff positions in obstructed atomic insulators."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Symmetry-preserving unit-cell partitions make CNOs inherit symmetry properties and identify candidate EBRs.",
+        "evidence_span": "CNOs inherit symmetry properties from symmetry-preserving unit-cell partitions and therefore identify candidate EBRs."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Including the embedding matrix is crucial; omitting it produces eigenstates that are not exponentially localized.",
+        "evidence_span": "Including Vk in Eq. (6) is crucial; excluding it would lead to eigenstates that are not exponentially localized."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Deviation from the ideal UC-1pRDM spectrum indicates multiple compact orbitals are needed for low-energy wavefunctions.",
+        "evidence_span": "Deviations from this limit indicate that multiple unit-cell compact orbitals are required to represent the low-energy wavefunctions."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Modes with occupation 0 or 1 are pure and do not contribute to entropy, while occupation 1/2 maximizes single-mode entropy.",
+        "evidence_span": "Modes with \u03bba = 0 or 1 are pure and do not contribute to the entropy, while \u03bba = 1/2 gives the maximal single- mode contribution ln 2."
+      },
+      {
+        "role": "causal_claim",
+        "content": "If one compact orbital spans the target manifold, unit-cell entanglement entropy vanishes.",
+        "evidence_span": "If a single compact orbital spans the target manifold, \u03bb1 = 1 and \u03bba>1 = 0, implying Scell = 0."
+      },
+      {
+        "role": "causal_claim",
+        "content": "For Chern bands, entanglement cannot be removed for any partition.",
+        "evidence_span": "For Chern bands this entanglement cannot be removed, implying Scell > 0 for every choice of partition"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Moving the partition only redistributes fixed total occupation among CNOs, and entropy decreases when weight concentrates into fewer modes.",
+        "evidence_span": "Since Eq. (9) fixes the total occupation independently of where the cell boundary is drawn, moving the partition center can only redistribute that weight among the CNOs, and the entropy falls as the weight concentrates into fewer modes."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Minimizing unit-cell entropy over partitions selects centers where the fewest compact orbitals overlap the target bands.",
+        "evidence_span": "Minimizing Scell over partitions is therefore equivalent to selecting the center(s) at which the smallest number of compact orbitals overlaps with target bands."
+      },
+      {
+        "role": "causal_claim",
+        "content": "If target and CNO Bloch states carry different little-group irreps, their overlap must vanish.",
+        "evidence_span": "If they transform according to different irreps of Gk, Schur\u2019s lemma implies that \u27e8\u03c8kn|\u03c4k,aq\u27e9= 0."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Therefore any candidate EBR decomposition must match the target-band little-group irreps before it can span the subspace.",
+        "evidence_span": "Consequently, any candidate EBR decomposition must first reproduce the little-group irreps of the target bands before it can possibly span the desired subspace."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Constructive interference of sp2-like orbitals changes C3z character at \u0393 and K/K\u2032, causing the obstruction.",
+        "evidence_span": "This constructive interference leads to a different character under C3z at the \u0393 and K/K\u2032 points, and therefore to the obstruction"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The obstruction forces zeros in all CNO envelope functions at two of \u0393, K, and K\u2032 for the 1a-centered partition.",
+        "evidence_span": "The obstruction forces zeros in the envelope function sa,k = \u27e8uk,val|\u03c4a\u27e9/\u221a\u03bba for all the CNOs at two of the \u0393, K and K\u2032 points"
+      },
+      {
+        "role": "causal_claim",
+        "content": "A zero determinant of the overlap matrix at any momentum means the chosen EBR set does not span the target bands.",
+        "evidence_span": "A zero in det Sk at any momentum in the Brillouin zone indicates that the EBR set fails to span the target bands."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The detailed form of the disentanglement weight does not determine whether a local effective model exists, but tunes Wannier localization.",
+        "evidence_span": "The precise form of this function does not control whether a local effective model can be constructed, but it provides a tunable parameter for optimizing the localization of Wannier functions."
+      },
+      {
+        "role": "causal_claim",
+        "content": "When the partition is centered away from the charge center at a potential maximum, the leading envelope has symmetry-enforced zeros.",
+        "evidence_span": "When the partition is centered on a potential maximum, and hence away from the charge center of the lowest band, the leading occupation is sizable but the envelope has a symmetry-enforced zero at the K and K\u2032 points."
+      },
+      {
+        "role": "causal_claim",
+        "content": "When centered on the potential minimum, one compact CNO captures the lowest band accurately.",
+        "evidence_span": "When the partition is centered on the potential minimum, \u03bb1 increases to roughly 0.93 and the minimum of |s1,k| is close to unity, showing that a single compact CNO captures the lowest band to high accuracy."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Moving the partition among symmetry-preserving Wyckoff positions can reduce the number of local orbitals required.",
+        "evidence_span": "When several symmetry-preserving Wyckoff positions are available, moving the partition can reduce the number of local orbitals needed."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Sweeping partition center minimizes unit-cell entanglement entropy over partition choice.",
+        "evidence_span": "Equivalently, the sweep in Fig. 4a) minimizes the unit-cell entanglement entropy of Eq. (22) over the partition center."
+      },
+      {
+        "role": "causal_claim",
+        "content": "A band touching and inversion at \u0393 changes the second band's Chern number and makes the top two bands' total Chern number zero below 1.51\u00b0.",
+        "evidence_span": "At \u03b8 \u223c1.51\u25e6, the second and third bands touch at the \u0393 point and a band inversion occurs, leading to the second band switching Chern number to C = 1 for \u03b8 < 1.51\u25e6, and the top two bands having a total Chern number of zero."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Finite total Chern number of the top two bands prevents any local state from completely spanning them.",
+        "evidence_span": "In the topologically nontrivial regime, the finite total Chern number of the top two bands precludes any local state from completely spanning the band."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Pinned zeros of leading CNO overlaps at \u0393 or K/K\u2032 follow from little-group characters.",
+        "evidence_span": "The overlap between the topmost band and the leading CNO in the MM-centered partition generically has a zero pinned to \u0393, while the one with the leading CNO in the XM(MX)-centered has zeros at the K(K\u2032) points. These pinned locations follow from the little-group characters"
+      },
+      {
+        "role": "causal_claim",
+        "content": "If the disentanglement projector is restricted too sharply in the presence of inversion-character mismatch, Wannier functions develop algebraic tails.",
+        "evidence_span": "If the projector \u03b7km is taken to be exactly the first three bands, this will lead to an algebraic tail in the Wannier functions."
+      },
+      {
+        "role": "causal_claim",
+        "content": "C3 character of two MM-centered CNOs forces zeros at the centers of the corresponding Wannier functions.",
+        "evidence_span": "Due to the C3 character of |\u03c4 MM_2 \u27e9and |\u03c4 MM_3 \u27e9, the Wannier functions obtained from these two CNOs are forced to have a zero at their center."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The preferred model depends on the many-body method: multi-centered gives more local interactions, whereas MM-centered better fits symmetry-preserving cluster DMFT with fewer sites.",
+        "evidence_span": "The choice between the two models de- pends on the numerical method used to treat interac- tions. The multi-centered model has more localized Wan- nier functions and therefore yields more local interaction parameters. However, because the three orbitals are cen- tered at different sites, a cluster DMFT ansatz that re- spects C3 symmetry would require a seven-site cluster. In contrast, the MM-centered model requires only one site with three orbitals, making it easier to preserve the C3 symmetry."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The trade-off is that the MM-centered model has longer-range interactions.",
+        "evidence_span": "The trade-off, of course, is that the MM- centered model has longer-range interaction terms."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Topology causes unavoidable zeros in the CNO envelope function.",
+        "evidence_span": "While topology enforces irremovable zeros"
+      },
+      {
+        "role": "causal_claim",
+        "content": "An incompatible real-space center causes symmetry-forced zeros.",
+        "evidence_span": "symmetry-\nforced zeros are associated with an incompatible choice of\nreal-space center."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Moving the partition to the appropriate Wyckoff position removes symmetry-forced zeros.",
+        "evidence_span": "The latter can be removed by moving\nthe partition to the appropriate Wyckoff position."
+      },
+      {
+        "role": "causal_claim",
+        "content": "In the BHZ model, an irremovable zero in the CNO envelope gives a real-space manifestation of Wannier obstruction.",
+        "evidence_span": "In the BHZ model, the appearance of\nan irremovable zero in the CNO envelope function gives a\nreal-space manifestation of the Wannier obstruction."
+      },
+      {
+        "role": "causal_claim",
+        "content": "In monolayer WSe2, zeros reveal the obstructed atomic character of the bands.",
+        "evidence_span": "In\nmonolayer WSe2, the zeros reveal the obstructed atomic\ncharacter of the bands."
+      },
+      {
+        "role": "causal_claim",
+        "content": "When the topology of the low-energy bands changes, the occupations and momentum-space weights of the CNOs reorganize.",
+        "evidence_span": "Their\noccupations and momentum-space weights evolve contin-\nuously with twist angle and reorganize when the topol-\nogy of the low-energy bands changes."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using the same CNOs as trial states for Wannierization yields a short-ranged model reproducing dispersion and Berry curvature.",
+        "evidence_span": "The same CNOs\nprovide compact trial states for Wannierization, yielding\na short-ranged model that reproduces not only the dis-\npersion but also the Berry curvature of the continuum\nbands."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The most localized CNO has the largest on-site interaction, so the occupation hierarchy orders interaction scales.",
+        "evidence_span": "The\nmost localized CNO carries the largest on-site interac-\ntion, so the occupation hierarchy orders the interaction\nscales"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The occupation spectrum ranks local orbitals by weight in the manifold, so the leading CNO defines an impurity space fixed by the wavefunctions.",
+        "evidence_span": "The occupation spectrum in-\nstead ranks local orbitals by their weight in the manifold,\nso the leading CNO defines a impurity space fixed by the\nwavefunctions."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Topology enforces zeros in projected CNO envelopes for Chern bands.",
+        "evidence_span": "For Chern bands, the projected CNO envelope functions necessarily contain zeros enforced by the topology."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Electrons reorganizing into a bonding pattern incompatible with atomic positions causes obstructed atomic insulation.",
+        "evidence_span": "The band representation induced from the atomic orbitals does not match the band representation of the occupied bands, signaling that the electrons have reorganized into a bonding pattern incompatible with the underlying atomic positions."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Finite Chern number forbids a smooth nowhere-vanishing Bloch-bundle section, forcing a zero in overlap with any fixed orbital-space vector.",
+        "evidence_span": "For a band with finite Chern number, say C = 1, there cannot exist a smooth, nowhere-vanishing section of the Bloch bundle over the torus [60, 61]. Since |\u03c41\u27e9 is a fixed vector in orbital space, the overlap function \u27e8uper_k |\u03c41\u27e9 is a smooth map from the torus to C. The topological obstruction guarantees the existence of at least one momentum k0 where \u27e8uper_k0 |\u03c41\u27e9= 0"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Irremovable zeros reflect obstructions to forming a local description.",
+        "evidence_span": "The zeros in envelope\nfunction arise from obstructions to a local description."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "CNOs are natural for band-projected interactions because they diagonalize the unit-cell correlation matrix.",
+        "evidence_span": "Because they di-\nagonalize the unit-cell correlation matrix, they are the\nnatural basis for band-projected interactions [49]."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Their locality makes the CNOs natural ansatz candidates for the dynamical self-energy.",
+        "evidence_span": "Their locality makes them natural candi-\ndates for the ansatz entering the dynamical self-energy."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper proposes constructing local orbitals systematically from only the band projector via the UC-1pRDM.",
+        "evidence_span": "In this work, we introduce a systematic construction of local orbitals using only the band projector as input."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "CNO eigenstates are proposed to be the intrinsic local-orbital basis selected by the target bands.",
+        "evidence_span": "The eigenstates of this operator, which we call Cell Natural Orbitals (CNOs), provide the local orbital basis intrinsically selected by the target Bloch bands"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The CNO center is treated as a physical variational choice.",
+        "evidence_span": "The CNO center is therefore a physical variational choice."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "CNOs are proposed to help both quantify quantum geometry before modeling and provide trial states even for topological bands.",
+        "evidence_span": "the CNO construction is helpful in two ways. The first is accurately assessing the quantum geometry of the bands even before any attempt at a local model, and the second is providing trial states for an effective local model even for a topologically nontrivial set of bands."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors anticipate that the dominant orbital promotes charge-density-wave order, while subdominant modes stabilize a fractional state.",
+        "evidence_span": "We anticipate that the dom-\ninant orbital favors charge-density-wave order, while the\nsubdominant modes stabilize a fractional state."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "For the 1c-centered partition, the leading trivial CNO has no envelope-function zeros, indicating one local orbital can span the valence band.",
+        "evidence_span": "The leading 1c-centered CNO is the C3 trivial combination and has no zeros in its envelope function (see Fig. 2d),e)), indicating that the valence band of monolayer WSe2 can be fully spanned by a single local orbital at the 1c Wyckoff position."
+      },
+      {
+        "role": "evidence_result",
+        "content": "In the trivial BHZ phase one CNO approaches full weight and the other vanishes, consistent with localized Wannier functions.",
+        "evidence_span": "In the trivial phase (|\u2206| > 2), \u03bb1 (blue line) approaches unity and \u03bb2 (red line) approaches zero, reflecting the fact that the top band becomes increasingly s-like or pz-like as \u2206\u2192\u00b1\u221e. A single CNO is sufficient to represent the band, consistent with the existence of exponentially localized Wannier functions."
+      },
+      {
+        "role": "evidence_result",
+        "content": "In the topological BHZ phase both occupations are fractional; at \u0394=0 they are equal and unit-cell entanglement is maximal.",
+        "evidence_span": "In the topological phase (|\u2206| < 2), both occupations are fractional. At \u2206= 0, the two occupations equalize at \u03bb1 = \u03bb2 = 1/2, giving maximal unit-cell entanglement Scell = ln 2 per mode."
+      },
+      {
+        "role": "evidence_result",
+        "content": "CNO occupations change smoothly through the transition and do not distinguish phases by themselves.",
+        "evidence_span": "The occupations vary smoothly through the transition and do not by themselves separate the two phases"
+      },
+      {
+        "role": "evidence_result",
+        "content": "In the trivial BHZ phase the dominant envelope is smooth and nonzero everywhere, while in the topological phase it vanishes at M.",
+        "evidence_span": "In the trivial phase, |s1,k| is smooth and nonvanishing everywhere. In the topological phase, |s1,k| vanishes at the M point"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Despite topological obstruction, one MM-centered CNO remains clearly dominant over most of the topological regime.",
+        "evidence_span": "Despite this, there is a hierarchy in CNO weights since |\u03c4 MM_1 \u27e9 is a clearly dominant mode across most of the range"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The leading MM-centered CNO localizes on MM, while subleading modes localize away from MM, motivating MX/XM-centered partitions.",
+        "evidence_span": "As seen in Fig. 5b), this leading CNO is localized on the MM stacking region. The subleading modes are generically localized away from the MM site, suggesting that the MX/XM-centered partitions should be considered."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Across the topological transition, CNO weights remain smooth; topology change appears instead in the second-band envelope where the zero is lifted.",
+        "evidence_span": "As in Sec. III C, the CNO weights themselves vary smoothly across the topological phase transition, as seen in the grey regions of Fig. 5a) and c). The change in topology is reflected instead in the envelope function of the second band, where the zero is lifted and a local state is able to fully span both bands."
+      },
+      {
+        "role": "evidence_result",
+        "content": "In the trivial regime the dominant MX-centered CNO approaches weight 0.5, indicating an almost exact two-orbital hexagonal-lattice description centered at MX and XM.",
+        "evidence_span": "What the CNO construction tells us about this regime can be seen in the dominant CNO weight in Fig. 5c) as \u03bbMX_1 \u21920.5. The top two bands form a hexag- onal lattice and can be described almost exactly with two orbitals, one centered at the MX stacking site, and the other at the XM site."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For 3\u00b0 twisted WSe2, the top three MM-centered CNOs span the two target bands because the combined overlap determinant stays finite.",
+        "evidence_span": "Importantly, the top three CNOs from this partition span the entirety of the two bands. Notice that individual CNO envelopes have zeros, but the multi-orbital trial set {|\u03c4 MM_1 \u27e9, |\u03c4 MM_2 \u27e9, |\u03c4 MM_3 \u27e9} still spans the two bands as det Sk (defined in Eq. (27)) is finite as shown in Fig. 6b)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "With MX-centered partition, three MX/XM pairs would be needed because the top two CNOs miss the \u0393 point of the second band.",
+        "evidence_span": "Moving to the MX-centered partition, we see that we would require three pairs of local orbitals to fully span the top two bands, since the top two CNOs lack support on the \u0393-point of the second band"
+      },
+      {
+        "role": "evidence_result",
+        "content": "A mixed MM/MX/XM three-CNO set is complete because det Sk remains finite.",
+        "evidence_span": "which allows for a complete set of states at all k, con- firmed by the finite det Sk (Fig. 6d))"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The mixed multi-centered set has higher total spectral weight than the MM-centered set.",
+        "evidence_span": "The total spectral weight of the MM-centered set is 0.755, while that of the multi-centered CNO subset is 0.899."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The multi-centered Wannier functions resemble the trial states but acquire tails that carry intersite hopping.",
+        "evidence_span": "They look similar to the trial states, except for tails on the neighboring stacking regions that carry the inter- site hopping."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For the multi-centered set, Wannier weights and hopping parameters decay exponentially, confirming a short-ranged model.",
+        "evidence_span": "The Wannier function weights, and sub- sequently the hopping parameters of the tight-binding model, decay exponentially as shown in the bottom panel of Fig. 7e), confirming that the CNO trial states pro- duce a short-ranged model."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The tight-binding model reproduces the first band's Berry curvature well, while the second band shows slight qualitative deviation.",
+        "evidence_span": "The Berry curvature of the first band is repro- duced both qualitatively and quantitatively well, while the second band deviates slightly in the qualitative pro- file."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The MM-centered Wannier functions are slightly more spread out than the multi-centered ones but remain exponentially localized to nearly the same degree.",
+        "evidence_span": "Compared to the multi-centered set, the Wannier functions are slightly more spread out in real- space but are exponentially localized to almost the same degree"
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Matching symmetry representations is necessary but not sufficient for a local model.",
+        "evidence_span": "Matching symmetry representations is therefore a necessary, but not sufficient, condition for constructing a local model."
+      },
+      {
+        "role": "constraint",
+        "content": "Exponentially localized Wannier functions require a unitary Bloch-to-Wannier transformation throughout the Brillouin zone.",
+        "evidence_span": "For the Wannier functions to be exponentially localized, the transformation between Bloch states and Wannier functions must remain unitary throughout the Brillouin zone."
+      },
+      {
+        "role": "constraint",
+        "content": "This in turn requires the trial-overlap matrix to be square and nonsingular at every k.",
+        "evidence_span": "This requires that Ak is square and nonsingular at every k."
+      },
+      {
+        "role": "constraint",
+        "content": "For topological bands one must use more trial states than target bands.",
+        "evidence_span": "In the case of topological bands, we are forced to work with N\u03c4 > NP ."
+      },
+      {
+        "role": "constraint",
+        "content": "A precise calculation is still required to establish the proposed connection.",
+        "evidence_span": "A precise\ncalculation is needed to establish this connection, which\nwe leave for future work."
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "A central challenge is to determine an appropriate minimal set of real-space/local orbitals for chosen target bands that still captures key band properties such as dispersion, symmetry, and quantum geometry.",
+        "evidence_spans": [
+          "Identifying a minimal set of local orbitals that fulfills these criteria, however, is a nontrivial task.",
+          "The central problem is therefore to determine the appropriate real-space orbitals corresponding to a set of target bands."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Periodic natural orbitals in the noninteracting limit\u2014CNOs\u2014have remained unexplored, motivating their investigation.",
+        "evidence_spans": [
+          "Although natural orbitals have been known for decades [27], their periodic counterpart in the non-interacting limit, CNOs, have remained unexplored."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Constructing real-space models for topological bands is motivated by the Wannier obstruction, which has driven several recent approaches to overcoming it.",
+        "evidence_spans": [
+          "The goal of constructing real-space models for topological bands has motivated several recent approaches to overcoming the associated Wannier obstruction."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Accurate real-space models are needed to enable many-body methods, such as DMFT and fRG, for twisted TMDs.",
+        "evidence_spans": [
+          "Methods such as Dynamical Mean Field Theory (DMFT) [86, 87] and functional Renormalization Group (fRG) [88\u201392], for example, rely on accurate real-space models in order to treat the many-body problem."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Existing Wannier-construction methods use trial orbitals and optimize their overlap with the target bands; maximally localized Wannier functions yield localized orbitals, and disentanglement methods extend this construction to entangled band manifolds.",
+        "evidence_spans": [
+          "Most existing approaches use a set of trial orbitals and then optimize their overlap with the target bands [18].",
+          "Maximally localized Wannier functions yield localized orbitals [19]",
+          "while disentanglement methods extend this construction to entangled band manifolds [20]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Automated approaches such as SCDM remove the need for physically motivated initial projections.",
+        "evidence_spans": [
+          "Automated approaches such as SCDM remove the need for physically motivated initial projections [21\u201323]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Topological quantum chemistry provides a complementary prior approach: it classifies bands using elementary band representations induced from localized orbitals at specific Wyckoff positions; conventionally, such local orbitals are inferred from local quantum chemistry or from EBRs based on symmetry eigenvalues at high-symmetry points.",
+        "evidence_spans": [
+          "A complementary route is offered by topological quantum chemistry [24, 25], which classifies bands according to elementary band representations (EBRs) induced from localized orbitals at specific Wyckoff positions.",
+          "Conventionally, such orbitals are inferred from the local quantum chemistry of the material or from EBRs based on symmetry eigenvalues of the wavefunction at the high symmetry points."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "To overcome Wannier obstruction, prior approaches relax symmetry requirements (e.g. translational symmetry or valley conservation), enlarge the Hilbert space by introducing auxiliary orbitals outside the target manifold, or use compact molecular orbitals.",
+        "evidence_spans": [
+          "These include relaxing symmetry requirements, like translational symetry [28\u201330] or valley conservation [31, 32], enlarging the Hilbert space by introducing auxiliary orbitals outside the target manifold [33\u201335], as explored in heavy-fermion-like models [36, 37], and compact molecular orbitals [38\u201342]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Quantum embedding methods such as dynamical mean-field theory and density-matrix embedding require choosing a correlated subspace onto which the many-body problem is projected.",
+        "evidence_spans": [
+          "Methods such as dynamical mean-field theory [87] and density-matrix embedding [95]\nrequire a correlated subspace onto which the many-body\nproblem is projected [96]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The Wannier model produced in this work is similar to previous models of twisted WSe2.",
+        "evidence_spans": [
+          "The Wannier model produced here is similar to ones in previous works [15, 94]"
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "Existing approaches still require specifying the number of Wannier orbitals and therefore do not optimize the minimal local Hilbert space required by the target bands; similarly, topological quantum chemistry can identify symmetry-compatible atomic limits but does not determine which local orbitals best overlap the target-band wavefunctions.",
+        "evidence_spans": [
+          "However, these methods still require specifying the number of Wannier orbitals, and therefore do not optimize the minimal local Hilbert space required by the bands itself.",
+          "While it identifies symmetry-compatible atomic limits [26], it does not identify which local orbitals have the most overlap with the wavefunctions over the target bands."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "Instead of relying on prior obstruction-handling routes or inferring orbitals from chemistry/EBR symmetry data, the authors use CNOs as Wannierization trial states and reverse the usual procedure by ranking orbitals according to spectral weight with CNOs.",
+        "evidence_spans": [
+          "In this work, we address this challenge by using CNOs as trials for Wannierization",
+          "The CNO construction reverses this procedure and gives orbitals ranked by their spectral weight."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The authors reject model-building approaches guided mainly by fitting the dispersion alone, arguing that reproducing the wavefunctions\u2014and thus also matching quantum geometry\u2014is a stronger criterion.",
+        "evidence_spans": [
+          "Reproduc- ing the dispersion is a weaker test than reproducing the wavefunctions, so we also compare the quantum geome- try of the truncated model against the continuum result."
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [],
+    "causal_claim": [
+      {
+        "content": "Correlation phenomena and low-energy physics depend not only on band energies but on the momentum dependence of Bloch wavefunctions; when orbital composition varies strongly across momentum space, quantum geometry becomes physically important and centrally controls effective interactions and low-energy behavior.",
+        "evidence_spans": [
+          "Recent advances in moir\u00b4e materials [4, 5] and growing interest in flat-band physics [6] have emphasized that correlation phenomena depend not only on the band energies but also on the momentum dependence of the Bloch wavefunctions themselves.",
+          "Although quantum geometry is ubiquitous in materials, it becomes physically important when the orbital composition of the low-energy states varies strongly across momentum space [12].",
+          "In such systems, quantum geometry plays a central role in determining the effective interactions [13, 14] and low- energy physics [15\u201317]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A dominant or ideal UC-1pRDM/CNO occupation spectrum (one mode with occupation 1 and the rest 0) implies that a single compact orbital spans the target manifold, the unit-cell entanglement entropy vanishes, and one orbital suffices to represent the low-energy wavefunctions; deviations or fractional occupations indicate that multiple compact orbitals are required.",
+        "evidence_spans": [
+          "Dominant occupation of a single CNO indicates that the set of bands is well described by a single orbital, while a fractional occupation spectrum reveals the necessity of multiple orbitals.",
+          "Deviations from this limit indicate that multiple unit-cell compact orbitals are required to represent the low-energy wavefunctions.",
+          "If a single compact orbital spans the target manifold, \u03bb1 = 1 and \u03bba>1 = 0, implying Scell = 0."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For Chern bands or topologically nontrivial target manifolds, entanglement cannot be removed for any partition and no single local/compact orbital can completely span the bands; topology therefore enforces irremovable zeros in CNO envelope functions, providing a real-space manifestation of Wannier/topological obstruction.",
+        "evidence_spans": [
+          "These irremovable zeros prevent any single compact orbital from spanning the band manifold and provide a real-space manifestation of topological obstruction.",
+          "For Chern bands this entanglement cannot be removed, implying Scell > 0 for every choice of partition",
+          "Finite total Chern number of the top two bands precludes any local state from completely spanning the band.",
+          "While topology enforces irremovable zeros",
+          "In the BHZ model, the appearance of an irremovable zero in the CNO envelope function gives a real-space manifestation of the Wannier obstruction."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Zeros in CNO envelopes can also arise from symmetry/real-space mismatch rather than topology: incompatible Wyckoff positions or an incompatible real-space center force symmetry-enforced zeros, and moving the partition to the appropriate symmetry-preserving Wyckoff position can remove these symmetry-forced zeros and reduce the number of local orbitals needed.",
+        "evidence_spans": [
+          "Other than topology, zeros can arise from incompatible Wyckoff positions in obstructed atomic insulators.",
+          "symmetry- forced zeros are associated with an incompatible choice of real-space center.",
+          "The latter can be removed by moving the partition to the appropriate Wyckoff position.",
+          "When several symmetry-preserving Wyckoff positions are available, moving the partition can reduce the number of local orbitals needed."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because CNOs inherit symmetry properties from symmetry-preserving unit-cell partitions, they can identify candidate EBRs; if target and CNO Bloch states carry different little-group irreps then their overlap vanishes, so any candidate EBR decomposition must first match the target-band little-group irreps, and a zero determinant of the overlap matrix at any momentum signals that the chosen EBR set fails to span the target bands.",
+        "evidence_spans": [
+          "CNOs inherit symmetry properties from symmetry-preserving unit-cell partitions and therefore identify candidate EBRs.",
+          "If they transform according to different irreps of Gk, Schur\u2019s lemma implies that \u27e8\u03c8kn|\u03c4k,aq\u27e9= 0.",
+          "Consequently, any candidate EBR decomposition must first reproduce the little-group irreps of the target bands before it can possibly span the desired subspace.",
+          "A zero in det Sk at any momentum in the Brillouin zone indicates that the EBR set fails to span the target bands."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The locations of CNO-envelope zeros are fixed by symmetry characters: constructive interference of sp2-like orbitals changes the C3z character at \u0393 and K/K\u2032 and causes the obstruction; correspondingly, for a 1a-centered partition the obstruction forces zeros at two of \u0393, K, and K\u2032, and more generally pinned zeros at \u0393 or K/K\u2032 follow from little-group characters.",
+        "evidence_spans": [
+          "This constructive interference leads to a different character under C3z at the \u0393 and K/K\u2032 points, and therefore to the obstruction",
+          "The obstruction forces zeros in the envelope function sa,k = \u27e8uk,val|\u03c4a\u27e9/\u221a\u03bba for all the CNOs at two of the \u0393, K and K\u2032 points",
+          "The overlap between the topmost band and the leading CNO in the MM-centered partition generically has a zero pinned to \u0393, while the one with the leading CNO in the XM(MX)-centered has zeros at the K(K\u2032) points. These pinned locations follow from the little-group characters"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Partition choice redistributes a fixed total occupation among CNOs; since entropy decreases when weight concentrates into fewer modes, minimizing unit-cell entanglement entropy over symmetry-preserving partition centers selects the center where the fewest compact orbitals overlap the target bands.",
+        "evidence_spans": [
+          "Since Eq. (9) fixes the total occupation independently of where the cell boundary is drawn, moving the partition center can only redistribute that weight among the CNOs, and the entropy falls as the weight concentrates into fewer modes.",
+          "Minimizing Scell over partitions is therefore equivalent to selecting the center(s) at which the smallest number of compact orbitals overlaps with target bands.",
+          "Equivalently, the sweep in Fig. 4a) minimizes the unit-cell entanglement entropy of Eq. (22) over the partition center."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Partitioning away from the charge center can produce symmetry-enforced zeros and poorer single-orbital descriptions, whereas centering the partition at the appropriate potential minimum/charge center allows one compact CNO to capture the lowest band accurately.",
+        "evidence_spans": [
+          "When the partition is centered on a potential maximum, and hence away from the charge center of the lowest band, the leading occupation is sizable but the envelope has a symmetry-enforced zero at the K and K\u2032 points.",
+          "When the partition is centered on the potential minimum, \u03bb1 increases to roughly 0.93 and the minimum of |s1,k| is close to unity, showing that a single compact CNO captures the lowest band to high accuracy."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Including the embedding matrix is crucial because omitting it produces eigenstates that are not exponentially localized.",
+        "evidence_spans": [
+          "Including Vk in Eq. (6) is crucial; excluding it would lead to eigenstates that are not exponentially localized."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The detailed form of the disentanglement weight does not decide whether a local effective model exists, but it does control Wannier localization; if the disentanglement projector is chosen too sharply in the presence of symmetry-character mismatch, the Wannier functions acquire algebraic tails.",
+        "evidence_spans": [
+          "The precise form of this function does not control whether a local effective model can be constructed, but it provides a tunable parameter for optimizing the localization of Wannier functions.",
+          "If the projector \u03b7km is taken to be exactly the first three bands, this will lead to an algebraic tail in the Wannier functions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A band touching and inversion at \u0393 near 1.51\u00b0 changes the second band's Chern number and makes the top two bands' total Chern number zero below 1.51\u00b0; when the topology of the low-energy bands changes, the occupations and momentum-space weights of the CNOs reorganize.",
+        "evidence_spans": [
+          "At \u03b8 \u223c1.51\u25e6, the second and third bands touch at the \u0393 point and a band inversion occurs, leading to the second band switching Chern number to C = 1 for \u03b8 < 1.51\u25e6, and the top two bands having a total Chern number of zero.",
+          "Their occupations and momentum-space weights evolve contin- uously with twist angle and reorganize when the topol- ogy of the low-energy bands changes."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In monolayer WSe2, zeros in the CNO envelopes reveal the obstructed atomic character of the bands.",
+        "evidence_spans": [
+          "In monolayer WSe2, the zeros reveal the obstructed atomic character of the bands."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using the same CNOs as Wannier trial states yields a short-ranged model that reproduces both the continuum-band dispersion and Berry curvature.",
+        "evidence_spans": [
+          "The same CNOs provide compact trial states for Wannierization, yielding a short-ranged model that reproduces not only the dispersion but also the Berry curvature of the continuum bands."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The most localized CNO has the largest on-site interaction, so the occupation hierarchy orders interaction scales; correspondingly, because the occupation spectrum ranks local orbitals by their weight in the manifold, the leading CNO defines an impurity space fixed by the wavefunctions.",
+        "evidence_spans": [
+          "The most localized CNO carries the largest on-site interac- tion, so the occupation hierarchy orders the interaction scales",
+          "The occupation spectrum in- stead ranks local orbitals by their weight in the manifold, so the leading CNO defines a impurity space fixed by the wavefunctions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The preferred effective model depends on the many-body solver: a multi-centered model gives more localized Wannier functions and thus more local interaction parameters, whereas an MM-centered model is better suited to symmetry-preserving cluster DMFT with fewer sites, at the cost of longer-range interactions.",
+        "evidence_spans": [
+          "The choice between the two models de- pends on the numerical method used to treat interac- tions. The multi-centered model has more localized Wan- nier functions and therefore yields more local interaction parameters. However, because the three orbitals are cen- tered at different sites, a cluster DMFT ansatz that re- spects C3 symmetry would require a seven-site cluster. In contrast, the MM-centered model requires only one site with three orbitals, making it easier to preserve the C3 symmetry.",
+          "The trade-off, of course, is that the MM- centered model has longer-range interaction terms."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Modes with occupation 0 or 1 are pure and do not contribute to entropy, while occupation 1/2 maximizes the single-mode entropy contribution.",
+        "evidence_spans": [
+          "Modes with \u03bba = 0 or 1 are pure and do not contribute to the entropy, while \u03bba = 1/2 gives the maximal single- mode contribution ln 2."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The C3 character of two MM-centered CNOs forces the corresponding Wannier functions to vanish at their centers.",
+        "evidence_spans": [
+          "Due to the C3 character of |\u03c4 MM_2 \u27e9and |\u03c4 MM_3 \u27e9, the Wannier functions obtained from these two CNOs are forced to have a zero at their center."
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "For Chern bands, topology enforces zeros in projected CNO envelope/overlap functions: a finite Chern number forbids any smooth nowhere-vanishing Bloch-bundle section, so the overlap with any fixed orbital-space vector must vanish at some momentum. These irremovable zeros reflect a topological obstruction to forming a fully local description.",
+        "evidence_spans": [
+          "For Chern bands, the projected CNO envelope functions necessarily contain zeros enforced by the topology.",
+          "For a band with finite Chern number, say C = 1, there cannot exist a smooth, nowhere-vanishing section of the Bloch bundle over the torus [60, 61]. Since |\u03c41\u27e9 is a fixed vector in orbital space, the overlap function \u27e8uper_k |\u03c41\u27e9 is a smooth map from the torus to C. The topological obstruction guarantees the existence of at least one momentum k0 where \u27e8uper_k0 |\u03c41\u27e9= 0",
+          "The zeros in envelope function arise from obstructions to a local description."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Obstructed atomic insulation arises when the occupied-band representation does not match the representation induced from the atomic orbitals, indicating that electrons have reorganized into a bonding pattern incompatible with the underlying atomic positions.",
+        "evidence_spans": [
+          "The band representation induced from the atomic orbitals does not match the band representation of the occupied bands, signaling that the electrons have reorganized into a bonding pattern incompatible with the underlying atomic positions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "CNOs are natural for band-projected interactions because they diagonalize the unit-cell correlation matrix.",
+        "evidence_spans": [
+          "Because they di-\nagonalize the unit-cell correlation matrix, they are the\nnatural basis for band-projected interactions [49]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The locality of CNOs makes them natural ansatz candidates for the dynamical self-energy.",
+        "evidence_spans": [
+          "Their locality makes them natural candi-\ndates for the ansatz entering the dynamical self-energy."
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "The paper proposes a systematic construction of local orbitals using only the band projector as input via the UC-1pRDM; the resulting Cell Natural Orbitals (CNOs), defined as its eigenstates, are the intrinsic local-orbital basis selected by the target bands.",
+        "evidence_spans": [
+          "In this work, we introduce a systematic construction of local orbitals using only the band projector as input.",
+          "The eigenstates of this operator, which we call Cell Natural Orbitals (CNOs), provide the local orbital basis intrinsically selected by the target Bloch bands"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The CNO center is a physical variational choice.",
+        "evidence_spans": [
+          "The CNO center is therefore a physical variational choice."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The CNO construction is hypothesized to be useful both for quantifying band quantum geometry before local modeling and for providing trial states for an effective local model, even for topologically nontrivial bands.",
+        "evidence_spans": [
+          "the CNO construction is helpful in two ways. The first is accurately assessing the quantum geometry of the bands even before any attempt at a local model, and the second is providing trial states for an effective local model even for a topologically nontrivial set of bands."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The authors hypothesize that the dominant orbital favors charge-density-wave order, while subdominant modes stabilize a fractional state.",
+        "evidence_spans": [
+          "We anticipate that the dom- inant orbital favors charge-density-wave order, while the subdominant modes stabilize a fractional state."
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "For trivial phases/regimes, a single dominant CNO can fully represent the target band(s), consistent with localized Wannier functions. In monolayer WSe2, the leading 1c-centered trivial CNO has no envelope-function zeros, so one local orbital at 1c spans the valence band; likewise in the trivial BHZ phase one CNO approaches full weight while the other vanishes.",
+        "evidence_spans": [
+          "The leading 1c-centered CNO is the C3 trivial combination and has no zeros in its envelope function (see Fig. 2d),e)), indicating that the valence band of monolayer WSe2 can be fully spanned by a single local orbital at the 1c Wyckoff position.",
+          "In the trivial phase (|\u2206| > 2), \u03bb1 (blue line) approaches unity and \u03bb2 (red line) approaches zero, reflecting the fact that the top band becomes increasingly s-like or pz-like as \u2206\u2192\u00b1\u221e. A single CNO is sufficient to represent the band, consistent with the existence of exponentially localized Wannier functions.)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the BHZ model, CNO occupations evolve smoothly across the topological transition and therefore do not by themselves distinguish phases; nevertheless, in the topological phase both occupations are fractional, with \u03bb1 = \u03bb2 = 1/2 at \u0394 = 0 giving maximal unit-cell entanglement.",
+        "evidence_spans": [
+          "In the topological phase (|\u2206| < 2), both occupations are fractional. At \u2206= 0, the two occupations equalize at \u03bb1 = \u03bb2 = 1/2, giving maximal unit-cell entanglement Scell = ln 2 per mode.",
+          "The occupations vary smoothly through the transition and do not by themselves separate the two phases"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Across the BHZ/topological transition, the key evidence appears in envelope functions rather than in smoothly varying CNO weights: the dominant envelope is smooth and nonzero everywhere in the trivial phase but vanishes at M in the topological phase, and more generally the topology change is reflected in the second-band envelope where a zero is lifted in the trivial regime so that a local state can fully span both bands.",
+        "evidence_spans": [
+          "In the trivial phase, |s1,k| is smooth and nonvanishing everywhere. In the topological phase, |s1,k| vanishes at the M point",
+          "As in Sec. III C, the CNO weights themselves vary smoothly across the topological phase transition, as seen in the grey regions of Fig. 5a) and c). The change in topology is reflected instead in the envelope function of the second band, where the zero is lifted and a local state is able to fully span both bands.)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For the MM-centered partition in the moir\u00e9 system, one MM-centered CNO remains clearly dominant over most of the topological regime and is localized on the MM stacking region, while subleading modes localize away from MM, motivating consideration of MX/XM-centered partitions.",
+        "evidence_spans": [
+          "Despite this, there is a hierarchy in CNO weights since |\u03c4 MM_1 \u27e9 is a clearly dominant mode across most of the range",
+          "As seen in Fig. 5b), this leading CNO is localized on the MM stacking region. The subleading modes are generically localized away from the MM site, suggesting that the MX/XM-centered partitions should be considered.)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the trivial moir\u00e9 regime, the dominant MX-centered CNO approaches weight 0.5, indicating an almost exact two-orbital hexagonal-lattice description with one orbital centered at MX and the other at XM.",
+        "evidence_spans": [
+          "What the CNO construction tells us about this regime can be seen in the dominant CNO weight in Fig. 5c) as \u03bbMX_1 \u21920.5. The top two bands form a hexag- onal lattice and can be described almost exactly with two orbitals, one centered at the MX stacking site, and the other at the XM site.)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For 3\u00b0 twisted WSe2, the top three MM-centered CNOs are sufficient to span the two target bands because the combined overlap determinant remains finite, even though individual CNO envelopes have zeros.",
+        "evidence_spans": [
+          "Importantly, the top three CNOs from this partition span the entirety of the two bands. Notice that individual CNO envelopes have zeros, but the multi-orbital trial set {|\u03c4 MM_1 \u27e9, |\u03c4 MM_2 \u27e9, |\u03c4 MM_3 \u27e9} still spans the two bands as det Sk (defined in Eq. (27)) is finite as shown in Fig. 6b).)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For the MX-centered partition, the top two CNOs are insufficient because they miss the \u0393 point of the second band, so three MX/XM pairs of local orbitals would be required to span the top two bands.",
+        "evidence_spans": [
+          "Moving to the MX-centered partition, we see that we would require three pairs of local orbitals to fully span the top two bands, since the top two CNOs lack support on the \u0393-point of the second band)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A mixed MM/MX/XM three-CNO set forms a complete basis for the target bands, with finite det S_k, and it is superior to the purely MM-centered set in total spectral weight (0.899 vs 0.755).",
+        "evidence_spans": [
+          "which allows for a complete set of states at all k, con- firmed by the finite det Sk (Fig. 6d)))",
+          "The total spectral weight of the MM-centered set is 0.755, while that of the multi-centered CNO subset is 0.899.)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The multi-centered Wannier functions closely resemble the trial states but develop tails that carry intersite hopping; their weights and hopping amplitudes decay exponentially, confirming a short-ranged model.",
+        "evidence_spans": [
+          "They look similar to the trial states, except for tails on the neighboring stacking regions that carry the inter- site hopping.)",
+          "The Wannier function weights, and sub- sequently the hopping parameters of the tight-binding model, decay exponentially as shown in the bottom panel of Fig. 7e), confirming that the CNO trial states pro- duce a short-ranged model.)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The resulting tight-binding model reproduces the first band's Berry curvature well, while the second band shows slight qualitative deviations.",
+        "evidence_spans": [
+          "The Berry curvature of the first band is repro- duced both qualitatively and quantitatively well, while the second band deviates slightly in the qualitative pro- file.)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Compared with the multi-centered construction, MM-centered Wannier functions are somewhat more spatially spread but remain exponentially localized to nearly the same degree.",
+        "evidence_spans": [
+          "Compared to the multi-centered set, the Wannier functions are slightly more spread out in real- space but are exponentially localized to almost the same degree)"
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "Matching symmetry representations is a necessary but not sufficient condition for constructing a local model.",
+        "evidence_spans": [
+          "Matching symmetry representations is therefore a necessary, but not sufficient, condition for constructing a local model."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Exponentially localized Wannier functions require a unitary Bloch-to-Wannier transformation throughout the Brillouin zone, which in turn requires the trial-overlap matrix A_k to be square and nonsingular at every k.",
+        "evidence_spans": [
+          "For the Wannier functions to be exponentially localized, the transformation between Bloch states and Wannier functions must remain unitary throughout the Brillouin zone.",
+          "This requires that Ak is square and nonsingular at every k."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For topological bands, one must work with more trial states than target bands (N\u03c4 > NP).",
+        "evidence_spans": [
+          "In the case of topological bands, we are forced to work with N\u03c4 > NP ."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A precise calculation is still required to establish the proposed connection.",
+        "evidence_spans": [
+          "A precise calculation is needed to establish this connection, which we leave for future work."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

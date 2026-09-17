@@ -1,0 +1,464 @@
+{
+  "paper_id": "2606.17390",
+  "chunks_processed": 6,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Inverse identification of Barlat models is difficult because they have many parameters and need highly informative data.",
+        "evidence_span": "Inverse identification of Barlat models is challenging because these models contain many parameters and require highly informative experimental data."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Applying the framework to real experimental DIC data remains needed, since practical measurements introduce issues that affect robustness and uniqueness.",
+        "evidence_span": "Future work will focus on applying the framework to real experimental DIC data for inverse parameter identification. Experimental measurements introduce noise, imperfect boundary conditions, incomplete observations, and possible model discrepancy, which can affect optimization robustness and parameter uniqueness."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Conventional inverse characterization uses multiple standardized tests in different orientations.",
+        "evidence_span": "Conventional inverse characterization approaches rely on multiple standardized tests, such as uniaxial tension and simple shear tests in different orientations, to generate data for parameter identification."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Goncalves et al. used topology optimization to design specimen geometries that create heterogeneous strain fields for inverse identification.",
+        "evidence_span": "Recently, Goncalves et al. [67,68] used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, thereby enhancing the information content of experimental data for inverse identification."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "The conventional testing process is time-consuming and resource-intensive.",
+        "evidence_span": "This process is time-consuming and resource-intensive."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "The work positions itself against finite-difference-based gradients because they scale poorly and are step-size sensitive/computationally prohibitive.",
+        "evidence_span": "while avoiding the poor scaling and step-size sensitivity of finite-difference gradients"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The paper favors AD-based adjoint gradients rather than finite-difference-based approaches because the latter would be computationally prohibitive in high dimensions.",
+        "evidence_span": "AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference-based approaches would be computationally prohibitive."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than differentiating the local Newton iterations directly, the method uses implicit differentiation of the converged state.",
+        "evidence_span": "For a prescribed perturbation \u02d9p of the input variables, the local Newton iterations are not differentiated directly. Instead, the converged state is treated as an implicitly defined function of p"
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The line-search update is adopted following Scherzinger.",
+        "evidence_span": "we augment the local update with a line search along the Newton direction, following Scherzinger [53]."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The implicit-differentiation approach follows the general framework of automatic implicit differentiation for solver-defined mappings.",
+        "evidence_span": "following the general framework of automatic implicit differentiation for solver-defined mappings [69]"
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "The topology-optimized specimen creates a broad range of stress and strain states, making the data highly informative for inverse identification.",
+        "evidence_span": "The specimen generates a wide range of stress and strain states, from plane-strain tension to uniaxial compression, which are highly informative for inverse identification of anisotropic plasticity parameters."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using previous-step displacement histories as initial guesses skips smaller time steps and speeds convergence.",
+        "evidence_span": "This strategy allows smaller time steps to be skipped and accelerates convergence, especially in the later stages of optimization when both the objective function and parameter changes are small."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Warm-start initialization cuts overall inverse optimization time by about 1.6x.",
+        "evidence_span": "The warm-start strategy reduces the overall inverse optimization time by approximately a factor of 1.6."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Highly informative specimen geometries can significantly reduce the experimental effort needed for characterization.",
+        "evidence_span": "the proposed framework can identify complex constitutive models using data generated from highly informative specimen geometries, which can significantly reduce the experimental effort required for material characterization."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Automatic vectorization, JIT, and GPU-resident computation make the framework scalable for forward simulation and inverse identification.",
+        "evidence_span": "By exploiting automatic vectorization, JIT compilation, and GPU-resident computations, the framework provides a scalable route for forward simulation and inverse material identification in large nonlinear elastoplastic problems."
+      },
+      {
+        "role": "causal_claim",
+        "content": "AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference methods would be too expensive.",
+        "evidence_span": "These examples show that AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference-based approaches would be computationally prohibitive."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The quadratic approximation plus Goldstein condition ensure meaningful merit reduction while preserving quadratic Newton convergence when full steps are admissible.",
+        "evidence_span": "The combined effect of the quadratic approximation and the Goldstein condition ensures that the line search terminates with a step length that provides a meaningful reduction in \u03c8k while preserving the quadratic convergence of the Newton scheme when \u03b6k = 1 is admissible."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Choosing a reduced step length via the quadratic model substantially lowers the merit function and yields robust convergence.",
+        "evidence_span": "The quadratic model used in the line-search algorithm selects \u03b6 = 0.363, which still provides a substantial reduction of the merit function and leads to robust convergence."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The line-search strategy significantly improves robustness for highly anisotropic yield surfaces and difficult trial stress states.",
+        "evidence_span": "These results demonstrate that the line-search strategy significantly improves the robustness of the return-mapping algorithm for highly anisotropic yield surfaces and difficult trial stress states."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Avoiding differentiation through Newton iterations preserves exact linearization while avoiding tracing the solver iterations.",
+        "evidence_span": "This avoids tracing the iterations of the local Newton solver while preserving the exact linearization of the converged constitutive state."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The construction yields a consistent constitutive linearization while avoiding explicit differentiation through the iterative return-mapping process.",
+        "evidence_span": "This construction yields a consistent constitutive linearization while avoiding explicit differentiation through the iterative return-mapping process."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Performing sparse assembly directly on the accelerator benefits large systems.",
+        "evidence_span": "The comparison highlights the benefit of performing sparse assembly directly on the accelerator for large systems."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Negligible out-of-plane shear stresses justify identifying only a reduced parameter set.",
+        "evidence_span": "Because negligible out-of-plane shear stresses are expected for the current specimen with a thickness of 1 mm, we consider only the following parameter set for inverse identification"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Complex plasticity can produce a nonsymmetric tangent stiffness matrix, making direct sparse solvers more robust and efficient than iterative solvers for moderate-size problems.",
+        "evidence_span": "Because the complex constitutive plasticity model can lead to a nonsymmetric tangent stiffness matrix, direct sparse linear solvers are more robust and efficient than iterative solvers for moderate-size forward and inverse problems."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Predicted parameter non-uniqueness arises because different parameter combinations can generate the same yield surface.",
+        "evidence_span": "For complex yield surfaces, different parameter combinations can lead to the same yield surface, which explains the non-uniqueness of the predicted parameters."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Line search is added because full Newton steps can be too aggressive for highly anisotropic nonquadratic yield surfaces.",
+        "evidence_span": "To improve robustness when the full Newton correction is too aggressive for highly anisotropic nonquadratic yield surfaces, we augment the local update with a line search along the Newton direction, following Scherzinger [53]."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The Newton direction guarantees local decrease of the merit function at the start of the line search.",
+        "evidence_span": "Because \u03b4yk is the Newton direction, the directional derivative at \u03b6k = 0 satisfies (\u03c8k)\u2032(0) = \u22122\u03c8k(0), which guarantees that \u03c8k is locally decreasing at the full Newton step."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+        "evidence_span": "Using the proposed JAX-AD-based framework, the parameters of complex constitutive models such as Barlat\u2019s Yld2004-18p can be identified from data generated with topology-optimized specimen geometries."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+        "evidence_span": "We also implement a warm-start initialization strategy to reduce the computational cost of forward simulations during inverse optimization."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+        "evidence_span": "The optimization converges in 65 iterations and 73 function evaluations, with a total computation time of 131 min with warm-start initialization and 172 min without it."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+        "evidence_span": "Gradient verification against finite differences confirmed the correctness of the adjoint-based derivatives while avoiding the poor scaling and step-size sensitivity of finite-difference gradients."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+        "evidence_span": "The inverse identification examples demonstrated accurate recovery of anisotropic yield and hardening behavior from information-rich displacement fields."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+        "evidence_span": "The first two iterations are similar, but from the third iteration onward the standard Newton method begins to oscillate and fails to approach the yield surface in a stable manner."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+        "evidence_span": "The standard Newton method oscillates without converging even after 10 iterations, whereas the line-search method reduces the merit function sharply at each step by selecting a step length \u03b6 that yields sufficient decrease."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+        "evidence_span": "The full Newton step, \u03b6 = 1, increases the merit function relative to its value at \u03b6 = 0, whereas the true minimum of the merit function occurs at \u03b6 = 0.46."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+        "evidence_span": "The standard Newton method fails to converge for a large portion of the sampled trial states, approximately 9,600 points, whereas the line-search method converges for all sampled points."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Line search converges within 20 iterations for most sampled trial states.",
+        "evidence_span": "Moreover, the line-search method converges within 20 iterations for most of the sampled states, further demonstrating its robust convergence properties."
+      },
+      {
+        "role": "evidence_result",
+        "content": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+        "evidence_span": "Table E1: Computation times in seconds for CSR sparse matrix assembly and row elimination using SciPy on CPU and CuPy on H100 GPU."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Warm-start is only enabled when each parameter changes by less than 10% between consecutive forward passes.",
+        "evidence_span": "Warm-start initialization is enabled when the change in each parameter between the current and previous forward passes is less than 10%."
+      },
+      {
+        "role": "constraint",
+        "content": "The line-search step length is restricted to values between 0 and 1.",
+        "evidence_span": "a scalar step length \u03b6k \u2208(0, 1] is introduced"
+      },
+      {
+        "role": "constraint",
+        "content": "A lower bound prevents the step length from becoming too small.",
+        "evidence_span": "To prevent the step length from becoming excessively small, a lower bound is enforced at each iteration through a parameter \u03b7 \u2208(0, 1)"
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Inverse identification of Barlat models is difficult because they have many parameters and require highly informative data; furthermore, applying the framework to real experimental DIC data remains necessary because practical measurements introduce noise, imperfect boundary conditions, incomplete observations, and possible model discrepancy that can undermine optimization robustness and parameter uniqueness.",
+        "evidence_spans": [
+          "Inverse identification of Barlat models is challenging because these models contain many parameters and require highly informative experimental data.",
+          "Future work will focus on applying the framework to real experimental DIC data for inverse parameter identification. Experimental measurements introduce noise, imperfect boundary conditions, incomplete observations, and possible model discrepancy, which can affect optimization robustness and parameter uniqueness."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Conventional inverse characterization approaches rely on multiple standardized tests in different orientations, such as uniaxial tension and simple shear, to generate data for parameter identification.",
+        "evidence_spans": [
+          "Conventional inverse characterization approaches rely on multiple standardized tests, such as uniaxial tension and simple shear tests in different orientations, to generate data for parameter identification."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Goncalves et al. used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, enhancing the information content of experimental data for inverse identification.",
+        "evidence_spans": [
+          "Recently, Goncalves et al. [67,68] used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, thereby enhancing the information content of experimental data for inverse identification."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "The conventional testing process is time-consuming and resource-intensive.",
+        "evidence_spans": [
+          "This process is time-consuming and resource-intensive."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "Finite-difference-based gradient approaches are rejected in favor of AD/adjoint gradients because they scale poorly, are step-size sensitive, and become computationally prohibitive in high-dimensional inverse problems.",
+        "evidence_spans": [
+          "while avoiding the poor scaling and step-size sensitivity of finite-difference gradients",
+          "AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference-based approaches would be computationally prohibitive."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Direct differentiation of the local Newton iterations is rejected; instead, the method implicitly differentiates the converged state as a function of the inputs.",
+        "evidence_spans": [
+          "For a prescribed perturbation \u02d9p of the input variables, the local Newton iterations are not differentiated directly. Instead, the converged state is treated as an implicitly defined function of p"
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The line-search update is adopted following Scherzinger.",
+        "evidence_span": "we augment the local update with a line search along the Newton direction, following Scherzinger [53]."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The implicit-differentiation approach follows the general framework of automatic implicit differentiation for solver-defined mappings.",
+        "evidence_span": "following the general framework of automatic implicit differentiation for solver-defined mappings [69]"
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "The topology-optimized specimen creates a broad range of stress and strain states, making the data highly informative for inverse identification.",
+        "evidence_span": "The specimen generates a wide range of stress and strain states, from plane-strain tension to uniaxial compression, which are highly informative for inverse identification of anisotropic plasticity parameters."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using previous-step displacement histories as initial guesses skips smaller time steps and speeds convergence.",
+        "evidence_span": "This strategy allows smaller time steps to be skipped and accelerates convergence, especially in the later stages of optimization when both the objective function and parameter changes are small."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Warm-start initialization cuts overall inverse optimization time by about 1.6x.",
+        "evidence_span": "The warm-start strategy reduces the overall inverse optimization time by approximately a factor of 1.6."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Highly informative specimen geometries can significantly reduce the experimental effort needed for characterization.",
+        "evidence_span": "the proposed framework can identify complex constitutive models using data generated from highly informative specimen geometries, which can significantly reduce the experimental effort required for material characterization."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Automatic vectorization, JIT, and GPU-resident computation make the framework scalable for forward simulation and inverse identification.",
+        "evidence_span": "By exploiting automatic vectorization, JIT compilation, and GPU-resident computations, the framework provides a scalable route for forward simulation and inverse material identification in large nonlinear elastoplastic problems."
+      },
+      {
+        "role": "causal_claim",
+        "content": "AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference methods would be too expensive.",
+        "evidence_span": "These examples show that AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference-based approaches would be computationally prohibitive."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The quadratic approximation plus Goldstein condition ensure meaningful merit reduction while preserving quadratic Newton convergence when full steps are admissible.",
+        "evidence_span": "The combined effect of the quadratic approximation and the Goldstein condition ensures that the line search terminates with a step length that provides a meaningful reduction in \u03c8k while preserving the quadratic convergence of the Newton scheme when \u03b6k = 1 is admissible."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Choosing a reduced step length via the quadratic model substantially lowers the merit function and yields robust convergence.",
+        "evidence_span": "The quadratic model used in the line-search algorithm selects \u03b6 = 0.363, which still provides a substantial reduction of the merit function and leads to robust convergence."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The line-search strategy significantly improves robustness for highly anisotropic yield surfaces and difficult trial stress states.",
+        "evidence_span": "These results demonstrate that the line-search strategy significantly improves the robustness of the return-mapping algorithm for highly anisotropic yield surfaces and difficult trial stress states."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Avoiding differentiation through Newton iterations preserves exact linearization while avoiding tracing the solver iterations.",
+        "evidence_span": "This avoids tracing the iterations of the local Newton solver while preserving the exact linearization of the converged constitutive state."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The construction yields a consistent constitutive linearization while avoiding explicit differentiation through the iterative return-mapping process.",
+        "evidence_span": "This construction yields a consistent constitutive linearization while avoiding explicit differentiation through the iterative return-mapping process."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Performing sparse assembly directly on the accelerator benefits large systems.",
+        "evidence_span": "The comparison highlights the benefit of performing sparse assembly directly on the accelerator for large systems."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Negligible out-of-plane shear stresses justify identifying only a reduced parameter set.",
+        "evidence_span": "Because negligible out-of-plane shear stresses are expected for the current specimen with a thickness of 1 mm, we consider only the following parameter set for inverse identification"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Complex plasticity can produce a nonsymmetric tangent stiffness matrix, making direct sparse solvers more robust and efficient than iterative solvers for moderate-size problems.",
+        "evidence_span": "Because the complex constitutive plasticity model can lead to a nonsymmetric tangent stiffness matrix, direct sparse linear solvers are more robust and efficient than iterative solvers for moderate-size forward and inverse problems."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Predicted parameter non-uniqueness arises because different parameter combinations can generate the same yield surface.",
+        "evidence_span": "For complex yield surfaces, different parameter combinations can lead to the same yield surface, which explains the non-uniqueness of the predicted parameters."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Line search is added because full Newton steps can be too aggressive for highly anisotropic nonquadratic yield surfaces.",
+        "evidence_span": "To improve robustness when the full Newton correction is too aggressive for highly anisotropic nonquadratic yield surfaces, we augment the local update with a line search along the Newton direction, following Scherzinger [53]."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The Newton direction guarantees local decrease of the merit function at the start of the line search.",
+        "evidence_span": "Because \u03b4yk is the Newton direction, the directional derivative at \u03b6k = 0 satisfies (\u03c8k)\u2032(0) = \u22122\u03c8k(0), which guarantees that \u03c8k is locally decreasing at the full Newton step."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+        "evidence_span": "Using the proposed JAX-AD-based framework, the parameters of complex constitutive models such as Barlat\u2019s Yld2004-18p can be identified from data generated with topology-optimized specimen geometries."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+        "evidence_span": "We also implement a warm-start initialization strategy to reduce the computational cost of forward simulations during inverse optimization."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+        "evidence_span": "The optimization converges in 65 iterations and 73 function evaluations, with a total computation time of 131 min with warm-start initialization and 172 min without it."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+        "evidence_span": "Gradient verification against finite differences confirmed the correctness of the adjoint-based derivatives while avoiding the poor scaling and step-size sensitivity of finite-difference gradients."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+        "evidence_span": "The inverse identification examples demonstrated accurate recovery of anisotropic yield and hardening behavior from information-rich displacement fields."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+        "evidence_span": "The first two iterations are similar, but from the third iteration onward the standard Newton method begins to oscillate and fails to approach the yield surface in a stable manner."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+        "evidence_span": "The standard Newton method oscillates without converging even after 10 iterations, whereas the line-search method reduces the merit function sharply at each step by selecting a step length \u03b6 that yields sufficient decrease."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+        "evidence_span": "The full Newton step, \u03b6 = 1, increases the merit function relative to its value at \u03b6 = 0, whereas the true minimum of the merit function occurs at \u03b6 = 0.46."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+        "evidence_span": "The standard Newton method fails to converge for a large portion of the sampled trial states, approximately 9,600 points, whereas the line-search method converges for all sampled points."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Line search converges within 20 iterations for most sampled trial states.",
+        "evidence_span": "Moreover, the line-search method converges within 20 iterations for most of the sampled states, further demonstrating its robust convergence properties."
+      },
+      {
+        "role": "evidence_result",
+        "content": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+        "evidence_span": "Table E1: Computation times in seconds for CSR sparse matrix assembly and row elimination using SciPy on CPU and CuPy on H100 GPU."
+      }
+    ],
+    "constraint": [
+      {
+        "content": "Warm-start initialization is enabled only when the change in each parameter between consecutive forward passes is less than 10%.",
+        "evidence_spans": [
+          "Warm-start initialization is enabled when the change in each parameter between the current and previous forward passes is less than 10%."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The line-search step length is constrained to the interval (0, 1], with a lower-bound parameter \u03b7 \u2208 (0, 1) enforced at each iteration to prevent it from becoming excessively small.",
+        "evidence_spans": [
+          "a scalar step length \u03b6k \u2208(0, 1] is introduced",
+          "To prevent the step length from becoming excessively small, a lower bound is enforced at each iteration through a parameter \u03b7 \u2208(0, 1)"
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

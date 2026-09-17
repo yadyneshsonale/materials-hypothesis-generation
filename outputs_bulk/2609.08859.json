@@ -1,0 +1,381 @@
+{
+  "paper_id": "2609.08859",
+  "chunks_processed": 6,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Accurate CKM generation needs precise environment reconstruction including materials, but materials are hard to obtain directly from sparse channel measurements.",
+        "evidence_span": "Accurate CKM generation requires precise reconstruction of the environment, including 3D geometries and scatterer materials, typically from multi-modal sensory observations such as LiDAR point clouds and sparse channel measurements. While the former is relatively easy to acquire, materials remain difficult to obtain directly from sparse channel measurements due to the lack of an explicit channel model linking them."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Material acquisition remains challenging even when 3D geometry from LiDAR is already available.",
+        "evidence_span": "This approach offers ex- plainability, generalizability, and improved data efficiency, but material acquisition remains challenging despite the already availability of 3D geometry LiDAR point clouds."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Existing CKM generation methods include direct end-to-end generation using interpolation, matrix completion, or deep learning.",
+        "evidence_span": "Overall, CKM generation methods fall into two categories, including direct end-to-end generation from multi- modal observations via mathematical interpolation [7], matrix completion [8], or deep learning, which requires abundant measurements"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Another existing CKM approach reconstructs environment geometry/materials and then uses diffusion models, flow matching, or ray tracing to generate channel knowledge.",
+        "evidence_span": "and environment reconstruction based genera- tion, which first reconstructs 3D geometry and materials, then applies diffusion models [9], flow matching [10], or ray tracing [11] to generate channel knowledge."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior material inference approaches recognize materials from visuals or ISAC.",
+        "evidence_span": "inferring materials from sparse channel measure- ments for CKM generation is more promising than recognizing from visuals [12] or ISAC [13]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Statistical channel models, the unified channel model, GBSM, pervasive models, and deterministic models are prior approaches for channel/material modeling.",
+        "evidence_span": "While statistical models [14] omit materials; the 1 unified channel model [15], geometry-based stochastic model (GBSM), and pervasive models [16] incorporate materials only implicitly via radar cross section (RCS), which depends on material, directions, and frequency; deterministic models [17] rely on numerical computation"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Full-wave physical optics and method of moments are used as comparison baselines for evaluating the RCS model.",
+        "evidence_span": "by comparing S(P, aI, aR) with full wave physical optics (PO) and method of moments (MoM) results SPO(P, aI, aR) and SMoM(P, aI, aR)"
+      },
+      {
+        "role": "prior_approach",
+        "content": "The proposed RCS model is compared against full-wave physical optics and method of moments baselines.",
+        "evidence_span": "by comparing S(P, aI, aR) with full wave physical optics (PO) and method of moments (MoM) results SPO(P, aI, aR) and SMoM(P, aI, aR) [23]"
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Direct end-to-end CKM generation requires abundant measurements.",
+        "evidence_span": "direct end-to-end generation from multi- modal observations via mathematical interpolation [7], matrix completion [8], or deep learning, which requires abundant measurements"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Statistical models omit materials; unified/GBSM/pervasive models include them only implicitly via RCS; deterministic models rely on numerical computation.",
+        "evidence_span": "While statistical models [14] omit materials; the 1 unified channel model [15], geometry-based stochastic model (GBSM), and pervasive models [16] incorporate materials only implicitly via radar cross section (RCS), which depends on material, directions, and frequency; deterministic models [17] rely on numerical computation"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Closed-form solutions are difficult because the expressions are complex and involve square roots and complex-domain terms.",
+        "evidence_span": "Due to the complex expressions in (4), (6), (22), Lemma 1, and the extra complicity from the square root and complex domain [21], closed-form solutions are difficult to be obstained."
+      }
+    ],
+    "rejected_alternative": [],
+    "inspiration_source": [],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Complexity in XL-MIMO estimation, ISAC sensing, and high mmWave/THz data rates limits deployment.",
+        "evidence_span": "However, the resulting complexity in XL-MIMO channel estimation, ISAC sensing, and extra high data rate of mmWave/THz systems limits their deployment [4]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Expressing the channel component explicitly as a function of material properties establishes a direct material-channel link and enables material reconstruction from channel measurements when geometry is known.",
+        "evidence_span": "Remark 1: Expressing hs(qT, qR) in (1) as an explicit function of {\u03b5s, \u03c3s} establishes a direct link between materials and the channel, which enables the reconstruction of m from H with precise geometries of S scatterers as priori knowledge."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Once geometry is fixed, the RCS depends explicitly only on material properties, enabling inference of materials from the channel.",
+        "evidence_span": "Remark 3: Once the geometries of the target environment are determined, the RCSs in (6) and (22) only depend explicitly on the material properties m through \u03a5(\u03b5, \u03c3) and \u03a8(\u03b5, \u03c3), which enables the inference of m from H via (4)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The weighting term emphasizes positions with larger deviation.",
+        "evidence_span": "which aims to optimize the position with large deviation."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Because closed-form solutions are difficult, the authors use an iterative gradient-descent algorithm to approximately solve the problem with tolerable complexity.",
+        "evidence_span": "We thus propose an iterative gradient descent algorithm to approx- imately solve (36) with tolerable complexity."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using reconstructed materials lowers channel error versus ITU-material assumptions, demonstrating the algorithm's effectiveness.",
+        "evidence_span": "Comparing err(H, \u02c6HITU) for brick buildings and concrete ground with err(H, \u02c6HR) for reconstructed materials in Fig. 5, the average percentage error decreases from 11.66% to 4.39%, and the median position-wise MASE of HR and H is \u221216.34 dB, reveling effectiveness of the proposed algorithm."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Inferring materials from channel measurements is promising because it directly captures how materials affect the channel.",
+        "evidence_span": "as it captures how material impacts on the channel."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The far-field constraint is justified by the Rayleigh-distance phase-error criterion under normal incidence.",
+        "evidence_span": "Proof: The Rayleigh distance dRayl is defined as the minimum link distance under normal incidence with (\u03d5I, \u03b8I) = (0, \u03c0 2 ), for which the phase error \u2206\u03c6(dRayl) \u2264\u03c0/8"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Closed-form solutions are hard because of complex expressions plus square-root and complex-domain complications.",
+        "evidence_span": "Due to the complex expressions in (4), (6), (22), Lemma 1, and the extra complicity from the square root and complex domain [21], closed-form solutions are difficult to be obstained."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper proposes that a material-aware channel model can explicitly characterize material influence on wireless channels and enable reconstruction.",
+        "evidence_span": "To fill this gap, this paper proposes a material-aware channel model that explicitly characterizes the influence of scatterer materials on the wireless channel."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper develops an EM-theory-based material-aware channel model with explicit dependence on permittivity and conductivity, plus a gradient-descent material reconstruction algorithm.",
+        "evidence_span": "this paper develops a material-aware channel model based on electromagnetic (EM) theory that explicitly characterizes scatterer materials via their relative permittivities and conductivities, and proposes an iter- ative gradient descent based material reconstruction algorithm."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper proposes an iterative gradient-descent algorithm to infer material properties from channel measurements.",
+        "evidence_span": "In the following sections, an iterative algorithm is proposed to infer m from H and its performance is verified."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "A gradient descent-based iterative method is proposed to solve the material reconstruction problem.",
+        "evidence_span": "In this section, an iterative gradient descent-based algorithm is proposed to solve the material reconstruction problem."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "An iterative gradient-descent algorithm is proposed for material reconstruction.",
+        "evidence_span": "In this section, an iterative gradient descent-based algorithm is proposed to solve the material reconstruction problem."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "Full-wave simulations validate the model and reconstruction algorithm and indicate potential for efficient CKM generation.",
+        "evidence_span": "Full wave simulation re- sults validate the developed model and the proposed algorithm, demonstrating their potentials for efficient CKM generation via environment reconstruction."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Numerical results from full-wave simulation validate the proposed models' effectiveness for CKM generation.",
+        "evidence_span": "Finally, numerical results based on full wave simulation are provided to validate the effectiveness of the proposed models, demonstrating their potentials for effective CKM generation."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The proposed model matches full-wave simulations well, with MASE of \u221213.88 dB relative to PO.",
+        "evidence_span": "As shown in Fig. 4, the proposed model agrees well with full wave simulations, achieving a MASE of \u221213.88 dB relative to PO."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Material reconstruction reduces average percentage error from 11.66% to 4.39%.",
+        "evidence_span": "Comparing err(H, \u02c6HITU) for brick buildings and concrete ground with err(H, \u02c6HR) for reconstructed materials in Fig. 5, the average percentage error decreases from 11.66% to 4.39%"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The reconstructed channel has a median position-wise MASE of \u221216.34 dB relative to the true channel.",
+        "evidence_span": "the median position-wise MASE of HR and H is \u221216.34 dB"
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "This reconstruction approach requires an explicit model linking material properties to channel response.",
+        "evidence_span": "However, this method requires a model explicitly linking material properties to the channel response."
+      },
+      {
+        "role": "constraint",
+        "content": "Facet dimensions are chosen so transmitter/receiver distances satisfy the far-field Rayleigh-distance condition.",
+        "evidence_span": "Let LH and LV be chosen such that ||\u2206\u02d8q|| and ||\u2206\u02dcq|| exceed the Rayleigh distance."
+      },
+      {
+        "role": "constraint",
+        "content": "To satisfy the far-field Rayleigh-region condition, the link distances and facet dimensions must jointly meet a lower-bound inequality.",
+        "evidence_span": "Besides, to ensure the facet locates at the far-field region defined by Rayleigh distance, the link distances ||\u2206\u02d8q|| and ||\u2206\u02dcq|| should satisfy: Lemma 2: To locates at the far-field region, LH, LV of facet and ||\u2206\u02d8q||, ||\u2206\u02dcq|| should be jointly considered: min{||\u2206\u02d8q||, ||\u2206\u02dcq||} \u22652(L2 H + L2 V)/\u03bb \u2212\u03bb/32. (29)"
+      },
+      {
+        "role": "constraint",
+        "content": "The optimization constrains permittivity to be at least 1 and conductivity to be positive.",
+        "evidence_span": "s.t. \u03b5s \u22651, s \u2208{1, 2, \u00b7 \u00b7 \u00b7 , S}\n\u03c3s > 0, s \u2208{1, 2, \u00b7 \u00b7 \u00b7 , S}."
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Accurate CKM generation requires precise environment reconstruction, including 3D geometry and scatterer materials, but while geometry can be obtained relatively easily (e.g., from LiDAR), acquiring materials remains challenging even when 3D geometry is already available because materials are hard to infer directly from sparse channel measurements due to the lack of an explicit channel model linking them.",
+        "evidence_spans": [
+          "Accurate CKM generation requires precise reconstruction of the environment, including 3D geometries and scatterer materials, typically from multi-modal sensory observations such as LiDAR point clouds and sparse channel measurements. While the former is relatively easy to acquire, materials remain difficult to obtain directly from sparse channel measurements due to the lack of an explicit channel model linking them.",
+          "This approach offers ex- plainability, generalizability, and improved data efficiency, but material acquisition remains challenging despite the already availability of 3D geometry LiDAR point clouds."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Existing CKM generation methods fall into two main prior approaches: (1) direct end-to-end generation from multimodal observations using mathematical interpolation, matrix completion, or deep learning; and (2) environment-reconstruction-based generation that first reconstructs 3D geometry and materials, then generates channel knowledge using diffusion models, flow matching, or ray tracing.",
+        "evidence_spans": [
+          "Overall, CKM generation methods fall into two categories, including direct end-to-end generation from multi- modal observations via mathematical interpolation [7], matrix completion [8], or deep learning, which requires abundant measurements",
+          "and environment reconstruction based genera- tion, which first reconstructs 3D geometry and materials, then applies diffusion models [9], flow matching [10], or ray tracing [11] to generate channel knowledge."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior material inference approaches recognize materials from visuals or integrated sensing and communication (ISAC).",
+        "evidence_spans": [
+          "inferring materials from sparse channel measure- ments for CKM generation is more promising than recognizing from visuals [12] or ISAC [13]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior channel/material modeling approaches include statistical channel models; the unified channel model, geometry-based stochastic model (GBSM), and pervasive models that incorporate materials only implicitly via radar cross section (RCS); and deterministic models based on numerical computation.",
+        "evidence_spans": [
+          "While statistical models [14] omit materials; the 1 unified channel model [15], geometry-based stochastic model (GBSM), and pervasive models [16] incorporate materials only implicitly via radar cross section (RCS), which depends on material, directions, and frequency; deterministic models [17] rely on numerical computation"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Full-wave physical optics (PO) and method of moments (MoM) are prior baseline methods used for comparison in evaluating the RCS model.",
+        "evidence_spans": [
+          "by comparing S(P, aI, aR) with full wave physical optics (PO) and method of moments (MoM) results SPO(P, aI, aR) and SMoM(P, aI, aR)",
+          "by comparing S(P, aI, aR) with full wave physical optics (PO) and method of moments (MoM) results SPO(P, aI, aR) and SMoM(P, aI, aR) [23]"
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "Direct end-to-end CKM generation methods require abundant measurements.",
+        "evidence_spans": [
+          "direct end-to-end generation from multi- modal observations via mathematical interpolation [7], matrix completion [8], or deep learning, which requires abundant measurements"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Existing channel modeling approaches handle materials inadequately: statistical models omit materials, unified/GBSM/pervasive models include them only implicitly via RCS, and deterministic models rely on numerical computation.",
+        "evidence_spans": [
+          "While statistical models [14] omit materials; the 1 unified channel model [15], geometry-based stochastic model (GBSM), and pervasive models [16] incorporate materials only implicitly via radar cross section (RCS), which depends on material, directions, and frequency; deterministic models [17] rely on numerical computation"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Closed-form solutions are difficult to obtain because the relevant expressions are complex and additionally involve square roots and complex-domain terms.",
+        "evidence_spans": [
+          "Due to the complex expressions in (4), (6), (22), Lemma 1, and the extra complicity from the square root and complex domain [21], closed-form solutions are difficult to be obstained."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [],
+    "inspiration_source": [],
+    "causal_claim": [
+      {
+        "content": "The high complexity of XL-MIMO channel estimation, ISAC sensing, and mmWave/THz high-data-rate systems limits their deployment.",
+        "evidence_spans": [
+          "However, the resulting complexity in XL-MIMO channel estimation, ISAC sensing, and extra high data rate of mmWave/THz systems limits their deployment [4]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "When the geometry of the environment/scatterers is known or fixed, the channel/RCS depends explicitly on material properties, establishing a direct material\u2013channel link that enables reconstruction or inference of materials from channel measurements.",
+        "evidence_spans": [
+          "Remark 1: Expressing hs(qT, qR) in (1) as an explicit function of {\u03b5s, \u03c3s} establishes a direct link between materials and the channel, which enables the reconstruction of m from H with precise geometries of S scatterers as priori knowledge.",
+          "Remark 3: Once the geometries of the target environment are determined, the RCSs in (6) and (22) only depend explicitly on the material properties m through \u03a5(\u03b5, \u03c3) and \u03a8(\u03b5, \u03c3), which enables the inference of m from H via (4)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The weighting term emphasizes positions with larger deviation.",
+        "evidence_spans": [
+          "which aims to optimize the position with large deviation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because closed-form solutions are difficult, the authors use an iterative gradient-descent algorithm to approximately solve the problem with tolerable complexity.",
+        "evidence_spans": [
+          "We thus propose an iterative gradient descent algorithm to approx- imately solve (36) with tolerable complexity."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using reconstructed materials instead of ITU material assumptions reduces channel error, demonstrating the effectiveness of the proposed algorithm.",
+        "evidence_spans": [
+          "Comparing err(H, \u02c6HITU) for brick buildings and concrete ground with err(H, \u02c6HR) for reconstructed materials in Fig. 5, the average percentage error decreases from 11.66% to 4.39%, and the median position-wise MASE of HR and H is \u221216.34 dB, reveling effectiveness of the proposed algorithm."
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "Inferring materials from channel measurements is promising because it directly captures how materials affect the channel.",
+        "evidence_spans": [
+          "as it captures how material impacts on the channel."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The far-field constraint is justified by the Rayleigh-distance phase-error criterion under normal incidence.",
+        "evidence_spans": [
+          "Proof: The Rayleigh distance dRayl is defined as the minimum link distance under normal incidence with (\u03d5I, \u03b8I) = (0, \u03c0 2 ), for which the phase error \u2206\u03c6(dRayl) \u2264\u03c0/8"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Closed-form solutions are difficult to obtain because the expressions are complex and further complicated by square-root and complex-domain issues.",
+        "evidence_spans": [
+          "Due to the complex expressions in (4), (6), (22), Lemma 1, and the extra complicity from the square root and complex domain [21], closed-form solutions are difficult to be obstained."
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "The paper hypothesizes/proposes that an EM-theory-based material-aware channel model can explicitly characterize the influence of scatterer materials on wireless channels through relative permittivity and conductivity, and that this characterization enables material reconstruction from channel measurements via an iterative gradient-descent algorithm.",
+        "evidence_spans": [
+          "To fill this gap, this paper proposes a material-aware channel model that explicitly characterizes the influence of scatterer materials on the wireless channel.",
+          "this paper develops a material-aware channel model based on electromagnetic (EM) theory that explicitly characterizes scatterer materials via their relative permittivities and conductivities, and proposes an iter- ative gradient descent based material reconstruction algorithm.",
+          "In the following sections, an iterative algorithm is proposed to infer m from H and its performance is verified.",
+          "In this section, an iterative gradient descent-based algorithm is proposed to solve the material reconstruction problem."
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "Full-wave simulation results validate the proposed model and reconstruction algorithm for CKM generation; the model matches full-wave simulations well, achieving a MASE of \u221213.88 dB relative to PO.",
+        "evidence_spans": [
+          "Full wave simulation re- sults validate the developed model and the proposed algorithm, demonstrating their potentials for efficient CKM generation via environment reconstruction.",
+          "Finally, numerical results based on full wave simulation are provided to validate the effectiveness of the proposed models, demonstrating their potentials for effective CKM generation.",
+          "As shown in Fig. 4, the proposed model agrees well with full wave simulations, achieving a MASE of \u221213.88 dB relative to PO."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Material reconstruction improves channel accuracy: the average percentage error decreases from 11.66% to 4.39%, and the reconstructed channel has a median position-wise MASE of \u221216.34 dB relative to the true channel.",
+        "evidence_spans": [
+          "Comparing err(H, \u02c6HITU) for brick buildings and concrete ground with err(H, \u02c6HR) for reconstructed materials in Fig. 5, the average percentage error decreases from 11.66% to 4.39%)",
+          "the median position-wise MASE of HR and H is \u221216.34 dB"
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "The reconstruction approach requires an explicit model linking material properties to the channel response.",
+        "evidence_spans": [
+          "However, this method requires a model explicitly linking material properties to the channel response."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "To ensure the facet is in the far-field Rayleigh region, the facet dimensions and the transmitter/receiver link distances must be jointly chosen to satisfy a lower-bound Rayleigh-distance condition, e.g., with distances exceeding the Rayleigh threshold and specifically min{||\u2206\u02d8q||, ||\u2206\u02dcq||} \u2265 2(L_H^2 + L_V^2)/\u03bb \u2212 \u03bb/32.",
+        "evidence_spans": [
+          "Let LH and LV be chosen such that ||\u2206\u02d8q|| and ||\u2206\u02dcq|| exceed the Rayleigh distance.",
+          "Besides, to ensure the facet locates at the far-field region defined by Rayleigh distance, the link distances ||\u2206\u02d8q|| and ||\u2206\u02dcq|| should satisfy: Lemma 2: To locates at the far-field region, LH, LV of facet and ||\u2206\u02d8q||, ||\u2206\u02dcq|| should be jointly considered: min{||\u2206\u02d8q||, ||\u2206\u02dcq||} \u22652(L2 H + L2 V)/\u03bb \u2212\u03bb/32. (29)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The optimization constrains material parameters so that permittivity is at least 1 and conductivity is strictly positive.",
+        "evidence_spans": [
+          "s.t. \u03b5s \u22651, s \u2208{1, 2, \u00b7 \u00b7 \u00b7 , S}\n\u03c3s > 0, s \u2208{1, 2, \u00b7 \u00b7 \u00b7 , S}."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

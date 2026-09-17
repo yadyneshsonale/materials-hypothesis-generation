@@ -1,0 +1,954 @@
+{
+  "paper_id": "2605.29181",
+  "chunks_processed": 5,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Extending quantum algorithms to nonlinear mechanics problems is difficult because quantum operations are inherently linear.",
+        "evidence_span": "The extension of quantum algorithms to nonlinear problems in mechanics remains challenging due to the inherently linear structure of quantum operations."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Practical realization and multidimensional extension face algorithmic and hardware challenges.",
+        "evidence_span": "We discuss several practical algorithmic and hardware-based challenges towards a practical realization of the framework and extension to multi- dimensional problems."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Direct implementation of nonlinear transformations in quantum evaluation is difficult because quantum operations are linear.",
+        "evidence_span": "A key challenge, however, arises from the inherently linear nature of quantum operations, which makes the direct implementation of nonlinear transformations involved in the potential energy dif- ficult."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Quantum evaluation of the original energy would have to handle a logarithmic nonlinear term.",
+        "evidence_span": "Evaluating (25) within a quantum framework would require us to deal with the logarithmic nonlin- ear term."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The study identifies practical challenges in accuracy, convergence, and computational cost that still need to be addressed.",
+        "evidence_span": "The study highlights several practical challenges, including the influence of polynomial approximations on accuracy, convergence difficulties in more complex formulations, and increased computational cost associated with higher-order expansions and auxiliary variables."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "There is a need for more efficient approximation strategies that preserve accuracy while reducing quantum resources.",
+        "evidence_span": "In particular, developing more efficient approximation strategies that balance accuracy with quantum resource requirements (such as circuit depth and ancilla usage) is of primary interest."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Nonlinear mechanics is commonly solved by discretizing to an algebraic system and iteratively solving it.",
+        "evidence_span": "A common approach to solving nonlinear mechanics problems is to obtain an algebraic system following discretization, which is then solved iteratively."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Existing QC work mostly targets linear ODE/PDE problems via quantum linear systems algorithms after discretization.",
+        "evidence_span": "The majority of the relevant existing QC literature focuses on the evaluation of linear ordinary differential equations (ODEs) and PDEs. A common solution approach is to construct a linear sys- tem of equations following discretization, and evaluating it using quantum linear systems algorithms (QLSAs) [5, 6]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "HHL introduced a QLSA for sparse linear systems by encoding b and preparing a state proportional to A^{-1}|b\u27e9.",
+        "evidence_span": "The foundational work by Harrow et al. [7] (HHL) introduced the first QLSA, which solves sparse linear systems Ax = b by encoding the right-hand side vector b as a quantum state |b\u27e9. Using Hamiltonian simulation [8] and quantum phase estimation, the algorithm prepares a state |x\u27e9\u221dA\u22121|b\u27e9 that encodes the properties of the solution vector x."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Later QLSA variants used LCU, QSVT, and adiabatic approaches.",
+        "evidence_span": "Subsequent developments pro- duced high-precision QLSA variants based on linear combination of unitaries (LCU) [9], quantum singular value transformation (QSVT) [10], and adiabatic approaches [11]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "VQAs use parameterized quantum circuits to evaluate a cost while a classical optimizer updates parameters.",
+        "evidence_span": "The central idea behind VQAs is to offload the computationally intensive parts of a problem to a quan- tum processor that evaluates a cost function using parameterized quantum circuits encoding the quantity of interest. The circuit parameters are then iteratively updated by a classical optimizer to minimize this cost function."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Poisson and elliptic FEM problems have been tackled with QLSAs in the fault-tolerant regime.",
+        "evidence_span": "For example, the Poisson equation and elliptic finite element problems have been ad- dressed via QLSAs [19, 20], lying in the fault-tolerant quantum computing regime."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Liu et al. used a QFT-based algorithm for linear elastic homogenization of periodic composites.",
+        "evidence_span": "Similarly, Liu et al. [21] demonstrate an algorithm for the linear elastic homogenization of periodic composites using a quantum Fourier transform (QFT)-based approach."
+      },
+      {
+        "role": "prior_approach",
+        "content": "VQLS was used for FEM heat conduction and plane-strain elasticity.",
+        "evidence_span": "Within the VQA regime, the Variational Quantum Linear Solver (VQLS) [22] emerged as one of the prominent VQAs for linear systems, and was used by Arora et al. [23] for FEM-based steady-state heat conduction, and Rao et al. [24] for plane strain elasticity problems."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Quantum annealers were used to solve linear finite-element systems via quadratic optimization.",
+        "evidence_span": "Raisuddin and De [25] instead employed quantum annealers to solve linear finite element systems via an equivalent quadratic optimization formulation."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior nonlinear quantum approaches reformulate nonlinearities into compatible representations by expanding different quantities.",
+        "evidence_span": "Several existing approaches refor- mulate nonlinearities in the governing equations into representations compatible with available quantum algorithmic primitives, differing primarily in the quantities being expanded and the re- sulting reformulation."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Kyriienko et al. used a truncated Chebyshev quantum feature map and evaluated nonlinear operations classically.",
+        "evidence_span": "Kyriienko et al. [26] represent the solution function through a truncated Chebyshev quantum feature map, while the nonlinear operations associated with the governing equation are evaluated through classical post-processing."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Xu et al. expanded the solution path in a continuation parameter to obtain linear subproblems solved by VQLS.",
+        "evidence_span": "Xu et al. [27] expand the solution path with respect to a continuation parameter, resulting in a sequence of linear subproblems solved using VQLS."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Endo and Takahashi used Carleman linearization to embed a nonlinear differential equation into a larger truncated linear system.",
+        "evidence_span": "Endo and Takahashi [28] employ Carleman linearization to embed a nonlinear differ- ential equation into a larger truncated linear system."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Soize et al. used a related strategy with truncated polynomial expansion for a Fokker\u2013Planck eigenvalue problem solved by VQE.",
+        "evidence_span": "Soize et al. [29] apply a similar strategy to a Fokker\u2013Planck eigenvalue problem, which, although linear, involves an underlying non-algebraic potential approximated via a truncated polynomial expansion to enable a Variational Quantum Eigensolver-based solution."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Lubasch et al. proposed a VQA framework for nonlinear PDEs with polynomial nonlinearities using quantum nonlinear processing units.",
+        "evidence_span": "In the VQA regime, Lubasch et al. [30, 31] introduced a novel VQA framework for nonlinear PDEs with polynomial nonlinearities by devising quantum nonlinear processing units and demon- strated the efficacy of this approach on Burgers and nonlinear Schr\u00a8odinger equations."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Sarma et al. extended the QNPU-based nonlinear PDE approach to a broader class of nonlinear PDEs.",
+        "evidence_span": "Sarma et al. [32] recently extended this approach to solve a broader class of nonlinear PDEs."
+      },
+      {
+        "role": "prior_approach",
+        "content": "These nonlinear PDE VQA works use a least-squares functional as the cost function.",
+        "evidence_span": "The idea expressed in these works relies on a least-squares functional as the cost function."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Sato et al. solved the Poisson equation by minimizing Dirichlet energy in a VQA framework.",
+        "evidence_span": "Sato et al. [33] proposed a VQA to solve the Poisson equation by formulating the corresponding Dirichlet energy as a cost function parameterized by a quantum circuit."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Over and Bengoechea et al. derived a variational form for the time-discrete advection\u2013diffusion equation and minimized it with VQA.",
+        "evidence_span": "Similarly, Over and Bengoechea et al. [34, 35], also derived a variational form for the advection\u2013diffusion equation in the time-discrete setting and minimized it within a VQA framework."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "QLSA-style methods need deep circuits and low error rates beyond NISQ hardware capabilities.",
+        "evidence_span": "However, despite their favorable asymptotic complexity, the aforementioned approaches require deep circuits and error rates that are beyond the capabilities of the NISQ-era hardware [12]."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "VQAs suffer trainability issues such as barren plateaus, especially with larger width/depth.",
+        "evidence_span": "VQAs face well-documented trainability challenges. As circuit width or ansatz depth increases, the cost landscape can develop barren plateaus, regions where gradients vanish exponentially and classical optimization stalls [16]"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Existing methods for nonlinear transformations can be resource-intensive.",
+        "evidence_span": "Existing methods for nonlinear transformations can be resource-intensive [42]."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Arbitrary quantum-state preparation is a bottleneck whose complexity scales exponentially with qubit count.",
+        "evidence_span": "Preparation of arbitrary quantum states is a well- known bottleneck in quantum computing. The complexity to prepare an arbitrary state scales exponentially with number of qubits [54]."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Current implementations are limited by expensive statevector simulation, especially for larger problems, which prevents scaling analysis.",
+        "evidence_span": "In addition, current implementations are limited by the cost of statevector simulations, particularly for larger problem sizes, restricting the analysis of scaling behavior."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "The work uses minimization of the variational form rather than the weak form to make the problem suitable for VQA.",
+        "evidence_span": "(1) The numerical problem is expressed as the minimization of the variational form (as opposed to the weak form) to prepare it for VQA;"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Instead of resource-intensive nonlinear-transformation methods, the paper uses low-degree polynomial approximations implemented by shallow QNPU circuits for NISQ suitability.",
+        "evidence_span": "Instead, we propose low-degree polynomial approximations of arbitrary nonlinearities, which can be imple- mented using relatively shallow quantum circuits known as Quantum Nonlinear Processing Units (QNPUs), as developed in [30], and are more suitable for near-term NISQ devices."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The study simplifies the compressible Neo-Hookean model by setting \u039b=0 and using a 1D unidirectional representation.",
+        "evidence_span": "For the present study, we consider a special case of the compressible Neo-Hookean model by setting \u039b = 0, which eliminates the volumetric resistance term, and focusing on a unidirectional and one-dimensional representation."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Taylor expansion is preferred when small loads keep u\u2032 within its validity range; IHT is reserved for larger deformations because it is costlier to implement.",
+        "evidence_span": "Although more flexible than the Taylor series, the IHT expansion is costlier to implement within the current framework, requiring the auxiliary variable and penalty formulation introduced below. Consequently, the Taylor expansion is preferred whenever small enough loadings keep u\u2032 within its range of validity, with the IHT expansion reserved for larger deformations."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The ansatz used for state preparation is adopted from Sim et al.",
+        "evidence_span": "In this work, we adopt the ansatz proposed by Sim et al. [41], shown in Fig. 1."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "An iterative functional approach from prior work is suggested as another route, using low-order solutions as reference states for successive corrections.",
+        "evidence_span": "Similarly, an iterative functional approach has been developed in [43], in which an approximate low-order solution is first obtained and subsequently used as a reference state for expanding the nonlinear terms. This procedure generates a sequence of iterative VQAs"
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Introducing polynomial approximations makes the nonlinear strain-energy terms compatible with variational quantum algorithms.",
+        "evidence_span": "To enable a hybrid (classical-quantum implementation), polynomial approximations of the nonlinear terms in strain energy density are introduced, yielding a representation compatible with variational quantum algorithms."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Computational cost increases rapidly with system size.",
+        "evidence_span": "The compu- tational cost of the overall process grows rapidly with the system size."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Growing demand for large, complex simulations puts pressure on conventional architectures because of performance, memory, and energy-efficiency limits.",
+        "evidence_span": "As demand for simulation of large, complex material and structural systems increases, such computations place significant pressure on conventional computing architectures, particularly due to performance, memory, and energy-efficiency limitations associated with the von Neumann computing architectures [1]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Hardware noise worsens the barren plateau problem.",
+        "evidence_span": "The barren plateau problem is compounded by hardware noise [18]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "For hyperelastic materials, stress deriving from strain energy implies existence of a potential energy functional whose critical points satisfy the weak form.",
+        "evidence_span": "For hyperelastic materials, the stress follows from a strain energy density W(F ) via P = \u2202W/\u2202F . For such materials, it is a classical result that there exists a potential energy functional... The critical points of E satisfy the weak form of the governing equations (1)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Assuming cross-sectional uniformity lets 3D integrals factor into cross-sectional area times 1D integrals.",
+        "evidence_span": "Since all fields are uniform over the cross-section, volume and surface integrals factor into the cross-sectional area A, multiplied by one-dimensional integrals over (0, L)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Working per unit cross-sectional area reduces the 3D formulation to a 1D problem.",
+        "evidence_span": "For simplicity, and without loss of generality, we work per unit reference cross-sectional area (i.e., |A| = 1), so that the three-dimensional formulation reduces to a one-dimensional problem on the interval\n\u21260 = (0, L),\n\u2202\u21260 = {0, L}."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Classically combining circuit expectation values estimates the total potential energy.",
+        "evidence_span": "In particular, expectation values from a small set of circuits, are combined classically to estimate the total potential energy of the system."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Optimal control parameters define a discrete profile that is a critical point of the approximated energy and is taken as the solution.",
+        "evidence_span": "The optimal parameters (\u03bb\u2217\n0, \u03bb\u2217) identify the discrete\nprofile\nu\u2217= \u03bb\u2217\n0 bV (\u03bb\u2217)|0\u27e9,\n(18)\nwhich corresponds to a critical point of \u02dcE and is therefore taken as the solution."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Positive second variation on admissible displacements makes the energy strictly convex, implying a unique minimizer and weak solution.",
+        "evidence_span": "In this case, it can be shown that for admissible displacements satisfying u\u2032(X) > \u22121, the second variation of the energy functional is strictly positive. Conse- quently, the functional is strictly convex on the admissible set, implying the existence of a unique minimizer. This minimizer coincides with the unique weak solution of the governing equation"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Taylor truncation introduces constitutive-model error and therefore displacement error.",
+        "evidence_span": "The approximation (26a) introduces an error in the constitutive modeling and, consequently, in the computed displacement field."
+      },
+      {
+        "role": "causal_claim",
+        "content": "For larger deformations, the IHT expansion remains valid for all admissible u\u2032 > -1, including u\u2032=1.",
+        "evidence_span": "This approximation is valid for all u\u2032 > \u22121, including the transition point u\u2032 = 1, where the IHT argument u\u2032/(u\u2032+2) = 1/3 lies well within its convergence radius."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Introducing an auxiliary variable and large-penalty term enforces the IHT relation during minimization.",
+        "evidence_span": "we introduce an auxiliary variable y and define the augmented energy functional... where P \u226b1 is the penalty parameter enforcing the constraint\ny \u2248u\u2032/(u\u2032 + 2)\n(31)\nduring minimization"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Finite penalty introduces an O(P^{-1}) error in energy density, stress, and displacement that vanishes as P increases.",
+        "evidence_span": "In addition to the IHT truncation error, the finite-penalty enforcement introduces a separate O(P\u22121) error in the strain energy density, stress, and resulting displacement field, which vanishes as P \u2192\u221e"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Known structure in states can enable more efficient state-preparation methods.",
+        "evidence_span": "For states with known structure, such as sparse vectors or amplitudes described by low-degree polynomial functions, more efficient structured techniques may be used [55, 56]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Uniform-mesh auxiliary vectors can be prepared efficiently with ancilla-free depth O(log^2 M), avoiding optimization-based state preparation.",
+        "evidence_span": "Similarly, for a uniform mesh, several auxiliary vectors m used in this work reduce to uniform superpositions\nP\n1\n\u221a\nj\u2208S|j\u27e9 over a known index set S with |S| = M, enabling ancilla-free preparation with depth\nO(log2 M) [57] and thereby bypassing the optimization-based procedure in Eq. (66)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Higher-order approximations increase the number of circuit evaluations rapidly in the direct-expansion method.",
+        "evidence_span": "If higher-order approximations are required for improved accuracy, the number of circuit evaluations can grow rapidly"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Block encoding can reduce circuit-count growth, but postselection success probability can greatly raise measurement overhead.",
+        "evidence_span": "In contrast to the direct-expansion-based approach, the block-encoding-based approach can sig- nificantly reduce the number of circuit growth overhead, as element-wise arithmetic operations are effectively handled within the block-encoding framework. However, the post-selection success prob- ability can increase the measurement overhead significantly."
+      },
+      {
+        "role": "causal_claim",
+        "content": "For kth-order u' computations, success probability decreases as powers of the single block-encoding success probability.",
+        "evidence_span": "While evaluating a circuit involving the computation for kth order of u\u2032, the success probability will reduce as pk\u22121\ns\n, where ps is the success probability of a single block-encoding."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Positive second variation implies the energy is strictly convex over the admissible space.",
+        "evidence_span": "Hence, for \u00b5 > 0, the integrand in (118) is strictly positive for any v\u0338 = 0, which implies\n\u03b42E[u; v, v] > 0\n\u2200v \u2208V0, v\u0338 = 0.\nTherefore, the second variation defines a positive definite bilinear form on V0, and the energy\nfunctional E is strictly convex over the admissible space."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Strict convexity leads to a unique minimizer that solves the weak form.",
+        "evidence_span": "Consequently, the minimizer of E is\nunique and also represents the solution of the weak form (117)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Displacement error inherits geometric convergence when approximate displacement gradients stay away from u\u2032 = \u22121.",
+        "evidence_span": "Consequently, provided the approximate displacement gradients remain bounded away from u\u2032 =\n\u22121, the displacement error inherits the geometric convergence of the corresponding stress approx-\nimation."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Finite-penalty enforcement error in the auxiliary constraint decays as O(P^{-1}).",
+        "evidence_span": "The above result shows that the error introduced by the finite-penalty enforcement of the auxiliary\nconstraint decays as O(P\u22121)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Substituting the finite-penalty solution into the energy shows the strain-energy-density error also decays as O(P^{-1}).",
+        "evidence_span": "Substituting yP = y\u2217 + O(P\u22121) gives\nW P(u\u2032; P) \u2212W N(u\u2032) = \u22122\u00b52\u0000\n1 + y\u2217(u\u2032)2\u00012\nP(u\u2032 + 2)2\n+ O(P\u22122).\n(137)\nThus, the penalty-induced error in the strain energy density also decays as O(P\u22121)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Because the density error is O(P^{-1}) across the admissible domain, the total potential-energy functional error is O(P^{-1}).",
+        "evidence_span": "Since the above penalty-\ninduced strain-energy-density error is O(P\u22121) throughout the physically admissible domain, inte-\ngration over \u21260 gives\n\u02dcEP[u] \u2212\u02dcEN[u] = O(P\u22121).\n(138)"
+      },
+      {
+        "role": "causal_claim",
+        "content": "As penalty grows, the finite-penalty functional approaches the exact-constraint IHT functional.",
+        "evidence_span": "Hence, the finite-penalty functional approaches the corresponding exact-constraint IHT functional\nas P \u2192\u221e."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The displacement-gradient and displacement errors due to finite penalty are O(P^{-1}) in this 1D setting.",
+        "evidence_span": "yielding\nuP \u2212uN\n0(\u21260) = O(P\u22121),\n(140)\n...\nConsequently, in the\npresent one-dimensional setting,\n...\nuP \u2212uN\nL\u221e(\u21260) \u2264\n...\n0(\u21260) = O(P\u22121).\n(141)"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Larger ansatz depths give higher success rates.",
+        "evidence_span": "The success\nprobabilities computed out of the 20 runs when problem size is set to n = 6 for different polynomial\norders are reported in table shown in Fig. 9, which shows higher success rates for larger depths."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Barren plateaus are linked to cost-function and ansatz choice, with global observables causing them more readily than local ones.",
+        "evidence_span": "this behavior is closely tied to the choice of cost function and the ansatz, with global observables inducing barren plateaus more readily than local ones [17]."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The nature and number of critical points depend on properties of the strain-energy density.",
+        "evidence_span": "The number and nature of the critical points (i.e., minima vs. saddle points) of the potential energy functional depend on the properties of W [36]."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Displacement-gradient error is controlled by constitutive stress error because the exact stress is strongly monotone.",
+        "evidence_span": "From the strong monotonicity of P established in Appendix A.1, we have P \u2032(\u03bb) =\n\u00b5(1 + \u03bb\u22122) \u2265\u00b5. Thus, applying the mean value theorem to the exact stress function, and noting\nthat the exact and approximate solutions correspond to the same equilibrium loading, the error in\nthe displacement gradient can be bounded in terms of the corresponding constitutive stress error"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Strong convexity implies strong monotonicity of stress, enabling displacement-gradient error to be bounded by penalty-induced stress perturbation.",
+        "evidence_span": "and hence the corresponding stress is strongly monotone, throughout the physically admissible\nrange. Comparing the equilibrium conditions associated with \u02dcEP and \u02dcEN therefore bounds the\ndisplacement-gradient error by the penalty-induced stress perturbation"
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "A variational quantum formulation can solve nonlinear elasticity problems from hyperelastic models using a hybrid quantum-classical approach.",
+        "evidence_span": "This manuscript explores a variational quantum formulation for nonlinear elasticity problems arising from hyperelastic material models. The approach leverages the potential energy structure of hyperelasticity and employs a hybrid quantum\u2013classical framework"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The proposed framework uses hyperelastic strain-energy structure to formulate nonlinear elasticity as a variational quantum problem.",
+        "evidence_span": "This manuscript presents a VQA-based approach for nonlinear elasticity problems arising from hyperelastic material models under certain assumptions. The proposed framework exploits the fact that, for hyperelastic materials, the stress is derived from a strain energy density function, thereby enabling a variational formulation in terms of a total potential energy functional [36, 37, 38, 39, 40]. The resulting approximated potential energy functional is constructed to integrate naturally within a variational quantum framework."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "A complete VQA framework can be built by encoding the displacement field as a quantum state and using potential energy as the cost function.",
+        "evidence_span": "The VQA framework requires a cost function to optimize, which we construct from the system\u2019s potential energy. To evaluate this energy on a quantum 3 computer, the displacement field (represented by its discretized values) must be encoded as a quantum state. This motivates the introduction of a quantum representation of real-valued vectors. Finally, we integrate these components to establish a complete framework for approximating the solution to the underlying elasticity problem."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Nonlinearities in the energy can be approximated by truncated polynomials to define a VQA cost from the approximated energy.",
+        "evidence_span": "Accordingly, any nonlinearity G(u\u2032) in the functional (8) is approximated as\nNtn\nX\nG(u\u2032) \u2248\ni=0\nci (u\u2032)i,\n(16)\nwhere Ntn denotes the truncation order, yielding an approximated functional denoted by \u02dcE... Accordingly, we define the VQA cost function as follows:\nC(\u03bb0, \u03bb) := \u02dcE(u(\u03bb0, \u03bb))."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "An alternative constrained formulation with an auxiliary variable z could remove the need to approximate the logarithm while keeping polynomial nonlinearities.",
+        "evidence_span": "This reformulation eliminates the need to approximate the logarithmic term and, at the same time, expresses all terms in the integrand in terms of polynomial nonlinearities."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Amplitude amplification could mitigate block-encoding measurement overhead.",
+        "evidence_span": "Amplitude amplification could help reduce this overhead [58]."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "Numerical experiments show that the proposed method is feasible for near-term quantum devices while examining how polynomial order affects accuracy and efficiency.",
+        "evidence_span": "Numerical experiments investigate the influence of the polynomial approximation order on the accuracy and efficiency of the proposed approach, illustrating its feasibility for near-term quantum devices."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The method is demonstrated on a simplified one-dimensional Neo-Hookean problem, with two approximation strategies and evaluation of polynomial-order effects.",
+        "evidence_span": "The proposed methodology is demonstrated on a simplified one-dimensional Neo-Hookean material-based problem. Two distinct approximation strategies are developed and implemented in accordance with contemporary VQA capabilities. The displacement field is discretized using first- and second-order finite element shape functions, and the formulation accommodates nonhomogeneous boundary conditions. The influence of higher-order polynomial approximations on the efficiency and accuracy of the VQA implementation is evaluated."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The proposed VQA framework was demonstrated on a 1D Neo-Hookean case and reproduced expected behavior with first- and second-order finite elements on non-uniform meshes and non-homogeneous boundary conditions.",
+        "evidence_span": "The methodology was demonstrated on a special case of one-dimensional Neo-Hookean problem, where the potential energy functional is used as the VQA cost function. Two types of polynomial approximations were investigated, and the VQA was shown to capture the expected behavior using both first- and second-order finite element discretizations on non-uniform meshes with non-homogeneous boundary conditions."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Taylor truncation error is bounded by alternating-series/geometric-tail estimates and decays geometrically for |u\u2032|<1, but only as O(1/N) at u\u2032=1.",
+        "evidence_span": "For 0 \u2264u\u2032 \u22641, the Taylor expansion forms an alternating series with terms decreasing in\nmagnitude, and its truncation error obeys the standard alternating-series bound [59]. For \u22121 <\nu\u2032 < 0, the remainder can instead be bounded using the corresponding geometric tail:\n...\nFor |u\u2032| < 1, the Taylor series converges absolutely, and the truncation error decays geometrically,\nO\n\u0000\n|u\u2032|N\u0001\n. At u\u2032 = 1 the series converges only conditionally, and the bound weakens to O(1/N),\nresulting in substantially slower convergence."
+      },
+      {
+        "role": "evidence_result",
+        "content": "IHT truncation error is geometrically bounded for all physically admissible u\u2032 > \u22121.",
+        "evidence_span": "The IHT expansion (29) with N number of terms is\nthe Taylor series of ln\n\u0010\n1+x\n1\u2212x\n\u0011\n/2 evaluated at x = u\u2032/(u\u2032 +2), so its truncation error can be bounded\nby a geometric tail,\n...\nvalid for all u\u2032 > \u22121, since |x| < 1 throughout this range, giving a truncation error that decays\ngeometrically as O\n\u0000\n|x|2N\u0001\n."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The truncated strain energy density remains strongly convex for u\u2032 > \u22121.",
+        "evidence_span": "It can be\nestablished that the truncated strain energy density remains strongly convex:\n...\n> \u00b5,\nu\u2032 > \u22121,\n(139)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "To achieve error below 10^{-7}, polynomial approximation order does not appear to affect required ansatz depth.",
+        "evidence_span": "To achieve an error below 10\u22127, polynomial\napproximation order does not appear to affect the ansatz depth."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Accurate solutions were obtained with relatively modest ansatz depths over the studied problem sizes.",
+        "evidence_span": "We also observe achieving accurate\nsolutions with relatively modest depths within the range of problem sizes considered."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Errors become negligible at depths much lower than those needed for parameter count to exceed problem size.",
+        "evidence_span": "We notice that the errors become negligible at considerably lower depths as\ncompared to the depth required to exceed the problem size (starred points in Fig. 9a)."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Numerical verification used noise-free statevector simulations rather than real quantum hardware.",
+        "evidence_span": "Numerical verification of the proposed approach has been performed using noise-free statevector simulations rather than execution on real quantum hardware."
+      },
+      {
+        "role": "constraint",
+        "content": "Physical admissibility requires positive stretch determinant throughout the domain.",
+        "evidence_span": "Physical admissibility requires\nJ(X) = det F (X) = \u03bb(X) > 0,\n\u2200X \u2208(0, L)"
+      },
+      {
+        "role": "constraint",
+        "content": "The Taylor approximation is used only when the displacement gradient is expected to stay below 1 in magnitude over the domain.",
+        "evidence_span": "Since u\u2032(X) is a spatially varying field, this approximation is used only when supX\u2208\u21260 |u\u2032(X)| < 1 is expected to hold over the domain, per (26b)."
+      },
+      {
+        "role": "constraint",
+        "content": "The minimization problem is subject to the left boundary displacement condition.",
+        "evidence_span": "(u\u2217, y\u2217) = arg min\nu,y\n\u02dcE[u, y],\nsubject to u(0) = \u00afu."
+      },
+      {
+        "role": "constraint",
+        "content": "Extending to realistic 2D/3D hyperelastic problems remains future work, with scalability still unresolved.",
+        "evidence_span": "The present 1D study establishes the feasibility of the proposed formulations in a controlled proof-of-concept setting, while their computational scalability and efficient extension to realistic 2D and 3D hyperelastic problems remain subjects for future investigation."
+      },
+      {
+        "role": "constraint",
+        "content": "Real-hardware deployment must contend with noise, latency, compilation, and queue-time effects, requiring hardware-aware optimization.",
+        "evidence_span": "The impact of hardware noise, cou-pling latency, native-gate-set compilation, and cloud-access queue times on the performance of the framework when deployed on real hardware requires further optimization of algorithmic choices and efficient hardware-aware implementation."
+      },
+      {
+        "role": "constraint",
+        "content": "Future extensions must preserve quantum compatibility while broadening the class of nonlinearities and moving to near-term hardware.",
+        "evidence_span": "Extending the framework to a broader class of nonlinearities while maintaining quantum compatibility and implementing the proposed approach on current and near-term quantum hardware will be explored, requiring modifications to the algorithmic structure."
+      },
+      {
+        "role": "constraint",
+        "content": "Physical admissibility requires positive stretch \u03bb = 1 + u\u2032 > 0.",
+        "evidence_span": "Since physical admissibility requires \u03bb = 1 + u\u2032 > 0"
+      },
+      {
+        "role": "constraint",
+        "content": "The physically admissible branch is the positive \u03bb branch.",
+        "evidence_span": "The physically admissible solution corresponds to \u03bb > 0, hence\nu\u2032(X) = \u03bb(X) \u22121,\n(123)\nwhere we only consider the positive branch of (122), respecting the local material orientation."
+      },
+      {
+        "role": "constraint",
+        "content": "Taylor convergence requires deformation to stay within \u22121 < u\u2032 < 1, equivalently 0 < \u03bb < 2, so loads cannot be too extreme.",
+        "evidence_span": "The Taylor series expansion converges absolutely for \u22121 < u\u2032 < 1, which corresponds to 0 < \u03bb < 2\nvia (123). This translates to the requirement that body forces and the applied traction boundary\ncondition must not be extreme enough to cause the resulting u\u2032 to violate its allowed limit."
+      },
+      {
+        "role": "constraint",
+        "content": "For Taylor, approximate gradients must satisfy supX |\u0169\u2032N(X)| < 1; for IHT, admissibility requires |\u0169\u2032N/(\u0169\u2032N+2)| < 1.",
+        "evidence_span": "For the Taylor approximation, this requires supX |\u02dcu\u2032\nN(X)| < 1, whereas for the IHT\napproximation, |\u02dcu\u2032\nN/(\u02dcu\u2032\nN + 2)| < 1 for all physically admissible \u02dcu\u2032\nN > \u22121."
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "A core motivation/problem is that extending quantum algorithms to nonlinear mechanics/energy evaluation is difficult because quantum operations are inherently linear, making direct implementation of nonlinear transformations\u2014such as the logarithmic nonlinear term in the original energy\u2014challenging.",
+        "evidence_spans": [
+          "The extension of quantum algorithms to nonlinear problems in mechanics remains challenging due to the inherently linear structure of quantum operations.",
+          "A key challenge, however, arises from the inherently linear nature of quantum operations, which makes the direct implementation of nonlinear transformations involved in the potential energy dif- ficult.",
+          "Evaluating (25) within a quantum framework would require us to deal with the logarithmic nonlin- ear term."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Beyond the core nonlinearity issue, practical deployment and scaling of the framework face algorithmic and hardware challenges, including multidimensional extension, accuracy and convergence limitations from polynomial approximations, increased computational cost from higher-order expansions and auxiliary variables, and the need for more resource-efficient approximation strategies that preserve accuracy while reducing circuit depth and ancilla usage.",
+        "evidence_spans": [
+          "We discuss several practical algorithmic and hardware-based challenges towards a practical realization of the framework and extension to multi- dimensional problems.",
+          "The study highlights several practical challenges, including the influence of polynomial approximations on accuracy, convergence difficulties in more complex formulations, and increased computational cost associated with higher-order expansions and auxiliary variables.",
+          "In particular, developing more efficient approximation strategies that balance accuracy with quantum resource requirements (such as circuit depth and ancilla usage) is of primary interest."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "A common classical approach for nonlinear mechanics is to discretize the governing equations into an algebraic system and solve it iteratively.",
+        "evidence_spans": [
+          "A common approach to solving nonlinear mechanics problems is to obtain an algebraic system following discretization, which is then solved iteratively."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Most prior quantum computing work for mechanics/PDEs has focused on linear ODE/PDE problems after discretization, typically constructing a linear system and solving it with quantum linear systems algorithms (QLSAs).",
+        "evidence_spans": [
+          "The majority of the relevant existing QC literature focuses on the evaluation of linear ordinary differential equations (ODEs) and PDEs. A common solution approach is to construct a linear sys- tem of equations following discretization, and evaluating it using quantum linear systems algorithms (QLSAs) [5, 6]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Foundational and subsequent QLSA-based prior work includes HHL for sparse linear systems, which encodes |b\u27e9 and prepares a state proportional to A^{-1}|b\u27e9 using Hamiltonian simulation and phase estimation, followed by later high-precision variants based on LCU, QSVT, and adiabatic methods.",
+        "evidence_spans": [
+          "The foundational work by Harrow et al. [7] (HHL) introduced the first QLSA, which solves sparse linear systems Ax = b by encoding the right-hand side vector b as a quantum state |b\u27e9. Using Hamiltonian simulation [8] and quantum phase estimation, the algorithm prepares a state |x\u27e9\u221dA\u22121|b\u27e9 that encodes the properties of the solution vector x.",
+          "Subsequent developments pro- duced high-precision QLSA variants based on linear combination of unitaries (LCU) [9], quantum singular value transformation (QSVT) [10], and adiabatic approaches [11]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "QLSA-based applications in computational mechanics/scientific computing include fault-tolerant quantum algorithms for the Poisson equation and elliptic finite-element problems, and a QFT-based algorithm for linear elastic homogenization of periodic composites.",
+        "evidence_spans": [
+          "For example, the Poisson equation and elliptic finite element problems have been ad- dressed via QLSAs [19, 20], lying in the fault-tolerant quantum computing regime.",
+          "Similarly, Liu et al. [21] demonstrate an algorithm for the linear elastic homogenization of periodic composites using a quantum Fourier transform (QFT)-based approach."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Variational quantum algorithms (VQAs) are a prior approach in which a parameterized quantum circuit evaluates a cost function and a classical optimizer iteratively updates the circuit parameters.",
+        "evidence_spans": [
+          "The central idea behind VQAs is to offload the computationally intensive parts of a problem to a quan- tum processor that evaluates a cost function using parameterized quantum circuits encoding the quantity of interest. The circuit parameters are then iteratively updated by a classical optimizer to minimize this cost function."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Within the VQA regime, the Variational Quantum Linear Solver (VQLS) has been used for linear finite-element applications including steady-state heat conduction and plane-strain elasticity.",
+        "evidence_spans": [
+          "Within the VQA regime, the Variational Quantum Linear Solver (VQLS) [22] emerged as one of the prominent VQAs for linear systems, and was used by Arora et al. [23] for FEM-based steady-state heat conduction, and Rao et al. [24] for plane strain elasticity problems."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Quantum annealers have also been used as a prior approach for linear finite-element systems by reformulating them as equivalent quadratic optimization problems.",
+        "evidence_spans": [
+          "Raisuddin and De [25] instead employed quantum annealers to solve linear finite element systems via an equivalent quadratic optimization formulation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior quantum approaches for nonlinear problems often reformulate nonlinearities into forms compatible with quantum primitives, differing mainly in what quantity is expanded and the resulting reformulation.",
+        "evidence_spans": [
+          "Several existing approaches refor- mulate nonlinearities in the governing equations into representations compatible with available quantum algorithmic primitives, differing primarily in the quantities being expanded and the re- sulting reformulation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Examples of prior nonlinear reformulation strategies include: representing the solution via a truncated Chebyshev quantum feature map while evaluating nonlinear operations classically; expanding the solution path in a continuation parameter to obtain a sequence of linear subproblems solved by VQLS; using Carleman linearization to embed a nonlinear differential equation into a larger truncated linear system; and using a related truncated polynomial expansion for a Fokker\u2013Planck eigenvalue problem solved by VQE.",
+        "evidence_spans": [
+          "Kyriienko et al. [26] represent the solution function through a truncated Chebyshev quantum feature map, while the nonlinear operations associated with the governing equation are evaluated through classical post-processing.",
+          "Xu et al. [27] expand the solution path with respect to a continuation parameter, resulting in a sequence of linear subproblems solved using VQLS.",
+          "Endo and Takahashi [28] employ Carleman linearization to embed a nonlinear differ- ential equation into a larger truncated linear system.",
+          "Soize et al. [29] apply a similar strategy to a Fokker\u2013Planck eigenvalue problem, which, although linear, involves an underlying non-algebraic potential approximated via a truncated polynomial expansion to enable a Variational Quantum Eigensolver-based solution."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A distinct prior VQA line for nonlinear PDEs was introduced by Lubasch et al., who proposed quantum nonlinear processing units (QNPUs) for polynomial nonlinearities and demonstrated them on Burgers and nonlinear Schr\u00f6dinger equations; Sarma et al. later extended this approach to a broader class of nonlinear PDEs. These works use a least-squares functional as the cost function.",
+        "evidence_spans": [
+          "In the VQA regime, Lubasch et al. [30, 31] introduced a novel VQA framework for nonlinear PDEs with polynomial nonlinearities by devising quantum nonlinear processing units and demon- strated the efficacy of this approach on Burgers and nonlinear Schr\u00a8odinger equations.",
+          "Sarma et al. [32] recently extended this approach to solve a broader class of nonlinear PDEs.",
+          "The idea expressed in these works relies on a least-squares functional as the cost function."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Another prior variational line formulates PDE solving as minimizing an energy or variational functional in a VQA framework, including minimizing Dirichlet energy for the Poisson equation and minimizing a derived variational form for the time-discrete advection\u2013diffusion equation.",
+        "evidence_spans": [
+          "Sato et al. [33] proposed a VQA to solve the Poisson equation by formulating the corresponding Dirichlet energy as a cost function parameterized by a quantum circuit.",
+          "Similarly, Over and Bengoechea et al. [34, 35], also derived a variational form for the advection\u2013diffusion equation in the time-discrete setting and minimized it within a VQA framework."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "QLSA-style methods require deep circuits and very low error rates beyond NISQ hardware capabilities.",
+        "evidence_spans": [
+          "However, despite their favorable asymptotic complexity, the aforementioned approaches require deep circuits and error rates that are beyond the capabilities of the NISQ-era hardware [12]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "VQAs suffer trainability issues, including barren plateaus that become more severe as circuit width or ansatz depth increases, causing vanishing gradients and stalled classical optimization.",
+        "evidence_spans": [
+          "VQAs face well-documented trainability challenges. As circuit width or ansatz depth increases, the cost landscape can develop barren plateaus, regions where gradients vanish exponentially and classical optimization stalls [16]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Existing methods for nonlinear transformations can be resource-intensive, and arbitrary quantum-state preparation is a major bottleneck whose complexity scales exponentially with the number of qubits.",
+        "evidence_spans": [
+          "Existing methods for nonlinear transformations can be resource-intensive [42].",
+          "Preparation of arbitrary quantum states is a well- known bottleneck in quantum computing. The complexity to prepare an arbitrary state scales exponentially with number of qubits [54]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Current implementations rely on expensive statevector simulation, especially for larger problem sizes, which limits scalability analysis.",
+        "evidence_spans": [
+          "In addition, current implementations are limited by the cost of statevector simulations, particularly for larger problem sizes, restricting the analysis of scaling behavior."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "To make the problem suitable for VQA, the work formulates it as a minimization of the variational form rather than using the weak form.",
+        "evidence_spans": [
+          "The numerical problem is expressed as the minimization of the variational form (as opposed to the weak form) to prepare it for VQA;"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Rather than using resource-intensive nonlinear-transformation methods, the paper adopts low-degree polynomial approximations of nonlinearities implemented with shallow QNPU circuits for NISQ suitability.",
+        "evidence_spans": [
+          "Instead, we propose low-degree polynomial approximations of arbitrary nonlinearities, which can be imple- mented using relatively shallow quantum circuits known as Quantum Nonlinear Processing Units (QNPUs), as developed in [30], and are more suitable for near-term NISQ devices."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The study uses a simplified special case of the compressible Neo-Hookean model, setting \u039b = 0 to remove volumetric resistance and restricting the representation to 1D unidirectional behavior.",
+        "evidence_spans": [
+          "For the present study, we consider a special case of the compressible Neo-Hookean model by setting \u039b = 0, which eliminates the volumetric resistance term, and focusing on a unidirectional and one-dimensional representation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The Taylor expansion is used instead of the more flexible but costlier IHT expansion when loads are small enough that u\u2032 stays within the Taylor validity range; IHT is reserved only for larger deformations.",
+        "evidence_spans": [
+          "Although more flexible than the Taylor series, the IHT expansion is costlier to implement within the current framework, requiring the auxiliary variable and penalty formulation introduced below. Consequently, the Taylor expansion is preferred whenever small enough loadings keep u\u2032 within its range of validity, with the IHT expansion reserved for larger deformations."
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [
+      {
+        "content": "Prior variational quantum algorithm methods for state preparation inspired this work, including adopting the ansatz proposed by Sim et al. and considering an iterative functional approach from earlier work that uses low-order solutions as reference states for successive corrections.",
+        "evidence_spans": [
+          "In this work, we adopt the ansatz proposed by Sim et al. [41], shown in Fig. 1.",
+          "Similarly, an iterative functional approach has been developed in [43], in which an approximate low-order solution is first obtained and subsequently used as a reference state for expanding the nonlinear terms. This procedure generates a sequence of iterative VQAs"
+        ],
+        "conflicting": false
+      }
+    ],
+    "causal_claim": [
+      {
+        "content": "Introducing polynomial approximations of the nonlinear strain-energy terms makes the problem compatible with variational quantum algorithms.",
+        "evidence_spans": [
+          "To enable a hybrid (classical-quantum implementation), polynomial approximations of the nonlinear terms in strain energy density are introduced, yielding a representation compatible with variational quantum algorithms."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Growing demand for large, complex simulations, together with computational cost that grows rapidly with system size, puts pressure on conventional computing architectures due to performance, memory, and energy-efficiency limits.",
+        "evidence_spans": [
+          "As demand for simulation of large, complex material and structural systems increases, such computations place significant pressure on conventional computing architectures, particularly due to performance, memory, and energy-efficiency limitations associated with the von Neumann computing architectures [1].",
+          "The compu- tational cost of the overall process grows rapidly with the system size."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Hardware noise compounds the barren plateau problem.",
+        "evidence_spans": [
+          "The barren plateau problem is compounded by hardware noise [18]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For hyperelastic materials, because stress derives from a strain-energy density, there exists a potential-energy functional whose critical points satisfy the weak form of the governing equations.",
+        "evidence_spans": [
+          "For hyperelastic materials, the stress follows from a strain energy density W(F ) via P = \u2202W/\u2202F . For such materials, it is a classical result that there exists a potential energy functional... The critical points of E satisfy the weak form of the governing equations (1)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Assuming fields are uniform over the cross-section and working per unit cross-sectional area reduces the three-dimensional formulation to a one-dimensional problem, with 3D volume and surface integrals factoring into cross-sectional area times 1D integrals.",
+        "evidence_spans": [
+          "Since all fields are uniform over the cross-section, volume and surface integrals factor into the cross-sectional area A, multiplied by one-dimensional integrals over (0, L).",
+          "For simplicity, and without loss of generality, we work per unit reference cross-sectional area (i.e., |A| = 1), so that the three-dimensional formulation reduces to a one-dimensional problem on the interval \u21260 = (0, L), \u2202\u21260 = {0, L}."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Classically combining expectation values from a small set of circuits provides an estimate of the total potential energy.",
+        "evidence_spans": [
+          "In particular, expectation values from a small set of circuits, are combined classically to estimate the total potential energy of the system."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Optimal control parameters define a discrete profile that is a critical point of the approximated energy and is therefore taken as the solution.",
+        "evidence_spans": [
+          "The optimal parameters (\u03bb\u22170, \u03bb\u2217) identify the discrete profile u\u2217= \u03bb\u22170 bV (\u03bb\u2217)|0\u27e9, (18) which corresponds to a critical point of \u02dcE and is therefore taken as the solution."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "If the second variation is strictly positive on admissible displacements, then the energy functional is strictly convex over the admissible space; consequently, it has a unique minimizer, which coincides with the unique weak solution.",
+        "evidence_spans": [
+          "In this case, it can be shown that for admissible displacements satisfying u\u2032(X) > \u22121, the second variation of the energy functional is strictly positive. Conse- quently, the functional is strictly convex on the admissible set, implying the existence of a unique minimizer. This minimizer coincides with the unique weak solution of the governing equation",
+          "Hence, for \u00b5 > 0, the integrand in (118) is strictly positive for any v\u0338 = 0, which implies \u03b42E[u; v, v] > 0 \u2200v \u2208V0, v\u0338 = 0. Therefore, the second variation defines a positive definite bilinear form on V0, and the energy functional E is strictly convex over the admissible space.",
+          "Consequently, the minimizer of E is unique and also represents the solution of the weak form (117)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Taylor truncation introduces constitutive-model error, which in turn causes error in the computed displacement field.",
+        "evidence_spans": [
+          "The approximation (26a) introduces an error in the constitutive modeling and, consequently, in the computed displacement field."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For larger deformations, the IHT expansion remains valid for all admissible displacement gradients u\u2032 > -1, including u\u2032 = 1.",
+        "evidence_spans": [
+          "This approximation is valid for all u\u2032 > \u22121, including the transition point u\u2032 = 1, where the IHT argument u\u2032/(u\u2032+2) = 1/3 lies well within its convergence radius."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Introducing an auxiliary variable together with a large penalty term enforces the IHT relation during minimization.",
+        "evidence_spans": [
+          "we introduce an auxiliary variable y and define the augmented energy functional... where P \u226b1 is the penalty parameter enforcing the constraint y \u2248u\u2032/(u\u2032 + 2) (31) during minimization"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Finite-penalty enforcement introduces O(P^{-1}) error in the auxiliary constraint, strain-energy density, total potential energy, stress, and resulting displacement/displacement-gradient fields; these errors vanish as P increases, so the finite-penalty functional approaches the exact-constraint IHT functional as P \u2192 \u221e.",
+        "evidence_spans": [
+          "In addition to the IHT truncation error, the finite-penalty enforcement introduces a separate O(P\u22121) error in the strain energy density, stress, and resulting displacement field, which vanishes as P \u2192\u221e",
+          "The above result shows that the error introduced by the finite-penalty enforcement of the auxiliary constraint decays as O(P\u22121).",
+          "Substituting yP = y\u2217 + O(P\u22121) gives W P(u\u2032; P) \u2212W N(u\u2032) = \u22122\u00b52(1 + y\u2217(u\u2032)2)2 / (P(u\u2032 + 2)2) + O(P\u22122). (137) Thus, the penalty-induced error in the strain energy density also decays as O(P\u22121).",
+          "Since the above penalty- induced strain-energy-density error is O(P\u22121) throughout the physically admissible domain, inte- gration over \u21260 gives \u02dcEP[u] \u2212\u02dcEN[u] = O(P\u22121). (138))",
+          "Hence, the finite-penalty functional approaches the corresponding exact-constraint IHT functional as P \u2192\u221e.",
+          "yielding uP \u2212uN 0(\u21260) = O(P\u22121), (140) ... Consequently, in the present one-dimensional setting, ... uP \u2212uN L\u221e(\u21260) \u2264 ... 0(\u21260) = O(P\u22121). (141))"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "When approximate displacement gradients remain bounded away from u\u2032 = -1, the displacement error inherits the geometric convergence of the corresponding stress approximation.",
+        "evidence_spans": [
+          "Consequently, provided the approximate displacement gradients remain bounded away from u\u2032 = \u22121, the displacement error inherits the geometric convergence of the corresponding stress approx- imation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For states with known structure, more efficient state-preparation methods can be used; in particular, on a uniform mesh certain auxiliary vectors become uniform superpositions over known index sets and can be prepared ancilla-free with depth O(log^2 M), bypassing optimization-based state preparation.",
+        "evidence_spans": [
+          "For states with known structure, such as sparse vectors or amplitudes described by low-degree polynomial functions, more efficient structured techniques may be used [55, 56].",
+          "Similarly, for a uniform mesh, several auxiliary vectors m used in this work reduce to uniform superpositions P 1/\u221a j\u2208S|j\u27e9 over a known index set S with |S| = M, enabling ancilla-free preparation with depth O(log2 M) [57] and thereby bypassing the optimization-based procedure in Eq. (66)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the direct-expansion method, requiring higher-order approximations causes the number of circuit evaluations to grow rapidly.",
+        "evidence_spans": [
+          "If higher-order approximations are required for improved accuracy, the number of circuit evaluations can grow rapidly"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Block encoding can reduce circuit-count growth for arithmetic operations, but for kth-order u\u2032 computations the postselection success probability decreases as powers of the single block-encoding success probability, which can significantly increase measurement overhead.",
+        "evidence_spans": [
+          "In contrast to the direct-expansion-based approach, the block-encoding-based approach can sig- nificantly reduce the number of circuit growth overhead, as element-wise arithmetic operations are effectively handled within the block-encoding framework. However, the post-selection success prob- ability can increase the measurement overhead significantly.",
+          "While evaluating a circuit involving the computation for kth order of u\u2032, the success probability will reduce as pk\u22121 s , where ps is the success probability of a single block-encoding."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Larger ansatz depths lead to higher success rates.",
+        "evidence_spans": [
+          "The success probabilities computed out of the 20 runs when problem size is set to n = 6 for different polynomial orders are reported in table shown in Fig. 9, which shows higher success rates for larger depths."
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "Landscape/pathology behavior depends on the objective/energy form: barren plateaus are tied to the choice of cost function and ansatz, with global observables inducing them more readily than local ones; likewise, the number and type of critical points of a potential energy functional depend on properties of the strain-energy density.",
+        "evidence_spans": [
+          "this behavior is closely tied to the choice of cost function and the ansatz, with global observables inducing barren plateaus more readily than local ones [17].",
+          "The number and nature of the critical points (i.e., minima vs. saddle points) of the potential energy functional depend on the properties of W [36]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Strong convexity/strong monotonicity of the exact constitutive stress provides the control mechanism for error propagation: because the exact stress is strongly monotone throughout the admissible range, the displacement-gradient error can be bounded by the constitutive stress error, in particular by the penalty-induced stress perturbation when comparing the penalized and unpenalized equilibrium conditions.",
+        "evidence_spans": [
+          "From the strong monotonicity of P established in Appendix A.1, we have P \u2032(\u03bb) =\n\u00b5(1 + \u03bb\u22122) \u2265\u00b5. Thus, applying the mean value theorem to the exact stress function, and noting\nthat the exact and approximate solutions correspond to the same equilibrium loading, the error in\nthe displacement gradient can be bounded in terms of the corresponding constitutive stress error",
+          "and hence the corresponding stress is strongly monotone, throughout the physically admissible\nrange. Comparing the equilibrium conditions associated with \u02dcEP and \u02dcEN therefore bounds the\ndisplacement-gradient error by the penalty-induced stress perturbation"
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "The paper hypothesizes that nonlinear elasticity problems for hyperelastic materials can be cast and approximately solved within a hybrid quantum-classical variational quantum algorithm framework by exploiting the hyperelastic strain-energy / total potential energy structure, encoding the displacement field as a quantum state, and using the (approximated) potential energy as the VQA cost function.",
+        "evidence_spans": [
+          "This manuscript explores a variational quantum formulation for nonlinear elasticity problems arising from hyperelastic material models. The approach leverages the potential energy structure of hyperelasticity and employs a hybrid quantum\u2013classical framework",
+          "This manuscript presents a VQA-based approach for nonlinear elasticity problems arising from hyperelastic material models under certain assumptions. The proposed framework exploits the fact that, for hyperelastic materials, the stress is derived from a strain energy density function, thereby enabling a variational formulation in terms of a total potential energy functional [36, 37, 38, 39, 40]. The resulting approximated potential energy functional is constructed to integrate naturally within a variational quantum framework.",
+          "The VQA framework requires a cost function to optimize, which we construct from the system\u2019s potential energy. To evaluate this energy on a quantum 3 computer, the displacement field (represented by its discretized values) must be encoded as a quantum state. This motivates the introduction of a quantum representation of real-valued vectors. Finally, we integrate these components to establish a complete framework for approximating the solution to the underlying elasticity problem."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The paper further hypothesizes that nonlinear terms in the energy can be made compatible with the VQA by approximating them with truncated polynomials, thereby defining an approximated potential-energy cost function; alternatively, a constrained reformulation with an auxiliary variable z may avoid approximating the logarithmic term while preserving polynomial nonlinearities.",
+        "evidence_spans": [
+          "Accordingly, any nonlinearity G(u\u2032) in the functional (8) is approximated as\nNtn\nX\nG(u\u2032) \u2248\ni=0\nci (u\u2032)i,\n(16)\nwhere Ntn denotes the truncation order, yielding an approximated functional denoted by \u02dcE... Accordingly, we define the VQA cost function as follows:\nC(\u03bb0, \u03bb) := \u02dcE(u(\u03bb0, \u03bb)).",
+          "This reformulation eliminates the need to approximate the logarithmic term and, at the same time, expresses all terms in the integrand in terms of polynomial nonlinearities."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Amplitude amplification could mitigate the measurement overhead associated with block encoding.",
+        "evidence_spans": [
+          "Amplitude amplification could help reduce this overhead [58]."
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "The proposed VQA framework was demonstrated on a simplified one-dimensional Neo-Hookean problem, using two polynomial approximation strategies, first- and second-order finite element discretizations, and accommodating non-uniform meshes and non-homogeneous boundary conditions; it reproduced the expected behavior.",
+        "evidence_spans": [
+          "The proposed methodology is demonstrated on a simplified one-dimensional Neo-Hookean material-based problem. Two distinct approximation strategies are developed and implemented in accordance with contemporary VQA capabilities. The displacement field is discretized using first- and second-order finite element shape functions, and the formulation accommodates nonhomogeneous boundary conditions.",
+          "The methodology was demonstrated on a special case of one-dimensional Neo-Hookean problem, where the potential energy functional is used as the VQA cost function. Two types of polynomial approximations were investigated, and the VQA was shown to capture the expected behavior using both first- and second-order finite element discretizations on non-uniform meshes with non-homogeneous boundary conditions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Numerical experiments evaluated how polynomial approximation order affects the proposed method\u2019s accuracy and efficiency, and illustrated its feasibility for near-term quantum devices.",
+        "evidence_spans": [
+          "Numerical experiments investigate the influence of the polynomial approximation order on the accuracy and efficiency of the proposed approach, illustrating its feasibility for near-term quantum devices.",
+          "The influence of higher-order polynomial approximations on the efficiency and accuracy of the VQA implementation is evaluated."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For the Taylor expansion, truncation error is bounded by alternating-series or geometric-tail estimates: it decays geometrically for |u\u2032| < 1, but at u\u2032 = 1 convergence slows to O(1/N).",
+        "evidence_spans": [
+          "For 0 \u2264u\u2032 \u22641, the Taylor expansion forms an alternating series with terms decreasing in\nmagnitude, and its truncation error obeys the standard alternating-series bound [59]. For \u22121 <\nu\u2032 < 0, the remainder can instead be bounded using the corresponding geometric tail:",
+          "For |u\u2032| < 1, the Taylor series converges absolutely, and the truncation error decays geometrically,\nO\n(|u\u2032|N). At u\u2032 = 1 the series converges only conditionally, and the bound weakens to O(1/N),\nresulting in substantially slower convergence."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For the IHT expansion, truncation error is geometrically bounded for all physically admissible strains u\u2032 > \u22121.",
+        "evidence_spans": [
+          "The IHT expansion (29) with N number of terms is\nthe Taylor series of ln\n(1+x\n1\u2212x\n)/2 evaluated at x = u\u2032/(u\u2032 +2), so its truncation error can be bounded\nby a geometric tail,",
+          "valid for all u\u2032 > \u22121, since |x| < 1 throughout this range, giving a truncation error that decays\ngeometrically as O\n(|x|2N)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The truncated strain energy density remains strongly convex for u\u2032 > \u22121.",
+        "evidence_spans": [
+          "It can be\nestablished that the truncated strain energy density remains strongly convex:\n...\n> \u00b5,\nu\u2032 > \u22121,\n(139))"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Accurate solutions were obtained with relatively modest ansatz depths over the studied problem sizes; errors became negligible at depths well below those needed for the parameter count to exceed the problem size, and achieving error below 10^-7 did not appear to require greater ansatz depth for higher polynomial approximation order.",
+        "evidence_spans": [
+          "To achieve an error below 10\u22127, polynomial\napproximation order does not appear to affect the ansatz depth.",
+          "We also observe achieving accurate\nsolutions with relatively modest depths within the range of problem sizes considered.",
+          "We notice that the errors become negligible at considerably lower depths as\ncompared to the depth required to exceed the problem size (starred points in Fig. 9a)."
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "Physical admissibility constrains the deformation to have positive stretch/determinant throughout the domain: in 1D, \u03bb(X)=1+u\u2032(X)=J(X)=det F(X)>0 for all X, and only the positive \u03bb branch is considered.",
+        "evidence_spans": [
+          "Physical admissibility requires\nJ(X) = det F (X) = \u03bb(X) > 0,\n\u2200X \u2208(0, L)",
+          "Since physical admissibility requires \u03bb = 1 + u\u2032 > 0",
+          "The physically admissible solution corresponds to \u03bb > 0, hence\nu\u2032(X) = \u03bb(X) \u22121,\n(123)\nwhere we only consider the positive branch of (122), respecting the local material orientation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The Taylor-based approximation is only valid when the displacement gradient remains bounded in magnitude by 1 over the domain; equivalently, the series converges for \u22121<u\u2032<1, i.e. 0<\u03bb<2, so loads/boundary conditions cannot be so extreme as to violate this. At the discrete level this is enforced as supX |\u0169\u2032N(X)|<1.",
+        "evidence_spans": [
+          "Since u\u2032(X) is a spatially varying field, this approximation is used only when supX\u2208\u21260 |u\u2032(X)| < 1 is expected to hold over the domain, per (26b).",
+          "The Taylor series expansion converges absolutely for \u22121 < u\u2032 < 1, which corresponds to 0 < \u03bb < 2\nvia (123). This translates to the requirement that body forces and the applied traction boundary\ncondition must not be extreme enough to cause the resulting u\u2032 to violate its allowed limit.",
+          "For the Taylor approximation, this requires supX |\u02dcu\u2032\nN(X)| < 1, whereas for the IHT\napproximation, |\u02dcu\u2032\nN/(\u02dcu\u2032\nN + 2)| < 1 for all physically admissible \u02dcu\u2032\nN > \u22121."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For the IHT approximation, admissibility requires |\u0169\u2032N/(\u0169\u2032N+2)|<1 for all physically admissible approximate gradients \u0169\u2032N>-1.",
+        "evidence_spans": [
+          "For the Taylor approximation, this requires supX |\u02dcu\u2032\nN(X)| < 1, whereas for the IHT\napproximation, |\u02dcu\u2032\nN/(\u02dcu\u2032\nN + 2)| < 1 for all physically admissible \u02dcu\u2032\nN > \u22121."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The minimization problem is constrained by the left boundary displacement condition u(0)=\u016b.",
+        "evidence_spans": [
+          "(u\u2217, y\u2217) = arg min\nu,y\n\u02dcE[u, y],\nsubject to u(0) = \u00afu."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The study is presently limited to numerical verification in noise-free statevector simulation rather than execution on real quantum hardware; moving to real/near-term hardware is future work and requires algorithmic modifications that preserve quantum compatibility while broadening the supported nonlinearities.",
+        "evidence_spans": [
+          "Numerical verification of the proposed approach has been performed using noise-free statevector simulations rather than execution on real quantum hardware.",
+          "Extending the framework to a broader class of nonlinearities while maintaining quantum compatibility and implementing the proposed approach on current and near-term quantum hardware will be explored, requiring modifications to the algorithmic structure."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Scalability and practical deployment remain unresolved constraints: extension beyond the current 1D proof-of-concept to realistic 2D/3D hyperelastic problems is future work, and real-hardware use must cope with noise, coupling latency, native-gate-set compilation, and cloud queue times through hardware-aware optimization.",
+        "evidence_spans": [
+          "The present 1D study establishes the feasibility of the proposed formulations in a controlled proof-of-concept setting, while their computational scalability and efficient extension to realistic 2D and 3D hyperelastic problems remain subjects for future investigation.",
+          "The impact of hardware noise, cou-pling latency, native-gate-set compilation, and cloud-access queue times on the performance of the framework when deployed on real hardware requires further optimization of algorithmic choices and efficient hardware-aware implementation."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

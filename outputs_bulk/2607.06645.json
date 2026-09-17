@@ -1,0 +1,1120 @@
+{
+  "paper_id": "2607.06645",
+  "chunks_processed": 7,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Databases lack delithiation curves needed for average-voltage extraction.",
+        "evidence_span": "The remaining gap is that the databases store relaxed structures, not the per-step delithiation curves needed to read off an average voltage."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "A practical need is to know how often top surrogate candidates fail at the DFT tier",
+        "evidence_span": "A practical question for any user of the framework is the rate at which a top-k surrogate candidate fails at the DFT tier."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Historical computational work focused on predicting average cathode voltage at lower cost.",
+        "evidence_span": "The screening literature on cathodes has therefore been dominated, since the earliest computational work, by efforts to predict average voltage at decreasing cost."
+      },
+      {
+        "role": "prior_approach",
+        "content": "DFT thermodynamic-cycle calculations were used to compute average intercalation voltages.",
+        "evidence_span": "Aydinol, Ceder, and co-workers showed in 1997 that the average intercalation voltage of a cathode could be obtained from density functional theory (DFT) total energies through a thermodynamic cycle that requires only the lithiated structure, the delithiated structure, and the lithium-metal reference"
+      },
+      {
+        "role": "prior_approach",
+        "content": "High-throughput DFT screening of candidate phosphates was previously performed.",
+        "evidence_span": "Hautier, Mueller, Jain, and Ceder applied the protocol at scale in 2011, screening thousands of candidate phosphates in a single high-throughput campaign and predicting voltage, capacity, and stability for redox couples that had never been synthesized9."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Materials Project, AFLOW, OQMD, and JARVIS-DFT provide large databases of relaxed structures and properties.",
+        "evidence_span": "The Materials Project10, AFLOW11, the Open Quantum Materials Database (OQMD)12, and JARVIS-DFT13,14 now expose hundreds of thousands of relaxed crystal structures with formation energies, band gaps, elastic constants, and convex-hull labels precomputed by their respective groups."
+      },
+      {
+        "role": "prior_approach",
+        "content": "CGCNN predicted crystal properties from relaxed structures.",
+        "evidence_span": "Crystal Graph Convolutional Neural Networks (CGCNN) showed in 2018 that an end-to-end graph network trained on the Materials Project could predict formation energies and band gaps within DFT-level error using only the relaxed structure as input16"
+      },
+      {
+        "role": "prior_approach",
+        "content": "MEGNet generalized graph-network prediction across molecules and crystals with global state variables.",
+        "evidence_span": "MEGNet generalized the approach across both molecules and crystals while introducing global state variables17."
+      },
+      {
+        "role": "prior_approach",
+        "content": "ALIGNN incorporated three-body angular information and reduced errors on JARVIS-DFT targets.",
+        "evidence_span": "The Atomistic Line Graph Neural Network (ALIGNN)18 added explicit three-body angular information through a coupled atom-graph and line-graph representation, lowering errors on most JARVIS-DFT property targets relative to CGCNN and MEGNet."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Universal interatomic potentials such as M3GNet, CHGNet, MACE, and GNoME enable relaxation and MD from a pretrained model.",
+        "evidence_span": "The newest generation of universal interatomic potentials (M3GNet19, CHGNet20, MACE21, and the GNoME framework from DeepMind22) extends that representation to forces and stresses, enabling structural relaxation and molecular dynamics across the periodic table from a single pretrained checkpoint."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior voltage-specific surrogates used deep or attention-based graph networks to predict battery voltages.",
+        "evidence_span": "Voltage-specific surrogates have appeared in parallel: Joshi and co-workers reported a deep-network voltage predictor with a mean absolute error of approximately 0.43 V on a metal-ion battery dataset23, and Louis and co-workers introduced an attention-based graph network that brought the error below 0.32 V on the Materials Project battery subset and demonstrated transfer from lithium to sodium hosts24."
+      },
+      {
+        "role": "prior_approach",
+        "content": "A GGA/GGA+U mixing scheme for binary-oxide formation enthalpies was proposed previously",
+        "evidence_span": "A mixing scheme that blends GGA and GGA+U formation enthalpies of the binary oxides into the cathode calculation, as proposed by Jain, Hautier, Ong, and Persson8"
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Conventional DFT cannot feasibly generate delithiation curves at database scale.",
+        "evidence_span": "Generating those curves at the scale of the database with conventional DFT is not feasible."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Existing surrogates predict only scalar voltages, do not enforce thermodynamics, and cannot validate top candidates independently.",
+        "evidence_span": "The shared limitation across these surrogates is that they predict scalar voltages without enforcing the underlying thermodynamic cycle and provide no way to validate a top-ranked candidate beyond a second pass through the same network family."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "JARVIS-DFT lacks per-material voltage labels, and average voltage is not uniquely defined without a delithiation protocol.",
+        "evidence_span": "The training labels are not raw DFT voltages: JARVIS-DFT does not contain a per-material voltage subset, and the average voltage of a host structure is not single-valued without a delithiation protocol."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "vdW-DF systematically overestimates voltage at deep delithiation in layered transition-metal oxides",
+        "evidence_span": "The systematic overestimate at the deep-delithiation end is a known property of the vdW-DF family on layered transition-metal oxides"
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "The authors do not use tabulated external lithium reference values because mismatched PAW settings create systematic voltage offsets.",
+        "evidence_span": "Tabulated \u00b5Li values from earlier JARVIS-DFT releases and from external compilations were obtained with different PAW choices than the high-throughput cathode runs and produce a \u223c1 V systematic offset on PBE voltages when used naively. We recompute the lithium-metal reference in-house with the same Lisv PAW, plane-wave cutoff, and smearing scheme used for the cathode calculations"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The authors did not use the prior GGA/GGA+U mixing correction, instead reporting unmixed residuals as a baseline",
+        "evidence_span": "the present manuscript reports the unmixed residuals as a transparent baseline."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than renormalizing capacity to formula units, the current screen keeps reduced-cell normalization to preserve JARVIS compatibility",
+        "evidence_span": "The user can also choose to renormalise gravimetric capacity to the formula unit rather than the JARVIS reduced cell, which moves the thresholds onto a more familiar scale at the cost of breaking compatibility with the existing JARVIS columns."
+      }
+    ],
+    "inspiration_source": [],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "The materials-genome era improved database access but did not solve throughput.",
+        "evidence_span": "The materials-genome era softened the problem on the database side without solving it on the throughput side."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Basis-set or pseudopotential mismatch in the lithium reference causes a constant shift in predicted voltages.",
+        "evidence_span": "a basis-set or pseudopotential mismatch between the cathode calculation and the lithium-metal reference shifts every predicted voltage by a constant."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Recomputing the lithium-metal reference in the same basis removes a systematic ~1 V voltage offset.",
+        "evidence_span": "the lithium-metal reference energy recomputed in the same plane-wave basis as the cathode runs to remove a systematic \u223c1 V offset present in tabulated values."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The ALIGNN regressor compresses the full multi-step ALIGNN-FF delithiation into one forward pass.",
+        "evidence_span": "The ALIGNN regressor is therefore a structure-to-scalar distillation of the full ALIGNN-FF protocol that collapses an NLi-step force-field run into one forward pass."
+      },
+      {
+        "role": "causal_claim",
+        "content": "A 0.17 V error implies that candidates 0.5 V above benchmarks are unlikely to be reordered by model noise, while candidates within 0.2 V should advance together.",
+        "evidence_span": "In screening practice this means that a candidate that lands 0.5 V above a known commercial benchmark at the ALIGNN tier is unlikely to be displaced by network noise in the downstream tiers; conversely, two candidates within 0.2 V of each other should be promoted together to the ALIGNN-FF tier rather than disambiguated at the surrogate level."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using the surrogate distributions takes minutes instead of the months required for a DFT-only campaign on the same hardware.",
+        "evidence_span": "Both distributions\ntake minutes of GPU time end-to-end where a DFT-only campaign would have taken months on the same\nhardware."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The initial ISIF=3 relaxation overexpanded delithiated LCO by 28%, so the endpoint was rerun with ions-only relaxation to obtain a stable phase.",
+        "evidence_span": "Step08 (the fully delithiated endpoint)\nwas rerun with ISIF = 2 after the initial ISIF = 3 relaxation expanded the cell volume by 28%; the\nions-only relaxation produced a stable endpoint consistent with the experimentally observed metastable\nO3-type CoO2 phase."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The apparent NMC capacity deficit is caused mainly by stoichiometry mismatch",
+        "evidence_span": "The apparent \u223c50% deficit for NMC is dominated by a stoichiometry mismatch"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using the same U calibration yields opposite-sign residuals across the two olivines",
+        "evidence_span": "The same calibration is therefore self-consistent within a redox couple but produces residuals of opposite sign across the two olivine chemistries."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The proposed mixing scheme would likely reduce the olivine voltage gap",
+        "evidence_span": "would close most of this gap;"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The NMC residual has two contributing causes: stoichiometry mismatch and GGA+U failure on oxygen redox",
+        "evidence_span": "has two compounding sources. The smaller is the stoichiometry mismatch between the JVASP-144791 cell and the commercial NMC-111 reference, discussed above. The larger is the inability of plain GGA+U to capture the onset of oxygen redox at x < 0.5 in Ni-rich layered oxides36"
+      },
+      {
+        "role": "causal_claim",
+        "content": "ALIGNN scalar speed makes the database-scale screening feasible",
+        "evidence_span": "The ALIGNN scalar tier is many orders of magnitude faster than a single PBE+U supercell relaxation on a per-structure basis, which is what makes the database-scale screen in Sec. 2.3 feasible at all."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Deep-delithiation endpoints consume more core-hours because SCF convergence is slow for highly oxidized states",
+        "evidence_span": "the deep-delithiation endpoints (e.g. NMC step16) ran out to \u223c1300 core-hours each in the present campaign because of slow self-consistent-field convergence on the highly-oxidised endpoint."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The other four benchmarks are excluded by the gravimetric-capacity threshold",
+        "evidence_span": "The other four (LFP, LMP, LMO, NMC variant) are removed by the Qgrav,min = 20 mAh/g threshold"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Lowering the minimum gravimetric-capacity threshold to 9 mAh/g brings all five benchmarks back into the pool",
+        "evidence_span": "A user who wants to recover the commercial benchmarks at the top of the list can do so by lowering Qgrav,min to 9 mAh/g (a one-line change in the screening configuration), which admits all five benchmarks back into the candidate pool."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Four of five commercial benchmarks are absent from the top list because the gravimetric-capacity threshold filters them out",
+        "evidence_span": "Of the five DFT-validated benchmarks (LFP, LMP, LMO, NMC, LCO), four are filtered out by the maximum-gravimetric-capacity threshold;"
+      },
+      {
+        "role": "causal_claim",
+        "content": "LCO and NMC are absent from the top because of modest reduced-cell gravimetric capacities",
+        "evidence_span": "and the absence of LCO/NMC at the top reflects their already-modest gravimetric capacity in the JARVIS reduced cells."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Voltage depends on the lithium chemical potential through the intercalation thermodynamic cycle.",
+        "evidence_span": "Voltages depend on \u00b5Li through the intercalation cycle V = (EdeLi \u2212ELi \u2212n\u00b5Li)/n"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The larger residual for the fifth layered case is attributed to stoichiometry mismatch and oxygen redox at deep delithiation, not the framework.",
+        "evidence_span": "a fifth, non-stoichiometric layered entry (JVASP-144791, Li:TM = 1:2) is carried as an edge case whose larger residual is traceable to the stoichiometry mismatch against NMC-111 and to the onset of oxygen redox at deep delithiation rather than to the framework itself."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The right-skewed gravimetric-capacity distribution arises because capacity scales as nLi/Mcell while unit-cell masses vary widely.",
+        "evidence_span": "The\ngravimetric capacity distribution (right panel) is right-skewed because Qgrav scales as nLi/Mcell, and\nunit-cell masses span a wide range across the host families catalogued in JARVIS-DFT."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "optB88-vdW+U is used for layered LCO because it captures interlayer dispersion that PBE misrepresents.",
+        "evidence_span": "the\nlayered LCO framework (R\u00af3m, spacegroup 166) was routed automatically to optB88-vdW+U 30, which\ncaptures the interlayer dispersion that PBE misrepresents."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Multiple computed LFP plateaus arise from finite-size supercell vacancy orderings that stabilize artificial intermediate compositions.",
+        "evidence_span": "The multiple computed plateaus are an artefact of the\nfinite 2\u00d72\u00d71 supercell: a 16-Li cell admits only a discrete set of Li-vacancy orderings, which produce\nstable intermediate compositions that would not survive in the thermodynamic limit."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "LFP's upward voltage bias is consistent with known PBE+U overbinding on iron polyanions.",
+        "evidence_span": "the\nsystematic upward bias is consistent with the known PBE+U overbinding on iron polyanions under the\nMaterials Project U calibration8."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Opposite LMP vs LFP residual signs reflect different localization of Mn and Fe d-states, motivating GGA/GGA+U mixing.",
+        "evidence_span": "The opposite\nsign of the residual relative to LFP under the same Materials Project U calibration reflects the different\nlocalisation of Mn2+/3+ versus Fe2+/3+ d-states; this is a known motivation for GGA/GGA+U mixing\nschemes8."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The missing fully delithiated LMP endpoint is not experimentally important because Mn4+ is unstable and LMP is never fully delithiated in cycling.",
+        "evidence_span": "The non-convergence of the fully delithiated endpoint is not experimentally relevant: olivine\nLMP is never fully delithiated in cycling experiments because the Mn4+ state is unstable against oxygen\nevolution."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "LMO is well described because the Mn3+/Mn4+ redox couple matches the U calibration and the spinel has no vdW interlayer.",
+        "evidence_span": "The Mn3+/Mn4+ redox couple is well-described by the Materials Project Ueff(Mn) = 3.90 eV,\nand the 3D-bonded spinel framework has no van-der-Waals interlayer that would require optB88-vdW\ncorrections."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The NMC variant's large voltage residual comes from stoichiometry mismatch and missing oxygen-redox physics in plain GGA+U.",
+        "evidence_span": "The residual has two compounding\nsources discussed in Sec. 2.6: a stoichiometry mismatch between the JVASP cell and NMC-111, and the\nfailure of plain GGA+U to capture the onset of oxygen redox at x < 0.5 that is well known in Ni-rich\nlayered oxides."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "optB88-vdW is required for layered LCO because plain PBE overestimates c-axis spacing in delithiated states, affecting deep-delithiation voltages.",
+        "evidence_span": "The\noptB88-vdW correction is required for layered LCO because plain PBE substantially overestimates the\nc-axis spacing in the delithiated endpoints, which propagates into the deep-delithiation step voltages."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Opposite olivine voltage residual signs are attributed to different Fe and Mn d-state localization under the same U calibration",
+        "evidence_span": "the olivines show \u223c0.2 V residuals of opposite sign (LFP +0.15 V, LMP \u22120.19 V), reflecting the different localisation of Fe2+/3+ and Mn2+/3+ d-states under the same Materials Project Hubbard U calibration."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "NMC deficit arises because the JARVIS structure is a partially delithiated layered variant, not fully lithiated NMC-111",
+        "evidence_span": "the JVASP-144791 cell is Li4Mn3Co2Ni3O16, with a Li:TM ratio of 1:2, and corresponds to a partially-delithiated layered variant rather than fully-lithiated NMC-111 (Li:TM = 1:1)."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Opposite olivine residuals come from Fe U slightly overbinding high oxidation states while Mn U slightly underbinds Mn4+",
+        "evidence_span": "The asymmetry has a clean physical explanation: the U = 5.30 eV used on iron is calibrated to reproduce the formation enthalpy of the Fe2+/3+ couple in oxides, where it slightly overbinds the high-oxidation-state endpoint, while the U = 3.90 eV used on manganese is calibrated to reproduce the Mn2+/3+/4+ sequence and slightly underbinds the high-oxidation Mn4+ endpoint."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Deep-delithiation LCO error is linked to insecure vdW-DF treatment of strongly correlated oxygen 2p states",
+        "evidence_span": "where the vdW-DF functional family\u2019s treatment of the strongly correlated O 2p states is least secure."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "At low lithium content, oxygen 2p overlaps TM 3d at the Fermi level so oxidation shifts to oxygen",
+        "evidence_span": "as the lithium concentration drops below half, the oxygen 2p band overlaps the transition-metal 3d band at the Fermi level, and the redox electron is drawn from the oxygen sublattice rather than from the transition metal."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "PBE+U misplaces O 2p relative to TM 3d without hybrid or anionic-redox treatment, causing excessive predicted deep-delithiation voltage",
+        "evidence_span": "PBE+U does not place the O 2p states correctly relative to the TM 3d states without a hybrid component or explicit anionic-redox treatment, so the predicted voltage in the deep-delithiation regime climbs toward 5 V instead of plateauing at the experimental \u223c4 V."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "LCO's modest rank reflects low reduced-cell gravimetric capacity rather than model failure",
+        "evidence_span": "The ranking of the surviving LCO entry is consistent with its modest gravimetric capacity in the JARVIS reduced cell (\u223c36 mAh/g vs. the \u223c274 mAh/g theoretical ceiling per formula unit) and is not evidence of surrogate failure."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Prevalence of phosphates and fluorides in the top twelve is consistent with known voltage enhancement from fluorination and high-valent transition metals",
+        "evidence_span": "Polyanion phosphates and fluoride hosts together form the largest single grouping in the top twelve (five of twelve entries), with oxide and mixed-chemistry hosts filling the remainder; this is consistent with the well-known voltage enhancement that fluorination and high-valent transition metals provide9,28"
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "BatteryMat proposes a hierarchical screening framework using single-pass ALIGNN average-voltage prediction as the primary signal.",
+        "evidence_span": "BatteryMat closes that loop with a hierarchical screen that promotes single-pass average-voltage prediction with ALIGNN as the primary signal."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "At the surrogate tier, group-level ordering is the relevant signal for screening rather than exact rank ordering",
+        "evidence_span": "so ALIGNN-FF should be read as a group-level rather than rank-level signal at the surrogate tier; the group-level signal is what a screening cascade needs to deliver."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Rerunning NMC with optB88-vdW+U is expected to reduce about half of the residual",
+        "evidence_span": "Past experience on LCO suggests this would close roughly half of the residual."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "DFT validation should be extended to sodium and magnesium to test whether surrogate transferability persists",
+        "evidence_span": "The second is extending the DFT validation set to one sodium and one magnesium chemistry to confirm that the surrogate transfer-ability seen in Supplementary Fig. S3 survives the DFT tier;"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The hierarchy is intended as a strict sequential funnel rather than just a constant-factor DFT speedup",
+        "evidence_span": "The hierarchy is therefore not a constant-factor speedup over DFT, it is a strict sequential funnel that places the expensive tier last."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Users should advance at least top-10 to ALIGNN-FF profiles and top-3 to DFT, accepting some false positives",
+        "evidence_span": "In practice we recommend that users promote at least the top-10 to the ALIGNN-FF profile tier and at least the top-3 to the DFT tier, accepting that a fraction of the DFT validation budget will be spent on candidates that disqualify themselves on the per-step voltage curve."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The top-12 list is meant as actionable surrogate output, not a definitive ranking",
+        "evidence_span": "We treat the top-12 list as the actionable output of the surrogate tier rather than as a definitive ranking:"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Candidates above rank 5 should be advanced through ALIGNN-FF profiling and then DFT if they survive",
+        "evidence_span": "every candidate above rank 5 should be promoted to the ALIGNN-FF profile tier and, if it survives, to the DFT tier with the auto-selected functional."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Several Mn-, Co-, and Ni-containing oxide variants are natural next DFT-validation targets",
+        "evidence_span": "Several entries (Li2MgMn3O8, Li4Co3O7, Li2NiO2) are Mn-, Co-, or Ni-containing oxide variants that are natural targets for the next round of DFT validation."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "Prior DFT voltage calculations matched experiment within about 0.1\u20130.3 V.",
+        "evidence_span": "with the result reproducing experimental voltages to roughly 0.1\u20130.3 V across oxides and dichalcogenides7"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Using tabulated mismatched lithium references produces about a 1 V systematic offset in PBE voltages.",
+        "evidence_span": "Tabulated \u00b5Li values from earlier JARVIS-DFT releases and from external compilations were obtained with different PAW choices than the high-throughput cathode runs and produce a \u223c1 V systematic offset on PBE voltages when used naively."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The tier-1 ALIGNN regressor predicts average delithiation voltage in sub-second time with 0.17 V MAE relative to the ALIGNN-FF protocol.",
+        "evidence_span": "An ALIGNN scalar regressor trained on 7,610 lithium-containing JARVIS-DFT structures predicts the average delithiation voltage from the relaxed lithiated geometry alone in sub-second time on a single GPU, at a mean absolute error of 0.17 V relative to the ALIGNN-FF protocol it is distilled from."
+      },
+      {
+        "role": "evidence_result",
+        "content": "ALIGNN-FF can trace full delithiation profiles in seconds per step.",
+        "evidence_span": "The ALIGNN-FF universal force field traces the full step-by-step delithiation profile of any candidate that survives the first tier on the order of seconds per step."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The pipeline reproduces experimental average voltage within 0.3 V and theoretical volumetric capacity within 5% for four benchmark chemistries.",
+        "evidence_span": "We benchmark the pipeline on four commercial chemistries spanning olivine, spinel, and layered frameworks and recover the experimental average voltage to within 0.3 V and the crystallographic theoretical volumetric capacity to within 5% on all four"
+      },
+      {
+        "role": "evidence_result",
+        "content": "After filtering, the framework identifies 71 surviving lithium-intercalation candidates from the JARVIS-DFT pool.",
+        "evidence_span": "Across the lithium-containing JARVIS-DFT pool (7,474 entries after filtering) the framework returns a ranked list of 71 surviving lithium-intercalation candidates after the screening filters"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The top-ranked surviving candidates are mainly polyanion phosphates and fluoride hosts.",
+        "evidence_span": "the top of the list is led by polyanion phosphates and fluoride hosts"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Held-out test performance is 0.17 V MAE and R2 = 0.94.",
+        "evidence_span": "The held-out test-set mean absolute error is 0.17 V with a coefficient of determination of R2 = 0.94, against a dataset-mean baseline MAE of 1.03 V (Fig. 2)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Predictions follow parity closely across 0\u20136 V without visible systematic bias.",
+        "evidence_span": "Predictions cluster tightly along parity from 0 to 6 V, the bracket of practical intercalation chemistries, with no systematic bias visible in the residuals."
+      },
+      {
+        "role": "evidence_result",
+        "content": "After filtering, 7,610 structures contributed generated labels.",
+        "evidence_span": "After filtering on status == \u2019Success\u2019, 7,610 structures contributed labels."
+      },
+      {
+        "role": "evidence_result",
+        "content": "ALIGNN-FF delithiation costs about 10\u201330 seconds per material on a single GPU.",
+        "evidence_span": "The cost is roughly 10\u201330 s per material on a single GPU."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Benchmark ALIGNN-FF profiles recover expected qualitative voltage features for known frameworks.",
+        "evidence_span": "The qualitative features expected from each framework are recovered: flat 3.3\u20133.5 V plateaus for the olivines3,25, a single \u223c4.2 V plateau for the spinel LiMn2O4\nLi4Mn3Co2Ni3O16."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The lithium-containing JARVIS-DFT subset yields an average-voltage peak at 3.2\u20133.6 V and broad capacity distribution.",
+        "evidence_span": "The resulting average-\nvoltage distribution peaks between 3.2 and 3.6 V (Supplementary Fig. S2, left), within the operating\nwindow of commercial intercalation cathodes28, and the gravimetric capacity distribution spans a broad\nrange that reflects the diversity of host frameworks (Supplementary Fig. S2, right)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transferability stress test recovers the expected voltage-capacity trade-off across non-lithium ions.",
+        "evidence_span": "The familiar voltage\u2013capacity trade-off is recovered:\nK-based systems reach the highest voltage (above 4 V) at the lowest capacity, while Mg- and Na-based\nsystems approach NMC-level capacity at substantially lower voltage (Supplementary Fig. S3)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "A five-stage funnel reduces 4.49 million Alexandria structures to 213 candidates.",
+        "evidence_span": "A five-stage funnel (Fig. 3) reduces the 4.49 million-structure pool to a shortlist of 213 candidates,\na reduction of roughly 2.1 \u00d7 104."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The shortlist rediscovers known cathodes without seeding them into the search.",
+        "evidence_span": "Without any of them being seeded into the search, the screen blindly rediscovers\nLiNiO2, NaNiO2, LiMnO2, and the disordered-rocksalt Li2VO2F near the hull."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Pareto-optimal MgNiO2 is the highest-capacity on-hull magnesium candidate at 466 mAh/g.",
+        "evidence_span": "the Pareto-optimal MgNiO2 reaches 466 mAh/g on the\nhull, the highest-capacity on-hull magnesium candidate in the set."
+      },
+      {
+        "role": "evidence_result",
+        "content": "DFT reproduces experimental average voltage within 0.3 V for four stoichiometric commercial chemistries.",
+        "evidence_span": "The DFT tier reproduces the experimental average voltage to within\n0.3 V on all four stoichiometric commercial chemistries (LFP, LMP, LMO, LCO), with LMO the most\naccurate residual at +0.03 V;"
+      },
+      {
+        "role": "evidence_result",
+        "content": "LMO DFT gives 4.08 V, only +0.03 V above experiment, and resolves two plateaus matching experiment.",
+        "evidence_span": "The convex-hull average voltage is 4.08 V, +0.03 V\nabove the experimental upper plateau of 4.05 V26,27, the most accurate of the five chemistries. The\nhull resolves two distinct plateaus at 4.00 and 4.17 V that mirror the experimentally observed two-step\ndischarge profile of cubic spinel LiMn2O4, which proceeds through a cubic-to-cubic phase transition near\nx = 0.5."
+      },
+      {
+        "role": "evidence_result",
+        "content": "LCO DFT gives 4.18 V, +0.13 V above experiment, with three staged plateaus consistent with experiment.",
+        "evidence_span": "The convex-hull average voltage is 4.18 V, +0.13 V above the experimental\n4.05 V2,37, and the hull resolves three staged plateaus at 4.01, 4.23, and 4.48 V (Fig. 5, right panel),\nconsistent with the multi-step staging behaviour observed experimentally in cycled LixCoO2"
+      },
+      {
+        "role": "evidence_result",
+        "content": "DFT agrees best with experiment for LMO and LCO, with small average-voltage errors",
+        "evidence_span": "The DFT tier agrees best with experiment for LMO and LCO (|\u2206Vavg| \u22640.13 V);"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Theoretical volumetric capacity matches experiment within 5% for four cathodes",
+        "evidence_span": "The crystallographic theoretical volumetric capacity is reproduced to within 5% for LFP, LMP, LMO, and LCO."
+      },
+      {
+        "role": "evidence_result",
+        "content": "ALIGNN-FF reproduces the same three chemistry groupings as DFT despite a wider voltage range",
+        "evidence_span": "ALIGNN-FF spans a slightly wider voltage range across these five chemistries than DFT (1.01 V from LiMnPO4 to Li(Ni,Mn,Co)O2 versus 0.80 V at the DFT tier) but reproduces the same three-tier chemistry grouping"
+      },
+      {
+        "role": "evidence_result",
+        "content": "ALIGNN-FF and DFT differ in within-group rank ordering for two cathode pairs",
+        "evidence_span": "Within each group the ALIGNN-FF and DFT internal orderings differ (DFT places LiFePO4 below LiMnPO4 while ALIGNN-FF inverts that pair, and the same swap occurs for LiMn2O4/LiCoO2)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "optB88-vdW+U reproduces LCO average voltage within 0.13 V and resolves correct staging order",
+        "evidence_span": "The optB88-vdW+U functional reproduces the LCO average voltage to within 0.13 V and resolves the multi-step staging behaviour observed experimentally with the correct ordering of plateaus."
+      },
+      {
+        "role": "evidence_result",
+        "content": "LCO plateau voltages span 4.01 to 4.48 V, bracketing experimental staging steps",
+        "evidence_span": "The hull-resolved plateau voltages climb from 4.01 to 4.48 V across the staging sequence, a span of 0.47 V that brackets the experimentally observed staging steps in cycled Li_xCoO2."
+      },
+      {
+        "role": "evidence_result",
+        "content": "LCO agreement is strongest at intermediate lithium content and weakest at deep delithiation",
+        "evidence_span": "The agreement is best at intermediate lithium content (x \u2208[0.3,0.7]) and worst at the deep-delithiation endpoint (x < 0.2)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "NMC shows the largest benchmark residual, +0.70 V",
+        "evidence_span": "The largest residual in the benchmark, +0.70 V on NMC,"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Most wall-clock cost is spent in the third tier reserved for few surviving candidates",
+        "evidence_span": "In practice the framework spends almost all of its wall-clock budget on the third tier, which is reserved for the few candidates that survive the first two."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Only LCO survives second-stage filters among the five DFT-validated benchmarks, at rank 37 of 71",
+        "evidence_span": "Of the five DFT-validated benchmarks, only the LCO entry survives the second-stage screening filters; it is recovered at rank 37 out of 71 surviving lithium-intercalation candidates."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The authors interpret benchmark ranking as consistent with the unit-cell-normalized screening metric",
+        "evidence_span": "We read this as confirmation that the surrogate\u2019s ranking is internally consistent within the unit-cell-normalised metric used for screening."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The screen yields 71 lithium-intercalation candidates after applying voltage, capacity, stability, and max-voltage filters",
+        "evidence_span": "The screen produces a ranked list of 71 lithium-intercalation candidates after filtering on average voltage between 3.0 and 4.5 V, gravimetric capacity above 20 mAh/g, hull energy below 0.05 eV/atom, and maximum voltage below 5.5 V"
+      },
+      {
+        "role": "evidence_result",
+        "content": "LCO survives the screen and appears at rank 37",
+        "evidence_span": "the LCO entry (JVASP-2017) survives and is recovered by the screen at rank 37."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The top-ranked outputs are alternative candidates rather than commercial benchmarks",
+        "evidence_span": "The top of the list is therefore not seeded by the commercial benchmarks but instead surfaces a different set of candidates: a polyanionic chromium phosphate (LiCr2P2O8, JVASP-117419), a fluoride elpasolite-style host (Rb2LiFeF6, JVASP-141543), an iron oxide variant (Li3FeO3, JVASP-117295), and a vanadium fluoride (LiV2F7, JVASP-116849)."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Voltage predictions require a consistent absolute lithium chemical-potential reference.",
+        "evidence_span": "A second, less-emphasized constraint cuts across both surrogate and DFT campaigns: the absolute reference for the lithium chemical potential."
+      },
+      {
+        "role": "constraint",
+        "content": "The ALIGNN parity error only measures agreement with ALIGNN-FF labels, not direct agreement with DFT.",
+        "evidence_span": "Because the labels are produced by ALIGNN-FF rather than DFT, the parity error of the ALIGNN scalar regressor measures how faithfully a single forward pass reproduces the multi-step force-field protocol; it does not measure ALIGNN-vs-DFT error directly."
+      },
+      {
+        "role": "constraint",
+        "content": "Non-lithium results are only a transferability stress test and are not quantitatively validated against DFT.",
+        "evidence_span": "The non-\nlithium chemistries are not validated against DFT in this work and are reported only as a transferability\nstress test of the surrogate; quantitative claims are restricted to the lithium chemistries that survive into\nthe DFT tier."
+      },
+      {
+        "role": "constraint",
+        "content": "Foundation-scale voltages are surrogate estimates only and are used only for prioritization before DFT.",
+        "evidence_span": "These voltages\nare surrogate estimates rather than DFT, and serve only to prioritise candidates for the DFT tier."
+      },
+      {
+        "role": "constraint",
+        "content": "Shortlist entries still carry only surrogate-level voltages until advanced to the DFT tier.",
+        "evidence_span": "We stress that every entry carries only\nsurrogate-level voltages; the five-cathode benchmark of Sec. 2.5 establishes the accuracy of the DFT tier\nthrough which any shortlisted candidate would next be advanced."
+      },
+      {
+        "role": "constraint",
+        "content": "The fully delithiated LMP endpoint did not converge, so a closed convex hull could not be reported.",
+        "evidence_span": "The same 2\u00d72\u00d71 supercell at PBE+U with Ueff(Mn) = 3.90 eV completed 16 of the 17 delithiation\nsteps; the fully delithiated step16 (Mn16P16O64, Mn4+ d3) did not converge after multiple cold starts and\ngentler mixing schedules and was excluded from the curve. A closed convex hull would require both\nendpoints, so we report the step-voltage average over the 15 completed steps in place of a hull average."
+      },
+      {
+        "role": "constraint",
+        "content": "The NMC campaign used PBE+U for continuity because it predated the functional auto-selection logic.",
+        "evidence_span": "The NMC campaign predates the spacegroup-based functional auto-selection and was\ntherefore run at PBE+U; rerunning at optB88-vdW+U is flagged as a future-work item."
+      },
+      {
+        "role": "constraint",
+        "content": "Correcting the NMC residual would require methods beyond the paper's scope",
+        "evidence_span": "Resolving this residual requires a hybrid functional (e.g., HSE06) or an explicit anionic-redox correction36; both are outside the scope of the present manuscript."
+      },
+      {
+        "role": "constraint",
+        "content": "The current NMC calculations used PBE+U because they predated the auto-selector and for campaign continuity",
+        "evidence_span": "the present NMC runs predate the auto-selector and used PBE+U for continuity with the earlier campaign"
+      },
+      {
+        "role": "constraint",
+        "content": "Non-lithium screening is presented only as a transferability stress test, not quantitative validation",
+        "evidence_span": "the non-lithium screen in this manuscript is reported as a transferability stress test rather than a quantitative validation."
+      },
+      {
+        "role": "constraint",
+        "content": "The follow-on interventions were not performed because of HPC budget limits",
+        "evidence_span": "Both interventions are beyond the HPC budget of the present submission."
+      },
+      {
+        "role": "constraint",
+        "content": "A comprehensive false-positive estimate is not available because validation covers only five known commercial chemistries",
+        "evidence_span": "We do not have a comprehensive answer because the present manuscript validates only the five chemistries already known to be commercial"
+      }
+    ],
+    "contradiction": [
+      {
+        "role": "contradiction",
+        "content": "The NMC comparison is not like-for-like and the deficit reflects dataset stoichiometry rather than framework error",
+        "evidence_span": "The comparison to the NMC-111 theoretical reference is therefore not like-for-like, and the deficit reflects the stoichiometry of the underlying JARVIS entry rather than an error in the framework."
+      }
+    ]
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Databases lack delithiation curves needed for average-voltage extraction.",
+        "evidence_span": "The remaining gap is that the databases store relaxed structures, not the per-step delithiation curves needed to read off an average voltage."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "A practical need is to know how often top surrogate candidates fail at the DFT tier",
+        "evidence_span": "A practical question for any user of the framework is the rate at which a top-k surrogate candidate fails at the DFT tier."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Historical computational work focused on predicting average cathode voltage at lower cost.",
+        "evidence_span": "The screening literature on cathodes has therefore been dominated, since the earliest computational work, by efforts to predict average voltage at decreasing cost."
+      },
+      {
+        "role": "prior_approach",
+        "content": "DFT thermodynamic-cycle calculations were used to compute average intercalation voltages.",
+        "evidence_span": "Aydinol, Ceder, and co-workers showed in 1997 that the average intercalation voltage of a cathode could be obtained from density functional theory (DFT) total energies through a thermodynamic cycle that requires only the lithiated structure, the delithiated structure, and the lithium-metal reference"
+      },
+      {
+        "role": "prior_approach",
+        "content": "High-throughput DFT screening of candidate phosphates was previously performed.",
+        "evidence_span": "Hautier, Mueller, Jain, and Ceder applied the protocol at scale in 2011, screening thousands of candidate phosphates in a single high-throughput campaign and predicting voltage, capacity, and stability for redox couples that had never been synthesized9."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Materials Project, AFLOW, OQMD, and JARVIS-DFT provide large databases of relaxed structures and properties.",
+        "evidence_span": "The Materials Project10, AFLOW11, the Open Quantum Materials Database (OQMD)12, and JARVIS-DFT13,14 now expose hundreds of thousands of relaxed crystal structures with formation energies, band gaps, elastic constants, and convex-hull labels precomputed by their respective groups."
+      },
+      {
+        "role": "prior_approach",
+        "content": "CGCNN predicted crystal properties from relaxed structures.",
+        "evidence_span": "Crystal Graph Convolutional Neural Networks (CGCNN) showed in 2018 that an end-to-end graph network trained on the Materials Project could predict formation energies and band gaps within DFT-level error using only the relaxed structure as input16"
+      },
+      {
+        "role": "prior_approach",
+        "content": "MEGNet generalized graph-network prediction across molecules and crystals with global state variables.",
+        "evidence_span": "MEGNet generalized the approach across both molecules and crystals while introducing global state variables17."
+      },
+      {
+        "role": "prior_approach",
+        "content": "ALIGNN incorporated three-body angular information and reduced errors on JARVIS-DFT targets.",
+        "evidence_span": "The Atomistic Line Graph Neural Network (ALIGNN)18 added explicit three-body angular information through a coupled atom-graph and line-graph representation, lowering errors on most JARVIS-DFT property targets relative to CGCNN and MEGNet."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Universal interatomic potentials such as M3GNet, CHGNet, MACE, and GNoME enable relaxation and MD from a pretrained model.",
+        "evidence_span": "The newest generation of universal interatomic potentials (M3GNet19, CHGNet20, MACE21, and the GNoME framework from DeepMind22) extends that representation to forces and stresses, enabling structural relaxation and molecular dynamics across the periodic table from a single pretrained checkpoint."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior voltage-specific surrogates used deep or attention-based graph networks to predict battery voltages.",
+        "evidence_span": "Voltage-specific surrogates have appeared in parallel: Joshi and co-workers reported a deep-network voltage predictor with a mean absolute error of approximately 0.43 V on a metal-ion battery dataset23, and Louis and co-workers introduced an attention-based graph network that brought the error below 0.32 V on the Materials Project battery subset and demonstrated transfer from lithium to sodium hosts24."
+      },
+      {
+        "role": "prior_approach",
+        "content": "A GGA/GGA+U mixing scheme for binary-oxide formation enthalpies was proposed previously",
+        "evidence_span": "A mixing scheme that blends GGA and GGA+U formation enthalpies of the binary oxides into the cathode calculation, as proposed by Jain, Hautier, Ong, and Persson8"
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Conventional DFT cannot feasibly generate delithiation curves at database scale.",
+        "evidence_span": "Generating those curves at the scale of the database with conventional DFT is not feasible."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Existing surrogates predict only scalar voltages, do not enforce thermodynamics, and cannot validate top candidates independently.",
+        "evidence_span": "The shared limitation across these surrogates is that they predict scalar voltages without enforcing the underlying thermodynamic cycle and provide no way to validate a top-ranked candidate beyond a second pass through the same network family."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "JARVIS-DFT lacks per-material voltage labels, and average voltage is not uniquely defined without a delithiation protocol.",
+        "evidence_span": "The training labels are not raw DFT voltages: JARVIS-DFT does not contain a per-material voltage subset, and the average voltage of a host structure is not single-valued without a delithiation protocol."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "vdW-DF systematically overestimates voltage at deep delithiation in layered transition-metal oxides",
+        "evidence_span": "The systematic overestimate at the deep-delithiation end is a known property of the vdW-DF family on layered transition-metal oxides"
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "The authors do not use tabulated external lithium reference values because mismatched PAW settings create systematic voltage offsets.",
+        "evidence_span": "Tabulated \u00b5Li values from earlier JARVIS-DFT releases and from external compilations were obtained with different PAW choices than the high-throughput cathode runs and produce a \u223c1 V systematic offset on PBE voltages when used naively. We recompute the lithium-metal reference in-house with the same Lisv PAW, plane-wave cutoff, and smearing scheme used for the cathode calculations"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The authors did not use the prior GGA/GGA+U mixing correction, instead reporting unmixed residuals as a baseline",
+        "evidence_span": "the present manuscript reports the unmixed residuals as a transparent baseline."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than renormalizing capacity to formula units, the current screen keeps reduced-cell normalization to preserve JARVIS compatibility",
+        "evidence_span": "The user can also choose to renormalise gravimetric capacity to the formula unit rather than the JARVIS reduced cell, which moves the thresholds onto a more familiar scale at the cost of breaking compatibility with the existing JARVIS columns."
+      }
+    ],
+    "inspiration_source": [],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "The materials-genome era improved database access but did not solve throughput.",
+        "evidence_span": "The materials-genome era softened the problem on the database side without solving it on the throughput side."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Basis-set or pseudopotential mismatch in the lithium reference causes a constant shift in predicted voltages.",
+        "evidence_span": "a basis-set or pseudopotential mismatch between the cathode calculation and the lithium-metal reference shifts every predicted voltage by a constant."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Recomputing the lithium-metal reference in the same basis removes a systematic ~1 V voltage offset.",
+        "evidence_span": "the lithium-metal reference energy recomputed in the same plane-wave basis as the cathode runs to remove a systematic \u223c1 V offset present in tabulated values."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The ALIGNN regressor compresses the full multi-step ALIGNN-FF delithiation into one forward pass.",
+        "evidence_span": "The ALIGNN regressor is therefore a structure-to-scalar distillation of the full ALIGNN-FF protocol that collapses an NLi-step force-field run into one forward pass."
+      },
+      {
+        "role": "causal_claim",
+        "content": "A 0.17 V error implies that candidates 0.5 V above benchmarks are unlikely to be reordered by model noise, while candidates within 0.2 V should advance together.",
+        "evidence_span": "In screening practice this means that a candidate that lands 0.5 V above a known commercial benchmark at the ALIGNN tier is unlikely to be displaced by network noise in the downstream tiers; conversely, two candidates within 0.2 V of each other should be promoted together to the ALIGNN-FF tier rather than disambiguated at the surrogate level."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using the surrogate distributions takes minutes instead of the months required for a DFT-only campaign on the same hardware.",
+        "evidence_span": "Both distributions\ntake minutes of GPU time end-to-end where a DFT-only campaign would have taken months on the same\nhardware."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The initial ISIF=3 relaxation overexpanded delithiated LCO by 28%, so the endpoint was rerun with ions-only relaxation to obtain a stable phase.",
+        "evidence_span": "Step08 (the fully delithiated endpoint)\nwas rerun with ISIF = 2 after the initial ISIF = 3 relaxation expanded the cell volume by 28%; the\nions-only relaxation produced a stable endpoint consistent with the experimentally observed metastable\nO3-type CoO2 phase."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The apparent NMC capacity deficit is caused mainly by stoichiometry mismatch",
+        "evidence_span": "The apparent \u223c50% deficit for NMC is dominated by a stoichiometry mismatch"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using the same U calibration yields opposite-sign residuals across the two olivines",
+        "evidence_span": "The same calibration is therefore self-consistent within a redox couple but produces residuals of opposite sign across the two olivine chemistries."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The proposed mixing scheme would likely reduce the olivine voltage gap",
+        "evidence_span": "would close most of this gap;"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The NMC residual has two contributing causes: stoichiometry mismatch and GGA+U failure on oxygen redox",
+        "evidence_span": "has two compounding sources. The smaller is the stoichiometry mismatch between the JVASP-144791 cell and the commercial NMC-111 reference, discussed above. The larger is the inability of plain GGA+U to capture the onset of oxygen redox at x < 0.5 in Ni-rich layered oxides36"
+      },
+      {
+        "role": "causal_claim",
+        "content": "ALIGNN scalar speed makes the database-scale screening feasible",
+        "evidence_span": "The ALIGNN scalar tier is many orders of magnitude faster than a single PBE+U supercell relaxation on a per-structure basis, which is what makes the database-scale screen in Sec. 2.3 feasible at all."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Deep-delithiation endpoints consume more core-hours because SCF convergence is slow for highly oxidized states",
+        "evidence_span": "the deep-delithiation endpoints (e.g. NMC step16) ran out to \u223c1300 core-hours each in the present campaign because of slow self-consistent-field convergence on the highly-oxidised endpoint."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The other four benchmarks are excluded by the gravimetric-capacity threshold",
+        "evidence_span": "The other four (LFP, LMP, LMO, NMC variant) are removed by the Qgrav,min = 20 mAh/g threshold"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Lowering the minimum gravimetric-capacity threshold to 9 mAh/g brings all five benchmarks back into the pool",
+        "evidence_span": "A user who wants to recover the commercial benchmarks at the top of the list can do so by lowering Qgrav,min to 9 mAh/g (a one-line change in the screening configuration), which admits all five benchmarks back into the candidate pool."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Four of five commercial benchmarks are absent from the top list because the gravimetric-capacity threshold filters them out",
+        "evidence_span": "Of the five DFT-validated benchmarks (LFP, LMP, LMO, NMC, LCO), four are filtered out by the maximum-gravimetric-capacity threshold;"
+      },
+      {
+        "role": "causal_claim",
+        "content": "LCO and NMC are absent from the top because of modest reduced-cell gravimetric capacities",
+        "evidence_span": "and the absence of LCO/NMC at the top reflects their already-modest gravimetric capacity in the JARVIS reduced cells."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "Voltage is determined by the lithium chemical potential via the intercalation thermodynamic cycle.",
+        "evidence_spans": [
+          "Voltages depend on \u00b5Li through the intercalation cycle V = (EdeLi \u2212ELi \u2212n\u00b5Li)/n"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The right-skewed gravimetric-capacity distribution arises because gravimetric capacity scales as nLi/Mcell while unit-cell masses vary widely across materials.",
+        "evidence_spans": [
+          "The gravimetric capacity distribution (right panel) is right-skewed because Qgrav scales as nLi/Mcell, and unit-cell masses span a wide range across the host families catalogued in JARVIS-DFT."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Layered LCO requires optB88-vdW(+U) because plain PBE misrepresents interlayer dispersion and overestimates the c-axis spacing in delithiated states, which affects deep-delithiation voltages.",
+        "evidence_spans": [
+          "the layered LCO framework (R\u00af3m, spacegroup 166) was routed automatically to optB88-vdW+U 30, which captures the interlayer dispersion that PBE misrepresents.",
+          "The optB88-vdW correction is required for layered LCO because plain PBE substantially overestimates the c-axis spacing in the delithiated endpoints, which propagates into the deep-delithiation step voltages."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Deep-delithiation LCO errors are tied to limitations of vdW-DF/PBE+U treatments of oxygen redox: at low Li content, O 2p overlaps TM 3d near the Fermi level so oxidation shifts onto oxygen, but standard PBE+U/vdW-DF places O 2p incorrectly relative to TM 3d and handles correlated O 2p states insecurely, causing overpredicted voltages.",
+        "evidence_spans": [
+          "where the vdW-DF functional family\u2019s treatment of the strongly correlated O 2p states is least secure.",
+          "as the lithium concentration drops below half, the oxygen 2p band overlaps the transition-metal 3d band at the Fermi level, and the redox electron is drawn from the oxygen sublattice rather than from the transition metal.",
+          "PBE+U does not place the O 2p states correctly relative to the TM 3d states without a hybrid component or explicit anionic-redox treatment, so the predicted voltage in the deep-delithiation regime climbs toward 5 V instead of plateauing at the experimental \u223c4 V."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Multiple computed LFP voltage plateaus are an artifact of finite-size supercell vacancy orderings, which stabilize artificial intermediate Li compositions that would disappear in the thermodynamic limit.",
+        "evidence_spans": [
+          "The multiple computed plateaus are an artefact of the finite 2\u00d72\u00d71 supercell: a 16-Li cell admits only a discrete set of Li-vacancy orderings, which produce stable intermediate compositions that would not survive in the thermodynamic limit."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "LFP's upward voltage bias is attributed to PBE+U overbinding in iron polyanions, especially a slight overbinding of the high-oxidation Fe endpoint under the Materials Project U calibration.",
+        "evidence_spans": [
+          "the systematic upward bias is consistent with the known PBE+U overbinding on iron polyanions under the Materials Project U calibration8.",
+          "The asymmetry has a clean physical explanation: the U = 5.30 eV used on iron is calibrated to reproduce the formation enthalpy of the Fe2+/3+ couple in oxides, where it slightly overbinds the high-oxidation-state endpoint"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The opposite voltage residual signs of olivine LFP and LMP arise from different Fe and Mn d-state localization under the same Hubbard-U calibration: Fe U slightly overbinds the high-oxidation-state endpoint, whereas Mn U slightly underbinds the high-oxidation Mn4+ endpoint, motivating GGA/GGA+U mixing schemes.",
+        "evidence_spans": [
+          "The opposite sign of the residual relative to LFP under the same Materials Project U calibration reflects the different localisation of Mn2+/3+ versus Fe2+/3+ d-states; this is a known motivation for GGA/GGA+U mixing schemes8.",
+          "the olivines show \u223c0.2 V residuals of opposite sign (LFP +0.15 V, LMP \u22120.19 V), reflecting the different localisation of Fe2+/3+ and Mn2+/3+ d-states under the same Materials Project Hubbard U calibration.",
+          "The asymmetry has a clean physical explanation: the U = 5.30 eV used on iron is calibrated to reproduce the formation enthalpy of the Fe2+/3+ couple in oxides, where it slightly overbinds the high-oxidation-state endpoint, while the U = 3.90 eV used on manganese is calibrated to reproduce the Mn2+/3+/4+ sequence and slightly underbinds the high-oxidation Mn4+ endpoint."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The missing fully delithiated LMP endpoint is not experimentally relevant because Mn4+ is unstable and olivine LMP is not fully delithiated in cycling, instead tending toward oxygen evolution.",
+        "evidence_spans": [
+          "The non-convergence of the fully delithiated endpoint is not experimentally relevant: olivine LMP is never fully delithiated in cycling experiments because the Mn4+ state is unstable against oxygen evolution."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "LMO is well described because the Mn3+/Mn4+ redox couple aligns with the chosen Mn U calibration and the 3D spinel framework lacks a van der Waals interlayer correction issue.",
+        "evidence_spans": [
+          "The Mn3+/Mn4+ redox couple is well-described by the Materials Project Ueff(Mn) = 3.90 eV, and the 3D-bonded spinel framework has no van-der-Waals interlayer that would require optB88-vdW corrections."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The large voltage residual for the layered NMC-like case stems from two compounding causes: the JARVIS structure is a non-stoichiometric, partially delithiated layered variant rather than fully lithiated NMC-111, and plain GGA+U misses oxygen-redox physics that becomes important at deep delithiation.",
+        "evidence_spans": [
+          "a fifth, non-stoichiometric layered entry (JVASP-144791, Li:TM = 1:2) is carried as an edge case whose larger residual is traceable to the stoichiometry mismatch against NMC-111 and to the onset of oxygen redox at deep delithiation rather than to the framework itself.",
+          "The residual has two compounding sources discussed in Sec. 2.6: a stoichiometry mismatch between the JVASP cell and NMC-111, and the failure of plain GGA+U to capture the onset of oxygen redox at x < 0.5 that is well known in Ni-rich layered oxides.",
+          "the JVASP-144791 cell is Li4Mn3Co2Ni3O16, with a Li:TM ratio of 1:2, and corresponds to a partially-delithiated layered variant rather than fully-lithiated NMC-111 (Li:TM = 1:1)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The prevalence of phosphates and fluorides among top-ranked candidates is consistent with the known voltage-enhancing effect of fluorination and high-valent transition metals.",
+        "evidence_spans": [
+          "Polyanion phosphates and fluoride hosts together form the largest single grouping in the top twelve (five of twelve entries), with oxide and mixed-chemistry hosts filling the remainder; this is consistent with the well-known voltage enhancement that fluorination and high-valent transition metals provide9,28"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "LCO's modest ranking is explained by low reduced-cell gravimetric capacity rather than by failure of the surrogate model.",
+        "evidence_spans": [
+          "The ranking of the surviving LCO entry is consistent with its modest gravimetric capacity in the JARVIS reduced cell (\u223c36 mAh/g vs. the \u223c274 mAh/g theoretical ceiling per formula unit) and is not evidence of surrogate failure."
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "BatteryMat hypothesizes a hierarchical, strict sequential screening funnel for cathode discovery: use single-pass ALIGNN average-voltage prediction as the primary surrogate signal, interpret surrogate outputs at the group level rather than as an exact rank ordering, and treat the top-ranked candidate set as actionable output rather than a definitive ranking.",
+        "evidence_spans": [
+          "BatteryMat closes that loop with a hierarchical screen that promotes single-pass average-voltage prediction with ALIGNN as the primary signal.",
+          "so ALIGNN-FF should be read as a group-level rather than rank-level signal at the surrogate tier; the group-level signal is what a screening cascade needs to deliver.",
+          "The hierarchy is therefore not a constant-factor speedup over DFT, it is a strict sequential funnel that places the expensive tier last.",
+          "We treat the top-12 list as the actionable output of the surrogate tier rather than as a definitive ranking:"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Operationally, the paper proposes advancing a broad top-ranked set through the hierarchy\u2014e.g., at least the top-10 to ALIGNN-FF and at least the top-3 to DFT, or candidates above rank 5 to ALIGNN-FF and then DFT if they survive\u2014while accepting some false positives in DFT validation.",
+        "evidence_spans": [
+          "In practice we recommend that users promote at least the top-10 to the ALIGNN-FF profile tier and at least the top-3 to the DFT tier, accepting that a fraction of the DFT validation budget will be spent on candidates that disqualify themselves on the per-step voltage curve.",
+          "every candidate above rank 5 should be promoted to the ALIGNN-FF profile tier and, if it survives, to the DFT tier with the auto-selected functional."
+        ],
+        "conflicting": true
+      },
+      {
+        "content": "A follow-on hypothesis is that rerunning NMC with optB88-vdW+U would remove roughly half of the remaining residual error.",
+        "evidence_spans": [
+          "Past experience on LCO suggests this would close roughly half of the residual."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The paper proposes testing whether surrogate transferability persists beyond the current setting by extending DFT validation to sodium and magnesium chemistries, with Mn-, Co-, and Ni-containing oxide variants named as natural next DFT-validation targets.",
+        "evidence_spans": [
+          "The second is extending the DFT validation set to one sodium and one magnesium chemistry to confirm that the surrogate transfer-ability seen in Supplementary Fig. S3 survives the DFT tier;",
+          "Several entries (Li2MgMn3O8, Li4Co3O7, Li2NiO2) are Mn-, Co-, or Ni-containing oxide variants that are natural targets for the next round of DFT validation."
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "Prior DFT voltage calculations reproduced experimental intercalation voltages to roughly 0.1\u20130.3 V across oxides and dichalcogenides.",
+        "evidence_spans": [
+          "with the result reproducing experimental voltages to roughly 0.1\u20130.3 V across oxides and dichalcogenides7"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using tabulated lithium reference chemical potentials obtained with mismatched PAW choices produces an approximately 1 V systematic offset in PBE voltages if used naively.",
+        "evidence_spans": [
+          "Tabulated \u00b5Li values from earlier JARVIS-DFT releases and from external compilations were obtained with different PAW choices than the high-throughput cathode runs and produce a \u223c1 V systematic offset on PBE voltages when used naively."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "After filtering on successful calculations, 7,610 lithium-containing JARVIS-DFT structures contributed generated labels for training; the tier-1 ALIGNN regressor trained on these data predicts average delithiation voltage from the relaxed lithiated geometry alone in sub-second time on a single GPU, with 0.17 V MAE and R2 = 0.94 on a held-out test set relative to the ALIGNN-FF protocol.",
+        "evidence_spans": [
+          "After filtering on status == \u2019Success\u2019, 7,610 structures contributed labels.",
+          "An ALIGNN scalar regressor trained on 7,610 lithium-containing JARVIS-DFT structures predicts the average delithiation voltage from the relaxed lithiated geometry alone in sub-second time on a single GPU, at a mean absolute error of 0.17 V relative to the ALIGNN-FF protocol it is distilled from.",
+          "The held-out test-set mean absolute error is 0.17 V with a coefficient of determination of R2 = 0.94, against a dataset-mean baseline MAE of 1.03 V (Fig. 2)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The tier-1 regressor predictions follow parity closely across the practical 0\u20136 V range with no visible systematic bias in the residuals.",
+        "evidence_spans": [
+          "Predictions cluster tightly along parity from 0 to 6 V, the bracket of practical intercalation chemistries, with no systematic bias visible in the residuals."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "ALIGNN-FF can trace full step-by-step delithiation profiles in seconds per step, costing roughly 10\u201330 seconds per material on a single GPU.",
+        "evidence_spans": [
+          "The ALIGNN-FF universal force field traces the full step-by-step delithiation profile of any candidate that survives the first tier on the order of seconds per step.",
+          "The cost is roughly 10\u201330 s per material on a single GPU."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "On four commercial benchmark chemistries, the pipeline/DFT tier reproduces experimental average voltage within 0.3 V and crystallographic theoretical volumetric capacity within 5%; among stoichiometric commercial chemistries, LMO is most accurate at 4.08 V, only +0.03 V above experiment.",
+        "evidence_spans": [
+          "We benchmark the pipeline on four commercial chemistries spanning olivine, spinel, and layered frameworks and recover the experimental average voltage to within 0.3 V and the crystallographic theoretical volumetric capacity to within 5% on all four",
+          "The DFT tier reproduces the experimental average voltage to within 0.3 V on all four stoichiometric commercial chemistries (LFP, LMP, LMO, LCO), with LMO the most accurate residual at +0.03 V;",
+          "The crystallographic theoretical volumetric capacity is reproduced to within 5% for LFP, LMP, LMO, and LCO.",
+          "The convex-hull average voltage is 4.08 V, +0.03 V above the experimental upper plateau of 4.05 V26,27, the most accurate of the five chemistries."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Benchmark delithiation profiles recover expected qualitative voltage features for known frameworks, including flat 3.3\u20133.5 V plateaus for olivines and a single approximately 4.2 V plateau for spinel LiMn2O4.",
+        "evidence_spans": [
+          "The qualitative features expected from each framework are recovered: flat 3.3\u20133.5 V plateaus for the olivines3,25, a single \u223c4.2 V plateau for the spinel LiMn2O4\nLi4Mn3Co2Ni3O16."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For benchmark agreement with experiment, DFT performs best for LMO and LCO, with |\u0394Vavg| \u2264 0.13 V; for LCO specifically, the convex-hull average voltage is 4.18 V (+0.13 V vs experiment), the optB88-vdW+U functional resolves the correct multi-step staging order, the plateau voltages span 4.01\u20134.48 V, and agreement is best at intermediate lithium content and worst at deep delithiation.",
+        "evidence_spans": [
+          "The DFT tier agrees best with experiment for LMO and LCO (|\u2206Vavg| \u22640.13 V);",
+          "The convex-hull average voltage is 4.18 V, +0.13 V above the experimental 4.05 V2,37, and the hull resolves three staged plateaus at 4.01, 4.23, and 4.48 V (Fig. 5, right panel), consistent with the multi-step staging behaviour observed experimentally in cycled LixCoO2)",
+          "The optB88-vdW+U functional reproduces the LCO average voltage to within 0.13 V and resolves the multi-step staging behaviour observed experimentally with the correct ordering of plateaus.",
+          "The hull-resolved plateau voltages climb from 4.01 to 4.48 V across the staging sequence, a span of 0.47 V that brackets the experimentally observed staging steps in cycled Li_xCoO2.",
+          "The agreement is best at intermediate lithium content (x \u2208[0.3,0.7]) and worst at the deep-delithiation endpoint (x < 0.2)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For LMO, the DFT convex hull gives an average voltage of 4.08 V, only +0.03 V above experiment, and resolves two plateaus at 4.00 and 4.17 V that mirror the experimentally observed two-step discharge profile.",
+        "evidence_spans": [
+          "The convex-hull average voltage is 4.08 V, +0.03 V above the experimental upper plateau of 4.05 V26,27, the most accurate of the five chemistries. The hull resolves two distinct plateaus at 4.00 and 4.17 V that mirror the experimentally observed two-step discharge profile of cubic spinel LiMn2O4, which proceeds through a cubic-to-cubic phase transition near x = 0.5."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "NMC shows the largest benchmark residual, +0.70 V.",
+        "evidence_spans": [
+          "The largest residual in the benchmark, +0.70 V on NMC,"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Across the lithium-containing JARVIS-DFT subset, the average-voltage distribution peaks at 3.2\u20133.6 V and the gravimetric-capacity distribution is broad, reflecting diverse host frameworks.",
+        "evidence_spans": [
+          "The resulting average-\nvoltage distribution peaks between 3.2 and 3.6 V (Supplementary Fig. S2, left), within the operating\nwindow of commercial intercalation cathodes28, and the gravimetric capacity distribution spans a broad\nrange that reflects the diversity of host frameworks (Supplementary Fig. S2, right)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A transferability stress test across non-lithium ions recovers the expected voltage-capacity trade-off: K-based systems reach the highest voltages (>4 V) at the lowest capacities, while Mg- and Na-based systems approach NMC-level capacity at substantially lower voltage.",
+        "evidence_spans": [
+          "The familiar voltage\u2013capacity trade-off is recovered:\nK-based systems reach the highest voltage (above 4 V) at the lowest capacity, while Mg- and Na-based\nsystems approach NMC-level capacity at substantially lower voltage (Supplementary Fig. S3)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Across the lithium-containing JARVIS-DFT pool, the screening framework returns a ranked list of 71 surviving lithium-intercalation candidates after filters on average voltage, capacity, stability, and maximum voltage.",
+        "evidence_spans": [
+          "Across the lithium-containing JARVIS-DFT pool (7,474 entries after filtering) the framework returns a ranked list of 71 surviving lithium-intercalation candidates after the screening filters",
+          "The screen produces a ranked list of 71 lithium-intercalation candidates after filtering on average voltage between 3.0 and 4.5 V, gravimetric capacity above 20 mAh/g, hull energy below 0.05 eV/atom, and maximum voltage below 5.5 V"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The top-ranked surviving lithium candidates are mainly alternative hosts led by polyanion phosphates and fluoride hosts, rather than the commercial benchmark cathodes; example top outputs include LiCr2P2O8, Rb2LiFeF6, Li3FeO3, and LiV2F7.",
+        "evidence_spans": [
+          "the top of the list is led by polyanion phosphates and fluoride hosts",
+          "The top of the list is therefore not seeded by the commercial benchmarks but instead surfaces a different set of candidates: a polyanionic chromium phosphate (LiCr2P2O8, JVASP-117419), a fluoride elpasolite-style host (Rb2LiFeF6, JVASP-141543), an iron oxide variant (Li3FeO3, JVASP-117295), and a vanadium fluoride (LiV2F7, JVASP-116849)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Among the five DFT-validated benchmark cathodes, only LCO survives the second-stage screening filters, where it is recovered at rank 37 of the 71 surviving lithium-intercalation candidates; the authors interpret this ranking as consistent with the unit-cell-normalized screening metric.",
+        "evidence_spans": [
+          "Of the five DFT-validated benchmarks, only the LCO entry survives the second-stage screening filters; it is recovered at rank 37 out of 71 surviving lithium-intercalation candidates.",
+          "the LCO entry (JVASP-2017) survives and is recovered by the screen at rank 37.",
+          "We read this as confirmation that the surrogate\u2019s ranking is internally consistent within the unit-cell-normalised metric used for screening."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "ALIGNN-FF spans a slightly wider voltage range than DFT across the five benchmark chemistries but reproduces the same three chemistry groupings; however, ALIGNN-FF and DFT differ in within-group rank ordering for the LiFePO4/LiMnPO4 and LiMn2O4/LiCoO2 pairs.",
+        "evidence_spans": [
+          "ALIGNN-FF spans a slightly wider voltage range across these five chemistries than DFT (1.01 V from LiMnPO4 to Li(Ni,Mn,Co)O2 versus 0.80 V at the DFT tier) but reproduces the same three-tier chemistry grouping",
+          "Within each group the ALIGNN-FF and DFT internal orderings differ (DFT places LiFePO4 below LiMnPO4 while ALIGNN-FF inverts that pair, and the same swap occurs for LiMn2O4/LiCoO2)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the Alexandria search, a five-stage funnel reduces 4.49 million structures to a shortlist of 213 candidates, and the shortlist blindly rediscovers known cathodes such as LiNiO2, NaNiO2, LiMnO2, and disordered-rocksalt Li2VO2F near the hull.",
+        "evidence_spans": [
+          "A five-stage funnel (Fig. 3) reduces the 4.49 million-structure pool to a shortlist of 213 candidates,\na reduction of roughly 2.1 \u00d7 104.",
+          "Without any of them being seeded into the search, the screen blindly rediscovers\nLiNiO2, NaNiO2, LiMnO2, and the disordered-rocksalt Li2VO2F near the hull."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Within the Alexandria shortlist, Pareto-optimal MgNiO2 is the highest-capacity on-hull magnesium candidate at 466 mAh/g.",
+        "evidence_spans": [
+          "the Pareto-optimal MgNiO2 reaches 466 mAh/g on the\nhull, the highest-capacity on-hull magnesium candidate in the set."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In practice, almost all wall-clock cost is spent in the third tier, which is reserved for the few candidates that survive the first two screening stages.",
+        "evidence_spans": [
+          "In practice the framework spends almost all of its wall-clock budget on the third tier, which is reserved for the few candidates that survive the first two."
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "Voltage predictions require a consistent absolute lithium chemical-potential reference.",
+        "evidence_spans": [
+          "A second, less-emphasized constraint cuts across both surrogate and DFT campaigns: the absolute reference for the lithium chemical potential."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Surrogate-stage voltages are only surrogate estimates for prioritization and do not constitute direct DFT-validated quantitative results; this includes foundation-scale voltages, shortlist entries, and non-lithium results, which are presented only as transferability stress tests rather than quantitative validation against DFT.",
+        "evidence_spans": [
+          "These voltages are surrogate estimates rather than DFT, and serve only to prioritise candidates for the DFT tier.",
+          "We stress that every entry carries only surrogate-level voltages; the five-cathode benchmark of Sec. 2.5 establishes the accuracy of the DFT tier through which any shortlisted candidate would next be advanced.",
+          "The non-\nlithium chemistries are not validated against DFT in this work and are reported only as a transferability\nstress test of the surrogate; quantitative claims are restricted to the lithium chemistries that survive into\nthe DFT tier.",
+          "the non-lithium screen in this manuscript is reported as a transferability stress test rather than a quantitative validation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The ALIGNN parity error is constrained to measuring agreement with ALIGNN-FF-generated labels, not direct agreement with DFT.",
+        "evidence_spans": [
+          "Because the labels are produced by ALIGNN-FF rather than DFT, the parity error of the ALIGNN scalar regressor measures how faithfully a single forward pass reproduces the multi-step force-field protocol; it does not measure ALIGNN-vs-DFT error directly."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For LMP, the fully delithiated endpoint did not converge, so a closed convex hull could not be reported and the authors instead report a step-voltage average over the completed steps.",
+        "evidence_spans": [
+          "The same 2\u00d72\u00d71 supercell at PBE+U with Ueff(Mn) = 3.90 eV completed 16 of the 17 delithiation\nsteps; the fully delithiated step16 (Mn16P16O64, Mn4+ d3) did not converge after multiple cold starts and\ngentler mixing schedules and was excluded from the curve. A closed convex hull would require both\nendpoints, so we report the step-voltage average over the 15 completed steps in place of a hull average."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The NMC campaign used PBE+U because it predated the functional auto-selection logic and was kept for continuity with the earlier campaign.",
+        "evidence_spans": [
+          "The NMC campaign predates the spacegroup-based functional auto-selection and was\ntherefore run at PBE+U; rerunning at optB88-vdW+U is flagged as a future-work item.",
+          "the present NMC runs predate the auto-selector and used PBE+U for continuity with the earlier campaign"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Correcting the NMC residual would require beyond-scope methods, such as a hybrid functional or explicit anionic-redox correction, and the follow-on interventions were not performed because of HPC budget limits.",
+        "evidence_spans": [
+          "Resolving this residual requires a hybrid functional (e.g., HSE06) or an explicit anionic-redox correction36; both are outside the scope of the present manuscript.",
+          "Both interventions are beyond the HPC budget of the present submission."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A comprehensive false-positive estimate is not available because validation covers only five known commercial chemistries.",
+        "evidence_spans": [
+          "We do not have a comprehensive answer because the present manuscript validates only the five chemistries already known to be commercial"
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": [
+      {
+        "content": "The NMC comparison is not like-for-like, and the observed deficit reflects the stoichiometry of the underlying JARVIS entry rather than an error in the framework.",
+        "evidence_spans": [
+          "The comparison to the NMC-111 theoretical reference is therefore not like-for-like, and the deficit reflects the stoichiometry of the underlying JARVIS entry rather than an error in the framework."
+        ],
+        "conflicting": false
+      }
+    ]
+  }
+}

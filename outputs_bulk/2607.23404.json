@@ -1,0 +1,2264 @@
+{
+  "paper_id": "2607.23404",
+  "chunks_processed": 7,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Gaussian-process surrogates used in MFBO do not scale well with growing data and rely on smoothness assumptions that often fail in molecular/materials spaces.",
+        "evidence_span": "Gaussian processes (GPs) are the default choice, but they scale poorly as data accumulate and assume a smooth landscape that molecular and materials search spaces routinely violate."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Transfer learning has not yet been evaluated as the surrogate inside a closed-loop optimization process.",
+        "evidence_span": "Despite its use in property prediction, transfer learning has not been tested as the engine of a closed-loop optimization."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Conventional BO relies on a single information source, creating a cost\u2013accuracy tradeoff.",
+        "evidence_span": "A central limitation of conventional BO is its reliance on a single source of information, which imposes a trade-off between evaluation cost and prediction accuracy."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The use of transfer-learning models as closed-loop optimization decision engines is still largely unexplored.",
+        "evidence_span": "their role as decision-making engines in closed-loop optimization remains largely unexplored [14]."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Transfer-learning architectures have not been systematically evaluated in controlled closed-loop optimization.",
+        "evidence_span": "whereas transfer-learning architectures representing distinct mechanisms of knowledge transfer have not yet been systematically evaluated under controlled closed-loop optimization conditions."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "It is still unclear when transfer learning beats GP baselines, which transfer mechanisms work best, and what drives any advantage.",
+        "evidence_span": "It therefore remains unclear when transfer-learning surrogates outperform GP baselines, which transfer mechanisms are most effective and whether any advantage arises from better uncertainty estimates, better predictive means or improved representation of the design space."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The authors tested whether transfer-learning advantages could be explained by differing acquisition policies between GP and transfer-learning surrogates.",
+        "evidence_span": "Because the GP and transfer-learning surrogates used structurally different acquisition policies under the default protocol, we matched the acquisition policy across both model families to test whether the observed advantage of transfer-learning surrogates could be explained by this asymmetry."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The authors systematically tested whether calibrated uncertainty improves BO depending on acquisition policy and benchmark structure.",
+        "evidence_span": "Whether calibrated surrogate uncertainty improves BO depends on both the acquisition policy and the struc- ture of the benchmark. To test this systematically"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The authors sought to determine when learned surrogate models are actually necessary.",
+        "evidence_span": "A learned surrogate is not equally valuable for every optimization problem. To identify when surrogate learn- ing adds benefit"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "A next step is extending the comparison to adaptive, cost-aware fidelity selection and to hierarchical chains of three or more fidelities for a complete reliable decision engine.",
+        "evidence_span": "Extending this\ncomparison to adaptive, cost-aware fidelity selection\nand to hierarchical chains of three or more fidelities is\nthe natural next step towards a complete and reliable\ndecision-making engine for autonomous discovery"
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "MFBO commonly uses Gaussian processes as the surrogate model.",
+        "evidence_span": "Gaussian processes (GPs) are the default choice"
+      },
+      {
+        "role": "prior_approach",
+        "content": "MFBO combines low- and high-fidelity information in a unified optimization framework.",
+        "evidence_span": "Multi-fidelity Bayesian optimization (MFBO) addresses this challenge by combining these complementary information sources within a unified optimization framework, enabling inexpensive LF evaluations to broadly explore the design space while reserving scarce HF measurements for validation of the most promising candidates [5]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Most MFBO methods use Gaussian-process surrogates.",
+        "evidence_span": "Most MFBO methods remain rooted in Gaussian process (GP) surrogates whose strength lies in calibrated uncertainty estimation."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Standard multi-fidelity Gaussian processes are a prior method.",
+        "evidence_span": "Standard multi-fidelity Gaussian processes (MFGP) perform strongly in low-data regimes and provide uncertainty estimates"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Transfer-learning models have previously been used for multi-fidelity molecular property prediction.",
+        "evidence_span": "Although transfer-learning models have advanced multi-fidelity molecular property prediction"
+      },
+      {
+        "role": "prior_approach",
+        "content": "MFBO in molecular and materials discovery has mostly been built around GP-based surrogates.",
+        "evidence_span": "In molecular and materials discovery, MFBO has largely been developed around GP-based surrogates [6]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "The study compares against autoregressive MFGP, NARGP, deep-kernel GP, and sparse variational MFGP baselines.",
+        "evidence_span": "The comparison includes eleven transfer-learning surrogates and four GP baselines: autoregressive MFGP [5], nonlinear autoregressive GP (NARGP) [11], deep-kernel GP [15], and sparse variational MFGP[16, 17]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The baseline method is the standard autoregressive multi-fidelity GP.",
+        "evidence_span": "The baseline MFGP (the standard autoregressive multi- fidelity GP; Methods)"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Under the default protocol, baseline MFGP used uncertainty-driven expected improvement and transfer-learning surrogates used a greedy policy.",
+        "evidence_span": "In the default setting, the baseline MFGP used an uncertainty-driven expected- improvement (EI) acquisition whereas the transfer- learning surrogates used a greedy policy"
+      },
+      {
+        "role": "prior_approach",
+        "content": "The study considered five standard uncertainty-driven acquisition functions: EI, probability of improvement, lower confidence bound, max-value entropy search, and Thompson sampling.",
+        "evidence_span": "we replaced the greedy policy with a representative portfolio of five uncertainty-driven acquisitions span- ning the standard acquisition-function taxonomy [3]: EI [19] and probability of improvement [20] which are improvement-based; the GP lower confidence bound [21] which is optimistic; max-value entropy search [22] which is information-theoretic; and Thompson sam- pling [23] which is sampling-based."
+      },
+      {
+        "role": "prior_approach",
+        "content": "They compared methods against a surrogate-free LF screening baseline that ranks by LF value and evaluates top candidates at HF.",
+        "evidence_span": "we compared each method with a surrogate-free screening baseline that ranks candidates by their LF value and evaluates the top-ranked can- didates at HF."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Expected improvement was used as the unified acquisition objective.",
+        "evidence_span": "Candidate selection used EI [19] as the unified acquisition\nobjective"
+      },
+      {
+        "role": "prior_approach",
+        "content": "The study considered standard acquisition functions including probability of improvement, lower confidence bound, max-value entropy search, and Thompson sampling.",
+        "evidence_span": "These included a portfolio of five\nLF acquisitions using the BLR predictive standard devi-\nation: EI, probability of improvement [20], the GP lower\nconfidence bound [21], max-value entropy search [22],\nand Thompson sampling [23], spanning the standard\nacquisition-function taxonomy [3]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The baseline multi-fidelity GP uses a Kennedy\u2013O\u2019Hagan autoregressive formulation with Mat\u00e9rn-5/2 kernel.",
+        "evidence_span": "The\nbaseline\nMFGP\nwas\nimple-\nmented using the SingleTaskMultiFidelityGP in\nBoTorch [26], corresponding to an autoregressive\nKennedy\u2013O\u2019Hagan formulation with a Mat\u00b4ern-5/2\nkernel and fidelity encoded as a binary indicator."
+      },
+      {
+        "role": "prior_approach",
+        "content": "NARGP models the high-fidelity response as a nonlinear function of inputs and the low-fidelity posterior mean.",
+        "evidence_span": "NARGP [11] models the HF response\nas a nonlinear function of the input and the LF pos-\nterior mean."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Deep-kernel GP uses neural-network features inside the kernel.",
+        "evidence_span": "The deep-kernel GP [15] replaces the\nconventional kernel with one defined on neural network\nfeatures trained jointly with the marginal-likelihood\noptimization."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Sparse variational multi-fidelity GP uses inducing points and stochastic variational inference as a scalable alternative.",
+        "evidence_span": "The sparse variational MFGP approx-\nimated the multi-fidelity posterior using stochastic\nvariational inference over inducing points with a multi-\ntask index kernel, providing a scalable alternative to\nexact GP inference [16, 17]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The transfer-learning framework spans representation, parameter, output, data, distribution-alignment, and gradient-coupling transfer paradigms.",
+        "evidence_span": "The mechanisms spanned five paradigms:\nrepresentation transfer including sequential fine-tuning,\nprogressive unfreezing, and adapter modules that\nupdate a small number of parameters over a frozen back-\nbone; parameter transfer, including pretrain-then-joint\ntraining and soft parameter sharing; output transfer\nincluding knowledge distillation and pseudo-labelling;\ndata transfer implemented as curriculum learning by\nordering HF samples according to residual magni-\ntude; distribution alignment implemented using domain\nadaptation by a maximum-mean-discrepancy penalty\nbetween LF and HF feature distributions; and gradi-\nent coupling, comparing stop-gradient and end-to-end\njoint training."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The benchmark suite extends that of Sabanza-Gil et al. with two new materials tasks.",
+        "evidence_span": "HOPV15 and Matbench-gap extend the original suite\nof Sabanza-Gil et al. [6] with two materials tasks\nintroduced here."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Cost ratios were chosen to match originating studies for indirect comparison with prior GP results.",
+        "evidence_span": "Cost\nratios were matched to the originating studies to enable\nindirect comparison with prior single- and multi-fidelity\nGP results [6]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The baseline multi-fidelity GP uses BoTorch's SingleTaskMultiFidelityGP with Mat\u00e9rn-5/2 and a linear truncated fidelity kernel.",
+        "evidence_span": "We use SingleTaskMultiFidelityGP from BoTorch [26], which internally employs a Mat\u00b4ern 5/2 kernel with automatic relevance determination (ARD) for the input dimensions and a linear truncated kernel for the fidelity dimension."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The multi-fidelity GP acquires using a single cross-fidelity posterior for both fidelity steps.",
+        "evidence_span": "The multi-fidelity GP uses this single cross-fidelity posterior for acquisition at both fidelity steps."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Transfer-learning surrogate uncertainty is modeled with a Bayesian linear regression head on low-fidelity last-layer features.",
+        "evidence_span": "Uncertainty for the transfer-learning surrogates is obtained from a Bayesian linear regression (BLR) head on the low-fidelity (LF) network\u2019s last-layer features."
+      },
+      {
+        "role": "prior_approach",
+        "content": "An alternative acquisition portfolio included EI, probability of improvement, lower confidence bound, max-value entropy search, and Thompson sampling.",
+        "evidence_span": "we evaluated a portfolio of five uncertainty-driven acquisitions spanning the standard taxonomy of myopic acquisition functions [3]: the improvement-based EI [19] and probability of improvement [20]; the optimistic Gaussian-process lower confidence bound [21] (\u03b2 = 2); the information-theoretic max-value entropy search [22] (Gumbel approximation, ten max-value samples); and sampling-based Thompson sampling [23]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "A fully uncertainty-aware variant adds a second BLR head on the HF network and applies EI at both fidelities.",
+        "evidence_span": "We additionally evaluated a fully uncertainty-aware variant that adds a second BLR head on the HF network and applies EI at both fidelities."
+      },
+      {
+        "role": "prior_approach",
+        "content": "As a control, the baseline MFGP was also run with a greedy policy based on posterior mean.",
+        "evidence_span": "As a matched control for the surrogate-versus-acquisition question, the baseline MFGP was also run with a greedy policy that selects by its posterior mean, all other settings held fixed (Fig. 3)."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "GP surrogates become problematic in high-dimensional, heterogeneous molecular and materials spaces.",
+        "evidence_span": "but their limitations become increasingly apparent in the high-dimensional and heterogeneous search spaces characteristic of molecular and materials discovery."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "GPs scale poorly as low-fidelity data grows.",
+        "evidence_span": "GP surrogates scale poorly as LF data accumulate [8]"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Kernel similarity assumptions may fail for nonlinear, biased, or location-dependent LF\u2013HF relations.",
+        "evidence_span": "while kernel-based similarity assumptions can struggle to capture nonlinear, biased or location-dependent relationships between LF and HF signals [9\u201311]."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "FLOPs do not capture memory footprint or engineering factors affecting deployment cost.",
+        "evidence_span": "it does not capture memory footprint, which is particularly relevant for the sparse variational MFGP\u2019s inducing-point over- head, or engineering factors such as parallelization and library-level optimization that affect wall-clock cost in deployment."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Synthetic degradations in the grid may not reflect real experimental or simulation biases.",
+        "evidence_span": "whose syn-\nthetic degradations need not mirror real experimental\nor simulation biases"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "The synthetic degradations may not capture real experimental or simulation bias structure, limiting generalization.",
+        "evidence_span": "These\nsynthetic degradations nevertheless need not reproduce\nthe structure of real experimental or simulation biases,\nwhich bounds how far the grid\u2019s conclusions generalize\nbeyond the polarizability substrate."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "The paper argues against using uncertainty-driven exploration as the default, favoring greedy exploitation because uncertainty exploration is not reliably beneficial and calibration is not predictive.",
+        "evidence_span": "Uncertainty-driven exploration is not reliably beneficial, and calibration does not predict optimization performance, so greedy exploitation of the transfer-learned mean is the more robust default."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The paper positions against viewing MFBO primarily through uncertainty calibration or global correlation, reframing it as representation learning.",
+        "evidence_span": "This reframes multi-fidelity optimization as a representation-learning problem"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The paper reports FLOPs rather than wall-clock time because FLOPs isolate algorithmic scaling from implementation and hardware effects.",
+        "evidence_span": "We report FLOPs rather than wall-clock time because it isolates algorithmic scaling from imple- mentation and hardware effects"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "A decision map based only on global fidelity correlation is rejected as insufficient because advantage aligns with optimum agreement and is nearly flat in R2.",
+        "evidence_span": "because the\nadvantage is organized along the optimum-agreement\naxis and is nearly flat in R2, a decision map indexed by\nglobal correlation alone cannot separate the conditions\nin which a learned surrogate is essential from those\nin which it is dispensable"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Larger architectures and learned molecular representations were not used to preserve fairness.",
+        "evidence_span": "larger archi-\ntectures or learned molecular representations could\nfurther widen the gap but were deliberately excluded\nto keep the comparison fair"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Cost-aware fidelity heuristics were not used so surrogate quality could be isolated.",
+        "evidence_span": "A deterministic round-robin schedule issued\nnLF\u2192HF = \u230a1/\u03c1\u230bLF queries between successive HF\nqueries, isolating surrogate quality from cost-aware\nfidelity heuristics"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "They used random-forest prediction errors instead of directly perturbing ground-truth values because the former better mimic realistic structured low-fidelity errors.",
+        "evidence_span": "Random-\nforest predictions were chosen as the base, rather than\ndirect perturbations of the ground-truth values, because\nthe errors of a learned predictor carry the smooth,\ndescriptor-correlated structure of a realistic LF proxy,\nwhereas perturbing the ground truth directly would\ninject noise with an arbitrary, unstructured form."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "ReLU was considered as an alternative to tanh and tested in an ablation instead of being used in the main configuration.",
+        "evidence_span": "To isolate the effect of the activation function, the benchmark suite was repeated with ReLU in place of tanh under otherwise identical architectures and training"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The study does not base surrogate-comparison support on pooled ranking; instead it relies on per-benchmark paired tests and the controlled fidelity-quality grid.",
+        "evidence_span": "The statistical support for the surrogate comparison accordingly rests on the per-benchmark paired tests and effect sizes of Supplementary Table 6, and on the controlled fidelity-quality grid (Supplementary Table 7), rather than on the pooled ranking; Fig. 1k is presented as a descriptive summary."
+      }
+    ],
+    "inspiration_source": [],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Keeping the acquisition policy fixed implies the observed performance advantage comes from the surrogate model itself.",
+        "evidence_span": "Because acquisition policy is held fixed across surrogates, this advantage is attributable to the surrogate itself."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Shared LF/HF structure enables learned representations to support cross-fidelity transfer.",
+        "evidence_span": "When LF and HF signals share structure, such representations support cross-fidelity transfer;"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Even weak or biased LF information can improve optimization by enabling a more expressive model than fixed-kernel GPs.",
+        "evidence_span": "when LF information is weak or biased, they can still improve optimization by providing a more expressive model of high-dimensional molecular and materials descriptors than fixed-kernel GPs."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The advantage comes mainly from better predictive means and preservation of near-optimal regions, not uncertainty calibration or global LF\u2013HF correlation alone.",
+        "evidence_span": "The advantage is explained primarily by the quality of the transfer-learned predictive mean and by preservation of the near-optimal region, rather than by calibrated uncertainty or global LF\u2013HF correlation alone."
+      },
+      {
+        "role": "causal_claim",
+        "content": "GPs remain highly effective when their inductive bias matches objective structure.",
+        "evidence_span": "indicating that GP models remain highly effective when their inductive bias matches the objective struc- ture."
+      },
+      {
+        "role": "causal_claim",
+        "content": "GP advantage on synthetic tasks was confined to smooth, two-dimensional Branin functions rather than synthetic benchmarks generally.",
+        "evidence_span": "Therefore, the GP advantage on synthetic objectives was confined to the smooth, two- dimensional Branin functions, rather than synthetic benchmarks in general."
+      },
+      {
+        "role": "causal_claim",
+        "content": "GP competitiveness is strong when the kernel prior matches the objective, but this is not universal.",
+        "evidence_span": "These results suggest that GPs are highly competitive when the kernel prior is well matched to the structure of the objective, but that this advantage is problem-dependent rather than universal."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Changing GP formulation to nonlinear coupling, jointly learned kernels, or sparse variational approximation did not remove the performance gap.",
+        "evidence_span": "Thus substituting the baseline MFGP with nonlinear cross-fidelity coupling, jointly learned kernels, or sparse variational approximation did not remove the perfor- mance gap"
+      },
+      {
+        "role": "causal_claim",
+        "content": "In such settings, stationary-kernel GPs can misrank promising candidates, while transfer-learning surrogates can learn better representations and smoother residuals.",
+        "evidence_span": "In this setting, a stationary-kernel GP can misrank promising candidates, while a transfer-learning surrogate can learn task-adapted representations from the larger LF dataset and model a smoother resid- ual between fidelities."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The early appearance of the gap indicates the bottleneck is representational rather than just lack of HF data.",
+        "evidence_span": "This suggests that the bottleneck is representational (kernel misspecification) rather than simply a consequence of HF data scarcity."
+      },
+      {
+        "role": "causal_claim",
+        "content": "HOPV15 improvement cannot come from LF-to-HF transfer and instead reflects better function approximation of molecular descriptors by transfer-learning surrogates.",
+        "evidence_span": "the improvement cannot be attributed to suc- cessful LF-to-HF transfer. Instead, it indicates that the transfer-learning surrogate provides a better func- tion approximator for the molecular descriptors than a stationary GP."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Transfer-learning advantages arise from both improved representation learning and transfer from abundant LF data when informative.",
+        "evidence_span": "Across the empirical benchmarks, the advantage of transfer-learning surrogates therefore has two complementary sources: improved representation learning, which remains beneficial even when the LF proxy is weak, and transfer from abundant LF data, which becomes useful when the LF signal is informative, as in COFs, FreeSolv, and polarizability."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Outcomes depended not just on using transfer learning but on the specific transfer implementation.",
+        "evidence_span": "The spread of average ranks (from 5.3 to 11.8) neverthe- less suggests that outcomes depended not merely on using transfer learning but on how transfer was imple- mented."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Surrogate choice matters most on hard, sharply peaked molecular-descriptor benchmarks and less on dense, small-budget tasks.",
+        "evidence_span": "Surrogate choice was therefore most consequential on the hard, sharply-peaked molecular-descriptor benchmarks and less important on dense, small-budget tasks"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Transfer-learning advantage is structured by optimum agreement rather than global correlation.",
+        "evidence_span": "Third, the advantage is organized along the agreement axis rather than the correlation axis"
+      },
+      {
+        "role": "causal_claim",
+        "content": "At fixed R2, transfer-learning advantage increases sharply as top-10 agreement falls, but at fixed agreement it is nearly flat across R2.",
+        "evidence_span": "at fixed R2 it grows steeply as the top-10 agreement falls, whereas at fixed agreement it is nearly flat across the R2 range"
+      },
+      {
+        "role": "causal_claim",
+        "content": "What determines when transfer learning helps is preservation of top candidate ordering, not global LF-HF correlation.",
+        "evidence_span": "The property that decides when a transfer-learned surrogate pays off is therefore not the global correlation commonly used to character- ize an LF source, but whether that source preserves the ordering of the best candidates."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Matching acquisition policy did not improve baseline MFGP, indicating its limitation comes mainly from the surrogate rather than the acquisition strategy.",
+        "evidence_span": "Thus matching the acquisition pol- icy did not improve the baseline MFGP, indicating that its limitation arises primarily from the surrogate rather than the acquisition policy."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Greedy remained the most robust default overall, while uncertainty-driven exploration offered benchmark-dependent benefits.",
+        "evidence_span": "The greedy policy therefore remained the most robust single default, whereas uncertainty-driven exploration showed benchmark-dependent benefits"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Better-calibrated uncertainty did not yield better optimization; the best-calibrated models, including GPs, were often the weakest optimizers on molecular-descriptor benchmarks.",
+        "evidence_span": "If anything, the best-calibrated surrogates, including the entire GP family, were the weakest optimizers on the molecular-descriptor benchmarks, showing that better-calibrated uncertainty did not translate into better optimization."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Uncertainty is a secondary, benchmark-dependent factor rather than the main driver of performance.",
+        "evidence_span": "This is consistent with uncer- tainty acting as a secondary, benchmark-dependent factor rather than a primary driver of performance."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Transfer-learning advantage arises mainly from the quality of the transfer-learned mean, with uncertainty-driven exploration only a secondary benchmark-dependent factor.",
+        "evidence_span": "Together, these results indicate that the advantage of transfer-learning surrogates arises primar- ily from the quality of the transfer-learned mean, with uncertainty-driven exploration acting as a secondary and benchmark-dependent factor."
+      },
+      {
+        "role": "causal_claim",
+        "content": "When LF already identifies the optimum, learned surrogates add little value and all methods perform similarly.",
+        "evidence_span": "Under this setting, a learned surrogate added little value and all methods, including non-learning base- lines, performed similarly."
+      },
+      {
+        "role": "causal_claim",
+        "content": "In this regime, a learned surrogate is essential; the best transfer-learning surrogate greatly outperformed LF screening on COFs.",
+        "evidence_span": "In this setting, a learned surro- gate was essential; the best transfer-learning surrogate achieved a regret of 0.41, substantially outperforming the surrogate-free screen."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Need for a surrogate depends less on global LF-HF correlation than on preservation of the near-optimal region.",
+        "evidence_span": "Thus, the need for a surrogate depends less on global LF\u2013HF cor- relation than on whether the LF proxy preserves the near-optimal region."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Transfer-learning is a robust choice because it matches LF screening when the proxy is already sufficient and improves substantially when the proxy fails near the top ranks.",
+        "evidence_span": "The transfer-learning surrogate was a robust choice as it matched the surrogate-free screen when the proxy already identified the optimum and substantially improved performance when the proxy failed near the top of the ranking."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Surrogate learning is warranted in these cases, even if surrogate choice matters little on low-discrimination Matbench-gap.",
+        "evidence_span": "These results indicate that surrogate learning is war- ranted, even though the choice among surrogates had limited impact on the low-discrimination Matbench-gap task."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Because scaling exponents differ substantially, the computational gap widens as data size increases.",
+        "evidence_span": "Because the fitted scaling exponents differed by about 1.5 between the model families, the computational gap widened with increasing data"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Under the fixed protocol, transfer-learning surrogates delivered both lower regret on most molecular/materials benchmarks and better computational scaling.",
+        "evidence_span": "Therefore, under the fixed optimization protocol, transfer-learning sur- rogates provided both lower regret on most molecular and materials benchmarks and more favourable compu- tational scaling."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Introducing transfer learning into the multi-fidelity optimization loop makes transfer-learning surrogates the better engine for discovery",
+        "evidence_span": "By bringing transfer learning into the multi-fidelity\noptimization loop, we find a transfer-learning surrogate\nto be the better engine for molecular and materials\ndiscovery"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Surrogate choice governs MFBO performance more than acquisition policy or fidelity schedule in high-dimensional spaces",
+        "evidence_span": "more than the acquisition policy or the fidelity schedule,\ngoverns MFBO performance in high-dimensional molec-\nular and materials spaces."
+      },
+      {
+        "role": "causal_claim",
+        "content": "On descriptor-based molecular and materials pools, transfer-learning surrogates are a more reliable default than baseline MFGP",
+        "evidence_span": "on descriptor-based molecular and materials\npools, a transfer-learning surrogate is a more reliable\ndefault than the baseline MFGP"
+      },
+      {
+        "role": "causal_claim",
+        "content": "On large-pool, high-evaluation tasks, transfer-learning surrogates achieve this accuracy at far lower FLOP cost and thereby reduce expensive HF experiments needed",
+        "evidence_span": "on large-pool,\nhigh-evaluation tasks it delivers this accuracy at up\nto roughly 45\u00d7 fewer FLOPs than the most expensive\nGP, reducing the number of expensive HF experiments\nneeded to identify promising candidates."
+      },
+      {
+        "role": "causal_claim",
+        "content": "A learned surrogate is needed when low-fidelity screening fails, while it is unnecessary when screening is already near-optimal.",
+        "evidence_span": "so a learned surrogate is required precisely where a low-fidelity screen fails (Regime B), while in Regime A the screen is already near-optimal"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Below the crossover GPs are cheaper, while above it transfer-learning surrogates become cheaper and the advantage grows with size.",
+        "evidence_span": "below it the Gaussian processes are cheaper to fit, above it the transfer-learning surrogates are cheaper by a margin that grows with N, reaching roughly 5\u00d7 at N = 200 and 10\u00d7 at N = 300"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using BLR uncertainty to drive exploration can degrade performance by up to an order of magnitude in COFs.",
+        "evidence_span": "every uncertainty-driven acquisition degrades, by up to an order of magnitude, when its BLR uncertainty is used to drive exploration instead (COFs)"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Calibration quality did not predict optimization performance.",
+        "evidence_span": "Calibration quality, measured by expected calibration error, did not predict optimization performance"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The wrong kind of exploration can be sharply harmful, though sampling-based exploration can still help on some benchmarks.",
+        "evidence_span": "and the wrong kind of\nexploration can be sharply counterproductive, though\n\nthe right kind (sampling-based) can still help on some\nbenchmarks"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Transfer learning is a dependable default for high-dimensional molecular and materials pools, though not universally superior.",
+        "evidence_span": "Transfer\nlearning is therefore not a universally superior method\nbut the dependable default for the high-dimensional\nmolecular and materials pools where SDLs operate"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Comparisons to \u201cGaussian processes\u201d depend on which GP representative is chosen.",
+        "evidence_span": "Comparisons of\nlearned surrogates against \u201cGaussian processes\u201d, in our\nstudy and in the wider literature, should therefore be\nread against the strength of the chosen representative"
+      },
+      {
+        "role": "causal_claim",
+        "content": "This guidance can be adopted in existing autonomous-experimentation platforms without changing optimization policy because it concerns the surrogate, not acquisition or fidelity schedule.",
+        "evidence_span": "Because this guidance con-\ncerns the surrogate rather than the acquisition policy\nor fidelity schedule, it can be adopted within exist-\ning autonomous-experimentation platforms with no\nchange to their optimization policy"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Keeping backbone capacity fixed makes performance differences reflect transfer mechanism rather than model size.",
+        "evidence_span": "while keeping\nthe backbone capacity fixed so that the performance\ndifferences reflected the transfer mechanism rather than\nmodel size."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Retraining from scratch removes path dependence from warm-starting.",
+        "evidence_span": "Models were retrained de novo\nat every optimization iteration to remove path depen-\ndence from warm-starting."
+      },
+      {
+        "role": "causal_claim",
+        "content": "In the primary setup, using constant predictive standard deviation makes expected improvement reduce to greedy selection.",
+        "evidence_span": "In the primary configuration the LF expected improvement (EI) uses a constant predictive standard deviation, so the BLR head contributes a regularized posterior mean and the acquisition reduces to greedy selection"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Because baseline MFGP and NARGP scale as O(N^3) while transfer-learning surrogates scale as O(N), the compute gap widens with evaluation budget.",
+        "evidence_span": "the baseline MFGP and NARGP scale as O(N3) in the number of observations (measured fit-FLOP exponent k = 3.0) against O(N) for the transfer-learning surrogates (k = 1.0), so the gap widens with the evaluation budget."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The contrast between low per-cell significance and small map-level p-values is due to statistical power, not conflicting evidence.",
+        "evidence_span": "The contrast between the vanishing per-cell counts on final regret and these small map-level values is a matter of statistical power rather than of conflicting evidence"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The omnibus null is expected because the benchmark suite was designed to include regime-dependent rank reversals.",
+        "evidence_span": "This null is what the benchmark design predicts rather than evidence against a surrogate effect. The suite deliberately spans regimes in which the ranking reverses"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Averaging ranks over a heterogeneous suite cancels effects whose sign depends on regime.",
+        "evidence_span": "averaging ranks over a heterogeneous suite cancels an effect whose sign depends on the regime."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "The reason the advantage is assigned to the surrogate is that acquisition policy was controlled across models.",
+        "evidence_span": "Because acquisition policy is held fixed across surrogates, this advantage is attributable to the surrogate itself."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The limitation matters in SDLs because low-fidelity sources are often imperfect proxies that may mislead near the optimum or correlate weakly with the target.",
+        "evidence_span": "This limitation is particularly important in SDLs, where LF sources are often imperfect experimental proxies: they may be strongly informative only in restricted regions of the design space, misleading near the optimum or weakly correlated with the final HF objective."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The key principle is that the challenge is to identify structure in cheap data that remains informative for expensive decisions.",
+        "evidence_span": "in which the central challenge is to identify which structures in inexpensive data remain informative for expensive HF decisions."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Transfer learning works by learning LF representations and adapting them to sparse HF data through targeted correction.",
+        "evidence_span": "By learning representations from abundant LF data and adapting them to sparse HF observations through targeted correction [12], these models can capture cross-fidelity structure while retaining the expressive capacity needed for prediction in complex molecular and materials descriptor spaces [13]."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This flexibility matters when fixed-kernel GPs are mismatched to nonlinear, heterogeneous, or locally biased LF\u2013HF relations.",
+        "evidence_span": "This flexibility is particularly important when fixed-kernel GP surrogates are poorly matched to nonlinear, heterogeneous or locally biased LF\u2013HF relationships."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The Mat\u00e9rn-5/2 kernel gives a strong smoothness prior for smooth 2D objectives, enabling accurate GP modeling from few observations.",
+        "evidence_span": "This observation is consistent with the Mat\u00b4ern-5/2 kernel providing a strong smoothness prior for an ana- lytically smooth, two-dimensional objective, allowing the GP posterior to model the surface accurately from relatively few observations."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The limitation is due to GP modeling assumptions in compressed descriptor spaces rather than one specific baseline implementation.",
+        "evidence_span": "suggesting that the limitation lies in the GP modelling assumptions in these compressed descriptor spaces, rather than in a single baseline implementation."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "A stationary Mat\u00e9rn-5/2 kernel imposes one global smoothness notion, but PCA-compressed molecular descriptor spaces can be non-stationary and fidelity discrepancies can vary strongly across space, especially near the optimum.",
+        "evidence_span": "First, the Mat\u00b4ern-5/2 kernel imposes a single global notion of smoothness, whereas the molecular descriptor space, compressed by principal component analysis (PCA), can be non-stationary and the LF\u2013HF discrepancy may vary strongly across input space, particularly near the optimum."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This does not contradict transfer-learning advantages on harder benchmarks because Matbench-gap had limited discrimination.",
+        "evidence_span": "This does not contradict the advantage of the learned surrogates on harder molecular-descriptor benchmarks; rather, it reflects the limited discrimi- nation of this task."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Weak discrimination on Matbench-gap is explained by a very small HF budget and a dense near-optimal set.",
+        "evidence_span": "Two features explain the weak discrimination on Matbench-gap. First, it had the smallest evaluation budget in the suite with only ten HF queries... Second, a near-optimal set was comparatively dense: 3.6% of the 3,347-compound pool lay within 0.2 eV of the target"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Baseline MFGP likely misranks promising regions, so changing acquisition policy helps little, whereas transfer-learning gives a more useful ranking and is more sensitive to how HF budget is allocated.",
+        "evidence_span": "These results suggest that the baseline MFGP posterior mean misranks the promising regions in these descriptor spaces, so chang- ing the acquisition policy has limited effect. By contrast, the transfer-learning surrogate appeared to provide a more useful ranking of HF candidates, making perfor- mance more dependent on how scarce HF evaluations were allocated between exploitation and exploration."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "In strong transfer settings, exploration can waste scarce HF budget on uncertain but less promising candidates when the transfer-learned mean already ranks well.",
+        "evidence_span": "This suggests that in strong transfer settings, exploration could waste scarce HF budget on uncertain but less promising candidates when the transfer-learned mean already provides a useful ranking."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This linear scaling reflects fixed-architecture neural network training.",
+        "evidence_span": "This reflects the use of fixed-architecture neural network training."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This computational advantage matters in SDL because abundant LF data and repeated retraining make surrogate-update cost important in closed-loop workflows.",
+        "evidence_span": "This advantage is particularly relevant to SDL settings, where abundant LF data and repeated surrogate updates can make model retraining cost an important component of the closed-loop workflows."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The GP-family exponent is below cubic because the family includes scalable sparse variational MFGP, while exact GPs approach cubic scaling.",
+        "evidence_span": "which lies below pure cubic because it includes the scalable sparse variational MFGP, with the exact GPs (the baseline MFGP and NARGP) approaching the ideal O(N3)"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This failure is attributed to the regime rather than any specific acquisition function.",
+        "evidence_span": "so this catastrophic failure is a property of the regime, not of a particular acquisition"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "In strong-transfer SDL regimes, a good posterior mean is more valuable than exploration because abundant LF signal already ranks candidates well.",
+        "evidence_span": "when\nan abundant LF signal already orders candidates well,\na high-quality posterior mean is on average more\nvaluable than exploration"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The round-robin design is justified by similarity to SDL pipelines where instruments run in parallel.",
+        "evidence_span": "reflecting SDL pipelines in which\nlow- and HF instruments operate in parallel."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The discrepancy is expected to be smoother than the high-fidelity function when fidelities are correlated.",
+        "evidence_span": "which is smoother than the HF function itself when the\ntwo fidelities are correlated."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Learned-predictor errors are smoother and descriptor-correlated, unlike arbitrary unstructured noise from direct perturbation.",
+        "evidence_span": "because\nthe errors of a learned predictor carry the smooth,\ndescriptor-correlated structure of a realistic LF proxy,\nwhereas perturbing the ground truth directly would\ninject noise with an arbitrary, unstructured form."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Ten seeds per cell lack power to survive 126-way correction unless within-cell separation is nearly total, whereas map-level tests aggregate consistency across 126 conditions.",
+        "evidence_span": "ten seeds per cell cannot clear a 126-way correction unless the within-cell separation is close to total, as it is on the anytime metric but not at the endpoint, whereas the map-level test draws instead on the consistency of the advantage across the 126 conditions."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Many final-regret cells are exact ties because both sides reach regret 0.",
+        "evidence_span": "On final regret a large fraction of cells tie exactly (both sides reach regret 0); these ties are reported separately."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "Transfer learning may be a better surrogate for MFBO in molecular and materials settings by leveraging cheap-data representations and adapting to sparse expensive data.",
+        "evidence_span": "Transfer learning offers an alternative suited to this regime: it learns a representation from abundant cheap data and adapts it to sparse expensive data."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Greedy exploitation of the transfer-learned mean is the most robust default strategy.",
+        "evidence_span": "so greedy exploitation of the transfer-learned mean is the more robust default."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Transfer learning is the preferred surrogate for molecular and materials MFBO.",
+        "evidence_span": "Transfer learning is therefore the surrogate of choice for molecular and materials MFBO."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Optimization in high-dimensional multi-fidelity discovery depends more on learned representations than on uncertainty calibration or global LF\u2013HF correlation.",
+        "evidence_span": "Here we test an alternative hypothesis: in high-dimensional multi-fidelity discovery, optimization performance is governed less by uncertainty calibration or global LF\u2013HF correlation than by the surrogate\u2019s capability to learn useful representations of the design landscape."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Transfer-learning surrogates are a natural way to realize this representation-learning reframing.",
+        "evidence_span": "Transfer-learning surrogates provide a natural mechanism for this reframing."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "MFBO surrogate design should emphasize scalable learned representations that transfer across fidelities and adapt to biased or weak LF signals.",
+        "evidence_span": "These findings suggest that surrogate design for MFBO should place greater emphasis on scalable learned representations that can transfer information across fidelities while adapting to biased, local or weak LF signals."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Effort should focus first on transferred-representation quality, and if exploration is used, sampling-based acquisitions are preferred over improvement-based ones.",
+        "evidence_span": "effort is better spent first on the\nquality of the transferred representation, and where\nexploration is used, sampling-based acquisitions are\npreferable to improvement-based ones"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Transfer-learning surrogates are established as the preferred surrogate for molecular and materials multi-fidelity optimization.",
+        "evidence_span": "Taken together, these results establish transfer-\nlearning surrogates as the surrogate of choice for\nmolecular and materials multi-fidelity optimization"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The recommended recipe is to default to transfer learning on descriptor-based pools, reserve GPs for smooth low-dimensional spaces, and prioritize transferred-mean quality over aggressive uncertainty exploration.",
+        "evidence_span": "default to a transfer-learning surrogate\non descriptor-based molecular and materials pools,\nreserve GPs for the smooth, low-dimensional design\nspaces where their inductive bias is an asset, and invest\nfirst in the quality of the transferred mean, treat-\ning uncertainty-driven exploration as a case-dependent\nrefinement that, where used, is best supplied by a\nsampling-based acquisition"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The residual parameterization is intended to make the model learn the fidelity discrepancy rather than the full high-fidelity function.",
+        "evidence_span": "This parameterization encourages the residual net-\nwork to learn the discrepancy \u03b4(x) = f (H)(x)\u2212f (L)(x),\nwhich is smoother than the HF function itself when the\ntwo fidelities are correlated."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "On smooth low-dimensional tasks, GPs outperform transfer-learning surrogates.",
+        "evidence_span": "GPs win on smooth, low-dimensional functions"
+      },
+      {
+        "role": "evidence_result",
+        "content": "On molecular and materials problems, transfer-learning surrogates find better solutions with much lower computational cost than GPs.",
+        "evidence_span": "but perform worst on molecular and materials problems, where transfer-learning surrogates reach substantially better solutions using far less computation."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Uncertainty-based exploration does not consistently help optimization.",
+        "evidence_span": "Uncertainty-driven exploration is not reliably beneficial"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Calibration quality does not forecast optimization performance.",
+        "evidence_span": "calibration does not predict optimization performance"
+      },
+      {
+        "role": "evidence_result",
+        "content": "All transfer-learning surrogates used the same two-stage LF-to-HF residual-correction structure.",
+        "evidence_span": "All transfer-learning surrogates shared a two-stage structure in which an LF network learns from abundant proxy data and an HF network learns the residual correction required to predict sparse HF observations[18]."
+      },
+      {
+        "role": "evidence_result",
+        "content": "GPs work very well when their inductive bias matches the objective.",
+        "evidence_span": "Our results show that GPs remain highly effective when their inductive bias matches the objective"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer-learning surrogates perform better on most molecular and materials benchmarks.",
+        "evidence_span": "but that transfer-learning surrogates are more effective on most molecular and materials benchmarks considered here."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer-learning surrogates scale more favorably computationally under repeated updates with abundant LF data.",
+        "evidence_span": "Transfer-learning surrogates also provide more favourable computational scaling under repeated model updates, a regime typical of SDL workflows with abundant LF data."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The study evaluated 15 surrogates on 9 benchmarks under a shared protocol using simple regret over cumulative cost.",
+        "evidence_span": "We evaluated fifteen surrogates on nine benchmarks (Table 1) under a shared fixed protocol (Methods). Performance was measured as simple regret on HF evaluations as a function of cumulative cost, averaged over twenty random seeds."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Baseline MFGP achieved the lowest final regret on both Branin scenarios.",
+        "evidence_span": "The baseline MFGP (the standard autoregressive multi- fidelity GP; Methods) achieved the lowest final regret among all fifteen surrogates on both Branin scenar- ios"
+      },
+      {
+        "role": "evidence_result",
+        "content": "On Branin-Fav and Branin-Unfav, baseline MFGP outperformed the best transfer-learning surrogate by a wide margin.",
+        "evidence_span": "On Branin-Fav and Branin-Unfav (the favourable and unfavourable fidelity scenarios; Methods) the base- line MFGP reached mean final regrets of 0.07 and 0.05, respectively, ranking first in both cases, whereas the best transfer-learning surrogate reached final regrets of 0.43 and 1.24"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The GP advantage did not generalize across all synthetic benchmarks.",
+        "evidence_span": "The advantage was spe- cific to the Branin family and did not extend across all synthetic benchmarks."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Park benchmarks were weakly discriminative at the tested budget because most methods quickly reached near-zero regret.",
+        "evidence_span": "On the four-dimensional Park functions, simple regret rapidly approached zero for most methods after only a small number of HF evaluations (Fig. 1d,e), making these benchmarks weakly discriminative at the budget considered."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Several transfer-learning surrogates reached zero regret on Park-Fav before baseline MFGP.",
+        "evidence_span": "Sev- eral transfer-learning surrogates had already reached zero regret on Park-Fav whereas the baseline MFGP had not"
+      },
+      {
+        "role": "evidence_result",
+        "content": "On molecular-descriptor benchmarks, baseline MFGP ranked near the bottom.",
+        "evidence_span": "Whereas the baseline MFGP per- formed the best on the Branin functions it ranked at the bottom on covalent organic frameworks (COFs), solva- tion free energy (FreeSolv), polarizability, and organic photovoltaics (HOPV15)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Other MFGP variants also showed similarly high regret on molecular-descriptor benchmarks.",
+        "evidence_span": "The three MFGP variants (NARGP, the deep-kernel GP, and the sparse varia- tional MFGP) showed similar high-regret behaviour on these benchmarks"
+      },
+      {
+        "role": "evidence_result",
+        "content": "End-to-End Joint Training strongly outperformed baseline MFGP on COFs, FreeSolv, polarizability, and HOPV15.",
+        "evidence_span": "On COFs the best-performing surrogate, End-to-End Joint Train- ing, reached a final regret of 0.41 compared with 6.55 for the baseline MFGP... The correspond- ing values were 0.28 versus 0.80 on FreeSolv... 0.06 versus 0.17 on polarizability... and 1.89 versus 3.09 on HOPV15"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The performance gap appeared already at the first HF evaluation.",
+        "evidence_span": "Second, the performance gap was already visible at the first HF evaluation rather than emerging only after additional HF data were col- lected (Fig. 2)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For HOPV15, the LF signal was almost uninformative with R2 = 0.02.",
+        "evidence_span": "Because the LF signal is almost uninformative for this task (R2 = 0.02)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Performance depended on transfer mechanism; Curriculum, Knowledge Distillation, and End-to-End Joint Training had the lowest average ranks.",
+        "evidence_span": "Performance also depended on transfer mechanism. Curriculum, Knowledge Distillation and End-to-End Joint Training achieved the lowest average ranks across the nine benchmarks among all fifteen surro- gates"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Pooled omnibus testing did not resolve individual surrogate pairs because rankings reverse between synthetic and molecular regimes.",
+        "evidence_span": "Because the surrogate ranking reverses between the synthetic and molecular regimes, an omnibus test on the pooled nine-benchmark ranking is not expected to resolve individual pairs, and it does not"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Matbench-gap was a boundary case where baseline MFGP was competitive, ranking second with regret close to the best transfer-learning surrogate.",
+        "evidence_span": "In this inorganic band gap benchmark, optimized towards a photovoltaic target of 1.4 eV, the baseline MFGP was competitive, ranking second among all fif- teen surrogates with a final regret of 0.29 versus 0.23 for the best transfer-learning surrogate"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Surrogate choice had little practical effect on Matbench-gap because the regret range was narrow and MFGP was within 0.8 standard errors of the best method.",
+        "evidence_span": "The full regret range across the baseline MFGP and the eleven transfer-learning surro- gates was only 0.27 compared with 6.1 on COFs, and the baseline MFGP lay within 0.8 standard errors of the best method. Thus, surrogate choice had little prac- tical effect on this benchmark."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The authors constructed a controlled polarizability grid varying global LF-HF R2 and top-10 optimum agreement independently across 126 conditions.",
+        "evidence_span": "we con- structed a controlled grid on the polarizability substrate in which curated LF sources vary the global LF\u2013HF R2 and the top-10 optimum agreement... indepen- dently, giving 126 conditions of ten seeds each"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer learning beat baseline MFGP across the entire controlled grid in anytime performance.",
+        "evidence_span": "First, transfer learn- ing dominates the baseline MFGP across the entire plane: its anytime advantage is positive in 126 of 126 cells"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Against the best MFGP variant, the final-regret gap narrowed but the anytime advantage of transfer learning remained significant in most cells.",
+        "evidence_span": "Second, the GP representative matters: against the best MFGP variant the final-regret gap closes, with a median advantage near zero, but the anytime advantage persists and remains individually significant in 101 of 126 cells"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Using a greedy policy for baseline MFGP changed performance only marginally.",
+        "evidence_span": "Using the greedy policy for the baseline MFGP had little effect on performance. Final regret changed only marginally, for example 6.60 \u21926.71 on COFs and 0.13 \u21920.15 on polarizability."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Under matched greedy acquisition, transfer-learning still had a large advantage on COFs and consistent gains on other molecular benchmarks.",
+        "evidence_span": "Under this matched greedy policy the transfer-learning surrogate retained a large advantage on COFs, achieving approximately an 8\u00d7 lower regret than the baseline MFGP and a 16\u00d7 lower regret for the best transfer-learning surrogate. Smaller but consistent advantages were also observed on the remaining molecular benchmarks."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer-learning surrogate performance was highly sensitive to acquisition policy; on COFs uncertainty-driven exploration greatly worsened regret.",
+        "evidence_span": "The transfer- learning surrogate showed the opposite behaviour: its performance was strongly sensitive to its acquisition policy. On COFs regret increased from 0.88 under the greedy policy to 6.13 when its predictive uncertainty was used to drive exploration."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The effect of uncertainty-driven exploration was benchmark-dependent rather than uniform.",
+        "evidence_span": "The effect of uncertainty-driven exploration was case-dependent rather than uniform."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On COFs, greedy acquisition outperformed all five uncertainty-driven acquisitions for 10 of 11 surrogates.",
+        "evidence_span": "On COFs, where the LF signal transferred strongly, the greedy policy outperformed all five uncertainty-driven acquisitions for ten of the eleven surrogates."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On FreeSolv and polarizability, Thompson sampling beat greedy for all eleven transfer-learning surrogates, and most uncertainty-driven acquisitions helped on polarizability.",
+        "evidence_span": "The opposite pattern was observed on FreeSolv and polarizability. On both high-correlation chemistry benchmarks, Thomp- son sampling outperformed the greedy policy for all eleven transfer-learning surrogates, and on polarizabil- ity most uncertainty-driven acquisitions improved over the greedy policy."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Acquisition family mattered: Thompson sampling was most robust, while EI and probability of improvement were least reliable.",
+        "evidence_span": "The acquisition family mattered more than the presence of uncertainty alone. Thomp- son sampling was the most robust uncertainty-driven acquisition... whereas the improvement-based acquisitions (EI and probability of improvement) were the least reliable"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Calibration quality correlated negatively with final regret on every benchmark.",
+        "evidence_span": "Calibration quality was a poor predictor of opti- mization performance: across all fifteen surrogates, the correlation between expected calibration error and final regret was negative on every benchmark, ranging from \u22120.88 on COFs to \u22120.08 on HOPV15"
+      },
+      {
+        "role": "evidence_result",
+        "content": "In a tanh-versus-ReLU ablation, calibration was nearly identical but tanh achieved lower regret.",
+        "evidence_span": "In a matched tanh-versus-ReLU ablation on the molecular-descriptor benchmarks, calibration error was nearly identical for the two activations (0.30 ver- sus 0.30), whereas tanh achieved lower regret (0.39 versus 0.58)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The analysis split benchmarks into two regimes: one where LF screening already identifies the optimum and one where it does not.",
+        "evidence_span": "This analysis separated the benchmarks into two regimes."
+      },
+      {
+        "role": "evidence_result",
+        "content": "In Regime A, represented by Park-Fav and polarizability, top LF and HF candidates nearly coincide and screening regret was very low.",
+        "evidence_span": "In Regime A, represented by Park-Fav and polarizability, the top LF candidates coincide almost exactly with the top HF candidates. The top-1% overlap was approxi- mately 1 and the screening regret was no greater than 0.09."
+      },
+      {
+        "role": "evidence_result",
+        "content": "In Regime B, COFs had very high rank correlation but poor top-candidate agreement, leading to high screening regret.",
+        "evidence_span": "In Regime B, represented by COFs and Branin, high global LF\u2013HF correlation conceals poor agreement among the top-ranked can- didates. COFs had a rank correlation of 0.998 but a screening regret of 4.52."
+      },
+      {
+        "role": "evidence_result",
+        "content": "HOPV15 and Matbench-gap also fall in Regime B, with LF screening regrets of 3.90 and 0.91 respectively.",
+        "evidence_span": "Both HOPV15 and Matbench-gap fall in Regime B. An LF screen produced a regret of 3.90 on HOPV15 where the Scharber proxy was nearly uninformative and 0.91 on Matbench-gap."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Computational cost was quantified in FLOPs for one fit plus one pool-wide prediction accumulated over optimization.",
+        "evidence_span": "We quantified the computational cost of each surro- gate in floating-point operations (FLOPs). FLOPs were counted for one surrogate fit and one pool-wide pre- diction and accumulated over the optimization loop."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer-learning surrogates showed linear scaling with training-set size.",
+        "evidence_span": "The eleven transfer-learning surrogates exhibited linear scaling with the number of observa- tions with a measured fit-FLOP exponent of k = 1.0 for cost versus training-set size."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Exact GPs showed cubic scaling, while sparse variational MFGP and deep-kernel GP were intermediate.",
+        "evidence_span": "By con- trast, the exact GPs, the baseline MFGP and NARGP, showed cubic scaling (k = 3.0)... The sparse variational MFGP and the deep-kernel GP occu- pied an intermediate computational regime"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The computational cost crossover occurred around N \u2248 66; above that, transfer-learning became cheaper.",
+        "evidence_span": "The fitted cost curves inter- sected at N \u224866; below this point, the GPs were cheaper to fit whereas above it the transfer-learning surrogates became more efficient."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Integrated over optimization, sparse variational MFGP and deep-kernel GP were the most expensive methods on every benchmark.",
+        "evidence_span": "Integrated over the optimization loop, the sparse variational MFGP and the deep-kernel GP were the most expensive meth- ods on every benchmark."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Sparse variational MFGP required up to about 45-fold more FLOPs than the fastest transfer-learning surrogate.",
+        "evidence_span": "The sparse variational MFGP required up to approximately 45-fold more FLOPs than the fastest transfer-learning surrogate, for example 5.0 versus 0.11 TFLOPs on FreeSolv."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On small pools and budgets, exact GP cubic cost remained negligible; separation grew with more observations.",
+        "evidence_span": "On the smallest pools and budgets such as HOPV15 and Park-Unfav, the cubic cost of exact GPs remained neg- ligible; the separation between model families increased as the number of observations grew."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Across nine benchmarks, baseline MFGP and the GP family were either best on smooth low-dimensional Branin or worst on high-dimensional molecular-descriptor benchmarks under matched greedy policy",
+        "evidence_span": "Across nine benchmarks, the\nbaseline MFGP, like the broader GP family, was either\nthe best surrogate (smooth, low-dimensional Branin) or\nthe worst (the high-dimensional molecular-descriptor\nbenchmarks), a polarization that held under a matched\ngreedy policy;"
+      },
+      {
+        "role": "evidence_result",
+        "content": "A low-discrimination band-gap task with the smallest budget was the only exception, indicating where surrogate choice stops mattering",
+        "evidence_span": "the single exception, a low-discrimination\nband-gap task with the smallest budget, only sharp-\nens the boundary by marking where surrogate choice\nceases to matter."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Uncertainty-driven exploration is benchmark dependent; Thompson sampling beats greedy most often while improvement-based acquisitions beat it least often",
+        "evidence_span": "a, the fraction of the eleven surrogates on which each uncertainty-driven acquisition beats the\ngreedy policy (red: rarely; blue: usually); averaged over benchmarks, Thompson sampling beats the greedy policy most often and the\nimprovement-based acquisitions least often."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On high-correlation chemistry benchmarks, every uncertainty-driven acquisition is worse than greedy on COFs, while Thompson sampling beats greedy on FreeSolv and polarizability",
+        "evidence_span": "b\u2013d, final regret (mean over the eleven surrogates; error bars, s.e. across surrogates) on the\nthree high-correlation chemistry benchmarks (LF\u2013HF rank correlation \u22650.94): every uncertainty-driven acquisition is worse than the\ngreedy policy on COFs, whereas Thompson sampling beats it on FreeSolv and polarizability."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Calibration does not predict optimization performance; Pearson correlation between low-fidelity calibration error and final regret is negative on every benchmark",
+        "evidence_span": "e\u2013m, calibration versus regret: each point\nis one of the fifteen surrogates (Gaussian-process family in warm colours, transfer-learning surrogates in cool colours; legend); axes\nare the low-fidelity expected calibration error and the final regret, one panel per benchmark. The Pearson correlation is negative on\nevery benchmark"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Top-k agreement between low- and high-fidelity rankings varies, and high global correlation does not ensure top-k agreement.",
+        "evidence_span": "High global correlation does not guarantee top-k agreement"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer-learning surrogates scale linearly with training-set size.",
+        "evidence_span": "A shared-slope power-law fit gives kN = 1.00 (R2 = 1.00, exactly O(N)) for the eleven transfer-learning surrogates"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Gaussian-process-family scaling is steeper than linear and below pure cubic overall.",
+        "evidence_span": "and kN = 2.49 (R2 = 0.94) for the Gaussian-process family, which lies below pure cubic"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The cost crossover occurs near training-set size 66.",
+        "evidence_span": "The two family laws cross at a break-even size N \u224866 (vertical line)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "In strongly transferring settings, greedy use of transfer-learned means performs best and uncertainty-driven exploration can severely hurt.",
+        "evidence_span": "where the LF signal transfers strongly and cleanly the transfer-learning surrogates perform best by greedily exploiting their transfer-learned mean, and every uncertainty-driven acquisition degrades, by up to an order of magnitude, when its BLR uncertainty is used to drive exploration instead (COFs)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "On some other high-correlation chemistry benchmarks, Thompson sampling beat greedy for every surrogate.",
+        "evidence_span": "On other high-correlation chemistry benchmarks (FreeSolv, polarizability), by contrast, a sampling-based acquisition (Thompson sampling) beat the greedy policy on every surrogate"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Improvement-based acquisitions won least often on average.",
+        "evidence_span": "while the improvement-based acquisitions won least often on average"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Calibration-regret correlation was negative on every benchmark.",
+        "evidence_span": "across all fifteen surrogates its correla-\ntion with regret was negative on every benchmark\n(from \u22120.88 on COFs to \u22120.08 on HOPV15)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Screening-regret analysis split tasks into surrogate-free and surrogate-critical regimes, and correlation alone could not identify the regime.",
+        "evidence_span": "Our screening-regret analysis\nseparated tasks in which a surrogate-free LF screen\nis near-optimal (Regime A) from those in which it\nfails despite a high global correlation (Regime B), and\nshowed that regime membership cannot be inferred\nfrom the correlation alone"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer-learning surrogates matched the non-learning bound when a surrogate was unnecessary and beat it when one was essential.",
+        "evidence_span": "Transfer-learning surrogates\nwere the robust choice because they matched the non-\nlearning bound where a surrogate was unnecessary and\ndecisively beat it where one was essential"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Against baseline MFGP alone, transfer learning wins everywhere; against stronger GP variants, the final-regret gap mostly closes.",
+        "evidence_span": "against the base-\nline MFGP alone, transfer learning wins everywhere,\nwhereas against the stronger variants the final-regret\ngap largely closes"
+      },
+      {
+        "role": "evidence_result",
+        "content": "What remains against stronger GP variants is faster anytime convergence and robustness when LF misorders the best candidates.",
+        "evidence_span": "and what survives is faster anytime\nconvergence and robustness precisely where the LF\nsource misorders the best candidates"
+      },
+      {
+        "role": "evidence_result",
+        "content": "An ablation supported using tanh instead of ReLU.",
+        "evidence_span": "The choice of tanh rather than ReLU\nwas validated in a matched ablation reported in the\nSupplementary Information."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Repeating the analysis with the unselected family mean preserved family ordering.",
+        "evidence_span": "the analysis was repeated with the unse-\nlected family mean, which preserved the ordering of the\nfamilies (Supplementary Note 7)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On COFs, greedy beat all five uncertainty-driven acquisitions on 10 of 11 surrogates.",
+        "evidence_span": "the greedy policy beat all five acquisitions on COFs on ten of the eleven surrogates"
+      },
+      {
+        "role": "evidence_result",
+        "content": "On FreeSolv and polarizability, Thompson sampling beat greedy on every surrogate.",
+        "evidence_span": "whereas Thompson sampling beat the greedy policy on every surrogate on FreeSolv and polarizability"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Improvement-based acquisitions performed worst overall.",
+        "evidence_span": "and the improvement-based acquisitions ranked weakest overall (Fig. 4)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "None of the three additional ablations changed the qualitative ranking of surrogate families on any tested benchmark.",
+        "evidence_span": "Each was evaluated on a representative subset of three to five benchmarks spanning the favourable and unfavourable regimes, and on every benchmark tested none altered the qualitative ranking of the surrogate families."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Compute measurements confirm cubic-cost Gaussian processes dominate while linear-cost transfer-learning surrogates are one to two orders of magnitude cheaper.",
+        "evidence_span": "confirming that the O(N 3) Gaussian processes dominate the budget while the O(N) transfer-learning surrogates stay one to two orders of magnitude cheaper."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Sparse variational and deep-kernel GPs are the most expensive on every benchmark, up to about 45\u00d7 and 25\u00d7 the fastest transfer-learning surrogate.",
+        "evidence_span": "The sparse variational (Sparse MFGP) and deep-kernel (DKL) GPs are the most expensive on every benchmark, up to roughly 45\u00d7 and 25\u00d7 the fastest transfer-learning surrogate"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Final-regret and anytime-AUC maps agree structurally; advantage is largest at low top-10 optimum agreement and nearly flat across R2.",
+        "evidence_span": "The two metrics agree on the structure, with the advantage largest at low top-10 optimum agreement and nearly flat across the R2 range"
+      },
+      {
+        "role": "evidence_result",
+        "content": "MFGP variants close most of baseline MFGP's endpoint gap in final regret, but the anytime gap remains.",
+        "evidence_span": "the final-regret maps additionally show that the MFGP variants close most of the baseline MFGP\u2019s endpoint gap, whereas the anytime gap persists."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Using the unselected family mean preserved the family ordering and agreement-axis structure.",
+        "evidence_span": "the analysis was repeated with the unselected family mean; this preserved the ordering of the families and the structure along the agreement axis."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The omnibus Friedman test did not reject rank homogeneity across surrogates.",
+        "evidence_span": "The omnibus does not reject rank homogeneity (\u03c72\n14 = 20.9, p = 0.11), so no pairwise ordering is claimed."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The Nemenyi critical difference exceeds the entire observed range of average ranks, so no surrogate pair is statistically separable.",
+        "evidence_span": "The spread of the panel is therefore smaller than the smallest difference the post-hoc test can resolve, so no pair of surrogates is separable at this suite size, including the best against the worst."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Gaussian-process methods are best on the two Branin functions and worst on the four molecular-descriptor benchmarks.",
+        "evidence_span": "the Gaussian-process family is best on the two Branin functions and worst on the four molecular-descriptor benchmarks (Fig. 1b\u2013i)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On individual molecular-descriptor benchmarks, paired comparisons are significant with near-unanimous effect sizes.",
+        "evidence_span": "on the individual molecular-descriptor benchmarks the paired comparisons are significant with near-unanimous effect sizes (r = 0.97\u20131.00; Supplementary Table 6)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On the anytime metric, the typical cell unanimously favors transfer learning over both GP families.",
+        "evidence_span": "On the anytime metric the typical cell is unanimous: the median per-cell r is 1.00 against both GP families."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Architectures were constrained to differ only in transfer mechanism so that capacity was controlled.",
+        "evidence_span": "The architectures differ only in how information is transferred between these stages, allowing the transfer mechanism to be isolated from model capacity."
+      },
+      {
+        "role": "constraint",
+        "content": "Methods were evaluated under a shared closed-loop protocol with matched acquisition control.",
+        "evidence_span": "We evaluated all methods under a shared closed-loop optimization protocol and used matched-acquisition control to separate surrogate effects from acquisition-policy effects (Fig. 1)."
+      },
+      {
+        "role": "constraint",
+        "content": "The Park benchmarks are evaluated at an early decision budget because they saturate to near-zero regret by the full budget, and Park-Fav also exhausts its candidate pool",
+        "evidence_span": "The two Park benchmarks (g,h) saturate to \u22480 regret by the\nfull budget (Park-Fav additionally exhausts its 256-point candidate pool), so both are evaluated at the early decision budget B = 10"
+      },
+      {
+        "role": "constraint",
+        "content": "The evidence from the controlled grid is intentionally narrow: a mechanism experiment with curated LF sources on a single substrate.",
+        "evidence_span": "The scope of this evidence\nis deliberately narrow, a mechanism experiment with\ncurated LF sources on a single substrate"
+      },
+      {
+        "role": "constraint",
+        "content": "The protocol is limited to two fidelity levels and a deterministic round-robin schedule.",
+        "evidence_span": "Our protocol is restricted to\ntwo fidelity levels with a deterministic round-robin\nschedule"
+      },
+      {
+        "role": "constraint",
+        "content": "The transfer-learning models use fixed modest-capacity MLPs on PCA-reduced precomputed descriptors.",
+        "evidence_span": "The transfer-learning surrogates\nuse fixed, modest-capacity multilayer perceptrons on\nprecomputed descriptors reduced by PCA"
+      },
+      {
+        "role": "constraint",
+        "content": "The evaluation is retrospective over fixed candidate pools rather than a live autonomous platform.",
+        "evidence_span": "Our evaluation is also\nretrospective, optimizing over fixed candidate pools\nthat emulate the closed loop rather than driving a\nlive autonomous platform"
+      },
+      {
+        "role": "constraint",
+        "content": "The GP comparison is limited to the baseline MFGP and three variants, not all GP methods.",
+        "evidence_span": "the comparison is against the baseline MFGP and the\nthree MFGP variants rather than the entire space of\nGP methods"
+      },
+      {
+        "role": "constraint",
+        "content": "The optimization must satisfy a finite total cost budget across fidelity queries.",
+        "evidence_span": "subject to the total budget constraint P\n\nt cst \u2264B"
+      },
+      {
+        "role": "constraint",
+        "content": "The study uses a fixed candidate pool with no resampling of queried candidates.",
+        "evidence_span": "Optimization was performed over a fixed candidate\npool Xcand with sampled candidates removed after\neach query."
+      },
+      {
+        "role": "constraint",
+        "content": "Fidelity selection follows a deterministic round-robin schedule.",
+        "evidence_span": "A deterministic round-robin schedule issued\nnLF\u2192HF = \u230a1/\u03c1\u230bLF queries between successive HF\nqueries"
+      },
+      {
+        "role": "constraint",
+        "content": "Backbone capacity was kept fixed during transfer-learning adaptation.",
+        "evidence_span": "The model was then adapted to\nthe HF task using the smaller HF dataset, while keeping\nthe backbone capacity fixed"
+      },
+      {
+        "role": "constraint",
+        "content": "The controlled grid conclusions are bounded to the polarizability substrate because of possible mismatch to real bias structure.",
+        "evidence_span": "which bounds how far the grid\u2019s conclusions generalize\nbeyond the polarizability substrate."
+      },
+      {
+        "role": "constraint",
+        "content": "Best-of-family selection may advantage families with more members.",
+        "evidence_span": "Because\nbest-of-family selection can favour the family with more\nmembers"
+      },
+      {
+        "role": "constraint",
+        "content": "Models were retrained from scratch at each optimization iteration.",
+        "evidence_span": "Models were retrained de novo\nat every optimization iteration"
+      },
+      {
+        "role": "constraint",
+        "content": "The fidelity variable is encoded in the last input column as 0 for LF and 1 for HF.",
+        "evidence_span": "Fidelity encoding\nLast column: 0 = LF, 1 = HF"
+      },
+      {
+        "role": "constraint",
+        "content": "The GP is retrained from scratch at every iteration using exact marginal log-likelihood optimization.",
+        "evidence_span": "At each iteration the GP was retrained from scratch by maximizing the exact marginal log-likelihood with L-BFGS-B via fit gpytorch mll"
+      },
+      {
+        "role": "constraint",
+        "content": "Predictions are taken only at the high-fidelity level s = 1.",
+        "evidence_span": "predictions were taken from the posterior at the high-fidelity (HF) level s = 1."
+      },
+      {
+        "role": "constraint",
+        "content": "Best-of-family scoring can bias results toward the family with more members.",
+        "evidence_span": "Because best-of-family scoring can favour the family with more members"
+      },
+      {
+        "role": "constraint",
+        "content": "Per-cell significance is quoted only for anytime maps; final-regret maps are interpreted by direction and effect sizes.",
+        "evidence_span": "Per-cell significance is therefore quoted only for the anytime maps, which carry the claim; the final-regret maps are read from their direction and effect sizes."
+      }
+    ],
+    "contradiction": [
+      {
+        "role": "contradiction",
+        "content": "The usual expectation that GPs are best early and transfer-learning improves only later was not observed.",
+        "evidence_span": "The con- ventional pattern where GPs perform best early and transfer-learning surrogates improve only later was therefore not observed."
+      },
+      {
+        "role": "contradiction",
+        "content": "Contrary to what calibration quality would suggest, the best-calibrated Gaussian-process surrogates can be the worst optimizers on molecular-descriptor benchmarks",
+        "evidence_span": "so the best-calibrated surrogates (the Gaussian-process family) are, if\nanything, the worst optimizers on the molecular-descriptor benchmarks."
+      },
+      {
+        "role": "contradiction",
+        "content": "The best-calibrated surrogates, the GP family, were nevertheless the worst optimizers on molecular-descriptor tasks.",
+        "evidence_span": "so the best-calibrated surrogates (the GP family) were, if any-\nthing, the worst optimizers on the molecular-descriptor\ntasks"
+      },
+      {
+        "role": "contradiction",
+        "content": "The omnibus null does not imply surrogate choice has no effect, contrary to that possible interpretation.",
+        "evidence_span": "The omnibus null therefore indicates that no single ordering holds across a deliberately heterogeneous suite, not that the choice of surrogate is without effect"
+      }
+    ]
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Conventional Bayesian optimization and MFBO face core limitations: conventional BO relies on a single information source, creating a cost\u2013accuracy tradeoff, while GP surrogates commonly used in MFBO scale poorly as data grow and depend on smoothness assumptions that often break down in molecular and materials search spaces.",
+        "evidence_spans": [
+          "A central limitation of conventional BO is its reliance on a single source of information, which imposes a trade-off between evaluation cost and prediction accuracy.",
+          "Gaussian processes (GPs) are the default choice, but they scale poorly as data accumulate and assume a smooth landscape that molecular and materials search spaces routinely violate."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Although transfer learning is widely used for property prediction, its use as the surrogate or decision-making engine in closed-loop optimization remains largely unexplored and has not been systematically evaluated under controlled closed-loop optimization conditions.",
+        "evidence_spans": [
+          "Despite its use in property prediction, transfer learning has not been tested as the engine of a closed-loop optimization.",
+          "their role as decision-making engines in closed-loop optimization remains largely unexplored [14].",
+          "whereas transfer-learning architectures representing distinct mechanisms of knowledge transfer have not yet been systematically evaluated under controlled closed-loop optimization conditions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "It remains unclear when transfer-learning surrogates outperform GP baselines, which transfer mechanisms work best, and whether any advantage comes from better uncertainty estimates, better predictive means, improved design-space representations, or simply from differences in acquisition policy.",
+        "evidence_spans": [
+          "It therefore remains unclear when transfer-learning surrogates outperform GP baselines, which transfer mechanisms are most effective and whether any advantage arises from better uncertainty estimates, better predictive means or improved representation of the design space.",
+          "Because the GP and transfer-learning surrogates used structurally different acquisition policies under the default protocol, we matched the acquisition policy across both model families to test whether the observed advantage of transfer-learning surrogates could be explained by this asymmetry."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "More broadly, it is uncertain when calibrated surrogate uncertainty improves BO and when learned surrogate models are actually necessary, since their value depends on the acquisition policy and the structure of the benchmark or optimization problem.",
+        "evidence_spans": [
+          "Whether calibrated surrogate uncertainty improves BO depends on both the acquisition policy and the struc- ture of the benchmark. To test this systematically",
+          "A learned surrogate is not equally valuable for every optimization problem. To identify when surrogate learn- ing adds benefit"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "An open motivation for future work is extending the comparison to adaptive, cost-aware fidelity selection and to hierarchical chains of three or more fidelities to build a more complete and reliable autonomous decision-making engine.",
+        "evidence_spans": [
+          "Extending this comparison to adaptive, cost-aware fidelity selection and to hierarchical chains of three or more fidelities is the natural next step towards a complete and reliable decision-making engine for autonomous discovery"
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Prior multi-fidelity Bayesian optimization (MFBO), especially in molecular and materials discovery, is largely built around Gaussian-process surrogates that combine low- and high-fidelity information within a unified optimization framework.",
+        "evidence_spans": [
+          "Gaussian processes (GPs) are the default choice",
+          "Most MFBO methods remain rooted in Gaussian process (GP) surrogates whose strength lies in calibrated uncertainty estimation.",
+          "In molecular and materials discovery, MFBO has largely been developed around GP-based surrogates [6]",
+          "Multi-fidelity Bayesian optimization (MFBO) addresses this challenge by combining these complementary information sources within a unified optimization framework, enabling inexpensive LF evaluations to broadly explore the design space while reserving scarce HF measurements for validation of the most promising candidates [5]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A standard prior baseline is the autoregressive multi-fidelity Gaussian process (MFGP), implemented in this paper via BoTorch's SingleTaskMultiFidelityGP, corresponding to a Kennedy\u2013O\u2019Hagan autoregressive formulation with Mat\u00e9rn-5/2 input kernel; descriptions also specify fidelity handling either as a binary indicator or via a linear truncated fidelity kernel, and the model uses a single cross-fidelity posterior for acquisition at both fidelity steps.",
+        "evidence_spans": [
+          "Standard multi-fidelity Gaussian processes (MFGP) perform strongly in low-data regimes and provide uncertainty estimates",
+          "The baseline MFGP (the standard autoregressive multi- fidelity GP; Methods)",
+          "The baseline\nMFGP\nwas\nimple-\nmented using the SingleTaskMultiFidelityGP in\nBoTorch [26], corresponding to an autoregressive\nKennedy\u2013O\u2019Hagan formulation with a Mat\u00b4ern-5/2\nkernel and fidelity encoded as a binary indicator.",
+          "We use SingleTaskMultiFidelityGP from BoTorch [26], which internally employs a Mat\u00b4ern 5/2 kernel with automatic relevance determination (ARD) for the input dimensions and a linear truncated kernel for the fidelity dimension.",
+          "The multi-fidelity GP uses this single cross-fidelity posterior for acquisition at both fidelity steps."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior GP baselines considered include autoregressive MFGP, nonlinear autoregressive GP (NARGP), deep-kernel GP, and sparse variational MFGP; NARGP models the high-fidelity response as a nonlinear function of inputs and the low-fidelity posterior mean, deep-kernel GP uses neural-network feature-based kernels, and sparse variational MFGP uses inducing points with stochastic variational inference as a scalable alternative to exact GP inference.",
+        "evidence_spans": [
+          "The comparison includes eleven transfer-learning surrogates and four GP baselines: autoregressive MFGP [5], nonlinear autoregressive GP (NARGP) [11], deep-kernel GP [15], and sparse variational MFGP[16, 17].",
+          "NARGP [11] models the HF response\nas a nonlinear function of the input and the LF pos-\nterior mean.",
+          "The deep-kernel GP [15] replaces the\nconventional kernel with one defined on neural network\nfeatures trained jointly with the marginal-likelihood\noptimization.",
+          "The sparse variational MFGP approx-\nimated the multi-fidelity posterior using stochastic\nvariational inference over inducing points with a multi-\ntask index kernel, providing a scalable alternative to\nexact GP inference [16, 17]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Beyond GP-based approaches, transfer-learning models have also been used previously for multi-fidelity molecular property prediction, spanning representation transfer, parameter transfer, output transfer, data transfer, distribution alignment, and gradient-coupling paradigms.",
+        "evidence_spans": [
+          "Although transfer-learning models have advanced multi-fidelity molecular property prediction",
+          "The mechanisms spanned five paradigms:\nrepresentation transfer including sequential fine-tuning,\nprogressive unfreezing, and adapter modules that\nupdate a small number of parameters over a frozen back-\nbone; parameter transfer, including pretrain-then-joint\ntraining and soft parameter sharing; output transfer\nincluding knowledge distillation and pseudo-labelling;\ndata transfer implemented as curriculum learning by\nordering HF samples according to residual magni-\ntude; distribution alignment implemented using domain\nadaptation by a maximum-mean-discrepancy penalty\nbetween LF and HF feature distributions; and gradi-\nent coupling, comparing stop-gradient and end-to-end\njoint training."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior/baseline acquisition setups include expected improvement (EI) as a standard or unified acquisition objective, broader uncertainty-driven portfolios containing EI, probability of improvement, lower confidence bound, max-value entropy search, and Thompson sampling, a default protocol where baseline MFGP used EI while transfer-learning surrogates used a greedy policy, a fully uncertainty-aware transfer-learning variant applying EI at both fidelities, and matched greedy controls for MFGP based on posterior mean.",
+        "evidence_spans": [
+          "In the default setting, the baseline MFGP used an uncertainty-driven expected- improvement (EI) acquisition whereas the transfer- learning surrogates used a greedy policy",
+          "Expected improvement was used as the unified acquisition objective.",
+          "we replaced the greedy policy with a representative portfolio of five uncertainty-driven acquisitions span- ning the standard acquisition-function taxonomy [3]: EI [19] and probability of improvement [20] which are improvement-based; the GP lower confidence bound [21] which is optimistic; max-value entropy search [22] which is information-theoretic; and Thompson sam- pling [23] which is sampling-based.",
+          "These included a portfolio of five\nLF acquisitions using the BLR predictive standard devi-\nation: EI, probability of improvement [20], the GP lower\nconfidence bound [21], max-value entropy search [22],\nand Thompson sampling [23], spanning the standard\nacquisition-function taxonomy [3].",
+          "we evaluated a portfolio of five uncertainty-driven acquisitions spanning the standard taxonomy of myopic acquisition functions [3]: the improvement-based EI [19] and probability of improvement [20]; the optimistic Gaussian-process lower confidence bound [21] (\u03b2 = 2); the information-theoretic max-value entropy search [22] (Gumbel approximation, ten max-value samples); and sampling-based Thompson sampling [23].",
+          "We additionally evaluated a fully uncertainty-aware variant that adds a second BLR head on the HF network and applies EI at both fidelities.",
+          "As a matched control for the surrogate-versus-acquisition question, the baseline MFGP was also run with a greedy policy that selects by its posterior mean, all other settings held fixed (Fig. 3)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A surrogate-free low-fidelity screening baseline was also considered, ranking candidates by low-fidelity value and evaluating the top-ranked ones at high fidelity.",
+        "evidence_spans": [
+          "we compared each method with a surrogate-free screening baseline that ranks candidates by their LF value and evaluates the top-ranked can- didates at HF."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For transfer-learning surrogates, uncertainty was modeled using a Bayesian linear regression head on low-fidelity last-layer features.",
+        "evidence_spans": [
+          "Uncertainty for the transfer-learning surrogates is obtained from a Bayesian linear regression (BLR) head on the low-fidelity (LF) network\u2019s last-layer features."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The benchmark and costing setup was aligned with prior work: the benchmark suite extends that of Sabanza-Gil et al. with two new materials tasks, and cost ratios were chosen to match originating studies for indirect comparison with prior GP results.",
+        "evidence_spans": [
+          "HOPV15 and Matbench-gap extend the original suite\nof Sabanza-Gil et al. [6] with two materials tasks\nintroduced here.",
+          "Cost\nratios were matched to the originating studies to enable\nindirect comparison with prior single- and multi-fidelity\nGP results [6]."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "GP surrogates become problematic in high-dimensional, heterogeneous molecular and materials search spaces and also scale poorly as low-fidelity data accumulate.",
+        "evidence_spans": [
+          "but their limitations become increasingly apparent in the high-dimensional and heterogeneous search spaces characteristic of molecular and materials discovery.",
+          "GP surrogates scale poorly as LF data accumulate [8]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Kernel-based similarity assumptions may fail to capture nonlinear, biased, or location-dependent relationships between low- and high-fidelity signals.",
+        "evidence_spans": [
+          "while kernel-based similarity assumptions can struggle to capture nonlinear, biased or location-dependent relationships between LF and HF signals [9\u201311]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "FLOPs are an incomplete proxy for deployment cost because they ignore memory footprint and engineering factors such as parallelization and library-level optimization that affect wall-clock performance.",
+        "evidence_spans": [
+          "it does not capture memory footprint, which is particularly relevant for the sparse variational MFGP\u2019s inducing-point over- head, or engineering factors such as parallelization and library-level optimization that affect wall-clock cost in deployment."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Synthetic degradations used in the evaluation grid may not reproduce the structure of real experimental or simulation biases, limiting how far conclusions generalize beyond the studied substrate.",
+        "evidence_spans": [
+          "whose syn-\nthetic degradations need not mirror real experimental\nor simulation biases",
+          "These\nsynthetic degradations nevertheless need not reproduce\nthe structure of real experimental or simulation biases,\nwhich bounds how far the grid\u2019s conclusions generalize\nbeyond the polarizability substrate."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "Uncertainty-driven exploration is rejected as the default MFBO strategy; the paper favors greedy exploitation of the transfer-learned mean because uncertainty-based exploration is not reliably beneficial, calibration does not predict optimization performance, and MFBO should not be viewed primarily through uncertainty calibration or global correlation but rather as a representation-learning problem.",
+        "evidence_spans": [
+          "Uncertainty-driven exploration is not reliably beneficial, and calibration does not predict optimization performance, so greedy exploitation of the transfer-learned mean is the more robust default.",
+          "This reframes multi-fidelity optimization as a representation-learning problem"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A decision map based only on global fidelity correlation is rejected as insufficient, because performance advantage is organized along optimum agreement and is nearly flat in R2, so global correlation alone cannot distinguish when a learned surrogate is essential versus dispensable.",
+        "evidence_spans": [
+          "because the advantage is organized along the optimum-agreement axis and is nearly flat in R2, a decision map indexed by global correlation alone cannot separate the conditions in which a learned surrogate is essential from those in which it is dispensable"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Wall-clock time was rejected as the primary reporting metric; the paper reports FLOPs instead to isolate algorithmic scaling from implementation and hardware effects.",
+        "evidence_spans": [
+          "We report FLOPs rather than wall-clock time because it isolates algorithmic scaling from imple- mentation and hardware effects"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Larger architectures and learned molecular representations were deliberately not used, to keep comparisons fair, even though they might have widened the performance gap.",
+        "evidence_spans": [
+          "larger archi-tectures or learned molecular representations could further widen the gap but were deliberately excluded to keep the comparison fair"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Cost-aware fidelity heuristics were not used; instead a deterministic round-robin schedule was chosen to isolate surrogate quality from fidelity-scheduling effects.",
+        "evidence_spans": [
+          "A deterministic round-robin schedule issued nLF\u2192HF = \u230a1/\u03c1\u230bLF queries between successive HF queries, isolating surrogate quality from cost-aware fidelity heuristics"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Direct perturbation of ground-truth values was rejected for simulating low-fidelity data; random-forest prediction errors were used instead because they better reproduce realistic, smooth, descriptor-correlated low-fidelity error structure rather than arbitrary unstructured noise.",
+        "evidence_spans": [
+          "Random-forest predictions were chosen as the base, rather than direct perturbations of the ground-truth values, because the errors of a learned predictor carry the smooth, descriptor-correlated structure of a realistic LF proxy, whereas perturbing the ground truth directly would inject noise with an arbitrary, unstructured form."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "ReLU was not used in the main configuration; it was treated as an alternative activation and evaluated only in an ablation, with tanh retained for the main experiments.",
+        "evidence_spans": [
+          "To isolate the effect of the activation function, the benchmark suite was repeated with ReLU in place of tanh under otherwise identical architectures and training"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Pooled ranking was rejected as the basis for statistical support in surrogate comparison; instead the paper relies on per-benchmark paired tests, effect sizes, and the controlled fidelity-quality grid, with the pooled ranking used only descriptively.",
+        "evidence_spans": [
+          "The statistical support for the surrogate comparison accordingly rests on the per-benchmark paired tests and effect sizes of Supplementary Table 6, and on the controlled fidelity-quality grid (Supplementary Table 7), rather than on the pooled ranking; Fig. 1k is presented as a descriptive summary."
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [],
+    "causal_claim": [
+      {
+        "content": "Keeping the acquisition policy fixed showed that the observed performance gap was driven primarily by the surrogate model rather than the acquisition strategy; matching the acquisition policy did not improve baseline MFGP, and surrogate choice mattered more than acquisition policy or fidelity schedule in high-dimensional molecular/materials MFBO.",
+        "evidence_spans": [
+          "Because acquisition policy is held fixed across surrogates, this advantage is attributable to the surrogate itself.",
+          "Thus matching the acquisition pol- icy did not improve the baseline MFGP, indicating that its limitation arises primarily from the surrogate rather than the acquisition policy.",
+          "more than the acquisition policy or the fidelity schedule, governs MFBO performance in high-dimensional molec- ular and materials spaces."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Transfer-learning surrogates gain from two complementary mechanisms: learned representations can support cross-fidelity transfer when LF and HF share structure, and even weak or biased LF data can still help by enabling a more expressive model than fixed-kernel GPs.",
+        "evidence_spans": [
+          "When LF and HF signals share structure, such representations support cross-fidelity transfer;",
+          "when LF information is weak or biased, they can still improve optimization by providing a more expressive model of high-dimensional molecular and materials descriptors than fixed-kernel GPs.",
+          "Across the empirical benchmarks, the advantage of transfer-learning surrogates therefore has two complementary sources: improved representation learning, which remains beneficial even when the LF proxy is weak, and transfer from abundant LF data, which becomes useful when the LF signal is informative, as in COFs, FreeSolv, and polarizability."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The transfer-learning advantage arose mainly from better predictive means/representation learning and preservation of near-optimal regions, not from uncertainty calibration or global LF\u2013HF correlation alone; uncertainty was only a secondary, benchmark-dependent factor.",
+        "evidence_spans": [
+          "The advantage is explained primarily by the quality of the transfer-learned predictive mean and by preservation of the near-optimal region, rather than by calibrated uncertainty or global LF\u2013HF correlation alone.",
+          "Together, these results indicate that the advantage of transfer-learning surrogates arises primar- ily from the quality of the transfer-learned mean, with uncertainty-driven exploration acting as a secondary and benchmark-dependent factor.",
+          "If anything, the best-calibrated surrogates, including the entire GP family, were the weakest optimizers on the molecular-descriptor benchmarks, showing that better-calibrated uncertainty did not translate into better optimization.",
+          "This is consistent with uncer- tainty acting as a secondary, benchmark-dependent factor rather than a primary driver of performance.",
+          "Calibration quality, measured by expected calibration error, did not predict optimization performance"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Whether transfer learning helps is governed more by preservation of the near-optimal/top-candidate ordering than by global LF\u2013HF correlation: at fixed R2 the advantage grew as top-10 agreement fell, while at fixed agreement it was nearly flat across R2.",
+        "evidence_spans": [
+          "Third, the advantage is organized along the agreement axis rather than the correlation axis",
+          "at fixed R2 it grows steeply as the top-10 agreement falls, whereas at fixed agreement it is nearly flat across the R2 range",
+          "The property that decides when a transfer-learned surrogate pays off is therefore not the global correlation commonly used to character- ize an LF source, but whether that source preserves the ordering of the best candidates.",
+          "Thus, the need for a surrogate depends less on global LF\u2013HF cor- relation than on whether the LF proxy preserves the near-optimal region."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "When the LF proxy already identified the optimum, learned surrogates added little and methods performed similarly; when LF screening failed near the top ranks, a learned surrogate became essential and transfer-learning substantially outperformed LF screening.",
+        "evidence_spans": [
+          "Under this setting, a learned surrogate added little value and all methods, including non-learning base- lines, performed similarly.",
+          "In this setting, a learned surro- gate was essential; the best transfer-learning surrogate achieved a regret of 0.41, substantially outperforming the surrogate-free screen.",
+          "so a learned surrogate is required precisely where a low-fidelity screen fails (Regime B), while in Regime A the screen is already near-optimal"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because of this regime structure, transfer-learning is a robust default: it matches LF screening when the proxy is already sufficient and improves substantially when the proxy fails near the top ranks.",
+        "evidence_spans": [
+          "The transfer-learning surrogate was a robust choice as it matched the surrogate-free screen when the proxy already identified the optimum and substantially improved performance when the proxy failed near the top of the ranking.",
+          "Transfer learning is therefore not a universally superior method but the dependable default for the high-dimensional molecular and materials pools where SDLs operate",
+          "on descriptor-based molecular and materials pools, a transfer-learning surrogate is a more reliable default than the baseline MFGP"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "GPs remained highly effective when their inductive bias or kernel prior matched the objective structure, but this advantage was problem-dependent rather than universal and, on the synthetic suite, was largely confined to smooth two-dimensional Branin functions.",
+        "evidence_spans": [
+          "indicating that GP models remain highly effective when their inductive bias matches the objective struc- ture.",
+          "These results suggest that GPs are highly competitive when the kernel prior is well matched to the structure of the objective, but that this advantage is problem-dependent rather than universal.",
+          "Therefore, the GP advantage on synthetic objectives was confined to the smooth, two- dimensional Branin functions, rather than synthetic benchmarks in general."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "On descriptor-based molecular/materials settings, stationary-kernel GPs can misrank promising candidates because of representational mismatch, whereas transfer-learning surrogates can learn task-adapted representations and smoother residuals; the early emergence of the gap indicates the bottleneck is representational rather than just HF data scarcity.",
+        "evidence_spans": [
+          "In this setting, a stationary-kernel GP can misrank promising candidates, while a transfer-learning surrogate can learn task-adapted representations from the larger LF dataset and model a smoother resid- ual between fidelities.",
+          "This suggests that the bottleneck is representational (kernel misspecification) rather than simply a consequence of HF data scarcity."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "On HOPV15, the improvement did not come from LF-to-HF transfer but from better function approximation of molecular descriptors by the transfer-learning surrogate.",
+        "evidence_spans": [
+          "the improvement cannot be attributed to suc- cessful LF-to-HF transfer. Instead, it indicates that the transfer-learning surrogate provides a better func- tion approximator for the molecular descriptors than a stationary GP."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Altering the GP family to use nonlinear coupling, jointly learned kernels, or sparse variational approximations did not remove the performance gap, so the observed disadvantage was not fixed by these GP reformulations.",
+        "evidence_spans": [
+          "Thus substituting the baseline MFGP with nonlinear cross-fidelity coupling, jointly learned kernels, or sparse variational approximation did not remove the perfor- mance gap"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Outcomes depended not just on whether transfer learning was used but on how it was implemented.",
+        "evidence_spans": [
+          "The spread of average ranks (from 5.3 to 11.8) neverthe- less suggests that outcomes depended not merely on using transfer learning but on how transfer was imple- mented."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Surrogate choice mattered most on hard, sharply peaked molecular-descriptor benchmarks and less on dense, small-budget or low-discrimination tasks, though surrogate learning was still warranted in such cases.",
+        "evidence_spans": [
+          "Surrogate choice was therefore most consequential on the hard, sharply-peaked molecular-descriptor benchmarks and less important on dense, small-budget tasks",
+          "These results indicate that surrogate learning is war- ranted, even though the choice among surrogates had limited impact on the low-discrimination Matbench-gap task."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Greedy acquisition was the most robust default overall; uncertainty-driven exploration gave benchmark-dependent benefits, and the wrong exploration signal could be strongly harmful.",
+        "evidence_spans": [
+          "The greedy policy therefore remained the most robust single default, whereas uncertainty-driven exploration showed benchmark-dependent benefits",
+          "and the wrong kind of exploration can be sharply counterproductive, though the right kind (sampling-based) can still help on some benchmarks)",
+          "Using BLR uncertainty to drive exploration can degrade performance by up to an order of magnitude in COFs."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the primary setup, expected improvement reduced to greedy selection because predictive standard deviation was held constant.",
+        "evidence_spans": [
+          "In the primary configuration the LF expected improvement (EI) uses a constant predictive standard deviation, so the BLR head contributes a regularized posterior mean and the acquisition reduces to greedy selection"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Transfer-learning surrogates had better computational scaling than GP-based methods because GPs scaled roughly as O(N^3) while transfer-learning surrogates scaled roughly as O(N); therefore the compute-cost gap widened with evaluation budget, with GPs cheaper below a crossover and transfer-learning cheaper above it by a growing margin.",
+        "evidence_spans": [
+          "Because the fitted scaling exponents differed by about 1.5 between the model families, the computational gap widened with increasing data",
+          "the baseline MFGP and NARGP scale as O(N3) in the number of observations (measured fit-FLOP exponent k = 3.0) against O(N) for the transfer-learning surrogates (k = 1.0), so the gap widens with the evaluation budget.",
+          "below it the Gaussian processes are cheaper to fit, above it the transfer-learning surrogates are cheaper by a margin that grows with N, reaching roughly 5\u00d7 at N = 200 and 10\u00d7 at N = 300"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Under the fixed protocol, transfer-learning surrogates delivered lower regret on most molecular/materials benchmarks and more favorable computational scaling, making them a better engine for discovery; on large-pool, high-evaluation tasks they achieved similar accuracy at far lower FLOP cost and thereby reduced the number of expensive HF experiments needed.",
+        "evidence_spans": [
+          "Therefore, under the fixed optimization protocol, transfer-learning sur- rogates provided both lower regret on most molecular and materials benchmarks and more favourable compu- tational scaling.",
+          "By bringing transfer learning into the multi-fidelity optimization loop, we find a transfer-learning surrogate to be the better engine for molecular and materials discovery",
+          "on large-pool, high-evaluation tasks it delivers this accuracy at up to roughly 45\u00d7 fewer FLOPs than the most expensive GP, reducing the number of expensive HF experiments needed to identify promising candidates."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because the practical guidance concerns the surrogate rather than acquisition policy or fidelity schedule, it can be adopted in existing autonomous-experimentation platforms without changing their optimization policy.",
+        "evidence_spans": [
+          "Because this guidance con- cerns the surrogate rather than the acquisition policy or fidelity schedule, it can be adopted within exist- ing autonomous-experimentation platforms with no change to their optimization policy"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Keeping backbone capacity fixed ensured that performance differences reflected the transfer mechanism rather than model size.",
+        "evidence_spans": [
+          "while keeping the backbone capacity fixed so that the performance differences reflected the transfer mechanism rather than model size."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Retraining models from scratch at every iteration removed path dependence from warm-starting.",
+        "evidence_spans": [
+          "Models were retrained de novo at every optimization iteration to remove path depen- dence from warm-starting."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Apparent discrepancies between weak per-cell significance and small map-level p-values were attributed to statistical power rather than conflicting evidence; similarly, omnibus null results were expected because the heterogeneous benchmark suite was designed to include regime-dependent rank reversals, so averaging ranks across regimes cancels effects whose sign changes by regime.",
+        "evidence_spans": [
+          "The contrast between the vanishing per-cell counts on final regret and these small map-level values is a matter of statistical power rather than of conflicting evidence",
+          "This null is what the benchmark design predicts rather than evidence against a surrogate effect. The suite deliberately spans regimes in which the ranking reverses",
+          "averaging ranks over a heterogeneous suite cancels an effect whose sign depends on the regime."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Comparisons to 'Gaussian processes' depend causally on which GP representative is chosen, because conclusions about learned-surrogate advantages are sensitive to the strength of the GP baseline used.",
+        "evidence_spans": [
+          "Comparisons of learned surrogates against \u201cGaussian processes\u201d, in our study and in the wider literature, should therefore be read against the strength of the chosen representative"
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "The reason the advantage is assigned to the surrogate is that acquisition policy was controlled across models.",
+        "evidence_span": "Because acquisition policy is held fixed across surrogates, this advantage is attributable to the surrogate itself."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The limitation matters in SDLs because low-fidelity sources are often imperfect proxies that may mislead near the optimum or correlate weakly with the target.",
+        "evidence_span": "This limitation is particularly important in SDLs, where LF sources are often imperfect experimental proxies: they may be strongly informative only in restricted regions of the design space, misleading near the optimum or weakly correlated with the final HF objective."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The key principle is that the challenge is to identify structure in cheap data that remains informative for expensive decisions.",
+        "evidence_span": "in which the central challenge is to identify which structures in inexpensive data remain informative for expensive HF decisions."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Transfer learning works by learning LF representations and adapting them to sparse HF data through targeted correction.",
+        "evidence_span": "By learning representations from abundant LF data and adapting them to sparse HF observations through targeted correction [12], these models can capture cross-fidelity structure while retaining the expressive capacity needed for prediction in complex molecular and materials descriptor spaces [13]."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This flexibility matters when fixed-kernel GPs are mismatched to nonlinear, heterogeneous, or locally biased LF\u2013HF relations.",
+        "evidence_span": "This flexibility is particularly important when fixed-kernel GP surrogates are poorly matched to nonlinear, heterogeneous or locally biased LF\u2013HF relationships."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The Mat\u00e9rn-5/2 kernel gives a strong smoothness prior for smooth 2D objectives, enabling accurate GP modeling from few observations.",
+        "evidence_span": "This observation is consistent with the Mat\u00b4ern-5/2 kernel providing a strong smoothness prior for an ana- lytically smooth, two-dimensional objective, allowing the GP posterior to model the surface accurately from relatively few observations."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The limitation is due to GP modeling assumptions in compressed descriptor spaces rather than one specific baseline implementation.",
+        "evidence_span": "suggesting that the limitation lies in the GP modelling assumptions in these compressed descriptor spaces, rather than in a single baseline implementation."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "A stationary Mat\u00e9rn-5/2 kernel imposes one global smoothness notion, but PCA-compressed molecular descriptor spaces can be non-stationary and fidelity discrepancies can vary strongly across space, especially near the optimum.",
+        "evidence_span": "First, the Mat\u00b4ern-5/2 kernel imposes a single global notion of smoothness, whereas the molecular descriptor space, compressed by principal component analysis (PCA), can be non-stationary and the LF\u2013HF discrepancy may vary strongly across input space, particularly near the optimum."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This does not contradict transfer-learning advantages on harder benchmarks because Matbench-gap had limited discrimination.",
+        "evidence_span": "This does not contradict the advantage of the learned surrogates on harder molecular-descriptor benchmarks; rather, it reflects the limited discrimi- nation of this task."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Weak discrimination on Matbench-gap is explained by a very small HF budget and a dense near-optimal set.",
+        "evidence_span": "Two features explain the weak discrimination on Matbench-gap. First, it had the smallest evaluation budget in the suite with only ten HF queries... Second, a near-optimal set was comparatively dense: 3.6% of the 3,347-compound pool lay within 0.2 eV of the target"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Baseline MFGP likely misranks promising regions, so changing acquisition policy helps little, whereas transfer-learning gives a more useful ranking and is more sensitive to how HF budget is allocated.",
+        "evidence_span": "These results suggest that the baseline MFGP posterior mean misranks the promising regions in these descriptor spaces, so chang- ing the acquisition policy has limited effect. By contrast, the transfer-learning surrogate appeared to provide a more useful ranking of HF candidates, making perfor- mance more dependent on how scarce HF evaluations were allocated between exploitation and exploration."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "In strong transfer settings, exploration can waste scarce HF budget on uncertain but less promising candidates when the transfer-learned mean already ranks well.",
+        "evidence_span": "This suggests that in strong transfer settings, exploration could waste scarce HF budget on uncertain but less promising candidates when the transfer-learned mean already provides a useful ranking."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This linear scaling reflects fixed-architecture neural network training.",
+        "evidence_span": "This reflects the use of fixed-architecture neural network training."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This computational advantage matters in SDL because abundant LF data and repeated retraining make surrogate-update cost important in closed-loop workflows.",
+        "evidence_span": "This advantage is particularly relevant to SDL settings, where abundant LF data and repeated surrogate updates can make model retraining cost an important component of the closed-loop workflows."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The GP-family exponent is below cubic because the family includes scalable sparse variational MFGP, while exact GPs approach cubic scaling.",
+        "evidence_span": "which lies below pure cubic because it includes the scalable sparse variational MFGP, with the exact GPs (the baseline MFGP and NARGP) approaching the ideal O(N3)"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This failure is attributed to the regime rather than any specific acquisition function.",
+        "evidence_span": "so this catastrophic failure is a property of the regime, not of a particular acquisition"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "In strong-transfer SDL regimes, a good posterior mean is more valuable than exploration because abundant LF signal already ranks candidates well.",
+        "evidence_span": "when\nan abundant LF signal already orders candidates well,\na high-quality posterior mean is on average more\nvaluable than exploration"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The round-robin design is justified by similarity to SDL pipelines where instruments run in parallel.",
+        "evidence_span": "reflecting SDL pipelines in which\nlow- and HF instruments operate in parallel."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The discrepancy is expected to be smoother than the high-fidelity function when fidelities are correlated.",
+        "evidence_span": "which is smoother than the HF function itself when the\ntwo fidelities are correlated."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Learned-predictor errors are smoother and descriptor-correlated, unlike arbitrary unstructured noise from direct perturbation.",
+        "evidence_span": "because\nthe errors of a learned predictor carry the smooth,\ndescriptor-correlated structure of a realistic LF proxy,\nwhereas perturbing the ground truth directly would\ninject noise with an arbitrary, unstructured form."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Ten seeds per cell lack power to survive 126-way correction unless within-cell separation is nearly total, whereas map-level tests aggregate consistency across 126 conditions.",
+        "evidence_span": "ten seeds per cell cannot clear a 126-way correction unless the within-cell separation is close to total, as it is on the anytime metric but not at the endpoint, whereas the map-level test draws instead on the consistency of the advantage across the 126 conditions."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Many final-regret cells are exact ties because both sides reach regret 0.",
+        "evidence_span": "On final regret a large fraction of cells tie exactly (both sides reach regret 0); these ties are reported separately."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "Transfer learning may be a better surrogate for MFBO in molecular and materials settings by leveraging cheap-data representations and adapting to sparse expensive data.",
+        "evidence_span": "Transfer learning offers an alternative suited to this regime: it learns a representation from abundant cheap data and adapts it to sparse expensive data."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Greedy exploitation of the transfer-learned mean is the most robust default strategy.",
+        "evidence_span": "so greedy exploitation of the transfer-learned mean is the more robust default."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Transfer learning is the preferred surrogate for molecular and materials MFBO.",
+        "evidence_span": "Transfer learning is therefore the surrogate of choice for molecular and materials MFBO."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Optimization in high-dimensional multi-fidelity discovery depends more on learned representations than on uncertainty calibration or global LF\u2013HF correlation.",
+        "evidence_span": "Here we test an alternative hypothesis: in high-dimensional multi-fidelity discovery, optimization performance is governed less by uncertainty calibration or global LF\u2013HF correlation than by the surrogate\u2019s capability to learn useful representations of the design landscape."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Transfer-learning surrogates are a natural way to realize this representation-learning reframing.",
+        "evidence_span": "Transfer-learning surrogates provide a natural mechanism for this reframing."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "MFBO surrogate design should emphasize scalable learned representations that transfer across fidelities and adapt to biased or weak LF signals.",
+        "evidence_span": "These findings suggest that surrogate design for MFBO should place greater emphasis on scalable learned representations that can transfer information across fidelities while adapting to biased, local or weak LF signals."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Effort should focus first on transferred-representation quality, and if exploration is used, sampling-based acquisitions are preferred over improvement-based ones.",
+        "evidence_span": "effort is better spent first on the\nquality of the transferred representation, and where\nexploration is used, sampling-based acquisitions are\npreferable to improvement-based ones"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Transfer-learning surrogates are established as the preferred surrogate for molecular and materials multi-fidelity optimization.",
+        "evidence_span": "Taken together, these results establish transfer-\nlearning surrogates as the surrogate of choice for\nmolecular and materials multi-fidelity optimization"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The recommended recipe is to default to transfer learning on descriptor-based pools, reserve GPs for smooth low-dimensional spaces, and prioritize transferred-mean quality over aggressive uncertainty exploration.",
+        "evidence_span": "default to a transfer-learning surrogate\non descriptor-based molecular and materials pools,\nreserve GPs for the smooth, low-dimensional design\nspaces where their inductive bias is an asset, and invest\nfirst in the quality of the transferred mean, treat-\ning uncertainty-driven exploration as a case-dependent\nrefinement that, where used, is best supplied by a\nsampling-based acquisition"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The residual parameterization is intended to make the model learn the fidelity discrepancy rather than the full high-fidelity function.",
+        "evidence_span": "This parameterization encourages the residual net-\nwork to learn the discrepancy \u03b4(x) = f (H)(x)\u2212f (L)(x),\nwhich is smoother than the HF function itself when the\ntwo fidelities are correlated."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "On smooth low-dimensional tasks, GPs outperform transfer-learning surrogates.",
+        "evidence_span": "GPs win on smooth, low-dimensional functions"
+      },
+      {
+        "role": "evidence_result",
+        "content": "On molecular and materials problems, transfer-learning surrogates find better solutions with much lower computational cost than GPs.",
+        "evidence_span": "but perform worst on molecular and materials problems, where transfer-learning surrogates reach substantially better solutions using far less computation."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Uncertainty-based exploration does not consistently help optimization.",
+        "evidence_span": "Uncertainty-driven exploration is not reliably beneficial"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Calibration quality does not forecast optimization performance.",
+        "evidence_span": "calibration does not predict optimization performance"
+      },
+      {
+        "role": "evidence_result",
+        "content": "All transfer-learning surrogates used the same two-stage LF-to-HF residual-correction structure.",
+        "evidence_span": "All transfer-learning surrogates shared a two-stage structure in which an LF network learns from abundant proxy data and an HF network learns the residual correction required to predict sparse HF observations[18]."
+      },
+      {
+        "role": "evidence_result",
+        "content": "GPs work very well when their inductive bias matches the objective.",
+        "evidence_span": "Our results show that GPs remain highly effective when their inductive bias matches the objective"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer-learning surrogates perform better on most molecular and materials benchmarks.",
+        "evidence_span": "but that transfer-learning surrogates are more effective on most molecular and materials benchmarks considered here."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer-learning surrogates scale more favorably computationally under repeated updates with abundant LF data.",
+        "evidence_span": "Transfer-learning surrogates also provide more favourable computational scaling under repeated model updates, a regime typical of SDL workflows with abundant LF data."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The study evaluated 15 surrogates on 9 benchmarks under a shared protocol using simple regret over cumulative cost.",
+        "evidence_span": "We evaluated fifteen surrogates on nine benchmarks (Table 1) under a shared fixed protocol (Methods). Performance was measured as simple regret on HF evaluations as a function of cumulative cost, averaged over twenty random seeds."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Baseline MFGP achieved the lowest final regret on both Branin scenarios.",
+        "evidence_span": "The baseline MFGP (the standard autoregressive multi- fidelity GP; Methods) achieved the lowest final regret among all fifteen surrogates on both Branin scenar- ios"
+      },
+      {
+        "role": "evidence_result",
+        "content": "On Branin-Fav and Branin-Unfav, baseline MFGP outperformed the best transfer-learning surrogate by a wide margin.",
+        "evidence_span": "On Branin-Fav and Branin-Unfav (the favourable and unfavourable fidelity scenarios; Methods) the base- line MFGP reached mean final regrets of 0.07 and 0.05, respectively, ranking first in both cases, whereas the best transfer-learning surrogate reached final regrets of 0.43 and 1.24"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The GP advantage did not generalize across all synthetic benchmarks.",
+        "evidence_span": "The advantage was spe- cific to the Branin family and did not extend across all synthetic benchmarks."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Park benchmarks were weakly discriminative at the tested budget because most methods quickly reached near-zero regret.",
+        "evidence_span": "On the four-dimensional Park functions, simple regret rapidly approached zero for most methods after only a small number of HF evaluations (Fig. 1d,e), making these benchmarks weakly discriminative at the budget considered."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Several transfer-learning surrogates reached zero regret on Park-Fav before baseline MFGP.",
+        "evidence_span": "Sev- eral transfer-learning surrogates had already reached zero regret on Park-Fav whereas the baseline MFGP had not"
+      },
+      {
+        "role": "evidence_result",
+        "content": "On molecular-descriptor benchmarks, baseline MFGP ranked near the bottom.",
+        "evidence_span": "Whereas the baseline MFGP per- formed the best on the Branin functions it ranked at the bottom on covalent organic frameworks (COFs), solva- tion free energy (FreeSolv), polarizability, and organic photovoltaics (HOPV15)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Other MFGP variants also showed similarly high regret on molecular-descriptor benchmarks.",
+        "evidence_span": "The three MFGP variants (NARGP, the deep-kernel GP, and the sparse varia- tional MFGP) showed similar high-regret behaviour on these benchmarks"
+      },
+      {
+        "role": "evidence_result",
+        "content": "End-to-End Joint Training strongly outperformed baseline MFGP on COFs, FreeSolv, polarizability, and HOPV15.",
+        "evidence_span": "On COFs the best-performing surrogate, End-to-End Joint Train- ing, reached a final regret of 0.41 compared with 6.55 for the baseline MFGP... The correspond- ing values were 0.28 versus 0.80 on FreeSolv... 0.06 versus 0.17 on polarizability... and 1.89 versus 3.09 on HOPV15"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The performance gap appeared already at the first HF evaluation.",
+        "evidence_span": "Second, the performance gap was already visible at the first HF evaluation rather than emerging only after additional HF data were col- lected (Fig. 2)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For HOPV15, the LF signal was almost uninformative with R2 = 0.02.",
+        "evidence_span": "Because the LF signal is almost uninformative for this task (R2 = 0.02)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Performance depended on transfer mechanism; Curriculum, Knowledge Distillation, and End-to-End Joint Training had the lowest average ranks.",
+        "evidence_span": "Performance also depended on transfer mechanism. Curriculum, Knowledge Distillation and End-to-End Joint Training achieved the lowest average ranks across the nine benchmarks among all fifteen surro- gates"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Pooled omnibus testing did not resolve individual surrogate pairs because rankings reverse between synthetic and molecular regimes.",
+        "evidence_span": "Because the surrogate ranking reverses between the synthetic and molecular regimes, an omnibus test on the pooled nine-benchmark ranking is not expected to resolve individual pairs, and it does not"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Matbench-gap was a boundary case where baseline MFGP was competitive, ranking second with regret close to the best transfer-learning surrogate.",
+        "evidence_span": "In this inorganic band gap benchmark, optimized towards a photovoltaic target of 1.4 eV, the baseline MFGP was competitive, ranking second among all fif- teen surrogates with a final regret of 0.29 versus 0.23 for the best transfer-learning surrogate"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Surrogate choice had little practical effect on Matbench-gap because the regret range was narrow and MFGP was within 0.8 standard errors of the best method.",
+        "evidence_span": "The full regret range across the baseline MFGP and the eleven transfer-learning surro- gates was only 0.27 compared with 6.1 on COFs, and the baseline MFGP lay within 0.8 standard errors of the best method. Thus, surrogate choice had little prac- tical effect on this benchmark."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The authors constructed a controlled polarizability grid varying global LF-HF R2 and top-10 optimum agreement independently across 126 conditions.",
+        "evidence_span": "we con- structed a controlled grid on the polarizability substrate in which curated LF sources vary the global LF\u2013HF R2 and the top-10 optimum agreement... indepen- dently, giving 126 conditions of ten seeds each"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer learning beat baseline MFGP across the entire controlled grid in anytime performance.",
+        "evidence_span": "First, transfer learn- ing dominates the baseline MFGP across the entire plane: its anytime advantage is positive in 126 of 126 cells"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Against the best MFGP variant, the final-regret gap narrowed but the anytime advantage of transfer learning remained significant in most cells.",
+        "evidence_span": "Second, the GP representative matters: against the best MFGP variant the final-regret gap closes, with a median advantage near zero, but the anytime advantage persists and remains individually significant in 101 of 126 cells"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Using a greedy policy for baseline MFGP changed performance only marginally.",
+        "evidence_span": "Using the greedy policy for the baseline MFGP had little effect on performance. Final regret changed only marginally, for example 6.60 \u21926.71 on COFs and 0.13 \u21920.15 on polarizability."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Under matched greedy acquisition, transfer-learning still had a large advantage on COFs and consistent gains on other molecular benchmarks.",
+        "evidence_span": "Under this matched greedy policy the transfer-learning surrogate retained a large advantage on COFs, achieving approximately an 8\u00d7 lower regret than the baseline MFGP and a 16\u00d7 lower regret for the best transfer-learning surrogate. Smaller but consistent advantages were also observed on the remaining molecular benchmarks."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer-learning surrogate performance was highly sensitive to acquisition policy; on COFs uncertainty-driven exploration greatly worsened regret.",
+        "evidence_span": "The transfer- learning surrogate showed the opposite behaviour: its performance was strongly sensitive to its acquisition policy. On COFs regret increased from 0.88 under the greedy policy to 6.13 when its predictive uncertainty was used to drive exploration."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The effect of uncertainty-driven exploration was benchmark-dependent rather than uniform.",
+        "evidence_span": "The effect of uncertainty-driven exploration was case-dependent rather than uniform."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On COFs, greedy acquisition outperformed all five uncertainty-driven acquisitions for 10 of 11 surrogates.",
+        "evidence_span": "On COFs, where the LF signal transferred strongly, the greedy policy outperformed all five uncertainty-driven acquisitions for ten of the eleven surrogates."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On FreeSolv and polarizability, Thompson sampling beat greedy for all eleven transfer-learning surrogates, and most uncertainty-driven acquisitions helped on polarizability.",
+        "evidence_span": "The opposite pattern was observed on FreeSolv and polarizability. On both high-correlation chemistry benchmarks, Thomp- son sampling outperformed the greedy policy for all eleven transfer-learning surrogates, and on polarizabil- ity most uncertainty-driven acquisitions improved over the greedy policy."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Acquisition family mattered: Thompson sampling was most robust, while EI and probability of improvement were least reliable.",
+        "evidence_span": "The acquisition family mattered more than the presence of uncertainty alone. Thomp- son sampling was the most robust uncertainty-driven acquisition... whereas the improvement-based acquisitions (EI and probability of improvement) were the least reliable"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Calibration quality correlated negatively with final regret on every benchmark.",
+        "evidence_span": "Calibration quality was a poor predictor of opti- mization performance: across all fifteen surrogates, the correlation between expected calibration error and final regret was negative on every benchmark, ranging from \u22120.88 on COFs to \u22120.08 on HOPV15"
+      },
+      {
+        "role": "evidence_result",
+        "content": "In a tanh-versus-ReLU ablation, calibration was nearly identical but tanh achieved lower regret.",
+        "evidence_span": "In a matched tanh-versus-ReLU ablation on the molecular-descriptor benchmarks, calibration error was nearly identical for the two activations (0.30 ver- sus 0.30), whereas tanh achieved lower regret (0.39 versus 0.58)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The analysis split benchmarks into two regimes: one where LF screening already identifies the optimum and one where it does not.",
+        "evidence_span": "This analysis separated the benchmarks into two regimes."
+      },
+      {
+        "role": "evidence_result",
+        "content": "In Regime A, represented by Park-Fav and polarizability, top LF and HF candidates nearly coincide and screening regret was very low.",
+        "evidence_span": "In Regime A, represented by Park-Fav and polarizability, the top LF candidates coincide almost exactly with the top HF candidates. The top-1% overlap was approxi- mately 1 and the screening regret was no greater than 0.09."
+      },
+      {
+        "role": "evidence_result",
+        "content": "In Regime B, COFs had very high rank correlation but poor top-candidate agreement, leading to high screening regret.",
+        "evidence_span": "In Regime B, represented by COFs and Branin, high global LF\u2013HF correlation conceals poor agreement among the top-ranked can- didates. COFs had a rank correlation of 0.998 but a screening regret of 4.52."
+      },
+      {
+        "role": "evidence_result",
+        "content": "HOPV15 and Matbench-gap also fall in Regime B, with LF screening regrets of 3.90 and 0.91 respectively.",
+        "evidence_span": "Both HOPV15 and Matbench-gap fall in Regime B. An LF screen produced a regret of 3.90 on HOPV15 where the Scharber proxy was nearly uninformative and 0.91 on Matbench-gap."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Computational cost was quantified in FLOPs for one fit plus one pool-wide prediction accumulated over optimization.",
+        "evidence_span": "We quantified the computational cost of each surro- gate in floating-point operations (FLOPs). FLOPs were counted for one surrogate fit and one pool-wide pre- diction and accumulated over the optimization loop."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer-learning surrogates showed linear scaling with training-set size.",
+        "evidence_span": "The eleven transfer-learning surrogates exhibited linear scaling with the number of observa- tions with a measured fit-FLOP exponent of k = 1.0 for cost versus training-set size."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Exact GPs showed cubic scaling, while sparse variational MFGP and deep-kernel GP were intermediate.",
+        "evidence_span": "By con- trast, the exact GPs, the baseline MFGP and NARGP, showed cubic scaling (k = 3.0)... The sparse variational MFGP and the deep-kernel GP occu- pied an intermediate computational regime"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The computational cost crossover occurred around N \u2248 66; above that, transfer-learning became cheaper.",
+        "evidence_span": "The fitted cost curves inter- sected at N \u224866; below this point, the GPs were cheaper to fit whereas above it the transfer-learning surrogates became more efficient."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Integrated over optimization, sparse variational MFGP and deep-kernel GP were the most expensive methods on every benchmark.",
+        "evidence_span": "Integrated over the optimization loop, the sparse variational MFGP and the deep-kernel GP were the most expensive meth- ods on every benchmark."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Sparse variational MFGP required up to about 45-fold more FLOPs than the fastest transfer-learning surrogate.",
+        "evidence_span": "The sparse variational MFGP required up to approximately 45-fold more FLOPs than the fastest transfer-learning surrogate, for example 5.0 versus 0.11 TFLOPs on FreeSolv."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On small pools and budgets, exact GP cubic cost remained negligible; separation grew with more observations.",
+        "evidence_span": "On the smallest pools and budgets such as HOPV15 and Park-Unfav, the cubic cost of exact GPs remained neg- ligible; the separation between model families increased as the number of observations grew."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Across nine benchmarks, baseline MFGP and the GP family were either best on smooth low-dimensional Branin or worst on high-dimensional molecular-descriptor benchmarks under matched greedy policy",
+        "evidence_span": "Across nine benchmarks, the\nbaseline MFGP, like the broader GP family, was either\nthe best surrogate (smooth, low-dimensional Branin) or\nthe worst (the high-dimensional molecular-descriptor\nbenchmarks), a polarization that held under a matched\ngreedy policy;"
+      },
+      {
+        "role": "evidence_result",
+        "content": "A low-discrimination band-gap task with the smallest budget was the only exception, indicating where surrogate choice stops mattering",
+        "evidence_span": "the single exception, a low-discrimination\nband-gap task with the smallest budget, only sharp-\nens the boundary by marking where surrogate choice\nceases to matter."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Uncertainty-driven exploration is benchmark dependent; Thompson sampling beats greedy most often while improvement-based acquisitions beat it least often",
+        "evidence_span": "a, the fraction of the eleven surrogates on which each uncertainty-driven acquisition beats the\ngreedy policy (red: rarely; blue: usually); averaged over benchmarks, Thompson sampling beats the greedy policy most often and the\nimprovement-based acquisitions least often."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On high-correlation chemistry benchmarks, every uncertainty-driven acquisition is worse than greedy on COFs, while Thompson sampling beats greedy on FreeSolv and polarizability",
+        "evidence_span": "b\u2013d, final regret (mean over the eleven surrogates; error bars, s.e. across surrogates) on the\nthree high-correlation chemistry benchmarks (LF\u2013HF rank correlation \u22650.94): every uncertainty-driven acquisition is worse than the\ngreedy policy on COFs, whereas Thompson sampling beats it on FreeSolv and polarizability."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Calibration does not predict optimization performance; Pearson correlation between low-fidelity calibration error and final regret is negative on every benchmark",
+        "evidence_span": "e\u2013m, calibration versus regret: each point\nis one of the fifteen surrogates (Gaussian-process family in warm colours, transfer-learning surrogates in cool colours; legend); axes\nare the low-fidelity expected calibration error and the final regret, one panel per benchmark. The Pearson correlation is negative on\nevery benchmark"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Top-k agreement between low- and high-fidelity rankings varies, and high global correlation does not ensure top-k agreement.",
+        "evidence_span": "High global correlation does not guarantee top-k agreement"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer-learning surrogates scale linearly with training-set size.",
+        "evidence_span": "A shared-slope power-law fit gives kN = 1.00 (R2 = 1.00, exactly O(N)) for the eleven transfer-learning surrogates"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Gaussian-process-family scaling is steeper than linear and below pure cubic overall.",
+        "evidence_span": "and kN = 2.49 (R2 = 0.94) for the Gaussian-process family, which lies below pure cubic"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The cost crossover occurs near training-set size 66.",
+        "evidence_span": "The two family laws cross at a break-even size N \u224866 (vertical line)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "In strongly transferring settings, greedy use of transfer-learned means performs best and uncertainty-driven exploration can severely hurt.",
+        "evidence_span": "where the LF signal transfers strongly and cleanly the transfer-learning surrogates perform best by greedily exploiting their transfer-learned mean, and every uncertainty-driven acquisition degrades, by up to an order of magnitude, when its BLR uncertainty is used to drive exploration instead (COFs)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "On some other high-correlation chemistry benchmarks, Thompson sampling beat greedy for every surrogate.",
+        "evidence_span": "On other high-correlation chemistry benchmarks (FreeSolv, polarizability), by contrast, a sampling-based acquisition (Thompson sampling) beat the greedy policy on every surrogate"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Improvement-based acquisitions won least often on average.",
+        "evidence_span": "while the improvement-based acquisitions won least often on average"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Calibration-regret correlation was negative on every benchmark.",
+        "evidence_span": "across all fifteen surrogates its correla-\ntion with regret was negative on every benchmark\n(from \u22120.88 on COFs to \u22120.08 on HOPV15)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Screening-regret analysis split tasks into surrogate-free and surrogate-critical regimes, and correlation alone could not identify the regime.",
+        "evidence_span": "Our screening-regret analysis\nseparated tasks in which a surrogate-free LF screen\nis near-optimal (Regime A) from those in which it\nfails despite a high global correlation (Regime B), and\nshowed that regime membership cannot be inferred\nfrom the correlation alone"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transfer-learning surrogates matched the non-learning bound when a surrogate was unnecessary and beat it when one was essential.",
+        "evidence_span": "Transfer-learning surrogates\nwere the robust choice because they matched the non-\nlearning bound where a surrogate was unnecessary and\ndecisively beat it where one was essential"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Against baseline MFGP alone, transfer learning wins everywhere; against stronger GP variants, the final-regret gap mostly closes.",
+        "evidence_span": "against the base-\nline MFGP alone, transfer learning wins everywhere,\nwhereas against the stronger variants the final-regret\ngap largely closes"
+      },
+      {
+        "role": "evidence_result",
+        "content": "What remains against stronger GP variants is faster anytime convergence and robustness when LF misorders the best candidates.",
+        "evidence_span": "and what survives is faster anytime\nconvergence and robustness precisely where the LF\nsource misorders the best candidates"
+      },
+      {
+        "role": "evidence_result",
+        "content": "An ablation supported using tanh instead of ReLU.",
+        "evidence_span": "The choice of tanh rather than ReLU\nwas validated in a matched ablation reported in the\nSupplementary Information."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Repeating the analysis with the unselected family mean preserved family ordering.",
+        "evidence_span": "the analysis was repeated with the unse-\nlected family mean, which preserved the ordering of the\nfamilies (Supplementary Note 7)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On COFs, greedy beat all five uncertainty-driven acquisitions on 10 of 11 surrogates.",
+        "evidence_span": "the greedy policy beat all five acquisitions on COFs on ten of the eleven surrogates"
+      },
+      {
+        "role": "evidence_result",
+        "content": "On FreeSolv and polarizability, Thompson sampling beat greedy on every surrogate.",
+        "evidence_span": "whereas Thompson sampling beat the greedy policy on every surrogate on FreeSolv and polarizability"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Improvement-based acquisitions performed worst overall.",
+        "evidence_span": "and the improvement-based acquisitions ranked weakest overall (Fig. 4)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "None of the three additional ablations changed the qualitative ranking of surrogate families on any tested benchmark.",
+        "evidence_span": "Each was evaluated on a representative subset of three to five benchmarks spanning the favourable and unfavourable regimes, and on every benchmark tested none altered the qualitative ranking of the surrogate families."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Compute measurements confirm cubic-cost Gaussian processes dominate while linear-cost transfer-learning surrogates are one to two orders of magnitude cheaper.",
+        "evidence_span": "confirming that the O(N 3) Gaussian processes dominate the budget while the O(N) transfer-learning surrogates stay one to two orders of magnitude cheaper."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Sparse variational and deep-kernel GPs are the most expensive on every benchmark, up to about 45\u00d7 and 25\u00d7 the fastest transfer-learning surrogate.",
+        "evidence_span": "The sparse variational (Sparse MFGP) and deep-kernel (DKL) GPs are the most expensive on every benchmark, up to roughly 45\u00d7 and 25\u00d7 the fastest transfer-learning surrogate"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Final-regret and anytime-AUC maps agree structurally; advantage is largest at low top-10 optimum agreement and nearly flat across R2.",
+        "evidence_span": "The two metrics agree on the structure, with the advantage largest at low top-10 optimum agreement and nearly flat across the R2 range"
+      },
+      {
+        "role": "evidence_result",
+        "content": "MFGP variants close most of baseline MFGP's endpoint gap in final regret, but the anytime gap remains.",
+        "evidence_span": "the final-regret maps additionally show that the MFGP variants close most of the baseline MFGP\u2019s endpoint gap, whereas the anytime gap persists."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Using the unselected family mean preserved the family ordering and agreement-axis structure.",
+        "evidence_span": "the analysis was repeated with the unselected family mean; this preserved the ordering of the families and the structure along the agreement axis."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The omnibus Friedman test did not reject rank homogeneity across surrogates.",
+        "evidence_span": "The omnibus does not reject rank homogeneity (\u03c72\n14 = 20.9, p = 0.11), so no pairwise ordering is claimed."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The Nemenyi critical difference exceeds the entire observed range of average ranks, so no surrogate pair is statistically separable.",
+        "evidence_span": "The spread of the panel is therefore smaller than the smallest difference the post-hoc test can resolve, so no pair of surrogates is separable at this suite size, including the best against the worst."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Gaussian-process methods are best on the two Branin functions and worst on the four molecular-descriptor benchmarks.",
+        "evidence_span": "the Gaussian-process family is best on the two Branin functions and worst on the four molecular-descriptor benchmarks (Fig. 1b\u2013i)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On individual molecular-descriptor benchmarks, paired comparisons are significant with near-unanimous effect sizes.",
+        "evidence_span": "on the individual molecular-descriptor benchmarks the paired comparisons are significant with near-unanimous effect sizes (r = 0.97\u20131.00; Supplementary Table 6)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On the anytime metric, the typical cell unanimously favors transfer learning over both GP families.",
+        "evidence_span": "On the anytime metric the typical cell is unanimous: the median per-cell r is 1.00 against both GP families."
+      }
+    ],
+    "constraint": [
+      {
+        "content": "Architectures were constrained to differ only in the transfer mechanism, with backbone/model capacity kept fixed, so transfer effects could be isolated from capacity differences.",
+        "evidence_spans": [
+          "The architectures differ only in how information is transferred between these stages, allowing the transfer mechanism to be isolated from model capacity.",
+          "The model was then adapted to the HF task using the smaller HF dataset, while keeping the backbone capacity fixed"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "All methods were evaluated under a shared closed-loop optimization protocol with matched acquisition control to separate surrogate effects from acquisition-policy effects.",
+        "evidence_spans": [
+          "We evaluated all methods under a shared closed-loop optimization protocol and used matched-acquisition control to separate surrogate effects from acquisition-policy effects (Fig. 1)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The Park benchmarks were evaluated only at an early decision budget (B = 10) because by the full budget they saturate to near-zero regret, and Park-Fav additionally exhausts its 256-point candidate pool.",
+        "evidence_spans": [
+          "The two Park benchmarks (g,h) saturate to \u22480 regret by the\nfull budget (Park-Fav additionally exhausts its 256-point candidate pool), so both are evaluated at the early decision budget B = 10"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The evidence from the controlled grid is deliberately narrow: it is a mechanism experiment with curated low-fidelity sources on a single polarizability substrate, so its conclusions have limited generalizability beyond that substrate and may mismatch real bias structure.",
+        "evidence_spans": [
+          "The scope of this evidence\nis deliberately narrow, a mechanism experiment with\ncurated LF sources on a single substrate",
+          "which bounds how far the grid\u2019s conclusions generalize\nbeyond the polarizability substrate."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The protocol is restricted to two fidelity levels, with fidelity encoded in the last input column (0 = LF, 1 = HF), and uses a deterministic round-robin schedule for fidelity selection.",
+        "evidence_spans": [
+          "Our protocol is restricted to\ntwo fidelity levels with a deterministic round-robin\nschedule",
+          "A deterministic round-robin schedule issued\nnLF\u2192HF = \u230a1/\u03c1\u230bLF queries between successive HF\nqueries",
+          "Fidelity encoding\nLast column: 0 = LF, 1 = HF"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The transfer-learning surrogates are constrained to fixed, modest-capacity MLPs operating on precomputed descriptors reduced by PCA.",
+        "evidence_spans": [
+          "The transfer-learning surrogates\nuse fixed, modest-capacity multilayer perceptrons on\nprecomputed descriptors reduced by PCA"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The evaluation is retrospective rather than live: optimization is performed over fixed candidate pools that emulate the closed loop, with sampled candidates removed after each query and no resampling.",
+        "evidence_spans": [
+          "Our evaluation is also\nretrospective, optimizing over fixed candidate pools\nthat emulate the closed loop rather than driving a\nlive autonomous platform",
+          "Optimization was performed over a fixed candidate\npool Xcand with sampled candidates removed after\neach query."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The GP comparison is limited in scope to the baseline MFGP and three MFGP variants, rather than the full space of GP methods.",
+        "evidence_spans": [
+          "the comparison is against the baseline MFGP and the\nthree MFGP variants rather than the entire space of\nGP methods"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Optimization is constrained by a finite total cost budget across fidelity queries.",
+        "evidence_spans": [
+          "subject to the total budget constraint P\n\nt cst \u2264B"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Models are retrained from scratch at every optimization iteration; for the GP this means exact marginal log-likelihood optimization each iteration, and predictions are taken only from the high-fidelity posterior at s = 1.",
+        "evidence_spans": [
+          "Models were retrained de novo\nat every optimization iteration",
+          "At each iteration the GP was retrained from scratch by maximizing the exact marginal log-likelihood with L-BFGS-B via fit gpytorch mll",
+          "predictions were taken from the posterior at the high-fidelity (HF) level s = 1."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Best-of-family selection/scoring can bias results in favor of the family with more members.",
+        "evidence_spans": [
+          "Because\nbest-of-family selection can favour the family with more\nmembers",
+          "Because best-of-family scoring can favour the family with more members"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Per-cell significance is reported only for the anytime maps; final-regret maps are interpreted qualitatively by direction and effect size rather than per-cell significance testing.",
+        "evidence_spans": [
+          "Per-cell significance is therefore quoted only for the anytime maps, which carry the claim; the final-regret maps are read from their direction and effect sizes."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": [
+      {
+        "content": "The conventional expectation that Gaussian processes perform best early and transfer-learning surrogates improve only later was not observed.",
+        "evidence_spans": [
+          "The con- ventional pattern where GPs perform best early and transfer-learning surrogates improve only later was therefore not observed."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Contrary to what calibration quality might suggest, the best-calibrated surrogates\u2014the Gaussian-process family\u2014were nevertheless the worst optimizers on the molecular-descriptor benchmarks/tasks.",
+        "evidence_spans": [
+          "so the best-calibrated surrogates (the Gaussian-process family) are, if\nanything, the worst optimizers on the molecular-descriptor benchmarks.",
+          "so the best-calibrated surrogates (the GP family) were, if any-\nthing, the worst optimizers on the molecular-descriptor\ntasks"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The omnibus null should not be interpreted as showing surrogate choice has no effect; rather, it indicates that no single ordering holds across a deliberately heterogeneous suite.",
+        "evidence_spans": [
+          "The omnibus null therefore indicates that no single ordering holds across a deliberately heterogeneous suite, not that the choice of surrogate is without effect"
+        ],
+        "conflicting": false
+      }
+    ]
+  }
+}

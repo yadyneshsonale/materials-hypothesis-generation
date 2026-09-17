@@ -1,0 +1,1608 @@
+{
+  "paper_id": "2605.12654",
+  "chunks_processed": 7,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Robotics seeks to match or exceed the autonomy of natural organisms.",
+        "evidence_span": "Replicating and surpassing the autonomy of natural organisms remains a long-standing goal in robotics."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Robotic structure, materials, and control are usually designed separately rather than co-evolved, creating a need for integrated design.",
+        "evidence_span": "Yet most robotic systems have their structure, materials, and control designed separately, in sharp contrast to the co-evolution in nature."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "There is still limited understanding of how individual and combined design entities contribute to performance.",
+        "evidence_span": "we still have a limited understanding of the individual and collective contributions of these design entities."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Autonomous robots are still much less adaptive and diverse than natural organisms.",
+        "evidence_span": "However, autonomous robots remain far less adaptive and diverse compared with their natural counterparts [7]."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Robot structure, materials, and control are usually designed separately instead of jointly.",
+        "evidence_span": "More fundamentally, structure, materials, and control are often designed separately or sequentially, rather than being co-designed in a tightly coupled manner [2, 5, 8, 9, 10, 11]."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Finding optimal co-design solutions is difficult in practice.",
+        "evidence_span": "Yet, obtaining an optimal solution via co-design remains challenging in practice."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Co-design of discrete robotic systems is still limited.",
+        "evidence_span": "In contrast, co-design of discrete robotic systems remains relatively limited."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "There is still a need for comprehensive gradient-based platforms for co-design of structure, materials, and control, especially for discrete robots.",
+        "evidence_span": "Therefore, despite these pioneering efforts, there remains a need for comprehensive gradient-\nbased platforms that enable the co-design of structure, materials, and control, particularly for discrete robotic systems."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The field still lacks clear understanding of how different design entities individually and jointly affect system performance.",
+        "evidence_span": "Furthermore, we still lack a clear understanding of the individual and collective contributions of different design entities to the system-level performance [42, 50]."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Discrete one-hot material/state encoding is difficult for gradient-based optimization.",
+        "evidence_span": "This discrete representation poses challenges for gradient-based optimization."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The authors needed to rule out that the gain came only from a better initialization heuristic.",
+        "evidence_span": "However, the notable performance improvement demonstrated by 6b could be simply attributed to a superior initial heuristic compared with the baseline. To test this possibility"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Performance is still sensitive to initialization in this highly nonconvex optimization problem",
+        "evidence_span": "the final performance remains sensitive to initialization"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Manufacturing variability and environmental uncertainty need to be addressed for robust designs",
+        "evidence_span": "accounting for manufacturing variability and environmental uncertainty will be important for enabling more robust robotic designs"
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "A common prior pipeline specifies the robot body first and then develops control for that fixed body.",
+        "evidence_span": "For example, a robot structure is typically first specified, after which control strategies are developed to operate the resulting body [12, 13]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work uses advanced evolutionary algorithms and dimensionality reduction to search the design space more effectively.",
+        "evidence_span": "Although advanced evolutionary algorithms [16, 19, 20, 21, 22, 23] and dimensionality-reduction techniques [24, 25] enable more effective search"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Comprehensive co-design has mostly been shown for quasi-static systems such as shape-morphing material networks, kirigami, and granular matter.",
+        "evidence_span": "Consequently, comprehensive co-design has mainly been demonstrated for quasi-static systems, such as shape-morphing material networks [26], kirigami [27], and granular matter [28],"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Recent work extends co-design to dynamic systems.",
+        "evidence_span": "Recent pioneering efforts have begun extending co-design to dynamic systems[29, 30, 31, 32, 33]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Many existing gradient-based co-design methods focus on continuum soft robots.",
+        "evidence_span": "Many of these approaches focus on continuum soft robots[30, 41, 42, 23],"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Standard density-based topology optimization often uses SIMP to penalize intermediate probabilities.",
+        "evidence_span": "Note that in standard density-based topology optimization, methods like Solid Isotropic Material with Penalization (SIMP) are frequently used to penalize the stiffness of intermediate probabilities, driving the optimizer toward discrete solutions [52]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Adam is used as a state-of-the-art optimizer for large neural-network parameter sets.",
+        "evidence_span": "The MLP controller weights \u03b8 are initialized using Xavier Initialization and updated using the Adam optimizer, which represents the state-of-the-art for gradient-based optimization over large parameter sets in neural networks."
+      },
+      {
+        "role": "prior_approach",
+        "content": "A sequential baseline fixes structure/material first and then optimizes the controller.",
+        "evidence_span": "it serves as the sequential design baseline where the pre-designed structural and material distributions are first fixed, then followed by the optimization of the neural network controller with Xavier-initialized weights"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Existing methods treat topology, materials, and control separately",
+        "evidence_span": "Unlike most existing methods that treat these design entities separately"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Evolutionary algorithms are cited as global optimization methods",
+        "evidence_span": "global optimization methods, such as evolutionary algorithms [5, 21]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "The current controller is optimized using gradient-based methods",
+        "evidence_span": "we currently optimize the neural controller using gradient-based methods"
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Those search methods still need large populations and many iterations to converge.",
+        "evidence_span": "they still require large populations and many iterations to converge."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "SIMP-style penalization caused substantial instability for discrete truss robot optimization in preliminary tests.",
+        "evidence_span": "However, due to the extreme non-convexity of the optimization landscape for discrete truss robots, such penalization can induce significant instability in the system dynamics, as observed in our preliminary tests."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Some edges remain stuck in intermediate states because the system depends on infeasible intermediate materials for delicate balance.",
+        "evidence_span": "Despite the binarization constraint penalization, in practice, some edges can still become trapped in intermediate material states in the optimization (Fig. 4e). In these cases, the dynamic system relies on a delicate structural integrity and balance that is maintained by these physically infeasible intermediate materials."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Performance evaluated on intermediate designs is not a reliable predictor of final discrete-robot performance.",
+        "evidence_span": "Consequently, performance losses evaluated on intermediate designs rarely reflect the true performance of the final discrete robot."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Aggressive sharpening in the stability pass causes severe vanishing gradients.",
+        "evidence_span": "However, the aggressive sharpening induced by \u03b2stab can lead to severe vanishing gradients."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Heuristic-free optimization found a valid strategy but underperformed relative to heuristic-initialized designs.",
+        "evidence_span": "Although the heuristic-free optimization succeeds in finding a valid locomotion strategy, it still underperforms relative to Designs 6b and 6c"
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Separated design is implicitly rejected in favor of joint co-design because it is the baseline being outperformed.",
+        "evidence_span": "outperform baselines obtained through separated design"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The paper positions itself against separate or sequential design pipelines, favoring co-design instead.",
+        "evidence_span": "More fundamentally, structure, materials, and control are often designed separately or sequentially, rather than being co-designed in a tightly coupled manner [2, 5, 8, 9, 10, 11]."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Conventional separate design strategies are rejected in favor of joint co-design because the proposed method outperforms them.",
+        "evidence_span": "and automatically generates robotic designs for customized tasks that outperform conventional separate design strategies."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The authors avoid SIMP-like penalization because it destabilized dynamics for discrete truss robots, using binarization constraints instead.",
+        "evidence_span": "This motivates our use of the binarization constraints described above, which adaptively guide the solution toward discrete states over time."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Strictly enforcing binarization constraints is rejected in favor of augmented-Lagrangian enforcement because empirical performance is better.",
+        "evidence_span": "Empirically, we find this approach yields better performance compared with strictly enforcing the constraints."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Naive gradient computation through the aggressively sharpened stability projection is avoided because it suffers vanishing gradients; STE is used instead.",
+        "evidence_span": "To mitigate this, we adopt a Straight-Through Estimator (STE) to compute the gradient in a more reliable way [54]."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The paper rejects separate treatment of design entities in favor of joint optimization",
+        "evidence_span": "Unlike most existing methods that treat these design entities separately, our approach optimizes them jointly"
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "Natural systems, where structure, material, and control coevolve, motivate the co-design approach.",
+        "evidence_span": "This contrasts with natural systems, where structure, material, and control strategies coevolve to produce highly diverse and specialized organisms [14]."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "Future work may use global search like genetic algorithms to provide strong initial seeds.",
+        "evidence_span": "Future gradient-based co-design approaches could be combined with global search methods, such as genetic algorithms, to seed the solver with strong initial solutions."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The repeated central motif is likened to convergent evolution in nature.",
+        "evidence_span": "This phenomenon mirrors convergent evolution in nature, where identical musculoskeletal motifs emerge across species with similar body plans."
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Separating design of structure, materials, and control often causes suboptimal robot designs.",
+        "evidence_span": "This separation often leads to suboptimal designs"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Coupling among structure, materials, and control produces collective effects unavailable to each component alone.",
+        "evidence_span": "First, from a physical perspective, structure, materials, and control are inherently coupled in system dynamics, producing collective effects that cannot be achieved by each entity independently."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Co-design enlarges the design space, making it more likely to include a superior optimum inaccessible to separated design.",
+        "evidence_span": "Second, from a design perspective, co-design greatly expands the design space[16], which is more likely to contain a superior optima that is inaccessible to separated design pipelines."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The need for small time steps over long horizons makes exhaustive search prohibitively expensive.",
+        "evidence_span": "This often requires small integration steps over long time horizons, making exhaustive searches prohibitively costly."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Physical coupling across design entities makes the optimization highly non-convex or discontinuous.",
+        "evidence_span": "Third, the physical coupling across design entities makes the underlying optimization problem highly non-convex, even discontinuous;"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Small structural changes can cause large and unpredictable performance changes.",
+        "evidence_span": "for instance, small changes to structure may lead to large and unpredictable changes in performance."
+      },
+      {
+        "role": "causal_claim",
+        "content": "GPU-parallel physics solvers greatly speed up evaluation.",
+        "evidence_span": "In particular, GPU-parallel physics solvers dramatically accelerate evaluations [34, 35],"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Auto-differentiation enables efficient gradient computation over long horizons, even with discontinuous contacts.",
+        "evidence_span": "while auto-differentiation [36, 37] enables efficient calculation of gradients over long temporal horizons for design variables, even in the presence of discontinuous contacts."
+      },
+      {
+        "role": "causal_claim",
+        "content": "These advances enabled gradient-based co-design frameworks that cut simulation counts relative to exhaustive or heuristic optimizers.",
+        "evidence_span": "These advances have enabled a range of frameworks that achieve co-design using gradient-based optimization, drastically reducing the number of simulations compared with exhaustive or heuristic optimizers [15, 32, 38, 39, 40]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The scaled softmax projects relaxed variables toward normalized material states approximating one-hot encoding.",
+        "evidence_span": "Therefore, we relax the design variable to a continuous vector zij \u2208[0, 1]3 (Figure 2a) and project it to a normalized material state vector \u02dczij using a scaled softmax function that approximates the original one-hot encoding"
+      },
+      {
+        "role": "causal_claim",
+        "content": "An explicit binarization constraint penalizes intermediate values and drives variables toward one-hot discrete states.",
+        "evidence_span": "To further promote binarization, we introduce an explicit binarization constraint in the optimization problem (Section. 2.3), which can adaptively penalize intermediate values to drive the design variables toward one-hot encodings that correspond to discrete material states."
+      },
+      {
+        "role": "causal_claim",
+        "content": "High skeleton stiffness helps resist deformation and preserve structural integrity for stability.",
+        "evidence_span": "Its high stiffness allows it to passively resist deformation, upholding the structural integrity vital for the stability of a discrete lattice."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Lumping truss mass at nodes accelerates simulation.",
+        "evidence_span": "Finally, to accelerate the simulation, we lump the mass of the trusses at the connecting nodes."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Negligible baseline mass causes nodes connected only to void trusses to effectively drop out of dynamics.",
+        "evidence_span": "Consequently, nodes connected exclusively to void trusses act as negligible masses, naturally eliminating themselves from the system dynamics."
+      },
+      {
+        "role": "causal_claim",
+        "content": "CPG signals ensure synchronized periodic actuation of active trusses.",
+        "evidence_span": "The CPG signals C(t) \u2208RNCPG are modeled as phase-shifted sine waves to ensure all active trusses actuate in a synchronized, periodic manner:"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Actuator-state modulation makes only actuator edges receive nonzero target strain.",
+        "evidence_span": "This way, only trusses in actuator states will receive a target strain (Figure 2d)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Larger commanded strain increases mismatch from current length and thus internal truss force.",
+        "evidence_span": "Intuitively, a larger commanded target strain magnitude results in a greater difference between the current length and the target length, thereby producing a larger internal force in the truss."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Time-of-impact contact handling prevents interpenetration and reduces gradient discontinuity.",
+        "evidence_span": "To handle the contact with the ground, we use a high-fidelity Time of Impact (TOI) scheme to prevent interpenetration and reduce gradient discontinuity [35]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The forward simulation graph enables autodiff to backpropagate sensitivities and produce gradients for design and control updates.",
+        "evidence_span": "The resulting procedure also defines a forward computational graph, which allows automatic differentiation to backpropagate the sensitivity of the nodal displacement at the final state through all integration time steps to the design variables and weights of control networks. This yields the gradients required to update the design variables and control weights."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Relaxing volume-fraction bounds gives intermediate states mobility when objectives compete.",
+        "evidence_span": "To provide mobility for intermediate material states (\u02dczij,k /\u2208{0, 1}) that struggle to satisfy competing objectives, we progressively relax these bounds up to a small tolerance \u2206V ."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Global binarization and pairwise orthogonal penalties push material vectors toward fully discrete states.",
+        "evidence_span": "Second, we impose binarization constraints on the material state vectors to ensure they eventually achieve a fully discretized state, i.e., \u02dczij,k \u2208{0, 1} (Fig. 4). This is accomplished through a global binarization penalty gbin that drives the L2 norm of the material state vector toward 1 [39], and a pairwise orthogonal penalty gortho that minimizes the overlap between entries corresponding to any two distinct material types:"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Allowing occasional violation of binarization constraints increases exploration and can open pathways to better solutions.",
+        "evidence_span": "binarization constraints are allowed to be occasionally violated to increase the exploration of discrete choices and open up potential pathways to better solutions."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Alternating material and controller updates in a 3:2 ratio balances morphology and control evolution.",
+        "evidence_span": "Material design vectors and MLP weights are updated alternately at a 3:2 ratio, based on our preliminary experiments, to enable a balanced update between robot morphology and control, supporting optimal co-evolution of the configuration."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Removing intermediate materials can disrupt balance, causing collapse or disconnection and sharply changing dynamics.",
+        "evidence_span": "Once these materials are removed, the delicate balance may be disrupted, potentially causing collapse of the structure or disjoint geometry, which can drastically alter the system dynamics."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Iterative vector attraction is used late in optimization to accelerate convergence when gradients become small.",
+        "evidence_span": "To accelerate convergence during the later stages of optimization, where the continuous material design vectors zij exhibit reduced mobility due to smaller gradients (Fig. 4d), we implement a iterative vector attraction phase (Fig. 5)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "A hard discretization snap freezes the binarized layout, after which only controller parameters are fine-tuned.",
+        "evidence_span": "A hard discretization snap is enforced toward the end of the optimization process, after which the strictly binarized topology and material layout are frozen, and the neural controller parameters \u03b8 are fine-tuned alone for the remaining iterations (Fig. 5)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Gradually extending the horizon preserves dynamic fidelity while accelerating convergence.",
+        "evidence_span": "To preserve dynamic fidelity while accelerating convergence, gradients are initially calculated for only 2048 timesteps, and are gradually extended to a maximum of 4096 timesteps between iterations 80 and 150."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Limiting the hidden layer size helps keep the controller lightweight and stable during highly non-convex co-design.",
+        "evidence_span": "Similarly, to ensure the controller remains lightweight and stable during the highly non-convex co-design process, we adopt a hidden layer dimension of 32."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Passive cross-bracing restricted limb stroke and destabilized gait later in rollout.",
+        "evidence_span": "the prevalent passive cross-bracing restricted the stroke magnitude of its limbs, causing inconsistent ground contact dynamics that destabilize its gait during later stages of the rollout"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Promoting dense, low-center-of-mass structures narrows the space toward dynamically stable solutions.",
+        "evidence_span": "By promoting dense, low center of mass structures, this heuristic narrows the design space to favor solutions better suited for dynamic stability."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Volume-fraction constraints improved allocation, lowering objective and increasing walking distance.",
+        "evidence_span": "Volume fraction constraints encourage the solver to better allocate actuators and structural elements, leading to a significant decrease in the objective function and a corresponding improvement in the walking distance"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Iterative attraction resolved intermediate trusses toward binarization.",
+        "evidence_span": "These intermediate trusses are addressed in a second stage, where we introduce the progressive nudge of the iterative attraction phase to achieve binarization"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The co-designed robot outperformed the sequential baseline by 66%.",
+        "evidence_span": "This co-designed robot achieves a final displacement of 1.90 m, outperforming the sequential baseline by 66%."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Concentrating actuators in the middle leg overcame restricted stroke and enabled longer strides.",
+        "evidence_span": "Design 6c concentrates its actuators within the middle leg (Figure 6c). This allocation overcomes the restricted stroke observed in the baseline, enabling sweeping motions and lengthened strides"
+      },
+      {
+        "role": "causal_claim",
+        "content": "With no initialization guidance, the platform still found a viable design traveling 0.98 m.",
+        "evidence_span": "Despite this lack of guidance, the co-design platform is still able to discover a viable design that achieves a travel distance of 0.98m."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Actuation layout had the largest individual effect, increasing average displacement by 781%.",
+        "evidence_span": "Actuation layout demonstrates the largest individual contribution to performance improvement, increasing the average displacement by 781% compared to the \"without\" conditions"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Co-designing actuation layout consistently improved performance across topologies.",
+        "evidence_span": "actively co-designing the actuation layout consistently yields substantial performance improvements regardless of the underlying topology"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Topological design improved performance by 116%.",
+        "evidence_span": "Topological design produces an improvement of 116%"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Topology design amplified the gains from material design.",
+        "evidence_span": "while weak on its own, it is a powerful multiplier for the positive impact of material design"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Topological optimization consistently increased traversal even when actuation design already helped substantially.",
+        "evidence_span": "we observe that topological optimization consistently increases traversal distance, even on top of the already substantial gains achieved by actuation design alone"
+      },
+      {
+        "role": "causal_claim",
+        "content": "When combined with material layout optimization, control consistently improved traversal.",
+        "evidence_span": "However, when combined with material layout optimization, control consistently enhances traversal"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Adding control to topology+material co-evolution increased travel distance by 87%.",
+        "evidence_span": "when we further incorporate the topology entity, co-evolving control alongside all other entities, travel distance increases by 87% compared to the trial without control optimization"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Joint optimization of topology, material, and control outperforms optimizing them in isolation.",
+        "evidence_span": "This result demonstrates that the benefits of jointly optimizing topology, material distribution, and control exceed those achievable by optimizing the entities in isolation."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Lacking the compatible actuation layout for an optimized topology, or vice versa, led to much weaker performance.",
+        "evidence_span": "Discovering a highly optimized topology without its uniquely compatible actuation layout (Trial 7d vs. h), or vice versa (Trial 7f vs. h), leads to substantially weaker performance."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Strong coupling between material and topology means they must be jointly designed for best performance.",
+        "evidence_span": "This outcome indicates a strong coupling between material and topology, emphasizing that the two must be jointly designed to enable optimal performance."
+      },
+      {
+        "role": "causal_claim",
+        "content": "On the incline, the robot evolved a slimmer, lower-center-of-mass structure to resist toppling.",
+        "evidence_span": "Compared to Design 6b, the final design 9a evolved to an even slimmer structure to further prioritize a low center of mass, crucial for stabilizing against the toppling forces of the inclined ground boundary."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Slightly undercutting lower volume bounds reduced carried weight uphill.",
+        "evidence_span": "it slightly undercuts the lower volume bound for topology and actuation in exchange for having to carry less weight upwards"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Different ground friction caused a consistent morphological adaptation and a new locomotion strategy.",
+        "evidence_span": "Under this setting, it exhibits a consistent morphological adaptation to the new physical environment, adopting a locomotion strategy unobserved in previous designs."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Keeping the payload on the ground provided anchorage against skidding.",
+        "evidence_span": "it keeps the heavy payload with the ground to provide anchorage against skidding."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Folding the front leg inward increased contact area and used it as a friction pad.",
+        "evidence_span": "during the first 0.5 meters, the robot folds its front leg inward, increasing the contact area and effectively using it as a friction pad."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Co-design expands the accessible morphological design space and enables higher-performing and more diverse viable designs",
+        "evidence_span": "indicating that co-design expands the accessible morphological design space and enables not only higher performance solutions but also a broader range of viable designs"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Tailoring structure, materials, and control to tasks produces effective motion patterns",
+        "evidence_span": "automatically generating robots whose structures, material distributions, and control policies are tailored to specific tasks to produce effective motion patterns"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Redistributing actuation can reshape dynamics and yield strong performance even with suboptimal structure and control",
+        "evidence_span": "redistributing actuation within a given configuration can effectively reshape robot dynamics and achieve strong performance even when the structure and control are suboptimal"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Control alone cannot overcome structural or actuation limitations",
+        "evidence_span": "control alone cannot compensate for limitations in structure or actuation and is largely bounded by the underlying structural and material design"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Interaction among structure, materials, and control yields gains beyond any single component",
+        "evidence_span": "the interaction among structure, materials, and control produces performance gains that exceed the contributions of any single component"
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Embedding mixed topological and material variables in a continuous space and integrating a neural controller in a differentiable simulator enables interaction modeling and efficient gradient computation.",
+        "evidence_span": "The framework embeds mixed-type topological and material variables into a continuous design space and integrates a neural network controller within a differentiable simulator, capturing their interactions and enabling efficient gradient calculation via automatic differentiation."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Co-design is hard because different entities require different variable types, creating a massive and sometimes combinatorial search space.",
+        "evidence_span": "First, the design of different entities often requires variables of different types, leading to a massive and sometimes combinatorial design space."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Dynamic performance evaluation is expensive because it involves contacts, friction, large deformations, and nonlinear material behavior.",
+        "evidence_span": "Second, evaluating a robot\u2019s dynamic performance is difficult and computationally expensive, involving contacts, friction, large deformations, and nonlinear material behavior[17, 18]."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Quasi-static systems were favored because they are cheaper to evaluate and have smoother objectives.",
+        "evidence_span": "which are computationally cheaper to evaluate with smoother objectives."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Continuum soft robots support stable optimization because structures and materials vary continuously.",
+        "evidence_span": "which allow continuous variations in structures and materials and therefore enable stable optimization[8, 39]."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Discrete systems are harder for gradient-based co-design because they create mixed-variable spaces, sharp discontinuities, and severe nonconvexity.",
+        "evidence_span": "Their discrete nature introduces mixed-variable design space, sharp discontinuities, and severe nonconvexity in the optimization landscape, making gradient-based co-design more challenging[43]."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "A truss cannot simultaneously maximize stiffness and actuation, creating a trade-off that necessitates strategic allocation.",
+        "evidence_span": "This property scheme reflects the inherent trade-off observed in natural and artificial systems, where a truss cannot simultaneously possess high stiffness and high actuation capacity."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "State feedback and goal input let the controller modulate gait phase, react to perturbations, and steer.",
+        "evidence_span": "While the CPG provides the fundamental gait frequency, positional and velocity information allows the control policy to be modulated by the gait cycle\u2019s current stage, helping it react to environmental perturbations by sensing velocity changes. Further, the inclusion of the goal vector enabled active steering toward different spatial targets."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Strict volume bounds may harm physical stability, so relaxing them prioritizes task performance.",
+        "evidence_span": "This way, task performance will be prioritized over a strictly satisfied volume bound, which may damage physical stability."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The augmented Lagrangian adaptively adjusts penalty strength to support that controlled exploration.",
+        "evidence_span": "The AL method provides a rigorous mechanism to adaptively adjust the penalization strength to achieve this."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The centered sharp softmax is intended as a proxy for final discrete geometry assuming vectors diverge from the global mean under binarization pressure.",
+        "evidence_span": "This globally centered projection serves as a high-fidelity proxy of the final discrete geometry, operating on the assumption that design vectors will linearly diverge from the global mean under continuous binarization pressure."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The stability heuristic is meant to avoid collapse from sparse, top-heavy geometries or unsupported active clusters.",
+        "evidence_span": "The stability heuristic is aimed at preventing structural collapse, commonly caused by sparse, top-heavy geometries or large, unsupported active clusters."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Zigzagging intermediate trajectories reflect competition between performance and stability objectives.",
+        "evidence_span": "those trusses gradually resolve the competition between performance and stability objectives, indicative in their zigzagging trajectories"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The default actuator distribution requires topologies that can mechanically support high-stroke traversal.",
+        "evidence_span": "the default actuator distribution imposes stringent requirements on compatible topologies, which must mechanically facilitate high-stroke motions for traversal"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Control alone helps little when topology/material are suboptimal and limit mobility.",
+        "evidence_span": "This behavior likely occurs because the topology and material distribution themselves are suboptimal and provide limited mobility, leaving little room for further improvement through control optimization alone."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Ground-contact nonlinearities and small gradients can corrupt gradient directions for Adam when structure is suboptimal.",
+        "evidence_span": "The degradation may also arise because the severe non-linearities introduced by ground contacts pollute the gradient propagation through time; when coupled with a sub-optimal physical structure, the resulting small loss, and consequently small gradient amplitude, muddies the directional information provided to the Adam optimizer."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "A smaller 5\u00d75 grid makes material and topology allocation more critical because fewer resources are available.",
+        "evidence_span": "This reduction in available material resources makes the allocation of materials and topology more critical."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This behavior is explained as a beneficial morphological transformation leveraging coupled environmental physics, topology, material layout, and control.",
+        "evidence_span": "This behavior represents a beneficial morphological transformation that leverages the coupled effects of environmental physics, topology, material layout, and actuation control."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Convergent motifs suggest a form-function relationship arising from synergy among design entities",
+        "evidence_span": "suggesting an underlying form-function relationship that arises from the synergy among these design entities"
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper proposes a gradient-based co-design framework to jointly optimize topology, material distribution, and control policy.",
+        "evidence_span": "In this work, we propose a gradient-based co-design framework that simultaneously optimizes the topology, material distribution, and control policy of a truss-lattice robot."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper proposes a framework to jointly co-design structure, material layout, and control of a discrete truss-lattice robot.",
+        "evidence_span": "In this work, we propose a framework that co-designs the structure, material layout, and control of a discrete truss-lattice robot (Fig. 1)."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The method constructs a unified spatial-temporal design space combining structure, material selection, and neural control training.",
+        "evidence_span": "We begin by constructing a unified spatial-temporal design space, merging structure and material selections with control neural network training (Fig. 1a)."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The method uses a GPU-enabled differentiable dynamic simulation for performance and sensitivity evaluation.",
+        "evidence_span": "We then develop a GPU-enabled differentiable dynamic simulation to quantify system performance and sensitivity (Fig. 1b)."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The method integrates representation and differentiable evaluation into constrained optimization for concurrent updates of all design entities.",
+        "evidence_span": "We integrate the representation and differentiable evaluation into a constrained optimization to iteratively and concurrently update all design entities (Fig. 1c)."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "A continuous differentiable representation can unify topology, discrete material choice, and spatiotemporal neural control for gradient-based optimization.",
+        "evidence_span": "We introduce a continuous, differentiable design representation that unifies spatial topological, discrete material selection, and spatiotemporal neural control in a discrete robot, enabling the use of efficient gradient-based optimization."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "A GPU-parallel differentiable simulator can capture physical interdependence and efficiently evaluate contact-rich dynamics while providing gradients.",
+        "evidence_span": "We develop a GPU-parallel differentiable simulator that captures the physical interdependency among design entities and their environment, efficiently evaluating dynamics in contact-rich scenarios while providing gradient information through automatic differentiation."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "A constrained optimization can jointly design structure, materials, and control for automated dynamic robot design.",
+        "evidence_span": "We propose a constrained optimization method that jointly designs structure, materials, and control to automate dynamic robot design."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The framework jointly co-designs topology, material distribution, and temporal control to maximize dynamic performance.",
+        "evidence_span": "Our goal is to co-design the topology, the spatial distribution of material types, and the temporal control signals for each actuator to maximize dynamic performance."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The method extends topology optimization with mixed-variable representation, differentiable simulation, and constrained optimization.",
+        "evidence_span": "To achieve this, we extend topology optimization to integrate a mixed-variable design representation, a differentiable dynamic simulation for design evaluation, and a constrained optimization for design synthesis."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "An auxiliary stability evaluation with a sharpened proxy geometry is proposed to assess final discrete-robot integrity.",
+        "evidence_span": "To reliably probe the structural integrity of the final discrete robot, we propose to implement an auxiliary stability evaluation along with the ordinary objective function evaluation."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The proposed platform can navigate the mixed-variable space and co-design should improve dynamic performance over separate design.",
+        "evidence_span": "We first investigate whether the proposed platform can effectively navigate the mixed-variable design space to discover optimal configurations of topology, material layout, and control. Furthermore, we verify whether co-design yields improved dynamic performance by comparing our method against a baseline that designs configuration and control separately"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The framework is expected to generalize across objectives, design spaces, and environments.",
+        "evidence_span": "we apply the proposed co-design framework to several additional cases with varying optimization objectives, design space, and environmental parameters to demonstrate its flexibility"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The framework should also handle changed physical and environmental parameters.",
+        "evidence_span": "Our proposed framework is also flexible enough to handle varying physical and environmental parameters."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Combining gradient-based search with global optimization could improve exploration",
+        "evidence_span": "A promising direction is to combine the proposed gradient-based search with global optimization methods, such as evolutionary algorithms [5, 21], to improve exploration"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Adding richer physical effects should improve simulation fidelity",
+        "evidence_span": "incorporating richer physical effects such as bending and material nonlinearities would further improve fidelity"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Integrating reinforcement learning may improve generalization",
+        "evidence_span": "integrating reinforcement learning strategies may provide greater generalization"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The framework can be broadly adopted for robotic systems",
+        "evidence_span": "We envision that the proposed framework can be broadly adopted to establish design principles and develop computational tools for a wide range of robotic systems"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "By customizing components, the approach is generalizable to diverse materials and stimuli",
+        "evidence_span": "By customizing each component, the approach is generalizable and applicable to diverse materials and stimuli"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The framework is expected to accelerate development of robotic material systems across applications",
+        "evidence_span": "We anticipate that it will accelerate the development of robotic material systems with various applications"
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "Case studies show the framework finds diverse locomotion strategies that outperform designs from separated design baselines.",
+        "evidence_span": "Case studies demonstrate that the proposed framework consistently discovers diverse locomotion strategies that outperform baselines obtained through separated design."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The framework yields design insights about individual and collective effects of different entities on performance.",
+        "evidence_span": "Using this framework, we further extract design insights that reveal the individual and collective effects of different entities on robotic performance."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The framework is demonstrated on multiple dynamic tasks and reveals knowledge about co-design effects.",
+        "evidence_span": "The framework is demonstrated for a range of dynamic tasks, uncovering valuable knowledge on the effects of co-design entities (Fig. 1d)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The method generates task-specific robotic designs that outperform separate design strategies.",
+        "evidence_span": "and automatically generates robotic designs for customized tasks that outperform conventional separate design strategies."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The framework reveals individual and collective effects of structures, materials, and control on system-level performance.",
+        "evidence_span": "We uncover important design insights by revealing the individual and collective effects of structures, materials, and control on system-level performance."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Empirically, augmented-Lagrangian handling of binarization performs better than strict enforcement.",
+        "evidence_span": "Empirically, we find this approach yields better performance compared with strictly enforcing the constraints."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Using more than 10 CPG signals was found to desynchronize motion and reduce locomotion stability.",
+        "evidence_span": "Furthermore, we found that utilizing more than 10 CPG signals tends to desynchronize the robot\u2019s movement and harm overall locomotion stability."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The baseline reached a final horizontal displacement of 1.14 m.",
+        "evidence_span": "The baseline robot learns an optimal control policy for its fixed material layout over 200 iterations, achieving a final horizontal displacement of 1.14 m."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Most truss design vectors became discrete within 150 iterations under augmented-Lagrangian binarization.",
+        "evidence_span": "As the optimization proceeds, most design vectors migrate rapidly and smoothly toward discrete states within 150 iterations under the Augmented Lagrangian binarization penalty"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Design 6b fully converged before hard snap and reached 1.90 m.",
+        "evidence_span": "Ultimately, the design achieves full convergence before the hard binarization snap ... This co-designed robot achieves a final displacement of 1.90 m"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Design 6c reached a final displacement of 1.87 m.",
+        "evidence_span": "to achieve a final displacement of 1.87 m"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Performance depends on initialization in this nonconvex problem.",
+        "evidence_span": "This result falls slightly short of Design 6b, indicating that the performance indeed depends on initialization, as expected for such a nonconvex optimization problem."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Even with the same three-legged start, co-design still substantially beat the baseline.",
+        "evidence_span": "However, it still substantially outperforms the baseline that shares the same three-legged initial configuration."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Heuristic-free Design 6d rediscovered features similar to the stability-heuristic Design 6b.",
+        "evidence_span": "Interestingly, Design 6d automatically discovered structural features similar to the stability-heuristics Design 6b despite receiving no guidance."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Common emergent features included disconnecting bottom trusses and concentrating topology low in the body.",
+        "evidence_span": "Common emergent features include disconnecting specific bottom trusses for larger strides, and concentrating topology to the lower half for a low center of gravity."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Control design sometimes had small or negative individual effect.",
+        "evidence_span": "Surprisingly, control pattern design demonstrates a small individual contribution and occasionally impacts performance negatively (Trial 7c vs. d)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Travel increased from 1.02 m in Trial 7g to 1.91 m in Trial 7h.",
+        "evidence_span": "from 1.02 m in Trial 7g to 1.91 m in Trial 7h"
+      },
+      {
+        "role": "evidence_result",
+        "content": "High-performing trials showed topology-dependent material distributions and gaits.",
+        "evidence_span": "we observe that in trials producing substantial displacement (Designs 7e\u2013h), the resultant material distributions and locomotion strategies are topology-dependent."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Incline Design 9a achieved 1.36 m horizontal and 0.35 m vertical displacement.",
+        "evidence_span": "achieving a horizontal distance of 1.36 m and vertical elevation of 0.35 m."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The method generalized to the 5\u00d75 space and rediscovered the leg-division strategy.",
+        "evidence_span": "Our co-design platform reliably generalizes to this design space and automatically rediscovered the leg division strategy observed in designs Design 6b and d"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Design 9b achieved a traversal distance of 1.10 m.",
+        "evidence_span": "achieved a traversal distance of 1.10 m upon final evaluation"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The framework found high-performance solutions without heuristics",
+        "evidence_span": "we demonstrate that the proposed framework reliably discovers high-performance solutions even without heuristic guidance"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The method outperformed carefully crafted sequential baseline designs",
+        "evidence_span": "With only simple initialization, it can outperform carefully crafted baseline designs developed through sequential design processes"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The physical system has been realized with good agreement to simulation",
+        "evidence_span": "the corresponding physical system has recently been realized with good agreement to simulation [22]"
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "The optimization is constrained while navigating a highly non-convex design landscape.",
+        "evidence_span": "Furthermore, we develop a constrained optimization to navigate the highly non-convex design landscape and jointly optimize all design entities."
+      },
+      {
+        "role": "constraint",
+        "content": "The framework can handle varying functional requirements and boundary conditions.",
+        "evidence_span": "The framework is also flexible to accommodate different functional requirements and boundary conditions."
+      },
+      {
+        "role": "constraint",
+        "content": "The optimization is constrained.",
+        "evidence_span": "We integrate the representation and differentiable evaluation into a constrained optimization to iteratively and concurrently update all design entities (Fig. 1c)."
+      },
+      {
+        "role": "constraint",
+        "content": "The method must ensure structural integrity and physical feasibility.",
+        "evidence_span": "The method incorporates mechanisms to ensure structural integrity and physical feasibility,"
+      },
+      {
+        "role": "constraint",
+        "content": "Performance must be achieved under limited material resources.",
+        "evidence_span": "Therefore, to maximize performance within a limited materials constraint, it requires a highly strategic, synergistic allocation of passive skeleton and active actuation."
+      },
+      {
+        "role": "constraint",
+        "content": "Nodes are given a small baseline mass to maintain numerical stability and avoid singularities.",
+        "evidence_span": "To maintain numerical stability and prevent singularities during the physics simulation, every node is initialized with a negligible baseline mass m\u03f5."
+      },
+      {
+        "role": "constraint",
+        "content": "The optimization must satisfy feasibility constraints and structural stability checks.",
+        "evidence_span": "To obtain feasible solutions, we introduce additional constraints to the optimization problem and incorporate structural stability checks when solving the problem"
+      },
+      {
+        "role": "constraint",
+        "content": "The design is constrained by volume fraction and binarization requirements.",
+        "evidence_span": "We impose two main categories of constraints: volume fraction constraints and binarization constraints."
+      },
+      {
+        "role": "constraint",
+        "content": "Optimization is constrained by structural stability and physical feasibility",
+        "evidence_span": "within a constrained optimization framework that accounts for structural stability and physical feasibility"
+      },
+      {
+        "role": "constraint",
+        "content": "The current work uses a simplified simulator",
+        "evidence_span": "as an exploratory study, we employ a simplified simulator"
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Robotics aims to match or surpass the autonomy of natural organisms, yet autonomous robots remain far less adaptive and diverse than their natural counterparts.",
+        "evidence_spans": [
+          "Replicating and surpassing the autonomy of natural organisms remains a long-standing goal in robotics.",
+          "However, autonomous robots remain far less adaptive and diverse compared with their natural counterparts [7]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Robotic structure, materials, and control are often designed separately or sequentially rather than jointly/co-evolved, motivating integrated co-design.",
+        "evidence_spans": [
+          "Yet most robotic systems have their structure, materials, and control designed separately, in sharp contrast to the co-evolution in nature.",
+          "More fundamentally, structure, materials, and control are often designed separately or sequentially, rather than being co-designed in a tightly coupled manner [2, 5, 8, 9, 10, 11]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "There is still limited understanding of how different design entities, individually and collectively, contribute to system-level performance.",
+        "evidence_spans": [
+          "we still have a limited understanding of the individual and collective contributions of these design entities.",
+          "Furthermore, we still lack a clear understanding of the individual and collective contributions of different design entities to the system-level performance [42, 50]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Finding optimal co-design solutions remains challenging in practice, especially because co-design of discrete robotic systems is still limited and discrete one-hot material/state representations pose challenges for gradient-based optimization.",
+        "evidence_spans": [
+          "Yet, obtaining an optimal solution via co-design remains challenging in practice.",
+          "In contrast, co-design of discrete robotic systems remains relatively limited.",
+          "This discrete representation poses challenges for gradient-based optimization."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "There remains a need for comprehensive gradient-based platforms that enable the co-design of structure, materials, and control, particularly for discrete robotic systems.",
+        "evidence_spans": [
+          "Therefore, despite these pioneering efforts, there remains a need for comprehensive gradient-\nbased platforms that enable the co-design of structure, materials, and control, particularly for discrete robotic systems."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The optimization problem is highly nonconvex and performance remains sensitive to initialization, so it is important to rule out that observed gains come merely from a better initialization heuristic.",
+        "evidence_spans": [
+          "However, the notable performance improvement demonstrated by 6b could be simply attributed to a superior initial heuristic compared with the baseline. To test this possibility",
+          "the final performance remains sensitive to initialization"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Manufacturing variability and environmental uncertainty need to be addressed to enable more robust robotic designs.",
+        "evidence_spans": [
+          "accounting for manufacturing variability and environmental uncertainty will be important for enabling more robust robotic designs"
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "A common prior robotics pipeline specifies the robot body/structure first and then develops or optimizes control for that fixed body; similarly, a sequential baseline fixes structural and material distributions first and only afterward optimizes the controller.",
+        "evidence_spans": [
+          "For example, a robot structure is typically first specified, after which control strategies are developed to operate the resulting body [12, 13].",
+          "it serves as the sequential design baseline where the pre-designed structural and material distributions are first fixed, then followed by the optimization of the neural network controller with Xavier-initialized weights"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Most existing methods treat topology, materials, and control as separate design entities rather than jointly co-designing them.",
+        "evidence_spans": [
+          "Unlike most existing methods that treat these design entities separately"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior work uses global/evolutionary optimization methods, including advanced evolutionary algorithms, to search the design space more effectively.",
+        "evidence_spans": [
+          "Although advanced evolutionary algorithms [16, 19, 20, 21, 22, 23] and dimensionality-reduction techniques [24, 25] enable more effective search",
+          "global optimization methods, such as evolutionary algorithms [5, 21]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior work also uses dimensionality-reduction techniques to make design-space search more effective.",
+        "evidence_spans": [
+          "Although advanced evolutionary algorithms [16, 19, 20, 21, 22, 23] and dimensionality-reduction techniques [24, 25] enable more effective search"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Comprehensive co-design has mainly been demonstrated for quasi-static systems, such as shape-morphing material networks, kirigami, and granular matter; more recent pioneering work has begun extending co-design to dynamic systems.",
+        "evidence_spans": [
+          "Consequently, comprehensive co-design has mainly been demonstrated for quasi-static systems, such as shape-morphing material networks [26], kirigami [27], and granular matter [28],",
+          "Recent pioneering efforts have begun extending co-design to dynamic systems[29, 30, 31, 32, 33]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Many existing gradient-based co-design approaches focus on continuum soft robots.",
+        "evidence_spans": [
+          "Many of these approaches focus on continuum soft robots[30, 41, 42, 23],"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Standard density-based topology optimization commonly uses SIMP to penalize intermediate densities/probabilities and push the optimizer toward discrete solutions.",
+        "evidence_spans": [
+          "Note that in standard density-based topology optimization, methods like Solid Isotropic Material with Penalization (SIMP) are frequently used to penalize the stiffness of intermediate probabilities, driving the optimizer toward discrete solutions [52]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Gradient-based optimization is a standard prior approach for neural controllers, including use of Adam for large neural-network parameter sets.",
+        "evidence_spans": [
+          "The MLP controller weights \u03b8 are initialized using Xavier Initialization and updated using the Adam optimizer, which represents the state-of-the-art for gradient-based optimization over large parameter sets in neural networks.",
+          "we currently optimize the neural controller using gradient-based methods"
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "Prior search/optimization methods still require large populations and many iterations to converge.",
+        "evidence_spans": [
+          "they still require large populations and many iterations to converge."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "SIMP-style/binarization penalization is problematic for discrete truss robot optimization: due to the extreme non-convexity of the landscape it can cause substantial instability, and some edges can remain trapped in intermediate material states that the dynamics rely on for delicate but physically infeasible structural balance.",
+        "evidence_spans": [
+          "However, due to the extreme non-convexity of the optimization landscape for discrete truss robots, such penalization can induce significant instability in the system dynamics, as observed in our preliminary tests.",
+          "Despite the binarization constraint penalization, in practice, some edges can still become trapped in intermediate material states in the optimization (Fig. 4e). In these cases, the dynamic system relies on a delicate structural integrity and balance that is maintained by these physically infeasible intermediate materials."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because optimization may pass through or depend on infeasible intermediate-material designs, performance measured on intermediate designs is a poor predictor of the final discrete robot's true performance.",
+        "evidence_spans": [
+          "Consequently, performance losses evaluated on intermediate designs rarely reflect the true performance of the final discrete robot.",
+          "Despite the binarization constraint penalization, in practice, some edges can still become trapped in intermediate material states in the optimization (Fig. 4e). In these cases, the dynamic system relies on a delicate structural integrity and balance that is maintained by these physically infeasible intermediate materials."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The stability pass's aggressive sharpening (\u03b2stab) can cause severe vanishing gradients.",
+        "evidence_spans": [
+          "However, the aggressive sharpening induced by \u03b2stab can lead to severe vanishing gradients."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Heuristic-free optimization can find a valid locomotion strategy, but it underperforms compared with heuristic-initialized designs.",
+        "evidence_spans": [
+          "Although the heuristic-free optimization succeeds in finding a valid locomotion strategy, it still underperforms relative to Designs 6b and 6c"
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "Separate or sequential design pipelines that treat structure, materials, and control as distinct entities are rejected in favor of tightly coupled joint co-design/joint optimization, and conventional separated design strategies serve as baselines that are outperformed by the proposed method.",
+        "evidence_spans": [
+          "outperform baselines obtained through separated design",
+          "More fundamentally, structure, materials, and control are often designed separately or sequentially, rather than being co-designed in a tightly coupled manner [2, 5, 8, 9, 10, 11].",
+          "and automatically generates robotic designs for customized tasks that outperform conventional separate design strategies.",
+          "Unlike most existing methods that treat these design entities separately, our approach optimizes them jointly"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "SIMP-like penalization is rejected for discrete truss robots because it destabilizes dynamics; instead, the method uses binarization constraints that adaptively guide the solution toward discrete states.",
+        "evidence_spans": [
+          "This motivates our use of the binarization constraints described above, which adaptively guide the solution toward discrete states over time."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Strict enforcement of binarization constraints is rejected in favor of augmented-Lagrangian-style enforcement because it empirically performs better than strictly enforcing the constraints.",
+        "evidence_spans": [
+          "Empirically, we find this approach yields better performance compared with strictly enforcing the constraints."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Naive gradient computation through the aggressively sharpened stability projection is rejected because it leads to vanishing gradients; a Straight-Through Estimator is used instead for more reliable gradients.",
+        "evidence_spans": [
+          "To mitigate this, we adopt a Straight-Through Estimator (STE) to compute the gradient in a more reliable way [54]."
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [
+      {
+        "content": "Natural systems inspire the co-design approach: in nature, structure, material, and control coevolve, and repeated central motifs are likened to convergent evolution, where similar musculoskeletal motifs emerge across species with similar body plans.",
+        "evidence_spans": [
+          "This contrasts with natural systems, where structure, material, and control strategies coevolve to produce highly diverse and specialized organisms [14].",
+          "This phenomenon mirrors convergent evolution in nature, where identical musculoskeletal motifs emerge across species with similar body plans."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Future work may draw on global search methods such as genetic algorithms to seed gradient-based co-design with strong initial solutions.",
+        "evidence_spans": [
+          "Future gradient-based co-design approaches could be combined with global search methods, such as genetic algorithms, to seed the solver with strong initial solutions."
+        ],
+        "conflicting": false
+      }
+    ],
+    "causal_claim": [
+      {
+        "content": "Separating the design of structure, materials, and control often leads to suboptimal robot designs, whereas co-design/joint optimization expands the accessible design space and can reach superior optima and higher-performing, more diverse viable designs that isolated or sequential optimization cannot.",
+        "evidence_spans": [
+          "This separation often leads to suboptimal designs",
+          "Second, from a design perspective, co-design greatly expands the design space[16], which is more likely to contain a superior optima that is inaccessible to separated design pipelines.",
+          "indicating that co-design expands the accessible morphological design space and enables not only higher performance solutions but also a broader range of viable designs",
+          "This result demonstrates that the benefits of jointly optimizing topology, material distribution, and control exceed those achievable by optimizing the entities in isolation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Structure, materials, and control are strongly coupled: their interaction produces collective effects and performance gains unavailable to any component alone, so entities such as topology and material layout must be jointly designed for best performance.",
+        "evidence_spans": [
+          "First, from a physical perspective, structure, materials, and control are inherently coupled in system dynamics, producing collective effects that cannot be achieved by each entity independently.",
+          "the interaction among structure, materials, and control produces performance gains that exceed the contributions of any single component",
+          "This outcome indicates a strong coupling between material and topology, emphasizing that the two must be jointly designed to enable optimal performance."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because physical coupling across design entities makes co-design optimization highly non-convex or even discontinuous, small structural changes can cause large, unpredictable performance changes.",
+        "evidence_spans": [
+          "Third, the physical coupling across design entities makes the underlying optimization problem highly non-convex, even discontinuous;",
+          "for instance, small changes to structure may lead to large and unpredictable changes in performance."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Long-horizon simulation with small integration steps makes exhaustive search prohibitively expensive, motivating faster optimization methods.",
+        "evidence_spans": [
+          "This often requires small integration steps over long time horizons, making exhaustive searches prohibitively costly."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "GPU-parallel physics solvers accelerate evaluations, and automatic differentiation through the simulation graph enables efficient long-horizon gradient computation even with discontinuous contacts; together these advances enable gradient-based co-design frameworks that require far fewer simulations than exhaustive or heuristic optimization.",
+        "evidence_spans": [
+          "In particular, GPU-parallel physics solvers dramatically accelerate evaluations [34, 35],",
+          "while auto-differentiation [36, 37] enables efficient calculation of gradients over long temporal horizons for design variables, even in the presence of discontinuous contacts.",
+          "The resulting procedure also defines a forward computational graph, which allows automatic differentiation to backpropagate the sensitivity of the nodal displacement at the final state through all integration time steps to the design variables and weights of control networks. This yields the gradients required to update the design variables and control weights.",
+          "These advances have enabled a range of frameworks that achieve co-design using gradient-based optimization, drastically reducing the number of simulations compared with exhaustive or heuristic optimizers [15, 32, 38, 39, 40]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The scaled softmax relaxation projects continuous design variables toward normalized material states approximating one-hot encoding, and explicit/global binarization and orthogonality penalties further push intermediate material vectors toward discrete one-hot states.",
+        "evidence_spans": [
+          "Therefore, we relax the design variable to a continuous vector zij \u2208[0, 1]3 (Figure 2a) and project it to a normalized material state vector \u02dczij using a scaled softmax function that approximates the original one-hot encoding",
+          "To further promote binarization, we introduce an explicit binarization constraint in the optimization problem (Section. 2.3), which can adaptively penalize intermediate values to drive the design variables toward one-hot encodings that correspond to discrete material states.",
+          "Second, we impose binarization constraints on the material state vectors to ensure they eventually achieve a fully discretized state, i.e., \u02dczij,k \u2208{0, 1} (Fig. 4). This is accomplished through a global binarization penalty gbin that drives the L2 norm of the material state vector toward 1 [39], and a pairwise orthogonal penalty gortho that minimizes the overlap between entries corresponding to any two distinct material types:",
+          "These intermediate trusses are addressed in a second stage, where we introduce the progressive nudge of the iterative attraction phase to achieve binarization"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Relaxing volume-fraction bounds can give intermediate material states mobility under competing objectives, and occasional violation of binarization constraints can increase exploration and open pathways to better solutions.",
+        "evidence_spans": [
+          "To provide mobility for intermediate material states (\u02dczij,k /\u2208{0, 1}) that struggle to satisfy competing objectives, we progressively relax these bounds up to a small tolerance \u2206V .",
+          "binarization constraints are allowed to be occasionally violated to increase the exploration of discrete choices and open up potential pathways to better solutions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Removing intermediate materials can disrupt structural balance, causing collapse or disconnection and drastic dynamic changes; iterative vector attraction is therefore used late in optimization to accelerate convergence when gradients become small and resolve remaining intermediate trusses toward binarization.",
+        "evidence_spans": [
+          "Once these materials are removed, the delicate balance may be disrupted, potentially causing collapse of the structure or disjoint geometry, which can drastically alter the system dynamics.",
+          "To accelerate convergence during the later stages of optimization, where the continuous material design vectors zij exhibit reduced mobility due to smaller gradients (Fig. 4d), we implement a iterative vector attraction phase (Fig. 5).",
+          "These intermediate trusses are addressed in a second stage, where we introduce the progressive nudge of the iterative attraction phase to achieve binarization"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A hard discretization snap freezes the binarized topology/material layout, after which only controller parameters are fine-tuned.",
+        "evidence_spans": [
+          "A hard discretization snap is enforced toward the end of the optimization process, after which the strictly binarized topology and material layout are frozen, and the neural controller parameters \u03b8 are fine-tuned alone for the remaining iterations (Fig. 5)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "High skeleton stiffness resists deformation and preserves structural integrity, which is important for lattice stability.",
+        "evidence_spans": [
+          "Its high stiffness allows it to passively resist deformation, upholding the structural integrity vital for the stability of a discrete lattice."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Lumping truss mass at nodes accelerates simulation, and because baseline mass is negligible, nodes connected only to void trusses effectively eliminate themselves from the dynamics.",
+        "evidence_spans": [
+          "Finally, to accelerate the simulation, we lump the mass of the trusses at the connecting nodes.",
+          "Consequently, nodes connected exclusively to void trusses act as negligible masses, naturally eliminating themselves from the system dynamics."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "CPG phase-shifted sine signals ensure synchronized periodic actuation, and actuator-state modulation causes only edges in actuator states to receive nonzero target strain.",
+        "evidence_spans": [
+          "The CPG signals C(t) \u2208RNCPG are modeled as phase-shifted sine waves to ensure all active trusses actuate in a synchronized, periodic manner:",
+          "This way, only trusses in actuator states will receive a target strain (Figure 2d)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Larger commanded target strain increases the mismatch between current and target truss length, thereby increasing internal truss force.",
+        "evidence_spans": [
+          "Intuitively, a larger commanded target strain magnitude results in a greater difference between the current length and the target length, thereby producing a larger internal force in the truss."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using a high-fidelity time-of-impact contact scheme prevents interpenetration and reduces gradient discontinuity during ground contact.",
+        "evidence_spans": [
+          "To handle the contact with the ground, we use a high-fidelity Time of Impact (TOI) scheme to prevent interpenetration and reduce gradient discontinuity [35]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Alternating material and controller updates in a 3:2 ratio helps balance morphology and control evolution for better co-evolution.",
+        "evidence_spans": [
+          "Material design vectors and MLP weights are updated alternately at a 3:2 ratio, based on our preliminary experiments, to enable a balanced update between robot morphology and control, supporting optimal co-evolution of the configuration."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Gradually extending the optimization horizon preserves dynamic fidelity while accelerating convergence.",
+        "evidence_spans": [
+          "To preserve dynamic fidelity while accelerating convergence, gradients are initially calculated for only 2048 timesteps, and are gradually extended to a maximum of 4096 timesteps between iterations 80 and 150."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Limiting hidden-layer size helps keep the controller lightweight and stable during highly non-convex co-design.",
+        "evidence_spans": [
+          "Similarly, to ensure the controller remains lightweight and stable during the highly non-convex co-design process, we adopt a hidden layer dimension of 32."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Passive cross-bracing restricted limb stroke, causing inconsistent ground contact dynamics that destabilized gait later in the rollout.",
+        "evidence_spans": [
+          "the prevalent passive cross-bracing restricted the stroke magnitude of its limbs, causing inconsistent ground contact dynamics that destabilize its gait during later stages of the rollout"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Promoting dense, low-center-of-mass structures narrows the design space toward dynamically stable solutions; on an incline, the evolved robot became even slimmer and lower to resist toppling.",
+        "evidence_spans": [
+          "By promoting dense, low center of mass structures, this heuristic narrows the design space to favor solutions better suited for dynamic stability.",
+          "Compared to Design 6b, the final design 9a evolved to an even slimmer structure to further prioritize a low center of mass, crucial for stabilizing against the toppling forces of the inclined ground boundary."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Volume-fraction constraints improve allocation of actuators and structural elements, lowering the objective and increasing walking distance.",
+        "evidence_spans": [
+          "Volume fraction constraints encourage the solver to better allocate actuators and structural elements, leading to a significant decrease in the objective function and a corresponding improvement in the walking distance"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The co-designed robot outperformed the sequential baseline by 66%.",
+        "evidence_spans": [
+          "This co-designed robot achieves a final displacement of 1.90 m, outperforming the sequential baseline by 66%."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Concentrating actuators in the middle leg overcame restricted stroke and enabled sweeping motions and longer strides.",
+        "evidence_spans": [
+          "Design 6c concentrates its actuators within the middle leg (Figure 6c). This allocation overcomes the restricted stroke observed in the baseline, enabling sweeping motions and lengthened strides"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Even without initialization guidance, the platform could still discover a viable design traveling 0.98 m.",
+        "evidence_spans": [
+          "Despite this lack of guidance, the co-design platform is still able to discover a viable design that achieves a travel distance of 0.98m."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Actuation layout had the largest individual effect on performance: actively co-designing actuation consistently improved displacement across topologies, and redistributing actuation could reshape robot dynamics and yield strong performance even when structure and control were suboptimal.",
+        "evidence_spans": [
+          "Actuation layout demonstrates the largest individual contribution to performance improvement, increasing the average displacement by 781% compared to the \"without\" conditions",
+          "actively co-designing the actuation layout consistently yields substantial performance improvements regardless of the underlying topology",
+          "redistributing actuation within a given configuration can effectively reshape robot dynamics and achieve strong performance even when the structure and control are suboptimal"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Topological design improved performance and also amplified the gains from material design; topological optimization consistently increased traversal even on top of gains from actuation design alone.",
+        "evidence_spans": [
+          "Topological design produces an improvement of 116%",
+          "while weak on its own, it is a powerful multiplier for the positive impact of material design",
+          "we observe that topological optimization consistently increases traversal distance, even on top of the already substantial gains achieved by actuation design alone"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Control improved traversal when combined with material layout optimization, but control alone could not compensate for limitations in structure or actuation; adding control to topology+material co-evolution increased travel distance by 87%.",
+        "evidence_spans": [
+          "However, when combined with material layout optimization, control consistently enhances traversal",
+          "control alone cannot compensate for limitations in structure or actuation and is largely bounded by the underlying structural and material design",
+          "when we further incorporate the topology entity, co-evolving control alongside all other entities, travel distance increases by 87% compared to the trial without control optimization"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Lacking the compatible actuation layout for an optimized topology, or the compatible topology for an actuation layout, led to substantially weaker performance.",
+        "evidence_spans": [
+          "Discovering a highly optimized topology without its uniquely compatible actuation layout (Trial 7d vs. h), or vice versa (Trial 7f vs. h), leads to substantially weaker performance."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Slightly undercutting lower topology/actuation volume bounds on the incline reduced uphill carried weight.",
+        "evidence_spans": [
+          "it slightly undercuts the lower volume bound for topology and actuation in exchange for having to carry less weight upwards"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Different ground friction induced consistent morphological adaptation and a new locomotion strategy; keeping the payload on the ground provided anchorage against skidding, and folding the front leg inward increased contact area to act as a friction pad.",
+        "evidence_spans": [
+          "Under this setting, it exhibits a consistent morphological adaptation to the new physical environment, adopting a locomotion strategy unobserved in previous designs.",
+          "it keeps the heavy payload with the ground to provide anchorage against skidding.",
+          "during the first 0.5 meters, the robot folds its front leg inward, increasing the contact area and effectively using it as a friction pad."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Tailoring structure, materials, and control to specific tasks produces effective motion patterns.",
+        "evidence_spans": [
+          "automatically generating robots whose structures, material distributions, and control policies are tailored to specific tasks to produce effective motion patterns"
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "Embedding mixed topological and material variables in a continuous design space and integrating a neural controller within a differentiable simulator enables joint interaction modeling and efficient gradient-based co-design via automatic differentiation.",
+        "evidence_spans": [
+          "The framework embeds mixed-type topological and material variables into a continuous design space and integrates a neural network controller within a differentiable simulator, capturing their interactions and enabling efficient gradient calculation via automatic differentiation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Co-design is challenging because different entities require different variable types, producing a massive, sometimes combinatorial mixed-variable search space; in discrete systems this also induces sharp discontinuities and severe nonconvexity, making gradient-based co-design especially difficult.",
+        "evidence_spans": [
+          "First, the design of different entities often requires variables of different types, leading to a massive and sometimes combinatorial design space.",
+          "Their discrete nature introduces mixed-variable design space, sharp discontinuities, and severe nonconvexity in the optimization landscape, making gradient-based co-design more challenging[43]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Dynamic performance evaluation is computationally expensive because robot dynamics involve contacts, friction, large deformations, and nonlinear material behavior; consequently, quasi-static systems have often been favored since they are cheaper to evaluate and yield smoother objectives.",
+        "evidence_spans": [
+          "Second, evaluating a robot\u2019s dynamic performance is difficult and computationally expensive, involving contacts, friction, large deformations, and nonlinear material behavior[17, 18].",
+          "which are computationally cheaper to evaluate with smoother objectives."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Continuum soft robots support more stable optimization because their structures and materials vary continuously, unlike discrete systems that create harder optimization landscapes.",
+        "evidence_spans": [
+          "which allow continuous variations in structures and materials and therefore enable stable optimization[8, 39]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A truss cannot simultaneously maximize stiffness and actuation capacity, so performance depends on strategic allocation of structural versus active material resources.",
+        "evidence_spans": [
+          "This property scheme reflects the inherent trade-off observed in natural and artificial systems, where a truss cannot simultaneously possess high stiffness and high actuation capacity."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "State feedback and goal input allow the controller to modulate gait phase, react to perturbations, and steer toward targets.",
+        "evidence_spans": [
+          "While the CPG provides the fundamental gait frequency, positional and velocity information allows the control policy to be modulated by the gait cycle\u2019s current stage, helping it react to environmental perturbations by sensing velocity changes. Further, the inclusion of the goal vector enabled active steering toward different spatial targets."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Strictly enforcing volume bounds can damage physical stability, so the method relaxes them to prioritize task performance, while an augmented Lagrangian adaptively adjusts penalty strength to support this controlled exploration.",
+        "evidence_spans": [
+          "This way, task performance will be prioritized over a strictly satisfied volume bound, which may damage physical stability.",
+          "The AL method provides a rigorous mechanism to adaptively adjust the penalization strength to achieve this."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The centered sharp softmax is used as a proxy for the final discrete geometry, assuming design vectors diverge from the global mean under binarization pressure.",
+        "evidence_spans": [
+          "This globally centered projection serves as a high-fidelity proxy of the final discrete geometry, operating on the assumption that design vectors will linearly diverge from the global mean under continuous binarization pressure."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A stability heuristic is introduced to prevent structural collapse, especially from sparse, top-heavy geometries or unsupported active clusters.",
+        "evidence_spans": [
+          "The stability heuristic is aimed at preventing structural collapse, commonly caused by sparse, top-heavy geometries or large, unsupported active clusters."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Zigzagging intermediate trajectories are interpreted as evidence of competition between performance and stability objectives during optimization.",
+        "evidence_spans": [
+          "those trusses gradually resolve the competition between performance and stability objectives, indicative in their zigzagging trajectories"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The default actuator distribution imposes stringent topological requirements because the structure must mechanically support high-stroke traversal.",
+        "evidence_spans": [
+          "the default actuator distribution imposes stringent requirements on compatible topologies, which must mechanically facilitate high-stroke motions for traversal"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "When topology and material distribution are suboptimal, they limit mobility so control optimization alone offers little benefit; this can be exacerbated because ground-contact nonlinearities and small gradients pollute gradient directions and weaken Adam\u2019s updates.",
+        "evidence_spans": [
+          "This behavior likely occurs because the topology and material distribution themselves are suboptimal and provide limited mobility, leaving little room for further improvement through control optimization alone.",
+          "The degradation may also arise because the severe non-linearities introduced by ground contacts pollute the gradient propagation through time; when coupled with a sub-optimal physical structure, the resulting small loss, and consequently small gradient amplitude, muddies the directional information provided to the Adam optimizer."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "With a smaller 5\u00d75 grid, reduced material resources make topology and material allocation more critical.",
+        "evidence_spans": [
+          "This reduction in available material resources makes the allocation of materials and topology more critical."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Observed behavior is explained as a beneficial morphological transformation that leverages coupled effects among environmental physics, topology, material layout, and actuation control; convergent motifs further suggest an underlying form-function relationship emerging from synergy among these design entities.",
+        "evidence_spans": [
+          "This behavior represents a beneficial morphological transformation that leverages the coupled effects of environmental physics, topology, material layout, and actuation control.",
+          "suggesting an underlying form-function relationship that arises from the synergy among these design entities"
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "The paper proposes a gradient-based co-design framework for discrete truss-lattice robots that jointly optimizes topology/structure, material distribution/layout, and spatiotemporal/temporal control policy/signals to maximize dynamic performance.",
+        "evidence_spans": [
+          "In this work, we propose a gradient-based co-design framework that simultaneously optimizes the topology, material distribution, and control policy of a truss-lattice robot.",
+          "In this work, we propose a framework that co-designs the structure, material layout, and control of a discrete truss-lattice robot (Fig. 1).",
+          "Our goal is to co-design the topology, the spatial distribution of material types, and the temporal control signals for each actuator to maximize dynamic performance."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The core hypothesis/method claim is that a unified continuous, differentiable mixed-variable spatial-temporal design representation\u2014combining topology/structure, discrete material selection, and neural control\u2014together with GPU-parallel differentiable dynamic simulation and constrained optimization enables concurrent gradient-based updates of all design entities for automated dynamic robot design.",
+        "evidence_spans": [
+          "We begin by constructing a unified spatial-temporal design space, merging structure and material selections with control neural network training (Fig. 1a).",
+          "We then develop a GPU-enabled differentiable dynamic simulation to quantify system performance and sensitivity (Fig. 1b).",
+          "We integrate the representation and differentiable evaluation into a constrained optimization to iteratively and concurrently update all design entities (Fig. 1c).",
+          "We introduce a continuous, differentiable design representation that unifies spatial topological, discrete material selection, and spatiotemporal neural control in a discrete robot, enabling the use of efficient gradient-based optimization.",
+          "We develop a GPU-parallel differentiable simulator that captures the physical interdependency among design entities and their environment, efficiently evaluating dynamics in contact-rich scenarios while providing gradient information through automatic differentiation.",
+          "We propose a constrained optimization method that jointly designs structure, materials, and control to automate dynamic robot design.",
+          "To achieve this, we extend topology optimization to integrate a mixed-variable design representation, a differentiable dynamic simulation for design evaluation, and a constrained optimization for design synthesis."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The method includes an auxiliary stability evaluation using a sharpened proxy geometry to assess the structural integrity of the final discrete robot.",
+        "evidence_spans": [
+          "To reliably probe the structural integrity of the final discrete robot, we propose to implement an auxiliary stability evaluation along with the ordinary objective function evaluation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The paper hypothesizes that the proposed co-design platform can effectively navigate the mixed-variable design space and that joint co-design should yield better dynamic performance than designing configuration and control separately.",
+        "evidence_spans": [
+          "We first investigate whether the proposed platform can effectively navigate the mixed-variable design space to discover optimal configurations of topology, material layout, and control. Furthermore, we verify whether co-design yields improved dynamic performance by comparing our method against a baseline that designs configuration and control separately"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The framework is hypothesized to be flexible/generalizable across varying objectives, design spaces, physical and environmental parameters, and, by customizing components, applicable to diverse materials and stimuli; more broadly it could be adopted across robotic systems and accelerate robotic material system development.",
+        "evidence_spans": [
+          "we apply the proposed co-design framework to several additional cases with varying optimization objectives, design space, and environmental parameters to demonstrate its flexibility",
+          "Our proposed framework is also flexible enough to handle varying physical and environmental parameters.",
+          "We envision that the proposed framework can be broadly adopted to establish design principles and develop computational tools for a wide range of robotic systems",
+          "By customizing each component, the approach is generalizable and applicable to diverse materials and stimuli",
+          "We anticipate that it will accelerate the development of robotic material systems with various applications"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Future-looking hypotheses/suggestions: combining the gradient-based search with global optimization could improve exploration, adding richer physical effects could improve simulation fidelity, and integrating reinforcement learning could improve generalization.",
+        "evidence_spans": [
+          "A promising direction is to combine the proposed gradient-based search with global optimization methods, such as evolutionary algorithms [5, 21], to improve exploration",
+          "incorporating richer physical effects such as bending and material nonlinearities would further improve fidelity",
+          "integrating reinforcement learning strategies may provide greater generalization"
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "Across multiple dynamic tasks, the framework automatically generates task-specific co-designed robots that outperform conventional/sequential separate-design baselines; case studies show diverse locomotion strategies and high-performance solutions even with simple initialization and without heuristic guidance.",
+        "evidence_spans": [
+          "Case studies demonstrate that the proposed framework consistently discovers diverse locomotion strategies that outperform baselines obtained through separated design.",
+          "and automatically generates robotic designs for customized tasks that outperform conventional separate design strategies.",
+          "The framework is demonstrated for a range of dynamic tasks, uncovering valuable knowledge on the effects of co-design entities (Fig. 1d).",
+          "we demonstrate that the proposed framework reliably discovers high-performance solutions even without heuristic guidance",
+          "With only simple initialization, it can outperform carefully crafted baseline designs developed through sequential design processes"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The framework yields design insights by revealing the individual and collective effects of co-design entities\u2014structures, materials, and control\u2014on robotic/system-level performance.",
+        "evidence_spans": [
+          "Using this framework, we further extract design insights that reveal the individual and collective effects of different entities on robotic performance.",
+          "We uncover important design insights by revealing the individual and collective effects of structures, materials, and control on system-level performance.",
+          "The framework is demonstrated for a range of dynamic tasks, uncovering valuable knowledge on the effects of co-design entities (Fig. 1d)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For binarization, augmented-Lagrangian handling performed better than strict constraint enforcement, with most truss design vectors rapidly and smoothly becoming discrete within 150 iterations.",
+        "evidence_spans": [
+          "Empirically, we find this approach yields better performance compared with strictly enforcing the constraints.",
+          "As the optimization proceeds, most design vectors migrate rapidly and smoothly toward discrete states within 150 iterations under the Augmented Lagrangian binarization penalty"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using more than 10 CPG signals tended to desynchronize the robot\u2019s motion and reduce locomotion stability.",
+        "evidence_spans": [
+          "Furthermore, we found that utilizing more than 10 CPG signals tends to desynchronize the robot\u2019s movement and harm overall locomotion stability."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In one comparison, the separated-design baseline achieved a final horizontal displacement of 1.14 m, while co-designed variants substantially outperformed it: Design 6b fully converged before hard snap and reached 1.90 m, and Design 6c reached 1.87 m.",
+        "evidence_spans": [
+          "The baseline robot learns an optimal control policy for its fixed material layout over 200 iterations, achieving a final horizontal displacement of 1.14 m.",
+          "Ultimately, the design achieves full convergence before the hard binarization snap ... This co-designed robot achieves a final displacement of 1.90 m",
+          "to achieve a final displacement of 1.87 m"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Performance depends on initialization in this nonconvex optimization problem, but even when starting from the same three-legged configuration, co-design still substantially outperformed the baseline.",
+        "evidence_spans": [
+          "This result falls slightly short of Design 6b, indicating that the performance indeed depends on initialization, as expected for such a nonconvex optimization problem.",
+          "However, it still substantially outperforms the baseline that shares the same three-legged initial configuration."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Without heuristic guidance, the method rediscovered structural features similar to the heuristic-aided design; common emergent features included disconnecting bottom trusses for larger strides and concentrating topology in the lower half for a lower center of gravity.",
+        "evidence_spans": [
+          "Interestingly, Design 6d automatically discovered structural features similar to the stability-heuristics Design 6b despite receiving no guidance.",
+          "Common emergent features include disconnecting specific bottom trusses for larger strides, and concentrating topology to the lower half for a low center of gravity."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Control pattern design sometimes had only a small individual contribution and could even negatively affect performance; in one comparison, travel increased from 1.02 m in Trial 7g to 1.91 m in Trial 7h, and high-performing trials showed topology-dependent material distributions and gaits.",
+        "evidence_spans": [
+          "Surprisingly, control pattern design demonstrates a small individual contribution and occasionally impacts performance negatively (Trial 7c vs. d).",
+          "from 1.02 m in Trial 7g to 1.91 m in Trial 7h",
+          "we observe that in trials producing substantial displacement (Designs 7e\u2013h), the resultant material distributions and locomotion strategies are topology-dependent."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "On incline/traversal tasks, Design 9a achieved 1.36 m horizontal displacement and 0.35 m vertical elevation, while Design 9b achieved a traversal distance of 1.10 m; the method generalized to a 5\u00d75 design space and rediscovered the leg-division strategy.",
+        "evidence_spans": [
+          "achieving a horizontal distance of 1.36 m and vertical elevation of 0.35 m.",
+          "achieved a traversal distance of 1.10 m upon final evaluation",
+          "Our co-design platform reliably generalizes to this design space and automatically rediscovered the leg division strategy observed in designs Design 6b and d"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The corresponding physical system was realized with good agreement to simulation.",
+        "evidence_spans": [
+          "the corresponding physical system has recently been realized with good agreement to simulation [22]"
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "The method is formulated as a constrained optimization over a highly non-convex design landscape, jointly updating design entities while enforcing feasibility-related constraints including structural stability, structural integrity, and physical feasibility checks.",
+        "evidence_spans": [
+          "Furthermore, we develop a constrained optimization to navigate the highly non-convex design landscape and jointly optimize all design entities.",
+          "We integrate the representation and differentiable evaluation into a constrained optimization to iteratively and concurrently update all design entities (Fig. 1c).",
+          "The method incorporates mechanisms to ensure structural integrity and physical feasibility,",
+          "To obtain feasible solutions, we introduce additional constraints to the optimization problem and incorporate structural stability checks when solving the problem",
+          "within a constrained optimization framework that accounts for structural stability and physical feasibility"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The design is constrained by limited material resources, specifically through volume fraction constraints and binarization requirements.",
+        "evidence_spans": [
+          "Therefore, to maximize performance within a limited materials constraint, it requires a highly strategic, synergistic allocation of passive skeleton and active actuation.",
+          "We impose two main categories of constraints: volume fraction constraints and binarization constraints."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For numerical stability in physics simulation, every node is assigned a negligible baseline mass to avoid singularities.",
+        "evidence_spans": [
+          "To maintain numerical stability and prevent singularities during the physics simulation, every node is initialized with a negligible baseline mass m\u03f5."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The framework is designed to accommodate varying functional requirements and boundary conditions.",
+        "evidence_spans": [
+          "The framework is also flexible to accommodate different functional requirements and boundary conditions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "As an exploratory study, the current work uses a simplified simulator.",
+        "evidence_spans": [
+          "as an exploratory study, we employ a simplified simulator"
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

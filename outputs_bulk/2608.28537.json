@@ -1,0 +1,1451 @@
+{
+  "paper_id": "2608.28537",
+  "chunks_processed": 5,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Understanding perfusion in soft porous materials is needed because it is essential in biological and laboratory systems.",
+        "evidence_span": "Perfusion of soft materials such as biological tissue or hydrogels is essential for the functioning of organ and laboratory systems such as chromatographic columns and bioreactors."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Coupling between wall mechanics and compaction from deformable confining boundaries has not yet been explored.",
+        "evidence_span": "thereby enabling a hitherto unexplored coupling between the wall mechanics and compaction process"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "How boundary compliance augments compaction-limited flow remains unresolved.",
+        "evidence_span": "Understanding how the compaction-limited \ufb02ow is augmented by the boundary compliance is important for interpreting transport in soft media but remains an open question"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Numerical steady solutions alone do not reveal how wall compliance alters the compacted rigid-wall state.",
+        "evidence_span": "The numerical solution of (II.38) determines the full steady response, but does not im-mediately reveal how wall compliance modi\ufb01es the compacted, rigid-wall state"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Several extensions are needed to broaden the range of systems the model can describe.",
+        "evidence_span": "several extensions would broaden the range of systems described by the model."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Parker et al. theoretically and experimentally analyzed compaction in porous media with rigid boundaries.",
+        "evidence_span": "Generic models of compaction in porous media con\ufb01ned by rigid boundaries were analysed theoretically and experimentally by Parker, et al. [3]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Hewitt et al. more recently analyzed rigid-boundary compaction models.",
+        "evidence_span": "and more recently by Hewitt, et al. [4]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Strongly coupled poroelastic regimes are often modeled with fully nonlinear elasticity and solved numerically.",
+        "evidence_span": "Poroelastic regimes with strong \ufb02ow\u2013structure coupling are often treated with fully non-linear elastic models, for which numerical solutions are typically the only practical route"
+      },
+      {
+        "role": "prior_approach",
+        "content": "MacMinn et al. proposed a hybrid model with nonlinear kinematics but small-strain linear elasticity.",
+        "evidence_span": "MacMinn et al. [23] suggested a hybrid approach that retains nonlinear kinematic links between strain, porosity, and permeability but models the solid\u2019s constitutive law as small-strain linearly elastic"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Hewitt et al. adopted the hybrid approach with Kozeny-Carman permeability and porosity-dependent stiffness.",
+        "evidence_span": "This hybrid ap-proach was adopted with success by Hewitt et al. [4], who coupled a deformation-dependent Kozeny\u2013Carman law to an e\ufb00ective matrix sti\ufb00ness scaling inversely with liquid volume fraction"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Fiori et al. used Hewitt-like models for periodic loading and later extended them to solute transport.",
+        "evidence_span": "Fiori et al. [24] used models similar to Hewitt\u2019s to understand the e\ufb00ect of periodic loading, and later extended the framework to include solute transport [25]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Bouckley et al. studied variants including gravity and external forcing.",
+        "evidence_span": "Variations of Hewitt\u2019s problem were explored by Bouckley et al. [26], including \ufb02ow against gravity and external mechanical forcing"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Bouckley et al. generalized effective-stiffness laws using negative volume-fraction exponents.",
+        "evidence_span": "[26] generalized e\ufb00ective-sti\ufb00ness laws proportional to volume frac-tion raised to a negative exponent"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Related 1D compaction models couple porosity-dependent permeability with viscoelastic or viscoplastic response under fast loading.",
+        "evidence_span": "Related one-dimensional compaction models for soft, satu-rated media [27, 28] couple porosity-dependent permeability to viscoelastic or viscoplastic solid response under fast time-dependent loading"
+      },
+      {
+        "role": "prior_approach",
+        "content": "The Mackenzie effective-modulus model was derived by upscaling linear elasticity around spherical pores.",
+        "evidence_span": "These will be the Mackenzie model of e\ufb00ective bulk and shear moduli given in full in Appendix F and derived in [33], which are found by upscaling the equations of linear elasticity around spherical pores"
+      },
+      {
+        "role": "prior_approach",
+        "content": "One-dimensional model and experiments of Hewitt et al. previously reported the plateau behavior",
+        "evidence_span": "producing a plateau consistent with the one-dimensional model and experiments of [4]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Rigid-wall experimental comparison uses Hewitt's large-S compaction theory as the appropriate model",
+        "evidence_span": "The blue solid curve corresponds to experiments with a rigid outer wall, for which the deformation is essentially one-dimensional and the appropriate model is the large-S limit of Hewitt\u2019s compaction theory."
+      },
+      {
+        "role": "prior_approach",
+        "content": "This study extends Hewitt et al.'s one-dimensional compaction model to a cylindrical porous medium with a deformable membrane.",
+        "evidence_span": "In this study we extended the one-dimensional compaction model of Hewitt et al. [4] to a tall, thin cylindrical porous medium with a laterally deformable, impermeable elastic membrane."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Bouckley et al. studied one-dimensional soft media classification by flux response to pressure drop aligned with gravity.",
+        "evidence_span": "A natural point of comparison is the recent one-dimensional study of Bouckley et al. [26], who classify soft media by how the flux responds to a pressure drop applied in the direction of gravity."
+      },
+      {
+        "role": "prior_approach",
+        "content": "In Bouckley et al.'s framework, large-pressure behavior is set by permeability and effective-stiffness exponents, with type-1 showing ever-increasing flux and type-2 showing a finite plateau.",
+        "evidence_span": "In their framework, with pressure-driven flow aligned with gravity and both ends mechanically constrained, the large-pressure behaviour is controlled entirely by the exponents in the permeability and effective-stiffness laws: \u201ctype-1\u201d media have an ever-increasing flux, whereas \u201ctype-2\u201d media develop a finite compaction plateau whose existence and height depend on the balance of these exponents."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "The full analytical membrane solution is numerically inconvenient because the equation is singular for small T.",
+        "evidence_span": "this solution is di\ufb03cult to work with numerically because (II.32) is a singular di\ufb00erential equation because T \u226a1"
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than prior 1D/rigid-boundary treatments, this study extends the same hybrid philosophy to a 2D radially compliant cylindrical geometry.",
+        "evidence_span": "In this study, we follow the same hybrid linear/nonlinear philosophy, but extend it to a two-dimensional, radially compliant cylindrical geometry"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "To isolate wall compliance, the study uses clamped ends instead of more compliant end conditions.",
+        "evidence_span": "To fully isolate the role of wall compliance, we impose clamped boundary conditions"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Instead of the full coupled system, the rest of the study uses the simplified uncoupled system because the simplification is justified.",
+        "evidence_span": "for the rest of the study we focus on the simpli\ufb01ed system (II.32) and (II.24)"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than using the full analytical solution directly, the authors solve the membrane equation by matched asymptotics because of numerical difficulty from singularity.",
+        "evidence_span": "We therefore solve (II.32) according to (II.26) via matched asymptotics"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The paper rejects the idea that plateau formation is controlled only by poroelastic exponents, showing radial compliance changes that conclusion.",
+        "evidence_span": "Our work complements Bouckley et al. by showing that once radial compliance is admitted, the presence or absence of a plateau is no longer determined solely by the poroelastic exponents."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Unlike strictly one-dimensional fixed-boundary columns, the present two-dimensional setting permits reorganized regimes and super-Darcy flow.",
+        "evidence_span": "their exploration of how varying the permeability and stiffness exponents moves a one-dimensional system between plateau-forming and non-plateau-forming classes is extended here into a two-dimensional setting where an additional degree of freedom reorganizes those regimes and allows for behaviours such as super-Darcy flow that cannot arise in a strictly one-dimensional column with fixed boundaries."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The study is motivated by applications in organs, chromatographic columns, and bioreactors.",
+        "evidence_span": "Inspired by these applications, we model \ufb02uid-driven compaction in a long, thin cylindrical porous medium bounded by an impermeable elastic membrane and study how \ufb02ow regimes relate to elastic parameters."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The Mackenzie model is adopted because it is widely applicable at small porosity and extends the modulus used by Hewitt et al.",
+        "evidence_span": "it is considered a widely applicable model for media with small porosity [5], and is a direct two-dimensional extension of the e\ufb00ective modulus used in [4]"
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The rigid-wall limit is framed by analogy to Bouckley et al.'s type-2 class.",
+        "evidence_span": "For the constitutive choices adopted here, the rigid-wall limit of our model behaves in an analogous way to their type-2 class."
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Compliant walls allow flow to increase beyond an intermediate plateau once imposed pressure reaches a threshold set by membrane stiffness and initial porosity.",
+        "evidence_span": "Whereas rigid boundaries produce a compaction plateau, compliant walls exhibit, at most, an intermediate plateau beyond which the \ufb02ow increases once the imposed pressure becomes comparable to the product of membrane sti\ufb00ness and initial porosity."
+      },
+      {
+        "role": "causal_claim",
+        "content": "A membrane softer than the porous medium can cause flow rates to exceed those of a rigid medium.",
+        "evidence_span": "When the membrane is less sti\ufb00than the porous medium, \ufb02ow rate can exceed that expected for a rigid medium."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Pressure gradients compact porous media, shrinking pores and feeding back on flow.",
+        "evidence_span": "compact under forced perfusion due to \ufb02uid pressure gradients that shrink pore space and feed back to the \ufb02ow"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Matrix compression reduces permeability.",
+        "evidence_span": "This coupling reduces the permeability of a porous medium as its matrix compresses"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Beyond a threshold, increasing driving pressure no longer increases throughput because of a compaction plateau.",
+        "evidence_span": "beyond a certain point, additional driving pressure yields no extra throughput due to a compaction \ufb02ow-rate plateau"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Pressure gradients that drive perfusion can also compact tissue, reduce permeability, and affect transport.",
+        "evidence_span": "the same pressure gradients that drive \ufb02ow can compact the tissue, reduce permeability and impact transport"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Elevated interstitial pressure and matrix remodeling can restrict perfusion in tumors.",
+        "evidence_span": "elevated interstitial pressure and matrix remodeling can restrict perfusion [11]"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Boundary compliance can relieve a compaction-induced flow plateau.",
+        "evidence_span": "understanding when compaction can produce a plateau in \ufb02ow and when boundary compliance can relieve that plateau is important"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Semi-rigid confinement changes pathway formation and breakthrough behavior compared with rigid confinement.",
+        "evidence_span": "gas migration through bentonite under semi-rigid (transversely compliant) con\ufb01nement exhibits di\ufb00erent pathway formation and breakthrough behaviour than under rigid con\ufb01nement"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Different stiffness-law exponents select different qualitative flow-rate regimes.",
+        "evidence_span": "which identify how di\ufb00erent exponents select di\ufb00erent qualitative \ufb02ow-rate regimes"
+      },
+      {
+        "role": "causal_claim",
+        "content": "If the membrane is much stiffer than the porous medium and pressure, the model recovers Hewitt's 1D plateauing behavior.",
+        "evidence_span": "When the membrane is much sti\ufb00er than the porous medium and the pressure driving the \ufb02ow, the model we develop recovers the one-dimensional plateauing model of Hewitt et al. [4]"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Once driving pressure exceeds membrane stiffness times initial porosity, flow departs from the plateau.",
+        "evidence_span": "but diverges from the plateau when the driving pressure rises above the product of membrane sti\ufb00ness and initial porosity"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Moderately large membrane-to-medium stiffness ratios produce diverging flow without an intermediate plateau.",
+        "evidence_span": "When the sti\ufb00ness ratio of membrane to porous medium is only moderately large, we observe a diverging \ufb02ow rate with no intermediate plateau"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Small membrane-to-medium stiffness ratios yield flow rates above the rigid-medium expectation.",
+        "evidence_span": "When the ratio is small, we observe a \ufb02ow rate larger than would be expected for a rigid medium"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Neglecting porosity-dependent terms in the membrane equation reduces computational cost by uncoupling the system.",
+        "evidence_span": "the solution for \u03c7(z) substituted into (II.24) uncoupling the system and reducing unnecessary computational cost"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Wall compliance causes departure from the rigid-wall compaction plateau.",
+        "evidence_span": "identi\ufb01es how wall compliance produces departure from the rigid-wall compaction plateau"
+      },
+      {
+        "role": "causal_claim",
+        "content": "More compliant boundary causes radial expansion, reducing local axial compression",
+        "evidence_span": "Figure 2(b) shows the same pressure load (P = 8.9 \u00d7 102, L = 0) but with a more compliant boundary (S = 104), so that the membrane expands outwards radially. In this regime the cylinder expands radially in the middle of its length, reducing the axial compression locally."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Reduced axial compression keeps porosity near inlet value over more of the column and lowers vertical Darcy velocity in the bulged region",
+        "evidence_span": "As a result the porosity remains close to its inlet value over a much larger fraction of the column, and the vertical Darcy velocity is reduced in the bulging region where the cross-section is largest."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Higher hydrostatic pressure at the bottom causes stronger outward bowing there",
+        "evidence_span": "The lower part of the column carries most of the compaction, and the membrane bows outward more strongly toward the bottom where the hydrostatic pressure is highest."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Asymmetric bowing generates vertical asymmetry in porosity and Darcy velocity",
+        "evidence_span": "This generates a corresponding vertical asymmetry in porosity and Darcy velocity."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Decreasing bending parameter weakens bending resistance and makes radial expansion profile flatter and more plug-like",
+        "evidence_span": "Decreasing T weakens bending resistance and produces a \ufb02atter, more plug-like radial expansion in the interior, with the membrane curvature con\ufb01ned to narrow boundary layers near the clamped ends."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Small pressure gives Darcy-like linear flow because the matrix is essentially uncompressed",
+        "evidence_span": "For small P, all curves follow the Darcy prediction for a rigid medium: the porous matrix is essentially uncompressed, and the \ufb02ow rate is proportional to pressure."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Increasing pressure causes outlet-near axial compaction and a flow-rate plateau",
+        "evidence_span": "As P increases, the porous matrix compacts axially near the outlet and the \ufb02ow rate ceases to grow, producing a plateau consistent with the one-dimensional model and experiments of [4]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "When pressure exceeds membrane stiffness times initial porosity, flow departs from the plateau and rises again",
+        "evidence_span": "As predicted by the asymptotic analysis in section II C, divergence from the plateau values occurs once P becomes larger than the product of membrane sti\ufb00ness S and initial porosity \u03a6, allowing the \ufb02ow rate to increase again."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Increasing pressure causes central membrane bulging",
+        "evidence_span": "As P increases, the membrane bulges outward over the central portion of the cylinder"
+      },
+      {
+        "role": "causal_claim",
+        "content": "When pressure becomes comparable to \u03a6(S+2), membrane bulging causes deviation from Darcy prediction",
+        "evidence_span": "As P becomes comparable to \u03a6(S + 2) the membrane bulges and deviates from the Darcy prediction."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Softening the wall lets radial dilation offset compaction and can raise flow above the rigid-medium value",
+        "evidence_span": "As the wall is softened, radial dilation of the column increasingly o\ufb00sets this compaction, and for the softest admissible wall in panel (a), S = 0.2, the average porosity rises enough that Q0 exceeds the rigid-medium value, giving a weakly super-Darcy response."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Gravity-driven curves leave Darcy scaling once L becomes order 1",
+        "evidence_span": "The curves again depart from Darcy scaling once L becomes O(1), but gravity is e\ufb00ectively weaker than the imposed pressure."
+      },
+      {
+        "role": "causal_claim",
+        "content": "For S>1, increasing pressure drives axial compaction and makes flow sub-Darcy",
+        "evidence_span": "Immediately above this band for S > 1 lies the green sub-Darcy region, where increasing P drives axial compaction and the \ufb02ow rate lags behind the rigid-medium prediction."
+      },
+      {
+        "role": "causal_claim",
+        "content": "At very large stiffness, sub-Darcy behavior feeds into a compaction plateau where changing P or S barely changes flow",
+        "evidence_span": "At very large sti\ufb00ness, S \u2273103, this feeds into a triangular orange region in which a compaction plateau forms. Changing P or S within this region does not signi\ufb01cantly change Q0, as the system has reached the compacted state."
+      },
+      {
+        "role": "causal_claim",
+        "content": "For any finite wall stiffness, sufficiently large pressure unblocks the system and flow diverges again",
+        "evidence_span": "However, for all \ufb01nite S, a value of P can be reached which unblocks the system and the \ufb02ow rate starts diverging again."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Crossing the dot-dashed curve means porosity rises above its initial value somewhere, separating global compaction from local dilation",
+        "evidence_span": "The dot\u2013dashed black curve indicates where the porosity starts to rise above the initial value, and hence separates globally compacted states (\u03c60(z) \u2264\u03a6 everywhere, on the south\u2013east side of the curve) from solutions in which dilation occurs somewhere in the column (\u03c60(z) > \u03a6 locally, to the north\u2013west)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Changing porosity has little effect on map structure but strongly affects strain magnitude in proportion to \u03a6",
+        "evidence_span": "Changing \u03a6 has minimal impact on the overall structure of the parameter map, but strongly changes strain size which is proportional to \u03a6."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Changing bending parameter mainly shifts the \u03c60\u2264\u03a6 boundary, with smaller T shrinking the valid granular-media region",
+        "evidence_span": "Changing T also has little e\ufb00ect on the map structure, apart from changing the location of \u03c60 \u2264\u03a6 curve (a smaller T leads to a smaller valid region for granular media)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Increasing pressure compacts the outlet region and drives the flow rate toward a compaction plateau.",
+        "evidence_span": "Increasing pressure compacts the outlet region into a boundary layer and the flow rate approaches a genuine compaction plateau, beyond which additional forcing yields essentially no extra throughput."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Finite membrane stiffness qualitatively changes the flow-response behavior.",
+        "evidence_span": "Allowing the membrane to be finitely stiff qualitatively reorganises this picture."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Outlet jamming and porosity collapse make the flow rate nearly pressure-independent.",
+        "evidence_span": "The outlet region jams, the porosity collapses, and the flow rate becomes nearly pressure-independent."
+      },
+      {
+        "role": "causal_claim",
+        "content": "When imposed pressure reaches the scale of membrane stiffness times initial porosity, wall inflation relieves outlet compaction and flow rises again.",
+        "evidence_span": "Once the imposed pressure becomes comparable to the product of membrane stiffness and initial porosity the compliant wall inflates, relieving outlet compaction and allowing the flow rate to increase again."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Any finite wall compliance causes the flow-pressure curve to diverge eventually instead of saturating.",
+        "evidence_span": "Thus, for any finite S the flow\u2013pressure curve ultimately diverges rather than saturating."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Reducing stiffness makes radial expansion important at lower loads.",
+        "evidence_span": "As S is reduced, radial expansion becomes important at progressively lower loads."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Lower stiffness shrinks and then removes the intermediate plateau, yielding only divergent responses.",
+        "evidence_span": "The intermediate plateau shrinks and eventually disappears, leaving purely divergent responses"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Responses are sub-Darcy when axial compaction dominates and super-Darcy when wall-driven dilation raises average porosity above its undeformed value.",
+        "evidence_span": "leaving purely divergent responses that are sub-Darcy when axial compaction dominates and super-Darcy when wall-driven dilation allows the average porosity to rise above its undeformed value."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Any finite wall compliance destroys the terminal plateau and causes renewed divergence of flow rate.",
+        "evidence_span": "Any finite wall compliance ultimately destroys the terminal plateau and leads to renewed divergence of the flow rate"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Wall-stiffness ratio S becomes the key control parameter when radial compliance is included.",
+        "evidence_span": "with the wall-stiffness ratio S taking over as the key control parameter."
+      },
+      {
+        "role": "causal_claim",
+        "content": "When wall friction is negligible, the main fields, flow-pressure curves, and breakthrough criterion are unchanged except for higher-order effects.",
+        "evidence_span": "in that regime \u03c60(z) and \u03c7(z), the Q0\u2013P/S curves, and the breakthrough criterion P/(S+2) = O(\u03a6) are unchanged up to higher\u2013order corrections, with at most a mild thickening of axial boundary layers near z = 0, 1."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Only strong interfacial coupling or short/thick samples make wall friction reduce flow and shift onset.",
+        "evidence_span": "Only for very strong interfacial coupling or short/thick samples such that \u01eb \u039b \u22731 does wall friction measurably reduce Q0 at fixed P/S and shift the onset."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Lowering undeformed porosity leaves the regime-map structure nearly unchanged but moves strain contours upward so the same behaviors occur at small strain.",
+        "evidence_span": "Appendix K, Fig. 10 reproduces the main regime diagram with \u03a6 reduced from 0.05 to 0.01 and shows that the qualitative structure of the map is essentially unchanged, while the strain contours shift upward so that the entire sequence of behaviours discussed in the paper (plateau, its breakthrough, its disappearance with wall compliance, and the transitions between sub-Darcy and super-Darcy regimes) occurs within an indisputably small-strain range, max |\u03b5zz| \u22720.02."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The observed phenomena are not artifacts of large-strain linear elasticity because they persist at very small strain.",
+        "evidence_span": "This demonstrates that the phenomena we analyze are not artifacts of using linear elasticity at large strains; rather, they persist at very small strain and are therefore physically meaningful."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Transverse compliance qualitatively switches the flow-pressure relation rather than slightly perturbing one-dimensional compaction.",
+        "evidence_span": "Taken together, our results highlight that transverse compliance is not a small perturbation to classic one-dimensional compaction, but a qualitative switch that reorganises the flow\u2013pressure relation."
+      },
+      {
+        "role": "causal_claim",
+        "content": "In the rigid-wall limit, the plateau is terminal, but any finite wall stiffness removes that terminal plateau.",
+        "evidence_span": "In the strict rigid-wall limit the Hewitt\u2013type plateau is genuinely terminal, but any finite wall stiffness ultimately destroys this terminal plateau."
+      },
+      {
+        "role": "causal_claim",
+        "content": "When driving pressure reaches the scale of membrane stiffness times initial porosity, radial expansion relieves outlet compaction and flow diverges again.",
+        "evidence_span": "Once the driving pressure becomes comparable to the product of membrane stiffness and initial porosity, radial expansion relieves outlet compaction and the flow rate diverges again."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Large S gives a long intermediate plateau like the rigid case, whereas moderate and small S suppress the plateau and produce divergent sub- or super-Darcy responses.",
+        "evidence_span": "Large S yields an extended intermediate plateau that mimics the rigid case over several decades in pressure, whereas moderate and small S suppress this plateau and produce purely divergent responses that can be either sub-Darcy or super-Darcy depending on the balance between axial compaction and wall-driven dilation."
+      },
+      {
+        "role": "causal_claim",
+        "content": "When P + L exceeds 1, a boundary layer forms and this slows convergence.",
+        "evidence_span": "With P + L > 1, the boundary layer forms, slowing convergence."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Reducing undeformed porosity shifts strain contours upward and enlarges the low-strain validity region.",
+        "evidence_span": "the family of strain contours (shown in white) shifts upward in the (P, S) plane, enlarging the low\u2013strain validity wedge"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Undeformed porosity acts as a control parameter for overall strain level.",
+        "evidence_span": "Thus \u03a6 acts as a convenient control parameter for the overall strain level."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Further decreasing undeformed porosity moves the same behaviors to even smaller strains.",
+        "evidence_span": "Decreasing \u03a6 further pushes these behaviours to even smaller strains."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Smaller initial porosity enables the described behaviors to be captured at smaller strains.",
+        "evidence_span": "This shows that smaller initial porosity allows the described behaviours to be captured at even smaller strains."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Lowering T leaves the diagram nearly unchanged except for shifting the \u03c60(z) \u2264 \u03a6 contour southeast, which reduces the region that can plausibly represent disconnected media.",
+        "evidence_span": "Again, the diagram remains almost unchanged, except that the \u03c60(z) \u2264 \u03a6 contour is shifted southeast, reducing the portion of the map that can credibly model disconnected media."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Using linear elasticity with nonlinear kinematics gives greater analytical tractability.",
+        "evidence_span": "allowing greater analytical traction on the problem"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "These related models underscore the importance of nonlinear kinematics.",
+        "evidence_span": "further underscoring the importance of nonlinear kinematics"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Clamped ends effectively represent infinitely stiff collars at the top and bottom.",
+        "evidence_span": "e\ufb00ectively imposing in\ufb01nitely sti\ufb00collars at the top and bottom of the porous medium"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Small displacements ensure small strains, and small porosity changes reflect small volume changes.",
+        "evidence_span": "The displacements Dr0 and Dz0 are small to produce small strains, and \u03a6 \u2212\u03c60 is small to re\ufb02ect small volume changes"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Radial membrane expansion relieves axial compaction, allowing added pressure to increase throughput again",
+        "evidence_span": "This marks the point at which radial expansion of the membrane starts to relieve axial compaction, so that additional pressure can once more drive additional throughput."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Renewed flow-rate growth is due to wall inflation rather than further vertical collapse",
+        "evidence_span": "indicating that this renewed growth of Q0 is associated with wall in\ufb02ation rather than further vertical collapse of the porous skeleton."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Gravity is half as effective because the averaged wall-shape scaling contains P + L/2",
+        "evidence_span": "This is consistent with the relative scaling for P and L obtained by averaging the outer solution for the wall shape from (II.33),\nZ 1\n0\n\u03c7(z) dz =\nP + L/2\nS + 6G(\u03a6),\n(III.1)\nso that L enters with a factor of one-half."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "For relatively stiff walls, axial compression dominates radial expansion, producing sub-Darcy flow",
+        "evidence_span": "For relatively sti\ufb00walls (S \u22731) axial compression of the porous skeleton still dominates, so the \ufb02ow remains below the undeformable prediction (a sub-Darcy response)."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "For gravity alone, vertical compaction exceeds radial dilation, preventing super-Darcy behavior",
+        "evidence_span": "Even for the softest walls that maintain contact, vertical compaction always outweighs radial dilation. As a result, the response remains at most Darcy or sub-Darcy and no super-Darcy branch appears for gravity alone."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Boundary between sub-Darcy and super-Darcy near S\u22481 reflects balance between skeleton and membrane stiffness",
+        "evidence_span": "The location of this boundary is intuitive: S = O(1) marks a balance between the sti\ufb00ness of the porous skeleton and the sti\ufb00ness of the membrane."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "For S>1, stiffer skeleton means axial compaction dominates radial expansion, giving sub-Darcy behavior",
+        "evidence_span": "For S > 1, the skeleton is relatively sti\ufb00and axial compaction dominates over radial expansion, giving sub-Darcy behaviour."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "For S<1, more compliant membrane allows radial dilatation to raise average porosity enough for super-Darcy flow",
+        "evidence_span": "For S < 1, the membrane is more compliant, radial dilatation of the column becomes competitive, and the average porosity can increase enough that the \ufb02ow becomes super-Darcy."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Continued flow increase under flexible walls is consistent with theory that radial expansion prevents a fully jammed state",
+        "evidence_span": "consistent with the \ufb02exible-boundary regime of the theory in which radial expansion prevents the system from reaching a fully jammed state."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Radial compliance prevents formation of a fully jammed state.",
+        "evidence_span": "This agreement supports the central mechanistic conclusion that radial compliance prevents the establishment of a fully jammed state."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The study proposes that relative wall compliance reorganizes the flow-pressure relation in a compliant cylindrical porous medium.",
+        "evidence_span": "we model forced perfusion through a long, thin cylindrical porous medium bounded radially by an unattached impermeable elastic membrane and investigate how the relative wall compliance reorganizes the \ufb02ow\u2013pressure relationship"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors choose porosity-dependent permeability and elastic moduli intended to be broadly applicable.",
+        "evidence_span": "our choices for the porosity-dependent permeability k\u2217(\u03c6) and e\ufb00ective bulk and shear moduli of the porous medium K\u2217(\u03c6) and G\u2217(\u03c6), which we choose to be the most widely applicable"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The model is formulated to apply broadly without assuming specific microstructure.",
+        "evidence_span": "The model presented below is formulated to apply as generally as possible to a wide class of deformable porous media, without assuming speci\ufb01c microstructural details"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The study selects constitutive laws judged to be the most widely representative.",
+        "evidence_span": "We will choose the most widely representative models"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "An asymptotic approximation is introduced to isolate the mechanism by which wall compliance changes the rigid-wall compaction plateau.",
+        "evidence_span": "To isolate this mechanism, we consider pressure-driven \ufb02ow in the negligible-gravity limit, L = 0, and derive an asymptotic approximation in a regime where the wall deformation remains small but has an appreciable e\ufb00ect on the porosity \ufb01eld"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Wall friction is negligible when the aspect-ratio-scaled interfacial shear parameter is small.",
+        "evidence_span": "Consequently, wall friction is asymptotically negligible provided \u01eb \u039b \u226a1;"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The stiffness ratio S is proposed as a primary design parameter.",
+        "evidence_span": "The stiffness ratio S therefore acts as a primary design parameter."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "The parameter-space map identifies plateau/breakthrough regimes and sub-Darcy versus super-Darcy steady-flow behavior.",
+        "evidence_span": "A parameter-space map distinguishes regimes where plateau and breakthrough occur, where the steady \ufb02ow rate is below (sub-Darcy) or above (super-Darcy) the undeformable-medium prediction, and delineates the small-strain domain in which the theory applies."
+      },
+      {
+        "role": "evidence_result",
+        "content": "An asymptotic solution for negligible gravity captures departure from the plateau and provides compact formulas for effective permeability and flow rate.",
+        "evidence_span": "An asymptotic solution for negligible gravity captures the departure from the plateau and yields compact expressions for e\ufb00ective permeability and \ufb02ow rate."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Parker et al. observed boundary-layer-localized compaction near the outlet in sponge-flow experiments.",
+        "evidence_span": "whose experiments showed that water \ufb02owing downward through a cylindrical sponge can create highly nonuni-form deformation, concentrating compaction in a boundary layer near the outlet"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Hewitt et al. experimentally validated the model and found a flow-rate plateau.",
+        "evidence_span": "and experimentally validated the model using water \ufb02ow through hydrogel-bead beds, \ufb01nding the aforementioned \ufb02ow-rate plateau"
+      },
+      {
+        "role": "evidence_result",
+        "content": "A proof-of-principle experiment supports that wall compliance suppresses the compaction plateau.",
+        "evidence_span": "this is corroborated by a proof-of-principle experiment that predicts that wall compliance suppresses the compaction plateau"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Rigid-wall-like case shows outlet-localized compaction boundary layer and sharp porosity drop",
+        "evidence_span": "The deformation is then predominantly axial: \u03b5zz is most compressive near the outlet and the porosity drops sharply in that outlet-adjacent region consistent with the classic compaction boundary layer reported for rigid systems."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Asymptotic porosity prediction matches the numerical solution closely",
+        "evidence_span": "The dotted black curve in the porosity plot is the asymptotic prediction (H.11), which closely tracks the numerical solution."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Plateau level matches Hewitt et al.'s analytical plateau value to within 0.1% relative error",
+        "evidence_span": "the plateau level in our model coincides with the analytical plateau value reported by Hewitt et al. [4] to within a relative error of less than 0.1%, before the curves depart from it again for large values of pressure"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Agreement with rigid-wall limit validates the model",
+        "evidence_span": "This provides a strong validation of the model in the limit where the wall is e\ufb00ectively rigid."
+      },
+      {
+        "role": "evidence_result",
+        "content": "At large pressure, replotted curves collapse against P/S, showing common scaling",
+        "evidence_span": "At large P, the branches fall on a common trend, demonstrating that the post-plateau growth of the \ufb02ow rate is controlled primarily by the ratio of driving pressure to wall sti\ufb00ness."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Pressure-driven and gravity-driven flow curves nearly collapse when compared using L/2",
+        "evidence_span": "The near-collapse of these two sets of curves demonstrates that, in this regime, gravity alone is roughly half as e\ufb00ective as imposed pressure at driving \ufb02ow."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Overall flow-pressure relation is only weakly sensitive to bending stiffness in this regime",
+        "evidence_span": "The weak di\ufb00erence between those curves and the T = 10\u22124 results shows that, in this part of parameter space, the overall \ufb02ow\u2013pressure relation is relatively insensitive to the bending sti\ufb00ness."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Only admissible gravity-driven solutions are shown because contact fails at larger S than in the pressure-driven case",
+        "evidence_span": "In this case the contact condition fails at even larger values of S, and only admissible solutions are shown."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Low-pressure region is Darcy because membrane and skeleton are essentially undeformed",
+        "evidence_span": "The blue Darcy region occupies a band at low P, corresponding to the weakly forced limit in which both the membrane and skeleton are essentially undeformed."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Gravity-driven parameter map lacks a super-Darcy region and loses contact at larger S",
+        "evidence_span": "The map is very similar to the main \ufb01gure, however, the values for S at which the contact condition fails are much larger, and there is no super-Darcy behaviour for a purely gravity-driven \ufb02ow."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Rigid-wall experiment fit yields \u03a6=0.15 and Es=2.5\u00d710^4 Pa",
+        "evidence_span": "\u03a6 and Es are then \ufb01tted using a least squares method to the sti\ufb00-wall data, yielding the blue theoretical curve. These \ufb01tted values of \u03a6 = 0.15 and Es = 2.5 \u00d7 104Pa"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Flexible-wall experiments show non-plateauing flow rate",
+        "evidence_span": "The resulting red dashed curve is compared with the \ufb02exible-wall experiments (red solid), which show a non-plateauing \ufb02ow rate."
+      },
+      {
+        "role": "evidence_result",
+        "content": "After leaving the initial Darcy regime, flow continues increasing with pressure in flexible-wall experiments",
+        "evidence_span": "Once the \ufb02ow departs from the initial Darcy regime, the \ufb02ow rate continues to increase with driving pressure"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Despite quantitative discrepancies at high forcing, the flexible-wall model captures the experimental trend and absence of plateau",
+        "evidence_span": "Despite some quantitative discrepancies at large forcing, the \ufb02exible-wall model captures the overall trend of the experiments and, in particular, the absence of any intermediate plateau."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For large but finite stiffness ratios, an intermediate plateau still appears and matches rigid-wall behavior over many pressures.",
+        "evidence_span": "For sufficiently large but finite stiffness ratios S, the system still exhibits an intermediate plateau that closely matches the rigid-wall behaviour over a broad range of pressures."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Experiments with hydrogel beads agree with the prediction that a flexible boundary removes the compaction plateau.",
+        "evidence_span": "The experiments with packed hydrogel beads are consistent with the principal theoretical prediction that a flexible boundary eliminates the compaction plateau observed with a rigid boundary."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Using two fitted parameters from the stiff-wall case, the model reproduces the qualitative flexible-wall trend including no plateau and monotonic flow increase.",
+        "evidence_span": "Using only two fitted material parameters inferred from the stiff-wall configuration, the model captures the qualitative trend of the flexible-wall data, including the absence of an intermediate plateau and the monotonic growth of flow rate with pressure."
+      },
+      {
+        "role": "evidence_result",
+        "content": "With reduced porosity, the full behavior sequence occurs within a clearly small-strain regime.",
+        "evidence_span": "the entire sequence of behaviours discussed in the paper (plateau, its breakthrough, its disappearance with wall compliance, and the transitions between sub-Darcy and super-Darcy regimes) occurs within an indisputably small-strain range, max |\u03b5zz| \u22720.02."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The authors state that the numerical solutions agree very well with steady-state time-dependent simulations across the parameter space.",
+        "evidence_span": "Excellent agreement was observed across the parameter space."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The appendix reports that the approximation error stays small over nearly all tested parameters, only rising to about 6% in a limited regime.",
+        "evidence_span": "Figure 7 shows the relative error between the flow rates calculated from the full system and the system with the \u03c7 approximation, showing that this error remains small in the whole of the parameter space considered."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Grid refinement demonstrates second-order convergence in one case.",
+        "evidence_span": "Both indicate second-order convergence with increasing M."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The numerical solutions match the analytical plateau from Hewitt et al. to within 0.1% before breakthrough.",
+        "evidence_span": "Solutions to (II.38) and (II.39) find the analytical expression for the plateau from Hewitt et al. [4] to within 0.1% before rising again as the breakthrough occurs."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The figure is presented as validation and consistency with prior work.",
+        "evidence_span": "The figure is provided as validation and evidence of consistency with [4]."
+      },
+      {
+        "role": "evidence_result",
+        "content": "At \u03a6 = 0.01, all main behaviors occur while maximum axial strain stays below about 0.02.",
+        "evidence_span": "For \u03a6 = 0.01, all behaviours discussed in the main text\u2014plateau, its disappearance with wall compliance, breakthrough near P/(S + 2) = O(\u03a6), and the transitions between sub-Darcy and super-Darcy regimes\u2014occur with max |\u03b5zz| \u22720.02."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "The theory is only valid within the small-strain regime.",
+        "evidence_span": "and delineates the small-strain domain in which the theory applies."
+      },
+      {
+        "role": "constraint",
+        "content": "Initial porosity is kept small to maintain small-strain validity.",
+        "evidence_span": "We impose small initial porosity, which helps keep the deformation within the small-strain regime"
+      },
+      {
+        "role": "constraint",
+        "content": "The model only applies where parameter regions are identified for granular versus connected media.",
+        "evidence_span": "we precisely de\ufb01ne the regions of parameter space where the model is applicable to granular or connected media"
+      },
+      {
+        "role": "constraint",
+        "content": "Disconnected granular matrices cannot support tension.",
+        "evidence_span": "the main di\ufb00erence being that disconnected granular matrices cannot sustain tensile forces"
+      },
+      {
+        "role": "constraint",
+        "content": "The porous medium must remain in contact with the unattached membrane for the model to be valid.",
+        "evidence_span": "Physically this interaction only makes sense if the porous medium is in contact with the unattached membrane, and so we outline a contact condition which must be met for the model to be valid"
+      },
+      {
+        "role": "constraint",
+        "content": "The membrane is modeled as unattached, deforming outward under normal pressure while allowing tangential slip.",
+        "evidence_span": "We model the membrane as unattached to the porous medium: it deforms outwards under normal pressure, while tangential slip of the porous medium is allowed"
+      },
+      {
+        "role": "constraint",
+        "content": "Solutions with tensile radial wall stress are invalid because membrane separation would make the model unphysical.",
+        "evidence_span": "When this occurs, the membrane separates ([31, 32] ) from the porous medium and the model will become unphysical. Therefore, we restrict valid solutions to regions of the parameter space where the contact condition"
+      },
+      {
+        "role": "constraint",
+        "content": "For granular media, the model is further limited to compressive effective stress everywhere.",
+        "evidence_span": "For granular media, we must further constrain the applicability of the model as they cannot sustain tensile forces anywhere"
+      },
+      {
+        "role": "constraint",
+        "content": "Granular-media applications are rejected wherever porosity exceeds the reference value.",
+        "evidence_span": "we reject applications of the model to granular media for regions of the parameter space where this condition is not met"
+      },
+      {
+        "role": "constraint",
+        "content": "Physical magnitudes of porosity change and displacements must remain small to satisfy linear elasticity.",
+        "evidence_span": "their physical magnitudes are all constrained to be small (much less than 1) to satisfy the linear elasticity assumption"
+      },
+      {
+        "role": "constraint",
+        "content": "Solutions are rejected if the maximum axial strain exceeds 0.20 to remain within the small-strain approximation.",
+        "evidence_span": "To remain consistent with the small strain approximation we will reject any solution where max |\u03b5zz| > 0.20"
+      },
+      {
+        "role": "constraint",
+        "content": "Softer walls than those shown cannot be studied because membrane-medium contact fails in the model",
+        "evidence_span": "For smaller values of S the contact condition between the membrane and the porous medium fails in our model, so even softer walls cannot be explored within this unattached-membrane framework."
+      },
+      {
+        "role": "constraint",
+        "content": "Very small S lies outside assumptions because contact fails and the membrane would detach",
+        "evidence_span": "At very small S the assumptions break down. The hatched region for very small S marks parameter values for which the contact condition fails and the membrane would detach from the porous medium."
+      },
+      {
+        "role": "constraint",
+        "content": "For granular media, the model is physically self-consistent only in the compacted region because such media cannot sustain tensile grain-scale forces",
+        "evidence_span": "This distinction is important for granular media such as hydrogel beads, which can sustain compressive but not tensile grain-scale forces. For such systems the model is only physically self-consistent in the compacted region to the right of the black dot\u2013dashed line."
+      },
+      {
+        "role": "constraint",
+        "content": "Wavy shading marks where axial strain exceeds the small-strain validity bound",
+        "evidence_span": "The wavy black\u2013white shading superimposed on the map denotes where the axial strain exceeds our nominal small-strain bound, |\u03b5zz| > 0.2."
+      },
+      {
+        "role": "constraint",
+        "content": "Granular packings can sustain only compressive effective stresses, while connected porous matrices can sustain tension.",
+        "evidence_span": "granular assemblies such as hydrogel beads can only support compressive effective stresses, whereas connected skeletons such as sponges or tissues can sustain tension."
+      },
+      {
+        "role": "constraint",
+        "content": "Parameter regimes with dilation, porosity above the reference value, or tensile skeleton stresses should be interpreted as connected-media cases.",
+        "evidence_span": "this implies that parameter combinations that produce net dilation and local porosity increases above the reference value, or require tensile effective stresses in the skeleton, are more appropriately interpreted as models for connected media."
+      },
+      {
+        "role": "constraint",
+        "content": "Granular-bed interpretations require everywhere-compacted states and maintained membrane-matrix contact.",
+        "evidence_span": "By contrast, the compacted regimes in which (\u03c60(z) \u2264\u03a6) everywhere, and the contact condition between membrane and matrix is maintained, are consistent with granular beds."
+      },
+      {
+        "role": "constraint",
+        "content": "For larger undeformed porosity, the model should be used qualitatively because quantitative accuracy degrades near and beyond the small-strain limit.",
+        "evidence_span": "Consequently, for larger \u03a6 (and hence larger strains) the present model should still be read as a qualitative roadmap. The topology of the regime map and the key onset scalings remain informative, while quantitative predictions will gradually lose accuracy as one approaches and exceeds the small\u2013strain bound."
+      },
+      {
+        "role": "constraint",
+        "content": "The current model is limited by small-strain assumptions.",
+        "evidence_span": "Beyond the small-strain limitation, several extensions would broaden the range of systems described by the model."
+      },
+      {
+        "role": "constraint",
+        "content": "The \u03c7 approximation is only weakly inaccurate except when wall stiffness is very small and strain approaches the model's limiting value of 0.2.",
+        "evidence_span": "only rising to 6% for values of S = 10\u22122 and larger values of P where strain approaches our limiting value of 0.2"
+      },
+      {
+        "role": "constraint",
+        "content": "The experiments are limited and are not meant to fully validate the model, only to illustrate qualitative behavior.",
+        "evidence_span": "While limited in scope and not intended as a full validation, these experiments serve to illustrate the qualitative behaviour captured by our model."
+      }
+    ],
+    "contradiction": [
+      {
+        "role": "contradiction",
+        "content": "The study finds wall flexibility can cause diverging flow instead of the rigid-boundary plateau reported previously.",
+        "evidence_span": "\ufb02exible boundaries can induce a \ufb02ow rate divergence, contrasting with the plateau behaviour observed with rigid boundaries [4]"
+      }
+    ]
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Understanding perfusion/transport in soft porous materials is important because such flow is essential in biological and laboratory systems, and interpreting compaction-limited flow in soft media requires resolving how boundary compliance augments it.",
+        "evidence_spans": [
+          "Perfusion of soft materials such as biological tissue or hydrogels is essential for the functioning of organ and laboratory systems such as chromatographic columns and bioreactors.",
+          "Understanding how the compaction-limited \ufb02ow is augmented by the boundary compliance is important for interpreting transport in soft media but remains an open question"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The coupling between deformable confining-wall mechanics and the compaction process has not yet been explored, and existing numerical steady solutions do not clearly reveal how wall compliance modifies the compacted rigid-wall state.",
+        "evidence_spans": [
+          "thereby enabling a hitherto unexplored coupling between the wall mechanics and compaction process",
+          "The numerical solution of (II.38) determines the full steady response, but does not im-mediately reveal how wall compliance modi\ufb01es the compacted, rigid-wall state"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Several extensions are needed to broaden the range of systems the model can describe.",
+        "evidence_spans": [
+          "several extensions would broaden the range of systems described by the model."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Earlier work analyzed compaction in porous media with rigid boundaries, including theoretical and experimental studies by Parker et al. and later rigid-boundary compaction models by Hewitt et al.",
+        "evidence_spans": [
+          "Generic models of compaction in porous media con\ufb01ned by rigid boundaries were analysed theoretically and experimentally by Parker, et al. [3]",
+          "and more recently by Hewitt, et al. [4]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior strongly coupled poroelastic regimes are often modeled using fully nonlinear elasticity, typically requiring numerical solution.",
+        "evidence_spans": [
+          "Poroelastic regimes with strong \ufb02ow\u2013structure coupling are often treated with fully non-linear elastic models, for which numerical solutions are typically the only practical route"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "MacMinn et al. proposed a hybrid poroelastic model retaining nonlinear kinematics between strain, porosity, and permeability while using small-strain linear elasticity; Hewitt et al. successfully adopted this approach with deformation-dependent Kozeny\u2013Carman permeability and an effective matrix stiffness inversely proportional to liquid volume fraction.",
+        "evidence_spans": [
+          "MacMinn et al. [23] suggested a hybrid approach that retains nonlinear kinematic links between strain, porosity, and permeability but models the solid\u2019s constitutive law as small-strain linearly elastic",
+          "This hybrid ap-proach was adopted with success by Hewitt et al. [4], who coupled a deformation-dependent Kozeny\u2013Carman law to an e\ufb00ective matrix sti\ufb00ness scaling inversely with liquid volume fraction"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Fiori et al. used Hewitt-like models to study periodic loading and later extended the framework to include solute transport.",
+        "evidence_spans": [
+          "Fiori et al. [24] used models similar to Hewitt\u2019s to understand the e\ufb00ect of periodic loading, and later extended the framework to include solute transport [25]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Bouckley et al. explored variants of Hewitt\u2019s one-dimensional compaction problem, including gravity and external mechanical forcing, and generalized effective-stiffness laws to negative volume-fraction exponents.",
+        "evidence_spans": [
+          "Variations of Hewitt\u2019s problem were explored by Bouckley et al. [26], including \ufb02ow against gravity and external mechanical forcing",
+          "[26] generalized e\ufb00ective-sti\ufb00ness laws proportional to volume frac-tion raised to a negative exponent"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Related one-dimensional compaction models for soft, saturated media couple porosity-dependent permeability with viscoelastic or viscoplastic solid response under rapid time-dependent loading.",
+        "evidence_spans": [
+          "Related one-dimensional compaction models for soft, satu-rated media [27, 28] couple porosity-dependent permeability to viscoelastic or viscoplastic solid response under fast time-dependent loading"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The Mackenzie effective-modulus model was previously derived by upscaling linear elasticity around spherical pores.",
+        "evidence_spans": [
+          "These will be the Mackenzie model of e\ufb00ective bulk and shear moduli given in full in Appendix F and derived in [33], which are found by upscaling the equations of linear elasticity around spherical pores"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Hewitt et al.'s prior one-dimensional compaction theory and experiments reported plateau behavior; in rigid-wall experiments, the appropriate comparison is the large-S limit of Hewitt\u2019s theory.",
+        "evidence_spans": [
+          "producing a plateau consistent with the one-dimensional model and experiments of [4].",
+          "The blue solid curve corresponds to experiments with a rigid outer wall, for which the deformation is essentially one-dimensional and the appropriate model is the large-S limit of Hewitt\u2019s compaction theory."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Bouckley et al.'s recent one-dimensional framework classified soft media by flux response to a gravity-aligned pressure drop: large-pressure behavior is determined by the permeability and effective-stiffness exponents, with type-1 media showing unboundedly increasing flux and type-2 media exhibiting a finite compaction plateau.",
+        "evidence_spans": [
+          "A natural point of comparison is the recent one-dimensional study of Bouckley et al. [26], who classify soft media by how the flux responds to a pressure drop applied in the direction of gravity.",
+          "In their framework, with pressure-driven flow aligned with gravity and both ends mechanically constrained, the large-pressure behaviour is controlled entirely by the exponents in the permeability and effective-stiffness laws: \u201ctype-1\u201d media have an ever-increasing flux, whereas \u201ctype-2\u201d media develop a finite compaction plateau whose existence and height depend on the balance of these exponents."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "The full analytical membrane solution is numerically inconvenient because the governing equation becomes singular for small T (T \u226a 1).",
+        "evidence_spans": [
+          "this solution is di\ufb03cult to work with numerically because (II.32) is a singular di\ufb00erential equation because T \u226a1"
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "The paper rejects the limitation of prior strictly one-dimensional, fixed/rigid-boundary treatments by extending the hybrid framework to a two-dimensional, radially compliant cylindrical geometry; in this setting, the previously used poroelastic-exponent-only classification of plateau formation no longer suffices, regimes are reorganized, and behaviors such as super-Darcy flow can arise that are impossible in a 1D fixed-boundary column.",
+        "evidence_spans": [
+          "In this study, we follow the same hybrid linear/nonlinear philosophy, but extend it to a two-dimensional, radially compliant cylindrical geometry",
+          "Our work complements Bouckley et al. by showing that once radial compliance is admitted, the presence or absence of a plateau is no longer determined solely by the poroelastic exponents.",
+          "their exploration of how varying the permeability and stiffness exponents moves a one-dimensional system between plateau-forming and non-plateau-forming classes is extended here into a two-dimensional setting where an additional degree of freedom reorganizes those regimes and allows for behaviours such as super-Darcy flow that cannot arise in a strictly one-dimensional column with fixed boundaries."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "To isolate the role of wall compliance, the study rejects more compliant end conditions and instead imposes clamped boundary conditions.",
+        "evidence_spans": [
+          "To fully isolate the role of wall compliance, we impose clamped boundary conditions"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Rather than continue with the full coupled system or a direct full analytical solution, the paper proceeds with a justified simplified uncoupled system and solves the membrane equation via matched asymptotics because the direct formulation is numerically difficult due to a singularity.",
+        "evidence_spans": [
+          "for the rest of the study we focus on the simpli\ufb01ed system (II.32) and (II.24)",
+          "We therefore solve (II.32) according to (II.26) via matched asymptotics"
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [
+      {
+        "content": "The study is inspired by practical applications involving fluid-driven compaction in cylindrical porous media, including organs, chromatographic columns, and bioreactors.",
+        "evidence_spans": [
+          "Inspired by these applications, we model \ufb02uid-driven compaction in a long, thin cylindrical porous medium bounded by an impermeable elastic membrane and study how \ufb02ow regimes relate to elastic parameters."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The model formulation is informed by prior literature: it adopts the Mackenzie model because it is widely applicable for media with small porosity and extends the effective modulus used by Hewitt et al., and it frames the rigid-wall limit by analogy to Bouckley et al.'s type-2 class.",
+        "evidence_spans": [
+          "it is considered a widely applicable model for media with small porosity [5], and is a direct two-dimensional extension of the e\ufb00ective modulus used in [4]",
+          "For the constitutive choices adopted here, the rigid-wall limit of our model behaves in an analogous way to their type-2 class."
+        ],
+        "conflicting": false
+      }
+    ],
+    "causal_claim": [
+      {
+        "content": "Pressure gradients that drive perfusion compact the porous medium/tissue, shrinking pore space or compressing the matrix, which reduces permeability and feeds back on flow/transport.",
+        "evidence_spans": [
+          "compact under forced perfusion due to \ufb02uid pressure gradients that shrink pore space and feed back to the \ufb02ow",
+          "This coupling reduces the permeability of a porous medium as its matrix compresses",
+          "the same pressure gradients that drive \ufb02ow can compact the tissue, reduce permeability and impact transport"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Elevated interstitial pressure and matrix remodeling can restrict perfusion in tumors.",
+        "evidence_spans": [
+          "elevated interstitial pressure and matrix remodeling can restrict perfusion [11]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For small driving pressure, the matrix remains essentially uncompressed and flow is Darcy-like (approximately linear in pressure, as for a rigid medium).",
+        "evidence_spans": [
+          "For small P, all curves follow the Darcy prediction for a rigid medium: the porous matrix is essentially uncompressed, and the \ufb02ow rate is proportional to pressure."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "With rigid walls, or when the membrane is much stiffer than the porous medium and imposed pressure, increasing pressure causes outlet/axial compaction and jamming, producing a compaction plateau in which additional pressure yields little or no extra throughput; in this limit the model recovers Hewitt's one-dimensional plateauing behavior.",
+        "evidence_spans": [
+          "beyond a certain point, additional driving pressure yields no extra throughput due to a compaction \ufb02ow-rate plateau",
+          "When the membrane is much sti\ufb00er than the porous medium and the pressure driving the \ufb02ow, the model we develop recovers the one-dimensional plateauing model of Hewitt et al. [4]",
+          "As P increases, the porous matrix compacts axially near the outlet and the \ufb02ow rate ceases to grow, producing a plateau consistent with the one-dimensional model and experiments of [4].",
+          "At very large sti\ufb00ness, S \u2273103, this feeds into a triangular orange region in which a compaction plateau forms. Changing P or S within this region does not signi\ufb01cantly change Q0, as the system has reached the compacted state.",
+          "Increasing pressure compacts the outlet region into a boundary layer and the flow rate approaches a genuine compaction plateau, beyond which additional forcing yields essentially no extra throughput.",
+          "The outlet region jams, the porosity collapses, and the flow rate becomes nearly pressure-independent."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Finite wall/boundary compliance relieves and ultimately destroys the rigid-wall terminal compaction plateau, so the flow-pressure curve eventually departs from saturation and diverges instead; reducing wall stiffness makes radial expansion important at lower loads, shrinks the intermediate plateau, and can remove it entirely.",
+        "evidence_spans": [
+          "understanding when compaction can produce a plateau in \ufb02ow and when boundary compliance can relieve that plateau is important",
+          "identi\ufb01es how wall compliance produces departure from the rigid-wall compaction plateau",
+          "However, for all \ufb01nite S, a value of P can be reached which unblocks the system and the \ufb02ow rate starts diverging again.",
+          "Allowing the membrane to be finitely stiff qualitatively reorganises this picture.",
+          "Thus, for any finite S the flow\u2013pressure curve ultimately diverges rather than saturating.",
+          "As S is reduced, radial expansion becomes important at progressively lower loads.",
+          "The intermediate plateau shrinks and eventually disappears, leaving purely divergent responses",
+          "Any finite wall compliance ultimately destroys the terminal plateau and leads to renewed divergence of the flow rate",
+          "In the strict rigid-wall limit the Hewitt\u2013type plateau is genuinely terminal, but any finite wall stiffness ultimately destroys this terminal plateau.",
+          "Transverse compliance qualitatively switches the flow-pressure relation rather than slightly perturbing one-dimensional compaction."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "When driving/imposed pressure becomes comparable to the product of membrane stiffness and initial porosity, wall inflation/radial expansion relieves outlet compaction, causing flow to depart from the plateau and rise again; this threshold is set by membrane stiffness and initial porosity.",
+        "evidence_spans": [
+          "Whereas rigid boundaries produce a compaction plateau, compliant walls exhibit, at most, an intermediate plateau beyond which the \ufb02ow increases once the imposed pressure becomes comparable to the product of membrane sti\ufb00ness and initial porosity.",
+          "but diverges from the plateau when the driving pressure rises above the product of membrane sti\ufb00ness and initial porosity",
+          "As predicted by the asymptotic analysis in section II C, divergence from the plateau values occurs once P becomes larger than the product of membrane sti\ufb00ness S and initial porosity \u03a6, allowing the \ufb02ow rate to increase again.",
+          "When imposed pressure reaches the scale of membrane stiffness times initial porosity, wall inflation relieves outlet compaction and flow rises again.",
+          "Once the driving pressure becomes comparable to the product of membrane stiffness and initial porosity, radial expansion relieves outlet compaction and the flow rate diverges again."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Moderate and small membrane-to-medium stiffness ratios suppress the intermediate plateau and yield purely divergent responses; when axial compaction dominates these are sub-Darcy, and when wall-driven dilation raises average porosity above its undeformed value they become super-Darcy.",
+        "evidence_spans": [
+          "When the sti\ufb00ness ratio of membrane to porous medium is only moderately large, we observe a diverging \ufb02ow rate with no intermediate plateau",
+          "Responses are sub-Darcy when axial compaction dominates and super-Darcy when wall-driven dilation raises average porosity above its undeformed value.",
+          "Large S yields an extended intermediate plateau that mimics the rigid case over several decades in pressure, whereas moderate and small S suppress this plateau and produce purely divergent responses that can be either sub-Darcy or super-Darcy depending on the balance between axial compaction and wall-driven dilation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "When the membrane/wall is softer than the porous medium (small stiffness ratio), radial dilation offsets compaction enough that flow can exceed the rigid-medium expectation, producing a super-Darcy response.",
+        "evidence_spans": [
+          "When the membrane is less sti\ufb00than the porous medium, \ufb02ow rate can exceed that expected for a rigid medium.",
+          "When the ratio is small, we observe a \ufb02ow rate larger than would be expected for a rigid medium",
+          "As the wall is softened, radial dilation of the column increasingly o\ufb00sets this compaction, and for the softest admissible wall in panel (a), S = 0.2, the average porosity rises enough that Q0 exceeds the rigid-medium value, giving a weakly super-Darcy response."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For S > 1, increasing pressure drives axial compaction and makes flow sub-Darcy before any later compliance-driven reacceleration.",
+        "evidence_spans": [
+          "Immediately above this band for S > 1 lies the green sub-Darcy region, where increasing P drives axial compaction and the \ufb02ow rate lags behind the rigid-medium prediction."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Increasing pressure can cause central membrane bulging; a more compliant boundary expands radially, which reduces local axial compression, keeps porosity closer to its inlet value over more of the column, and lowers vertical Darcy velocity in the bulged region.",
+        "evidence_spans": [
+          "Figure 2(b) shows the same pressure load (P = 8.9 \u00d7 102, L = 0) but with a more compliant boundary (S = 104), so that the membrane expands outwards radially. In this regime the cylinder expands radially in the middle of its length, reducing the axial compression locally.",
+          "As a result the porosity remains close to its inlet value over a much larger fraction of the column, and the vertical Darcy velocity is reduced in the bulging region where the cross-section is largest.",
+          "As P increases, the membrane bulges outward over the central portion of the cylinder"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "As pressure becomes comparable to \u03a6(S+2), membrane bulging causes the flow response to deviate from the Darcy prediction.",
+        "evidence_spans": [
+          "As P becomes comparable to \u03a6(S + 2) the membrane bulges and deviates from the Darcy prediction."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Higher hydrostatic pressure near the bottom causes stronger outward membrane bowing there, which generates vertical asymmetry in porosity and Darcy velocity.",
+        "evidence_spans": [
+          "The lower part of the column carries most of the compaction, and the membrane bows outward more strongly toward the bottom where the hydrostatic pressure is highest.",
+          "This generates a corresponding vertical asymmetry in porosity and Darcy velocity."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Decreasing the bending parameter weakens bending resistance and makes radial expansion flatter and more plug-like, with curvature confined near the clamped ends.",
+        "evidence_spans": [
+          "Decreasing T weakens bending resistance and produces a \ufb02atter, more plug-like radial expansion in the interior, with the membrane curvature con\ufb01ned to narrow boundary layers near the clamped ends."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Different stiffness-law exponents select different qualitative flow-rate regimes.",
+        "evidence_spans": [
+          "which identify how di\ufb00erent exponents select di\ufb00erent qualitative \ufb02ow-rate regimes"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Gravity-driven flow curves depart from Darcy scaling once L becomes order 1, though gravity is effectively weaker than imposed pressure.",
+        "evidence_spans": [
+          "The curves again depart from Darcy scaling once L becomes O(1), but gravity is e\ufb00ectively weaker than the imposed pressure."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Crossing the regime boundary where porosity exceeds its initial value somewhere marks a transition from globally compacted states to states with local dilation.",
+        "evidence_spans": [
+          "The dot\u2013dashed black curve indicates where the porosity starts to rise above the initial value, and hence separates globally compacted states (\u03c60(z) \u2264\u03a6 everywhere, on the south\u2013east side of the curve) from solutions in which dilation occurs somewhere in the column (\u03c60(z) > \u03a6 locally, to the north\u2013west)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Wall-stiffness ratio S becomes the key control parameter once radial compliance is included.",
+        "evidence_spans": [
+          "with the wall-stiffness ratio S taking over as the key control parameter."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "When wall friction is negligible, it has only higher-order effects on the main fields, flow-pressure curves, and breakthrough criterion; only strong interfacial coupling or short/thick samples make wall friction measurably reduce flow and shift onset.",
+        "evidence_spans": [
+          "in that regime \u03c60(z) and \u03c7(z), the Q0\u2013P/S curves, and the breakthrough criterion P/(S+2) = O(\u03a6) are unchanged up to higher\u2013order corrections, with at most a mild thickening of axial boundary layers near z = 0, 1.",
+          "Only for very strong interfacial coupling or short/thick samples such that \u01eb \u039b \u22731 does wall friction measurably reduce Q0 at fixed P/S and shift the onset."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Changing undeformed porosity \u03a6 has little effect on the qualitative regime-map structure but strongly controls overall strain magnitude; lowering \u03a6 shifts strain contours upward, enlarges the low-strain validity region, and moves the same behaviors to smaller strains, showing the phenomena persist at very small strain and are not artifacts of large-strain linear elasticity.",
+        "evidence_spans": [
+          "Changing \u03a6 has minimal impact on the overall structure of the parameter map, but strongly changes strain size which is proportional to \u03a6.",
+          "Appendix K, Fig. 10 reproduces the main regime diagram with \u03a6 reduced from 0.05 to 0.01 and shows that the qualitative structure of the map is essentially unchanged, while the strain contours shift upward so that the entire sequence of behaviours discussed in the paper (plateau, its breakthrough, its disappearance with wall compliance, and the transitions between sub-Darcy and super-Darcy regimes) occurs within an indisputably small-strain range, max |\u03b5zz| \u22720.02.",
+          "This demonstrates that the phenomena we analyze are not artifacts of using linear elasticity at large strains; rather, they persist at very small strain and are therefore physically meaningful.",
+          "the family of strain contours (shown in white) shifts upward in the (P, S) plane, enlarging the low\u2013strain validity wedge",
+          "Thus \u03a6 acts as a convenient control parameter for the overall strain level.",
+          "Decreasing \u03a6 further pushes these behaviours to even smaller strains.",
+          "This shows that smaller initial porosity allows the described behaviours to be captured at even smaller strains."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Changing the bending parameter T has little effect on overall regime-map structure, but lowering T shifts the \u03c60(z) \u2264 \u03a6 boundary/contour so as to reduce the region plausibly representing disconnected or granular media.",
+        "evidence_spans": [
+          "Changing T also has little e\ufb00ect on the map structure, apart from changing the location of \u03c60 \u2264\u03a6 curve (a smaller T leads to a smaller valid region for granular media).",
+          "Again, the diagram remains almost unchanged, except that the \u03c60(z) \u2264 \u03a6 contour is shifted southeast, reducing the portion of the map that can credibly model disconnected media."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "When P + L exceeds 1, a boundary layer forms and slows convergence.",
+        "evidence_spans": [
+          "With P + L > 1, the boundary layer forms, slowing convergence."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Semi-rigid confinement changes pathway formation and breakthrough behavior compared with rigid confinement.",
+        "evidence_spans": [
+          "gas migration through bentonite under semi-rigid (transversely compliant) con\ufb01nement exhibits di\ufb00erent pathway formation and breakthrough behaviour than under rigid con\ufb01nement"
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "Using linear elasticity together with nonlinear kinematics provides analytical tractability while still capturing the key role of nonlinear kinematics in the system response.",
+        "evidence_spans": [
+          "allowing greater analytical traction on the problem",
+          "further underscoring the importance of nonlinear kinematics"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Clamped ends act effectively like infinitely stiff collars at the top and bottom of the porous medium.",
+        "evidence_spans": [
+          "e\ufb00ectively imposing in\ufb01nitely sti\ufb00collars at the top and bottom of the porous medium"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The small-displacement/small-porosity-change regime is used so that small displacements imply small strains, and porosity deviations represent small volume changes.",
+        "evidence_spans": [
+          "The displacements Dr0 and Dz0 are small to produce small strains, and \u03a6 \u2212\u03c60 is small to re\ufb02ect small volume changes"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "As pressure increases, radial membrane expansion (wall inflation) begins to relieve axial compaction; the renewed increase in flow rate is therefore driven by wall inflation rather than continued vertical collapse of the porous skeleton.",
+        "evidence_spans": [
+          "This marks the point at which radial expansion of the membrane starts to relieve axial compaction, so that additional pressure can once more drive additional throughput.",
+          "indicating that this renewed growth of Q0 is associated with wall in\ufb02ation rather than further vertical collapse of the porous skeleton."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Gravity is only half as effective as pressure in deforming the wall because the averaged wall-shape scaling depends on P + L/2, so the gravity/load term enters with a factor of one-half.",
+        "evidence_spans": [
+          "This is consistent with the relative scaling for P and L obtained by averaging the outer solution for the wall shape from (II.33),\nZ 1\n0\n\u03c7(z) dz =\nP + L/2\nS + 6G(\u03a6),\n(III.1)\nso that L enters with a factor of one-half."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The sub-Darcy/super-Darcy transition occurs near S \u2248 1 because this marks a balance between porous-skeleton stiffness and membrane stiffness: for relatively stiff walls or skeleton-dominated cases (S \u2273 1, especially S > 1), axial compaction dominates radial expansion and the response is sub-Darcy; for more compliant membranes (S < 1), radial dilation becomes competitive and can increase average porosity enough to produce super-Darcy flow.",
+        "evidence_spans": [
+          "For relatively sti\ufb00walls (S \u22731) axial compression of the porous skeleton still dominates, so the \ufb02ow remains below the undeformable prediction (a sub-Darcy response).",
+          "The location of this boundary is intuitive: S = O(1) marks a balance between the sti\ufb00ness of the porous skeleton and the sti\ufb00ness of the membrane.",
+          "For S > 1, the skeleton is relatively sti\ufb00and axial compaction dominates over radial expansion, giving sub-Darcy behaviour.",
+          "For S < 1, the membrane is more compliant, radial dilatation of the column becomes competitive, and the average porosity can increase enough that the \ufb02ow becomes super-Darcy."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Under gravity alone, vertical compaction always outweighs radial dilation\u2014even for the softest walls that maintain contact\u2014so the system remains at most Darcy or sub-Darcy and no super-Darcy branch appears.",
+        "evidence_spans": [
+          "Even for the softest walls that maintain contact, vertical compaction always outweighs radial dilation. As a result, the response remains at most Darcy or sub-Darcy and no super-Darcy branch appears for gravity alone."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Radial compliance/radial expansion prevents the system from reaching or establishing a fully jammed state, which explains the continued increase in flow under flexible walls.",
+        "evidence_spans": [
+          "consistent with the \ufb02exible-boundary regime of the theory in which radial expansion prevents the system from reaching a fully jammed state.",
+          "This agreement supports the central mechanistic conclusion that radial compliance prevents the establishment of a fully jammed state."
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "The study hypothesizes that relative wall compliance, quantified by the stiffness ratio S, reorganizes the flow\u2013pressure relationship in a compliant cylindrical porous medium and acts as a primary design parameter controlling this effect.",
+        "evidence_spans": [
+          "we model forced perfusion through a long, thin cylindrical porous medium bounded radially by an unattached impermeable elastic membrane and investigate how the relative wall compliance reorganizes the \ufb02ow\u2013pressure relationship",
+          "The stiffness ratio S therefore acts as a primary design parameter."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "To isolate the mechanism by which wall compliance alters the rigid-wall compaction plateau, the study considers pressure-driven flow in the negligible-gravity limit and derives an asymptotic approximation for small but influential wall deformation.",
+        "evidence_spans": [
+          "To isolate this mechanism, we consider pressure-driven \ufb02ow in the negligible-gravity limit, L = 0, and derive an asymptotic approximation in a regime where the wall deformation remains small but has an appreciable e\ufb00ect on the porosity \ufb01eld"
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "The study maps parameter space to distinguish Darcy, plateau, and breakthrough regimes, as well as sub-Darcy versus super-Darcy steady-flow behavior, and identifies a small-strain domain where the theory applies; at low pressure the response is Darcy because the membrane and skeleton are essentially undeformed. For purely gravity-driven flow, the map is similar but lacks a super-Darcy region and loses contact only at larger stiffness ratios S.",
+        "evidence_spans": [
+          "A parameter-space map distinguishes regimes where plateau and breakthrough occur, where the steady \ufb02ow rate is below (sub-Darcy) or above (super-Darcy) the undeformable-medium prediction, and delineates the small-strain domain in which the theory applies.",
+          "The blue Darcy region occupies a band at low P, corresponding to the weakly forced limit in which both the membrane and skeleton are essentially undeformed.",
+          "The map is very similar to the main \ufb01gure, however, the values for S at which the contact condition fails are much larger, and there is no super-Darcy behaviour for a purely gravity-driven \ufb02ow."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "An asymptotic solution for negligible gravity captures departure from the plateau and yields compact formulas for effective permeability and flow rate; its porosity prediction closely matches the numerical solution.",
+        "evidence_spans": [
+          "An asymptotic solution for negligible gravity captures the departure from the plateau and yields compact expressions for e\ufb00ective permeability and \ufb02ow rate.",
+          "The dotted black curve in the porosity plot is the asymptotic prediction (H.11), which closely tracks the numerical solution."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior rigid-wall observations and the rigid-wall-like limit show outlet-localized compaction: Parker et al. observed a compaction boundary layer near the outlet in sponge-flow experiments, and the model reproduces this behavior with predominantly axial deformation and a sharp porosity drop near the outlet.",
+        "evidence_spans": [
+          "whose experiments showed that water \ufb02owing downward through a cylindrical sponge can create highly nonuni-form deformation, concentrating compaction in a boundary layer near the outlet",
+          "The deformation is then predominantly axial: \u03b5zz is most compressive near the outlet and the porosity drops sharply in that outlet-adjacent region consistent with the classic compaction boundary layer reported for rigid systems."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The model is validated against rigid-wall theory and experiments: Hewitt et al. experimentally validated the rigid-wall model and found a flow-rate plateau; the present numerical solutions reproduce Hewitt et al.'s analytical plateau to within 0.1% before breakthrough, and this agreement is presented as validation and consistency with prior work, especially in the effectively rigid-wall limit.",
+        "evidence_spans": [
+          "and experimentally validated the model using water \ufb02ow through hydrogel-bead beds, \ufb01nding the aforementioned \ufb02ow-rate plateau",
+          "the plateau level in our model coincides with the analytical plateau value reported by Hewitt et al. [4] to within a relative error of less than 0.1%, before the curves depart from it again for large values of pressure",
+          "Solutions to (II.38) and (II.39) find the analytical expression for the plateau from Hewitt et al. [4] to within 0.1% before rising again as the breakthrough occurs.",
+          "This provides a strong validation of the model in the limit where the wall is e\ufb00ectively rigid.",
+          "The figure is provided as validation and evidence of consistency with [4]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Wall compliance suppresses or eliminates the compaction plateau: a proof-of-principle experiment and hydrogel-bead experiments support the prediction that flexible boundaries remove the intermediate plateau seen with rigid walls. Flexible-wall experiments show a non-plateauing, monotonically increasing flow rate after the initial Darcy regime, and although there are quantitative discrepancies at high forcing, the model captures the overall flexible-wall trend and absence of plateau using only two parameters fitted from the stiff-wall case.",
+        "evidence_spans": [
+          "this is corroborated by a proof-of-principle experiment that predicts that wall compliance suppresses the compaction plateau",
+          "The resulting red dashed curve is compared with the \ufb02exible-wall experiments (red solid), which show a non-plateauing \ufb02ow rate.",
+          "Once the \ufb02ow departs from the initial Darcy regime, the \ufb02ow rate continues to increase with driving pressure",
+          "Despite some quantitative discrepancies at large forcing, the \ufb02exible-wall model captures the overall trend of the experiments and, in particular, the absence of any intermediate plateau.",
+          "The experiments with packed hydrogel beads are consistent with the principal theoretical prediction that a flexible boundary eliminates the compaction plateau observed with a rigid boundary.",
+          "Using only two fitted material parameters inferred from the stiff-wall configuration, the model captures the qualitative trend of the flexible-wall data, including the absence of an intermediate plateau and the monotonic growth of flow rate with pressure."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For sufficiently large but finite wall stiffness ratios S, an intermediate plateau still appears and closely matches rigid-wall behavior over a broad pressure range before breakthrough.",
+        "evidence_spans": [
+          "For sufficiently large but finite stiffness ratios S, the system still exhibits an intermediate plateau that closely matches the rigid-wall behaviour over a broad range of pressures."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "At large driving pressure, post-plateau flow-rate curves collapse when replotted against P/S, indicating common scaling controlled primarily by the ratio of driving pressure to wall stiffness.",
+        "evidence_spans": [
+          "At large P, the branches fall on a common trend, demonstrating that the post-plateau growth of the \ufb02ow rate is controlled primarily by the ratio of driving pressure to wall sti\ufb00ness."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Pressure-driven and gravity-driven flow curves nearly collapse when compared using L/2, indicating that in this regime gravity alone is roughly half as effective as imposed pressure at driving flow.",
+        "evidence_spans": [
+          "The near-collapse of these two sets of curves demonstrates that, in this regime, gravity alone is roughly half as e\ufb00ective as imposed pressure at driving \ufb02ow."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the examined regime, the overall flow-pressure relation is only weakly sensitive to bending stiffness.",
+        "evidence_spans": [
+          "The weak di\ufb00erence between those curves and the T = 10\u22124 results shows that, in this part of parameter space, the overall \ufb02ow\u2013pressure relation is relatively insensitive to the bending sti\ufb00ness."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For gravity-driven cases, only admissible solutions are shown because the contact condition fails at larger S than in the pressure-driven case.",
+        "evidence_spans": [
+          "In this case the contact condition fails at even larger values of S, and only admissible solutions are shown."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Fitting the rigid-wall experiments gives parameter estimates \u03a6 = 0.15 and Es = 2.5 \u00d7 10^4 Pa.",
+        "evidence_spans": [
+          "\u03a6 and Es are then \ufb01tted using a least squares method to the sti\ufb00-wall data, yielding the blue theoretical curve. These \ufb01tted values of \u03a6 = 0.15 and Es = 2.5 \u00d7 104Pa"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The full sequence of reported behaviors\u2014plateau, breakthrough, disappearance of the plateau with wall compliance, and sub-/super-Darcy transitions\u2014can occur within a clearly small-strain regime; for reduced porosity (e.g. \u03a6 = 0.01), the maximum axial strain remains about |\u03b5zz| \u2272 0.02.",
+        "evidence_spans": [
+          "the entire sequence of behaviours discussed in the paper (plateau, its breakthrough, its disappearance with wall compliance, and the transitions between sub-Darcy and super-Darcy regimes) occurs within an indisputably small-strain range, max |\u03b5zz| \u22720.02.",
+          "For \u03a6 = 0.01, all behaviours discussed in the main text\u2014plateau, its disappearance with wall compliance, breakthrough near P/(S + 2) = O(\u03a6), and the transitions between sub-Darcy and super-Darcy regimes\u2014occur with max |\u03b5zz| \u22720.02."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The numerical solutions agree very well with steady-state time-dependent simulations across the parameter space.",
+        "evidence_spans": [
+          "Excellent agreement was observed across the parameter space."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The appendix reports that the \u03c7-approximation error remains small over nearly all tested parameter space, rising only modestly (about 6%) in a limited regime.",
+        "evidence_spans": [
+          "Figure 7 shows the relative error between the flow rates calculated from the full system and the system with the \u03c7 approximation, showing that this error remains small in the whole of the parameter space considered."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Grid refinement demonstrates second-order numerical convergence in one tested case.",
+        "evidence_spans": [
+          "Both indicate second-order convergence with increasing M."
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "The model is constrained by a small-strain/linear-elasticity regime: it is only valid when strains, porosity changes, and displacements remain small; in practice solutions are rejected when the maximum axial strain exceeds about 0.20, and predictions at larger undeformed porosity or larger strains should be treated as only qualitative.",
+        "evidence_spans": [
+          "and delineates the small-strain domain in which the theory applies.",
+          "We impose small initial porosity, which helps keep the deformation within the small-strain regime",
+          "their physical magnitudes are all constrained to be small (much less than 1) to satisfy the linear elasticity assumption",
+          "To remain consistent with the small strain approximation we will reject any solution where max |\u03b5zz| > 0.20",
+          "The wavy black\u2013white shading superimposed on the map denotes where the axial strain exceeds our nominal small-strain bound, |\u03b5zz| > 0.2.",
+          "Consequently, for larger \u03a6 (and hence larger strains) the present model should still be read as a qualitative roadmap. The topology of the regime map and the key onset scalings remain informative, while quantitative predictions will gradually lose accuracy as one approaches and exceeds the small\u2013strain bound.",
+          "Beyond the small-strain limitation, several extensions would broaden the range of systems described by the model."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The unattached-membrane formulation is only valid while membrane\u2013medium contact is maintained: the membrane is assumed to deform outward under normal pressure while allowing tangential slip, but solutions are invalid when tensile radial wall stress or very small wall stiffness causes detachment/separation, so sufficiently soft walls lie outside this framework.",
+        "evidence_spans": [
+          "We model the membrane as unattached to the porous medium: it deforms outwards under normal pressure, while tangential slip of the porous medium is allowed",
+          "Physically this interaction only makes sense if the porous medium is in contact with the unattached membrane, and so we outline a contact condition which must be met for the model to be valid",
+          "When this occurs, the membrane separates ([31, 32] ) from the porous medium and the model will become unphysical. Therefore, we restrict valid solutions to regions of the parameter space where the contact condition)",
+          "For smaller values of S the contact condition between the membrane and the porous medium fails in our model, so even softer walls cannot be explored within this unattached-membrane framework.",
+          "At very small S the assumptions break down. The hatched region for very small S marks parameter values for which the contact condition fails and the membrane would detach from the porous medium."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Applicability depends on the material class and parameter regime: the paper identifies regions of parameter space appropriate for granular versus connected media.",
+        "evidence_spans": [
+          "we precisely de\ufb01ne the regions of parameter space where the model is applicable to granular or connected media"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For granular media, the model is only physically self-consistent in everywhere-compacted/compressive states: disconnected granular matrices cannot sustain tensile forces, so granular interpretations are rejected wherever porosity exceeds the reference value, dilation occurs, or tensile effective/skeleton stresses are required; such regimes should instead be interpreted as connected-media cases, which can sustain tension.",
+        "evidence_spans": [
+          "the main di\ufb00erence being that disconnected granular matrices cannot sustain tensile forces",
+          "For granular media, we must further constrain the applicability of the model as they cannot sustain tensile forces anywhere",
+          "we reject applications of the model to granular media for regions of the parameter space where this condition is not met",
+          "This distinction is important for granular media such as hydrogel beads, which can sustain compressive but not tensile grain-scale forces. For such systems the model is only physically self-consistent in the compacted region to the right of the black dot\u2013dashed line.",
+          "granular assemblies such as hydrogel beads can only support compressive effective stresses, whereas connected skeletons such as sponges or tissues can sustain tension.",
+          "this implies that parameter combinations that produce net dilation and local porosity increases above the reference value, or require tensile effective stresses in the skeleton, are more appropriately interpreted as models for connected media.",
+          "By contrast, the compacted regimes in which (\u03c60(z) \u2264\u03a6) everywhere, and the contact condition between membrane and matrix is maintained, are consistent with granular beds."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For granular-bed interpretations, membrane\u2013matrix contact must also be maintained in addition to the everywhere-compacted/compressive condition.",
+        "evidence_spans": [
+          "By contrast, the compacted regimes in which (\u03c60(z) \u2264\u03a6) everywhere, and the contact condition between membrane and matrix is maintained, are consistent with granular beds."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The \u03c7 approximation remains only weakly inaccurate except in the extreme regime of very small wall stiffness combined with strain approaching the model\u2019s limiting value (~0.2).",
+        "evidence_spans": [
+          "only rising to 6% for values of S = 10\u22122 and larger values of P where strain approaches our limiting value of 0.2"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Experimental comparisons are limited in scope and are intended only to illustrate qualitative behavior, not to provide full model validation.",
+        "evidence_spans": [
+          "While limited in scope and not intended as a full validation, these experiments serve to illustrate the qualitative behaviour captured by our model."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": [
+      {
+        "content": "The study finds that wall flexibility can induce a flow-rate divergence, in contrast to the plateau behavior previously reported for rigid boundaries.",
+        "evidence_spans": [
+          "\ufb02exible boundaries can induce a \ufb02ow rate divergence, contrasting with the plateau behaviour observed with rigid boundaries [4]"
+        ],
+        "conflicting": false
+      }
+    ]
+  }
+}

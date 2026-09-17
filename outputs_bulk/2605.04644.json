@@ -1,0 +1,528 @@
+{
+  "paper_id": "2605.04644",
+  "chunks_processed": 4,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Textile drying is highly energy-intensive and crucial for quality and efficiency, motivating improved modeling.",
+        "evidence_span": "Textile drying is a key operation in the textile production cycle as it represents one of the most energy-\nintensive stages and plays a critical role in determining both product quality and overall process\nefficiency."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Reliable predictive drying models are needed to optimize textile processes, reduce energy use, and improve sustainability.",
+        "evidence_span": "the availability of reliable models capable of predicting drying dynamics represents a valuable tool for industrial process optimization."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Most textile drying models target convective air drying, leaving a gap for direct-contact, low-pressure heated-cylinder drying.",
+        "evidence_span": "Despite the extensive literature on textile drying, most existing models describe convective drying processes in which air is used as the primary heat and mass transfer medium. The drying process considered in the present work differs significantly from this configuration."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Existing models for paper drying served as prior work.",
+        "evidence_span": "already existing models for paper drying [5, 6]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Early work found fabric drying rates are governed mainly by air resistance and thickness, not fiber type.",
+        "evidence_span": "Early foundational work [7] established the baseline kinetics of fabric drying, demonstrating that drying rates are governed primarily by air resistance and fabric thickness rather than the specific type of fiber."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work studied moisture diffusion differences between highly and weakly hygroscopic fibers.",
+        "evidence_span": "Haghi et al. [8] detailed how moisture diffuses differently in highly hygroscopic fibers compared to weakly hygroscopic ones"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior models predicted effective thermal conductivity of woven fabrics.",
+        "evidence_span": "Ismail et al. [9] developed mathematical models to predict the effective thermal conductivity of woven fabrics."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Finite element methods were previously used to predict effective thermal conductivity and thermal resistance of woven fabric.",
+        "evidence_span": "The issue of predicting the effective thermal conductivity and thermal resistance of the woven fabric has also been faced [10] by using finite element methods."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Recent research has focused on simulation of convective drying processes.",
+        "evidence_span": "recent research has mainly focused on the simulation of convective drying processes."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Comprehensive mathematical models for textile drying under convective airflow were proposed.",
+        "evidence_span": "Comprehensive mathematical models [11\u201313] to analyze moisture distribution, local thermophysical parameters, and the impact of operational variables during textile drying under convective air flow have been proposed."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Models by Johan et al. and Dornyak et al. describe convective drying and estimate local fabric parameters.",
+        "evidence_span": "the models presented by Johan et al. [11] and Dornyak et al. [12], describe the convective drying process of textile materials and allow the estimation of local thermophysical and structural parameters of the fabric"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Sousa et al. experimentally studied drying of crude cotton fabric under controlled hot air flow.",
+        "evidence_span": "Sousa et al.[13] investigate experimentally the drying process of crude cotton fabric, by exposing textile samples to a controlled hot air flow within a drying chamber."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Drying models have also been extended to domestic drum dryers.",
+        "evidence_span": "These modeling approaches have also been extended to consumer applications, such as the simulation of domestic drum dryers[14]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Heat and mass transfer with a single-cylinder drying machine was previously studied for seven fabric types.",
+        "evidence_span": "The heat and mass transfer proces with a single-cylinder drying machine has also been investigated [15] for seven different fabric types."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Pang et al. studied transport and diffusion model relationships in softwood drying.",
+        "evidence_span": "Pang et al. [6] investigated the relationship between transport and diffusion models in softwood drying"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Ghosh et al. and Cepitis discussed theory and modeling of industrial paper drying systems.",
+        "evidence_span": "Ghosh et al. [16] and Cepitis [5] discussed the theoretical foundations and mathematical modeling of industrial paper drying systems."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "The optimization is computationally demanding because each trust-region iteration requires multiple objective evaluations and many IBVP solves.",
+        "evidence_span": "This procedure can be computationally demanding, since we need to solve the IBVP N times for each evaluation of f, which adds up to solving the differential problem 4N times for each iteration of the trust-region method."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Unlike prior literature that treats solid and liquid separately, this work models wet fabric as a single effective system.",
+        "evidence_span": "In contrast with several approaches in the literature, where the solid matrix and the liquid phase are treated separately, the present model considers the wet fabric as an effective single system composed of fibers and liquid."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The authors do not estimate beta by nonlinear least squares because it would significantly increase computational cost.",
+        "evidence_span": "A more accurate calibration of this parameter could be achieved by estimating \u03b2 through a nonlinear least-squares approach as for the other parameters of the model... including \u03b2 in the parameter space would significantly increase the computational cost of the parameter estimation procedure."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The study does not perform fabric-specific calibration; instead it seeks one parameter set across fabric types because detailed calibration is beyond scope.",
+        "evidence_span": "we are looking for a unique set of \"optimal\" parameters which are independent from the type of fabric, but in principle these parameters... could be fine-tuned for every different type of fabric. Since such a detailed, fabric-dependent calibration is beyond the scope of the present study"
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The model is based on and adapted from existing paper-drying models.",
+        "evidence_span": "The model we have devised in this paper is inspired by already existing models for paper drying [5, 6]."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The chosen evaporation-rate form is based on prior work showing an initial constant drying phase followed by slowing near residual moisture.",
+        "evidence_span": "it is shown [5] that during the drying process there is an initial phase of constant drying, then the intensity of the process slows down as we reach the minimum residual moisture content. So the following form for \u03ba(M) is chosen"
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "For a specific fabric, the developed model enables prediction of drying time and residual moisture content.",
+        "evidence_span": "Given a specific fabric, the developed model\nallows to predict the drying time and the residual moisture content."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Improving energy efficiency in thermal processes plays a crucial role in the textile industry's transition.",
+        "evidence_span": "the improvement of energy efficiency in thermal processes\u2014such as drying\u2014plays a crucial role in this transition."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Predictive, physics-based models enable optimization, waste heat recovery, shorter processing times, and lower product losses, reducing embodied energy.",
+        "evidence_span": "the development of predictive and physics-based models is increasingly recognized as a key enabling factor for the optimization of existing technologies and for the design of novel solutions aimed at waste heat recovery, reduction of processing times, and minimization of product losses, thereby lowering the embodied energy of textile products."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Accurate drying predictions improve scheduling, avoid overdrying, and reduce unnecessary energy consumption.",
+        "evidence_span": "Accurate predictions of drying times and residual moisture content allow for a more efficient scheduling of production cycles, avoidance of over-drying, and reduction of unnecessary energy consumption."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Predictive capabilities support control strategies that contribute to energy savings and sustainability.",
+        "evidence_span": "such predictive capabilities support informed control strategies that can significantly contribute to energy savings and to the overall sustainability of textile finishing operations."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Low-pressure operating conditions significantly reduce the evaporation temperature of the fluid in the fabric.",
+        "evidence_span": "Under these operating conditions, the evaporation temperature of the fluid permeating the fabric is significantly reduced."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Boundary conditions cause temperature to decrease from cylinder side to external surface.",
+        "evidence_span": "The temperature decreases almost monotonically from the cylinder side (x = 0) to the external surface (x = L). This behaviour is a direct consequence of the boundary conditions"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Longer drying time, different thickness, and similar initial water content make Sample 14 more uniformly dried.",
+        "evidence_span": "this sample was dried for 60s instead of 30s, the thickness is different (L3 = 6.3 \u00d7 10\u22124, L14 = 4.2 \u00d7 10\u22124 ) and the initial water quantity is almost the same (M0,3 = 0.63, M0,14 = 0.58 ), which results in the sample being more uniformly dried."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Neglecting vapor transport resistance and liquid motion is justified by short drying times and small fabric thickness, which limit internal transport phenomena.",
+        "evidence_span": "These assumptions are supported by the relatively short duration of the drying phase and the small thickness of the fabric, which limit the relevance of internal transport phenomena."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The temperature profile arises because one side is fixed by the cylinder, the other exchanges heat with the environment, conduction transfers heat, and evaporation consumes energy via latent heat.",
+        "evidence_span": "the temperature is fixed at the cylinder\u2013fabric interface, while the opposite surface exchanges heat with the environment through a convective\u2013radiative condition. Heat therefore propagates through the thickness by conduction, while part of the supplied energy is consumed by water evaporation through the latent heat term in the energy balance."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The bell-shaped moisture profile is explained by alternating drying and flipping, which exposes both surfaces directly to the heated cylinder and leaves the interior less heated.",
+        "evidence_span": "This behaviour can be explained by the operating sequence of the drying process. The fabric undergoes three drying phases and is flipped after each phase: it is first dried on side A, then on side B, and finally again on side A. As a consequence, both surfaces are directly exposed to the heated cylinder during the process and experience stronger evaporation, while the inner region remains comparatively less heated."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Misclassified samples are attributed to limited experimental data rather than systematic model deficiencies.",
+        "evidence_span": "these discrepancies are most likely attributable to the relatively small amount of available experimental data rather than to systematic deficiencies of the model."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper proposes that a mathematical model can describe drying of generic textile material on heated cylinders under low pressure.",
+        "evidence_span": "In this work we propose a mathematical model for the drying process of a generic textile\nmaterial using heated cylinders, operating under low-pressure conditions."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The work presents a mathematical model for drying generic textile material on heated cylinders under low pressure.",
+        "evidence_span": "As a first step in this direction, we present a mathematical model for the drying of a generic textile material using heated cylinders operating under low-pressure conditions."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "The developed model was validated with real-world industrial data from a major Italian textile company.",
+        "evidence_span": "The model is validated using real\nworld data provided by a major Italian textile company."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The model was validated using data from a similar water-based drying machine.",
+        "evidence_span": "the mathematical model accounts for the different thermo-physical properties of a generic fluid permeating the fabric and has been validated using experimental data collected from a similar drying machine, in which the fabric is washed with water and subsequently dried by means of heated cylinders."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Comparable MSE and MAE across alternative parameter configurations indicate stable predictive performance.",
+        "evidence_span": "comparable values of the mean squared error (MSE) and mean absolute error (MAE) were observed, indicating a consistent predictive performance."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The moisture profile is bell-shaped, with lower values near both surfaces and a slightly higher interior value.",
+        "evidence_span": "The moisture profile shows a bell-shaped distribution,\nwith lower values near both surfaces and a slightly higher value in the interior."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The model captures the drying process behavior in a consistent and physically meaningful way.",
+        "evidence_span": "Overall, the results show that the model captures the general behaviour of the drying process in a consistent and physically meaningful way."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The best parameter set yields MAE below 0.015, supporting generally accurate predictions across fabric types.",
+        "evidence_span": "the Mean Absolute Error remains below 0.015 for the best set of parameters, indicating that the predictions are generally accurate and that the adopted parameter set provides a satisfactory global description of the process across different fabric types."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Experimental data from the target CO2 prototype machine are not yet available because it is still in the prototype stage.",
+        "evidence_span": "Since the aforementioned machine is still at the prototype stage, experimental data from this specific system are currently unavailable."
+      },
+      {
+        "role": "constraint",
+        "content": "The chamber operates at constant low pressure of 0.1 bar.",
+        "evidence_span": "The system consists of a vacuum chamber that maintains a constant pressure of 0.1 bar."
+      },
+      {
+        "role": "constraint",
+        "content": "The mass-balance equation must satisfy the physical constraint that moisture cannot increase over time.",
+        "evidence_span": "the time derivative of the moisture content M must therefore be non-positive, that is,\n\u2202M\n\u2202t \u22640."
+      },
+      {
+        "role": "constraint",
+        "content": "The model must account for the fact that complete drying is beyond the scope of the machine and ambient conditions cause reabsorption.",
+        "evidence_span": "to completely dry a piece of fabric (M = 0), both extremely high temperatures and prolonged drying times would be required, conditions beyond the scope of the considered industrial drying machine. Secondly, even if the fabric were fully dried, exposure to standard environmental conditions6 would cause some water reabsorption from the surrounding environment; so this behavior has to be incorporated into the model."
+      },
+      {
+        "role": "constraint",
+        "content": "Evaporation is assumed to occur only when fabric temperature reaches the liquid evaporation temperature.",
+        "evidence_span": "the evaporation process is assumed to occur only when the temperature of the wet fabric T reaches the evaporation temperature of the liquid Tevap."
+      },
+      {
+        "role": "constraint",
+        "content": "The logistic steepness parameter beta must satisfy physical consistency and numerical overflow constraints.",
+        "evidence_span": "Its value must be consistent with both the physical characteristics of the system and the numerical stability of the solver, in particular with respect to overflow constraints."
+      },
+      {
+        "role": "constraint",
+        "content": "Model parameters are constrained to physically meaningful intervals.",
+        "evidence_span": "Taking into account that \u03ba, Mb and \u03b3 have physical meaning only if they belong to suitable intervals, the box constraints for the parameters have been established by looking for patterns in experimental data"
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Textile drying is a key, highly energy-intensive stage that strongly affects product quality and process efficiency, motivating the need for reliable predictive models to optimize textile processes, reduce energy use, and improve sustainability.",
+        "evidence_spans": [
+          "Textile drying is a key operation in the textile production cycle as it represents one of the most energy-\nintensive stages and plays a critical role in determining both product quality and overall process\nefficiency.",
+          "the availability of reliable models capable of predicting drying dynamics represents a valuable tool for industrial process optimization."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Most existing textile drying models focus on convective air drying, creating a gap for modeling the direct-contact, low-pressure heated-cylinder drying process considered here.",
+        "evidence_spans": [
+          "Despite the extensive literature on textile drying, most existing models describe convective drying processes in which air is used as the primary heat and mass transfer medium. The drying process considered in the present work differs significantly from this configuration."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Prior work on drying modeling included paper and softwood drying studies, such as existing models for paper drying, theoretical and mathematical models of industrial paper drying systems, and analyses of the relationship between transport and diffusion models in softwood drying.",
+        "evidence_spans": [
+          "already existing models for paper drying [5, 6]",
+          "Pang et al. [6] investigated the relationship between transport and diffusion models in softwood drying",
+          "Ghosh et al. [16] and Cepitis [5] discussed the theoretical foundations and mathematical modeling of industrial paper drying systems."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Early foundational work on fabric drying established that drying rates are governed mainly by air resistance and fabric thickness rather than fiber type, and subsequent work examined how moisture diffusion differs between highly and weakly hygroscopic fibers.",
+        "evidence_spans": [
+          "Early foundational work [7] established the baseline kinetics of fabric drying, demonstrating that drying rates are governed primarily by air resistance and fabric thickness rather than the specific type of fiber.",
+          "Haghi et al. [8] detailed how moisture diffuses differently in highly hygroscopic fibers compared to weakly hygroscopic ones"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior thermal-property modeling work for woven fabrics developed mathematical and finite-element models to predict effective thermal conductivity and thermal resistance.",
+        "evidence_spans": [
+          "Ismail et al. [9] developed mathematical models to predict the effective thermal conductivity of woven fabrics.",
+          "The issue of predicting the effective thermal conductivity and thermal resistance of the woven fabric has also been faced [10] by using finite element methods."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Recent prior research on textile drying has mainly focused on simulating convective drying processes, including comprehensive mathematical models for textile drying under convective airflow that analyze moisture distribution, local thermophysical parameters, and operational variables; models by Johan et al. and Dornyak et al. describe convective drying and estimate local fabric parameters.",
+        "evidence_spans": [
+          "recent research has mainly focused on the simulation of convective drying processes.",
+          "Comprehensive mathematical models [11\u201313] to analyze moisture distribution, local thermophysical parameters, and the impact of operational variables during textile drying under convective air flow have been proposed.",
+          "the models presented by Johan et al. [11] and Dornyak et al. [12], describe the convective drying process of textile materials and allow the estimation of local thermophysical and structural parameters of the fabric"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Related prior work also included experimental and applied drying studies, such as Sousa et al.'s controlled-hot-air experiments on crude cotton fabric, extensions of drying models to domestic drum dryers, and investigation of heat and mass transfer in single-cylinder drying machines across seven fabric types.",
+        "evidence_spans": [
+          "Sousa et al.[13] investigate experimentally the drying process of crude cotton fabric, by exposing textile samples to a controlled hot air flow within a drying chamber.",
+          "These modeling approaches have also been extended to consumer applications, such as the simulation of domestic drum dryers[14].",
+          "The heat and mass transfer proces with a single-cylinder drying machine has also been investigated [15] for seven different fabric types."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "The optimization is computationally demanding because each trust-region iteration requires multiple objective evaluations and many IBVP solves.",
+        "evidence_spans": [
+          "This procedure can be computationally demanding, since we need to solve the IBVP N times for each evaluation of f, which adds up to solving the differential problem 4N times for each iteration of the trust-region method."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "The study rejects modeling the solid matrix and liquid phase separately, instead treating wet fabric as a single effective system composed of fibers and liquid.",
+        "evidence_spans": [
+          "In contrast with several approaches in the literature, where the solid matrix and the liquid phase are treated separately, the present model considers the wet fabric as an effective single system composed of fibers and liquid."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The authors do not use a more accurate nonlinear least-squares estimation of \u03b2 because adding \u03b2 to the parameter-estimation space would significantly increase computational cost.",
+        "evidence_spans": [
+          "A more accurate calibration of this parameter could be achieved by estimating \u03b2 through a nonlinear least-squares approach as for the other parameters of the model... including \u03b2 in the parameter space would significantly increase the computational cost of the parameter estimation procedure."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The study does not pursue detailed fabric-specific calibration; instead it seeks a single set of optimal parameters independent of fabric type because fabric-dependent fine-tuning is beyond the scope of the work.",
+        "evidence_spans": [
+          "we are looking for a unique set of \"optimal\" parameters which are independent from the type of fabric, but in principle these parameters... could be fine-tuned for every different type of fabric. Since such a detailed, fabric-dependent calibration is beyond the scope of the present study"
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [
+      {
+        "content": "The model is adapted from prior paper-drying models, including the evaporation-rate formulation based on earlier work showing an initial constant drying phase followed by a slowdown near minimum residual moisture content.",
+        "evidence_spans": [
+          "The model we have devised in this paper is inspired by already existing models for paper drying [5, 6].",
+          "it is shown [5] that during the drying process there is an initial phase of constant drying, then the intensity of the process slows down as we reach the minimum residual moisture content. So the following form for \u03ba(M) is chosen"
+        ],
+        "conflicting": false
+      }
+    ],
+    "causal_claim": [
+      {
+        "content": "For a given fabric, the developed predictive, physics-based model enables prediction of drying time and residual moisture content; accurate predictions in turn improve production scheduling, avoid overdrying, reduce unnecessary energy consumption, and support informed control strategies that contribute to energy savings and sustainability in textile finishing.",
+        "evidence_spans": [
+          "Given a specific fabric, the developed model\nallows to predict the drying time and the residual moisture content.",
+          "Accurate predictions of drying times and residual moisture content allow for a more efficient scheduling of production cycles, avoidance of over-drying, and reduction of unnecessary energy consumption.",
+          "such predictive capabilities support informed control strategies that can significantly contribute to energy savings and to the overall sustainability of textile finishing operations."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The development of predictive, physics-based models is a key enabling factor for optimizing existing textile drying technologies and designing novel solutions for waste heat recovery, reduced processing times, and minimized product losses, thereby lowering the embodied energy of textile products and supporting the textile industry's transition through improved energy efficiency in thermal processes.",
+        "evidence_spans": [
+          "the development of predictive and physics-based models is increasingly recognized as a key enabling factor for the optimization of existing technologies and for the design of novel solutions aimed at waste heat recovery, reduction of processing times, and minimization of product losses, thereby lowering the embodied energy of textile products.",
+          "the improvement of energy efficiency in thermal processes\u2014such as drying\u2014plays a crucial role in this transition."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Low-pressure operating conditions significantly reduce the evaporation temperature of the fluid in the fabric.",
+        "evidence_spans": [
+          "Under these operating conditions, the evaporation temperature of the fluid permeating the fabric is significantly reduced."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The boundary conditions cause the temperature to decrease almost monotonically from the cylinder side to the external surface.",
+        "evidence_spans": [
+          "The temperature decreases almost monotonically from the cylinder side (x = 0) to the external surface (x = L). This behaviour is a direct consequence of the boundary conditions"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Sample 14 is more uniformly dried because it was dried longer, had a different thickness, and had a similar initial water quantity compared with the other sample.",
+        "evidence_spans": [
+          "this sample was dried for 60s instead of 30s, the thickness is different (L3 = 6.3 \u00d7 10\u22124, L14 = 4.2 \u00d7 10\u22124 ) and the initial water quantity is almost the same (M0,3 = 0.63, M0,14 = 0.58 ), which results in the sample being more uniformly dried."
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "Neglecting vapor transport resistance and liquid motion is justified because the drying phase is relatively short and the fabric is thin, so internal transport phenomena have limited relevance.",
+        "evidence_spans": [
+          "These assumptions are supported by the relatively short duration of the drying phase and the small thickness of the fabric, which limit the relevance of internal transport phenomena."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The temperature profile through the fabric thickness is governed by a fixed temperature at the cylinder\u2013fabric interface, heat exchange at the opposite surface with the environment, conductive heat transfer through the thickness, and energy consumption by evaporation via latent heat.",
+        "evidence_spans": [
+          "the temperature is fixed at the cylinder\u2013fabric interface, while the opposite surface exchanges heat with the environment through a convective\u2013radiative condition. Heat therefore propagates through the thickness by conduction, while part of the supplied energy is consumed by water evaporation through the latent heat term in the energy balance."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The bell-shaped moisture profile results from the alternating drying-and-flipping sequence: each surface is directly exposed to the heated cylinder during different phases and therefore dries more strongly, while the interior remains less heated and retains more moisture.",
+        "evidence_spans": [
+          "This behaviour can be explained by the operating sequence of the drying process. The fabric undergoes three drying phases and is flipped after each phase: it is first dried on side A, then on side B, and finally again on side A. As a consequence, both surfaces are directly exposed to the heated cylinder during the process and experience stronger evaporation, while the inner region remains comparatively less heated."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Misclassified samples are most likely due to the limited amount of experimental data rather than systematic deficiencies in the model.",
+        "evidence_spans": [
+          "these discrepancies are most likely attributable to the relatively small amount of available experimental data rather than to systematic deficiencies of the model."
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "A mathematical model can describe the drying process of generic textile material on heated cylinders under low-pressure conditions.",
+        "evidence_spans": [
+          "In this work we propose a mathematical model for the drying process of a generic textile material using heated cylinders, operating under low-pressure conditions.",
+          "As a first step in this direction, we present a mathematical model for the drying of a generic textile material using heated cylinders operating under low-pressure conditions."
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "The developed model was validated with real-world industrial data from a major Italian textile company.",
+        "evidence_span": "The model is validated using real\nworld data provided by a major Italian textile company."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The model was validated using data from a similar water-based drying machine.",
+        "evidence_span": "the mathematical model accounts for the different thermo-physical properties of a generic fluid permeating the fabric and has been validated using experimental data collected from a similar drying machine, in which the fabric is washed with water and subsequently dried by means of heated cylinders."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Comparable MSE and MAE across alternative parameter configurations indicate stable predictive performance.",
+        "evidence_span": "comparable values of the mean squared error (MSE) and mean absolute error (MAE) were observed, indicating a consistent predictive performance."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The moisture profile is bell-shaped, with lower values near both surfaces and a slightly higher interior value.",
+        "evidence_span": "The moisture profile shows a bell-shaped distribution,\nwith lower values near both surfaces and a slightly higher value in the interior."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The model captures the drying process behavior in a consistent and physically meaningful way.",
+        "evidence_span": "Overall, the results show that the model captures the general behaviour of the drying process in a consistent and physically meaningful way."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The best parameter set yields MAE below 0.015, supporting generally accurate predictions across fabric types.",
+        "evidence_span": "the Mean Absolute Error remains below 0.015 for the best set of parameters, indicating that the predictions are generally accurate and that the adopted parameter set provides a satisfactory global description of the process across different fabric types."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Experimental data from the target CO2 prototype machine are not yet available because it is still in the prototype stage.",
+        "evidence_span": "Since the aforementioned machine is still at the prototype stage, experimental data from this specific system are currently unavailable."
+      },
+      {
+        "role": "constraint",
+        "content": "The chamber operates at constant low pressure of 0.1 bar.",
+        "evidence_span": "The system consists of a vacuum chamber that maintains a constant pressure of 0.1 bar."
+      },
+      {
+        "role": "constraint",
+        "content": "The mass-balance equation must satisfy the physical constraint that moisture cannot increase over time.",
+        "evidence_span": "the time derivative of the moisture content M must therefore be non-positive, that is,\n\u2202M\n\u2202t \u22640."
+      },
+      {
+        "role": "constraint",
+        "content": "The model must account for the fact that complete drying is beyond the scope of the machine and ambient conditions cause reabsorption.",
+        "evidence_span": "to completely dry a piece of fabric (M = 0), both extremely high temperatures and prolonged drying times would be required, conditions beyond the scope of the considered industrial drying machine. Secondly, even if the fabric were fully dried, exposure to standard environmental conditions6 would cause some water reabsorption from the surrounding environment; so this behavior has to be incorporated into the model."
+      },
+      {
+        "role": "constraint",
+        "content": "Evaporation is assumed to occur only when fabric temperature reaches the liquid evaporation temperature.",
+        "evidence_span": "the evaporation process is assumed to occur only when the temperature of the wet fabric T reaches the evaporation temperature of the liquid Tevap."
+      },
+      {
+        "role": "constraint",
+        "content": "The logistic steepness parameter beta must satisfy physical consistency and numerical overflow constraints.",
+        "evidence_span": "Its value must be consistent with both the physical characteristics of the system and the numerical stability of the solver, in particular with respect to overflow constraints."
+      },
+      {
+        "role": "constraint",
+        "content": "Model parameters are constrained to physically meaningful intervals.",
+        "evidence_span": "Taking into account that \u03ba, Mb and \u03b3 have physical meaning only if they belong to suitable intervals, the box constraints for the parameters have been established by looking for patterns in experimental data"
+      }
+    ],
+    "contradiction": []
+  }
+}

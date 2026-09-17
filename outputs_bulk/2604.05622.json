@@ -1,0 +1,917 @@
+{
+  "paper_id": "2604.05622",
+  "chunks_processed": 6,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Discovering optimal NLO molecules is difficult because it requires balancing multiple competing objectives over a vast chemical space.",
+        "evidence_span": "Nonlinear optical (NLO) materials are essential for photonic tech-\nnologies, yet discovering optimal NLO molecules requires balanc-\ning multiple competing objectives across vast chemical spaces."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Hypervolume comparisons require normalization because raw HV is sensitive to scale and outliers",
+        "evidence_span": "However, hypervolume is sensitive to differences in objective scale and to extreme outliers [23], making normalization of objective scores necessary."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Previous work used Multi-Objective MAP-Elites with grid-based archives to find diverse, high-quality molecules for electro-optic applications.",
+        "evidence_span": "Previous work showed that Multi-Objective MAP-Elites (MOME)\nwith grid-based archives discovers diverse, high-quality molecules\nfor electro-optic applications."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Previous work compared several optimization methods on the four-objective NLO molecular design problem using SMILES molecules and Hartree-Fock evaluation.",
+        "evidence_span": "Previous work [12] systematically compares NSGA-II [3], MAP-Elites [15], MOME [17], (\ud835\udf07+\ud835\udf06) evolution, and simulated annealing on this four-objective NLO problem using SMILES-encoded organic molecules evaluated with ab initio Hartree-Fock (HF) calculations via PySCF [19] and the 3-21G basis set."
+      },
+      {
+        "role": "prior_approach",
+        "content": "MOME combines multiobjective and quality-diversity optimization to search for diverse genotypes with different objective tradeoffs.",
+        "evidence_span": "MOME (Multi-Objective MAP Elites [17]) combines multiobjective and quality diversity (QD) optimization, seeking diverse genotypes exhibiting various objective tradeoffs."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The study uses the same Hartree-Fock/3-21G quantum chemistry setup as previous work.",
+        "evidence_span": "the same HF quantum chemistry method with 3-21G basis set used in previous work [11]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "SMILES are manipulated following prior work.",
+        "evidence_span": "SMILES (Simplified Molecular Input Line Entry System [22]) encodes molecular structures as ASCII strings for evolution, and are also manipulated as in prior work [9, 10]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "MAP-Elites maintains elites across a discretized measure space.",
+        "evidence_span": "Multi-dimensional Archive of Phenotypic Elites (MAP-Elites) [15] maintains an archive of elite solutions across a discretized measure space."
+      },
+      {
+        "role": "prior_approach",
+        "content": "MOME extends MAP-Elites by storing local Pareto fronts in each bin.",
+        "evidence_span": "Multiobjective MAP-Elites (MOME) [17] extends MAP-Elites by storing local Pareto fronts within each archive bin rather than single elites."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Grid-based MOME uses atom and bond counts as behavior descriptors.",
+        "evidence_span": "Grid-based MOME uses atom and bond counts as behavior descriptors."
+      },
+      {
+        "role": "prior_approach",
+        "content": "CVT archives replace a uniform grid with Voronoi cells computed by k-means in measure space.",
+        "evidence_span": "Centroidal Voronoi Tessellation (CVT) archives [21] replace the uniform grid with \ud835\udc41 Voronoi cells whose centroids {c\ud835\udc58}\ud835\udc41 \ud835\udc58=1 are computed by \ud835\udc58-means clustering [8] of a set of sample points in measure space."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The experiments compare against NSGA-II, a multiobjective but non-QD method.",
+        "evidence_span": "and compare to NSGA-II [3], a multiobjective but non-QD method."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Previous studies found that fewer than 20% of the 400 grid cells are ever occupied because valid chemical structures are sparse.",
+        "evidence_span": "previous studies [12] indicate that fewer than 20% of those cells are ever occupied due to the sparse distribution of valid chemical structures."
+      },
+      {
+        "role": "prior_approach",
+        "content": "ChemBERTa-2 is cited as prior work on chemical foundation models.",
+        "evidence_span": "[1] Walid Ahmad, Elana Simon, Seyone Chithrananda, Gabriel Grand, and Bharath Ramsundar. 2022. ChemBERTa-2: Towards Chemical Foundation Models."
+      },
+      {
+        "role": "prior_approach",
+        "content": "pymoo is cited as an existing multi-objective optimization framework.",
+        "evidence_span": "[2] J. Blank and K. Deb. 2020. pymoo: Multi-Objective Optimization in Python."
+      },
+      {
+        "role": "prior_approach",
+        "content": "NSGA-II is cited as a prior fast elitist multiobjective genetic algorithm.",
+        "evidence_span": "[3] K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan. 2002. A fast and elitist multiobjec- tive genetic algorithm: NSGA-II."
+      },
+      {
+        "role": "prior_approach",
+        "content": "BERT is cited as prior work on bidirectional transformer language understanding.",
+        "evidence_span": "[4] Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Earlier work on designing molecular assemblies with large second-order optical nonlinearities is cited.",
+        "evidence_span": "[5] David R. Kanis, Mark A. Ratner, and Tobin J. Marks. 1994. Design and con- struction of molecular assemblies with large second-order optical nonlinear- ities."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work on quantum limits of hyper-Rayleigh scattering susceptibility is cited.",
+        "evidence_span": "[6] M.G. Kuzyk. 2001. Quantum limits of the hyper-Rayleigh scattering susceptibility."
+      },
+      {
+        "role": "prior_approach",
+        "content": "RDKit is cited as an existing cheminformatics tool.",
+        "evidence_span": "[7] Greg Landrum. 2010. RDKit: Open-source cheminformatics."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Least Squares Quantization in PCM is cited as prior work.",
+        "evidence_span": "[8] Stuart P. Lloyd. 1982. Least Squares Quantization in PCM."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work on finding molecules with large hyperpolarizabilities is cited.",
+        "evidence_span": "[9] Dominic Mashak and Steven Alexander. 2025. Finding Molecules with Large Hyperpolarizabilities."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work comparing simulated annealing and evolution for finding molecules with specific properties is cited.",
+        "evidence_span": "[10] Dominic Mashak and Steven Alexander. 2025. Finding Molecules with Spe- cific Properties: Simulated Annealing vs. Evolution."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior benchmarking of Hartree-Fock and DFT for molecular hyperpolarizability is cited.",
+        "evidence_span": "[11] Dominic Mashak and S. A. Alexander. 2025. Benchmarking Hartree-Fock and DFT for Molecular Hyperpolarizability: Implications for Evolutionary Design."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work on multi-objective evolutionary design of molecules with enhanced nonlinear optical properties is cited.",
+        "evidence_span": "[12] Dominic Mashak, Jacob Schrum, and S. A. Alexander. 2026. Multi-Objective Evolutionary Design of Molecules with Enhanced Nonlinear Optical Properties."
+      },
+      {
+        "role": "prior_approach",
+        "content": "UMAP is cited as prior dimensionality reduction work.",
+        "evidence_span": "[13] Leland McInnes, John Healy, and James Melville. 2018. UMAP: Uniform Man- ifold Approximation and Projection for Dimension Reduction."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work on modulation and demodulation of optical signals is cited.",
+        "evidence_span": "[14] R.A. Minasian. 2005. Modulation and Demodulation of Optical Signals."
+      },
+      {
+        "role": "prior_approach",
+        "content": "MAP-Elites is cited as prior work on illuminating search spaces by mapping elites.",
+        "evidence_span": "[15] Jean-Baptiste Mouret and Jeff Clune. 2015. Illuminating search spaces by mapping elites."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior quantum chemistry treatment of molecules in electric or magnetic fields is cited.",
+        "evidence_span": "[16] Lucjan Piela. 2020. The Molecule Subject to Electric or Magnetic Fields."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Multi-objective quality diversity optimization is cited as prior work.",
+        "evidence_span": "[17] Thomas Pierrot, Guillaume Richard, Karim Beguir, and Antoine Cully. 2022. Multi- objective quality diversity optimization."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior electro-optics reference is cited.",
+        "evidence_span": "[18] Bahaa E. A. Saleh and Malvin Carl Teich. 1991. Electro-Optics."
+      },
+      {
+        "role": "prior_approach",
+        "content": "PySCF program package developments are cited as prior computational chemistry work.",
+        "evidence_span": "[19] Q. Sun, X. Zhang, S. Banerjee, P. Bao, M. Barbry, N. S. Blunt, N. A. Bogdanov, ... 2020. Recent developments in the PySCF program package."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Modern Quantum Chemistry is cited as prior foundational work.",
+        "evidence_span": "[20] Attila Szab\u00f3 and Neil S. Ostlund. 1996. Modern Quantum Chemistry: Introduction to Advanced Electronic Structure Theory."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work on using centroidal Voronoi tessellations to scale up MAP-Elites archives is cited.",
+        "evidence_span": "[21] Vassilios Vassiliades, Konstantinos Chatzilygeroudis, and Jean-Baptiste Mouret. 2018. Using Centroidal Voronoi Tessellations to Scale Up the Multidimensional Archive of Phenotypic Elites Algorithm."
+      },
+      {
+        "role": "prior_approach",
+        "content": "SMILES is cited as a prior chemical language and encoding methodology.",
+        "evidence_span": "[22] David Weininger. 1988. SMILES, a chemical language and information system. 1. Introduction to methodology and encoding rules."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work reviewing performance assessment of multiobjective optimizers is cited.",
+        "evidence_span": "[23] E. Zitzler, L. Thiele, M. Laumanns, C.M. Fonseca, and V.G. da Fonseca. 2003. Performance assessment of multiobjective optimizers: an analysis and review."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Uniform grid partitioning wastes archive capacity on infeasible regions and undersamples dense regions.",
+        "evidence_span": "However, uniform grid partitioning\nwastes archive capacity on chemically infeasible regions while un-\ndersampling high-density areas."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Fixed uniform-grid archives waste capacity on infeasible molecular regions and undersample dense chemical regions.",
+        "evidence_span": "but exposed a key limitation: fixed grid cells waste archive capacity on chemically infeasible measure combinations (e.g., bond counts that cannot correspond to valid molecules) while undersampling high-density regions of chemical space [12]."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "The grid archive wastes capacity on chemically impossible combinations.",
+        "evidence_span": "no archive capacity is wasted on chemically impossible combinations as the grid archive does (e.g., more bonds than atoms)."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "The paper rejects the fixed uniform-grid archive in favor of a CVT archive based on learned embeddings.",
+        "evidence_span": "This work utilizes CVT-MOME, which replaces the fixed grid with a Centroidal Voronoi Tessellation (CVT) archive [21] whose cells are defined by learned chemical embeddings."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Crossover was not used because preserving chemical validity would require complex repair.",
+        "evidence_span": "Crossover is not used to maintain chemical validity without complex repair mechanisms."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The approach draws on ChemBERTa-2, a transformer pre-trained on PubChem compounds, to encode molecular SMILES.",
+        "evidence_span": "SMILES strings are encoded with ChemBERTa-2 MTR [1], a transformer pre-trained on over 10 million PubChem compounds, then projected to a compact 10-dimensional manifold via UMAP [13]."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The embedding space is based on ChemBERTa-2, a pretrained and fine-tuned molecular transformer.",
+        "evidence_span": "For embedding, we use ChemBERTa-2 Multi-Task Regression (MTR) [1], a BERT-style [4] transformer with 77 million parameters pre-trained on over 10 million SMILES strings from PubChem and fine-tuned on multiple molecular property regression tasks"
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Placing CVT niches where molecules cluster in chemical space yields semantically coherent niches and improves objective performance.",
+        "evidence_span": "CVT centroids are seeded from this manifold, placing niches where molecules actually cluster in chemical space rather than in chemically uninhabited corners of a uniform grid. The result is an archive that partitions diversity along axes of genuine chemical similarity, providing more semantically coherent niches for evolutionary search, resulting in improved objective performance, as evidenced by the significantly higher global hypervolume score."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using initialization-sample embeddings to seed CVT centroid generation ensures centroids lie in inhabited rather than empty regions.",
+        "evidence_span": "The fitted embeddings of the initialization sample also seed CVT centroid generation, ensuring centroids are placed in inhabited regions rather than empty ones."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The selected 100-centroid count was chosen because preliminary testing suggested it yields a comparable number of active niches to the grid baseline.",
+        "evidence_span": "We selected \ud835\udc41 = 100 based on preliminary testing, which suggested that this centroid count provides a comparable number of \"active\" niches to the grid-based baseline."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using embedded molecules directly for k-means causes centroids to be placed where molecules occur rather than in empty regions.",
+        "evidence_span": "the 10,000 UMAP-embedded molecules used to fit the manifold are directly passed to \ud835\udc58-means as the sample set, so centroids are placed where molecules actually live in the manifold rather than in uninhabited regions."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Data-driven centroid placement prevents wasting archive capacity on chemically impossible combinations, unlike the grid archive.",
+        "evidence_span": "As a result, no archive capacity is wasted on chemically impossible combinations as the grid archive does (e.g., more bonds than atoms)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The lower bound on \u03b3 prevents numerical instability in the \u03b2/\u03b3 objective",
+        "evidence_span": "The lower bound of 10 on \ud835\udefe is imposed to prevent numerical instability in the \ud835\udefd/\ud835\udefe objective"
+      },
+      {
+        "role": "causal_claim",
+        "content": "MOME occupies more grid cells because its diversity pressure acts directly in atom-count \u00d7 bond-count space",
+        "evidence_span": "Figure 3a shows that MOME consistently occupies more cells of the 20\u00d720 grid archive than CVT-MOME, as its diversity pressure directly operates in atom-count \u00d7 bond-count space."
+      },
+      {
+        "role": "causal_claim",
+        "content": "CVT-MOME clusters into fewer 2D structural bins when rebinned because it maintains diversity in 10D embedding space",
+        "evidence_span": "CVT-MOME maintains diversity in the 10-dimensional embedding space; when rebinned into the 2D grid, its solutions cluster in fewer structural bins."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Grid coverage alone misses broader chemical diversity revealed by CVT rebinned coverage",
+        "evidence_span": "demonstrating broader chemical diversity that grid coverage alone fails to capture."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Higher-quality Pareto fronts in occupied cells compensate for reduced grid coverage",
+        "evidence_span": "The cells CVT-MOME occupies contain Pareto fronts of considerably higher quality, more than compensating for reduced grid coverage."
+      },
+      {
+        "role": "causal_claim",
+        "content": "NSGA-II's focused population pressure yields the highest single-cell hypervolume but sacrifices diversity",
+        "evidence_span": "reflecting its focused population pressure, though at the cost of the diversity that QD methods provide."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Placing niches where molecules cluster avoids wasting archive capacity on infeasible atom-count/bond-count combinations",
+        "evidence_span": "By placing niches where molecules actually cluster, using ChemBERTa-2 MTR embeddings projected to a 10-dimensional UMAP manifold, CVT-MOME avoids wasting archive capacity on structurally infeasible atom-count/bond-count combinations."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "The improvement is explained by aligning archive partitions with genuine chemical similarity instead of uninhabited grid regions.",
+        "evidence_span": "The result is an archive that partitions diversity along axes of genuine chemical similarity, providing more semantically coherent niches for evolutionary search"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "ChemBERTa representations are expected to have physicochemical meaning because of fine-tuning on molecular property regression tasks.",
+        "evidence_span": "fine-tuned on multiple molecular property regression tasks, giving its representations physicochemical grounding beyond the base language model."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The reason capacity is not wasted is that centroids are placed where molecules actually exist in the manifold instead of uninhabited regions.",
+        "evidence_span": "so centroids are placed where molecules actually live in the manifold rather than in uninhabited regions. As a result, no archive capacity is wasted on chemically impossible combinations as the grid archive does"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "When \u03b3 approaches zero, the ratio diverges and creates artificially large, physically meaningless scores",
+        "evidence_span": "when \ud835\udefe approaches zero, the ratio diverges, producing artificially large scores disconnected from genuine second-order NLO performance rather than reflecting a high \ud835\udefd."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This concentration is attributed to embedding-guided search pressure toward chemically promising regions",
+        "evidence_span": "consistent with embedding-guided search pressure toward chemically promising regions."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Archive efficiency comes from locating niches where molecules actually cluster in embedding space",
+        "evidence_span": "By placing niches where molecules actually cluster, using ChemBERTa-2 MTR embeddings projected to a 10-dimensional UMAP manifold"
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "Using CVT archives defined by learned chemical embeddings is proposed as the approach for the NLO molecular design problem.",
+        "evidence_span": "We apply MOME with Centroidal\nVoronoi Tessellation (CVT) archives whose cells are defined by\nlearned embeddings from ChemBERTa-2 Multi-Task Regression\nreduced via UMAP, capturing chemical similarity beyond simple\nstructural features."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The work proposes CVT-MOME with a CVT archive defined by learned chemical embeddings instead of a fixed grid.",
+        "evidence_span": "This work utilizes CVT-MOME, which replaces the fixed grid with a Centroidal Voronoi Tessellation (CVT) archive [21] whose cells are defined by learned chemical embeddings."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "Embedding-based CVT archives achieved higher median global hypervolume and quality-diversity scores and filled nearly all archive niches.",
+        "evidence_span": "Our results demonstrate\nthat embedding-based measures in CVT archives yield significantly\nhigher median global hypervolume and multi-objective quality\ndiversity scores, while filling nearly all native archive niches."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Prior results found that MOME with a fine-grained uniform grid archive best populated diverse, high-quality niches.",
+        "evidence_span": "Results showed that MOME with a fine-grained uniform grid archive best populates diverse, high-quality niches,"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Improved objective performance is supported by a significantly higher global hypervolume score.",
+        "evidence_span": "resulting in improved objective performance, as evidenced by the significantly higher global hypervolume score."
+      },
+      {
+        "role": "evidence_result",
+        "content": "CVT-MOME achieves the highest median global hypervolume throughout evolution.",
+        "evidence_span": "CVT-MOME consistently achieves the highest median hypervolume throughout evolution."
+      },
+      {
+        "role": "evidence_result",
+        "content": "CVT-MOME's median global hypervolume rises faster and reaches a much higher plateau than MOME's",
+        "evidence_span": "CVT-MOME\u2019s median global hypervolume rises more steeply and reaches a substantially higher plateau than MOME\u2019s."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Final median normalized HV is highest for CVT-MOME",
+        "evidence_span": "By the end of evolution, CVT-MOME achieves a median normalized HV of 0.0273 compared to 0.0095 for MOME and 0.0068 for NSGA-II."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Statistical tests confirm significant performance differences favoring CVT-MOME over MOME",
+        "evidence_span": "a Kruskal-Wallis test yields \ud835\udc3b = 13.52, \ud835\udc5d = 1.16 \u00d7 10\u22123, and a Mann-Whitney U test between MOME and CVT-MOME gives \ud835\udc5d = 2.23 \u00d7 10\u22122, confirming statistically significant differences."
+      },
+      {
+        "role": "evidence_result",
+        "content": "CVT-MOME shows lower run-to-run variance than MOME",
+        "evidence_span": "CVT-MOME also exhibits lower inter-run variance than MOME, whose wide interquartile range reflects greater sensitivity to random seed."
+      },
+      {
+        "role": "evidence_result",
+        "content": "In the CVT archive, CVT-MOME fills far more centroids than MOME or NSGA-II",
+        "evidence_span": "Rebinned into the CVT archive (Figure 3b), CVT-MOME fills 91 of 100 centroids versus only 52 for MOME and 21 for NSGA-II"
+      },
+      {
+        "role": "evidence_result",
+        "content": "CVT-MOME attains a substantially higher grid-archive MOQD score despite occupying fewer grid cells",
+        "evidence_span": "Despite occupying fewer grid cells, CVT-MOME achieves a substantially higher median MOQD score in the grid archive (Figure 3c): 0.065 for CVT-MOME versus 0.034 for MOME and 0.013 for NSGA-II."
+      },
+      {
+        "role": "evidence_result",
+        "content": "CVT-MOME's advantage is even larger when MOQD is measured in the CVT archive",
+        "evidence_span": "When MOQD is computed in the CVT archive (Figure 3d), CVT-MOME\u2019s advantage grows further: 0.098 versus 0.032 for MOME and 0.014 for NSGA-II."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Mega-archive heatmaps show MOME spreads solutions along the structural diagonal",
+        "evidence_span": "MOME distributes solutions broadly along the structural diagonal."
+      },
+      {
+        "role": "evidence_result",
+        "content": "CVT-MOME concentrates its best Pareto fronts at the small-molecule end",
+        "evidence_span": "CVT-MOME covers a somewhat narrower structural range but concentrates its highest-quality Pareto fronts at the small-molecule end"
+      },
+      {
+        "role": "evidence_result",
+        "content": "NSGA-II attains the highest single-cell hypervolume",
+        "evidence_span": "Notably, NSGA-II achieves the highest single-cell hypervolume among algorithms"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The study concludes that CVT archives in learned chemical embedding space substantially improve MOQD performance",
+        "evidence_span": "We demonstrate that CVT archives defined in a learned chemical embedding space substantially improve multi-objective quality diversity in NLO molecular design."
+      },
+      {
+        "role": "evidence_result",
+        "content": "CVT-MOME achieves significantly higher median global HV and both grid- and CVT-based MOQD",
+        "evidence_span": "CVT-MOME achieves a significantly higher median global hypervolume, grid-based MOQD, and CVT-based MOQD."
+      },
+      {
+        "role": "evidence_result",
+        "content": "CVT-MOME fills nearly all of its native centroids, whereas MOME fills about half",
+        "evidence_span": "CVT-MOME fills almost all of its native CVT centroids compared to half for MOME, demonstrating substantially broader chemical diversity in embedding space."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Embedding-informed archive structures enhance both quality and diversity of discovered NLO molecules",
+        "evidence_span": "These results demonstrate that embedding-informed archive structures significantly enhance the quality and diversity of discovered NLO molecules."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "The design problem constrains HOMO-LUMO gap and linear polarizability to target ranges.",
+        "evidence_span": "We investigate a four-objective NLO molecu-\nlar design problem: maximizing the \ud835\udefd/\ud835\udefehyperpolarizability ratio,\nconstraining HOMO-LUMO gap and linear polarizability to target\nranges, and minimizing energy per atom."
+      },
+      {
+        "role": "constraint",
+        "content": "Effective EO modulators must optimize four properties, including target ranges for polarizability and HOMO-LUMO gap plus stability.",
+        "evidence_span": "However, practical performance requires optimizing four properties: a high \ud835\udefd/\ud835\udefe ratio to favor second-order over competing third-order optical responses (defined by \ud835\udefe); moderate linear polarizability (\ud835\udefc\u2208[100, 500] a.u.) for strong charge transfer without excessive optical loss or dispersion; a HOMO-LUMO gap (\u0394\ud835\udc38) of 2\u20134 eV, providing visible-range transparency while sustaining NLO-active charge-transfer character; and thermodynamic stability, proxied by minimizing total energy per heavy atom."
+      },
+      {
+        "role": "constraint",
+        "content": "CVT archives require low-dimensional measures for efficient lookup.",
+        "evidence_span": "Because CVT archives require low-dimensional measures for efficient Voronoi lookup, the 768-dimensional fingerprints are reduced to \ud835\udc51 = 10 dimensions using UMAP"
+      },
+      {
+        "role": "constraint",
+        "content": "Molecules are limited to 5-30 heavy atoms and must be a single connected component.",
+        "evidence_span": "Molecules are restricted to 5-30 heavy atoms (non-hydrogen), forming a single connected component."
+      },
+      {
+        "role": "constraint",
+        "content": "The optimization uses four objectives including target polarizability and HOMO-LUMO-gap ranges and a stability proxy, rejecting molecules with positive per-atom HF energy.",
+        "evidence_span": "All algorithms optimize four objectives: (1) \ud835\udefd/\ud835\udefe: maximize to favor second-order NLO responses over third-order; (2) \ud835\udc53\ud835\udefc: deviation from target \ud835\udefc\u2208[100, 500] a.u. [16]; (3) \ud835\udc53\u0394\ud835\udc38: deviation from target HOMO-LUMO gap 2\u20134 eV; and (4) \ud835\udc38\ud835\udc61\ud835\udc5c\ud835\udc61\ud835\udc4e\ud835\udc59/\ud835\udc41\ud835\udc4e\ud835\udc61\ud835\udc5c\ud835\udc5a\ud835\udc60: minimize total HF energy per heavy atom as a thermodynamic stability proxy; molecules with positive values (convergence failures or strained geometries) are rejected"
+      },
+      {
+        "role": "constraint",
+        "content": "Physically incoherent molecules are pruned using Kuzyk-limit bounds",
+        "evidence_span": "To ensure physical coherence, we prune any molecule whose \ud835\udefd or \ud835\udefe violates the Kuzyk limit [6]."
+      },
+      {
+        "role": "constraint",
+        "content": "Candidates violating hyperpolarizability bounds are discarded",
+        "evidence_span": "Any molecule satisfying |\ud835\udefd| > \ud835\udefdmax or \ud835\udefe \u2209 [\ud835\udefemin, \ud835\udefemax] is discarded."
+      },
+      {
+        "role": "constraint",
+        "content": "Molecules outside specified property ranges are removed as unsuitable EO modulators",
+        "evidence_span": "Based on this knowledge, we discard molecules that exceed any of these specific property ranges: \ud835\udefd \u2208 [0, 50000] and \ud835\udefe \u2208 [10, 10000] [5]."
+      },
+      {
+        "role": "constraint",
+        "content": "Objective values are normalized to fixed ranges before HV computation",
+        "evidence_span": "We then normalize objective scores to the following ranges: \ud835\udefd/\ud835\udefe: [0, 500] (unitless), \ud835\udc53\ud835\udefc: [0, 100] (a.u.), \ud835\udc53\u0394\ud835\udc38: [0, 8] (eV), \ud835\udc38\ud835\udc61\ud835\udc5c\ud835\udc61\ud835\udc4e\ud835\udc59/\ud835\udc41\ud835\udc4e\ud835\udc61\ud835\udc5c\ud835\udc5a\ud835\udc60: [\u221255, \u221210] (Hartree)."
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Discovering optimal nonlinear optical (NLO) molecules is challenging because it requires balancing multiple competing objectives across a vast chemical space.",
+        "evidence_spans": [
+          "Nonlinear optical (NLO) materials are essential for photonic tech-\nnologies, yet discovering optimal NLO molecules requires balanc-\ning multiple competing objectives across vast chemical spaces."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Hypervolume comparisons require normalization because raw hypervolume is sensitive to objective scale and outliers.",
+        "evidence_spans": [
+          "However, hypervolume is sensitive to differences in objective scale and to extreme outliers [23], making normalization of objective scores necessary."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Previous work used Multi-Objective MAP-Elites with grid-based archives to find diverse, high-quality molecules for electro-optic applications.",
+        "evidence_span": "Previous work showed that Multi-Objective MAP-Elites (MOME)\nwith grid-based archives discovers diverse, high-quality molecules\nfor electro-optic applications."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Previous work compared several optimization methods on the four-objective NLO molecular design problem using SMILES molecules and Hartree-Fock evaluation.",
+        "evidence_span": "Previous work [12] systematically compares NSGA-II [3], MAP-Elites [15], MOME [17], (\ud835\udf07+\ud835\udf06) evolution, and simulated annealing on this four-objective NLO problem using SMILES-encoded organic molecules evaluated with ab initio Hartree-Fock (HF) calculations via PySCF [19] and the 3-21G basis set."
+      },
+      {
+        "role": "prior_approach",
+        "content": "MOME combines multiobjective and quality-diversity optimization to search for diverse genotypes with different objective tradeoffs.",
+        "evidence_span": "MOME (Multi-Objective MAP Elites [17]) combines multiobjective and quality diversity (QD) optimization, seeking diverse genotypes exhibiting various objective tradeoffs."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The study uses the same Hartree-Fock/3-21G quantum chemistry setup as previous work.",
+        "evidence_span": "the same HF quantum chemistry method with 3-21G basis set used in previous work [11]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "SMILES are manipulated following prior work.",
+        "evidence_span": "SMILES (Simplified Molecular Input Line Entry System [22]) encodes molecular structures as ASCII strings for evolution, and are also manipulated as in prior work [9, 10]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "MAP-Elites maintains elites across a discretized measure space.",
+        "evidence_span": "Multi-dimensional Archive of Phenotypic Elites (MAP-Elites) [15] maintains an archive of elite solutions across a discretized measure space."
+      },
+      {
+        "role": "prior_approach",
+        "content": "MOME extends MAP-Elites by storing local Pareto fronts in each bin.",
+        "evidence_span": "Multiobjective MAP-Elites (MOME) [17] extends MAP-Elites by storing local Pareto fronts within each archive bin rather than single elites."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Grid-based MOME uses atom and bond counts as behavior descriptors.",
+        "evidence_span": "Grid-based MOME uses atom and bond counts as behavior descriptors."
+      },
+      {
+        "role": "prior_approach",
+        "content": "CVT archives replace a uniform grid with Voronoi cells computed by k-means in measure space.",
+        "evidence_span": "Centroidal Voronoi Tessellation (CVT) archives [21] replace the uniform grid with \ud835\udc41 Voronoi cells whose centroids {c\ud835\udc58}\ud835\udc41 \ud835\udc58=1 are computed by \ud835\udc58-means clustering [8] of a set of sample points in measure space."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The experiments compare against NSGA-II, a multiobjective but non-QD method.",
+        "evidence_span": "and compare to NSGA-II [3], a multiobjective but non-QD method."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Previous studies found that fewer than 20% of the 400 grid cells are ever occupied because valid chemical structures are sparse.",
+        "evidence_span": "previous studies [12] indicate that fewer than 20% of those cells are ever occupied due to the sparse distribution of valid chemical structures."
+      },
+      {
+        "role": "prior_approach",
+        "content": "ChemBERTa-2 is cited as prior work on chemical foundation models.",
+        "evidence_span": "[1] Walid Ahmad, Elana Simon, Seyone Chithrananda, Gabriel Grand, and Bharath Ramsundar. 2022. ChemBERTa-2: Towards Chemical Foundation Models."
+      },
+      {
+        "role": "prior_approach",
+        "content": "pymoo is cited as an existing multi-objective optimization framework.",
+        "evidence_span": "[2] J. Blank and K. Deb. 2020. pymoo: Multi-Objective Optimization in Python."
+      },
+      {
+        "role": "prior_approach",
+        "content": "NSGA-II is cited as a prior fast elitist multiobjective genetic algorithm.",
+        "evidence_span": "[3] K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan. 2002. A fast and elitist multiobjec- tive genetic algorithm: NSGA-II."
+      },
+      {
+        "role": "prior_approach",
+        "content": "BERT is cited as prior work on bidirectional transformer language understanding.",
+        "evidence_span": "[4] Jacob Devlin, Ming-Wei Chang, Kenton Lee, and Kristina Toutanova. 2019. BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Earlier work on designing molecular assemblies with large second-order optical nonlinearities is cited.",
+        "evidence_span": "[5] David R. Kanis, Mark A. Ratner, and Tobin J. Marks. 1994. Design and con- struction of molecular assemblies with large second-order optical nonlinear- ities."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work on quantum limits of hyper-Rayleigh scattering susceptibility is cited.",
+        "evidence_span": "[6] M.G. Kuzyk. 2001. Quantum limits of the hyper-Rayleigh scattering susceptibility."
+      },
+      {
+        "role": "prior_approach",
+        "content": "RDKit is cited as an existing cheminformatics tool.",
+        "evidence_span": "[7] Greg Landrum. 2010. RDKit: Open-source cheminformatics."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Least Squares Quantization in PCM is cited as prior work.",
+        "evidence_span": "[8] Stuart P. Lloyd. 1982. Least Squares Quantization in PCM."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work on finding molecules with large hyperpolarizabilities is cited.",
+        "evidence_span": "[9] Dominic Mashak and Steven Alexander. 2025. Finding Molecules with Large Hyperpolarizabilities."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work comparing simulated annealing and evolution for finding molecules with specific properties is cited.",
+        "evidence_span": "[10] Dominic Mashak and Steven Alexander. 2025. Finding Molecules with Spe- cific Properties: Simulated Annealing vs. Evolution."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior benchmarking of Hartree-Fock and DFT for molecular hyperpolarizability is cited.",
+        "evidence_span": "[11] Dominic Mashak and S. A. Alexander. 2025. Benchmarking Hartree-Fock and DFT for Molecular Hyperpolarizability: Implications for Evolutionary Design."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work on multi-objective evolutionary design of molecules with enhanced nonlinear optical properties is cited.",
+        "evidence_span": "[12] Dominic Mashak, Jacob Schrum, and S. A. Alexander. 2026. Multi-Objective Evolutionary Design of Molecules with Enhanced Nonlinear Optical Properties."
+      },
+      {
+        "role": "prior_approach",
+        "content": "UMAP is cited as prior dimensionality reduction work.",
+        "evidence_span": "[13] Leland McInnes, John Healy, and James Melville. 2018. UMAP: Uniform Man- ifold Approximation and Projection for Dimension Reduction."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work on modulation and demodulation of optical signals is cited.",
+        "evidence_span": "[14] R.A. Minasian. 2005. Modulation and Demodulation of Optical Signals."
+      },
+      {
+        "role": "prior_approach",
+        "content": "MAP-Elites is cited as prior work on illuminating search spaces by mapping elites.",
+        "evidence_span": "[15] Jean-Baptiste Mouret and Jeff Clune. 2015. Illuminating search spaces by mapping elites."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior quantum chemistry treatment of molecules in electric or magnetic fields is cited.",
+        "evidence_span": "[16] Lucjan Piela. 2020. The Molecule Subject to Electric or Magnetic Fields."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Multi-objective quality diversity optimization is cited as prior work.",
+        "evidence_span": "[17] Thomas Pierrot, Guillaume Richard, Karim Beguir, and Antoine Cully. 2022. Multi- objective quality diversity optimization."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior electro-optics reference is cited.",
+        "evidence_span": "[18] Bahaa E. A. Saleh and Malvin Carl Teich. 1991. Electro-Optics."
+      },
+      {
+        "role": "prior_approach",
+        "content": "PySCF program package developments are cited as prior computational chemistry work.",
+        "evidence_span": "[19] Q. Sun, X. Zhang, S. Banerjee, P. Bao, M. Barbry, N. S. Blunt, N. A. Bogdanov, ... 2020. Recent developments in the PySCF program package."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Modern Quantum Chemistry is cited as prior foundational work.",
+        "evidence_span": "[20] Attila Szab\u00f3 and Neil S. Ostlund. 1996. Modern Quantum Chemistry: Introduction to Advanced Electronic Structure Theory."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work on using centroidal Voronoi tessellations to scale up MAP-Elites archives is cited.",
+        "evidence_span": "[21] Vassilios Vassiliades, Konstantinos Chatzilygeroudis, and Jean-Baptiste Mouret. 2018. Using Centroidal Voronoi Tessellations to Scale Up the Multidimensional Archive of Phenotypic Elites Algorithm."
+      },
+      {
+        "role": "prior_approach",
+        "content": "SMILES is cited as a prior chemical language and encoding methodology.",
+        "evidence_span": "[22] David Weininger. 1988. SMILES, a chemical language and information system. 1. Introduction to methodology and encoding rules."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work reviewing performance assessment of multiobjective optimizers is cited.",
+        "evidence_span": "[23] E. Zitzler, L. Thiele, M. Laumanns, C.M. Fonseca, and V.G. da Fonseca. 2003. Performance assessment of multiobjective optimizers: an analysis and review."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Uniform grid partitioning wastes archive capacity on infeasible regions and undersamples dense regions.",
+        "evidence_span": "However, uniform grid partitioning\nwastes archive capacity on chemically infeasible regions while un-\ndersampling high-density areas."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Fixed uniform-grid archives waste capacity on infeasible molecular regions and undersample dense chemical regions.",
+        "evidence_span": "but exposed a key limitation: fixed grid cells waste archive capacity on chemically infeasible measure combinations (e.g., bond counts that cannot correspond to valid molecules) while undersampling high-density regions of chemical space [12]."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "The grid archive wastes capacity on chemically impossible combinations.",
+        "evidence_span": "no archive capacity is wasted on chemically impossible combinations as the grid archive does (e.g., more bonds than atoms)."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "The paper rejects the fixed uniform-grid archive in favor of a CVT archive based on learned embeddings.",
+        "evidence_span": "This work utilizes CVT-MOME, which replaces the fixed grid with a Centroidal Voronoi Tessellation (CVT) archive [21] whose cells are defined by learned chemical embeddings."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Crossover was not used because preserving chemical validity would require complex repair.",
+        "evidence_span": "Crossover is not used to maintain chemical validity without complex repair mechanisms."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The approach draws on ChemBERTa-2, a transformer pre-trained on PubChem compounds, to encode molecular SMILES.",
+        "evidence_span": "SMILES strings are encoded with ChemBERTa-2 MTR [1], a transformer pre-trained on over 10 million PubChem compounds, then projected to a compact 10-dimensional manifold via UMAP [13]."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The embedding space is based on ChemBERTa-2, a pretrained and fine-tuned molecular transformer.",
+        "evidence_span": "For embedding, we use ChemBERTa-2 Multi-Task Regression (MTR) [1], a BERT-style [4] transformer with 77 million parameters pre-trained on over 10 million SMILES strings from PubChem and fine-tuned on multiple molecular property regression tasks"
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Placing CVT niches where molecules cluster in chemical space yields semantically coherent niches and improves objective performance.",
+        "evidence_span": "CVT centroids are seeded from this manifold, placing niches where molecules actually cluster in chemical space rather than in chemically uninhabited corners of a uniform grid. The result is an archive that partitions diversity along axes of genuine chemical similarity, providing more semantically coherent niches for evolutionary search, resulting in improved objective performance, as evidenced by the significantly higher global hypervolume score."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using initialization-sample embeddings to seed CVT centroid generation ensures centroids lie in inhabited rather than empty regions.",
+        "evidence_span": "The fitted embeddings of the initialization sample also seed CVT centroid generation, ensuring centroids are placed in inhabited regions rather than empty ones."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The selected 100-centroid count was chosen because preliminary testing suggested it yields a comparable number of active niches to the grid baseline.",
+        "evidence_span": "We selected \ud835\udc41 = 100 based on preliminary testing, which suggested that this centroid count provides a comparable number of \"active\" niches to the grid-based baseline."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using embedded molecules directly for k-means causes centroids to be placed where molecules occur rather than in empty regions.",
+        "evidence_span": "the 10,000 UMAP-embedded molecules used to fit the manifold are directly passed to \ud835\udc58-means as the sample set, so centroids are placed where molecules actually live in the manifold rather than in uninhabited regions."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Data-driven centroid placement prevents wasting archive capacity on chemically impossible combinations, unlike the grid archive.",
+        "evidence_span": "As a result, no archive capacity is wasted on chemically impossible combinations as the grid archive does (e.g., more bonds than atoms)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The lower bound on \u03b3 prevents numerical instability in the \u03b2/\u03b3 objective",
+        "evidence_span": "The lower bound of 10 on \ud835\udefe is imposed to prevent numerical instability in the \ud835\udefd/\ud835\udefe objective"
+      },
+      {
+        "role": "causal_claim",
+        "content": "MOME occupies more grid cells because its diversity pressure acts directly in atom-count \u00d7 bond-count space",
+        "evidence_span": "Figure 3a shows that MOME consistently occupies more cells of the 20\u00d720 grid archive than CVT-MOME, as its diversity pressure directly operates in atom-count \u00d7 bond-count space."
+      },
+      {
+        "role": "causal_claim",
+        "content": "CVT-MOME clusters into fewer 2D structural bins when rebinned because it maintains diversity in 10D embedding space",
+        "evidence_span": "CVT-MOME maintains diversity in the 10-dimensional embedding space; when rebinned into the 2D grid, its solutions cluster in fewer structural bins."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Grid coverage alone misses broader chemical diversity revealed by CVT rebinned coverage",
+        "evidence_span": "demonstrating broader chemical diversity that grid coverage alone fails to capture."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Higher-quality Pareto fronts in occupied cells compensate for reduced grid coverage",
+        "evidence_span": "The cells CVT-MOME occupies contain Pareto fronts of considerably higher quality, more than compensating for reduced grid coverage."
+      },
+      {
+        "role": "causal_claim",
+        "content": "NSGA-II's focused population pressure yields the highest single-cell hypervolume but sacrifices diversity",
+        "evidence_span": "reflecting its focused population pressure, though at the cost of the diversity that QD methods provide."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Placing niches where molecules cluster avoids wasting archive capacity on infeasible atom-count/bond-count combinations",
+        "evidence_span": "By placing niches where molecules actually cluster, using ChemBERTa-2 MTR embeddings projected to a 10-dimensional UMAP manifold, CVT-MOME avoids wasting archive capacity on structurally infeasible atom-count/bond-count combinations."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "The improvement is explained by aligning archive partitions with genuine chemical similarity instead of uninhabited grid regions.",
+        "evidence_span": "The result is an archive that partitions diversity along axes of genuine chemical similarity, providing more semantically coherent niches for evolutionary search"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "ChemBERTa representations are expected to have physicochemical meaning because of fine-tuning on molecular property regression tasks.",
+        "evidence_span": "fine-tuned on multiple molecular property regression tasks, giving its representations physicochemical grounding beyond the base language model."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The reason capacity is not wasted is that centroids are placed where molecules actually exist in the manifold instead of uninhabited regions.",
+        "evidence_span": "so centroids are placed where molecules actually live in the manifold rather than in uninhabited regions. As a result, no archive capacity is wasted on chemically impossible combinations as the grid archive does"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "When \u03b3 approaches zero, the ratio diverges and creates artificially large, physically meaningless scores",
+        "evidence_span": "when \ud835\udefe approaches zero, the ratio diverges, producing artificially large scores disconnected from genuine second-order NLO performance rather than reflecting a high \ud835\udefd."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This concentration is attributed to embedding-guided search pressure toward chemically promising regions",
+        "evidence_span": "consistent with embedding-guided search pressure toward chemically promising regions."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Archive efficiency comes from locating niches where molecules actually cluster in embedding space",
+        "evidence_span": "By placing niches where molecules actually cluster, using ChemBERTa-2 MTR embeddings projected to a 10-dimensional UMAP manifold"
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "Using CVT archives defined by learned chemical embeddings is proposed as the approach for the NLO molecular design problem.",
+        "evidence_span": "We apply MOME with Centroidal\nVoronoi Tessellation (CVT) archives whose cells are defined by\nlearned embeddings from ChemBERTa-2 Multi-Task Regression\nreduced via UMAP, capturing chemical similarity beyond simple\nstructural features."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The work proposes CVT-MOME with a CVT archive defined by learned chemical embeddings instead of a fixed grid.",
+        "evidence_span": "This work utilizes CVT-MOME, which replaces the fixed grid with a Centroidal Voronoi Tessellation (CVT) archive [21] whose cells are defined by learned chemical embeddings."
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "CVT-MOME (using CVT archives in a learned chemical embedding space) outperforms MOME and NSGA-II on overall optimization performance, achieving the highest and significantly better median global hypervolume throughout evolution; its hypervolume rises faster, reaches a much higher plateau, and ends with the highest final normalized HV.",
+        "evidence_spans": [
+          "Our results demonstrate that embedding-based measures in CVT archives yield significantly higher median global hypervolume and multi-objective quality diversity scores, while filling nearly all native archive niches.",
+          "resulting in improved objective performance, as evidenced by the significantly higher global hypervolume score.",
+          "CVT-MOME consistently achieves the highest median hypervolume throughout evolution.",
+          "CVT-MOME\u2019s median global hypervolume rises more steeply and reaches a substantially higher plateau than MOME\u2019s.",
+          "By the end of evolution, CVT-MOME achieves a median normalized HV of 0.0273 compared to 0.0095 for MOME and 0.0068 for NSGA-II.",
+          "a Kruskal-Wallis test yields \ud835\udc3b = 13.52, \ud835\udc5d = 1.16 \u00d7 10\u22123, and a Mann-Whitney U test between MOME and CVT-MOME gives \ud835\udc5d = 2.23 \u00d7 10\u22122, confirming statistically significant differences.",
+          "CVT-MOME achieves a significantly higher median global hypervolume, grid-based MOQD, and CVT-based MOQD."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "CVT-MOME also delivers stronger quality-diversity performance than baselines, with substantially higher MOQD in both grid and CVT evaluations and much broader coverage of its native archive, filling nearly all CVT centroids; embedding-informed archive structures therefore improve both the quality and diversity of discovered NLO molecules.",
+        "evidence_spans": [
+          "Our results demonstrate that embedding-based measures in CVT archives yield significantly higher median global hypervolume and multi-objective quality diversity scores, while filling nearly all native archive niches.",
+          "Rebinned into the CVT archive (Figure 3b), CVT-MOME fills 91 of 100 centroids versus only 52 for MOME and 21 for NSGA-II",
+          "Despite occupying fewer grid cells, CVT-MOME achieves a substantially higher median MOQD score in the grid archive (Figure 3c): 0.065 for CVT-MOME versus 0.034 for MOME and 0.013 for NSGA-II.",
+          "When MOQD is computed in the CVT archive (Figure 3d), CVT-MOME\u2019s advantage grows further: 0.098 versus 0.032 for MOME and 0.014 for NSGA-II.",
+          "The study concludes that CVT archives in learned chemical embedding space substantially improve MOQD performance",
+          "CVT-MOME achieves a significantly higher median global hypervolume, grid-based MOQD, and CVT-based MOQD.",
+          "CVT-MOME fills almost all of its native CVT centroids compared to half for MOME, demonstrating substantially broader chemical diversity in embedding space.",
+          "These results demonstrate that embedding-informed archive structures significantly enhance the quality and diversity of discovered NLO molecules."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "CVT-MOME shows lower run-to-run variance than MOME, indicating more stable performance across random seeds.",
+        "evidence_spans": [
+          "CVT-MOME also exhibits lower inter-run variance than MOME, whose wide interquartile range reflects greater sensitivity to random seed."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The spatial distribution of solutions differs by algorithm: MOME spreads solutions broadly along the structural diagonal, whereas CVT-MOME covers a somewhat narrower structural range but concentrates its highest-quality Pareto fronts at the small-molecule end.",
+        "evidence_spans": [
+          "MOME distributes solutions broadly along the structural diagonal.",
+          "CVT-MOME covers a somewhat narrower structural range but concentrates its highest-quality Pareto fronts at the small-molecule end"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "NSGA-II achieves the highest single-cell hypervolume, even though it is inferior to CVT-MOME on global hypervolume, MOQD, and archive coverage.",
+        "evidence_spans": [
+          "Notably, NSGA-II achieves the highest single-cell hypervolume among algorithms",
+          "CVT-MOME consistently achieves the highest median hypervolume throughout evolution.",
+          "Despite occupying fewer grid cells, CVT-MOME achieves a substantially higher median MOQD score in the grid archive (Figure 3c): 0.065 for CVT-MOME versus 0.034 for MOME and 0.013 for NSGA-II.",
+          "Rebinned into the CVT archive (Figure 3b), CVT-MOME fills 91 of 100 centroids versus only 52 for MOME and 21 for NSGA-II"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A prior result cited in the paper states that MOME with a fine-grained uniform grid archive best populated diverse, high-quality niches.",
+        "evidence_spans": [
+          "Results showed that MOME with a fine-grained uniform grid archive best populates diverse, high-quality niches,"
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "The molecular design problem constrains key properties to target ranges for suitable EO/NLO molecules: linear polarizability \u03b1 must be in 100\u2013500 a.u. and the HOMO\u2013LUMO gap \u0394E must be in 2\u20134 eV; thermodynamic stability is also enforced via minimizing total energy per heavy atom, with molecules having positive per-atom HF energy rejected.",
+        "evidence_spans": [
+          "We investigate a four-objective NLO molecu-\nlar design problem: maximizing the \ud835\udefd/\ud835\udefehyperpolarizability ratio,\nconstraining HOMO-LUMO gap and linear polarizability to target\nranges, and minimizing energy per atom.",
+          "However, practical performance requires optimizing four properties: a high \ud835\udefd/\ud835\udefe ratio to favor second-order over competing third-order optical responses (defined by \ud835\udefe); moderate linear polarizability (\ud835\udefc\u2208[100, 500] a.u.) for strong charge transfer without excessive optical loss or dispersion; a HOMO-LUMO gap (\u0394\ud835\udc38) of 2\u20134 eV, providing visible-range transparency while sustaining NLO-active charge-transfer character; and thermodynamic stability, proxied by minimizing total energy per heavy atom.",
+          "All algorithms optimize four objectives: (1) \ud835\udefd/\ud835\udefe: maximize to favor second-order NLO responses over third-order; (2) \ud835\udc53\ud835\udefc: deviation from target \ud835\udefc\u2208[100, 500] a.u. [16]; (3) \ud835\udc53\u0394\ud835\udc38: deviation from target HOMO-LUMO gap 2\u20134 eV; and (4) \ud835\udc38\ud835\udc61\ud835\udc5c\ud835\udc61\ud835\udc4e\ud835\udc59/\ud835\udc41\ud835\udc4e\ud835\udc61\ud835\udc5c\ud835\udc5a\ud835\udc4e\ud835\udc60: minimize total HF energy per heavy atom as a thermodynamic stability proxy; molecules with positive values (convergence failures or strained geometries) are rejected)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Candidate molecules are structurally constrained to be single connected components containing 5\u201330 heavy (non-hydrogen) atoms.",
+        "evidence_spans": [
+          "Molecules are restricted to 5-30 heavy atoms (non-hydrogen), forming a single connected component."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Physically incoherent or unsuitable molecules are discarded if their hyperpolarizability values violate admissible bounds, including Kuzyk-limit constraints: molecules are pruned when |\u03b2| > \u03b2max or \u03b3 falls outside [\u03b3min, \u03b3max], and specified screening ranges include \u03b2 \u2208 [0, 50000] and \u03b3 \u2208 [10, 10000].",
+        "evidence_spans": [
+          "To ensure physical coherence, we prune any molecule whose \ud835\udefd or \ud835\udefe violates the Kuzyk limit [6].",
+          "Any molecule satisfying |\ud835\udefd| > \ud835\udefdmax or \ud835\udefe \u2209 [\ud835\udefemin, \ud835\udefemax] is discarded.",
+          "Based on this knowledge, we discard molecules that exceed any of these specific property ranges: \ud835\udefd \u2208 [0, 50000] and \ud835\udefe \u2208 [10, 10000] [5]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For the CVT archive implementation, descriptors must be low-dimensional for efficient Voronoi lookup, so 768-dimensional fingerprints are reduced to d = 10 dimensions using UMAP.",
+        "evidence_spans": [
+          "Because CVT archives require low-dimensional measures for efficient Voronoi lookup, the 768-dimensional fingerprints are reduced to \ud835\udc51 = 10 dimensions using UMAP"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Objective scores are normalized to fixed ranges before hypervolume computation: \u03b2/\u03b3 to [0, 500], f\u03b1 to [0, 100] a.u., f\u0394E to [0, 8] eV, and Etotal/Natoms to [\u221255, \u221210] Hartree.",
+        "evidence_spans": [
+          "We then normalize objective scores to the following ranges: \ud835\udefd/\ud835\udefe: [0, 500] (unitless), \ud835\udc53\ud835\udefc: [0, 100] (a.u.), \ud835\udc53\u0394\ud835\udc38: [0, 8] (eV), \ud835\udc38\ud835\udc61\ud835\udc5c\ud835\udc61\ud835\udc4e\ud835\udc59/\ud835\udc41\ud835\udc4e\ud835\udc61\ud835\udc5c\ud835\udc5a\ud835\udc60: [\u221255, \u221210] (Hartree)."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

@@ -1,0 +1,952 @@
+{
+  "paper_id": "2606.18691",
+  "chunks_processed": 12,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Pre-trained materials foundation models need domain-specific calibration because of physicochemical diversity and mismatched computational settings.",
+        "evidence_span": "However, they often require domain-specific calibration due to physicochemical diversity as well as mismatches between practical computational settings and those used in constructing the pre-training data."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Pre-trained foundation MLIPs do not fully cover materials diversity and unseen conditions, so domain-specific calibration is needed",
+        "evidence_span": "Due to the extreme diversity of material systems, however, even a large-scale pre-training dataset cannot fully cover the complicated and subtle landscape of materials, under-representing elements and motifs, as well as diverse physicochemical variations (e.g., pressure and temperature). Thus, a direct application of a pre-trained foundation MLIP often fails to generalize to unseen conditions, requiring domain-specific calibration (fine-tuning) of the foundation model."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Different theory levels or exchange-correlation settings create systematic discrepancies",
+        "evidence_span": "Moreover, downstream applications may rely on different levels of theory or exchange-correlation functional settings than those used to construct the pre-training data, introducing systematic discrepancies."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Sparsity-promoting fine-tuning for MLIPs remains underexplored, especially for fine-tuning applications",
+        "evidence_span": "However, sparsity-promoting approaches remain underexplored in the context of MLIPs, particularly regarding their application to fine-tuning."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Sparsity-promoting approaches remain underexplored in MLIPs, especially for fine-tuning.",
+        "evidence_span": "De-\nspite these promising results, sparsity-promoting approaches remain largely underexplored in the\nMLIP domain (Sandberg et al., 2024; Torabi et al., 2026), particularly in fine-tuning scenarios."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Zero-shot and from-scratch results indicate that fine-tuning MLIPs is necessary.",
+        "evidence_span": "First, the results of zero-shot foundation models and models trained from scratch highlight the neces- sity of fine-tuning MLIPs."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Accurate prediction is needed in magnetic transition-metal systems because spin effects are central and relevant energies are very small.",
+        "evidence_span": "Magnetism often emerges in transition-metal systems, where spin degrees of freedom play a central role. The relevant energy scale is typically on the order of 10 meV/atom, making accurate prediction essential."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "MLIPs are used as surrogate models for DFT potential energy surfaces",
+        "evidence_span": "Machine learning interatomic potentials (MLIPs, Blank et al. (1995)) aim to reproduce the potential energy surface (PES) of material structures, serving as efficient surrogates for density functional theory (DFT, Kohn & Sham (1965))."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Recent work developed atomistic foundation models using large-scale materials datasets",
+        "evidence_span": "recent work has leveraged large-scale materials datasets to develop atomistic foundation models (Barroso-Luque et al., 2024; Batatia et al., 2025; Chen & Ong, 2022; Deng et al., 2023; Park et al., 2024), achieving impressive accuracy on multiple benchmarks"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Full fine-tuning is the straightforward calibration method",
+        "evidence_span": "Full fine-tuning, which updates all model parameters, would be the most straightforward adaptation method."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Adapters and LoRA are parameter-efficient fine-tuning alternatives using a small trainable parameter set",
+        "evidence_span": "Parameter-efficient fine-tuning methods such as Adapters (Houlsby et al., 2019) and low-rank adaptation (LoRA, Hu et al. (2022)) provide a natural alternative by introducing a small set of trainable parameters."
+      },
+      {
+        "role": "prior_approach",
+        "content": "GeoAda and ELoRA redesign Adapters and LoRA to preserve equivariance constraints",
+        "evidence_span": "To this end, GeoAda (Zhao et al., 2025) and ELoRA (Wang et al., 2025) redesign Adapters and LoRA, respectively, to preserve these constraints."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Early MLIPs used simple feed-forward networks with atomic descriptors on limited systems.",
+        "evidence_span": "In the early stages of MLIP development, simple feed-\nforward networks were employed on limited target systems, using atomic descriptors to predict\nenergy"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Later MLIPs used GNNs with message passing over atom-bond graphs.",
+        "evidence_span": "Later, GNNs enabled sophisticated modeling of chemical interactions through message passing by\nrepresenting atoms as nodes and bonds as edges"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Equivariant architectures were developed to preserve geometric symmetries under SE(3)/E(3).",
+        "evidence_span": "Recognizing this limitation, architectures that preserve geometric symmetries have been developed,\nwith features and outputs transforming under SE(3) or E(3) group operations."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Representative equivariant architectures include MACE, NequIP, Allegro, and Equiformer.",
+        "evidence_span": "Building upon these foundations, representative equivariant architec-\ntures such as MACE (Batatia et al., 2022), NequIP (Batzner et al., 2022), Allegro (Musaelian et al.,\n2023), and Equiformer (Liao & Smidt, 2023)"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Foundation MLIPs emerged following trends from vision and language.",
+        "evidence_span": "These advances have further enabled the emergence of foundation MLIPs, following trends in vision\nand language domains"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Foundation models are pre-trained on large-scale DFT databases for broader generalization.",
+        "evidence_span": "Such foundation\nmodels are pre-trained on large-scale databases of DFT calculations (Barroso-Luque et al., 2024;\nDeng et al., 2023; Jain et al., 2013; Levine et al., 2025) to achieve broader generalization."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Task-specific adaptation has generally used full fine-tuning, sometimes with partial layer freezing.",
+        "evidence_span": "Generally, existing studies have employed full fine-tuning, sometimes with\npartial layer freezing to reduce computational cost"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Equivariant adapters and ELoRA have been proposed for equivariant architectures.",
+        "evidence_span": "Recently, equivariant adapters (Zhao et al., 2025) and ELoRA (Lu et al.,\n2025; Wang et al., 2025) have been proposed for equivariant architectures."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Early sparse-network work pruned trained networks and then fine-tuned them to recover accuracy.",
+        "evidence_span": "Early work\nby Han et al. (2015); Li et al. (2017); Srinivas & Babu (2015) proposed to prune trained networks\nand then fine-tune to recover the accuracy."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Later work focused on subnetworks obtained after pruning and their initialization strategies.",
+        "evidence_span": "Subsequently, the lottery ticket hypothesis (Frankle &\nCarbin, 2019) and Liu et al. (2019) shifted focus toward the subnetworks obtained after pruning and\ntheir initialization strategies"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Some studies jointly learned weights and sparse masks to avoid repeated training and pruning.",
+        "evidence_span": "Some studies (Azarian et al.,\n2020; LIU et al., 2020; Louizos et al., 2018; Savarese et al., 2020; XIAO et al., 2019) proposed to\nsimultaneously learn weights and their sparse masks to avoid multiple rounds of model training and\npruning."
+      },
+      {
+        "role": "prior_approach",
+        "content": "SINDy uses sparsity to identify simple governing equations.",
+        "evidence_span": "For example, the family of SINDy\nframeworks (Brunton et al., 2016) leverages sparsity to identify simple governing equations"
+      },
+      {
+        "role": "prior_approach",
+        "content": "ELoRA parameterizes adaptation as a product of two low-rank matrices, producing dense updates.",
+        "evidence_span": "Existing approaches such as ELoRA (Wang et al., 2025) parameterize \u2206W as the product of two low-rank matrices, leading to dense updates in which every interaction path is perturbed to some degree."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The study compares against standard full fine-tuning and ELoRA as baselines.",
+        "evidence_span": "We demonstrate the effectiveness of our adaptation method on MACE and NequIP potentials (Bata- tia et al., 2022; 2025; Kov\u00b4acs et al., 2025; Tan et al., 2025) through comparison with two major base- lines: standard full-parameter fine-tuning and ELoRA (Wang et al., 2025)."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Foundation models used include MACE-MP-0b3 and MACE-OFF23, pretrained on MPTrj and SPICE.",
+        "evidence_span": "In our main fine-tuning experiments, we use MACE-MP-0b3 (Batatia et al., 2025) and MACE-OFF23 (Kov\u00b4acs et al., 2025) as foundation models. These architectures are updated and extended variants of the original MACE model (Batatia et al., 2022), pre-trained on the MPTrj and SPICE datasets (Deng et al., 2023; Eastman et al., 2023), respectively, and tailored to crystal and molecular domains."
+      },
+      {
+        "role": "prior_approach",
+        "content": "These foundation MLIPs are typically trained on PES targets using energy, force, and sometimes stress losses.",
+        "evidence_span": "These models are commonly trained to reproduce the PES by minimizing energy, force, and optionally stress prediction losses."
+      },
+      {
+        "role": "prior_approach",
+        "content": "For baseline methods, the authors use hyperparameters from Wang et al. (2025).",
+        "evidence_span": "For the full fine-tuning and ELoRA baselines, we adopted the optimal hyperparameters from Wang et al. (2025) to ensure a fair comparison."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Full fine-tuning is prone to overfitting and has computational and memory costs when domain data are small",
+        "evidence_span": "However, domain-specific datasets are typically small relative to the vast configurational and chemical space they should represent, making full fine-tuning highly prone to overfitting, aside from its computational and memory costs."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Existing methods focus on how parameters are updated, leaving unexplored which parameters should be updated",
+        "evidence_span": "These methods focus on how the parameters are updated, e.g., via low-rank structures or regularized magnitudes. A complementary yet unexplored perspective is to instead control which parameters are updated"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Invariant-only models miss directional information needed for vector and tensor quantities.",
+        "evidence_span": "However, these models handle only invariant representations, without considering\ndirectional information crucial for vector and tensor quantities (e.g., forces or dipoles)."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "The work positions itself against full fine-tuning and equivariant low-rank adaptation by showing comparable or better performance with sparse updates.",
+        "evidence_span": "our method matches or surpasses full fine-tuning and equivariant low-rank adaptation while updating only \u223c3 % of parameters, and in some cases as little as \u223c0.5 %."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The paper contrasts its approach with methods that constrain how updates are parameterized, instead directly regularizing how many parameters are impacted",
+        "evidence_span": "In other words, rather than constraining how updates are parameterized, one can directly regularize the number of impacted parameters."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "They do not use sparsity to reduce training-time compute or memory, because the frozen pretrained weights remain dense; instead sparsity is used for selective meaningful updates.",
+        "evidence_span": "Here, we note that sparsity is not introduced to reduce training-time compute or memory usage, since the pre-trained weights W remain dense; rather, it serves to induce selective and physically meaningful updates in \u2206W."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The work is inspired by foundation models from vision and language",
+        "evidence_span": "Inspired by foundation models in computer vision and natural language processing (Caron et al., 2021; Li et al., 2022; Radford et al., 2021), recent work has leveraged large-scale materials datasets to develop atomistic foundation models"
+      },
+      {
+        "role": "inspiration_source",
+        "content": "Equivariant transformations are inspired by physical principles.",
+        "evidence_span": "These transforma-\ntions rely on type-\u00106vectors and spherical harmonics, combined with Clebsch-Gordan tensor prod-\nucts, inspired by physical principles"
+      },
+      {
+        "role": "inspiration_source",
+        "content": "Foundation MLIPs were shaped by trends in vision and language domains.",
+        "evidence_span": "These advances have further enabled the emergence of foundation MLIPs, following trends in vision\nand language domains"
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The method employs soft threshold weight reparameterization from prior sparsity methods.",
+        "evidence_span": "Soft threshold weight reparameterization (STR, Kusupati et al. (2020)), which we employ\nand describe below, belongs to this line of methods."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The sparse adaptation method is based on STR from computer vision.",
+        "evidence_span": "To enable selective adaptation, we learn \u2206W in a sparse manner based on STR (Kusupati et al., 2020), a sparsity-promoting approach originally introduced in the computer vision domain."
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Fine-tuning reweights interaction paths, adapting the model to target-domain characteristics such as composition or thermodynamic regime.",
+        "evidence_span": "From this perspective, fine-tuning corresponds to reweighting the relative contributions of interaction paths, thereby adjusting the model to the characteristics of the target dataset (e.g., composition, pressure/temperature regime, or the level of theory used in DFT calculations)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Injecting \u0394W directly into path weights adds negligible overhead while allowing flexible domain adaptation.",
+        "evidence_span": "In practice, we inject \u2206W directly into the path-weight tensor, introducing negligible computational overhead (see Section 5.5) while enabling flexible domain adaptation."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Thresholding removes small-magnitude entries in \u0394W during training, making updates sparse and compact.",
+        "evidence_span": "This threshold removes entries of \u2206W with magnitudes below the threshold during training, making it sparse and yielding compact updates."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Updating only a subset of path weights highlights physically relevant interactions and suppresses symmetry-trivial paths.",
+        "evidence_span": "In our case, only a subset of path weights corresponding to specific interaction paths is updated during adaptation, highlighting only the physically relevant interactions while suppressing symmetry-trivial paths."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Decoupling updates of \u03c4 and \u0394W fixes instability and enables stable controllable fine-tuning.",
+        "evidence_span": "Decoupling these updates resolves this issue and provides stable, controllable fine-tuning."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Large initial zero-shot errors make the advantage of the approach especially evident.",
+        "evidence_span": "The strength of our approach is particularly evident for systems with large initial zero-shot errors, indicating a significant dis-"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Updating only about 3% of parameters achieved strong performance on shifted domains such as Sn and H2O-PD.",
+        "evidence_span": "This was achieved by modifying approximately 3 % of the model\u2019s parameters."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Highly targeted, compact modifications lead to performance gains.",
+        "evidence_span": "This\nhighlights our method\u2019s ability to achieve performance gains through highly targeted and compact\nmodifications."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The poor FCTP-only performance indicates that most adaptation capability resides in linear layers.",
+        "evidence_span": "indicating that the majority of the adaptation capability is captured by linear\nlayers."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Fine-tuning from the pretrained model leads to substantial gains over scratch training.",
+        "evidence_span": "As shown in Table 2, fine- tuning from the pre-trained model provides substantial improvements over training from scratch"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using the pretrained model especially improves total-energy and force accuracy, while spin-aware energy improves only slightly.",
+        "evidence_span": "While predictions for spin-aware energy showed only slight improvements, the accuracy of total energy and forces improved significantly"
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Generalization failure arises because pre-training under-represents elements, motifs, and physicochemical variations",
+        "evidence_span": "even a large-scale pre-training dataset cannot fully cover the complicated and subtle landscape of materials, under-representing elements and motifs, as well as diverse physicochemical variations (e.g., pressure and temperature). Thus, a direct application of a pre-trained foundation MLIP often fails to generalize to unseen conditions"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Overfitting risk comes from small domain-specific datasets relative to the configurational and chemical space",
+        "evidence_span": "domain-specific datasets are typically small relative to the vast configurational and chemical space they should represent, making full fine-tuning highly prone to overfitting"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "SINDy relies on the idea that physical phenomena are governed by a few core variables.",
+        "evidence_span": "based\non the principle that physical phenomena are often governed by a few core variables"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Reducing model complexity is said to improve interpretability and generalization in scientific applications.",
+        "evidence_span": "This reflects Occam\u0019s razor, where reducing\nmodel complexity enhances both interpretability and generalization in scientific applications."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Equivariance is preserved because fixed CGCs enforce symmetry while learnable path weights only scale allowed interactions.",
+        "evidence_span": "These couplings, or symmetry-allowed interaction paths (Geiger & Smidt, 2022), are realized through Clebsch\u2013Gordan coefficients (CGCs), which are predefined, non-trainable constants that mathematically guarantee equivariance."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Updating only the path-weight tensor preserves equivariance because symmetry is enforced by CGCs, not by the trainable weights.",
+        "evidence_span": "Equivariance is strictly enforced by the predefined CGCs, while the capacity to learn lies entirely in the weights W. Therefore, when adapting a pre-trained model, the natural intervention point is this path-weight tensor. In other words, updating the path-weight tensor does not affect equivariance constraints."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Sparse fine-tuning keeps most path coefficients near zero, suppressing unnecessary degrees of freedom.",
+        "evidence_span": "To this end, we promote sparsity in \u2206W by encouraging most path coefficients to remain close to zero, thereby suppressing unnecessary degrees of freedom during fine-tuning."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Symmetry is preserved during sparse adaptation because \u0394W only modulates learnable weights on CGCs in tensor interaction paths.",
+        "evidence_span": "Because \u2206W modulates the learnable weights on CGCs in individual tensor interaction paths (see Appendix A), symmetry constraints are maintained, and equivariance is strictly preserved."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The instability of naive STR is attributed to coupled decay of threshold and weight updates.",
+        "evidence_span": "We empirically found that applying the naive STR causes instability during the fine-tuning process in equivariant MLIPs due to the coupled decay of \u03c4 and \u2206W."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Linear parameters are inferred to be more important for preserving performance, so the model prunes them less readily.",
+        "evidence_span": "This suggests that the linear parameters are more critical for maintaining performance and are thus pruned more reluctantly by the model"
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper proposes a sparsity-promoting fine-tuning method that selectively updates parameters using structural properties of E(3)-equivariant models.",
+        "evidence_span": "To address this, we propose a sparsity-promoting fine-tuning method that selectively updates model parameters by exploiting the structural properties of E(3)-equivariant materials foundation models."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Selective parameter updating can modify only target-domain-relevant parameters while keeping the rest intact",
+        "evidence_span": "A complementary yet unexplored perspective is to instead control which parameters are updated, encouraging the model to selectively modify only those most relevant to the target domain while preserving the rest intact."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper proposes a sparsity-promoting fine-tuning method for equivariant MLIPs that maintains equivariance via selective parameter updates",
+        "evidence_span": "To bridge this gap, we propose a sparsity-promoting fine-tuning method for equivariant MLIPs, which carefully maintains equivariance with selective parameter updating."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Selective updates of only critical interaction paths should yield more effective adaptation.",
+        "evidence_span": "We hypothesize that more effective adaptation can be achieved through selective updates, enabling the model to adaptively identify and modify only the most critical paths."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The approach should generalize across diverse chemical domains rather than being limited to one material class.",
+        "evidence_span": "These results suggest that our approach is not confined to a single material class but\ncan generalize across diverse chemical domains, from inorganic crystals to organic molecules."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The high-sparsity regime may compress adaptation into only the most essential parameter changes.",
+        "evidence_span": "We hypothesize that this high-sparsity regime forces the model to distill the adaptation into the most essential parameter updates."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Extending non-magnetic foundation models is proposed as an efficient way to reuse pretrained knowledge while modeling magnetic energy differences.",
+        "evidence_span": "Extending non-magnetic foundation models is therefore a highly efficient strategy, as it enables the reuse of pre-trained knowledge while capturing the subtle energy differences associated with magnetic configurations."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "Across molecular and crystalline benchmarks, the method matches or outperforms full fine-tuning and equivariant low-rank adaptation while updating only a small fraction of parameters.",
+        "evidence_span": "On energy and force prediction tasks across molecular and crystalline benchmarks, our method matches or surpasses full fine-tuning and equivariant low-rank adaptation while updating only \u223c3 % of parameters, and in some cases as little as \u223c0.5 %."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The method generalizes beyond energy/force calibration to magnetic moment prediction and magnetism-aware total energy modeling.",
+        "evidence_span": "Beyond energy and force calibration, we further demonstrate task generalizability by applying our method to magnetic moment prediction and magnetism-aware total energy modeling."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Analysis finds physically interpretable sparsity patterns, including enhanced d-orbital contributions in transition metal systems.",
+        "evidence_span": "Finally, analysis of sparsity patterns reveals physically interpretable signatures, such as enhanced d-orbital contributions in transition metal systems."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The method matches or exceeds full fine-tuning while updating only 0.5-3% of parameters across benchmarks",
+        "evidence_span": "Applied to MACE potentials (Batatia et al., 2022; 2025; Kov\u00b4acs et al., 2025) across molecular, crystalline, and magnetic benchmarks, our method matches or exceeds the accuracy of full fine-tuning while updating only 0.5-3 % of parameters."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The method extends effectively to magnetic moments and other material properties beyond energy and force recalibration",
+        "evidence_span": "Beyond recalibrating energy and force predictions, it extends effectively to other material properties such as magnetic moments, demonstrating broader applicability of foundation MLIPs."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Sparsity-pattern analysis shows selectively updated coefficients and yields physical insight",
+        "evidence_span": "Finally, analysis of sparsity patterns reveals which coefficients are selectively updated, yielding physical insights into the learned representations."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Naive STR was empirically unstable for fine-tuning equivariant MLIPs.",
+        "evidence_span": "We empirically found that applying the naive STR causes instability during the fine-tuning process in equivariant MLIPs due to the coupled decay of \u03c4 and \u2206W."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The method is comparable to or better than full fine-tuning and ELoRA across domains while changing under 3% of parameters, sometimes only 0.5%.",
+        "evidence_span": "In this section, we present experimental results demonstrating that our method is comparable to or superior to baselines such as full fine-tuning and ELoRA across all domains. Remarkably, these gains are achieved by modifying fewer than 3 % of the total parameters, with some tasks requiring updates to as few as 0.5 %."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On rMD17, the low-sparsity version beats both full fine-tuning and ELoRA on eight of ten molecules.",
+        "evidence_span": "In the standard setup (L), it surpasses both full fine-tuning and ELoRA on eight out of the ten molecules."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On rMD17, the high-sparsity version still outperforms ELoRA on all molecules.",
+        "evidence_span": "Even more impressively, our method in a high-sparsity setup (H) also outperforms ELoRA across all molecules, showing the robustness of our sparse adaptation strategy on diverse organic systems."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On inorganic crystals, the standard setup is comparable to or better than full fine-tuning and ELoRA.",
+        "evidence_span": "The results on inorganic crystal datasets shown on the right side of Table 1 further confirm the strength of our method. In the standard setup, our method achieves results comparable to or superior to both full fine-tuning and ELoRA."
+      },
+      {
+        "role": "evidence_result",
+        "content": "With 0.5\u20130.7% parameter updates, the high-sparsity setup remains comparable to full fine-tuning and better than ELoRA on nearly all subsets.",
+        "evidence_span": "For the high-sparsity setup, by updating merely 0.5-\n0.7 % of the total parameters, our method still demonstrates comparable accuracy to full fine-tuning\nand better prediction accuracy than ELoRA for energy and forces across nearly all subsets."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On NequIP-OAM-L, the method matches or exceeds full fine-tuning and ELoRA across all benchmark datasets.",
+        "evidence_span": "As shown in Table I in Appendix D, our\nmethod achieves comparable or superior accuracy to full fine-tuning and ELoRA across all bench-\nmark datasets, demonstrating its generalizability across different equivariant architectures."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Linear-only and All update settings have nearly identical predictive performance over many \u03bb\u03c4 values.",
+        "evidence_span": "As shown in Figure 1, the predictive performance trends for the Linear and All settings are nearly\nidentical across a wide range of \u03bb\u03c4 values."
+      },
+      {
+        "role": "evidence_result",
+        "content": "FCTP-only updates consistently perform worst.",
+        "evidence_span": "Conversely, the FCTP setting consistently yields the\npoorest performance"
+      },
+      {
+        "role": "evidence_result",
+        "content": "TM-O-Spin shows the same trend as the Ti ablation.",
+        "evidence_span": "Results on TM-O-Spin (shown in Figure II in Appendix D) demonstrate a similar tendency."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Figure 1 shows linear and All are much better than FCTP and remain stable at high sparsity for large \u03bb\u03c4.",
+        "evidence_span": "The tendency of the linear and All configurations is similar and significantly\nsuperior to that of FCTP, showing a stable, high-sparsity regime at large \u03bb\u03c4 values."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Linear-only sparsity grows gradually with increasing \u03bb\u03c4, while All sparsity rises sharply earlier.",
+        "evidence_span": "As shown in Figure 1, for the Linear-only strategy, sparsity increases gradually with increasing \u03bb\u03c4. In contrast, for the All strategy, module sparsity increases sharply at a much earlier stage."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The energy plots show two effective adaptation regimes: a low-sparsity high-performance regime and a high-sparsity stable regime.",
+        "evidence_span": "Furthermore, the energy plots for both the Linear and All settings commonly exhibit two distinct, effective adaptation regimes."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For most datasets, the best compact-update point in the low-sparsity regime occurs at \u03bb\u03c4 = 0.01, except TM-O-Spin where it is 0.05.",
+        "evidence_span": "This corresponds to \u03bb\u03c4 = 0.01 for most datasets, except for the TM-O-Spin, where the optimum occurs at \u03bb\u03c4 = 0.05."
+      },
+      {
+        "role": "evidence_result",
+        "content": "A high-sparsity stable regime exists at larger \u03bb\u03c4 values from 0.3 and keeps strong performance despite extreme sparsity.",
+        "evidence_span": "Second, we identified a high-sparsity, stable regime (labeled as Ours (H)) at larger \u03bb\u03c4 from 0.3, which maintains strong performance with extreme sparsity despite being slightly sub-optimal."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On TM-O-Spin, fine-tuning from the pretrained model substantially outperforms training from scratch.",
+        "evidence_span": "As shown in Table 2, fine- tuning from the pre-trained model provides substantial improvements over training from scratch, un- derscoring the importance of domain-specific fine-tuning."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Fine-tuning equivariant GNNs must preserve translational, rotational, and reflectional symmetry",
+        "evidence_span": "Applying these methods to equivariant graph neural networks (GNNs), which are commonly used in state-of-the-art MLIPs, requires preserving equivariance constraints, i.e., translational, rotational, and reflectional symmetries in 3D space."
+      },
+      {
+        "role": "constraint",
+        "content": "\u0394W cannot be initialized to zero because the thresholding mechanism would block learning via vanishing gradients.",
+        "evidence_span": "This initialization is necessary because if \u2206W were set to zero, the threshold mechanism would cause vanishing gradients and prevent any learning."
+      },
+      {
+        "role": "constraint",
+        "content": "Spin-aware layers add 8.6% parameters and are trained from scratch, while sparsity-promoting adaptation is restricted to the original foundation-model parameters.",
+        "evidence_span": "We add spin-aware layers (+8.6 % parameters) to MACE-MP-0b3, which are trained from scratch, while our sparsity-promoting adaptation is applied exclusively to the original foundation model parameters."
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Pre-trained materials foundation models need domain-specific calibration because of physicochemical diversity and mismatched computational settings.",
+        "evidence_span": "However, they often require domain-specific calibration due to physicochemical diversity as well as mismatches between practical computational settings and those used in constructing the pre-training data."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Pre-trained foundation MLIPs do not fully cover materials diversity and unseen conditions, so domain-specific calibration is needed",
+        "evidence_span": "Due to the extreme diversity of material systems, however, even a large-scale pre-training dataset cannot fully cover the complicated and subtle landscape of materials, under-representing elements and motifs, as well as diverse physicochemical variations (e.g., pressure and temperature). Thus, a direct application of a pre-trained foundation MLIP often fails to generalize to unseen conditions, requiring domain-specific calibration (fine-tuning) of the foundation model."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Different theory levels or exchange-correlation settings create systematic discrepancies",
+        "evidence_span": "Moreover, downstream applications may rely on different levels of theory or exchange-correlation functional settings than those used to construct the pre-training data, introducing systematic discrepancies."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Sparsity-promoting fine-tuning for MLIPs remains underexplored, especially for fine-tuning applications",
+        "evidence_span": "However, sparsity-promoting approaches remain underexplored in the context of MLIPs, particularly regarding their application to fine-tuning."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Sparsity-promoting approaches remain underexplored in MLIPs, especially for fine-tuning.",
+        "evidence_span": "De-\nspite these promising results, sparsity-promoting approaches remain largely underexplored in the\nMLIP domain (Sandberg et al., 2024; Torabi et al., 2026), particularly in fine-tuning scenarios."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Zero-shot and from-scratch results indicate that fine-tuning MLIPs is necessary.",
+        "evidence_span": "First, the results of zero-shot foundation models and models trained from scratch highlight the neces- sity of fine-tuning MLIPs."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Accurate prediction is needed in magnetic transition-metal systems because spin effects are central and relevant energies are very small.",
+        "evidence_span": "Magnetism often emerges in transition-metal systems, where spin degrees of freedom play a central role. The relevant energy scale is typically on the order of 10 meV/atom, making accurate prediction essential."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "MLIPs are used as surrogate models for DFT potential energy surfaces",
+        "evidence_span": "Machine learning interatomic potentials (MLIPs, Blank et al. (1995)) aim to reproduce the potential energy surface (PES) of material structures, serving as efficient surrogates for density functional theory (DFT, Kohn & Sham (1965))."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Recent work developed atomistic foundation models using large-scale materials datasets",
+        "evidence_span": "recent work has leveraged large-scale materials datasets to develop atomistic foundation models (Barroso-Luque et al., 2024; Batatia et al., 2025; Chen & Ong, 2022; Deng et al., 2023; Park et al., 2024), achieving impressive accuracy on multiple benchmarks"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Full fine-tuning is the straightforward calibration method",
+        "evidence_span": "Full fine-tuning, which updates all model parameters, would be the most straightforward adaptation method."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Adapters and LoRA are parameter-efficient fine-tuning alternatives using a small trainable parameter set",
+        "evidence_span": "Parameter-efficient fine-tuning methods such as Adapters (Houlsby et al., 2019) and low-rank adaptation (LoRA, Hu et al. (2022)) provide a natural alternative by introducing a small set of trainable parameters."
+      },
+      {
+        "role": "prior_approach",
+        "content": "GeoAda and ELoRA redesign Adapters and LoRA to preserve equivariance constraints",
+        "evidence_span": "To this end, GeoAda (Zhao et al., 2025) and ELoRA (Wang et al., 2025) redesign Adapters and LoRA, respectively, to preserve these constraints."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Early MLIPs used simple feed-forward networks with atomic descriptors on limited systems.",
+        "evidence_span": "In the early stages of MLIP development, simple feed-\nforward networks were employed on limited target systems, using atomic descriptors to predict\nenergy"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Later MLIPs used GNNs with message passing over atom-bond graphs.",
+        "evidence_span": "Later, GNNs enabled sophisticated modeling of chemical interactions through message passing by\nrepresenting atoms as nodes and bonds as edges"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Equivariant architectures were developed to preserve geometric symmetries under SE(3)/E(3).",
+        "evidence_span": "Recognizing this limitation, architectures that preserve geometric symmetries have been developed,\nwith features and outputs transforming under SE(3) or E(3) group operations."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Representative equivariant architectures include MACE, NequIP, Allegro, and Equiformer.",
+        "evidence_span": "Building upon these foundations, representative equivariant architec-\ntures such as MACE (Batatia et al., 2022), NequIP (Batzner et al., 2022), Allegro (Musaelian et al.,\n2023), and Equiformer (Liao & Smidt, 2023)"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Foundation MLIPs emerged following trends from vision and language.",
+        "evidence_span": "These advances have further enabled the emergence of foundation MLIPs, following trends in vision\nand language domains"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Foundation models are pre-trained on large-scale DFT databases for broader generalization.",
+        "evidence_span": "Such foundation\nmodels are pre-trained on large-scale databases of DFT calculations (Barroso-Luque et al., 2024;\nDeng et al., 2023; Jain et al., 2013; Levine et al., 2025) to achieve broader generalization."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Task-specific adaptation has generally used full fine-tuning, sometimes with partial layer freezing.",
+        "evidence_span": "Generally, existing studies have employed full fine-tuning, sometimes with\npartial layer freezing to reduce computational cost"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Equivariant adapters and ELoRA have been proposed for equivariant architectures.",
+        "evidence_span": "Recently, equivariant adapters (Zhao et al., 2025) and ELoRA (Lu et al.,\n2025; Wang et al., 2025) have been proposed for equivariant architectures."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Early sparse-network work pruned trained networks and then fine-tuned them to recover accuracy.",
+        "evidence_span": "Early work\nby Han et al. (2015); Li et al. (2017); Srinivas & Babu (2015) proposed to prune trained networks\nand then fine-tune to recover the accuracy."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Later work focused on subnetworks obtained after pruning and their initialization strategies.",
+        "evidence_span": "Subsequently, the lottery ticket hypothesis (Frankle &\nCarbin, 2019) and Liu et al. (2019) shifted focus toward the subnetworks obtained after pruning and\ntheir initialization strategies"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Some studies jointly learned weights and sparse masks to avoid repeated training and pruning.",
+        "evidence_span": "Some studies (Azarian et al.,\n2020; LIU et al., 2020; Louizos et al., 2018; Savarese et al., 2020; XIAO et al., 2019) proposed to\nsimultaneously learn weights and their sparse masks to avoid multiple rounds of model training and\npruning."
+      },
+      {
+        "role": "prior_approach",
+        "content": "SINDy uses sparsity to identify simple governing equations.",
+        "evidence_span": "For example, the family of SINDy\nframeworks (Brunton et al., 2016) leverages sparsity to identify simple governing equations"
+      },
+      {
+        "role": "prior_approach",
+        "content": "ELoRA parameterizes adaptation as a product of two low-rank matrices, producing dense updates.",
+        "evidence_span": "Existing approaches such as ELoRA (Wang et al., 2025) parameterize \u2206W as the product of two low-rank matrices, leading to dense updates in which every interaction path is perturbed to some degree."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The study compares against standard full fine-tuning and ELoRA as baselines.",
+        "evidence_span": "We demonstrate the effectiveness of our adaptation method on MACE and NequIP potentials (Bata- tia et al., 2022; 2025; Kov\u00b4acs et al., 2025; Tan et al., 2025) through comparison with two major base- lines: standard full-parameter fine-tuning and ELoRA (Wang et al., 2025)."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Foundation models used include MACE-MP-0b3 and MACE-OFF23, pretrained on MPTrj and SPICE.",
+        "evidence_span": "In our main fine-tuning experiments, we use MACE-MP-0b3 (Batatia et al., 2025) and MACE-OFF23 (Kov\u00b4acs et al., 2025) as foundation models. These architectures are updated and extended variants of the original MACE model (Batatia et al., 2022), pre-trained on the MPTrj and SPICE datasets (Deng et al., 2023; Eastman et al., 2023), respectively, and tailored to crystal and molecular domains."
+      },
+      {
+        "role": "prior_approach",
+        "content": "These foundation MLIPs are typically trained on PES targets using energy, force, and sometimes stress losses.",
+        "evidence_span": "These models are commonly trained to reproduce the PES by minimizing energy, force, and optionally stress prediction losses."
+      },
+      {
+        "role": "prior_approach",
+        "content": "For baseline methods, the authors use hyperparameters from Wang et al. (2025).",
+        "evidence_span": "For the full fine-tuning and ELoRA baselines, we adopted the optimal hyperparameters from Wang et al. (2025) to ensure a fair comparison."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Full fine-tuning is prone to overfitting and has computational and memory costs when domain data are small",
+        "evidence_span": "However, domain-specific datasets are typically small relative to the vast configurational and chemical space they should represent, making full fine-tuning highly prone to overfitting, aside from its computational and memory costs."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Existing methods focus on how parameters are updated, leaving unexplored which parameters should be updated",
+        "evidence_span": "These methods focus on how the parameters are updated, e.g., via low-rank structures or regularized magnitudes. A complementary yet unexplored perspective is to instead control which parameters are updated"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Invariant-only models miss directional information needed for vector and tensor quantities.",
+        "evidence_span": "However, these models handle only invariant representations, without considering\ndirectional information crucial for vector and tensor quantities (e.g., forces or dipoles)."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "The work positions itself against full fine-tuning and equivariant low-rank adaptation by showing comparable or better performance with sparse updates.",
+        "evidence_span": "our method matches or surpasses full fine-tuning and equivariant low-rank adaptation while updating only \u223c3 % of parameters, and in some cases as little as \u223c0.5 %."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The paper contrasts its approach with methods that constrain how updates are parameterized, instead directly regularizing how many parameters are impacted",
+        "evidence_span": "In other words, rather than constraining how updates are parameterized, one can directly regularize the number of impacted parameters."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "They do not use sparsity to reduce training-time compute or memory, because the frozen pretrained weights remain dense; instead sparsity is used for selective meaningful updates.",
+        "evidence_span": "Here, we note that sparsity is not introduced to reduce training-time compute or memory usage, since the pre-trained weights W remain dense; rather, it serves to induce selective and physically meaningful updates in \u2206W."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "content": "The work is inspired by foundation models and trends from computer vision and natural language processing, which helped shape the emergence of foundation MLIPs.",
+        "evidence_spans": [
+          "Inspired by foundation models in computer vision and natural language processing (Caron et al., 2021; Li et al., 2022; Radford et al., 2021), recent work has leveraged large-scale materials datasets to develop atomistic foundation models",
+          "These advances have further enabled the emergence of foundation MLIPs, following trends in vision and language domains"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The sparse adaptation method is inspired by prior sparsity methods, specifically soft threshold weight reparameterization (STR), a sparsity-promoting approach originally introduced in computer vision.",
+        "evidence_spans": [
+          "Soft threshold weight reparameterization (STR, Kusupati et al. (2020)), which we employ and describe below, belongs to this line of methods.",
+          "To enable selective adaptation, we learn \u2206W in a sparse manner based on STR (Kusupati et al., 2020), a sparsity-promoting approach originally introduced in the computer vision domain."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The equivariant transformations are inspired by physical principles.",
+        "evidence_spans": [
+          "These transforma-\ntions rely on type-\u00106vectors and spherical harmonics, combined with Clebsch-Gordan tensor prod-\nucts, inspired by physical principles"
+        ],
+        "conflicting": false
+      }
+    ],
+    "causal_claim": [
+      {
+        "content": "Fine-tuning reweights the relative contributions of interaction paths to adapt the model to target-domain characteristics such as composition or thermodynamic regime; in practice, injecting \u0394W directly into the path-weight tensor enables this flexible domain adaptation with negligible computational overhead.",
+        "evidence_spans": [
+          "From this perspective, fine-tuning corresponds to reweighting the relative contributions of interaction paths, thereby adjusting the model to the characteristics of the target dataset (e.g., composition, pressure/temperature regime, or the level of theory used in DFT calculations).",
+          "In practice, we inject \u2206W directly into the path-weight tensor, introducing negligible computational overhead (see Section 5.5) while enabling flexible domain adaptation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Thresholding removes small-magnitude entries in \u0394W during training, making updates sparse and compact.",
+        "evidence_spans": [
+          "This threshold removes entries of \u2206W with magnitudes below the threshold during training, making it sparse and yielding compact updates."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Updating only a subset of path weights highlights physically relevant interactions and suppresses symmetry-trivial paths.",
+        "evidence_spans": [
+          "In our case, only a subset of path weights corresponding to specific interaction paths is updated during adaptation, highlighting only the physically relevant interactions while suppressing symmetry-trivial paths."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Decoupling updates of \u03c4 and \u0394W resolves instability, enabling stable and controllable fine-tuning.",
+        "evidence_spans": [
+          "Decoupling these updates resolves this issue and provides stable, controllable fine-tuning."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The approach\u2019s advantage is especially evident for systems with large initial zero-shot errors.",
+        "evidence_spans": [
+          "The strength of our approach is particularly evident for systems with large initial zero-shot errors, indicating a significant dis-"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Highly targeted, compact modifications\u2014updating only about 3% of parameters\u2014lead to strong performance gains on shifted domains such as Sn and H2O-PD.",
+        "evidence_spans": [
+          "This was achieved by modifying approximately 3 % of the model\u2019s parameters.",
+          "This\nhighlights our method\u2019s ability to achieve performance gains through highly targeted and compact\nmodifications."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Poor performance when adapting only FCTP indicates that most adaptation capability resides in the linear layers.",
+        "evidence_spans": [
+          "indicating that the majority of the adaptation capability is captured by linear\nlayers."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Fine-tuning from the pretrained model yields substantial gains over training from scratch, especially for total-energy and force accuracy, while spin-aware energy improves only slightly.",
+        "evidence_spans": [
+          "As shown in Table 2, fine- tuning from the pre-trained model provides substantial improvements over training from scratch",
+          "While predictions for spin-aware energy showed only slight improvements, the accuracy of total energy and forces improved significantly"
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "Generalization failure in direct application of a pre-trained foundation MLIP arises because pre-training data cannot fully cover the complex materials landscape, under-representing elements, motifs, and physicochemical variations such as pressure and temperature.",
+        "evidence_spans": [
+          "even a large-scale pre-training dataset cannot fully cover the complicated and subtle landscape of materials, under-representing elements and motifs, as well as diverse physicochemical variations (e.g., pressure and temperature). Thus, a direct application of a pre-trained foundation MLIP often fails to generalize to unseen conditions"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Full fine-tuning on small domain-specific datasets is prone to overfitting because such datasets are tiny relative to the vast configurational and chemical space they are meant to represent.",
+        "evidence_spans": [
+          "domain-specific datasets are typically small relative to the vast configurational and chemical space they should represent, making full fine-tuning highly prone to overfitting"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The method is motivated by sparsity/Occam-style principles: physical phenomena are often governed by a few core variables, and reducing model complexity improves interpretability and generalization in scientific applications.",
+        "evidence_spans": [
+          "based on the principle that physical phenomena are often governed by a few core variables",
+          "This reflects Occam\u2019s razor, where reducing model complexity enhances both interpretability and generalization in scientific applications."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Equivariance is preserved during adaptation because symmetry is enforced by fixed, non-trainable Clebsch\u2013Gordan coefficients (CGCs), while the trainable path weights or sparse updates (\u0394W) only scale or modulate these symmetry-allowed interaction paths; therefore updating the path-weight tensor does not violate equivariance constraints.",
+        "evidence_spans": [
+          "These couplings, or symmetry-allowed interaction paths (Geiger & Smidt, 2022), are realized through Clebsch\u2013Gordan coefficients (CGCs), which are predefined, non-trainable constants that mathematically guarantee equivariance.",
+          "Equivariance is strictly enforced by the predefined CGCs, while the capacity to learn lies entirely in the weights W. Therefore, when adapting a pre-trained model, the natural intervention point is this path-weight tensor. In other words, updating the path-weight tensor does not affect equivariance constraints.",
+          "Because \u2206W modulates the learnable weights on CGCs in individual tensor interaction paths (see Appendix A), symmetry constraints are maintained, and equivariance is strictly preserved."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Sparse fine-tuning works by keeping most path-coefficient updates near zero, suppressing unnecessary degrees of freedom during adaptation.",
+        "evidence_spans": [
+          "To this end, we promote sparsity in \u2206W by encouraging most path coefficients to remain close to zero, thereby suppressing unnecessary degrees of freedom during fine-tuning."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Naive STR becomes unstable during fine-tuning because the decay of the threshold \u03c4 is coupled to the updates/decay of \u0394W.",
+        "evidence_spans": [
+          "We empirically found that applying the naive STR causes instability during the fine-tuning process in equivariant MLIPs due to the coupled decay of \u03c4 and \u2206W."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Linear parameters appear more critical for preserving model performance, so the pruning mechanism removes them more reluctantly.",
+        "evidence_spans": [
+          "This suggests that the linear parameters are more critical for maintaining performance and are thus pruned more reluctantly by the model"
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "The paper hypothesizes that sparsity-promoting fine-tuning for E(3)-equivariant MLIPs/materials foundation models\u2014by selectively updating only target-domain-relevant or critical interaction-path parameters while preserving the rest and maintaining equivariance\u2014will enable more effective adaptation.",
+        "evidence_spans": [
+          "To address this, we propose a sparsity-promoting fine-tuning method that selectively updates model parameters by exploiting the structural properties of E(3)-equivariant materials foundation models.",
+          "A complementary yet unexplored perspective is to instead control which parameters are updated, encouraging the model to selectively modify only those most relevant to the target domain while preserving the rest intact.",
+          "To bridge this gap, we propose a sparsity-promoting fine-tuning method for equivariant MLIPs, which carefully maintains equivariance with selective parameter updating.",
+          "We hypothesize that more effective adaptation can be achieved through selective updates, enabling the model to adaptively identify and modify only the most critical paths."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The paper hypothesizes that a high-sparsity regime compresses adaptation into only the most essential parameter changes.",
+        "evidence_spans": [
+          "We hypothesize that this high-sparsity regime forces the model to distill the adaptation into the most essential parameter updates."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The approach is expected to generalize across diverse chemical domains rather than being limited to a single material class.",
+        "evidence_spans": [
+          "These results suggest that our approach is not confined to a single material class but can generalize across diverse chemical domains, from inorganic crystals to organic molecules."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Extending non-magnetic foundation models is proposed as an efficient way to reuse pretrained knowledge while modeling magnetic energy differences.",
+        "evidence_spans": [
+          "Extending non-magnetic foundation models is therefore a highly efficient strategy, as it enables the reuse of pre-trained knowledge while capturing the subtle energy differences associated with magnetic configurations."
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "Across molecular, crystalline, and magnetic benchmarks, the method matches or exceeds full fine-tuning and ELoRA while updating only a small fraction of parameters\u2014typically under 3% and in some cases as little as 0.5%\u2014and this generalizes across equivariant architectures including MACE and NequIP-OAM-L.",
+        "evidence_spans": [
+          "On energy and force prediction tasks across molecular and crystalline benchmarks, our method matches or surpasses full fine-tuning and equivariant low-rank adaptation while updating only \u223c3 % of parameters, and in some cases as little as \u223c0.5 %.",
+          "Applied to MACE potentials (Batatia et al., 2022; 2025; Kov\u00b4acs et al., 2025) across molecular, crystalline, and magnetic benchmarks, our method matches or exceeds the accuracy of full fine-tuning while updating only 0.5-3 % of parameters.",
+          "In this section, we present experimental results demonstrating that our method is comparable to or superior to baselines such as full fine-tuning and ELoRA across all domains. Remarkably, these gains are achieved by modifying fewer than 3 % of the total parameters, with some tasks requiring updates to as few as 0.5 %.",
+          "As shown in Table I in Appendix D, our method achieves comparable or superior accuracy to full fine-tuning and ELoRA across all bench- mark datasets, demonstrating its generalizability across different equivariant architectures."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The method generalizes beyond energy/force recalibration to additional material properties, including magnetic moment prediction and magnetism-aware total energy modeling.",
+        "evidence_spans": [
+          "Beyond energy and force calibration, we further demonstrate task generalizability by applying our method to magnetic moment prediction and magnetism-aware total energy modeling.",
+          "Beyond recalibrating energy and force predictions, it extends effectively to other material properties such as magnetic moments, demonstrating broader applicability of foundation MLIPs."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Sparsity-pattern analysis indicates selectively updated coefficients and physically interpretable signatures, including enhanced d-orbital contributions in transition-metal systems.",
+        "evidence_spans": [
+          "Finally, analysis of sparsity patterns reveals physically interpretable signatures, such as enhanced d-orbital contributions in transition metal systems.",
+          "Finally, analysis of sparsity patterns reveals which coefficients are selectively updated, yielding physical insights into the learned representations."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Naive STR was empirically unstable for fine-tuning equivariant MLIPs because coupled decay of \u03c4 and \u2206W caused instability during fine-tuning.",
+        "evidence_spans": [
+          "We empirically found that applying the naive STR causes instability during the fine-tuning process in equivariant MLIPs due to the coupled decay of \u03c4 and \u2206W."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "On rMD17, the low-sparsity setup surpasses both full fine-tuning and ELoRA on eight of ten molecules, while the high-sparsity setup still outperforms ELoRA across all molecules.",
+        "evidence_spans": [
+          "In the standard setup (L), it surpasses both full fine-tuning and ELoRA on eight out of the ten molecules.",
+          "Even more impressively, our method in a high-sparsity setup (H) also outperforms ELoRA across all molecules, showing the robustness of our sparse adaptation strategy on diverse organic systems."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "On inorganic crystal datasets, the standard setup is comparable to or better than full fine-tuning and ELoRA; even in the high-sparsity setup, updating only about 0.5-0.7% of parameters maintains accuracy comparable to full fine-tuning and better than ELoRA on nearly all subsets.",
+        "evidence_spans": [
+          "The results on inorganic crystal datasets shown on the right side of Table 1 further confirm the strength of our method. In the standard setup, our method achieves results comparable to or superior to both full fine-tuning and ELoRA.",
+          "For the high-sparsity setup, by updating merely 0.5-\n0.7 % of the total parameters, our method still demonstrates comparable accuracy to full fine-tuning\nand better prediction accuracy than ELoRA for energy and forces across nearly all subsets."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Ablations show that Linear-only and All update settings have nearly identical predictive performance across many \u03bb\u03c4 values, both are substantially better than FCTP-only, and the same trend also appears on TM-O-Spin.",
+        "evidence_spans": [
+          "As shown in Figure 1, the predictive performance trends for the Linear and All settings are nearly\nidentical across a wide range of \u03bb\u03c4 values.",
+          "Conversely, the FCTP setting consistently yields the\npoorest performance",
+          "The tendency of the linear and All configurations is similar and significantly\nsuperior to that of FCTP, showing a stable, high-sparsity regime at large \u03bb\u03c4 values.",
+          "Results on TM-O-Spin (shown in Figure II in Appendix D) demonstrate a similar tendency."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "As \u03bb\u03c4 increases, Linear-only sparsity grows gradually whereas All sparsity rises sharply earlier; the energy plots reveal two effective adaptation regimes: a low-sparsity, high-performance regime and a high-sparsity, stable regime. For most datasets the best compact-update point in the low-sparsity regime is at \u03bb\u03c4 = 0.01, except TM-O-Spin where it is 0.05; a high-sparsity stable regime emerges from \u03bb\u03c4 \u2248 0.3 and retains strong performance despite extreme sparsity.",
+        "evidence_spans": [
+          "As shown in Figure 1, for the Linear-only strategy, sparsity increases gradually with increasing \u03bb\u03c4. In contrast, for the All strategy, module sparsity increases sharply at a much earlier stage.",
+          "Furthermore, the energy plots for both the Linear and All settings commonly exhibit two distinct, effective adaptation regimes.",
+          "This corresponds to \u03bb\u03c4 = 0.01 for most datasets, except for the TM-O-Spin, where the optimum occurs at \u03bb\u03c4 = 0.05.",
+          "Second, we identified a high-sparsity, stable regime (labeled as Ours (H)) at larger \u03bb\u03c4 from 0.3, which maintains strong performance with extreme sparsity despite being slightly sub-optimal."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "On TM-O-Spin, fine-tuning from the pretrained model substantially outperforms training from scratch, underscoring the importance of domain-specific fine-tuning.",
+        "evidence_spans": [
+          "As shown in Table 2, fine- tuning from the pre-trained model provides substantial improvements over training from scratch, un- derscoring the importance of domain-specific fine-tuning."
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "Fine-tuning equivariant GNNs must preserve equivariance constraints\u2014specifically translational, rotational, and reflectional symmetries in 3D space.",
+        "evidence_spans": [
+          "Applying these methods to equivariant graph neural networks (GNNs), which are commonly used in state-of-the-art MLIPs, requires preserving equivariance constraints, i.e., translational, rotational, and reflectional symmetries in 3D space."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "\u0394W cannot be initialized to zero because the thresholding mechanism would cause vanishing gradients and prevent learning.",
+        "evidence_spans": [
+          "This initialization is necessary because if \u2206W were set to zero, the threshold mechanism would cause vanishing gradients and prevent any learning."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Spin-aware layers are added as separate components (+8.6% parameters) and trained from scratch, while the sparsity-promoting adaptation is constrained to the original foundation-model parameters.",
+        "evidence_spans": [
+          "We add spin-aware layers (+8.6 % parameters) to MACE-MP-0b3, which are trained from scratch, while our sparsity-promoting adaptation is applied exclusively to the original foundation model parameters."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

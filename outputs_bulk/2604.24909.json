@@ -1,0 +1,1144 @@
+{
+  "paper_id": "2604.24909",
+  "chunks_processed": 4,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Dose efficiency, not spatial resolution, is now the main limitation of TEM.",
+        "evidence_span": "its limiting factor is no longer spatial resolution but dose efficiency"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Low-dose imaging creates noisy images without ground truth, making learning difficult.",
+        "evidence_span": "Low electron doses avoid sample damage but produce noisy images for which, unlike in classical computer vision, there is no ground truth."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Autonomous materials experimentation needs representations tied to microscope state during acquisition.",
+        "evidence_span": "Autonomous materials experimentation poses a related problem, since closed-loop instruments need representations grounded in the microscope state at acquisition."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Both applications require representations grounded in image acquisition.",
+        "evidence_span": "Both demand representations grounded in how an image was acquired."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "What is missing is an encoder aligning visual content with instrument physical parameters",
+        "evidence_span": "In both modes, the missing piece is an encoder that aligns visual content with the physical parameters of the instrument."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Existing TEM data are rarely shared because data-sharing culture is not established",
+        "evidence_span": "Unfortunately, this data is almost never shared as the culture of data sharing is not established in the electron microscopy community [Ivanova et al., 2025]."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Very little HAADF-STEM data is open-sourced despite large volumes being collected.",
+        "evidence_span": "While petabytes of\nHAADF-STEM images are collected each year [Ivanova\net al., 2025], very few are ever open-sourced."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Existing datasets do not provide the scale of paired experimental HAADF-STEM images with rich instrument metadata needed by the paper.",
+        "evidence_span": "None of these match the scale of pairing between\nexperimental HAADF-STEM images and rich instrument metadata that we target."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "No prior work has applied this kind of contrastive image-annotation framework to electron microscopy.",
+        "evidence_span": "To our knowledge, however, no prior\nwork applies this or any similar framework to electron microscopy (EM)."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Lower electron doses create a constant need for denoisers that make low-dose data interpretable.",
+        "evidence_span": "With those ever diminishing electron doses, the need for appropriate denoisers\nto make low-dose data interpretable and easy to use, is constant."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "There are no general STEM denoisers informed by acquisition settings and pixel size that work across instrument settings.",
+        "evidence_span": "As far as the authors are aware, there exist no general STEM denoisers in\nthe sense that they are informed about the acquisition settings and pixel size related to the images and\ncan produce good results across instrument settings."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "A factored representation grounded in physical microscope state is needed for autonomous high-throughput microscopy.",
+        "evidence_span": "A\nfactored representation grounded in physical microscope state is a foundational requirement for any\nsuch system"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Training data lacks examples of extreme acquisition boundary conditions, leaving those behaviors unlearned.",
+        "evidence_span": "Boundary conditions are missing from the training data."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Although large for this microscopy niche, the dataset is still small and narrow compared with computer-vision datasets.",
+        "evidence_span": "It is nonetheless modest and narrow by computer-vision standards"
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "CLIP-style contrastive method used as the basis for the proposed approach",
+        "evidence_span": "we propose Contrastive Image-Metadata Pre-training (CIMP), a CLIP-style method [Radford et al., 2021]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Sytwu et al. released a small HRTEM dataset with paired metadata.",
+        "evidence_span": "The closest experimental precedent is\nfrom Sytwu et al. [2023], who released 407 HRTEM\nimages of Au, Ag, and CdSe nanoparticles paired with\nacquisition metadata including magnification and elec-\ntron dose."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Atomagined provides simulated PRISM-generated HAADF-STEM images with emulated noise and distortion.",
+        "evidence_span": "Atomagined [Schwenker\net al., 2020] provides PRISM-generated HAADF-STEM\nimages post-processed to emulate noise and distor-\ntion, covering a wide range of ICSD structure proto-\ntypes."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Eliasson and colleagues released a 250,000-image multislice-simulated HAADF-STEM Pt nanoparticle corpus.",
+        "evidence_span": "Eliasson and Erni [2025], Eliasson [2025], Elias-\nson et al. [2026] release a 250,000-image multislice-\nsimulated HAADF-STEM corpus of Pt nanoparticles for\nsize and morphology prediction."
+      },
+      {
+        "role": "prior_approach",
+        "content": "TEMImageNet is a simulated training library for atom-resolution STEM and showed transfer to experiments.",
+        "evidence_span": "TEMImageNet [Lin\net al., 2021] offers a simulated training library for\n2\nFigure 1: Diagram of a STEM with our ac-\nquisition parameters shown in orange text.\nDescription of each acquisition parameter\nis provided in Appendix A.\n\natom-resolution STEM tasks and shows that simulation-\ntrained models can transfer to experimental data."
+      },
+      {
+        "role": "prior_approach",
+        "content": "CIMP adapts the CLIP image-text pretraining framework to image-metadata pairs.",
+        "evidence_span": "CIMP adapts the CLIP image\u2013text pretraining framework [Radford et al.,\n2021] to pairs of HAADF-STEM images and their acquisition metadata."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior EM image-to-image work used CycleGANs and GAN denoisers for simulation-to-experiment transfer and denoising.",
+        "evidence_span": "Prior work has applied image-to-image\nnetworks to EM data in two main directions: to bridge the simulation-to-experiment gap so that\nsynthetic training data gains realism, and for denoising of experimental acquisitions."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Khan et al. used a CycleGAN with a reciprocal-space discriminator to add realistic high-frequency content to simulated STEM images.",
+        "evidence_span": "Khan et al. [2023] use\na CycleGAN [Zhu et al., 2017] with a reciprocal-space discriminator to add realistic high-frequency\ncontent to simulated STEM images so that a downstream segmentation network can transfer to real\nexperiments."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Eliasson et al. used a CycleGAN between simulated and experimental HAADF-STEM of Pt nanoparticles.",
+        "evidence_span": "Eliasson et al. [2024] use\na CycleGAN to translate between simulated and experimental HAADF-STEM of Pt nanoparticles,\nshowcasing both denoising and realistic noise addition."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Lobato et al. trained a GAN denoiser on synthetic image pairs with modeled noise.",
+        "evidence_span": "And in another work, Lobato et al. [2024] train\na GAN denoiser on synthetic image pairs with intricately modeled noise."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Self-supervised denoisers such as Noise2Noise, Noise2Void, and UDVD have been popular for STEM denoising.",
+        "evidence_span": "Self-supervised denoisers in the\nNoise2Noise / Noise2Void / UDVD family [Lehtinen et al., 2018, Krull et al., 2019, Sheth et al., 2021]\nhave been popular approaches to denoising STEM imagery, with several recent applications to atomic-\nresolution data [Kim et al., 2025, Thornley et al., 2026]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "GAN-based denoisers including Noise2Atom have also been explored.",
+        "evidence_span": "GAN-based denoisers have also been explored.\nNoise2Atom [Wang et al., 2020] is an unsupervised GAN-based denoiser trained on noisy acquisitions\nof sub-nm catalytic clusters, and is, to our knowledge, the only STEM denoiser to release the data\nwith which it was trained."
+      },
+      {
+        "role": "prior_approach",
+        "content": "ImageNet is cited as a large-scale computer-vision dataset benchmark.",
+        "evidence_span": "ImageNet [Deng et al., 2009] contains 1.28 million natural images"
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Current machine-learning methods are usually trained from scratch for a specific noise level and narrow sample range because open-source data are lacking",
+        "evidence_span": "a lack of open-source data means that current methods are typically trained from scratch for a specific noise level on a single or narrow set of samples"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "That prior dataset was smaller and in HRTEM, not HAADF-STEM.",
+        "evidence_span": "This release was much smaller in scale and in\nHRTEM rather than HAADF-STEM."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Existing experimental datasets are small, narrow in material coverage, and usually lack acquisition metadata needed for generalization across settings.",
+        "evidence_span": "Existing exper-\nimental datasets tend to be small, narrow in material coverage, and rarely include the acquisition\nmetadata needed to train models that generalise across instrument settings."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "These previous image-to-image approaches are one-to-one and agnostic to microscope settings.",
+        "evidence_span": "These approaches are all\none-to-one and agnostic to microscope settings (i.e., a dedicated network is trained per source/target\ndomain pair, with no natural way to parameterise the target style)."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Prior methods require retraining a new CycleGAN for each dwell time or detector gain setting.",
+        "evidence_span": "Simulating a different dwell time\nor detector gain with any previous method requires training a new CycleGAN with a new paired or\nunpaired corpus at that setting."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "These denoisers are heavily specialized to single noise profiles and materials, and some require paired time-series data.",
+        "evidence_span": "However, these models are heavily specialised\nfor single noise profiles and materials samples, some of which (such as Noise2Noise) further require\ntime-series data where noise changes but image content does not (i.e., true image pairs)."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Noise2Void-based methods can introduce checkerboard artifacts and lose detail when pixels are not much smaller than atomic features.",
+        "evidence_span": "Noise2Void-\nbased techniques that can work on single or unpaired images instead introduce checkerboard artefacts\nwhen trained to convergence and lose image detail if pixel size is not significantly smaller than the\natomic features the experimentalist is interested in."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "The model fails to capture the clipping boundary condition seen experimentally for gain changes.",
+        "evidence_span": "However,\nit does not successfully model the boundary condition where the experimental image is clipped."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Noise2Void is overly aggressive, shows checkerboard artifacts, and hallucinates background content by smoothing speckle noise into gaussians.",
+        "evidence_span": "which is overly aggressive in its denoising, suffers from checkerboard artifacts\n(Figure 2), and tends to hallucinate content in background regions by smoothing speckle noise into\ngaussians."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "The current corpus cannot support the model scaling seen in larger vision datasets.",
+        "evidence_span": "and has supported three orders of magnitude of model scaling beyond what our corpus can support."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than one-to-one setting-agnostic methods, the paper uses a one-to-many generator conditioned on continuous acquisition metadata so target settings can be queried without retraining.",
+        "evidence_span": "The style-transfer network we present downstream of CIMP\nis instead one-to-many: a single generator is conditioned on continuous acquisition metadata through CIMP\nembeddings such that any target instrument setting can be queried at inference without retraining."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Methods dominated by iterative refinement are ruled out because they are too slow for real-time use.",
+        "evidence_span": "This rules out methods whose inference cost is\ndominated by iterative refinement."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Palette-style diffusion was not used because it requires paired source-target examples unavailable here.",
+        "evidence_span": "By contrast, Palette-style image-to-image diffusion [Saharia et al.,\n2021] requires paired source-target examples that we do not have"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Flow matching was not used because it is naturally noise-to-image rather than metadata-conditioned image-to-image translation.",
+        "evidence_span": "and flow matching [Lipman et al.,\n2022] is natively a noise-to-image generative method rather than an image-to-image translator that\ncan be conditioned on metadata."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Pixel size was excluded from qualitative style-transfer evaluation because changing field of view synthetically at fixed image dimensions has no physical basis.",
+        "evidence_span": "We qualitatively evaluate style transfer for each metadata parameter individually, with the exception\nof pixel size. Since pixel size is determined by the image\u2019s field of view, altering it synthetically\nwhile keeping image dimensions fixed has no physical basis"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Noise2Atom was excluded from the user study because it was not considered a comparable denoiser.",
+        "evidence_span": "We therefore do not\nconsider Noise2Atom a comparable denoiser and exclude it from the user study below."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The method is inspired by or derived from CLIP-style training",
+        "evidence_span": "we propose Contrastive Image-Metadata Pre-training (CIMP), a CLIP-style method [Radford et al., 2021]"
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The approach is structurally analogous to CLOOME in microscopy.",
+        "evidence_span": "The closest structural ana-\nlogue in any microscopy domain is CLOOME [Sanchez-Fernandez et al., 2023], which contrastively\naligns fluorescence cell-painting images with chemical-structure embeddings and demonstrates\ncross-modal retrieval across a large bioimaging database."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The approach is conceptually parallel to ContIG, which aligns images with structured physical annotations.",
+        "evidence_span": "ContIG [Taleb et al., 2022] is the closest\nconceptual parallel: a medical-imaging model that contrastively aligns retinal images with a structured\nphysical-annotation vector (SNP arrays, polygenic risk scores)."
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Using the embedding to condition a metadata-conditioned style-transfer model enables re-rendering under different acquisition parameters.",
+        "evidence_span": "we use the embedding to condition a metadata-conditioned style-transfer model that re-renders experimental images under different acquisition parameters"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Virtually scaling dwell time and beam current converts the model into a physics-informed denoiser.",
+        "evidence_span": "Virtually scaling dwell time and beam current of low-dose images turns this model into a physics-informed denoiser"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Limiting electron dose causes images to become very noisy",
+        "evidence_span": "Limiting the electron dose is crucial to avoid sample damage and ensure physical relevance of observed phenomena, but naturally leads to very noisy images"
+      },
+      {
+        "role": "causal_claim",
+        "content": "TEM experiment exploration and tuning cause large amounts of data to remain unused",
+        "evidence_span": "Yet, for every published image, a massive volume of data, more than 90% by some estimates [Ivanova et al., 2025], remains unused, not because the quality of the data is bad but because TEM experiments require exploration and tuning to identify and record the golden data that eventually makes publication."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using the embedding as perceptual loss and conditioning enables style transfer across acquisition parameters",
+        "evidence_span": "we use the embedding as both a perceptual loss and a conditioning signal for a generative metadata-conditioned style-transfer model that translates an experimental image into the style it would have had under different acquisition parameters"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Virtually scaling dwell time and beam current allows the style-transfer model to act as a physics-informed denoiser",
+        "evidence_span": "we use the style-transfer model as a physics-informed denoiser by virtually scaling dwell time and beam current of low-dose images"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Contrastive image-metadata alignment yields a factored, physics-aligned representation as a byproduct of retrieval training.",
+        "evidence_span": "Yet seven physically distinct acquisition pa-\nrameters are independently recoverable from the frozen 128-d embedding through a closed-form\nlinear probe, evidence that contrastive image-metadata alignment yields a factored, physics-aligned\nrepresentation as a byproduct of retrieval training."
+      },
+      {
+        "role": "causal_claim",
+        "content": "These constraints motivate using a GAN-based architecture.",
+        "evidence_span": "These constraints\nmotivate a GAN-based architecture."
+      },
+      {
+        "role": "causal_claim",
+        "content": "This indicates the model changes images by about as much as natural changes between adjacent real acquisitions.",
+        "evidence_span": "This indicates that the\nCIMP GAN modifies the input by an amount comparable to the natural change between adjacent\nreal acquisitions in the series."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Gain appears to be modeled most actively, while dwell has the highest baseline similarity because adjacent dwell-series images differ only modestly.",
+        "evidence_span": "Among the three series, the CIMP GAN\u2019s similarity to the reference is\nhighest for gain, suggesting the model captures the gain change most actively, while dwell shows the\nhighest baseline similarity since consecutive images in the dwell series differ only modestly to begin\nwith."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Together, the image-level and distributional results indicate the model reproduces experimental changes with realistic magnitude and distribution.",
+        "evidence_span": "Read together,\nTables 2 and 3 indicate that the CIMP GAN reproduces the experimental change at both the per-image\nand the distributional level, with the magnitude of induced change matching the natural intra-series\nvariation and the output distribution matching the distribution of real eval-set images."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Increasing dwell time makes generated images smoother but also brightens the background unlike experiments.",
+        "evidence_span": "In general, increasing dwell time does make the image smoother as expected, but\nalso makes the background brighter, which does not happen in the experimental series."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Virtually increasing dwell time and beam current lets the model be used as a denoiser.",
+        "evidence_span": "Finally, we utilize the CIMP-conditioned GAN model as a denoiser by feeding it a target embedding\netgt derived from the source metadata with virtually increased dwell time and beam current."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Noise2Void behaves like a low-pass filter, strongly suppressing high frequencies while leaving low frequencies mostly unchanged.",
+        "evidence_span": "Noise2Void shows a simple low-pass profile, suppressing high-frequency power by\nroughly an order of magnitude while leaving low frequencies essentially unchanged."
+      },
+      {
+        "role": "causal_claim",
+        "content": "CIMP GAN suppresses power gently and almost uniformly across frequencies.",
+        "evidence_span": "Our CIMP GAN\nsuppresses power gently and almost uniformly across the spectrum"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Noise2Atom adds low-to-mid-frequency power while suppressing high frequencies.",
+        "evidence_span": "Noise2Atom suppresses\nhigh-frequency content but adds power in the low-to-mid frequency range"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Under-representation of parameter extremes causes the model to miss corresponding image behaviors.",
+        "evidence_span": "As a result, the upper and lower bounds of each acquisition parameter are under-represented in the dataset, and the model has no examples from which to learn the corresponding image behaviours."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Unused data arises from the exploratory and tuning-heavy nature of TEM experiments rather than poor data quality",
+        "evidence_span": "not because the quality of the data is bad but because TEM experiments require exploration and tuning to identify and record the golden data that eventually makes publication"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Open-sourcing is limited because publications emphasize only the best images and data-sharing culture is weak.",
+        "evidence_span": "Mi-\ncroscopy publications typically focus on findings from\nthe highest-quality images, and the culture of data shar-\ning is not well-established in the field."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This suggests HAADF-STEM-specific image priors are needed because natural-image and atomic-scale image distributions differ.",
+        "evidence_span": "which conveys the need for HAADF-STEM\nimage priors given the difference in distributions between natural images and atomic-scale images."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "SMAPE is inflated for the log-transformed wide-range variables because residuals are re-exponentiated from log10 space.",
+        "evidence_span": "The three log10-transformed di-\nmensions with wide dynamic range (pixel\nsize, dwell time, beam current) show in-\nflated SMAPE of 28\u201347% despite R2 \u2208\n[0.66, 0.78], reflecting the multiplicative ef-\nfect of re-exponentiating log10-space resid-\nuals."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "GANs are suitable because they allow one-shot inference, work on small datasets, fit the LPIPS-based objective, and do not require true pairs.",
+        "evidence_span": "GANs admit one-shot inference without iterative ODE solving,\ntrain reliably on small datasets, integrate naturally with the multi-task LPIPS-based objective we use,\nand allow us to jointly optimise for the correct metadata style, content preservation, and image realism\nwithout true image-metadata pairs."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The common KID around 0.19 versus training data reflects content shift between eval-series and training corpus rather than model artifacts.",
+        "evidence_span": "Against the training corpus, the CIMP GAN\u2019s KID (0.185) matches the content-gap floor\n(0.189) within one standard error. The common \u223c0.19 value therefore reflects the shift between the\nnarrow eval-series content and the wider training distribution, not a model artefact."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Poor offset performance is likely caused by limited diversity in the training set.",
+        "evidence_span": "This is likely due to limited diversity in the training set."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This frequency behavior is consistent with denoising via metadata-driven style shift rather than frequency cutoff.",
+        "evidence_span": "consistent with its denoising\nmechanism being a metadata-driven style shift rather than a frequency cutoff."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "This happens because Noise2Atom imprints periodic atomic-lattice content regardless of the actual sample.",
+        "evidence_span": "reflecting the periodic\natomic-lattice content the model imprints on every input regardless of the underlying sample."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Extreme parameter behaviors are not learned because operators avoid recording bad clipped or saturated images.",
+        "evidence_span": "Operators do not routinely record images with clipped intensities, saturated detectors, or other extreme boundary conditions, because such acquisitions are considered bad."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The proposed CIMP method aligns images with acquisition metadata.",
+        "evidence_span": "propose Contrastive Image-Metadata Pre-training (CIMP), a CLIP-style encoder that aligns the two modalities"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "For downstream conditioning, the embedding should encode physically meaningful microscope-state axes, not just retrieval cues.",
+        "evidence_span": "For CIMP embeddings to serve as a foundation layer that downstream models can condition on,\nthe representation must encode physically meaningful axes of microscope state, not just enough\ninformation to re-pair an image with its own metadata at retrieval time."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Future improvement will come from collecting a larger and more diverse dataset from additional facilities.",
+        "evidence_span": "Future work will include amassing a higher volume and more diverse corpus of data from further research facilities."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "CIMP achieves strong cross-modal retrieval performance on held-out data.",
+        "evidence_span": "reaches 84.4% Top-1 cross-modal retrieval on a held-out split"
+      },
+      {
+        "role": "evidence_result",
+        "content": "All acquisition parameters can be linearly recovered from the frozen visual embedding.",
+        "evidence_span": "All seven parameters are individually recoverable from the frozen visual embedding through a linear probe"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Microscopists preferred the method over the current state-of-the-art denoiser in most trials.",
+        "evidence_span": "in a blind user study, experimental microscopists prefer it over the current state-of-the-art denoiser for STEM imagery on 70.2% of trials"
+      },
+      {
+        "role": "evidence_result",
+        "content": "CIMP reaches 84.4% Top-1 cross-modal retrieval on held-out validation data",
+        "evidence_span": "reaching Top-1 cross-modal retrieval of 84.4% on a held-out validation split"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Linear probing recovers all seven acquisition parameters from the frozen visual embedding",
+        "evidence_span": "linear probing shows that all seven acquisition parameters are individually recoverable from the frozen 128-d visual embedding through Ridge regression despite the contrastive objective never supervising any metadata value directly"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Microscopists preferred the denoiser over Noise2Void in 70.2% of trials",
+        "evidence_span": "In a blind user study, experimental microscopists prefer this denoiser over the state-of-the-art Noise2Void baseline on 70.2% of trials."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The dataset introduced contains 7,330 HAADF-STEM images with paired metadata over more than 30 material systems and 130 samples.",
+        "evidence_span": "In this work, we introduce 7,330 HAADF-STEM images with paired metadata from a Titan mi-\ncroscope at an anonymised materials-research laboratory. The dataset covers more than 30 distinct\nmaterials systems, predominantly heterogeneous catalysts (Pt/CeO2, Pd/ZrO2, Ru/TiO2, In2O3/ZrO2,\netc.), with more than 130 material samples synthesized by different techniques and with different\nmetal loading, imaged with a variety of instrument settings."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Special evaluation sets were collected as true experimental image series varying one metadata parameter at a time.",
+        "evidence_span": "We additionally solicited the creation of several evaluation sets,\n\nwhich are series of true experimental images captured of the same sample in quick succession while\nvarying a single metadata parameter. These series sweep dwell time, gain, and offset respectively."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The chosen CIMP configuration achieved Top-1 0.8438, Top-5 0.9688, and Top-10 0.9844 on held-out validation.",
+        "evidence_span": "We train for 1000 epochs and achieve final Top-1 of 0.8438, Top-5 of 0.9688,\nand Top-10 of 0.9844 on our held-out validation set."
+      },
+      {
+        "role": "evidence_result",
+        "content": "All seven metadata parameters are linearly decodable from the frozen 128-d embedding.",
+        "evidence_span": "All seven metadata parameters are lin-\nearly decodable from the frozen 128-d em-\nbedding (Table 1)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Correct output-target pairs exceed incorrect pairs by 0.523 cosine similarity, showing conditioning aligns generated style with the target embedding.",
+        "evidence_span": "As shown in Figure 7, the mean similarity of correct\npairs exceeds that of incorrect pairs by 0.523 on the cosine-similarity scale (bounded in [\u22121, 1]),\ndemonstrating that the generator aligns image style with the provided conditioning embedding."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Style-transfer fidelity metrics are very close to the real evaluation-series baseline.",
+        "evidence_span": "Table 2 shows that the SSIM, PSNR, and LPIPS values are very consistent between\nthe CIMP GAN and the eval-series baseline across all three series, with the two rows differing by\nless than 0.02 on SSIM, 1.3 on PSNR, and 0.05 on LPIPS in every case."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The model's KID against real eval-set images is near zero, indicating close distributional match.",
+        "evidence_span": "Most\ndirectly, the CIMP GAN\u2019s KID against the real eval-set images is near zero (\u22120.016 \u00b1 0.009), and\nwe conclude that its output distribution almost perfectly matches the distribution of the real evaluation\nimages."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For gain, the model correctly predicts brightness changes when gain is lowered or increased.",
+        "evidence_span": "For gain, our\nmodel correctly predicts the behaviour of lowering and increasing brightness in the image."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The model performs worst on offset, with little generated variation despite substantial experimental change.",
+        "evidence_span": "The\nCIMP-conditioned GAN model performs worst on the offset parameter; there is almost no difference\nbetween generated images across offset values, though the experimental series shows substantial\nchange."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Qualitatively, the CIMP GAN denoiser gives more realistic outputs than Noise2Void.",
+        "evidence_span": "Qualitatively, our CIMP GAN denoiser consistently outputs more realistic looking denoised images\nthan Noise2Void"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Noise2Atom fails broadly, collapsing content when the input is not a clean atomic lattice.",
+        "evidence_span": "Noise2Atom fails on the broader denoising task, with complete content\ncollapse on any input whose content is not a clean atomic-resolution lattice."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Quantitatively, CIMP GAN preserves the most edge magnitude among compared denoisers.",
+        "evidence_span": "Our CIMP GAN preserves the\nmost edge magnitude (edge energy ratio 0.79)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Noise2Void preserves edge locations best but retains only 36% of edge magnitude due to aggressive smoothing.",
+        "evidence_span": "Noise2Void preserves edge location best (gradient\ncorrelation 0.69) but smooths aggressively and retains only 36% of total edge magnitude."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Noise2Atom scores poorly on both edge metrics because it collapses images onto an atomic prior.",
+        "evidence_span": "Noise2Atom\ncollapses image content onto a learned atomic prior, scoring poorly on both edge metrics."
+      },
+      {
+        "role": "evidence_result",
+        "content": "In the blind user study, CIMP GAN was chosen in 70.2% of trials, significantly above chance.",
+        "evidence_span": "Across all 486 judgments, CIMP GAN is chosen on 70.2% (Wilson 95% CI [66.0, 74.1]) of trials,\nsignificantly above 50% (binomial p < 10\u22123)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Most raters preferred CIMP GAN, though one rater was at chance.",
+        "evidence_span": "Per-rater preference is uneven, four raters prefer\nCIMP at 68\u201386% while one is indistinguishable from chance at 50.7% (Table 5)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Raters reported that Noise2Void produced sharper but less realistic images with cross artifacts and worked better when raw signal was already high.",
+        "evidence_span": "A general impression from some of the\nraters was that \"the one with cross artefacts\" (N2V) generates sharper but more unrealistic images,\nand works better when the signal of the raw image is already quite high."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The gain sweep shows the model captures brighter/noisier trends but not saturation at high values.",
+        "evidence_span": "This is visible in the gain sweep (Figure 5b), where the model correctly reproduces the trend of increasing brightness and noise but fails to saturate at the high end"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Extreme offset values are reproduced poorly.",
+        "evidence_span": "and in the offset sweep (Figure 5c), where extreme values are poorly reproduced."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Electron dose must be limited to avoid sample damage and preserve physical relevance",
+        "evidence_span": "Limiting the electron dose is crucial to avoid sample damage and ensure physical relevance of observed phenomena"
+      },
+      {
+        "role": "constraint",
+        "content": "Autonomous TEM systems require image representations grounded in the microscope state at acquisition",
+        "evidence_span": "any such autonomous system needs a representation of each image grounded in the instrument state under which it was acquired"
+      },
+      {
+        "role": "constraint",
+        "content": "The main corpus has no paired or matched source-target groupings, only varied unpaired samples across acquisition parameters.",
+        "evidence_span": "Outside of these sets, images were captured as the operator saw fit, so\nthe corpus contains no paired or matched groupings, only a broad collection of samples spanning\nvaried acquisition parameters."
+      },
+      {
+        "role": "constraint",
+        "content": "A useful microscope denoiser must run faster than acquisition frame rate to support real-time decisions.",
+        "evidence_span": "In practice, the most useful denoiser for an experimental microscopist is one that runs while they\nare at the microscope, quicker than the frame rate of the acquisition, so that low-dose images can\nbe interpreted in time to inform the next decision."
+      },
+      {
+        "role": "constraint",
+        "content": "The method cannot rely on paired low-dose/high-dose images because acquiring matched pairs would damage the sample.",
+        "evidence_span": "We additionally cannot rely on paired source-target data, since\nacquiring matched low-dose and high-dose images of the same field would itself degrade the sample,"
+      },
+      {
+        "role": "constraint",
+        "content": "The training corpus is small by computer-vision standards.",
+        "evidence_span": "and our training corpus of \u223c7,000 images is small by computer-vision standards."
+      },
+      {
+        "role": "constraint",
+        "content": "The usefulness of such approaches depends on having diverse paired corpora available.",
+        "evidence_span": "However, the utility of\nsuch approaches scales with the diversity of paired corpora available to the field"
+      }
+    ],
+    "contradiction": [
+      {
+        "role": "contradiction",
+        "content": "An ImageNet-pretrained ViT did not outperform a ResNet-18 trained from scratch on HAADF-STEM retrieval.",
+        "evidence_span": "Notably, an ImageNet-pretrained ViT finetuned\nend-to-end on our HAADF-STEM data (Top-1 82.8%) does not outperform our ResNet-18 trained\nfrom scratch (Top-1 84.4%) on this task (Appendix D)"
+      }
+    ]
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "In transmission electron microscopy/electron microscopy, dose efficiency has become the main limitation rather than spatial resolution: lowering electron dose avoids sample damage but produces noisy images without ground truth, creating a constant need for denoisers that make low-dose data interpretable.",
+        "evidence_spans": [
+          "its limiting factor is no longer spatial resolution but dose efficiency",
+          "Low electron doses avoid sample damage but produce noisy images for which, unlike in classical computer vision, there is no ground truth.",
+          "With those ever diminishing electron doses, the need for appropriate denoisers to make low-dose data interpretable and easy to use, is constant."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Autonomous materials experimentation and closed-loop microscopy require representations grounded in image acquisition and physical microscope state; more specifically, a factored encoder/representation is needed that aligns visual content with instrument parameters at acquisition.",
+        "evidence_spans": [
+          "Autonomous materials experimentation poses a related problem, since closed-loop instruments need representations grounded in the microscope state at acquisition.",
+          "Both demand representations grounded in how an image was acquired.",
+          "In both modes, the missing piece is an encoder that aligns visual content with the physical parameters of the instrument.",
+          "A factored representation grounded in physical microscope state is a foundational requirement for any such system"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Despite petabytes of HAADF-STEM data being collected, electron microscopy data are rarely shared/open-sourced because data-sharing culture is weak, and existing datasets do not provide the needed scale of paired experimental HAADF-STEM images with rich instrument metadata.",
+        "evidence_spans": [
+          "Unfortunately, this data is almost never shared as the culture of data sharing is not established in the electron microscopy community [Ivanova et al., 2025].",
+          "While petabytes of HAADF-STEM images are collected each year [Ivanova et al., 2025], very few are ever open-sourced.",
+          "None of these match the scale of pairing between experimental HAADF-STEM images and rich instrument metadata that we target."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "There is a methodological gap in electron microscopy: no prior work has applied this kind of contrastive image-annotation framework to EM, and there are no general STEM denoisers that incorporate acquisition settings and pixel size to work across instrument settings.",
+        "evidence_spans": [
+          "To our knowledge, however, no prior work applies this or any similar framework to electron microscopy (EM).",
+          "As far as the authors are aware, there exist no general STEM denoisers in the sense that they are informed about the acquisition settings and pixel size related to the images and can produce good results across instrument settings."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Training data misses extreme acquisition boundary conditions, so those behaviors remain unlearned.",
+        "evidence_spans": [
+          "Boundary conditions are missing from the training data."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Even though the dataset is large for this microscopy niche, it remains modest and narrow compared with standard computer-vision datasets.",
+        "evidence_spans": [
+          "It is nonetheless modest and narrow by computer-vision standards"
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "CLIP [Radford et al., 2021] is a prior contrastive image-text pretraining framework and serves as the basis for the paper's CIMP adaptation to image-metadata pairs.",
+        "evidence_spans": [
+          "we propose Contrastive Image-Metadata Pre-training (CIMP), a CLIP-style method [Radford et al., 2021]",
+          "CIMP adapts the CLIP image\u2013text pretraining framework [Radford et al., 2021] to pairs of HAADF-STEM images and their acquisition metadata."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Sytwu et al. [2023] released a small HRTEM dataset of 407 images of Au, Ag, and CdSe nanoparticles paired with acquisition metadata such as magnification and electron dose; this is described as the closest experimental precedent.",
+        "evidence_spans": [
+          "The closest experimental precedent is from Sytwu et al. [2023], who released 407 HRTEM images of Au, Ag, and CdSe nanoparticles paired with acquisition metadata including magnification and electron dose."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Atomagined [Schwenker et al., 2020] provides PRISM-generated HAADF-STEM images post-processed to emulate noise and distortion across a wide range of ICSD structure prototypes.",
+        "evidence_spans": [
+          "Atomagined [Schwenker et al., 2020] provides PRISM-generated HAADF-STEM images post-processed to emulate noise and distortion, covering a wide range of ICSD structure prototypes."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Eliasson and colleagues [Eliasson and Erni, 2025; Eliasson, 2025; Eliasson et al., 2026] released a 250,000-image multislice-simulated HAADF-STEM corpus of Pt nanoparticles for size and morphology prediction.",
+        "evidence_spans": [
+          "Eliasson and Erni [2025], Eliasson [2025], Eliasson et al. [2026] release a 250,000-image multislice-simulated HAADF-STEM corpus of Pt nanoparticles for size and morphology prediction."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "TEMImageNet [Lin et al., 2021] is a simulated training library for atom-resolution STEM tasks and demonstrated that simulation-trained models can transfer to experimental data.",
+        "evidence_spans": [
+          "TEMImageNet [Lin et al., 2021] offers a simulated training library for atom-resolution STEM tasks and shows that simulation-trained models can transfer to experimental data."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior EM image-to-image work has focused on simulation-to-experiment transfer and denoising, including CycleGAN-based translation methods and GAN denoisers.",
+        "evidence_spans": [
+          "Prior work has applied image-to-image networks to EM data in two main directions: to bridge the simulation-to-experiment gap so that synthetic training data gains realism, and for denoising of experimental acquisitions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Khan et al. [2023] used a CycleGAN [Zhu et al., 2017] with a reciprocal-space discriminator to add realistic high-frequency content to simulated STEM images, enabling downstream segmentation models to transfer to real experiments.",
+        "evidence_spans": [
+          "Khan et al. [2023] use a CycleGAN [Zhu et al., 2017] with a reciprocal-space discriminator to add realistic high-frequency content to simulated STEM images so that a downstream segmentation network can transfer to real experiments."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Eliasson et al. [2024] used a CycleGAN to translate between simulated and experimental HAADF-STEM images of Pt nanoparticles, demonstrating both denoising and realistic noise addition.",
+        "evidence_spans": [
+          "Eliasson et al. [2024] use a CycleGAN to translate between simulated and experimental HAADF-STEM of Pt nanoparticles, showcasing both denoising and realistic noise addition."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Lobato et al. [2024] trained a GAN denoiser on synthetic image pairs with intricately modeled noise.",
+        "evidence_spans": [
+          "And in another work, Lobato et al. [2024] train a GAN denoiser on synthetic image pairs with intricately modeled noise."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Self-supervised denoisers in the Noise2Noise, Noise2Void, and UDVD family [Lehtinen et al., 2018; Krull et al., 2019; Sheth et al., 2021] have been popular approaches for STEM denoising, including recent atomic-resolution applications.",
+        "evidence_spans": [
+          "Self-supervised denoisers in the Noise2Noise / Noise2Void / UDVD family [Lehtinen et al., 2018, Krull et al., 2019, Sheth et al., 2021] have been popular approaches to denoising STEM imagery, with several recent applications to atomic-resolution data [Kim et al., 2025, Thornley et al., 2026]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "GAN-based denoisers have also been explored for STEM; for example, Noise2Atom [Wang et al., 2020] is an unsupervised GAN-based denoiser trained on noisy acquisitions of sub-nm catalytic clusters and reportedly the only STEM denoiser to release its training data.",
+        "evidence_spans": [
+          "GAN-based denoisers have also been explored. Noise2Atom [Wang et al., 2020] is an unsupervised GAN-based denoiser trained on noisy acquisitions of sub-nm catalytic clusters, and is, to our knowledge, the only STEM denoiser to release the data with which it was trained."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "ImageNet [Deng et al., 2009] is cited as a large-scale computer-vision dataset benchmark containing 1.28 million natural images.",
+        "evidence_spans": [
+          "ImageNet [Deng et al., 2009] contains 1.28 million natural images"
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "Existing experimental microscopy datasets are limited: they are small in scale, narrow in material/sample coverage, often lack acquisition metadata needed to generalize across instrument settings, and prior public releases were smaller and in HRTEM rather than HAADF-STEM.",
+        "evidence_spans": [
+          "a lack of open-source data means that current methods are typically trained from scratch for a specific noise level on a single or narrow set of samples",
+          "This release was much smaller in scale and in\nHRTEM rather than HAADF-STEM.",
+          "Existing exper-\nimental datasets tend to be small, narrow in material coverage, and rarely include the acquisition\nmetadata needed to train models that generalise across instrument settings."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior image-to-image microscopy methods are typically one-to-one and agnostic to microscope settings, so adapting to different conditions such as dwell time or detector gain requires training a separate model (e.g., a new CycleGAN) for each setting.",
+        "evidence_spans": [
+          "These approaches are all\none-to-one and agnostic to microscope settings (i.e., a dedicated network is trained per source/target\ndomain pair, with no natural way to parameterise the target style).",
+          "Simulating a different dwell time\nor detector gain with any previous method requires training a new CycleGAN with a new paired or\nunpaired corpus at that setting."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior denoising methods are heavily specialized to single noise profiles and materials; some require paired time-series data with unchanged image content, and Noise2Void-based methods can be overly aggressive, introduce checkerboard artifacts, lose detail when pixels are not much smaller than atomic features, and hallucinate background structure by smoothing speckle noise into gaussians.",
+        "evidence_spans": [
+          "However, these models are heavily specialised\nfor single noise profiles and materials samples, some of which (such as Noise2Noise) further require\ntime-series data where noise changes but image content does not (i.e., true image pairs).",
+          "Noise2Void-\nbased techniques that can work on single or unpaired images instead introduce checkerboard artefacts\nwhen trained to convergence and lose image detail if pixel size is not significantly smaller than the\natomic features the experimentalist is interested in.",
+          "which is overly aggressive in its denoising, suffers from checkerboard artifacts\n(Figure 2), and tends to hallucinate content in background regions by smoothing speckle noise into\ngaussians."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A prior model for gain changes failed to capture the experimentally observed clipping boundary condition.",
+        "evidence_spans": [
+          "However,\nit does not successfully model the boundary condition where the experimental image is clipped."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The available corpus is too limited to support the degree of model scaling achieved in larger vision datasets.",
+        "evidence_spans": [
+          "and has supported three orders of magnitude of model scaling beyond what our corpus can support."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "One-to-one, setting-agnostic style-transfer methods were rejected in favor of a one-to-many generator conditioned on continuous acquisition metadata, allowing arbitrary target instrument settings to be queried at inference without retraining.",
+        "evidence_spans": [
+          "The style-transfer network we present downstream of CIMP is instead one-to-many: a single generator is conditioned on continuous acquisition metadata through CIMP embeddings such that any target instrument setting can be queried at inference without retraining."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Methods whose inference cost is dominated by iterative refinement were ruled out because they are too slow for real-time use.",
+        "evidence_spans": [
+          "This rules out methods whose inference cost is dominated by iterative refinement."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Palette-style image-to-image diffusion was rejected because it requires paired source-target examples, which are unavailable in this work.",
+        "evidence_spans": [
+          "By contrast, Palette-style image-to-image diffusion [Saharia et al., 2021] requires paired source-target examples that we do not have"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Flow matching was rejected because it is natively a noise-to-image generative method rather than a metadata-conditioned image-to-image translation approach.",
+        "evidence_spans": [
+          "and flow matching [Lipman et al., 2022] is natively a noise-to-image generative method rather than an image-to-image translator that can be conditioned on metadata."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Pixel size was excluded from the qualitative style-transfer evaluation because synthetically changing field of view while keeping image dimensions fixed has no physical basis.",
+        "evidence_spans": [
+          "We qualitatively evaluate style transfer for each metadata parameter individually, with the exception of pixel size. Since pixel size is determined by the image\u2019s field of view, altering it synthetically while keeping image dimensions fixed has no physical basis"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Noise2Atom was excluded from the user study because it was not considered a comparable denoiser.",
+        "evidence_spans": [
+          "We therefore do not consider Noise2Atom a comparable denoiser and exclude it from the user study below."
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [
+      {
+        "content": "The method is inspired by CLIP-style contrastive training and is positioned as analogous to prior cross-modal microscopy and medical-imaging approaches, especially CLOOME and conceptually ContIG.",
+        "evidence_spans": [
+          "we propose Contrastive Image-Metadata Pre-training (CIMP), a CLIP-style method [Radford et al., 2021]",
+          "The closest structural ana-\nlogue in any microscopy domain is CLOOME [Sanchez-Fernandez et al., 2023], which contrastively\naligns fluorescence cell-painting images with chemical-structure embeddings and demonstrates\ncross-modal retrieval across a large bioimaging database.",
+          "ContIG [Taleb et al., 2022] is the closest\nconceptual parallel: a medical-imaging model that contrastively aligns retinal images with a structured\nphysical-annotation vector (SNP arrays, polygenic risk scores)."
+        ],
+        "conflicting": false
+      }
+    ],
+    "causal_claim": [
+      {
+        "content": "Using the learned embedding to condition a metadata-conditioned style-transfer/GAN model enables re-rendering or translating experimental images into the style they would have under different acquisition parameters; using the embedding both as a conditioning signal and as a perceptual loss supports style transfer across acquisition parameters.",
+        "evidence_spans": [
+          "we use the embedding to condition a metadata-conditioned style-transfer model that re-renders experimental images under different acquisition parameters",
+          "we use the embedding as both a perceptual loss and a conditioning signal for a generative metadata-conditioned style-transfer model that translates an experimental image into the style it would have had under different acquisition parameters"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Virtually increasing or scaling dwell time and beam current of low-dose images allows the style-transfer/CIMP-conditioned GAN model to function as a physics-informed denoiser.",
+        "evidence_spans": [
+          "Virtually scaling dwell time and beam current of low-dose images turns this model into a physics-informed denoiser",
+          "we use the style-transfer model as a physics-informed denoiser by virtually scaling dwell time and beam current of low-dose images",
+          "Finally, we utilize the CIMP-conditioned GAN model as a denoiser by feeding it a target embedding etgt derived from the source metadata with virtually increased dwell time and beam current."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Limiting electron dose causes images to become very noisy.",
+        "evidence_spans": [
+          "Limiting the electron dose is crucial to avoid sample damage and ensure physical relevance of observed phenomena, but naturally leads to very noisy images"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "TEM experiment exploration and tuning cause large amounts of collected data to remain unused.",
+        "evidence_spans": [
+          "Yet, for every published image, a massive volume of data, more than 90% by some estimates [Ivanova et al., 2025], remains unused, not because the quality of the data is bad but because TEM experiments require exploration and tuning to identify and record the golden data that eventually makes publication."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Contrastive image-metadata alignment causes or yields a factored, physics-aligned representation as a byproduct of retrieval training.",
+        "evidence_spans": [
+          "Yet seven physically distinct acquisition pa- rameters are independently recoverable from the frozen 128-d embedding through a closed-form linear probe, evidence that contrastive image-metadata alignment yields a factored, physics-aligned representation as a byproduct of retrieval training."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The stated constraints motivate using a GAN-based architecture.",
+        "evidence_spans": [
+          "These constraints motivate a GAN-based architecture."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The model changes images by about as much as natural changes between adjacent real acquisitions, and together the image-level and distributional results indicate that it reproduces experimental changes with realistic magnitude and distribution.",
+        "evidence_spans": [
+          "This indicates that the CIMP GAN modifies the input by an amount comparable to the natural change between adjacent real acquisitions in the series.",
+          "Read together, Tables 2 and 3 indicate that the CIMP GAN reproduces the experimental change at both the per-image and the distributional level, with the magnitude of induced change matching the natural intra-series variation and the output distribution matching the distribution of real eval-set images."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Increasing dwell time makes generated images smoother but also brightens the background, unlike in experiments.",
+        "evidence_spans": [
+          "In general, increasing dwell time does make the image smoother as expected, but also makes the background brighter, which does not happen in the experimental series."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Adjacent dwell-series images differ only modestly, causing dwell to have the highest baseline similarity, while gain changes are captured most actively by the model.",
+        "evidence_spans": [
+          "Among the three series, the CIMP GAN\u2019s similarity to the reference is highest for gain, suggesting the model captures the gain change most actively, while dwell shows the highest baseline similarity since consecutive images in the dwell series differ only modestly to begin with."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Noise2Void behaves like a low-pass filter, strongly suppressing high frequencies while leaving low frequencies mostly unchanged.",
+        "evidence_spans": [
+          "Noise2Void shows a simple low-pass profile, suppressing high-frequency power by roughly an order of magnitude while leaving low frequencies essentially unchanged."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "CIMP GAN suppresses power gently and almost uniformly across frequencies.",
+        "evidence_spans": [
+          "Our CIMP GAN suppresses power gently and almost uniformly across the spectrum"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Noise2Atom adds low-to-mid-frequency power while suppressing high frequencies.",
+        "evidence_spans": [
+          "Noise2Atom suppresses high-frequency content but adds power in the low-to-mid frequency range"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Under-representation of acquisition-parameter extremes causes the model to miss the corresponding image behaviors because it lacks examples from which to learn them.",
+        "evidence_spans": [
+          "As a result, the upper and lower bounds of each acquisition parameter are under-represented in the dataset, and the model has no examples from which to learn the corresponding image behaviours."
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "Unused TEM data arises mainly from the exploratory, tuning-heavy nature of experiments and publication norms/culture rather than poor data quality: operators collect many trial images to find the publishable 'golden' data, publications emphasize only the best images, and data-sharing is not yet well established.",
+        "evidence_spans": [
+          "not because the quality of the data is bad but because TEM experiments require exploration and tuning to identify and record the golden data that eventually makes publication",
+          "Mi-\ncroscopy publications typically focus on findings from\nthe highest-quality images, and the culture of data shar-\ning is not well-established in the field."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "HAADF-STEM-specific image priors are needed because natural-image and atomic-scale image distributions differ.",
+        "evidence_spans": [
+          "which conveys the need for HAADF-STEM\nimage priors given the difference in distributions between natural images and atomic-scale images."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "SMAPE is inflated for log10-transformed variables with wide dynamic range because residuals are re-exponentiated from log space, producing multiplicative error effects.",
+        "evidence_spans": [
+          "The three log10-transformed di-\nmensions with wide dynamic range (pixel\nsize, dwell time, beam current) show in-\nflated SMAPE of 28\u201347% despite R2 \u2208\n[0.66, 0.78], reflecting the multiplicative ef-\nfect of re-exponentiating log10-space resid-\nuals."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "GANs are suitable because they provide one-shot inference, train reliably on small datasets, align naturally with the LPIPS-based multi-task objective, and do not require true image-metadata pairs.",
+        "evidence_spans": [
+          "GANs admit one-shot inference without iterative ODE solving,\ntrain reliably on small datasets, integrate naturally with the multi-task LPIPS-based objective we use,\nand allow us to jointly optimise for the correct metadata style, content preservation, and image realism\nwithout true image-metadata pairs."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The approximately 0.19 KID reflects content shift between the narrow evaluation series and the broader training corpus, rather than model artifacts.",
+        "evidence_spans": [
+          "Against the training corpus, the CIMP GAN\u2019s KID (0.185) matches the content-gap floor\n(0.189) within one standard error. The common \u223c0.19 value therefore reflects the shift between the\nnarrow eval-series content and the wider training distribution, not a model artefact."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Poor offset performance is likely due to limited diversity in the training set.",
+        "evidence_spans": [
+          "This is likely due to limited diversity in the training set."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The observed frequency behavior indicates denoising occurs through a metadata-driven style shift rather than a frequency cutoff.",
+        "evidence_spans": [
+          "consistent with its denoising\nmechanism being a metadata-driven style shift rather than a frequency cutoff."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "This effect occurs because Noise2Atom imprints periodic atomic-lattice content onto every input regardless of the actual sample.",
+        "evidence_spans": [
+          "reflecting the periodic\natomic-lattice content the model imprints on every input regardless of the underlying sample."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Extreme parameter regimes are not learned because operators usually avoid recording bad acquisitions such as clipped, saturated, or otherwise extreme images.",
+        "evidence_spans": [
+          "Operators do not routinely record images with clipped intensities, saturated detectors, or other extreme boundary conditions, because such acquisitions are considered bad."
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "The proposed Contrastive Image-Metadata Pre-training (CIMP) method aligns images with acquisition metadata, and for it to be useful for downstream conditioning, its embeddings should capture physically meaningful microscope-state axes rather than merely retrieval cues for re-pairing images with metadata.",
+        "evidence_spans": [
+          "propose Contrastive Image-Metadata Pre-training (CIMP), a CLIP-style encoder that aligns the two modalities",
+          "For CIMP embeddings to serve as a foundation layer that downstream models can condition on,\nthe representation must encode physically meaningful axes of microscope state, not just enough\ninformation to re-pair an image with its own metadata at retrieval time."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Future improvement will come from collecting a larger and more diverse dataset from additional facilities.",
+        "evidence_spans": [
+          "Future work will include amassing a higher volume and more diverse corpus of data from further research facilities."
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "CIMP achieves strong cross-modal retrieval on held-out validation data, with Top-1 84.4% (0.8438), Top-5 96.88%, and Top-10 98.44%.",
+        "evidence_spans": [
+          "reaches 84.4% Top-1 cross-modal retrieval on a held-out split",
+          "reaching Top-1 cross-modal retrieval of 84.4% on a held-out validation split",
+          "We train for 1000 epochs and achieve final Top-1 of 0.8438, Top-5 of 0.9688, and Top-10 of 0.9844 on our held-out validation set."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "All seven acquisition/metadata parameters are individually linearly recoverable/decodable from the frozen 128-d visual embedding via linear probing/Ridge regression, despite the contrastive objective not directly supervising metadata values.",
+        "evidence_spans": [
+          "All seven parameters are individually recoverable from the frozen visual embedding through a linear probe",
+          "linear probing shows that all seven acquisition parameters are individually recoverable from the frozen 128-d visual embedding through Ridge regression despite the contrastive objective never supervising any metadata value directly",
+          "All seven metadata parameters are linearly decodable from the frozen 128-d embedding (Table 1)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In a blind user study, experimental microscopists preferred the CIMP GAN denoiser over the state-of-the-art Noise2Void baseline in 70.2% of trials/judgments, significantly above chance.",
+        "evidence_spans": [
+          "in a blind user study, experimental microscopists prefer it over the current state-of-the-art denoiser for STEM imagery on 70.2% of trials",
+          "In a blind user study, experimental microscopists prefer this denoiser over the state-of-the-art Noise2Void baseline on 70.2% of trials.",
+          "Across all 486 judgments, CIMP GAN is chosen on 70.2% (Wilson 95% CI [66.0, 74.1]) of trials, significantly above 50% (binomial p < 10\u22123)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Most raters preferred CIMP GAN, though preference was uneven and one rater was approximately at chance; some raters reported that Noise2Void looked sharper but less realistic, with cross artifacts, and worked better when the raw signal was already high.",
+        "evidence_spans": [
+          "Per-rater preference is uneven, four raters prefer CIMP at 68\u201386% while one is indistinguishable from chance at 50.7% (Table 5).",
+          "A general impression from some of the raters was that \"the one with cross artefacts\" (N2V) generates sharper but more unrealistic images, and works better when the signal of the raw image is already quite high."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The introduced dataset contains 7,330 HAADF-STEM images with paired metadata, spanning more than 30 material systems and over 130 samples.",
+        "evidence_spans": [
+          "In this work, we introduce 7,330 HAADF-STEM images with paired metadata from a Titan microscope at an anonymised materials-research laboratory. The dataset covers more than 30 distinct materials systems, predominantly heterogeneous catalysts (Pt/CeO2, Pd/ZrO2, Ru/TiO2, In2O3/ZrO2, etc.), with more than 130 material samples synthesized by different techniques and with different metal loading, imaged with a variety of instrument settings."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The authors collected special evaluation sets consisting of true experimental image series of the same sample captured in quick succession while varying a single metadata parameter at a time, specifically sweeping dwell time, gain, and offset.",
+        "evidence_spans": [
+          "We additionally solicited the creation of several evaluation sets,\n\nwhich are series of true experimental images captured of the same sample in quick succession while\nvarying a single metadata parameter. These series sweep dwell time, gain, and offset respectively."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Generated image style aligns with the conditioning embedding: correct output-target pairs exceed incorrect pairs by 0.523 cosine similarity.",
+        "evidence_spans": [
+          "As shown in Figure 7, the mean similarity of correct\npairs exceeds that of incorrect pairs by 0.523 on the cosine-similarity scale (bounded in [\u22121, 1]),\ndemonstrating that the generator aligns image style with the provided conditioning embedding."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Style-transfer fidelity is close to the real evaluation-series baseline: SSIM, PSNR, and LPIPS differ only slightly across all three series, and the CIMP GAN's KID against real eval-set images is near zero (-0.016 \u00b1 0.009), indicating an almost perfect distributional match.",
+        "evidence_spans": [
+          "Table 2 shows that the SSIM, PSNR, and LPIPS values are very consistent between\nthe CIMP GAN and the eval-series baseline across all three series, with the two rows differing by\nless than 0.02 on SSIM, 1.3 on PSNR, and 0.05 on LPIPS in every case.",
+          "Most\ndirectly, the CIMP GAN\u2019s KID against the real eval-set images is near zero (\u22120.016 \u00b1 0.009), and\nwe conclude that its output distribution almost perfectly matches the distribution of the real evaluation\nimages."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For gain sweeps, the model captures the qualitative trend of increased brightness and noise when gain increases (and lower brightness when gain decreases), but fails to reproduce saturation at high gain values.",
+        "evidence_spans": [
+          "For gain, our\nmodel correctly predicts the behaviour of lowering and increasing brightness in the image.",
+          "This is visible in the gain sweep (Figure 5b), where the model correctly reproduces the trend of increasing brightness and noise but fails to saturate at the high end"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The model performs worst on offset sweeps: it generates little variation across offset values and reproduces extreme offset values poorly, despite substantial change in the experimental series.",
+        "evidence_spans": [
+          "The\nCIMP-conditioned GAN model performs worst on the offset parameter; there is almost no difference\nbetween generated images across offset values, though the experimental series shows substantial\nchange.",
+          "and in the offset sweep (Figure 5c), where extreme values are poorly reproduced."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Qualitatively, the CIMP GAN denoiser produces more realistic outputs than Noise2Void.",
+        "evidence_spans": [
+          "Qualitatively, our CIMP GAN denoiser consistently outputs more realistic looking denoised images\nthan Noise2Void"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Noise2Atom fails broadly on denoising beyond clean atomic-resolution lattices, collapsing content onto an atomic prior and scoring poorly on edge metrics.",
+        "evidence_spans": [
+          "Noise2Atom fails on the broader denoising task, with complete content\ncollapse on any input whose content is not a clean atomic-resolution lattice.",
+          "Noise2Atom\ncollapses image content onto a learned atomic prior, scoring poorly on both edge metrics."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Quantitatively, CIMP GAN preserves the most edge magnitude among compared denoisers (edge energy ratio 0.79), while Noise2Void preserves edge locations best (gradient correlation 0.69) but aggressively smooths and retains only 36% of total edge magnitude.",
+        "evidence_spans": [
+          "Our CIMP GAN preserves the\nmost edge magnitude (edge energy ratio 0.79).",
+          "Noise2Void preserves edge location best (gradient\ncorrelation 0.69) but smooths aggressively and retains only 36% of total edge magnitude."
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "Electron dose must be limited to avoid sample damage and preserve physical relevance of observed phenomena.",
+        "evidence_spans": [
+          "Limiting the electron dose is crucial to avoid sample damage and ensure physical relevance of observed phenomena"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Autonomous TEM systems require image representations grounded in the microscope/instrument state at acquisition.",
+        "evidence_spans": [
+          "any such autonomous system needs a representation of each image grounded in the instrument state under which it was acquired"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The method cannot rely on paired low-dose/high-dose images because acquiring matched pairs would damage the sample, and the corpus therefore contains no paired or matched source-target groupings outside limited sets\u2014only varied unpaired samples across acquisition parameters.",
+        "evidence_spans": [
+          "We additionally cannot rely on paired source-target data, since acquiring matched low-dose and high-dose images of the same field would itself degrade the sample,",
+          "Outside of these sets, images were captured as the operator saw fit, so the corpus contains no paired or matched groupings, only a broad collection of samples spanning varied acquisition parameters."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A useful microscope denoiser must run faster than the acquisition frame rate so low-dose images can be interpreted in time to support real-time decisions at the microscope.",
+        "evidence_spans": [
+          "In practice, the most useful denoiser for an experimental microscopist is one that runs while they are at the microscope, quicker than the frame rate of the acquisition, so that low-dose images can be interpreted in time to inform the next decision."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The training corpus is small by computer-vision standards, and the usefulness of approaches that depend on paired data is constrained by the availability and diversity of paired corpora.",
+        "evidence_spans": [
+          "and our training corpus of \u223c7,000 images is small by computer-vision standards.",
+          "However, the utility of such approaches scales with the diversity of paired corpora available to the field"
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": [
+      {
+        "content": "An ImageNet-pretrained ViT fine-tuned end-to-end on HAADF-STEM data did not outperform a ResNet-18 trained from scratch on HAADF-STEM retrieval (Top-1 82.8% vs. 84.4%).",
+        "evidence_spans": [
+          "Notably, an ImageNet-pretrained ViT finetuned end-to-end on our HAADF-STEM data (Top-1 82.8%) does not outperform our ResNet-18 trained from scratch (Top-1 84.4%) on this task (Appendix D)"
+        ],
+        "conflicting": false
+      }
+    ]
+  }
+}

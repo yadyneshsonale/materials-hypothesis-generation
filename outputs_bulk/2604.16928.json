@@ -1,0 +1,414 @@
+{
+  "paper_id": "2604.16928",
+  "chunks_processed": 7,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Using plane waves for isolated-system many-body calculations introduces extra challenges.",
+        "evidence_span": "Performing many-body calculations of isolated systems using the plane-wave basis requires additional consider-ations."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Active-space determination is a key challenge in quantum molecular computation.",
+        "evidence_span": "Another important issue in quantum molecular com-putation is the determination of active space."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Many-body Hamiltonians are conventionally built using Hartree-Fock states as the basis.",
+        "evidence_span": "Convention-ally, the Hartree-Fock (HF) states are used as the basis to compute hpq and hpqrs."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Recent work used plane-wave basis sets to build one-electron wavefunctions for many-body solvers such as FCI, CC, and MP perturbation theory.",
+        "evidence_span": "Recently, the PW basis set has been used to construct the one-electron wavefunc-tions, on top of which the many-body Hamiltonian can be solved by methods such as FCI, CC, M\u00f8ller-Plesset perturbation theory."
+      },
+      {
+        "role": "prior_approach",
+        "content": "COVOs were proposed to address the vacuum-state issue.",
+        "evidence_span": "To address this issue, the concept of COVOs was pro-posed."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The original COVO method sorts KS virtual orbitals by energy and optimizes each target virtual using a tiny active space.",
+        "evidence_span": "In the original COVO method, the KS virtual orbitals are initially sorted in ascending KS orbital ener-gies. Using these as an initial guess, new virtual orbitals are then obtained by optimizing the correlation energies of a very small active space consisting of only the highest occupied orbital and the single target virtual orbital10."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The original COVO method simply sorted virtual orbitals by KS energies.",
+        "evidence_span": "While simply sorting the virtual orbitals by their KS orbital energies has proved reason-ably successful for the original COVO method11"
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "COVO often sacrifices accuracy despite capturing correlation energy.",
+        "evidence_span": "although its accuracy is often sacri-ficed."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Energy-sorted virtual orbitals may lack significant correlation energy, making the basis inaccurate and inefficient.",
+        "evidence_span": "virtual orbitals considered in this manner may not have signif-icant correlation energies, making it an inaccurate and inefficient basis."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "The proposed PW-derived LCCVO approach gives an unsatisfactorily large error for C2 dissociation energy.",
+        "evidence_span": "the error in the dissociation energy of C2 exceeds 10% when using the proposed PW-derived LCCVO approach. Although this deviation remains unsatisfactory in absolute terms"
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Gaussian-type orbitals are contrasted against plane waves because they provide less flexible basis-size control.",
+        "evidence_span": "In contrast, Gaussian-type orbitals offer less flexibility, as their basis-set expansion relies on discrete function forms with fixed increments in basis-set sizes."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "Plane waves are motivated by Bloch's theorem as a momentum-space grid basis.",
+        "evidence_span": "Motivated by Bloch\u2019s theorem, PWs can be seen as a grid basis in momentum space22."
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "The periodic nature of plane waves can introduce spurious interactions between molecular images.",
+        "evidence_span": "Due the periodic nature of plane-waves, spurious interactions with the periodic images of the molecules may be inadvertently introduced."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Treating molecule and vacuum equally in a uniform plane-wave basis yields unoccupied states with large vacuum contributions.",
+        "evidence_span": "As a result, PW-based DFT calcu-lations will yield unoccupied electronic states with sig-nificant contributions from the vacuum region, including pure vacuum states and mixed vacuum-molecule states"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Including vacuum states substantially lowers the correlation energy recovered in many-body calculations.",
+        "evidence_span": "The in-clusion of such vacuum states considerably reduces the correlation energies captured in many-body calculations."
+      },
+      {
+        "role": "causal_claim",
+        "content": "LCCVO construction discards KS states with insignificant CCSD correlation contributions.",
+        "evidence_span": "Thus when constructing the LCCVOs, we include the KS states in an energy-ascending manner and discard those with insignificant contributions to the correlation energy obtained by a CCSD calculation."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The method enables more flexible orbital-count choice and comparable correlation-energy recovery with far fewer orbitals.",
+        "evidence_span": "Therefore, out method allows for more flexibility in the choice of N orb and achieves comparable correlation energy recovery with substantially fewer orbitals."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Open-shell character is unlikely to be the main cause of the C2 error because the same framework works reliably for other open-shell systems.",
+        "evidence_span": "Since the same framework provides reliable results for open-shell systems such as triplet O2 and the doublet CN radical, the open-shell character of C2 is unlikely to be the dominant source of error."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Kohn-Sham states may be a better single-particle basis because they partially include electron correlation.",
+        "evidence_span": "Kohn-Sham (KS) states obtained via DFT calculations can also be used instead of the HF states, which may serve as a better single-particle basis to con-struct the many-body Hamiltonian due to the partial in-clusion of electron correlation in the KS wavefunction."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "A large vacuum region usually remedies periodic-image interactions.",
+        "evidence_span": "While this is typically remedied by including a large vacuum region between the periodic images"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Pure and partial vacuum states interfere with correlation-energy optimization.",
+        "evidence_span": "As men-tioned previously, the pure and partial vacuum states may cause problems during correlation energy optimiza-tion."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Weak interactions and transient environments in experimental C2 generation may perturb geometry and electronic structure, affecting inferred dissociation energy.",
+        "evidence_span": "In practice, C2 is typically generated under conditions where weak interactions with surrounding species or transient environments cannot be completely eliminated. Even subtle perturbations may influence its geometric and electronic structures, which in turn affect the experimentally inferred dissociation energy."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Sensitivity in assigning the ground-state electronic structure of C2 suggests subtle factors can affect experimental interpretation.",
+        "evidence_span": "Although it is commonly assigned as a singlet X1\u03a3+ g state in experiments, its characterization is known to be highly sensitive, suggesting that subtle factors may influence the interpretation of experimental observations."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors propose LCCVOs from the same PW-DFT calculations to solve these issues.",
+        "evidence_span": "We introduced LCCVOs, derived from the same PW-based DFT calculations, to address these issues."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The large C2 dissociation-energy error likely does not come solely from the LCCVO method but also from uncertainty in the experimental reference.",
+        "evidence_span": "Taken together, these considerations indicate that the relatively large error in the dissociation energy is unlikely to arise solely from the LCCVO method itself, but may also be related to the intrinsic difficulty in establishing a definitive experimental reference for C2."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "The COVO method was successful at capturing significant correlation energies.",
+        "evidence_span": "the COVO method has proven its success in capturing significant correlation energies"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The method reproduces the expected O(1/N_orb) error scaling versus number of orbitals.",
+        "evidence_span": "The results reproduce the ex-pected O(1/N orb) error scaling with respect to the num-ber of orbitals N orb (see Supplementary Figure 5)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The method reduces required spatial orbitals from 110\u2013182 to 15\u201350 while maintaining or surpassing accuracy.",
+        "evidence_span": "Remarkably, our method reduces the number of required spatial orbitals from 110\u2013182 (using cc-pV5Z) to only 15\u201350, while maintaining (and sometimes surpassing) the accuracy of the much larger basis sets."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Even with that issue, the present method has the smallest error among all approaches tested in the study.",
+        "evidence_span": "the present method still yields the smallest error among all approaches considered in this study."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Supplementary Figure 4 compares correlation energies with and without LCCVO for N2.",
+        "evidence_span": "Supplementary Figure 4. Bar chart comparing the correlation energies obtained with and without LCCVO."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Supplementary Figure 5 shows O(1/N) scaling of CCSD energies with the number of LCCVOs for N2.",
+        "evidence_span": "Supplementary Figure 5. Plot of CCSD energies of the N2 system with varying numbers of LCCVOs, illustrating the O(1/N) relationship between CCSD energies and the number of LCCVOs."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Supplementary Figure 6 shows O(1/L) scaling of CCSD energies with cell parameter for N2.",
+        "evidence_span": "Supplementary Figure 6. Plot of CCSD energies of the N2 system with varying cell parameters, illustrating the O(1/L) relationship between the CCSD energies and the cell parameters."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Computational resources prevent use of a truly complete basis set.",
+        "evidence_span": "Due to lim-ited computational resources, it is impossible to utilize a truly complete basis set."
+      },
+      {
+        "role": "constraint",
+        "content": "One must balance accuracy against computational efficiency.",
+        "evidence_span": "Therefore, one has to compro-mise between accuracy and computational efficiency."
+      },
+      {
+        "role": "constraint",
+        "content": "Finite-size effects in plane-wave calculations must be accounted for by cell-size extrapolation.",
+        "evidence_span": "To account for finite size effects inherent in the plane-wave basis, each calculation is performed using a series of simple cubic simulation cells with edge lengths of L = 10 \u02daA, 12 \u02daA, 14 \u02daA, 16 \u02daA and 18 \u02daA, and the final energy is obtained by extrapolating the results to L = \u221e"
+      },
+      {
+        "role": "constraint",
+        "content": "Interpretation of the C2 results is bounded by inherent uncertainty in the experimental reference.",
+        "evidence_span": "Therefore, the present results should be interpreted in the context of this inherent uncertainty."
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Using a plane-wave basis for isolated-system many-body calculations introduces additional challenges, including the need to determine an appropriate active space in quantum molecular computation.",
+        "evidence_spans": [
+          "Performing many-body calculations of isolated systems using the plane-wave basis requires additional consider-ations.",
+          "Another important issue in quantum molecular com-putation is the determination of active space."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Conventionally, many-body Hamiltonians are built using Hartree-Fock (HF) states as the basis for computing one- and two-electron terms.",
+        "evidence_spans": [
+          "Convention-ally, the Hartree-Fock (HF) states are used as the basis to compute hpq and hpqrs."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Recent prior work used plane-wave (PW) basis sets to construct one-electron wavefunctions, on top of which many-body Hamiltonians were solved with methods such as FCI, coupled cluster (CC), and M\u00f8ller-Plesset perturbation theory.",
+        "evidence_spans": [
+          "Recently, the PW basis set has been used to construct the one-electron wavefunc-tions, on top of which the many-body Hamiltonian can be solved by methods such as FCI, CC, M\u00f8ller-Plesset perturbation theory."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "To address the vacuum-state issue, the concept of COVOs was proposed; in the original COVO method, KS virtual orbitals were sorted by ascending KS orbital energies and each target virtual orbital was optimized by correlating a very small active space consisting only of the highest occupied orbital and that single target virtual orbital.",
+        "evidence_spans": [
+          "To address this issue, the concept of COVOs was pro-posed.",
+          "In the original COVO method, the KS virtual orbitals are initially sorted in ascending KS orbital ener-gies. Using these as an initial guess, new virtual orbitals are then obtained by optimizing the correlation energies of a very small active space consisting of only the highest occupied orbital and the single target virtual orbital10.",
+          "While simply sorting the virtual orbitals by their KS orbital energies has proved reason-ably successful for the original COVO method11"
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "Prior orbital-truncation/virtual-orbital selection approaches have notable accuracy limitations: COVO often sacrifices overall accuracy despite capturing correlation energy, and energy-sorted virtual orbitals may omit important correlation contributions, making the basis inaccurate and inefficient.",
+        "evidence_spans": [
+          "although its accuracy is often sacri-ficed.",
+          "virtual orbitals considered in this manner may not have signif-icant correlation energies, making it an inaccurate and inefficient basis."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A limitation of the proposed PW-derived LCCVO approach is that it yields an unsatisfactorily large error for the C2 dissociation energy, exceeding 10% in absolute terms.",
+        "evidence_spans": [
+          "the error in the dissociation energy of C2 exceeds 10% when using the proposed PW-derived LCCVO approach. Although this deviation remains unsatisfactory in absolute terms"
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "Gaussian-type orbitals were rejected as an alternative to plane waves because they offer less flexible basis-size control, relying on discrete function forms with fixed increments in basis-set sizes.",
+        "evidence_spans": [
+          "In contrast, Gaussian-type orbitals offer less flexibility, as their basis-set expansion relies on discrete function forms with fixed increments in basis-set sizes."
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [
+      {
+        "content": "Plane waves are used as an inspiration/source because, motivated by Bloch\u2019s theorem, they can be viewed as a grid basis in momentum space.",
+        "evidence_spans": [
+          "Motivated by Bloch\u2019s theorem, PWs can be seen as a grid basis in momentum space22."
+        ],
+        "conflicting": false
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "The periodic nature of plane waves can introduce spurious interactions between molecular images.",
+        "evidence_span": "Due the periodic nature of plane-waves, spurious interactions with the periodic images of the molecules may be inadvertently introduced."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Treating molecule and vacuum equally in a uniform plane-wave basis yields unoccupied states with large vacuum contributions.",
+        "evidence_span": "As a result, PW-based DFT calcu-lations will yield unoccupied electronic states with sig-nificant contributions from the vacuum region, including pure vacuum states and mixed vacuum-molecule states"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Including vacuum states substantially lowers the correlation energy recovered in many-body calculations.",
+        "evidence_span": "The in-clusion of such vacuum states considerably reduces the correlation energies captured in many-body calculations."
+      },
+      {
+        "role": "causal_claim",
+        "content": "LCCVO construction discards KS states with insignificant CCSD correlation contributions.",
+        "evidence_span": "Thus when constructing the LCCVOs, we include the KS states in an energy-ascending manner and discard those with insignificant contributions to the correlation energy obtained by a CCSD calculation."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The method enables more flexible orbital-count choice and comparable correlation-energy recovery with far fewer orbitals.",
+        "evidence_span": "Therefore, out method allows for more flexibility in the choice of N orb and achieves comparable correlation energy recovery with substantially fewer orbitals."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Open-shell character is unlikely to be the main cause of the C2 error because the same framework works reliably for other open-shell systems.",
+        "evidence_span": "Since the same framework provides reliable results for open-shell systems such as triplet O2 and the doublet CN radical, the open-shell character of C2 is unlikely to be the dominant source of error."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Kohn-Sham states may be a better single-particle basis because they partially include electron correlation.",
+        "evidence_span": "Kohn-Sham (KS) states obtained via DFT calculations can also be used instead of the HF states, which may serve as a better single-particle basis to con-struct the many-body Hamiltonian due to the partial in-clusion of electron correlation in the KS wavefunction."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "A large vacuum region usually remedies periodic-image interactions.",
+        "evidence_span": "While this is typically remedied by including a large vacuum region between the periodic images"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Pure and partial vacuum states interfere with correlation-energy optimization.",
+        "evidence_span": "As men-tioned previously, the pure and partial vacuum states may cause problems during correlation energy optimiza-tion."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Weak interactions and transient environments in experimental C2 generation may perturb geometry and electronic structure, affecting inferred dissociation energy.",
+        "evidence_span": "In practice, C2 is typically generated under conditions where weak interactions with surrounding species or transient environments cannot be completely eliminated. Even subtle perturbations may influence its geometric and electronic structures, which in turn affect the experimentally inferred dissociation energy."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Sensitivity in assigning the ground-state electronic structure of C2 suggests subtle factors can affect experimental interpretation.",
+        "evidence_span": "Although it is commonly assigned as a singlet X1\u03a3+ g state in experiments, its characterization is known to be highly sensitive, suggesting that subtle factors may influence the interpretation of experimental observations."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors propose LCCVOs from the same PW-DFT calculations to solve these issues.",
+        "evidence_span": "We introduced LCCVOs, derived from the same PW-based DFT calculations, to address these issues."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The large C2 dissociation-energy error likely does not come solely from the LCCVO method but also from uncertainty in the experimental reference.",
+        "evidence_span": "Taken together, these considerations indicate that the relatively large error in the dissociation energy is unlikely to arise solely from the LCCVO method itself, but may also be related to the intrinsic difficulty in establishing a definitive experimental reference for C2."
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "The COVO/LCCVO-based method successfully captures significant correlation energies and yields the smallest error among all approaches tested in the study, even despite the noted issue.",
+        "evidence_spans": [
+          "the COVO method has proven its success in capturing significant correlation energies",
+          "the present method still yields the smallest error among all approaches considered in this study."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The method reproduces the expected O(1/N_orb) error scaling with respect to the number of orbitals; this is illustrated for N2 by Supplementary Figure 5, which shows an O(1/N) relationship between CCSD energies and the number of LCCVOs.",
+        "evidence_spans": [
+          "The results reproduce the ex-pected O(1/N orb) error scaling with respect to the num-ber of orbitals N orb (see Supplementary Figure 5).",
+          "Supplementary Figure 5. Plot of CCSD energies of the N2 system with varying numbers of LCCVOs, illustrating the O(1/N) relationship between CCSD energies and the number of LCCVOs."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The method reduces the number of required spatial orbitals from 110\u2013182 (using cc-pV5Z) to 15\u201350 while maintaining, and sometimes surpassing, the accuracy of the much larger basis sets.",
+        "evidence_spans": [
+          "Remarkably, our method reduces the number of required spatial orbitals from 110\u2013182 (using cc-pV5Z) to only 15\u201350, while maintaining (and sometimes surpassing) the accuracy of the much larger basis sets."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For N2, Supplementary Figure 4 compares the correlation energies obtained with and without LCCVO.",
+        "evidence_spans": [
+          "Supplementary Figure 4. Bar chart comparing the correlation energies obtained with and without LCCVO."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For N2, Supplementary Figure 6 shows an O(1/L) relationship between CCSD energies and the cell parameter.",
+        "evidence_spans": [
+          "Supplementary Figure 6. Plot of CCSD energies of the N2 system with varying cell parameters, illustrating the O(1/L) relationship between the CCSD energies and the cell parameters."
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "Computational limits prevent using a truly complete basis set, so calculations must balance accuracy against computational efficiency.",
+        "evidence_spans": [
+          "Due to lim-ited computational resources, it is impossible to utilize a truly complete basis set.",
+          "Therefore, one has to compro-mise between accuracy and computational efficiency."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Plane-wave calculations are constrained by finite-size effects, requiring cell-size extrapolation to obtain final energies.",
+        "evidence_spans": [
+          "To account for finite size effects inherent in the plane-wave basis, each calculation is performed using a series of simple cubic simulation cells with edge lengths of L = 10 \u02daA, 12 \u02daA, 14 \u02daA, 16 \u02daA and 18 \u02daA, and the final energy is obtained by extrapolating the results to L = \u221e"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Interpretation of the C2 results is constrained by inherent uncertainty in the experimental reference.",
+        "evidence_spans": [
+          "Therefore, the present results should be interpreted in the context of this inherent uncertainty."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

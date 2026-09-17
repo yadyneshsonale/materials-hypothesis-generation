@@ -1,0 +1,804 @@
+{
+  "paper_id": "2608.16267",
+  "chunks_processed": 3,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Design of 3D-printed microfluidic systems remains difficult despite manufacturing advances.",
+        "evidence_span": "However, despite these advances in manufacturing, the design of 3D-printed microfluidic systems remains a major challenge."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Manual CAD-based design is slow, hard to scale, and more error-prone for complex devices.",
+        "evidence_span": "In practice, the design workflow still relies heavily on manual computer-aided design (CAD), which is time-consuming, difficult to scale, and increasingly error-prone as device complexity grows."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "There is a critical gap between the promise of 3D printing for microfluidics and practical adoption due to persistent challenges.",
+        "evidence_span": "Taken together, these issues reveal a critical gap between the promise of 3D printing for microfluidics and its practical adoption."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Challenges in design, synthesis, materials, and fidelity hinder broader dissemination, especially for low-cost fabrication.",
+        "evidence_span": "Although 3D printing has made fabrication more accessible, persistent challenges in design complexity, functional synthesis, material limitations, and fabrication fidelity continue to slow the broader dissemination of 3D-printed microfluidics."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Manual CAD becomes a bottleneck as microfluidic networks grow more complex.",
+        "evidence_span": "As the complexity of microfluidic networks increases, manual design using standard mechanical CAD software becomes a significant bottleneck."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "There is a need for integrated 3D-capable CAD and automation tools for 3D-printed microfluidics.",
+        "evidence_span": "This limitation highlights the growing need for domain-specific CAD and design automation tools tailored to fully leverage the advantages of 3D-printed microfluidics."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Lack of integrated 3D-capable synthesis tools forces tedious iterative manual design to meet constraints.",
+        "evidence_span": "This lack of integrated, 3D-capable design synthesis tools forces researchers into tedious, iterative manual design cycles to satisfy specific timing, volumetric, or mixing constraints."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Traditional CAD software is ill-suited to complex multi-layer 3D microfluidic architectures.",
+        "evidence_span": "As the field of microfluidics grows from planar, single-layer devices to complex, multi-layer 3D architectures, the limitations of traditional mechanical CAD software become increasingly apparent."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "There is a bottleneck due to lack of synthesis tools that jointly handle multilayer layout and desired fluid-delivery behavior.",
+        "evidence_span": "A central bottleneck in 3D-printed microfluidics is the lack of synthesis tools that can jointly handle multi-layer physical layout generation and user-defined fluid-delivery behavior."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Passive 3D-printed mixers should achieve desired ratios without external hardware complexity.",
+        "evidence_span": "The central motivation is to avoid external complexity (multiple pumps, controllers, or valves) while still achieving ratio-specific mixing that is accurate enough for assay and diagnostic workflows."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Unintended curing from light penetration is a core manufacturability bottleneck, especially in small enclosed channels and multilayer layouts.",
+        "evidence_span": "A core manufacturability bottleneck in resin-based 3D-printed microfluidics is the unintended curing caused by light penetration through previously printed material. This artifact is especially severe for enclosed small channels and multi-layer layouts, where over-exposure can narrow or fully block critical flow paths."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Functional layouts are not necessarily printable because optical side effects distort fine features.",
+        "evidence_span": "While layout synthesis can generate functionally correct geometries, printability is not guaranteed when optical side effects distort fine features."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Compensation must be location-specific to preserve intended dimensions in complex multilayer designs.",
+        "evidence_span": "The central goal is therefore to predict location-specific com-\npensation values that preserve intended feature dimensions in\ncomplex multi-layer designs."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "There is a gap between accessible low-cost 3D printing and the needs of reliable microfluidic development.",
+        "evidence_span": "Overall, this work helps bridge\nthe gap between the accessibility of low-cost 3D printing\nand the practical requirements of reliable microfluidic device\ndevelopment."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Earlier automation tools improved conventional planar microfluidic chip design.",
+        "evidence_span": "While earlier design automation tools [5]\u2013[11] have improved the design of conventional planar microfluidic chips"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Microfluidic fabrication has traditionally used soft lithography and PDMS molding.",
+        "evidence_span": "The fabrication of microfluidic devices has historically been dominated by soft lithography and PDMS molding"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Researchers have explored multiple 3D printing techniques including SLA, DLP, FDM, and 2PP.",
+        "evidence_span": "researchers have increasingly turned to diverse 3D printing techniques for microfluidic fabrication, including stereolithography (SLA), digital light processing (DLP), fused deposition modeling (FDM), and two-photon polymerization (2PP) [14]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "EDA tools such as 3D\u00b5F, Cloud Columba, Micado, and Fluigi automate microfluidic design tasks.",
+        "evidence_span": "Several state-of-the-art design automation tools, such as 3D\u00b5F [8], Cloud Columba [6], [7], Micado [10], and Fluigi [11], have significantly facilitated the design of continuous-flow microfluidic devices."
+      },
+      {
+        "role": "prior_approach",
+        "content": "3D\u00b5F supports planar chip design and Cloud Columba supports synthesis for continuous-flow mLSI.",
+        "evidence_span": "For instance, 3D\u00b5F provides an interactive environment for planar chip design, while Cloud Columba supports synthesis for continuous-flow mLSI systems."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work used uniform-compensation approaches.",
+        "evidence_span": "prior uniform-compensation approaches"
+      },
+      {
+        "role": "prior_approach",
+        "content": "The evaluation compares against a prior state-of-the-art baseline method.",
+        "evidence_span": "compared against the prior state-of-the-art baseline\nmethod"
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Earlier tools do not address the needs of 3D-printed microfluidic systems.",
+        "evidence_span": "they do not adequately address the distinctive requirements of 3D-printed systems."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Soft lithography and PDMS molding require cleanrooms and extensive manual labor.",
+        "evidence_span": "which require specialized cleanroom environments and extensive manual labor."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Existing automation solutions are mostly limited to 2D architectures and layered flow/control designs.",
+        "evidence_span": "However, despite their capabilities, most existing microfluidic design automation solutions are fundamentally limited to 2D architectures, often relying on layered flow and control designs."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Existing tools are not directly applicable to 3D-printed microfluidic device design.",
+        "evidence_span": "As a result, they are not directly applicable to the design of microfluidic devices intended for 3D printing."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Standard CAD is not optimized for fluidic routing and requires tedious manual adjustments.",
+        "evidence_span": "Standard CAD tools are not optimized for fluidic routing, requiring manual, tedious adjustments for every channel bend, layer transition, and component placement."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Manual CAD can satisfy requirements for simple devices but becomes iterative and error-prone for larger multilayer designs with coupled timing and volume targets.",
+        "evidence_span": "While manual CAD workflows can meet these requirements for simple devices, they become highly iterative and error-prone as designs scale to multiple layers and involve tightly coupled timing and volume targets."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Unlike many passive mixer designs that optimize homogeneity for symmetric or fixed settings, this work targets arbitrary ratios and manufacturability for low-cost resin printing.",
+        "evidence_span": "In contrast to many passive mixer designs that primarily optimize homogeneity for symmetric or fixed settings, \u00b5-MM targets arbitrary ratio specifications and explicitly incorporates manufacturability for low-cost resin printing."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The method avoids requiring full optical characterization of each printer-resin pair by using a simpler calibration interface.",
+        "evidence_span": "To avoid requir-\ning full optical characterization of each printer-resin com-\nbination, the method uses a practical calibration interface\nbased on four user inputs"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Unlike prior uniform-compensation methods, LiPCon uses a physics-aware spatially resolved compensation model.",
+        "evidence_span": "In contrast\nto prior uniform-compensation approaches, LiPCon explicitly\nmodels the fact that over-curing depends not only on feature\ndepth but also on nearby geometry and local optical context."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The approach rejects purely black-box fitting in favor of hybrid physics-guided machine learning.",
+        "evidence_span": "This hybrid strategy combines domain\npriors with machine learning, reducing reliance on purely\nblack-box fitting."
+      }
+    ],
+    "inspiration_source": [],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Rigid, inelastic resin materials prevent reliance on deformable active flow-control components.",
+        "evidence_span": "As a result, 3D-printed microfluidic devices often cannot rely on deformable components for active flow control and must instead achieve functionality primarily through the careful design of internal geometries and fluidic pathways."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Dependence on geometry increases demands on precise design coordination.",
+        "evidence_span": "This strong dependence on geometry places greater demands on the design process: channel lengths, volumes, resistances, and timing relationships must be coordinated precisely to ensure correct fluid handling, synchronized reactions, and accurate dispensing behavior [13]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Light penetration and scattering cause over-curing outside intended regions.",
+        "evidence_span": "During printing, light penetration and scattering can cause polymerization outside the intended exposure region, a phenomenon commonly referred to as over-curing."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Over-curing introduces geometric deviations and can block channels.",
+        "evidence_span": "This effect introduces geometric deviations from the nominal design and is especially problematic in narrow channels and in fine, complex internal features. In severe cases, over-curing can partially or completely block channels, rendering a device unusable."
+      },
+      {
+        "role": "causal_claim",
+        "content": "High-end printers may reduce inaccuracies but undermine affordability.",
+        "evidence_span": "High-end printers may alleviate some of these problems, but they do so at the expense of affordability, thereby weakening one of the most compelling motivations for using 3D printing in the first place."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Integrating design support, constraint-driven synthesis, and ML-assisted compensation lowers barriers for non-experts and reduces development time and cost.",
+        "evidence_span": "By integrating interactive design support, constraint-driven functional synthesis, and machine-learning-assisted manufacturing compensation, the presented methodologies lower the barrier to entry for non-expert users and reduce the time and cost required to develop complex microfluidic systems."
+      },
+      {
+        "role": "causal_claim",
+        "content": "UV light penetration and scattering cause unintended polymerization in trapped resin inside microchannels.",
+        "evidence_span": "This phenomenon, known as light penetration or over-curing, causes unintended polymerization of the residual liquid resin trapped inside the microchannels."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Cumulative UV exposure distorts dimensions, changes hydraulic resistance, and can clog channels.",
+        "evidence_span": "This cumulative UV exposure severely distorts the fabricated dimensions of the features, altering their intended hydraulic resistance and, in extreme cases, completely clogging the fluidic pathways"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Parameterized components enable rapid iteration and reduce invalid geometries.",
+        "evidence_span": "This approach encapsulates domain knowledge directly into the design representation, enabling rapid iteration and reducing the likelihood of invalid geometries."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The platform shifts design from geometric modeling to configuration of functional building blocks.",
+        "evidence_span": "As a result, the platform shifts the design task from geometric modeling to the configuration and composition of microfluidic functionality."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Introducing calibrated volume offsets produces prescribed delay differences under assigned flow conditions.",
+        "evidence_span": "shifted-arrival constraints are implemented by introducing calibrated volume offsets that produce prescribed delay differences under the assigned flow conditions."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Routing decisions determine whether temporal objectives are satisfied.",
+        "evidence_span": "In this way, routing decisions directly influence whether temporal objectives are satisfied."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Ratio decomposition increases flexibility in flow allocation and exposes degrees of freedom for mixing arrangement while preserving aggregate ratios.",
+        "evidence_span": "Decomposition increases flexibility in flow allocation: each reagent contribution can be represented by multiple sub-streams that are later interleaved spatially. This strategy allows the method to preserve exact aggregate ratio contributions while exposing additional degrees of freedom for improving the downstream mixing pattern."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using dynamic layer-wise offsets lets deeper or vulnerable regions receive stronger compensation automatically.",
+        "evidence_span": "In practice, this allows deeper or more vulnerable\nregions to receive stronger compensation automatically, which\nis particularly useful for multi-layer channel stacks."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Spatially resolved compensation enables stronger correction in high-risk areas and milder correction elsewhere.",
+        "evidence_span": "Unlike uniform com-\npensation, this allows stronger correction where local over-\ncuring risk is high and milder correction where risk is lower."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Injecting the learned compensation map before fabrication makes printed dimensions closer to CAD targets.",
+        "evidence_span": "In practice, the learned compensation map is injected into the\nDFM stage before fabrication, producing a compensated 3D\nmodel whose printed dimensions are closer to the original\nCAD targets."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Combining design support, synthesis, mixer design, and compensation reduces manual effort and improves print reliability.",
+        "evidence_span": "By combining interactive design support,\nconstraint-driven synthesis for passive fluidic functions, low-\ncost mixer synthesis, and compensation methods for light-\npenetration artifacts, the framework reduces manual effort\nwhile improving print reliability on resin 3D printers."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Because common resins are rigid and inelastic, unlike PDMS, they cannot support elastic active elements.",
+        "evidence_span": "Off-the-shelf materials for resin printing generally produce rigid and inelastic structures, in contrast to PDMS-based devices, which can exploit the elasticity of the substrate to implement active elements such as pneumatic valves and pumps."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Light penetration depth follows Beer-Lambert exponential decay, while neighboring features reflect, refract, and scatter light.",
+        "evidence_span": "The extent of this light penetration depth is governed by the Beer-Lambert law, which dictates an exponential decay of light intensity as it travels through the resin. Neighboring structural features also reflect, refract, and scatter this light, creating localized variations in the over-curing effect."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "In passive chips, geometry directly encodes functional correctness.",
+        "evidence_span": "In passive chips, this challenge is particularly acute because functional correctness is encoded directly in geometry."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Under laminar-flow assumptions, geometry is coupled to behavior via resistance-flow relations and T=V/Q.",
+        "evidence_span": "Under laminar-flow assumptions, 3M-DeSyn couples geometry to behavior using resistance- and flow-based relationships, together with a volume-to-time relation (T = V/Q)."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Concentration control in passive reagent preparation depends on maintaining robust volume ratios without active valves or pumps.",
+        "evidence_span": "This is particularly important for passive reagent preparation, where concentration control depends on maintaining robust volume ratios without active valves or pumps."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Distributing and reordering subcomponents increases distinct laminar sub-streams, supporting better passive homogenization.",
+        "evidence_span": "Intuitively, by distributing and reordering subcomponents in the tree, the outlet can exhibit more distinct laminar sub-streams (referred to as wider spectrum width), which supports better passive homogenization after merging."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Because passive systems lack active perturbation, flow ordering and geometric interleaving are key for mixing performance.",
+        "evidence_span": "This is an important design choice because passive systems cannot rely on active perturbation; therefore, flow ordering and geometric interleaving become key levers for practical mixing performance."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Under common pressure, resistive channel paths enforce intended relative flow rates so outlet composition matches the target ratio.",
+        "evidence_span": "Under a common pressure boundary, these resistive paths enforce the intended relative flow rates so that outlet composition tracks the original target ratio."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Local and global compensation address different causes of over-curing: depth-varying dose versus nearby-void polymerization risk.",
+        "evidence_span": "This local-plus-global decomposition provides a flexible mecha-\nnism: local compensation addresses depth-dependent exposure\nnonuniformity, while global compensation provides additional\nrobustness for difficult print settings."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Local compensation is based on exponential light attenuation with distance.",
+        "evidence_span": "Local compensation is\nderived from a Beer\u2013Lambert-style attenuation assumption in\nwhich light intensity decays exponentially with distance from\nthe source."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Preprocessing incorporates light-propagation physics so the model sees physically meaningful context.",
+        "evidence_span": "Specifically, geometric features are weighted\nbased on cumulative light passage and attenuation effects\n(including absorption/scattering-related decay), so the model\nreceives physically meaningful context instead of only raw\ngeometric descriptors."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "A unified framework spanning design and fabrication can lower barriers, time, and cost for 3D-printed microfluidics.",
+        "evidence_span": "To address these challenges, this paper presents a cohesive design automation framework for 3D-printed microfluidics that unifies a series of interconnected methods across design and fabrication."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "A web-based interactive platform tailored to 3D-printed microfluidics can overcome infrastructure bottlenecks.",
+        "evidence_span": "To overcome these infrastructural bottlenecks, we developed a foundational web-based interactive design automation platform\u2014Flui3d\u2014specifically tailored for 3D-printed microfluidics [15]."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "3M-DeSyn addresses the joint synthesis problem for multilayer 3D-printed microfluidics.",
+        "evidence_span": "To address this problem, we introduced 3M-DeSyn [16]."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The method shifts complexity from hardware control to algorithmic design synthesis.",
+        "evidence_span": "This framing intentionally shifts complexity from hardware control to algorithmic design synthesis."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Integrated DFM compensation in Flui3d can enable reliable fabrication on hobby-grade printers without custom materials or hardware changes.",
+        "evidence_span": "We introduced practical Design-for-Manufacturing (DFM) compensation strategies that is integrated directly into the design-output stage of Flui3d, enabling reliable fabrication on hobby-grade SLA/LCD platforms without requiring custom resins or printer hardware modifications."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The DFM module treats fabrication fidelity as a first-class objective by transforming geometry before export to counter over-curing.",
+        "evidence_span": "The DFM module therefore treats fabrication fidelity as a first-class design objective: before STL export, the geometry is transformed to counter expected light-induced over-curing."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The goal of DFM compensation is to preserve voids and keep microchannels open after printing, especially in compact vertically integrated devices.",
+        "evidence_span": "The goal is to preserve intended void regions and keep microchannels open after printing, especially in compact and vertically integrated devices."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "A three-layer mixing device can be taken to print-ready design in under five minutes.",
+        "evidence_span": "For example, the three-layer mixing device from Figure 1 could be taken from initial setup to a print-ready design in less than five minutes, demonstrating the efficiency of this interaction model."
+      },
+      {
+        "role": "evidence_result",
+        "content": "3M-DeSyn reduced design time from hours to seconds or minutes compared with manual workflows.",
+        "evidence_span": "Compared with a manual baseline workflow (schematic analysis, iterative placement/routing, and hand-tuned channel dimensions), 3M-DeSyn reduced design time from hours to seconds/minutes: baseline estimates ranged from 5 h 07 m to 20 h 54 m, whereas 3M-DeSyn completed synthesis in 2 s to 3 m 40 s."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Synthesized chips were fabricated on a low-cost hobby SLA setup, confirming printability of generated geometries.",
+        "evidence_span": "The synthesized chips were additionally fabricated on a low-cost hobby SLA setup (Anycubic Photon D2 with plant-based clear resin), confirming that the automatically generated geometries are not only computationally valid but also practically printable."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Simulated outlet concentrations were very close to target values across evaluated cases.",
+        "evidence_span": "Across the four real-world scenarios, simulated outlet concentrations deviated by less than 0.01 mol/L from target values. Over all eight cases, reported deviations remained small (from \u22120.016 to +0.009 mol/L), while synthesis runtime stayed in the millisecond range (108\u2013145 ms)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "\u00b5-MM achieved a balance of compactness and manufacturability despite slightly narrower mixing spectrum in some cases.",
+        "evidence_span": "Chip footprints and total channel lengths remained moderate relative to a custom baseline, highlighting that \u00b5-MM achieves an effective balance: slightly narrower mixing spectrum in some cases, but substantially improved compactness and manufacturability with lower channel complexity and hydraulic burden."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The dataset contained 2,488 supervised examples from measured fabrication discrepancies.",
+        "evidence_span": "This produced 2,488 data points, providing\nsupervised targets for compensation learning."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The model converged quickly and achieved low test error with stable generalization.",
+        "evidence_span": "The model converged in fewer\nthan 40 epochs, achieved about 90.01% training accuracy, and\nshowed tight test-error behavior: all reported L1 errors were\nbelow 0.45 with an average around 0.11, indicating stable\ngeneralization for local compensation prediction."
+      },
+      {
+        "role": "evidence_result",
+        "content": "LiPCon consistently produced fabricated dimensions closer to design targets than the baseline.",
+        "evidence_span": "Across representative microfluidic features (e.g., nar-\nrow channels, serpentine regions, and cavity-like structures),\nLiPCon produced fabricated dimensions consistently closer\nto design targets."
+      },
+      {
+        "role": "evidence_result",
+        "content": "On six in-domain cases, LiPCon reduced dimensional error by at least 87.64%, leaving only small final deviations.",
+        "evidence_span": "For six cases printed on the same printer-\nresin setup as training data, dimensional errors were reduced\nby at least 87.64% relative to baseline, with final deviations\nonly 1.25%\u20135.5%."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Without retraining on a new printer-resin pair, LiPCon still beat the baseline and kept deviations within 5.75%\u201317.00%.",
+        "evidence_span": "The method was also applied to an addi-\ntional printer-resin pair without retraining, where deviations\nremained within 5.75%\u201317.00% and still outperformed the\nbaseline, demonstrating practical robustness and transfer po-\ntential."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Experiments showed large design-time reductions and close agreement between fabricated and target dimensions.",
+        "evidence_span": "Exper-\nimental results across representative designs show substantial\nreductions in design time and strong agreement between fab-\nricated and target dimensions."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Channel lengths, volumes, resistances, and timing must be precisely coordinated for correct operation.",
+        "evidence_span": "channel lengths, volumes, resistances, and timing relationships must be coordinated precisely to ensure correct fluid handling, synchronized reactions, and accurate dispensing behavior [13]."
+      },
+      {
+        "role": "constraint",
+        "content": "Designers must satisfy both spatial and hydraulic constraints simultaneously.",
+        "evidence_span": "Designers must simultaneously satisfy spatial constraints\u2014such as placement, routing, non-overlap, and layer usage\u2014and hydraulic constraints, including flow, timing, and filling volume."
+      },
+      {
+        "role": "constraint",
+        "content": "Additional constraints enforce spacing, prevent overlap, and guarantee legal inter-layer transitions.",
+        "evidence_span": "Additional constraints enforce manufacturable spacing, prevent overlap among components and channels, and guarantee legal inter-layer transitions."
+      },
+      {
+        "role": "constraint",
+        "content": "Global compensation must be tuned because too much offset harms structural stability.",
+        "evidence_span": "The work also notes a practical tradeoff:\nexcessive global offset can reduce structural stability, so this\nparameter must be tuned alongside local settings."
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Despite advances that make 3D printing more accessible for microfluidics, practical adoption and broader dissemination remain limited because designing reliable 3D-printed microfluidic devices is still difficult; persistent challenges in design complexity, functional synthesis, material limitations, fabrication fidelity, and reliable manufacturability create a gap between the promise of low-cost 3D printing and the needs of dependable microfluidic development.",
+        "evidence_spans": [
+          "However, despite these advances in manufacturing, the design of 3D-printed microfluidic systems remains a major challenge.",
+          "Taken together, these issues reveal a critical gap between the promise of 3D printing for microfluidics and its practical adoption.",
+          "Although 3D printing has made fabrication more accessible, persistent challenges in design complexity, functional synthesis, material limitations, and fabrication fidelity continue to slow the broader dissemination of 3D-printed microfluidics.",
+          "Overall, this work helps bridge the gap between the accessibility of low-cost 3D printing and the practical requirements of reliable microfluidic device development."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Manual, traditional mechanical CAD-based design is a major bottleneck for 3D-printed microfluidics: it is time-consuming, hard to scale, increasingly error-prone, and ill-suited to complex multi-layer 3D microfluidic architectures as network complexity grows.",
+        "evidence_spans": [
+          "In practice, the design workflow still relies heavily on manual computer-aided design (CAD), which is time-consuming, difficult to scale, and increasingly error-prone as device complexity grows.",
+          "As the complexity of microfluidic networks increases, manual design using standard mechanical CAD software becomes a significant bottleneck.",
+          "As the field of microfluidics grows from planar, single-layer devices to complex, multi-layer 3D architectures, the limitations of traditional mechanical CAD software become increasingly apparent."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A central motivation is the lack of integrated, domain-specific, 3D-capable synthesis/CAD automation tools that can jointly generate multilayer layouts and satisfy desired fluid-delivery behaviors and constraints; without such tools, researchers are forced into tedious iterative manual design cycles.",
+        "evidence_spans": [
+          "This limitation highlights the growing need for domain-specific CAD and design automation tools tailored to fully leverage the advantages of 3D-printed microfluidics.",
+          "This lack of integrated, 3D-capable design synthesis tools forces researchers into tedious, iterative manual design cycles to satisfy specific timing, volumetric, or mixing constraints.",
+          "A central bottleneck in 3D-printed microfluidics is the lack of synthesis tools that can jointly handle multi-layer physical layout generation and user-defined fluid-delivery behavior."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For passive 3D-printed mixers, a key motivation is to achieve accurate ratio-specific mixing for assays and diagnostics without adding external hardware complexity such as multiple pumps, controllers, or valves.",
+        "evidence_spans": [
+          "The central motivation is to avoid external complexity (multiple pumps, controllers, or valves) while still achieving ratio-specific mixing that is accurate enough for assay and diagnostic workflows."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Manufacturability is a core bottleneck in resin-based 3D-printed microfluidics because unintended curing from light penetration can distort or block small enclosed channels, especially in multilayer layouts; as a result, functionally correct synthesized layouts are not necessarily printable, motivating location-specific compensation to preserve intended dimensions.",
+        "evidence_spans": [
+          "A core manufacturability bottleneck in resin-based 3D-printed microfluidics is the unintended curing caused by light penetration through previously printed material. This artifact is especially severe for enclosed small channels and multi-layer layouts, where over-exposure can narrow or fully block critical flow paths.",
+          "While layout synthesis can generate functionally correct geometries, printability is not guaranteed when optical side effects distort fine features.",
+          "The central goal is therefore to predict location-specific compensation values that preserve intended feature dimensions in complex multi-layer designs."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Earlier design automation / EDA tools for microfluidics improved and facilitated conventional planar and continuous-flow device design; examples include 3D\u00b5F, Cloud Columba, Micado, and Fluigi. 3D\u00b5F provides an interactive environment for planar chip design, while Cloud Columba supports synthesis for continuous-flow mLSI systems.",
+        "evidence_spans": [
+          "While earlier design automation tools [5]\u2013[11] have improved the design of conventional planar microfluidic chips",
+          "Several state-of-the-art design automation tools, such as 3D\u00b5F [8], Cloud Columba [6], [7], Micado [10], and Fluigi [11], have significantly facilitated the design of continuous-flow microfluidic devices.",
+          "For instance, 3D\u00b5F provides an interactive environment for planar chip design, while Cloud Columba supports synthesis for continuous-flow mLSI systems."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Microfluidic fabrication has historically been dominated by soft lithography and PDMS molding.",
+        "evidence_spans": [
+          "The fabrication of microfluidic devices has historically been dominated by soft lithography and PDMS molding"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior microfluidic fabrication research has explored multiple 3D-printing techniques, including SLA, DLP, FDM, and 2PP.",
+        "evidence_spans": [
+          "researchers have increasingly turned to diverse 3D printing techniques for microfluidic fabrication, including stereolithography (SLA), digital light processing (DLP), fused deposition modeling (FDM), and two-photon polymerization (2PP) [14]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior work used uniform-compensation approaches.",
+        "evidence_spans": [
+          "prior uniform-compensation approaches"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The evaluation compares against a prior state-of-the-art baseline method.",
+        "evidence_spans": [
+          "compared against the prior state-of-the-art baseline method"
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "Conventional microfluidic fabrication/design workflows such as soft lithography and PDMS molding require specialized cleanroom environments and extensive manual labor.",
+        "evidence_spans": [
+          "which require specialized cleanroom environments and extensive manual labor."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Standard CAD and manual CAD workflows are not optimized for fluidic routing: they require tedious manual adjustment for channel bends, layer transitions, and component placement, and while they may suffice for simple devices, they become highly iterative and error-prone for larger multilayer designs with tightly coupled timing and volume targets.",
+        "evidence_spans": [
+          "Standard CAD tools are not optimized for fluidic routing, requiring manual, tedious adjustments for every channel bend, layer transition, and component placement.",
+          "While manual CAD workflows can meet these requirements for simple devices, they become highly iterative and error-prone as designs scale to multiple layers and involve tightly coupled timing and volume targets."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Existing microfluidic design automation tools are largely built around 2D architectures and layered flow/control designs, so they do not adequately address the distinctive requirements of 3D-printed microfluidic systems and are not directly applicable to designing devices intended for 3D printing.",
+        "evidence_spans": [
+          "However, despite their capabilities, most existing microfluidic design automation solutions are fundamentally limited to 2D architectures, often relying on layered flow and control designs.",
+          "they do not adequately address the distinctive requirements of 3D-printed systems.",
+          "As a result, they are not directly applicable to the design of microfluidic devices intended for 3D printing."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "Prior approaches optimized for symmetric or fixed settings rather than arbitrary ratio specifications and manufacturability for low-cost resin printing.",
+        "evidence_spans": [
+          "In contrast to many passive mixer designs that primarily optimize homogeneity for symmetric or fixed settings, \u00b5-MM targets arbitrary ratio specifications and explicitly incorporates manufacturability for low-cost resin printing."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Methods requiring full optical characterization of each printer-resin combination were avoided in favor of a practical calibration interface based on four user inputs.",
+        "evidence_spans": [
+          "To avoid requir-ing full optical characterization of each printer-resin com-bination, the method uses a practical calibration interface based on four user inputs"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior uniform-compensation approaches were rejected in favor of a physics-aware, spatially resolved compensation model that accounts for nearby geometry and local optical context rather than only feature depth.",
+        "evidence_spans": [
+          "In contrast to prior uniform-compensation approaches, LiPCon explicitly models the fact that over-curing depends not only on feature depth but also on nearby geometry and local optical context."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Purely black-box fitting was rejected in favor of a hybrid physics-guided machine learning strategy.",
+        "evidence_spans": [
+          "This hybrid strategy combines domain priors with machine learning, reducing reliance on purely black-box fitting."
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [],
+    "causal_claim": [
+      {
+        "content": "Rigid, inelastic resin materials prevent the use of deformable active flow-control components, so 3D-printed microfluidic devices must rely primarily on carefully designed internal geometries and fluidic pathways; this geometry dependence in turn increases demands on precise coordination of channel lengths, volumes, resistances, and timing relationships.",
+        "evidence_spans": [
+          "As a result, 3D-printed microfluidic devices often cannot rely on deformable components for active flow control and must instead achieve functionality primarily through the careful design of internal geometries and fluidic pathways.",
+          "This strong dependence on geometry places greater demands on the design process: channel lengths, volumes, resistances, and timing relationships must be coordinated precisely to ensure correct fluid handling, synchronized reactions, and accurate dispensing behavior [13]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Light/UV penetration and scattering during printing cause unintended polymerization (over-curing) outside intended regions, including residual trapped resin inside microchannels; cumulative exposure then distorts fabricated dimensions, introduces geometric deviations, changes hydraulic resistance, and in severe cases partially or completely clogs channels, rendering devices unusable.",
+        "evidence_spans": [
+          "During printing, light penetration and scattering can cause polymerization outside the intended exposure region, a phenomenon commonly referred to as over-curing.",
+          "This effect introduces geometric deviations from the nominal design and is especially problematic in narrow channels and in fine, complex internal features. In severe cases, over-curing can partially or completely block channels, rendering a device unusable.",
+          "This phenomenon, known as light penetration or over-curing, causes unintended polymerization of the residual liquid resin trapped inside the microchannels.",
+          "This cumulative UV exposure severely distorts the fabricated dimensions of the features, altering their intended hydraulic resistance and, in extreme cases, completely clogging the fluidic pathways"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "High-end printers may reduce fabrication inaccuracies, but only at the cost of affordability, undermining a key motivation for using 3D printing.",
+        "evidence_spans": [
+          "High-end printers may alleviate some of these problems, but they do so at the expense of affordability, thereby weakening one of the most compelling motivations for using 3D printing in the first place."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Integrating interactive design support, constraint-driven synthesis, mixer design, and machine-learning-assisted manufacturing compensation lowers barriers for non-experts, reduces development time, cost, and manual effort, and improves print reliability.",
+        "evidence_spans": [
+          "By integrating interactive design support, constraint-driven functional synthesis, and machine-learning-assisted manufacturing compensation, the presented methodologies lower the barrier to entry for non-expert users and reduce the time and cost required to develop complex microfluidic systems.",
+          "By combining interactive design support,\nconstraint-driven synthesis for passive fluidic functions, low-\ncost mixer synthesis, and compensation methods for light-\npenetration artifacts, the framework reduces manual effort\nwhile improving print reliability on resin 3D printers."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Encapsulating domain knowledge in parameterized functional components enables rapid iteration, reduces invalid geometries, and shifts microfluidic design from low-level geometric modeling to configuration and composition of functional building blocks.",
+        "evidence_spans": [
+          "This approach encapsulates domain knowledge directly into the design representation, enabling rapid iteration and reducing the likelihood of invalid geometries.",
+          "As a result, the platform shifts the design task from geometric modeling to the configuration and composition of microfluidic functionality."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Introducing calibrated volume offsets produces prescribed delay differences under assigned flow conditions, and routing decisions therefore directly determine whether temporal objectives are satisfied.",
+        "evidence_spans": [
+          "shifted-arrival constraints are implemented by introducing calibrated volume offsets that produce prescribed delay differences under the assigned flow conditions.",
+          "In this way, routing decisions directly influence whether temporal objectives are satisfied."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Ratio decomposition increases flexibility in flow allocation and exposes degrees of freedom for arranging mixing patterns while preserving exact aggregate ratios.",
+        "evidence_spans": [
+          "Decomposition increases flexibility in flow allocation: each reagent contribution can be represented by multiple sub-streams that are later interleaved spatially. This strategy allows the method to preserve exact aggregate ratio contributions while exposing additional degrees of freedom for improving the downstream mixing pattern."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using dynamic, spatially resolved compensation offsets allows deeper, more vulnerable, or otherwise high-risk regions to receive stronger correction automatically, while lower-risk regions receive milder correction.",
+        "evidence_spans": [
+          "In practice, this allows deeper or more vulnerable\nregions to receive stronger compensation automatically, which\nis particularly useful for multi-layer channel stacks.",
+          "Unlike uniform com-\npensation, this allows stronger correction where local over-\ncuring risk is high and milder correction where risk is lower."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Injecting the learned compensation map before fabrication makes printed dimensions closer to the original CAD targets.",
+        "evidence_spans": [
+          "In practice, the learned compensation map is injected into the\nDFM stage before fabrication, producing a compensated 3D\nmodel whose printed dimensions are closer to the original\nCAD targets."
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "Common resin-printed materials are typically rigid and inelastic, unlike PDMS, so they cannot exploit substrate elasticity to realize active elements such as pneumatic valves and pumps; consequently, passive chips must rely on geometry to encode function, including maintaining robust volume ratios for concentration control without active actuation.",
+        "evidence_spans": [
+          "Off-the-shelf materials for resin printing generally produce rigid and inelastic structures, in contrast to PDMS-based devices, which can exploit the elasticity of the substrate to implement active elements such as pneumatic valves and pumps.",
+          "In passive chips, this challenge is particularly acute because functional correctness is encoded directly in geometry.",
+          "This is particularly important for passive reagent preparation, where concentration control depends on maintaining robust volume ratios without active valves or pumps."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Under laminar-flow assumptions and a common pressure boundary, device geometry determines behavior through resistance- and flow-based relations together with the volume-to-time relation T = V/Q; resistive channel paths thereby enforce intended relative flow rates so outlet composition matches the target ratio.",
+        "evidence_spans": [
+          "Under laminar-flow assumptions, 3M-DeSyn couples geometry to behavior using resistance- and flow-based relationships, together with a volume-to-time relation (T = V/Q).",
+          "Under a common pressure boundary, these resistive paths enforce the intended relative flow rates so that outlet composition tracks the original target ratio."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because passive systems lack active perturbation, mixing performance depends on flow ordering and geometric interleaving; distributing and reordering subcomponents increases the number of distinct laminar sub-streams ('wider spectrum width'), which supports better passive homogenization after merging.",
+        "evidence_spans": [
+          "This is an important design choice because passive systems cannot rely on active perturbation; therefore, flow ordering and geometric interleaving become key levers for practical mixing performance.",
+          "Intuitively, by distributing and reordering subcomponents in the tree, the outlet can exhibit more distinct laminar sub-streams (referred to as wider spectrum width), which supports better passive homogenization after merging."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Over-curing and exposure nonuniformity are governed by light-propagation physics: light intensity decays exponentially with depth according to a Beer\u2013Lambert-style law, while neighboring features reflect, refract, and scatter light, creating localized variations; accordingly, local compensation targets depth-dependent attenuation/exposure variation, and global compensation adds robustness for difficult print settings and nearby-void polymerization risks.",
+        "evidence_spans": [
+          "The extent of this light penetration depth is governed by the Beer-Lambert law, which dictates an exponential decay of light intensity as it travels through the resin. Neighboring structural features also reflect, refract, and scatter this light, creating localized variations in the over-curing effect.",
+          "This local-plus-global decomposition provides a flexible mechanism: local compensation addresses depth-dependent exposure nonuniformity, while global compensation provides additional robustness for difficult print settings.",
+          "Local compensation is derived from a Beer\u2013Lambert-style attenuation assumption in which light intensity decays exponentially with distance from the source."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Preprocessing incorporates light-propagation physics, including cumulative light passage and attenuation from absorption/scattering, so the model receives physically meaningful context rather than only raw geometric descriptors.",
+        "evidence_spans": [
+          "Specifically, geometric features are weighted based on cumulative light passage and attenuation effects (including absorption/scattering-related decay), so the model receives physically meaningful context instead of only raw geometric descriptors."
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "A unified design-and-fabrication automation framework for 3D-printed microfluidics\u2014implemented as the web-based platform Flui3d\u2014can overcome infrastructure bottlenecks and lower barriers, time, and cost.",
+        "evidence_spans": [
+          "To address these challenges, this paper presents a cohesive design automation framework for 3D-printed microfluidics that unifies a series of interconnected methods across design and fabrication.",
+          "To overcome these infrastructural bottlenecks, we developed a foundational web-based interactive design automation platform\u2014Flui3d\u2014specifically tailored for 3D-printed microfluidics [15]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "3M-DeSyn addresses the joint synthesis problem for multilayer 3D-printed microfluidics, shifting complexity from hardware control to algorithmic design synthesis.",
+        "evidence_spans": [
+          "To address this problem, we introduced 3M-DeSyn [16].",
+          "This framing intentionally shifts complexity from hardware control to algorithmic design synthesis."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Integrated DFM compensation in Flui3d treats fabrication fidelity as a first-class objective by transforming geometry before export to counter over-curing, with the goal of preserving voids and keeping microchannels open, thereby enabling reliable fabrication on hobby-grade printers without custom materials or hardware changes.",
+        "evidence_spans": [
+          "We introduced practical Design-for-Manufacturing (DFM) compensation strategies that is integrated directly into the design-output stage of Flui3d, enabling reliable fabrication on hobby-grade SLA/LCD platforms without requiring custom resins or printer hardware modifications.",
+          "The DFM module therefore treats fabrication fidelity as a first-class design objective: before STL export, the geometry is transformed to counter expected light-induced over-curing.",
+          "The goal is to preserve intended void regions and keep microchannels open after printing, especially in compact and vertically integrated devices."
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "3M-DeSyn greatly reduced design time versus manual workflows, taking designs from initial setup to print-ready in seconds to minutes; for example, a three-layer mixing device could be made print-ready in under five minutes, compared with manual estimates of 5 h 07 m to 20 h 54 m.",
+        "evidence_spans": [
+          "For example, the three-layer mixing device from Figure 1 could be taken from initial setup to a print-ready design in less than five minutes, demonstrating the efficiency of this interaction model.",
+          "Compared with a manual baseline workflow (schematic analysis, iterative placement/routing, and hand-tuned channel dimensions), 3M-DeSyn reduced design time from hours to seconds/minutes: baseline estimates ranged from 5 h 07 m to 20 h 54 m, whereas 3M-DeSyn completed synthesis in 2 s to 3 m 40 s."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Synthesized chips were successfully fabricated on a low-cost hobby SLA printer, confirming that the automatically generated geometries were practically printable.",
+        "evidence_spans": [
+          "The synthesized chips were additionally fabricated on a low-cost hobby SLA setup (Anycubic Photon D2 with plant-based clear resin), confirming that the automatically generated geometries are not only computationally valid but also practically printable."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Across evaluated mixing cases, simulated outlet concentrations closely matched target values, with deviations below 0.01 mol/L in four real-world scenarios and ranging overall from \u22120.016 to +0.009 mol/L, while synthesis runtime remained in the millisecond range.",
+        "evidence_spans": [
+          "Across the four real-world scenarios, simulated outlet concentrations deviated by less than 0.01 mol/L from target values. Over all eight cases, reported deviations remained small (from \u22120.016 to +0.009 mol/L), while synthesis runtime stayed in the millisecond range (108\u2013145 ms)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "\u00b5-MM achieved a favorable tradeoff between performance and fabrication practicality: although the mixing spectrum was slightly narrower in some cases, chip footprints and total channel lengths stayed moderate relative to a custom baseline, yielding improved compactness, manufacturability, lower channel complexity, and lower hydraulic burden.",
+        "evidence_spans": [
+          "Chip footprints and total channel lengths remained moderate relative to a custom baseline, highlighting that \u00b5-MM achieves an effective balance: slightly narrower mixing spectrum in some cases, but substantially improved compactness and manufacturability with lower channel complexity and hydraulic burden."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For fabrication-compensation learning, the dataset comprised 2,488 supervised examples derived from measured fabrication discrepancies.",
+        "evidence_spans": [
+          "This produced 2,488 data points, providing supervised targets for compensation learning."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The compensation model converged quickly and generalized stably, reaching convergence in fewer than 40 epochs, about 90.01% training accuracy, and low test error with all reported L1 errors below 0.45 and an average around 0.11.",
+        "evidence_spans": [
+          "The model converged in fewer\nthan 40 epochs, achieved about 90.01% training accuracy, and\nshowed tight test-error behavior: all reported L1 errors were\nbelow 0.45 with an average around 0.11, indicating stable\ngeneralization for local compensation prediction."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "LiPCon consistently produced fabricated dimensions closer to design targets than the baseline across representative microfluidic features; in six in-domain cases it reduced dimensional error by at least 87.64%, leaving final deviations of only 1.25%\u20135.5%, and on an unseen printer-resin pair without retraining it still outperformed baseline with deviations within 5.75%\u201317.00%, indicating practical robustness and transfer potential.",
+        "evidence_spans": [
+          "Across representative microfluidic features (e.g., nar-\nrow channels, serpentine regions, and cavity-like structures),\nLiPCon produced fabricated dimensions consistently closer\n to design targets.",
+          "For six cases printed on the same printer-\nresin setup as training data, dimensional errors were reduced\nby at least 87.64% relative to baseline, with final deviations\nonly 1.25%\u20135.5%.",
+          "The method was also applied to an addi-\ntional printer-resin pair without retraining, where deviations\nremained within 5.75%\u201317.00% and still outperformed the\nbaseline, demonstrating practical robustness and transfer po-\ntential."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Overall experiments showed substantial design-time reductions together with close agreement between fabricated and target dimensions.",
+        "evidence_spans": [
+          "Exper-\nimental results across representative designs show substantial\nreductions in design time and strong agreement between fab-\nricated and target dimensions."
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "Designs must satisfy coordinated spatial, hydraulic, and timing constraints: channel lengths, volumes, resistances, and timing relationships must be precisely matched, while placement, routing, non-overlap, layer usage, and filling/flow constraints are simultaneously enforced to ensure correct operation.",
+        "evidence_spans": [
+          "channel lengths, volumes, resistances, and timing relationships must be coordinated precisely to ensure correct fluid handling, synchronized reactions, and accurate dispensing behavior [13].",
+          "Designers must simultaneously satisfy spatial constraints\u2014such as placement, routing, non-overlap, and layer usage\u2014and hydraulic constraints, including flow, timing, and filling volume."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Additional manufacturability constraints require sufficient spacing, prevent overlap among components and channels, and guarantee legal inter-layer transitions.",
+        "evidence_spans": [
+          "Additional constraints enforce manufacturable spacing, prevent overlap among components and channels, and guarantee legal inter-layer transitions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Global compensation/offset must be tuned under a structural-stability constraint, because excessive global offset reduces structural stability.",
+        "evidence_spans": [
+          "The work also notes a practical tradeoff:\nexcessive global offset can reduce structural stability, so this\nparameter must be tuned alongside local settings."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

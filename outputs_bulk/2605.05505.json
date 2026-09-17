@@ -1,0 +1,838 @@
+{
+  "paper_id": "2605.05505",
+  "chunks_processed": 6,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Higher-Tc superconductors are needed to allow 4.2 K operation and lower cryogenic costs.",
+        "evidence_span": "Using higher \ud835\udc47\ud835\udc50 superconductors could enable operation at 4.2 K, substantially reducing cryogenic costs [5]."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Applying these deposition methods to complex cavity geometries is expected to create large-scale thickness inhomogeneities.",
+        "evidence_span": "However, extending these techniques to complex geometries, e.g. TESLA-type cavities, is expected to produce large-scale thickness inhomogeneities, with spatial distributions that depend on the particular deposition method."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The effects of coating-thickness inhomogeneity on quality factor are largely unexplored and experimentally hard to assess.",
+        "evidence_span": "The influences of such inhomogeneities on relevant quantities of interest, e.g. quality factor, remains largely unexplored and is difficult to assess experimentally."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Reactance had not previously been included in this SIS model, but it is needed for solving the eigenvalue problem.",
+        "evidence_span": "Eqs. (31) and (32) also include the reactance, which has not previously been mentioned for this model, but is required for the eigenvalue problem."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Precise experimental coating-thickness distributions are currently not realistically obtainable.",
+        "evidence_span": "As of time of writing, obtaining the precise distribution from experimental samples is not realistic"
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Surface preparation methods for Nb SRF cavities include electropolishing, heat treatment, and high-pressure rinsing.",
+        "evidence_span": "A variety of surface preparation techniques have been developed to improve RF performance. Electropolishing produces smoother surfaces, reducing local enhancement due to roughness, but introduces hydrogen absorption that must be removed by subsequent heat treatment. High-pressure rinsing with ultrapure water is then applied to remove microparticles and reduce field emission [1]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "More recent prior methods include nitrogen doping/diffusion and low-temperature baking.",
+        "evidence_span": "More recent advances include nitrogen doping and diffusion [2], as well as low-temperature baking [3, 4]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Thin-film cavities with superconducting coatings on bulk substrates have been developed.",
+        "evidence_span": "This has motivated the development of thin-film cavities, in which a superconducting coating is deposited onto a bulk substrate."
+      },
+      {
+        "role": "prior_approach",
+        "content": "An extension is SIS multilayer structures with insulating and superconducting thin layers on a bulk superconductor.",
+        "evidence_span": "An extension of this concept is the use of superconductor-insulator-superconductor (SIS) multilayer structures [7]. Here, a bulk superconducting substrate is coated with a thin insulating layer O(10 nm) followed by a superconducting thin film O(100 nm) with higher \ud835\udc47\ud835\udc50 and \ud835\udc3b\ud835\udc50."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Promising and related prior coating approaches include NbTiN-AlN-Nb multilayers, Nb3Sn/Nb bilayers, and Nb3Sn films on Cu.",
+        "evidence_span": "One promising candidate is the NbTiN-AlN-Nb multilayer [9\u201311]. Other approaches include superconductor-superconductor bilayers, such as Nb3Sn on Nb produced via e.g. co-sputtering [12, 13], as well as Nb3Sn thin films on Cu substrates, expanding on the successes of Nb/Cu cavities [14]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "These approaches rely on thin-film deposition methods such as ALD, co-sputtering, and DC magnetron sputtering, usually studied on flat samples.",
+        "evidence_span": "All of these approaches rely on thin-film deposition techniques, e.g. atomic layer deposition, co-sputtering and DC magnetron sputtering, and are typically investigated on flat samples for quadrupole resonator (QPR) measurements [14, 15]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The study uses the finite element method to compute the cavity quality factor via an eigenvalue problem.",
+        "evidence_span": "In order to obtain the quality factor of the cavity, we use the finite element (FE) method."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The Leontovich surface impedance boundary condition is adopted as the boundary treatment.",
+        "evidence_span": "The latter, Eq. (2), is the Leontovich surface impedance boundary condition (SIBC) [16]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The surface-impedance model is based on the SIS multilayer treatment of Kubo et al.",
+        "evidence_span": "The model by Kubo et al. [8, 20, 21] provides the magnetic fields under reasonable assumptions and simplifications for precisely this setup."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Gaussian random fields are used to model position-dependent coating thickness.",
+        "evidence_span": "For this purpose, we use Gaussian random fields."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The Gaussian random field generation follows the known SPDE approach for Mat\u00e9rn kernels.",
+        "evidence_span": "It is known that for zero-mean Gaussian random fields with Mat\u00b4ern covariance kernel, a sample can be generated by solving a stochastic partial differential equation (SPDE) [24]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "One possible extension is to add rough-surface contributions to the surface-impedance model.",
+        "evidence_span": "One approach could be to introduce rough surface contributions to the surface impedance model [44]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "More advanced surface-impedance formulations include BCS theory and the Dynes superconductor model.",
+        "evidence_span": "for instance by replacing the two-fluid model by more advanced formulations such as BCS theory [45] or Dynes superconductor model [46]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Coating inhomogeneities were modeled using Gaussian random fields.",
+        "evidence_span": "Coating inhomogeneities were modeled using Gaussian random fields."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Existing Nb-focused improvements are fundamentally capped by Nb's critical magnetic field.",
+        "evidence_span": "However, such approaches remain fundamentally limited by the critical magnetic field of Nb (\ud835\udc3b\ud835\udc50\u223c200 mT)."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Earlier presentations of the model omitted the reactance term.",
+        "evidence_span": "Eqs. (31) and (32) also include the reactance, which has not previously been mentioned for this model"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "The current scheme only treats macroscale coating-thickness deviations and omits microscale deviations.",
+        "evidence_span": "The current scheme considers macro scale deviations in coating thickness due to difficulties depositing on non-flat surfaces. There are, however, also micro-scale deviations, see e.g. the atomic force microscopy in Ref. [10]. These contributions are not considered here."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than model a specific deposition process, the study stays agnostic to deposition method by emulating thickness with Gaussian random fields.",
+        "evidence_span": "The coating thickness distribution is emulated through Gaussian random fields, hence remaining agnostic of the deposition method."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "An alternative would be to abandon Leontovich boundary conditions in favor of higher-order SIBCs.",
+        "evidence_span": "another is to move away from the Leontovich boundary conditions and consider higher order SIBCs [16]."
+      }
+    ],
+    "inspiration_source": [],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Electropolishing smooths surfaces and reduces local enhancement from roughness.",
+        "evidence_span": "Electropolishing produces smoother surfaces, reducing local enhancement due to roughness"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Electropolishing causes hydrogen absorption that requires later heat treatment.",
+        "evidence_span": "but introduces hydrogen absorption that must be removed by subsequent heat treatment"
+      },
+      {
+        "role": "causal_claim",
+        "content": "High-pressure rinsing removes microparticles and reduces field emission.",
+        "evidence_span": "High-pressure rinsing with ultrapure water is then applied to remove microparticles and reduce field emission [1]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Nitrogen doping/diffusion and low-temperature baking improved quality factor and accelerating fields.",
+        "evidence_span": "These methods have significantly improved the quality factor and the achievable accelerating fields."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Shallow RF penetration motivated development of thin-film cavities.",
+        "evidence_span": "This has motivated the development of thin-film cavities, in which a superconducting coating is deposited onto a bulk substrate."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The superconducting thin film partially screens RF fields, allowing the substrate to stay superconducting at higher fields.",
+        "evidence_span": "The superconducting thin film partially screens the RF field, reducing the field strengths encountered by the substrate such that it maintains the superconducting state at higher fields than possible by bulk only."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The insulating layer prevents vortex penetration and suppresses Josephson coupling.",
+        "evidence_span": "The insulator layer prevents vortex penetration and suppresses Josephson coupling effects [8]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Because the normal-conductivity term is much smaller than the imaginary conductivity term, the conductivity expressions can be expanded and simplified.",
+        "evidence_span": "For typical values \ud835\udf0e\ud835\udc5b\u223c107 S m\u22121, \ud835\udf14\u223c1010 s\u22121 and \ud835\udf06\u223c10\u22127 m one observes that \ud835\udf0e\u2032/\ud835\udf0e\u2032\u2032\u223c10\u22123 \u226a1, so we expand 1/\ud835\udf0e and 1/|\ud835\udf0e|2 up to O(\ud835\udf0e\u20322/\ud835\udf0e\u2032\u20322)"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Because \u03c9\u00b2\u03bb\u00b2/c\u00b2 is negligible, the surface-impedance expression is further simplified.",
+        "evidence_span": "Again, we note that \ud835\udf142\ud835\udf062/\ud835\udc502\u223c10\u221210 \u226a1 and can therefore be neglected. This further simplifies Eq. (25) to"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Rescaling the Gaussian-field sample makes the standard deviation parameter irrelevant.",
+        "evidence_span": "Note that the rescaling effectively makes the standard deviation \ud835\udf0e irrelevant."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Solving the eigenvalue problem yields \u03c9, from which Q is obtained.",
+        "evidence_span": "Solving this problem yields an eigenvalue \ud835\udf14 from which the quality factor \ud835\udc44 can be extracted through Eq. (13)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The coupled FE workflow produces one sample of the quality factor per run.",
+        "evidence_span": "This process, which involves two FE simulations, returns a single sample of the quality factor."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Temperature scaling is applied to penetration depth values at 4.2 K using the two-fluid model.",
+        "evidence_span": "for the two-fluid model, the London penetration depth \ud835\udf06(\ud835\udc47) is scaled from \ud835\udf06(0) by [34]"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using the residual resistivity ratio gives the niobium conductivity at 4.2 K.",
+        "evidence_span": "Hence \ud835\udf0eNb(4.2 K) = RRRNb\ud835\udf0eNb(300 K)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Taking deviations as 10% of the optimal coating thickness sets the maximum thickness deviation to 26 nm.",
+        "evidence_span": "For the size of the deviations we take 10 % of this value, yielding \u0394\ud835\udc51\ud835\udc46,max = 26 nm."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Increasing length scale increases the spread of quality factors.",
+        "evidence_span": "We observe that the spread increases with increasing \ud835\udc59, this trend is corroborated by the \ud835\udf0e\ud835\udc44 observations in Fig. 6."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Increasing length scale primarily increases the standard deviation of quality factor, with no significant effect on the mean.",
+        "evidence_span": "Hence, increasing \ud835\udc59primarily results an increase in \ud835\udf0e\ud835\udc44, while no significant change in \ud835\udf07\ud835\udc44is observed."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Because precise experimental distributions are not realistic to obtain, one would need to use numerical simulations of the coating process.",
+        "evidence_span": "As of time of writing, obtaining the precise distribution from experimental samples is not realistic, hence one would have to resort to numerical simulations of the coating process itself."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Increasing length scale increases the standard deviation of quality factor.",
+        "evidence_span": "We found that the standard deviations increase with length scale."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Only a thin surface layer matters because RF fields penetrate less than about 1 \u00b5m into superconductors.",
+        "evidence_span": "Because RF fields penetrate only a very thin surface layer in superconductors (typically less than 1 \u00b5m [5]), the superconducting properties relevant for cavity performance are governed almost entirely by this thin layer."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Field decay at infinity means only the surface plane contributes to the surface integral in the Poynting-theorem derivation.",
+        "evidence_span": "Since the fields must decay to zero at infinity, this means only the \ud835\udc65 = 0 plane contributes to the surface integral."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Thickness variations determine the local surface impedance, which enters the boundary condition and thereby the eigenvalue problem.",
+        "evidence_span": "This in turn defines \ud835\udc4d(\ud835\udc93, \ud835\udf14), which is present in the boundary condition Eq. (2) and hence a component of the eigenvalue problem Eq. (9)."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The maximum applicable field is controlled by layer thicknesses and bounded by the smaller of coating and substrate field limits through the gamma factors.",
+        "evidence_span": "This value depends on the layer thicknesses and is given by [8]\n\n\ud835\udc35max = min {\u02dc\ud835\udefe\u22121\ud835\udc35sh,NbTiN, \ud835\udefe\u22121\ud835\udc35max,Nb}"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "If thickness parameters minimize surface resistance, the quality factor is maximized; deviations from that optimum can only preserve or reduce it, implying skewness.",
+        "evidence_span": "Indeed, if one selects the thickness parameters to minimize the surface resistance, the highest quality factor would be reached. Deviating from this optimum would necessarily maintain or decrease the quality factor, yielding a very skewed distribution."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Different deposition methods are expected to produce different coating-thickness distributions.",
+        "evidence_span": "Furthermore, one can expect the representative distributions to be quite different between e.g. sputtering based approaches such as co-sputtering [12, 13] and DC magnetron sputtering [14], or atomic layer deposition [10]."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The work proposes to numerically quantify how coating thickness variations affect TESLA-cavity quality factor.",
+        "evidence_span": "In this work, we perform a numerical study to quantify the impact of coating thickness variations on the quality factor for a single cell TESLA cavity."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The proposed simulation scheme is intended to apply broadly to thin-film approaches, with emphasis on SIS structures.",
+        "evidence_span": "We outline a simulation scheme that is applicable to the mentioned thin-film approaches, though we focus on SIS structures in particular."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The study expects different length scales of thickness variation to be meaningfully compared statistically.",
+        "evidence_span": "Different length scales of the variations are considered and compared statistically."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "Nb/Cu thin-film cavity implementation has been achieved at CERN facilities.",
+        "evidence_span": "This approach has been successfully implemented in Nb/Cu cavities at CERN facilities such as LEP-II and LHC [6]."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The derived resistive part matches the surface resistance reported earlier by Kubo's model.",
+        "evidence_span": "We note that the resistive component of the surface impedance is identical to the surface resistance found in Ref. [8] through Joule dissipation."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Prior work reports dielectric-loss resistance as negligible relative to other contributions.",
+        "evidence_span": "There, it is also mentioned that the resistance from dielectric losses is negligible compared to other contributions, concretely when \ud835\udc51\ud835\udc3c = 100 nm, the contribution from dielectric losses is less than 10\u22125 n\u03a9, while the other contributions range from 10 n\u03a9 to 1000 n\u03a9."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The illustrated samples show that the correlation length controls the spatial scale of thickness deviations.",
+        "evidence_span": "We observe that, as the name suggests, \ud835\udc59 controls the length scale over which deviations occur."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The optimal layer thicknesses for maximum applicable field are 10 nm insulator and 260 nm superconducting coating.",
+        "evidence_span": "We find that the optimum is reached when \ud835\udc51\ud835\udc3c= 10 nm and \ud835\udc51\ud835\udc46= 260 nm, hence these parameters will be used."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Q-Q plots indicate the quality factors are normally distributed for each length scale.",
+        "evidence_span": "By observing Q-Q plots of the data, we observed that, in this case, the quality factors for each \ud835\udc59 were normally distributed, i.e. \ud835\udc44\u223cN (\ud835\udf07\ud835\udc44, \ud835\udf0e\ud835\udc44)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "In extreme cases, inhomogeneous coating changes quality factor by about 6% relative to the uniform 260 nm coating.",
+        "evidence_span": "In the most extreme cases, the quality factor deviates from that of a uniformly coated cavity with coating thickness 260 nm by approximately 6 %."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Standard-deviation error bars barely overlap across length scales, while mean error bars overlap substantially, especially at larger scales.",
+        "evidence_span": "the error bars of the \ud835\udf0e\ud835\udc44 in Fig. 6 show barely any overlap, whereas the error bars of the \ud835\udf07\ud835\udc44 overlap substantially, particularly for the larger length scales."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Mean quality factors for inhomogeneous coatings are consistently below the uniform-coating value.",
+        "evidence_span": "We additionally observe that the \ud835\udf07\ud835\udc44 of inhomogeneously coated cavities are consistently smaller than the uniform value, including the error bars."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Levene\u2019s test shows the variances across the eight populations are not all equal.",
+        "evidence_span": "The resulting \ud835\udc5d-value was extremely small, allowing rejection of the null hypothesis. Thus, the population variances are not all equal."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Pairwise Levene tests indicate all population variances are statistically distinct.",
+        "evidence_span": "From the pairwise comparisons we conclude that all null hypotheses can be rejected. Hence, the variances of all populations are statistically distinct."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Welch\u2019s ANOVA shows not all means are equal.",
+        "evidence_span": "We find that the null hypothesis of equal means can be rejected with \ud835\udc5d= 4.8 \u00d7 10\u22125, indicating that not all means are equal."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Games-Howell post hoc testing finds most pairwise mean differences are not significant, with only a few weakly significant cases.",
+        "evidence_span": "We find that the null hypothesis cannot be rejected in nearly all cases, and the few cases for which rejection is possible are only weakly significant."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Mean quality factors are mostly not statistically distinguishable, with only weak differences in a few cases.",
+        "evidence_span": "From our analysis, we find that the \ud835\udf07\ud835\udc44cannot be statistically distinguished in most cases, and only weakly so in a few instances."
+      },
+      {
+        "role": "evidence_result",
+        "content": "All variances differ significantly, and increasing length scale mainly increases the spread of quality factor without significantly changing the mean.",
+        "evidence_span": "In contrast, all variances differ significantly in the statistical sense. Hence, increasing \ud835\udc59primarily results an increase in \ud835\udf0e\ud835\udc44, while no significant change in \ud835\udf07\ud835\udc44is observed."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The uniform-coating quality factor is significantly above the confidence intervals of all inhomogeneous-coating means.",
+        "evidence_span": "Nevertheless, we find that the quality factor corresponding to a uniform coating lies significantly above the confidence intervals of all \ud835\udf07\ud835\udc44w.r.t the 95 % confidence interval."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Extreme observations show quality-factor changes of 2% to 6%, depending on length scale.",
+        "evidence_span": "Depending on the length scale, extreme observations show a 2 % to 6 % increase or decrease in the quality factor."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Population means were mostly unchanged across length scales, with only weakly significant exceptions.",
+        "evidence_span": "Our analysis revealed that the population means were mostly indifferent, with exceptions being only weakly significant"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Standard deviations differed strongly across length scales.",
+        "evidence_span": "however, pronounced differences were observed in the standard deviations."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The homogeneous-coating quality factor lies above the confidence intervals of all population means.",
+        "evidence_span": "Furthermore, the quality factor of a homogeneous coating was found to lie above the confidence interval of all population means."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Extreme outcomes show the quality factor can increase or decrease by about 2% to 6% depending on length scale.",
+        "evidence_span": "Finally, extreme observations indicate that, depending on the length scale, the quality factor may increase or decrease by approximately 2 % to 6 %."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Bulk Nb cavity operation is bounded by Nb's critical temperature, currently at 2 K.",
+        "evidence_span": "Additionally, the operating temperature of bulk Nb cavities is currently 2 K, and is limited by the critical temperature \ud835\udc47\ud835\udc50 of Nb."
+      },
+      {
+        "role": "constraint",
+        "content": "On flat samples, film thickness is generally globally uniform.",
+        "evidence_span": "Under such conditions, film thickness is generally uniform, globally speaking."
+      },
+      {
+        "role": "constraint",
+        "content": "Each boundary cell is approximated as semi-infinite because mesh-cell dimensions are much larger than coating-layer thicknesses.",
+        "evidence_span": "However, due to the order of magnitude difference in length scales, \u223c1 mm to 10 mm for the size of mesh cells on the boundary and \u223c10 nm to 100 nm for the layer thicknesses, we view each boundary cell as a semi-infinite space"
+      },
+      {
+        "role": "constraint",
+        "content": "No boundary condition is needed for the SPDE on the cavity surface because the surface is closed.",
+        "evidence_span": "Note that no boundary condition was required. Since \u03a9 \u2286 R3 is a Lipschitz domain, \ud835\udf15\u03a9 is closed and \ud835\udf15(\ud835\udf15\u03a9) = \u2205"
+      },
+      {
+        "role": "constraint",
+        "content": "The insulator and coating thicknesses must be chosen to maximize the applicable magnetic field while preserving superconductivity.",
+        "evidence_span": "Lastly, the thickness of the insulator and coating layer must be specified. We choose them to optimize for the maximum applicable magnetic field. This corresponds to the highest value of \ud835\udc350 such that the SIS structures maintains the superconducting state."
+      },
+      {
+        "role": "constraint",
+        "content": "Boundary mesh triangles were required to be smaller than the smallest length scale considered.",
+        "evidence_span": "The mesh was refined purposefully such that this value is smaller than the smallest length scale considered (10.6 mm)."
+      },
+      {
+        "role": "constraint",
+        "content": "Gaussian random fields may fail to represent coating-thickness distributions for some deposition methods.",
+        "evidence_span": "We used Gaussian random fields to emulate the distribution from a coating process, however, depending on the deposition method, certain random fields may not be representative."
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Higher-Tc superconductors are needed to enable 4.2 K operation and reduce cryogenic costs.",
+        "evidence_spans": [
+          "Using higher \ud835\udc47\ud835\udc50 superconductors could enable operation at 4.2 K, substantially reducing cryogenic costs [5]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Applying superconducting coating deposition methods to complex cavity geometries is expected to create large-scale coating-thickness inhomogeneities, but the effects of these inhomogeneities on quantities such as quality factor remain largely unexplored and are difficult to assess experimentally, in part because precise experimental coating-thickness distributions are not realistically obtainable.",
+        "evidence_spans": [
+          "However, extending these techniques to complex geometries, e.g. TESLA-type cavities, is expected to produce large-scale thickness inhomogeneities, with spatial distributions that depend on the particular deposition method.",
+          "The influences of such inhomogeneities on relevant quantities of interest, e.g. quality factor, remains largely unexplored and is difficult to assess experimentally.",
+          "As of time of writing, obtaining the precise distribution from experimental samples is not realistic"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Reactance had not previously been included in this SIS model, but it is needed for solving the eigenvalue problem.",
+        "evidence_spans": [
+          "Eqs. (31) and (32) also include the reactance, which has not previously been mentioned for this model, but is required for the eigenvalue problem."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Prior surface-preparation approaches for Nb SRF cavities include electropolishing, subsequent heat treatment to remove absorbed hydrogen, and high-pressure rinsing with ultrapure water to remove microparticles and reduce field emission; more recent treatments include nitrogen doping/diffusion and low-temperature baking.",
+        "evidence_spans": [
+          "A variety of surface preparation techniques have been developed to improve RF performance. Electropolishing produces smoother surfaces, reducing local enhancement due to roughness, but introduces hydrogen absorption that must be removed by subsequent heat treatment. High-pressure rinsing with ultrapure water is then applied to remove microparticles and reduce field emission [1].",
+          "More recent advances include nitrogen doping and diffusion [2], as well as low-temperature baking [3, 4]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A major prior line of work is thin-film cavities, where a superconducting coating is deposited on a bulk substrate; an extension is SIS multilayer structures in which a bulk superconductor is coated with a thin insulating layer (~10 nm) and then a higher-Tc, higher-Hc superconducting thin film (~100 nm).",
+        "evidence_spans": [
+          "This has motivated the development of thin-film cavities, in which a superconducting coating is deposited onto a bulk substrate.",
+          "An extension of this concept is the use of superconductor-insulator-superconductor (SIS) multilayer structures [7]. Here, a bulk superconducting substrate is coated with a thin insulating layer O(10 nm) followed by a superconducting thin film O(100 nm) with higher \ud835\udc47\ud835\udc50 and \ud835\udc3b\ud835\udc50."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Related prior coating implementations include NbTiN-AlN-Nb multilayers, superconductor-superconductor bilayers such as Nb3Sn on Nb (e.g. via co-sputtering), and Nb3Sn thin films on Cu substrates; these approaches rely on thin-film deposition methods such as atomic layer deposition, co-sputtering, and DC magnetron sputtering, and are typically studied first on flat samples for quadrupole resonator measurements.",
+        "evidence_spans": [
+          "One promising candidate is the NbTiN-AlN-Nb multilayer [9\u201311]. Other approaches include superconductor-superconductor bilayers, such as Nb3Sn on Nb produced via e.g. co-sputtering [12, 13], as well as Nb3Sn thin films on Cu substrates, expanding on the successes of Nb/Cu cavities [14].",
+          "All of these approaches rely on thin-film deposition techniques, e.g. atomic layer deposition, co-sputtering and DC magnetron sputtering, and are typically investigated on flat samples for quadrupole resonator (QPR) measurements [14, 15]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A prior analytical basis for the present work is the SIS multilayer surface-impedance treatment of Kubo et al., which provides magnetic-field solutions for this configuration.",
+        "evidence_spans": [
+          "The model by Kubo et al. [8, 20, 21] provides the magnetic fields under reasonable assumptions and simplifications for precisely this setup."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior modeling of coating inhomogeneities uses Gaussian random fields; in particular, position-dependent coating thickness can be represented this way, and for Mat\u00e9rn kernels samples can be generated using the established SPDE approach.",
+        "evidence_spans": [
+          "For this purpose, we use Gaussian random fields.",
+          "It is known that for zero-mean Gaussian random fields with Mat\u00b4ern covariance kernel, a sample can be generated by solving a stochastic partial differential equation (SPDE) [24].",
+          "Coating inhomogeneities were modeled using Gaussian random fields."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Possible prior/alternative modeling extensions mentioned in the literature include adding rough-surface contributions to the surface-impedance model and replacing the two-fluid model with more advanced surface-impedance formulations such as BCS theory or the Dynes superconductor model.",
+        "evidence_spans": [
+          "One approach could be to introduce rough surface contributions to the surface impedance model [44]",
+          "for instance by replacing the two-fluid model by more advanced formulations such as BCS theory [45] or Dynes superconductor model [46]."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "Existing Nb-focused improvements are fundamentally limited by Nb's critical magnetic field (H_c ~ 200 mT).",
+        "evidence_spans": [
+          "However, such approaches remain fundamentally limited by the critical magnetic field of Nb (\ud835\udc3b\ud835\udc50\u223c200 mT)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Earlier presentations of the model omitted the reactance term; the current formulation includes reactance in Eqs. (31) and (32).",
+        "evidence_spans": [
+          "Eqs. (31) and (32) also include the reactance, which has not previously been mentioned for this model"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The current scheme considers only macroscale coating-thickness deviations and does not account for microscale deviations, partly due to difficulties depositing on non-flat surfaces.",
+        "evidence_spans": [
+          "The current scheme considers macro scale deviations in coating thickness due to difficulties depositing on non-flat surfaces. There are, however, also micro-scale deviations, see e.g. the atomic force microscopy in Ref. [10]. These contributions are not considered here."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "Rather than model a specific deposition process, the study stays agnostic to deposition method by emulating coating thickness with Gaussian random fields.",
+        "evidence_spans": [
+          "The coating thickness distribution is emulated through Gaussian random fields, hence remaining agnostic of the deposition method."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A rejected alternative is to move away from Leontovich boundary conditions and use higher-order SIBCs instead.",
+        "evidence_spans": [
+          "another is to move away from the Leontovich boundary conditions and consider higher order SIBCs [16]."
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [],
+    "causal_claim": [
+      {
+        "content": "Electropolishing smooths the surface, reducing local field enhancement from roughness, but it also causes hydrogen absorption that must later be removed by heat treatment.",
+        "evidence_spans": [
+          "Electropolishing produces smoother surfaces, reducing local enhancement due to roughness",
+          "but introduces hydrogen absorption that must be removed by subsequent heat treatment"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "High-pressure rinsing with ultrapure water removes microparticles and reduces field emission.",
+        "evidence_spans": [
+          "High-pressure rinsing with ultrapure water is then applied to remove microparticles and reduce field emission [1]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Nitrogen doping/diffusion and low-temperature baking have significantly improved the quality factor and achievable accelerating fields.",
+        "evidence_spans": [
+          "These methods have significantly improved the quality factor and the achievable accelerating fields."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Shallow RF penetration motivated the development of thin-film cavities.",
+        "evidence_spans": [
+          "This has motivated the development of thin-film cavities, in which a superconducting coating is deposited onto a bulk substrate."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The superconducting thin film partially screens the RF field, allowing the substrate to remain superconducting at higher fields than would be possible with bulk material alone.",
+        "evidence_spans": [
+          "The superconducting thin film partially screens the RF field, reducing the field strengths encountered by the substrate such that it maintains the superconducting state at higher fields than possible by bulk only."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The insulating layer prevents vortex penetration and suppresses Josephson coupling effects.",
+        "evidence_spans": [
+          "The insulator layer prevents vortex penetration and suppresses Josephson coupling effects [8]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because the normal-conductivity term is much smaller than the imaginary conductivity term, the conductivity expressions can be expanded and simplified.",
+        "evidence_spans": [
+          "For typical values \ud835\udf0e\ud835\udc5b\u223c107 S m\u22121, \ud835\udf14\u223c1010 s\u22121 and \ud835\udf06\u223c10\u22127 m one observes that \ud835\udf0e\u2032/\ud835\udf0e\u2032\u2032\u223c10\u22123 \u226a1, so we expand 1/\ud835\udf0e and 1/|\ud835\udf0e|2 up to O(\ud835\udf0e\u20322/\ud835\udf0e\u2032\u20322)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because \u03c9\u00b2\u03bb\u00b2/c\u00b2 is negligible, the surface-impedance expression can be further simplified.",
+        "evidence_spans": [
+          "Again, we note that \ud835\udf142\ud835\udf062/\ud835\udc502\u223c10\u221210 \u226a1 and can therefore be neglected. This further simplifies Eq. (25) to"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Rescaling the Gaussian-field sample makes the standard deviation parameter irrelevant.",
+        "evidence_spans": [
+          "Note that the rescaling effectively makes the standard deviation \ud835\udf0e irrelevant."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Solving the eigenvalue problem yields \u03c9, from which the quality factor Q can be extracted.",
+        "evidence_spans": [
+          "Solving this problem yields an eigenvalue \ud835\udf14 from which the quality factor \ud835\udc44 can be extracted through Eq. (13)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The coupled finite-element workflow returns a single sample of the quality factor per run.",
+        "evidence_spans": [
+          "This process, which involves two FE simulations, returns a single sample of the quality factor."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Temperature scaling is applied to penetration depth values at 4.2 K using the two-fluid model.",
+        "evidence_spans": [
+          "for the two-fluid model, the London penetration depth \ud835\udf06(\ud835\udc47) is scaled from \ud835\udf06(0) by [34]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using the residual resistivity ratio gives the niobium conductivity at 4.2 K.",
+        "evidence_spans": [
+          "Hence \ud835\udf0eNb(4.2 K) = RRRNb\ud835\udf0eNb(300 K)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Taking deviations as 10% of the optimal coating thickness sets the maximum thickness deviation to 26 nm.",
+        "evidence_spans": [
+          "For the size of the deviations we take 10 % of this value, yielding \u0394\ud835\udc51\ud835\udc46,max = 26 nm."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Increasing the length scale increases the spread/standard deviation of the quality factor, while having no significant effect on its mean.",
+        "evidence_spans": [
+          "We observe that the spread increases with increasing \ud835\udc59, this trend is corroborated by the \ud835\udf0e\ud835\udc44 observations in Fig. 6.",
+          "Hence, increasing \ud835\udc59primarily results an increase in \ud835\udf0e\ud835\udc44, while no significant change in \ud835\udf07\ud835\udc44is observed.",
+          "We found that the standard deviations increase with length scale."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because obtaining precise experimental distributions is not realistic, one would need to use numerical simulations of the coating process.",
+        "evidence_spans": [
+          "As of time of writing, obtaining the precise distribution from experimental samples is not realistic, hence one would have to resort to numerical simulations of the coating process itself."
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "Because RF fields penetrate only a very thin surface layer in superconductors (typically <1 \u00b5m), cavity performance is governed almost entirely by that layer; correspondingly, in the field-theoretic treatment the fields decay at infinity so the relevant surface contribution reduces to the surface plane in the Poynting-theorem derivation.",
+        "evidence_spans": [
+          "Because RF fields penetrate only a very thin surface layer in superconductors (typically less than 1 \u00b5m [5]), the superconducting properties relevant for cavity performance are governed almost entirely by this thin layer.",
+          "Since the fields must decay to zero at infinity, this means only the \ud835\udc65 = 0 plane contributes to the surface integral."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Thickness variations determine the local surface impedance, which enters the electromagnetic boundary condition and thus the cavity eigenvalue problem.",
+        "evidence_spans": [
+          "This in turn defines \ud835\udc4d(\ud835\udc93, \ud835\udf14), which is present in the boundary condition Eq. (2) and hence a component of the eigenvalue problem Eq. (9)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The maximum applicable field is controlled by the layer thicknesses, with the achievable limit bounded by the smaller of the coating and substrate field limits through the gamma factors.",
+        "evidence_spans": [
+          "This value depends on the layer thicknesses and is given by [8]\n\n\ud835\udc35max = min {\u02dc\ud835\udefe\u22121\ud835\udc35sh,NbTiN, \ud835\udefe\u22121\ud835\udc35max,Nb})"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Thickness parameters set a surface-resistance optimum: choosing them to minimize surface resistance maximizes the quality factor, while deviations can only preserve or reduce the quality factor, leading to a skewed distribution of outcomes.",
+        "evidence_spans": [
+          "Indeed, if one selects the thickness parameters to minimize the surface resistance, the highest quality factor would be reached. Deviating from this optimum would necessarily maintain or decrease the quality factor, yielding a very skewed distribution."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Different deposition methods are expected to generate different coating-thickness distributions.",
+        "evidence_spans": [
+          "Furthermore, one can expect the representative distributions to be quite different between e.g. sputtering based approaches such as co-sputtering [12, 13] and DC magnetron sputtering [14], or atomic layer deposition [10]."
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "The study proposes a numerical simulation scheme to quantify how coating thickness variations at different length scales affect the quality factor of a single-cell TESLA cavity, with statistical comparison across variation scales; the scheme is intended to be broadly applicable to thin-film approaches, with particular emphasis on SIS structures.",
+        "evidence_spans": [
+          "In this work, we perform a numerical study to quantify the impact of coating thickness variations on the quality factor for a single cell TESLA cavity.",
+          "We outline a simulation scheme that is applicable to the mentioned thin-film approaches, though we focus on SIS structures in particular.",
+          "Different length scales of the variations are considered and compared statistically."
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "The derived resistive component of the surface impedance matches the surface resistance reported earlier by Kubo's model.",
+        "evidence_spans": [
+          "We note that the resistive component of the surface impedance is identical to the surface resistance found in Ref. [8] through Joule dissipation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior work reports that dielectric-loss resistance is negligible relative to other contributions; for d_I = 100 nm it is less than 10^-5 n\u03a9 versus roughly 10 to 1000 n\u03a9 for other contributions.",
+        "evidence_spans": [
+          "There, it is also mentioned that the resistance from dielectric losses is negligible compared to other contributions, concretely when \ud835\udc51\ud835\udc3c = 100 nm, the contribution from dielectric losses is less than 10\u22125 n\u03a9, while the other contributions range from 10 n\u03a9 to 1000 n\u03a9."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Nb/Cu thin-film cavity implementation has been achieved at CERN facilities such as LEP-II and LHC.",
+        "evidence_spans": [
+          "This approach has been successfully implemented in Nb/Cu cavities at CERN facilities such as LEP-II and LHC [6]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The correlation length l controls the spatial scale over which coating-thickness deviations occur.",
+        "evidence_spans": [
+          "We observe that, as the name suggests, \ud835\udc59 controls the length scale over which deviations occur."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The optimal layer thicknesses for maximizing the applicable field are d_I = 10 nm for the insulator and d_S = 260 nm for the superconducting coating.",
+        "evidence_spans": [
+          "We find that the optimum is reached when \ud835\udc51\ud835\udc3c= 10 nm and \ud835\udc51\ud835\udc46= 260 nm, hence these parameters will be used."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Q-Q plots indicate that, for each correlation length scale, the quality factors are approximately normally distributed.",
+        "evidence_spans": [
+          "By observing Q-Q plots of the data, we observed that, in this case, the quality factors for each \ud835\udc59 were normally distributed, i.e. \ud835\udc44\u223cN (\ud835\udf07\ud835\udc44, \ud835\udf0e\ud835\udc44)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Inhomogeneous coatings mainly affect the spread of the quality factor rather than its mean: standard deviations differ strongly and significantly across length scales, with little overlap in \u03c3_Q error bars, while means are mostly statistically indistinguishable across length scales, their error bars overlap substantially, and only a few pairwise mean differences are weakly significant.",
+        "evidence_spans": [
+          "the error bars of the \ud835\udf0e\ud835\udc44 in Fig. 6 show barely any overlap, whereas the error bars of the \ud835\udf07\ud835\udc44 overlap substantially, particularly for the larger length scales.",
+          "The resulting \ud835\udc5d-value was extremely small, allowing rejection of the null hypothesis. Thus, the population variances are not all equal.",
+          "From the pairwise comparisons we conclude that all null hypotheses can be rejected. Hence, the variances of all populations are statistically distinct.",
+          "We find that the null hypothesis of equal means can be rejected with \ud835\udc5d= 4.8 \u00d7 10\u22125, indicating that not all means are equal.",
+          "We find that the null hypothesis cannot be rejected in nearly all cases, and the few cases for which rejection is possible are only weakly significant.",
+          "From our analysis, we find that the \ud835\udf07\ud835\udc44cannot be statistically distinguished in most cases, and only weakly so in a few instances.",
+          "In contrast, all variances differ significantly in the statistical sense. Hence, increasing \ud835\udc59primarily results an increase in \ud835\udf0e\ud835\udc44, while no significant change in \ud835\udf07\ud835\udc44is observed.",
+          "Our analysis revealed that the population means were mostly indifferent, with exceptions being only weakly significant",
+          "however, pronounced differences were observed in the standard deviations."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Mean quality factors for inhomogeneously coated cavities are consistently below the uniform/homogeneous-coating value, and the uniform-coating quality factor lies above the 95% confidence intervals of all inhomogeneous population means.",
+        "evidence_spans": [
+          "We additionally observe that the \ud835\udf07\ud835\udc44 of inhomogeneously coated cavities are consistently smaller than the uniform value, including the error bars.",
+          "Nevertheless, we find that the quality factor corresponding to a uniform coating lies significantly above the confidence intervals of all \ud835\udf07\ud835\udc44w.r.t the 95 % confidence interval.",
+          "Furthermore, the quality factor of a homogeneous coating was found to lie above the confidence interval of all population means."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Extreme outcomes under inhomogeneous coating show the quality factor can deviate from the uniform 260 nm coating by about 2% to 6%, increasing or decreasing depending on length scale; in the most extreme cases the deviation is about 6%.",
+        "evidence_spans": [
+          "In the most extreme cases, the quality factor deviates from that of a uniformly coated cavity with coating thickness 260 nm by approximately 6 %.",
+          "Depending on the length scale, extreme observations show a 2 % to 6 % increase or decrease in the quality factor.",
+          "Finally, extreme observations indicate that, depending on the length scale, the quality factor may increase or decrease by approximately 2 % to 6 %."
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "Bulk Nb cavity operation is constrained by Nb\u2019s critical temperature, with current operation at about 2 K.",
+        "evidence_spans": [
+          "Additionally, the operating temperature of bulk Nb cavities is currently 2 K, and is limited by the critical temperature \ud835\udc47\ud835\udc50 of Nb."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For the SIS design, the insulator and coating thicknesses are constrained to values that maximize the applicable magnetic field while maintaining the superconducting state.",
+        "evidence_spans": [
+          "Lastly, the thickness of the insulator and coating layer must be specified. We choose them to optimize for the maximum applicable magnetic field. This corresponds to the highest value of \ud835\udc350 such that the SIS structures maintains the superconducting state."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the boundary-cell modeling, each boundary cell is treated as semi-infinite because mesh-cell dimensions are orders of magnitude larger than the coating-layer thicknesses.",
+        "evidence_spans": [
+          "However, due to the order of magnitude difference in length scales, \u223c1 mm to 10 mm for the size of mesh cells on the boundary and \u223c10 nm to 100 nm for the layer thicknesses, we view each boundary cell as a semi-infinite space"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "No boundary condition is required for the SPDE on the cavity surface because the surface is closed (\u2202(\u2202\u03a9)=\u2205 for the closed boundary of a Lipschitz domain).",
+        "evidence_spans": [
+          "Note that no boundary condition was required. Since \u03a9 \u2286 R3 is a Lipschitz domain, \ud835\udf15\u03a9 is closed and \ud835\udf15(\ud835\udf15\u03a9) = \u2205"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The boundary mesh must be sufficiently refined so that triangle size is smaller than the smallest length scale considered.",
+        "evidence_spans": [
+          "The mesh was refined purposefully such that this value is smaller than the smallest length scale considered (10.6 mm)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The coating-thickness random-field model is constrained by process realism: although Gaussian random fields were used, some deposition methods may produce thickness distributions that such fields do not represent well.",
+        "evidence_spans": [
+          "We used Gaussian random fields to emulate the distribution from a coating process, however, depending on the deposition method, certain random fields may not be representative."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "On flat samples, film thickness is generally globally uniform.",
+        "evidence_spans": [
+          "Under such conditions, film thickness is generally uniform, globally speaking."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

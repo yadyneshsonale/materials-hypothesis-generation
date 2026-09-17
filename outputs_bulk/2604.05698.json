@@ -1,0 +1,1465 @@
+{
+  "paper_id": "2604.05698",
+  "chunks_processed": 5,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "There is a need to improve the fitting flexibility of Material Fingerprinting.",
+        "evidence_span": "To increase the fitting flexibility of Material Fingerprinting, we propose an adaptive model database coupled with an iterative pattern recognition algorithm that refines the material model in each step."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Data-driven characterization methods still require optimization that may be expensive and unreliable.",
+        "evidence_span": "Despite their enhanced fitting accuracy and broad applicability, all aforementioned data-driven material characteriza-\ntion methods share the requirement of solving an optimization problem. Depending on the experimental setup and the\nunderlying material modeling assumptions, this optimization problem can be computationally expensive, non-convex,\nand subject to nonlinear parameter constraints, such that convergence to a global optimum is often not guaranteed."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Remaining discrepancies in the skin fit need explanation",
+        "evidence_span": "However, for certain loading modes and stress components, deviations remain."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Future work is needed on more deformation modes, inelasticity, alternative features, and automated hyperparameter tuning",
+        "evidence_span": "Future work may extend the database to additional deformation modes, explore inelastic material behavior, incorporate alternative feature sets, and further investigate automated strategies for hyperparameter tuning and model selection."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Exponential feature evaluations can overflow at large deformations, motivating approximation.",
+        "evidence_span": "We note that some of the considered modeling features require the evaluation of the exponential function, which can lead to overflow errors for large deformations."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "The authors previously proposed Material Fingerprinting for rapid discovery of mechanical material models without continuous optimization.",
+        "evidence_span": "We recently proposed a method called Material Fingerprinting for the rapid discovery of mechanical material models that avoids solving continuous optimization problems."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Material Fingerprinting precomputes a database of fingerprints and uses pattern recognition to identify a model for unseen measurements.",
+        "evidence_span": "Material Fingerprinting is a novel method for the rapid discovery of material models (Flaschel et al., 2026a). It oper-\nates by precomputing a database of material responses, a.k.a. fingerprints, and their corresponding material models in\nan offline stage, which is subsequently leveraged in an online stage to identify the appropriate material model for an\nunseen experimental measurement via a pattern-recognition algorithm."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Classical material characterization assumes a constitutive form and fits parameters by minimizing mismatch to experiments.",
+        "evidence_span": "The classical strategy for material characterization is to assume a mathematical\ndescription of the material behavior that depends on a set of material parameters, which are then identified by min-\nimizing the mismatch between model predictions and experimentally measured data (Gdoutos and Konsta-Gdoutos,\n2024)."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Full-field methods characterize materials by minimizing mismatch with boundary-value simulations or PDE residuals.",
+        "evidence_span": "More specifically, the measured displacement fields and reaction forces can be used for\nmaterial characterization by minimizing the mismatch between experimental data and data predicted by simulations\nof the corresponding boundary value problem, or by minimizing the residuals of the governing partial differential\nequations, see the overviews by Avril et al. (2008); Roux and Hild (2020); R\u00f6mer et al. (2025)."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Modern data-driven characterization methods impose fewer assumptions on model form, including neural networks.",
+        "evidence_span": "In contrast to a priori assuming a material model and calibrating its parameters, modern methods for material char-\nacterization impose fewer assumptions on the mathematical form of the material model, which promises enhanced\nfitting accuracy. For example, neural networks can be used to represent mechanical material behavior (Ghaboussi\net al., 1991)."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Other prior concise/interpretable discovery methods include symbolic regression, EUCLID, and CANNs.",
+        "evidence_span": "Another line of research focuses on the discovery of concise and inter-\npretable mathematical expressions for material models. Popular methods include symbolic regression (Abdusalamov\net al., 2023), the EUCLID approach (Flaschel et al., 2021; Flaschel, 2023), and CANNs (Linka and Kuhl, 2023; Linka\net al., 2023; Holthusen et al., 2024, 2026; Martonov\u00e1 et al., 2024, 2025)."
+      },
+      {
+        "role": "prior_approach",
+        "content": "In the extreme prior approach, simulations are driven directly by a database of stress-strain pairs instead of an explicit material model.",
+        "evidence_span": "Finally, in the extreme case, the formulation of the material model is omitted altogether, and simulations are\ndirectly informed by a database of stress-strain pairs, which serves as a surrogate for the material model (Kirchdoer-\nfer and Ortiz, 2016; Iba\u00f1ez et al., 2017)."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Traditional sparse regression starts from many candidate features and uses L1 regularization to enforce sparsity.",
+        "evidence_span": "Traditional sparse regression methods begin with\na large set of candidate features and employ L1-regularization to enforce sparsity, thereby reducing the number of\nactive features in the resulting model."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Similar principal-stretch-based modeling features have been used previously in neural networks.",
+        "evidence_span": "Similar modeling features have been\nused in the context of neural networks by St. Pierre et al. (2023); Vijayakumaran et al. (2025); Martonov\u00e1 et al. (2025);\nTepole et al. (2025)."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior neural-network models based on signed singular values closely related to principal stretches were shown to be universal approximators.",
+        "evidence_span": "Further, Geuken et al. (2025) have introduced neural network models that depend on the signed\nsingular values of the deformation gradient, which are closely related to the principal stretches, and prove the universal\napproximation capability of these networks."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Previous work analyzed these rubber data using Material Fingerprinting with one modeling feature",
+        "evidence_span": "These results are in line with our previous work (Martonov\u00e1 et al., 2026), which was restricted to one modeling feature in the strain energy density function."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Generalized-invariant constitutive neural networks were used on the same rubber data",
+        "evidence_span": "using a generalized-invariant-based constitutive neural network for the same data (Martonov\u00e1 et al., 2025)"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Constitutive neural networks previously modeled the same skin data",
+        "evidence_span": "constitutive artificial neural networks, as reported in Linka et al. (2023)"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Continuous optimization-based model discovery uses regularization parameters similarly to na",
+        "evidence_span": "the choice of the hyperparameter na plays a role similar to that of a regularization parameter in continuous optimization\u2013based model discovery approaches (Martonov\u00e1 et al., 2024; Martonov\u00e1 et al., 2025; Vervenne et al., 2025; Flaschel et al., 2025a)"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work found that increasing regularization reduced complexity and goodness of fit, even collapsing to isotropy in cardiac tissue",
+        "evidence_span": "In Martonov\u00e1 et al. (2024), an increase in the regularization parameter also reduced model complexity and goodness of fit. In the extreme case, the identified model for orthotropic cardiac tissue reduced to an isotropic formulation."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The work follows Boehler's approach of introducing a structural direction into the strain energy arguments for anisotropy.",
+        "evidence_span": "To account for anisotropic material behavior, we follow the approach of Boehler (1977, 1979) and extend the argument list of the strain energy function by introducing a structural direction a in addition to the deformation gradient F."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Polyconvexity was originally introduced by Ball.",
+        "evidence_span": "Polyconvexity, originally introduced by Ball (1976), together with coercivity, provides a sufficient mathematical framework for the existence of minimizers of elastic energy functionals at finite strains, see Ciarlet (1988)."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Treloar reported stress-strain data for vulcanised rubber under various deformation types.",
+        "evidence_span": "Treloar, L.R.G., 1944. Stress-strain data for vulcanised rubber under various types of deformation."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Linka et al. studied automated model discovery for skin, including model, data, and experiment selection.",
+        "evidence_span": "Linka, K., Buganza Tepole, A., Holzapfel, G.A., Kuhl, E., 2023. Automated model discovery for skin: Discovering the best model, data, and experiment."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Ball introduced convexity conditions and existence theorems in nonlinear elasticity.",
+        "evidence_span": "Ball, J.M., 1976. Convexity conditions and existence theorems in nonlinear elasticity."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Schr\u00f6der and Neff formulated hyperelastic transverse isotropy using polyconvex free energy functions.",
+        "evidence_span": "Schr\u00f6der, J., Neff, P., 2003. Invariant formulation of hyperelastic transverse isotropy based on polyconvex free energy functions."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "The original method used a database with a fixed set of models and fixed numbers of parameters.",
+        "evidence_span": "In our original contributions, the database comprised a fixed number of material models, each with a fixed number of parameters."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "The original Material Fingerprinting can only choose models explicitly present in the database.",
+        "evidence_span": "In its current form, however, Material Finger-\nprinting is limited to selecting only those material models that are explicitly represented in the database."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Simple homogeneous experiments provide only sparse information because they cover very basic deformation modes.",
+        "evidence_span": "However, because these simple experiments are limited to very basic deformation modes, they are of-\nten criticized for providing only sparse information in the high-dimensional strain space."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "These full-field methods can be computationally demanding due to repeated global or local nonlinear solves.",
+        "evidence_span": "These methods\ncan, however, be computationally demanding, particularly when they require repeated solutions of either the global\nboundary value problem or the local nonlinear equations at each material point and time step."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "The original method's lookup-table restriction limits model flexibility in describing experiments.",
+        "evidence_span": "The original Material Fingerprinting method (Flaschel et al., 2026a,b; Martonov\u00e1 et al., 2026) is restricted to dis-\ncovering material models from an a priori defined lookup table of material models and associated parameters. This\nrestriction limits the flexibility of the resulting models in describing experimental data."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Possible limitations include insufficiently expressive features, restrictive anisotropy assumptions, misaligned fiber direction, nonoptimal feature selection, or measurement uncertainty",
+        "evidence_span": "Several factors may contribute to these discrepancies. The selected feature functions may not be sufficiently expressive, the assumed class of anisotropy may be overly restrictive, the fiber direction may not be perfectly aligned with the e2-direction in the experiment, or the adaptive algorithm may not have identified the optimal combination of features. Additionally, measurement uncertainties in the experimental data cannot be excluded."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Instead of restricting selection to a single predefined model, the method uses combinations of models.",
+        "evidence_span": "rather than being restricted to selecting a single model from a predefined set"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Previous Material Fingerprinting approaches are contrasted as less capable, since the new method targets more complex models.",
+        "evidence_span": "In comparison to previous works on Material Fingerprinting, this enables the discovery of more complex models, such as multi-term Ogden models or the anisotropic Holzapfel-Gasser-Ogden model."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The method is positioned against constitutive neural networks by avoiding their time-consuming training process.",
+        "evidence_span": "comparable to that of constitutive artificial neural networks while not relying on a time-consuming training process"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Unlike the original method, the new strategy does not restrict discovery to single database-contained models and instead targets multi-feature constitutive models.",
+        "evidence_span": "In contrast to the original\nMaterial Fingerprinting method (Flaschel et al., 2026a), this strategy facilitates the discovery of complex constitutive\nmodels with multiple modeling features, including the multi-term Ogden model (Ogden, 1972) and the anisotropic\nHolzapfel-Gasser-Ogden model (Holzapfel et al., 2004)."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than starting with many candidates and pruning them by L1 regularization, the method starts from zero and incrementally adds features.",
+        "evidence_span": "In contrast, our adaptive strategy starts from a zero solution and incrementally\nadds features, producing a model that is sparse by construction, while allowing the user to specify the desired number\nof features."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Unlike forward stepwise regression and LARS, the proposed method relies on a precomputed database.",
+        "evidence_span": "However, unlike our methods, these\nmethods do not rely on a precomputed database."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Unlike forward stepwise regression and LARS, adaptive Material Fingerprinting uses a precomputed database and different step-size rules.",
+        "evidence_span": "However, adaptive Material Fingerprinting differs in its utilization of a\nprecomputed database and in its use of distinct step-size rules."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "They do not use anisotropic invariants for isotropic rubber because no preferred direction exists",
+        "evidence_span": "Since the investigated materials do not exhibit a preferred direction, it is not appropriate to assume any specific fiber orientation. Consequently, the computation of the invariants \u03bba and Aa is not meaningful. We therefore restrict the analysis to the isotropic feature database introduced in Section 2.2."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The paper positions its bottom-up feature addition against top-down regularization-based optimization approaches",
+        "evidence_span": "This is an advantage over most optimization-based approaches that successively remove irrelevant features and build the model top-down through regularization terms in the optimization function."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The paper explicitly contrasts polyconvexity with physical principles, rejecting it as a mandatory constitutive requirement because it is not itself a physical principle.",
+        "evidence_span": "However, in contrast to objectivity and material symmetry, polyconvexity does not constitute a physical principle and therefore does not represent a mandatory requirement for constitutive laws."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The adaptive database is built using sums of strain-energy-density feature functions based on isotropic and anisotropic invariants.",
+        "evidence_span": "To design the adaptive database, we leverage sums of strain energy density feature functions that depend on isotropic and anisotropic invariants."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The proposed strategy is conceptually similar to sparse regression-based model discovery.",
+        "evidence_span": "We note that the proposed strategy shares conceptual similarities with sparse regression-based approaches for material\nmodel discovery (Flaschel et al., 2021; McCulloch and Kuhl, 2024)."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The approach is also similar to forward stepwise regression and the LARS algorithm.",
+        "evidence_span": "This approach shares similarities with forward stepwise regression (Hastie et al., 2009) and the LARS\nalgorithm (Efron et al., 2004; Flaschel et al., 2025a; Urrea\u2013Quintero et al., 2026)."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The online stage has methodological parallels to forward stepwise regression and LARS.",
+        "evidence_span": "We note that the online stage of adaptive Material Fingerprinting exhibits methodological\nparallels to forward stepwise regression (Hastie et al., 2009) and the LARS algorithm (Efron et al., 2004; Flaschel\net al., 2025a; Urrea\u2013Quintero et al., 2026)."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The cardiac-tissue regularization result provides an analogy for the skin behavior here",
+        "evidence_span": "This behavior resembles the transverse isotropic skin considered here, where an excessively restrictive choice of na likewise suppresses anisotropic contributions and leads to an isotropic model with limited predictive capability."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The polyconvexity discussion is aligned with established literature results, citing Schr\u00f6der and Neff.",
+        "evidence_span": "These findings are consistent with established results in the literature, see for example Schr\u00f6der and Neff (2003) for a detailed discussion of polyconvexity in anisotropic material models."
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Having a precomputed fingerprint database allows real-time discovery of a model for unseen measurements by comparison.",
+        "evidence_span": "If a database of fingerprints is generated in an offline phase, a model for an unseen experimental measurement can be discovered in real time by comparing the experimentally measured fingerprint to the fingerprints in the database."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The adaptive strategy allows discovery of arbitrary linear combinations of database models instead of only one predefined model.",
+        "evidence_span": "This strategy enables Material Fingerprinting to discover arbitrary linear combinations of material models from the database, rather than being restricted to selecting a single model from a predefined set."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Compared with previous Material Fingerprinting work, the new approach enables discovery of more complex models.",
+        "evidence_span": "In comparison to previous works on Material Fingerprinting, this enables the discovery of more complex models, such as multi-term Ogden models or the anisotropic Holzapfel-Gasser-Ogden model."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using the adaptive approach increases fitting accuracy while largely preserving computational speed.",
+        "evidence_span": "Our results show that the adaptive approach increases the fitting accuracy of Material Fingerprinting without significantly sacrificing the computational speed of the originally proposed method."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Tuning hyperparameters can produce sparse, interpretable material models.",
+        "evidence_span": "The hyperparameters of the adaptive method can be tuned to obtain sparse material models that are described by interpretable mathematical expressions."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Successively adding database terms enables discovery of arbitrary model combinations.",
+        "evidence_span": "Adaptive Material\nFingerprinting enables not only the selection of material models contained in the database, but also the discovery of\narbitrary combinations thereof by successively adding terms from the database to the model."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Complex specimen experiments have become more popular because they generate rich heterogeneous strain states measurable over the surface.",
+        "evidence_span": "Consequently, experiments\ninvolving complexly shaped specimens have gained increasing popularity because they generate rich, heterogeneous\nstrain states, which can be captured over the specimen surface using camera-based measurement systems (Gr\u00e9diac,\n1989; Hild and Roux, 2006)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using a reusable precomputed database makes material characterization computationally efficient and robust by avoiding continuous optimization and local optima.",
+        "evidence_span": "In this way, material characterization becomes both computationally efficient, since no continuous\noptimization problem needs to be solved, and robust, as Material Fingerprinting guarantees identification of the best\nmatching fingerprint contained in the database rather than convergence to a local optimum."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Combining isotropic feature wI with gA gives the Ogden model; using multiple terms with different alpha yields the multi-term Ogden model.",
+        "evidence_span": "For example, combining the isotropic feature \u02dcwI with the function gA yields the Ogden model\n(Ogden, 1972), while combining multiple terms with different values of \u03b1 naturally leads to the multi-term Ogden\nmodel."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Combining anisotropic feature wIII with hB gives the Holzapfel-Gasser-Ogden model.",
+        "evidence_span": "Furthermore, combining the anisotropic feature \u02dcwIII with the function hB results in the Holzapfel-Gasser-\nOgden model (Holzapfel et al., 2004)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Flagging feature configurations by polyconvexity allows optional enforcement of that constraint online.",
+        "evidence_span": "During database\ngeneration, each feature configuration is flagged according to whether it guarantees polyconvexity, allowing the user\nto optionally enforce this constraint in the online phase by restricting the selection to admissible features."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Including additional loading paths in the anisotropic database enables characterization of directional effects.",
+        "evidence_span": "For the anisotropic database, we consider both\nisotropic and anisotropic features and generate fingerprints for the biaxial tension/compression experiments BT1-BT5,\nwhere the inclusion of additional loading paths enables the characterization of directional effects."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Interpolation and masking guarantee matched lengths and matching control-variable states between experimental and database fingerprints.",
+        "evidence_span": "Through the\ninterpolation and masking procedure, we guarantee that the experimental fingerprint \u02c6f \u2217 and the database fingerprints\n\u02c6f (i) have identical lengths and contain stress values corresponding to the same values of the control variable."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Adding more features progressively increases fitting accuracy.",
+        "evidence_span": "Using this strategy, we build an adaptive strain energy density function that exhibits\nincreasing fitting accuracy as more features are added to the function."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The parameter na controls the number of terms and therefore the sparsity and interpretability of the discovered model.",
+        "evidence_span": "The parameter na determines\nthe number of terms included in the discovered strain energy density function and thus governs the sparsity and\ninterpretability of the resulting model."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The scaling parameter s controls update magnitude, and both hyperparameters affect fitting accuracy.",
+        "evidence_span": "The scaling parameter s controls the magnitude by which the strain energy\ndensity function is updated at each iteration. Both hyperparameters influence the fitting accuracy of the method."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Heuristic hyperparameter choice gives consistently high fitting accuracy",
+        "evidence_span": "In our experiments, we found that a heuristic choice of na = 10 and s = 0.5 consistently yields models with high fitting accuracy"
+      },
+      {
+        "role": "causal_claim",
+        "content": "If predictive performance matters more than term count, the chosen hyperparameters provide a reliable default",
+        "evidence_span": "Therefore, when the primary objective is to maximize predictive performance and the number of terms in the model is of secondary importance, this parameter setting provides a reliable default."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Further hyperparameter optimization can produce sparser, more interpretable models while retaining high accuracy",
+        "evidence_span": "these hyperparameters can be further optimized to produce sparse and more interpretable models while maintaining a high level of fitting accuracy"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Increasing the number of terms tends to improve fitting accuracy",
+        "evidence_span": "As expected, we observe that the fitting accuracy tends to increase as the number of terms na in the material model increases."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Adding a second feature improves equibiaxial-tension fit and adding a third improves uniaxial-tension fit",
+        "evidence_span": "The newly added second modeling feature improves the fitting accuracy in equibiaxial tension, while the newly added third feature improves the fitting accuracy in uniaxial tension."
+      },
+      {
+        "role": "causal_claim",
+        "content": "A purely isotropic formulation cannot capture the strong anisotropic skin response",
+        "evidence_span": "Thus, a purely isotropic formulation cannot represent the pronounced anisotropic response of skin."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Adding one anisotropic term substantially improves average accuracy",
+        "evidence_span": "This model achieves a substantially improved average accuracy of R2 = 0.8441"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The improved two-term skin model shows anisotropic features are essential",
+        "evidence_span": "thereby demonstrates that anisotropic features are essential for capturing the mechanical behavior of the skin."
+      },
+      {
+        "role": "causal_claim",
+        "content": "In more general deformations or fiber orientations, anisotropic contributions would influence all stress components",
+        "evidence_span": "In more general settings, e.g., when the deformation gradient contains off-diagonal components or when the fiber direction is not aligned with a principal axis, the anisotropic contribution would, in general, influence all stress components."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Small na promotes simple low-complexity models but lowers predictive accuracy",
+        "evidence_span": "Small values of na promote simple models with limited complexity but reduce predictive accuracy."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Larger na increases expressiveness but may cause overfitting",
+        "evidence_span": "Larger values increase expressiveness but may introduce overfitting."
+      },
+      {
+        "role": "causal_claim",
+        "content": "An overly restrictive na suppresses anisotropic contributions and yields an isotropic model with limited predictive capability",
+        "evidence_span": "an excessively restrictive choice of na likewise suppresses anisotropic contributions and leads to an isotropic model with limited predictive capability."
+      },
+      {
+        "role": "causal_claim",
+        "content": "na provides a transparent, physically interpretable way to balance complexity and predictive performance",
+        "evidence_span": "These results show that the parameter na provides a transparent and physically interpretable mechanism to balance model complexity and predictive performance within the adaptive Material Fingerprinting framework."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Imposing polyconvexity excludes hA and yields a polyconvex discovered model",
+        "evidence_span": "If we impose polyconvexity a priori, the feature function hA is not considered, and the resulting discovered material model is polyconvex."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The polyconvexity constraint lowers skin fitting accuracy from 0.8916 to 0.8371",
+        "evidence_span": "However, as a result of the polyconvexity constraint, the fitting accuracy for na = 4 and s = 0.7 reduces from an average coefficient of determination of 0.8916 to 0.8371."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Coupling an adaptive feature database with iterative pattern recognition gives an accurate and computationally efficient discovery method",
+        "evidence_span": "By coupling an adaptive feature database with an iterative pattern recognition algorithm, we obtain an accurate yet computationally efficient methodology for constitutive model discovery."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Adaptive enrichment significantly increases modeling flexibility and accuracy",
+        "evidence_span": "the adaptive enrichment strategy significantly increases modeling flexibility and accuracy."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Successively adding features lets the user tune sparsity-accuracy balance without regularization",
+        "evidence_span": "By successively adding features to the strain energy density function, the user can fine-tune the balance between model sparsity and model accuracy without having to rely on regularization."
+      },
+      {
+        "role": "causal_claim",
+        "content": "For rubber, adding more terms substantially improves R2 over the original method and reaches neural-network-level accuracy without costly training",
+        "evidence_span": "For rubber, adaptive Material Fingerprinting can substantially improve the coefficient of determination compared to the original method by successively adding more terms to the model and achieve accuracies comparable to constitutive artificial neural networks without requiring a costly training phase."
+      },
+      {
+        "role": "causal_claim",
+        "content": "For skin, the framework identifies the need for anisotropic features and recovers established model structures",
+        "evidence_span": "For skin, the framework successfully identifies the need to include anisotropic features and recovers model structures consistent with established formulations."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Depending only on principal stretches makes the isotropic contribution satisfy objectivity and material symmetry.",
+        "evidence_span": "As a consequence, the isotropic contribution to the strain energy density in Eq. (A.1) depends exclusively on the principal stretches and therefore satisfies both objectivity and material symmetry."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The stress representation immediately implies the isotropic stress contribution satisfies objectivity and material symmetry.",
+        "evidence_span": "As already discussed for the strain energy density, the representation in Eq. (A.8) immediately implies that the isotropic stress contribution satisfies objectivity and material symmetry."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Approximating the features with a second-order Taylor series around a threshold point is used to avoid overflow.",
+        "evidence_span": "To circumvent this, we approximate the features by a second order Taylor-series around the point at which the slope of the strain energy reaches a predefined threshold."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The adaptive switching strategy prevents numerical overflow while preserving smoothness.",
+        "evidence_span": "To prevent numerical overflow while maintaining smoothness, an adaptive switching strategy based on the derivative magnitude is used."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Heuristic hyperparameters na=10 and s=0.5 consistently yield highly accurate solutions when fitting accuracy is prioritized.",
+        "evidence_span": "However, when fitting accuracy is the primary objective, our results indicate that the heuristic choice of na = 10 and s = 0.5 consistently provides highly accurate solutions."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Because anisotropic invariant derivatives at the undeformed state are not identity-like, pressure alone cannot enforce zero stress there; thus anisotropic feature derivatives must vanish at F=I.",
+        "evidence_span": "For anisotropic features, in contrast, the derivatives \u2202I/\u2202F do not reduce to the identity tensor. Hence, the\nisotropic pressure term alone cannot enforce P = 0 in the undeformed configuration. To address this issue, we require\nthe first derivatives of the anisotropic feature functions to vanish at F = I. This additional condition motivates the\ndifferent design of the anisotropic features h compared to the isotropic features g."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Polyconvexity is guaranteed when g and h are convex and monotone, leading to simple parameter constraints.",
+        "evidence_span": "In particular, polyconvexity is ensured if the\nfunctions g and h in Eq. (7)-Eq. (8) are convex and monotone, which leads to simple parameter constraints: gA requires\n\u03b1 \u22651, gB requires \u03b1 \u22650, and gC requires \u03b11 \u22650, while hB is admissible for \u03b1 \u22650 and hA is excluded."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Because anisotropic stress depends on \u03bba=F22 here, it affects only the P22 stress component under the standardized modes",
+        "evidence_span": "This expression shows that anisotropic contributions act exclusively on the P22 component of the first Piola-Kirchhoff stress tensor. Consequently, the additional terms introduced in the second adaptive step in Eq. (16), as well as the second and fourth terms in Eq. (17), affect only this stress component."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Separating offline database generation from online identification avoids continuous potentially nonconvex optimization",
+        "evidence_span": "the separation into an offline database generation stage and an online identification stage avoids the solution of continuous, potentially non-convex optimization problems."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Because online discovery is algebraic operations and similarity searches in a precomputed database, robustness and real-time capability are ensured",
+        "evidence_span": "In the online phase, model discovery reduces to a sequence of algebraic operations and similarity searches within a precomputed database, which ensures robustness and real-time capability."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Convex and non-decreasing g, together with non-negative scaling and additive combination, make the isotropic strain energy polyconvex.",
+        "evidence_span": "The additional scaling by the non-negative homogeneity parameters \u03b8 preserves convexity, and since sums of convex functions remain convex, the isotropic contribution to the strain energy is polyconvex provided that g is convex and non-decreasing."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Because composition of a convex, non-decreasing function with a convex argument remains convex, the anisotropic contribution is polyconvex if h has those properties.",
+        "evidence_span": "Since the composition of a convex, non-decreasing function with a convex argument remains convex, the anisotropic contribution to the strain energy is polyconvex as well, provided that h satisfies these properties."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "When the derivative bound is exceeded, replacing the exponential by a second-order Taylor expansion controls growth and preserves local C2 consistency at the switching point.",
+        "evidence_span": "If the bound is exceeded, the exponential term is replaced by its second-order Taylor expansion around the corresponding point x0, implicitly defined by |f \u2032(x0)| = \u03c4,\n...\nThis ensures controlled growth and local C2 consistency at the switching point."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "Each material is assumed to have a unique standardized response that can serve as a mechanical fingerprint.",
+        "evidence_span": "Material Fingerprinting assumes that each material exhibits a unique response when subjected to a standardized experimental setup, which is interpreted as the material\u2019s mechanical fingerprint."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper proposes an adaptive model database with iterative pattern recognition to refine the material model step by step.",
+        "evidence_span": "To increase the fitting flexibility of Material Fingerprinting, we propose an adaptive model database coupled with an iterative pattern recognition algorithm that refines the material model in each step."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper proposes an adaptive Material Fingerprinting framework to overcome the database-selection limitation.",
+        "evidence_span": "To overcome\nthis limitation, we propose an adaptive Material Fingerprinting framework as summarized in Fig. 1."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The previously proposed two-stage Material Fingerprinting was introduced to address optimization-related challenges.",
+        "evidence_span": "To\naddress these challenges, we proposed the two-stage Material Fingerprinting approach."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "This work proposes an adaptive strategy that successively adds modeling features to improve description of experiments.",
+        "evidence_span": "In this work, we propose an adaptive strategy for Material Fingerprinting in which modeling features are successively\nincorporated into the material model to progressively improve the description of the experimental data."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The adaptive strategy enables discovery of individual models and combinations through iterative pattern recognition.",
+        "evidence_span": "In this work, we therefore\npropose an adaptive strategy for Material Fingerprinting that enables not only the discovery of individual material\nmodels but also combinations of different material models through an iterative pattern recognition algorithm."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The adaptive approach is expected to improve fitting accuracy.",
+        "evidence_span": "This\napproach is expected to enhance fitting accuracy."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper proposes an iterative framework that builds adaptive strain energy functions with tunable numbers of features and parameters.",
+        "evidence_span": "In this contribution, we propose an iterative framework for discovering adaptive strain energy density functions with\na tunable number of feature functions and material parameters."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper introduces an adaptive extension for rapid discovery of anisotropic constitutive models",
+        "evidence_span": "we have introduced an adaptive extension of the Material Fingerprinting framework for the rapid discovery of anisotropic constitutive models in incompressible hyperelasticity."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Adaptive Material Fingerprinting is proposed as a scalable alternative to optimization-based and purely data-driven methods",
+        "evidence_span": "It offers a scalable alternative to optimization-based and purely data-driven approaches, particularly in scenarios where rapid and robust material characterization is required."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The appendix states the proposed framework increases flexibility by adding generic feature functions for strain energy density.",
+        "evidence_span": "We develop an adaptive framework that increases the flexibility of the original Material Fingerprinting method by introducing a generic set of feature functions defining the strain energy density."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "Experiments were conducted on isotropic rubber and anisotropic animal skin tissue data.",
+        "evidence_span": "We test the method on experimental data stemming from mechanical tests of isotropic rubber materials and anisotropic animal skin tissue."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The adaptive approach improved fitting accuracy without major loss of computational speed.",
+        "evidence_span": "Our results show that the adaptive approach increases the fitting accuracy of Material Fingerprinting without significantly sacrificing the computational speed of the originally proposed method."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Adaptive Material Fingerprinting achieved fitting accuracy comparable to constitutive neural networks without needing time-consuming training.",
+        "evidence_span": "We found that the fitting accuracy of adaptive Material Fingerprinting is comparable to that of constitutive artificial neural networks while not relying on a time-consuming training process."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Prior work validated Material Fingerprinting experimentally and on camera-based data with orders-of-magnitude speedups over conventional simulation-based fitting.",
+        "evidence_span": "Following a numerical\nproof of concept (Flaschel et al., 2026a), we validated Material Fingerprinting on experimental data (Martonov\u00e1 et al.,\n2026). More recently, we demonstrated that Material Fingerprinting can be applied to data obtained from camera-\nbased measurement systems (Flaschel et al., 2026b), achieving speed-ups of several orders of magnitude compared to\nconventional approaches that rely on minimizing the mismatch between experimental data and predictions obtained\nfrom simulations of the corresponding boundary value problem."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The method is demonstrated on isotropic rubber and anisotropic animal skin data.",
+        "evidence_span": "We establish databases for\nuniaxial tension/compression, pure shear, and biaxial tension/compression tests, and demonstrate the adaptive Mate-\nrial Fingerprinting approach by applying it to data obtained from isotropic rubber materials (Treloar, 1944) as well as\nanisotropic animal skin (Linka et al., 2023)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Average R2 values from hyperparameter sweeps are shown for rubber datasets",
+        "evidence_span": "The resulting average R2 values are illustrated in Fig. 5."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Higher s appears preferable for the two rubber datasets",
+        "evidence_span": "We also observe that higher values of s seem to be preferable for the two experimental datasets."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For rubber at 20C with na=1 and s=1, the discovered model qualitatively matches data but has room for improvement",
+        "evidence_span": "As shown in Fig. 6, the model is in good qualitative agreement with the data. However, the average coefficient of determination R2 = 0.9286 indicates that there remains potential for improving fitting accuracy."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For rubber at 50C, the same modeling features are found as at 20C, but with different parameters",
+        "evidence_span": "Interestingly, we discover the same modeling features as for rubber at 20\u25e6C, albeit with different material parameters."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For rubber at 50C, the second term is needed for equibiaxial tension and the third for uniaxial tension and pure shear",
+        "evidence_span": "We observe that the second term is necessary for describing equibiaxial tension, and the third term is necessary for describing uniaxial tension and pure shear."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For rubber, enforcing polyconvexity does not change the discovered models or fitting accuracy",
+        "evidence_span": "For the rubber datasets and the chosen hyperparameters, adaptive Material Fingerprinting discovers the same models regardless of whether polyconvexity is enforced. Thus, for the present example, imposing the polyconvexity constraint does not affect the fitting accuracy of the method."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Adaptive Material Fingerprinting reaches nearly the same fitting accuracy as the constitutive neural network on rubber",
+        "evidence_span": "We finally note that the fitting accuracy achieved with adaptive Material Fingerprinting is nearly the same as using a generalized-invariant-based constitutive neural network for the same data"
+      },
+      {
+        "role": "evidence_result",
+        "content": "For skin, the hyperparameter study shows a sweet spot at s=0.7",
+        "evidence_span": "We observe a sweet spot for the hyperparameter value s = 0.7, which is kept fixed in the following examples."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For skin with na=1, the identified isotropic one-term model performs poorly",
+        "evidence_span": "which shows poor predictive performance, with an average coefficient of determination of R2 = 0.3777"
+      },
+      {
+        "role": "evidence_result",
+        "content": "For skin, na=4 gives the best balance between complexity and accuracy",
+        "evidence_span": "Choosing na = 4 yields the best hyperparameter combination regarding the balance of model complexity and accuracy."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For the 4-term skin model, agreement is satisfactory overall but some deviations remain",
+        "evidence_span": "Overall, we obtain satisfactory agreement between the experimental observations and the model predictions. However, for certain loading modes and stress components, deviations remain."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The P11 component in BT5 is not captured accurately",
+        "evidence_span": "In particular, the stress component P11 of loading mode BT5 is not captured accurately."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Adaptive Material Fingerprinting achieves skin-fitting accuracy comparable to constitutive neural networks",
+        "evidence_span": "the proposed adaptive Material Fingerprinting approach achieves a fitting accuracy comparable to that of constitutive artificial neural networks"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Neural networks also struggle to fit all loading modes simultaneously, especially P11 in BT5",
+        "evidence_span": "the neural network models exhibit similar difficulties in simultaneously fitting all loading modes, particularly with respect to the stress component P11 of loading mode BT5."
+      },
+      {
+        "role": "evidence_result",
+        "content": "This stress-component-specific behavior matches the observed responses in the experiments",
+        "evidence_span": "This behavior is consistent with the observed responses in the standardized experiments shown in Figs. 11 and 12."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The hyperparameter study shows users can modulate complexity and add features bottom-up by iteration across fingerprints",
+        "evidence_span": "A hyperparameter study highlights that the user can modulate model complexity and successively include additional features to build the final model bottom-up through iteration across possible fingerprints."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The transformation relations show the anisotropic part satisfies objectivity and material symmetry.",
+        "evidence_span": "These relations demonstrate that the anisotropic part of the strain energy density also satisfies the requirements of objectivity and material symmetry."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Transformation properties imply the anisotropic stress contribution satisfies material symmetry and objectivity.",
+        "evidence_span": "From the transformation properties of \u03bba and Aa with respect to rotations of the deformation gradient and the fiber direction, it follows that the anisotropic stress contribution satisfies material symmetry and objectivity in the sense that \u02dcPani(QF, a) = Q \u02dcPani(F, a) and \u02dcPani(FQ, QT a) = \u02dcPani(F, a) Q."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Both isotropic and anisotropic constitutive parts are consistent with symmetry requirements.",
+        "evidence_span": "Thus, both the isotropic and anisotropic parts of the constitutive response are fully consistent with the underlying symmetry requirements."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The second directional derivative analysis shows \u03bba is convex in F and Aa is convex in cof(F).",
+        "evidence_span": "This shows that \u03bba is convex with respect to F, while, by analogous arguments, Aa is convex with respect to cof(F)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The discovered model fits rubber data at 20\u00b0C with very high accuracy (average R\u00b2 = 0.9988) for na = 10 and s = 0.5.",
+        "evidence_span": "Figure D.13: Stress-stretch data and discovered model for rubber at 20\u25e6C with hyperparameters na = 10 and s = 0.5, average R2 = 0.9988."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The discovered model fits rubber data at 50\u00b0C with high accuracy (average R\u00b2 = 0.9897) for na = 10 and s = 0.5.",
+        "evidence_span": "Figure D.14: Stress-stretch data and discovered model for rubber at 50\u25e6C with hyperparameters na = 10 and s = 0.5, average R2 = 0.9897."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The discovered model fits skin data with average R\u00b2 = 0.8763 for na = 10 and s = 0.5.",
+        "evidence_span": "Figure D.15: Stress-stretch data and discovered model for skin with hyperparameters na = 10 and s = 0.5, average R2 = 0.8763."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "The modeling features must satisfy fundamental physical constraints.",
+        "evidence_span": "All modeling features satisfy fundamental physical constraints"
+      },
+      {
+        "role": "constraint",
+        "content": "Polyconvexity can optionally be enforced.",
+        "evidence_span": "polyconvexity can be optionally enforced via a simple user-controlled switch"
+      },
+      {
+        "role": "constraint",
+        "content": "There is no guarantee of finding the globally optimal feature combination because the search is combinatorial and quickly intractable.",
+        "evidence_span": "It is important to emphasize that, in all aforementioned methods,\nincluding our proposed approach, there is no guarantee of identifying the globally optimal combination of features\nfrom the database, which is a combinatorial problem that quickly becomes intractable as the number of potential\nfeatures increases."
+      },
+      {
+        "role": "constraint",
+        "content": "The work is restricted to incompressible hyperelastic materials.",
+        "evidence_span": "In this contribution, we focus on incompressible hyperelastic materials."
+      },
+      {
+        "role": "constraint",
+        "content": "The chosen features are required to allow direct incorporation of physical constraints including thermodynamic consistency, objectivity, and stress-free reference state.",
+        "evidence_span": "Furthermore, the chosen feature set allows for the direct incorporation of physical constraints, such as thermodynamic\nconsistency, objectivity, and a stress-free reference configuration."
+      },
+      {
+        "role": "constraint",
+        "content": "Polyconvexity can be enforced by restricting the database to an admissible subset.",
+        "evidence_span": "We implement a simple switch that can be activated\nto enforce polyconvexity by restricting the database to an appropriate subset of entries."
+      },
+      {
+        "role": "constraint",
+        "content": "The paper assumes incompressible hyperelasticity throughout.",
+        "evidence_span": "We assume incompressible hyperelasticity throughout this paper,"
+      },
+      {
+        "role": "constraint",
+        "content": "Only isochoric deformation states are admissible under the incompressibility constraint.",
+        "evidence_span": "The constraint det(F) = \u03bb1\u03bb2\u03bb3 = 1 enforces incompressibility. Under this constraint, only isochoric\ndeformation states are admissible."
+      },
+      {
+        "role": "constraint",
+        "content": "The isochoric strain energy is constructed to satisfy objectivity and material symmetry.",
+        "evidence_span": "The isochoric strain energy density \u02dcW is constructed to satisfy the fundamental requirements of objectivity and ma-\nterial symmetry."
+      },
+      {
+        "role": "constraint",
+        "content": "If twice continuous differentiability is required, hB-based features must be excluded or replaced by a smooth surrogate.",
+        "evidence_span": "We note that the function hB(x) is not twice continuously differentiable at\nx = 1. If a twice continuously differentiable strain energy density function is required within the proposed framework,\nall features associated with hB can either be excluded during the pattern recognition stage, or the function can be\nreplaced by a suitably smooth surrogate."
+      },
+      {
+        "role": "constraint",
+        "content": "Polyconvexity is enforced by restricting admissible feature functions and parameter ranges.",
+        "evidence_span": "Within the adaptive Material Fingerprinting framework, polyconvexity (Ball (1976)) can be enforced by restricting\nthe admissible feature functions and their parameter ranges, see Appendix A for a detailed discussion."
+      },
+      {
+        "role": "constraint",
+        "content": "The P22-only anisotropic effect is specific to the standardized deformation modes",
+        "evidence_span": "It should be noted, however, that this property is specific to the considered standardized deformation modes."
+      },
+      {
+        "role": "constraint",
+        "content": "Without imposed polyconvexity, inclusion of hA means polyconvexity is not guaranteed",
+        "evidence_span": "Without imposing polyconvexity, the material model discovered by the adaptive Material Fingerprinting in Eqs. (16) and (17) includes the feature function hA. The discovered model may be polyconvex, but it is not guaranteed to be polyconvex."
+      },
+      {
+        "role": "constraint",
+        "content": "Any constitutive formulation must satisfy objectivity and material symmetry.",
+        "evidence_span": "Irrespective of the particular choice of the strain energy function and, in the present work, the selected set of feature functions, any constitutive formulation must satisfy the material principles of objectivity and material symmetry."
+      },
+      {
+        "role": "constraint",
+        "content": "The Lagrange multiplier is determined using the plane stress condition P33 = 0 for all experiments.",
+        "evidence_span": "We finally note that the Lagrange multiplier p is derived from the plane stress constraint P33 = 0 to compute the components of P for all experiments considered in this work."
+      },
+      {
+        "role": "constraint",
+        "content": "The isotropic polyconvexity derivation only applies under the assumption of a linearly separable strain energy.",
+        "evidence_span": "The above derivation holds only under the assumption of a linearly separable strain energy, as adopted in our adaptive approach."
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Existing data-driven material characterization/material fingerprinting methods need more flexible fitting while still typically requiring optimization that can be computationally expensive, non-convex, constrained, and unreliable in finding a global optimum.",
+        "evidence_spans": [
+          "To increase the fitting flexibility of Material Fingerprinting, we propose an adaptive model database coupled with an iterative pattern recognition algorithm that refines the material model in each step.",
+          "Despite their enhanced fitting accuracy and broad applicability, all aforementioned data-driven material characteriza-\ntion methods share the requirement of solving an optimization problem. Depending on the experimental setup and the\nunderlying material modeling assumptions, this optimization problem can be computationally expensive, non-convex,\nand subject to nonlinear parameter constraints, such that convergence to a global optimum is often not guaranteed."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Residual discrepancies remain in the skin fit for certain loading modes and stress components, motivating further explanation or improvement.",
+        "evidence_spans": [
+          "However, for certain loading modes and stress components, deviations remain."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Some modeling features rely on exponential evaluations that can overflow at large deformations, motivating approximation or alternative treatment.",
+        "evidence_spans": [
+          "We note that some of the considered modeling features require the evaluation of the exponential function, which can lead to overflow errors for large deformations."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The work identifies remaining gaps for future extension, including more deformation modes, inelastic behavior, alternative feature sets, and automated hyperparameter tuning/model selection.",
+        "evidence_spans": [
+          "Future work may extend the database to additional deformation modes, explore inelastic material behavior, incorporate alternative feature sets, and further investigate automated strategies for hyperparameter tuning and model selection."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "The paper situates itself against classical material characterization approaches that assume a constitutive model form and identify its parameters by minimizing mismatch to experiments; in full-field variants this mismatch is computed against boundary-value simulations or PDE residuals.",
+        "evidence_spans": [
+          "The classical strategy for material characterization is to assume a mathematical description of the material behavior that depends on a set of material parameters, which are then identified by min-imizing the mismatch between model predictions and experimentally measured data (Gdoutos and Konsta-Gdoutos, 2024).",
+          "More specifically, the measured displacement fields and reaction forces can be used for material characterization by minimizing the mismatch between experimental data and data predicted by simulations of the corresponding boundary value problem, or by minimizing the residuals of the governing partial differential equations, see the overviews by Avril et al. (2008); Roux and Hild (2020); R\u00f6mer et al. (2025)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior data-driven characterization methods relax assumptions on the constitutive form; examples include neural-network-based material models.",
+        "evidence_spans": [
+          "In contrast to a priori assuming a material model and calibrating its parameters, modern methods for material char-acterization impose fewer assumptions on the mathematical form of the material model, which promises enhanced fitting accuracy. For example, neural networks can be used to represent mechanical material behavior (Ghaboussi et al., 1991)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Another prior line of work targets concise and interpretable constitutive discovery, including symbolic regression, the EUCLID approach, and CANNs.",
+        "evidence_spans": [
+          "Another line of research focuses on the discovery of concise and inter-pretable mathematical expressions for material models. Popular methods include symbolic regression (Abdusalamov et al., 2023), the EUCLID approach (Flaschel et al., 2021; Flaschel, 2023), and CANNs (Linka and Kuhl, 2023; Linka et al., 2023; Holthusen et al., 2024, 2026; Martonov\u00e1 et al., 2024, 2025)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "At the extreme end of prior data-driven approaches, simulations can omit an explicit constitutive law and instead use a database of stress-strain pairs directly as a surrogate material model.",
+        "evidence_spans": [
+          "Finally, in the extreme case, the formulation of the material model is omitted altogether, and simulations are directly informed by a database of stress-strain pairs, which serves as a surrogate for the material model (Kirchdoer-fer and Ortiz, 2016; Iba\u00f1ez et al., 2017)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The authors' own prior approach is Material Fingerprinting, proposed for rapid discovery of mechanical material models without continuous optimization. It works by precomputing an offline database of material-response fingerprints and corresponding models, then using pattern recognition online to identify the appropriate model for unseen measurements.",
+        "evidence_spans": [
+          "We recently proposed a method called Material Fingerprinting for the rapid discovery of mechanical material models that avoids solving continuous optimization problems.",
+          "Material Fingerprinting is a novel method for the rapid discovery of material models (Flaschel et al., 2026a). It oper-ates by precomputing a database of material responses, a.k.a. fingerprints, and their corresponding material models in an offline stage, which is subsequently leveraged in an online stage to identify the appropriate material model for an unseen experimental measurement via a pattern-recognition algorithm."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Previous work by the authors analyzed the same rubber data with Material Fingerprinting, but restricted the strain energy density function to one modeling feature.",
+        "evidence_spans": [
+          "These results are in line with our previous work (Martonov\u00e1 et al., 2026), which was restricted to one modeling feature in the strain energy density function."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Generalized-invariant constitutive neural networks were previously applied to the same rubber data.",
+        "evidence_spans": [
+          "using a generalized-invariant-based constitutive neural network for the same data (Martonov\u00e1 et al., 2025)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Constitutive artificial neural networks were previously used to model the same skin data.",
+        "evidence_spans": [
+          "constitutive artificial neural networks, as reported in Linka et al. (2023)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Traditional sparse regression begins with many candidate features and uses L1 regularization to enforce sparsity.",
+        "evidence_spans": [
+          "Traditional sparse regression methods begin with a large set of candidate features and employ L1-regularization to enforce sparsity, thereby reducing the number of active features in the resulting model."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In related continuous-optimization-based model discovery approaches, regularization controls the tradeoff between model complexity and fit quality; prior work reported that stronger regularization reduced complexity and goodness of fit, and in an extreme case collapsed an orthotropic cardiac-tissue model to isotropy.",
+        "evidence_spans": [
+          "the choice of the hyperparameter na plays a role similar to that of a regularization parameter in continuous optimization\u2013based model discovery approaches (Martonov\u00e1 et al., 2024; Martonov\u00e1 et al., 2025; Vervenne et al., 2025; Flaschel et al., 2025a)",
+          "In Martonov\u00e1 et al. (2024), an increase in the regularization parameter also reduced model complexity and goodness of fit. In the extreme case, the identified model for orthotropic cardiac tissue reduced to an isotropic formulation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Similar principal-stretch-based modeling features have previously been used in neural networks, and closely related neural-network models based on signed singular values have been shown to be universal approximators.",
+        "evidence_spans": [
+          "Similar modeling features have been used in the context of neural networks by St. Pierre et al. (2023); Vijayakumaran et al. (2025); Martonov\u00e1 et al. (2025); Tepole et al. (2025).",
+          "Further, Geuken et al. (2025) have introduced neural network models that depend on the signed singular values of the deformation gradient, which are closely related to the principal stretches, and prove the universal approximation capability of these networks."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For anisotropy, the work follows prior constitutive modeling traditions that introduce a structural direction into the strain-energy arguments, as in Boehler's approach.",
+        "evidence_spans": [
+          "To account for anisotropic material behavior, we follow the approach of Boehler (1977, 1979) and extend the argument list of the strain energy function by introducing a structural direction a in addition to the deformation gradient F."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The paper also builds on prior mathematical constitutive theory, including Ball's introduction of polyconvexity/convexity conditions and existence theorems in nonlinear elasticity, and later polyconvex formulations for transverse isotropy by Schr\u00f6der and Neff.",
+        "evidence_spans": [
+          "Polyconvexity, originally introduced by Ball (1976), together with coercivity, provides a sufficient mathematical framework for the existence of minimizers of elastic energy functionals at finite strains, see Ciarlet (1988).",
+          "Ball, J.M., 1976. Convexity conditions and existence theorems in nonlinear elasticity.",
+          "Schr\u00f6der, J., Neff, P., 2003. Invariant formulation of hyperelastic transverse isotropy based on polyconvex free energy functions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The study's datasets and related prior applications include Treloar's classic vulcanised-rubber stress-strain experiments and Linka et al.'s automated model discovery for skin, including model, data, and experiment selection.",
+        "evidence_spans": [
+          "Treloar, L.R.G., 1944. Stress-strain data for vulcanised rubber under various types of deformation.",
+          "Linka, K., Buganza Tepole, A., Holzapfel, G.A., Kuhl, E., 2023. Automated model discovery for skin: Discovering the best model, data, and experiment."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "The original Material Fingerprinting method is restricted to an a priori lookup-table/database containing a fixed set of material models, each with fixed numbers of parameters, so it can only select models explicitly represented there; this limits the flexibility of the resulting models in describing experimental data.",
+        "evidence_spans": [
+          "In our original contributions, the database comprised a fixed number of material models, each with a fixed number of parameters.",
+          "In its current form, however, Material Finger-printing is limited to selecting only those material models that are explicitly represented in the database.",
+          "The original Material Fingerprinting method (Flaschel et al., 2026a,b; Martonov\u00e1 et al., 2026) is restricted to dis-covering material models from an a priori defined lookup table of material models and associated parameters. This restriction limits the flexibility of the resulting models in describing experimental data."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Simple homogeneous experiments are limited to very basic deformation modes and therefore provide only sparse information in the high-dimensional strain space.",
+        "evidence_spans": [
+          "However, because these simple experiments are limited to very basic deformation modes, they are of-ten criticized for providing only sparse information in the high-dimensional strain space."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Existing full-field methods can be computationally demanding because they may require repeated solutions of the global boundary value problem or local nonlinear equations at each material point and time step.",
+        "evidence_spans": [
+          "These methods can, however, be computationally demanding, particularly when they require repeated solutions of either the global boundary value problem or the local nonlinear equations at each material point and time step."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Observed discrepancies may stem from limitations such as insufficiently expressive feature functions, overly restrictive anisotropy assumptions, misaligned fiber direction, nonoptimal adaptive feature selection, or measurement uncertainty.",
+        "evidence_spans": [
+          "Several factors may contribute to these discrepancies. The selected feature functions may not be sufficiently expressive, the assumed class of anisotropy may be overly restrictive, the fiber direction may not be perfectly aligned with the e2-direction in the experiment, or the adaptive algorithm may not have identified the optimal combination of features. Additionally, measurement uncertainties in the experimental data cannot be excluded."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "Instead of restricting selection to a single predefined/database-contained model as in the original Material Fingerprinting method and earlier Material Fingerprinting approaches, the proposed method combines models/features to discover more complex multi-feature constitutive models, such as multi-term Ogden and anisotropic Holzapfel-Gasser-Ogden models.",
+        "evidence_spans": [
+          "rather than being restricted to selecting a single model from a predefined set",
+          "In comparison to previous works on Material Fingerprinting, this enables the discovery of more complex models, such as multi-term Ogden models or the anisotropic Holzapfel-Gasser-Ogden model.",
+          "In contrast to the original\nMaterial Fingerprinting method (Flaschel et al., 2026a), this strategy facilitates the discovery of complex constitutive\nmodels with multiple modeling features, including the multi-term Ogden model (Ogden, 1972) and the anisotropic\nHolzapfel-Gasser-Ogden model (Holzapfel et al., 2004).)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The method is positioned as an alternative to constitutive neural networks, aiming for comparable capability without relying on their time-consuming training process.",
+        "evidence_spans": [
+          "comparable to that of constitutive artificial neural networks while not relying on a time-consuming training process"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Rather than top-down sparse model selection approaches that start with many candidate features and prune them via regularization (e.g., L1-based optimization), the proposed bottom-up adaptive strategy starts from a zero solution and incrementally adds features, yielding sparsity by construction and allowing the user to specify the desired number of features.",
+        "evidence_spans": [
+          "In contrast, our adaptive strategy starts from a zero solution and incrementally\nadds features, producing a model that is sparse by construction, while allowing the user to specify the desired number\nof features.",
+          "This is an advantage over most optimization-based approaches that successively remove irrelevant features and build the model top-down through regularization terms in the optimization function."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Unlike forward stepwise regression and LARS, adaptive Material Fingerprinting relies on a precomputed database and uses distinct step-size rules.",
+        "evidence_spans": [
+          "However, unlike our methods, these\nmethods do not rely on a precomputed database.",
+          "However, adaptive Material Fingerprinting differs in its utilization of a\nprecomputed database and in its use of distinct step-size rules."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For the isotropic rubber materials studied, anisotropic invariants/features are rejected because the materials have no preferred direction, so assuming a fiber orientation and computing \u03bba and Aa is not meaningful; the analysis is therefore restricted to the isotropic feature database.",
+        "evidence_spans": [
+          "Since the investigated materials do not exhibit a preferred direction, it is not appropriate to assume any specific fiber orientation. Consequently, the computation of the invariants \u03bba and Aa is not meaningful. We therefore restrict the analysis to the isotropic feature database introduced in Section 2.2."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Polyconvexity is explicitly rejected as a mandatory constitutive requirement, in contrast to physical principles such as objectivity and material symmetry, because polyconvexity is not itself a physical principle.",
+        "evidence_spans": [
+          "However, in contrast to objectivity and material symmetry, polyconvexity does not constitute a physical principle and therefore does not represent a mandatory requirement for constitutive laws."
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [
+      {
+        "content": "The proposed strategy is inspired by sparse regression-based model discovery, with methodological/conceptual parallels to forward stepwise regression and the LARS algorithm, including specifically in the online stage of adaptive Material Fingerprinting.",
+        "evidence_spans": [
+          "We note that the proposed strategy shares conceptual similarities with sparse regression-based approaches for material model discovery (Flaschel et al., 2021; McCulloch and Kuhl, 2024).",
+          "This approach shares similarities with forward stepwise regression (Hastie et al., 2009) and the LARS algorithm (Efron et al., 2004; Flaschel et al., 2025a; Urrea\u2013Quintero et al., 2026).",
+          "We note that the online stage of adaptive Material Fingerprinting exhibits methodological parallels to forward stepwise regression (Hastie et al., 2009) and the LARS algorithm (Efron et al., 2004; Flaschel et al., 2025a; Urrea\u2013Quintero et al., 2026)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The work draws analogy from prior observations on regularization effects in cardiac tissue, using that behavior as a comparison point for the transverse isotropic skin behavior studied here.",
+        "evidence_spans": [
+          "This behavior resembles the transverse isotropic skin considered here, where an excessively restrictive choice of na likewise suppresses anisotropic contributions and leads to an isotropic model with limited predictive capability."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The polyconvexity discussion is informed by established literature on anisotropic material models, particularly Schr\u00f6der and Neff (2003).",
+        "evidence_spans": [
+          "These findings are consistent with established results in the literature, see for example Schr\u00f6der and Neff (2003) for a detailed discussion of polyconvexity in anisotropic material models."
+        ],
+        "conflicting": false
+      }
+    ],
+    "causal_claim": [
+      {
+        "content": "Using a reusable precomputed fingerprint database allows real-time, computationally efficient, and robust model discovery for unseen measurements by comparing the experimental fingerprint to database fingerprints, avoiding continuous optimization and reducing the risk of local optima.",
+        "evidence_spans": [
+          "If a database of fingerprints is generated in an offline phase, a model for an unseen experimental measurement can be discovered in real time by comparing the experimentally measured fingerprint to the fingerprints in the database.",
+          "In this way, material characterization becomes both computationally efficient, since no continuous optimization problem needs to be solved, and robust, as Material Fingerprinting guarantees identification of the best matching fingerprint contained in the database rather than convergence to a local optimum."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Adaptive Material Fingerprinting discovers arbitrary linear combinations of database models by successively adding terms/features from the database, rather than being restricted to selecting a single predefined model.",
+        "evidence_spans": [
+          "This strategy enables Material Fingerprinting to discover arbitrary linear combinations of material models from the database, rather than being restricted to selecting a single model from a predefined set.",
+          "Adaptive Material Fingerprinting enables not only the selection of material models contained in the database, but also the discovery of arbitrary combinations thereof by successively adding terms from the database to the model."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Compared with previous Material Fingerprinting, the adaptive/enrichment approach increases modeling flexibility, enabling discovery of more complex constitutive models such as multi-term Ogden and anisotropic Holzapfel-Gasser-Ogden models.",
+        "evidence_spans": [
+          "In comparison to previous works on Material Fingerprinting, this enables the discovery of more complex models, such as multi-term Ogden models or the anisotropic Holzapfel-Gasser-Ogden model.",
+          "the adaptive enrichment strategy significantly increases modeling flexibility and accuracy."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Coupling an adaptive feature database with iterative pattern recognition yields an accurate yet computationally efficient constitutive model discovery method.",
+        "evidence_spans": [
+          "By coupling an adaptive feature database with an iterative pattern recognition algorithm, we obtain an accurate yet computationally efficient methodology for constitutive model discovery."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Adding more terms/features progressively increases fitting accuracy; for rubber, this substantially improves R2 over the original method and can reach neural-network-level accuracy without costly training.",
+        "evidence_spans": [
+          "Using this strategy, we build an adaptive strain energy density function that exhibits increasing fitting accuracy as more features are added to the function.",
+          "As expected, we observe that the fitting accuracy tends to increase as the number of terms na in the material model increases.",
+          "For rubber, adaptive Material Fingerprinting can substantially improve the coefficient of determination compared to the original method by successively adding more terms to the model and achieve accuracies comparable to constitutive artificial neural networks without requiring a costly training phase."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The adaptive approach increases fitting accuracy while largely preserving the computational speed of the original Material Fingerprinting method.",
+        "evidence_spans": [
+          "Our results show that the adaptive approach increases the fitting accuracy of Material Fingerprinting without significantly sacrificing the computational speed of the originally proposed method."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Successively adding features lets users tune the sparsity-accuracy balance without regularization; hyperparameter tuning can produce sparse, interpretable material models while retaining high accuracy.",
+        "evidence_spans": [
+          "The hyperparameters of the adaptive method can be tuned to obtain sparse material models that are described by interpretable mathematical expressions.",
+          "By successively adding features to the strain energy density function, the user can fine-tune the balance between model sparsity and model accuracy without having to rely on regularization.",
+          "these hyperparameters can be further optimized to produce sparse and more interpretable models while maintaining a high level of fitting accuracy"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The hyperparameter na controls the number of terms and therefore sparsity, interpretability, model complexity, and predictive performance: small na promotes simple low-complexity models but reduces predictive accuracy, while larger na increases expressiveness and accuracy but may introduce overfitting.",
+        "evidence_spans": [
+          "The parameter na determines the number of terms included in the discovered strain energy density function and thus governs the sparsity and interpretability of the resulting model.",
+          "Small values of na promote simple models with limited complexity but reduce predictive accuracy.",
+          "Larger values increase expressiveness but may introduce overfitting.",
+          "These results show that the parameter na provides a transparent and physically interpretable mechanism to balance model complexity and predictive performance within the adaptive Material Fingerprinting framework."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The scaling parameter s controls the magnitude of iterative model updates, and together with na influences fitting accuracy.",
+        "evidence_spans": [
+          "The scaling parameter s controls the magnitude by which the strain energy density function is updated at each iteration. Both hyperparameters influence the fitting accuracy of the method."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "When fitting accuracy is prioritized, a heuristic hyperparameter choice of na = 10 and s = 0.5 consistently yields highly accurate solutions and provides a reliable default if term count is secondary.",
+        "evidence_spans": [
+          "In our experiments, we found that a heuristic choice of na = 10 and s = 0.5 consistently yields models with high fitting accuracy",
+          "Therefore, when the primary objective is to maximize predictive performance and the number of terms in the model is of secondary importance, this parameter setting provides a reliable default.",
+          "However, when fitting accuracy is the primary objective, our results indicate that the heuristic choice of na = 10 and s = 0.5 consistently provides highly accurate solutions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For skin, a purely isotropic formulation cannot capture the pronounced anisotropic response; adding anisotropic terms substantially improves accuracy, shows anisotropic features are essential, and the framework identifies and recovers established anisotropic model structures.",
+        "evidence_spans": [
+          "Thus, a purely isotropic formulation cannot represent the pronounced anisotropic response of skin.",
+          "This model achieves a substantially improved average accuracy of R2 = 0.8441",
+          "thereby demonstrates that anisotropic features are essential for capturing the mechanical behavior of the skin.",
+          "For skin, the framework successfully identifies the need to include anisotropic features and recovers model structures consistent with established formulations.",
+          "an excessively restrictive choice of na likewise suppresses anisotropic contributions and leads to an isotropic model with limited predictive capability."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Adding specific features can improve fit for specific loading modes: in one example, the second added feature improves equibiaxial-tension fit and the third improves uniaxial-tension fit.",
+        "evidence_spans": [
+          "The newly added second modeling feature improves the fitting accuracy in equibiaxial tension, while the newly added third feature improves the fitting accuracy in uniaxial tension."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Including additional loading paths in the anisotropic database enables characterization of directional effects.",
+        "evidence_spans": [
+          "For the anisotropic database, we consider both isotropic and anisotropic features and generate fingerprints for the biaxial tension/compression experiments BT1-BT5, where the inclusion of additional loading paths enables the characterization of directional effects."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Combining isotropic feature wI with gA yields the Ogden model, and combining multiple such terms with different alpha values naturally produces the multi-term Ogden model.",
+        "evidence_spans": [
+          "For example, combining the isotropic feature \u02dcwI with the function gA yields the Ogden model (Ogden, 1972), while combining multiple terms with different values of \u03b1 naturally leads to the multi-term Ogden model."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Combining anisotropic feature wIII with hB yields the Holzapfel-Gasser-Ogden model.",
+        "evidence_spans": [
+          "Furthermore, combining the anisotropic feature \u02dcwIII with the function hB results in the Holzapfel-Gasser-Ogden model (Holzapfel et al., 2004)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Flagging database feature configurations by polyconvexity during offline generation allows optional online enforcement of polyconvexity by restricting selection to admissible features; imposing this constraint excludes hA, yields a polyconvex discovered model, but reduces skin fitting accuracy from 0.8916 to 0.8371.",
+        "evidence_spans": [
+          "During database generation, each feature configuration is flagged according to whether it guarantees polyconvexity, allowing the user to optionally enforce this constraint in the online phase by restricting the selection to admissible features.",
+          "If we impose polyconvexity a priori, the feature function hA is not considered, and the resulting discovered material model is polyconvex.",
+          "However, as a result of the polyconvexity constraint, the fitting accuracy for na = 4 and s = 0.7 reduces from an average coefficient of determination of 0.8916 to 0.8371."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Interpolation and masking guarantee that experimental and database fingerprints have matched lengths and correspond to the same control-variable states.",
+        "evidence_spans": [
+          "Through the interpolation and masking procedure, we guarantee that the experimental fingerprint \u02c6f \u2217 and the database fingerprints \u02c6f (i) have identical lengths and contain stress values corresponding to the same values of the control variable."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Complex specimen experiments have become more popular because they generate rich heterogeneous strain states that can be measured over the surface using camera-based systems.",
+        "evidence_spans": [
+          "Consequently, experiments involving complexly shaped specimens have gained increasing popularity because they generate rich, heterogeneous strain states, which can be captured over the specimen surface using camera-based measurement systems (Gr\u00e9diac, 1989; Hild and Roux, 2006)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In more general deformations or fiber orientations, anisotropic contributions would generally influence all stress components.",
+        "evidence_spans": [
+          "In more general settings, e.g., when the deformation gradient contains off-diagonal components or when the fiber direction is not aligned with a principal axis, the anisotropic contribution would, in general, influence all stress components."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because the isotropic contribution depends only on principal stretches, both the strain-energy and stress representations satisfy objectivity and material symmetry.",
+        "evidence_spans": [
+          "As a consequence, the isotropic contribution to the strain energy density in Eq. (A.1) depends exclusively on the principal stretches and therefore satisfies both objectivity and material symmetry.",
+          "As already discussed for the strain energy density, the representation in Eq. (A.8) immediately implies that the isotropic stress contribution satisfies objectivity and material symmetry."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Approximating features with a second-order Taylor series around a threshold point and using an adaptive switching strategy prevents numerical overflow while maintaining smoothness.",
+        "evidence_spans": [
+          "To circumvent this, we approximate the features by a second order Taylor-series around the point at which the slope of the strain energy reaches a predefined threshold.",
+          "To prevent numerical overflow while maintaining smoothness, an adaptive switching strategy based on the derivative magnitude is used."
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "To ensure zero stress in the undeformed configuration, anisotropic feature derivatives must vanish at F = I because, unlike isotropic invariants, anisotropic invariant derivatives at F = I are not identity-like, so the pressure term alone cannot enforce P = 0 there.",
+        "evidence_spans": [
+          "For anisotropic features, in contrast, the derivatives \u2202I/\u2202F do not reduce to the identity tensor. Hence, the isotropic pressure term alone cannot enforce P = 0 in the undeformed configuration. To address this issue, we require the first derivatives of the anisotropic feature functions to vanish at F = I. This additional condition motivates the different design of the anisotropic features h compared to the isotropic features g."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Polyconvexity of the strain energy is obtained by choosing the feature functions g and h to be convex and non-decreasing/monotone; non-negative scaling and additive combination preserve convexity for the isotropic part, convex non-decreasing composition yields polyconvexity for the anisotropic part, and this leads to simple parameter admissibility constraints (gA: \u03b1 \u2265 1, gB: \u03b1 \u2265 0, gC: \u03b11 \u2265 0, hB: \u03b1 \u2265 0, while hA is excluded).",
+        "evidence_spans": [
+          "In particular, polyconvexity is ensured if the functions g and h in Eq. (7)-Eq. (8) are convex and monotone, which leads to simple parameter constraints: gA requires \u03b1 \u22651, gB requires \u03b1 \u22650, and gC requires \u03b11 \u22650, while hB is admissible for \u03b1 \u22650 and hA is excluded.",
+          "The additional scaling by the non-negative homogeneity parameters \u03b8 preserves convexity, and since sums of convex functions remain convex, the isotropic contribution to the strain energy is polyconvex provided that g is convex and non-decreasing.",
+          "Since the composition of a convex, non-decreasing function with a convex argument remains convex, the anisotropic contribution to the strain energy is polyconvex as well, provided that h satisfies these properties."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Under the standardized loading modes considered, the anisotropic stress depends on \u03bba = F22, so anisotropic contributions act exclusively on the P22 component of the first Piola-Kirchhoff stress tensor.",
+        "evidence_spans": [
+          "This expression shows that anisotropic contributions act exclusively on the P22 component of the first Piola-Kirchhoff stress tensor. Consequently, the additional terms introduced in the second adaptive step in Eq. (16), as well as the second and fourth terms in Eq. (17), affect only this stress component."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The method\u2019s computational principle is to separate offline database generation from online identification: this avoids continuous, potentially non-convex optimization, and because online discovery reduces to algebraic operations and similarity searches in a precomputed database, it is robust and suitable for real-time use.",
+        "evidence_spans": [
+          "the separation into an offline database generation stage and an online identification stage avoids the solution of continuous, potentially non-convex optimization problems.",
+          "In the online phase, model discovery reduces to a sequence of algebraic operations and similarity searches within a precomputed database, which ensures robustness and real-time capability."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "To control excessive growth, when a derivative bound is exceeded the exponential term is replaced by a second-order Taylor expansion about the switching point x0 defined by |f\u2032(x0)| = \u03c4, which controls growth while preserving local C2 consistency at the switch.",
+        "evidence_spans": [
+          "If the bound is exceeded, the exponential term is replaced by its second-order Taylor expansion around the corresponding point x0, implicitly defined by |f \u2032(x0)| = \u03c4, ... This ensures controlled growth and local C2 consistency at the switching point."
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "The paper hypothesizes that materials exhibit a unique, standardized mechanical response that can serve as a fingerprint, and builds on this by proposing an adaptive Material Fingerprinting framework that iteratively adds modeling/features and uses pattern recognition to discover individual or combined constitutive models/strain-energy functions, thereby overcoming fixed-database limitations and improving fitting flexibility and accuracy.",
+        "evidence_spans": [
+          "Material Fingerprinting assumes that each material exhibits a unique response when subjected to a standardized experimental setup, which is interpreted as the material\u2019s mechanical fingerprint.",
+          "To increase the fitting flexibility of Material Fingerprinting, we propose an adaptive model database coupled with an iterative pattern recognition algorithm that refines the material model in each step.",
+          "To overcome this limitation, we propose an adaptive Material Fingerprinting framework as summarized in Fig. 1.",
+          "In this work, we propose an adaptive strategy for Material Fingerprinting in which modeling features are successively incorporated into the material model to progressively improve the description of the experimental data.",
+          "In this work, we therefore propose an adaptive strategy for Material Fingerprinting that enables not only the discovery of individual material models but also combinations of different material models through an iterative pattern recognition algorithm.",
+          "This approach is expected to enhance fitting accuracy.",
+          "In this contribution, we propose an iterative framework for discovering adaptive strain energy density functions with a tunable number of feature functions and material parameters.",
+          "We develop an adaptive framework that increases the flexibility of the original Material Fingerprinting method by introducing a generic set of feature functions defining the strain energy density."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The work proposes an adaptive extension of Material Fingerprinting for rapid, robust, and scalable discovery of anisotropic constitutive models, positioned as an alternative to optimization-based and purely data-driven methods.",
+        "evidence_spans": [
+          "we have introduced an adaptive extension of the Material Fingerprinting framework for the rapid discovery of anisotropic constitutive models in incompressible hyperelasticity.",
+          "It offers a scalable alternative to optimization-based and purely data-driven approaches, particularly in scenarios where rapid and robust material characterization is required."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The previously proposed two-stage Material Fingerprinting approach was introduced to address optimization-related challenges.",
+        "evidence_spans": [
+          "To address these challenges, we proposed the two-stage Material Fingerprinting approach."
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "The adaptive Material Fingerprinting method was demonstrated/tested on experimental data from isotropic rubber and anisotropic animal skin tissue, using databases built from uniaxial tension/compression, pure shear, and biaxial tension/compression tests.",
+        "evidence_spans": [
+          "We test the method on experimental data stemming from mechanical tests of isotropic rubber materials and anisotropic animal skin tissue.",
+          "We establish databases for uniaxial tension/compression, pure shear, and biaxial tension/compression tests, and demonstrate the adaptive Mate- rial Fingerprinting approach by applying it to data obtained from isotropic rubber materials (Treloar, 1944) as well as anisotropic animal skin (Linka et al., 2023)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Overall, adaptive Material Fingerprinting improved fitting accuracy without major loss of computational speed, and its fitting accuracy was comparable to constitutive artificial neural networks while avoiding a time-consuming training process.",
+        "evidence_spans": [
+          "Our results show that the adaptive approach increases the fitting accuracy of Material Fingerprinting without significantly sacrificing the computational speed of the originally proposed method.",
+          "We found that the fitting accuracy of adaptive Material Fingerprinting is comparable to that of constitutive artificial neural networks while not relying on a time-consuming training process."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior work had already validated Material Fingerprinting on experimental and camera-based measurement data, with speed-ups of several orders of magnitude over conventional simulation-based fitting approaches.",
+        "evidence_spans": [
+          "Following a numerical proof of concept (Flaschel et al., 2026a), we validated Material Fingerprinting on experimental data (Martonov\u00e1 et al., 2026). More recently, we demonstrated that Material Fingerprinting can be applied to data obtained from camera- based measurement systems (Flaschel et al., 2026b), achieving speed-ups of several orders of magnitude compared to conventional approaches that rely on minimizing the mismatch between experimental data and predictions obtained from simulations of the corresponding boundary value problem."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For the rubber datasets, hyperparameter sweeps reported average R2 values, and higher values of s appeared preferable for the two rubber datasets.",
+        "evidence_spans": [
+          "The resulting average R2 values are illustrated in Fig. 5.",
+          "We also observe that higher values of s seem to be preferable for the two experimental datasets."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For rubber at 20\u00b0C with na = 1 and s = 1, the discovered model qualitatively matched the data but still had room for improvement, with average R2 = 0.9286.",
+        "evidence_spans": [
+          "As shown in Fig. 6, the model is in good qualitative agreement with the data. However, the average coefficient of determination R2 = 0.9286 indicates that there remains potential for improving fitting accuracy."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For rubber at 50\u00b0C, the same modeling features were discovered as at 20\u00b0C, but with different material parameters; specifically, the second term was necessary for equibiaxial tension, and the third term was necessary for uniaxial tension and pure shear.",
+        "evidence_spans": [
+          "Interestingly, we discover the same modeling features as for rubber at 20\u25e6C, albeit with different material parameters.",
+          "We observe that the second term is necessary for describing equibiaxial tension, and the third term is necessary for describing uniaxial tension and pure shear."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For the rubber datasets and chosen hyperparameters, enforcing polyconvexity did not change the discovered models or their fitting accuracy.",
+        "evidence_spans": [
+          "For the rubber datasets and the chosen hyperparameters, adaptive Material Fingerprinting discovers the same models regardless of whether polyconvexity is enforced. Thus, for the present example, imposing the polyconvexity constraint does not affect the fitting accuracy of the method."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "On rubber data, adaptive Material Fingerprinting achieved nearly the same fitting accuracy as a generalized-invariant-based constitutive neural network.",
+        "evidence_spans": [
+          "We finally note that the fitting accuracy achieved with adaptive Material Fingerprinting is nearly the same as using a generalized-invariant-based constitutive neural network for the same data"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For skin, the hyperparameter study indicated a sweet spot at s = 0.7, and choosing na = 4 provided the best balance between model complexity and accuracy.",
+        "evidence_spans": [
+          "We observe a sweet spot for the hyperparameter value s = 0.7, which is kept fixed in the following examples.",
+          "Choosing na = 4 yields the best hyperparameter combination regarding the balance of model complexity and accuracy."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For skin with na = 1, the identified isotropic one-term model performed poorly, with average R2 = 0.3777.",
+        "evidence_spans": [
+          "which shows poor predictive performance, with an average coefficient of determination of R2 = 0.3777"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For the 4-term skin model, agreement with experiments was satisfactory overall but some deviations remained, especially failure to accurately capture the P11 stress component in loading mode BT5.",
+        "evidence_spans": [
+          "Overall, we obtain satisfactory agreement between the experimental observations and the model predictions. However, for certain loading modes and stress components, deviations remain.",
+          "In particular, the stress component P11 of loading mode BT5 is not captured accurately."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For skin, adaptive Material Fingerprinting achieved fitting accuracy comparable to constitutive neural networks, and the neural networks showed similar difficulty fitting all loading modes simultaneously, particularly the P11 component in BT5, consistent with the experimental responses.",
+        "evidence_spans": [
+          "the proposed adaptive Material Fingerprinting approach achieves a fitting accuracy comparable to that of constitutive artificial neural networks",
+          "the neural network models exhibit similar difficulties in simultaneously fitting all loading modes, particularly with respect to the stress component P11 of loading mode BT5.",
+          "This behavior is consistent with the observed responses in the standardized experiments shown in Figs. 11 and 12."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The hyperparameter study showed that users can modulate model complexity and iteratively add features bottom-up across candidate fingerprints.",
+        "evidence_spans": [
+          "A hyperparameter study highlights that the user can modulate model complexity and successively include additional features to build the final model bottom-up through iteration across possible fingerprints."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The theoretical analysis showed that the anisotropic constitutive part satisfies objectivity and material symmetry at both the strain-energy and stress levels; consequently, both isotropic and anisotropic parts of the constitutive response are consistent with the underlying symmetry requirements.",
+        "evidence_spans": [
+          "These relations demonstrate that the anisotropic part of the strain energy density also satisfies the requirements of objectivity and material symmetry.",
+          "From the transformation properties of \u03bba and Aa with respect to rotations of the deformation gradient and the fiber direction, it follows that the anisotropic stress contribution satisfies material symmetry and objectivity in the sense that \u02dcPani(QF, a) = Q \u02dcPani(F, a) and \u02dcPani(FQ, QT a) = \u02dcPani(F, a) Q.",
+          "Thus, both the isotropic and anisotropic parts of the constitutive response are fully consistent with the underlying symmetry requirements."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The second directional derivative analysis showed that \u03bba is convex with respect to F and Aa is convex with respect to cof(F).",
+        "evidence_spans": [
+          "This shows that \u03bba is convex with respect to F, while, by analogous arguments, Aa is convex with respect to cof(F)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Appendix/example figures report high-fit models with na = 10 and s = 0.5: rubber at 20\u00b0C achieved average R2 = 0.9988, rubber at 50\u00b0C achieved average R2 = 0.9897, and skin achieved average R2 = 0.8763.",
+        "evidence_spans": [
+          "Figure D.13: Stress-stretch data and discovered model for rubber at 20\u25e6C with hyperparameters na = 10 and s = 0.5, average R2 = 0.9988.",
+          "Figure D.14: Stress-stretch data and discovered model for rubber at 50\u25e6C with hyperparameters na = 10 and s = 0.5, average R2 = 0.9897.",
+          "Figure D.15: Stress-stretch data and discovered model for skin with hyperparameters na = 10 and s = 0.5, average R2 = 0.8763."
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "The work is restricted to incompressible hyperelastic materials; accordingly, only isochoric deformation states with det(F)=1 are admissible.",
+        "evidence_spans": [
+          "In this contribution, we focus on incompressible hyperelastic materials.",
+          "We assume incompressible hyperelasticity throughout this paper,",
+          "The constraint det(F) = \u03bb1\u03bb2\u03bb3 = 1 enforces incompressibility. Under this constraint, only isochoric deformation states are admissible."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The constitutive/modeling features must satisfy fundamental physical constraints, including objectivity, material symmetry, thermodynamic consistency, and a stress-free reference configuration.",
+        "evidence_spans": [
+          "All modeling features satisfy fundamental physical constraints",
+          "Furthermore, the chosen feature set allows for the direct incorporation of physical constraints, such as thermodynamic consistency, objectivity, and a stress-free reference configuration.",
+          "The isochoric strain energy density \u02dcW is constructed to satisfy the fundamental requirements of objectivity and ma-terial symmetry.",
+          "Irrespective of the particular choice of the strain energy function and, in the present work, the selected set of feature functions, any constitutive formulation must satisfy the material principles of objectivity and material symmetry."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Polyconvexity is optional rather than automatic: it can be enforced via a user-controlled switch by restricting the admissible feature/database entries and parameter ranges to an appropriate subset; otherwise polyconvexity is not guaranteed (e.g., when hA is included).",
+        "evidence_spans": [
+          "polyconvexity can be optionally enforced via a simple user-controlled switch",
+          "We implement a simple switch that can be activated to enforce polyconvexity by restricting the database to an appropriate subset of entries.",
+          "Within the adaptive Material Fingerprinting framework, polyconvexity (Ball (1976)) can be enforced by restricting the admissible feature functions and their parameter ranges, see Appendix A for a detailed discussion.",
+          "Without imposing polyconvexity, the material model discovered by the adaptive Material Fingerprinting in Eqs. (16) and (17) includes the feature function hA. The discovered model may be polyconvex, but it is not guaranteed to be polyconvex."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "There is no guarantee of identifying the globally optimal combination of features because the feature search is a combinatorial problem that becomes quickly intractable as the number of candidate features grows.",
+        "evidence_spans": [
+          "It is important to emphasize that, in all aforementioned methods,\nincluding our proposed approach, there is no guarantee of identifying the globally optimal combination of features\nfrom the database, which is a combinatorial problem that quickly becomes intractable as the number of potential\nfeatures increases."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "If twice continuous differentiability of the strain energy is required, features based on hB must be excluded during pattern recognition or replaced by a sufficiently smooth surrogate.",
+        "evidence_spans": [
+          "We note that the function hB(x) is not twice continuously differentiable at\nx = 1. If a twice continuously differentiable strain energy density function is required within the proposed framework,\nall features associated with hB can either be excluded during the pattern recognition stage, or the function can be\nreplaced by a suitably smooth surrogate."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The reported P22-only anisotropic effect is constrained to the standardized deformation modes considered and is not claimed as a general property.",
+        "evidence_spans": [
+          "It should be noted, however, that this property is specific to the considered standardized deformation modes."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For all experiments, the Lagrange multiplier p is determined from the plane-stress constraint P33 = 0.",
+        "evidence_spans": [
+          "We finally note that the Lagrange multiplier p is derived from the plane stress constraint P33 = 0 to compute the components of P for all experiments considered in this work."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The isotropic polyconvexity derivation applies only under the assumption of a linearly separable strain energy, as used in the adaptive approach.",
+        "evidence_spans": [
+          "The above derivation holds only under the assumption of a linearly separable strain energy, as adopted in our adaptive approach."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

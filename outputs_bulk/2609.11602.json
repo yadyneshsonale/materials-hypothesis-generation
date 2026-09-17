@@ -1,0 +1,633 @@
+{
+  "paper_id": "2609.11602",
+  "chunks_processed": 5,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "How solvation affects defect-mediated water dissociation at solid surfaces is not well understood.",
+        "evidence_span": "Defects often serve as reactive sites for dissociation, yet how solvation influences water dissociation at such sites remains poorly understood."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The coupling of defect-mediated reactivity and solvent-assisted proton transfer in 2D materials remains insufficiently understood.",
+        "evidence_span": "Yet, while defect-mediated reactivity and solvent-assisted proton transfer are well-established for metals and metal oxides, how these two phenomena couple together for 2D materials such as graphene, MoS2, or hBN remains far less understood."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The paper frames two open questions about solvation effects on mechanism/energetics and on surrounding water structure/adsorption.",
+        "evidence_span": "These gaps motivate two key open questions: (i) how does solvation alter the mechanism and energetics of water dissociation for these 2D materials, and (ii) how do the resulting chemisorbed species modify the structure and adsorption properties of the surrounding water?"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Bulk-solvation description of water dissociation at the graphene single vacancy is missing.",
+        "evidence_span": "However, a description of this process under bulk solvation conditions is missing."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Direct gas-phase versus solvated comparisons of water dissociation are rare across surfaces.",
+        "evidence_span": "More broadly, direct comparisons between gas-phase and solvated water dissociation remain rare for any surface."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "An important open issue is whether nearby vacancies react independently or cooperatively.",
+        "evidence_span": "An important next step is to understand cooperative effects and whether proximal vacancies react independently or exhibit coupled reactivity"
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Prior work reported direct dissociative chemisorption on flat transition metals.",
+        "evidence_span": "On flat transition metals, water molecules can undergo direct dissociative chemisorption, colliding with the metal surface and cleaving an O-H bond to deposit H and OH fragments via a concerted mechanism."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work found that solvation can facilitate dissociation on metals.",
+        "evidence_span": "Solvation with other water molecules can facilitate this process."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work showed enhanced dissociation at corrugations, steps, or kinks on metals.",
+        "evidence_span": "When corrugations, steps, or kinks are introduced to the surface, metal-water dissociation can be further enhanced with binding to undercoordinated sites."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work showed oxygen vacancies on TiO2 promote heterolytic dissociation.",
+        "evidence_span": "On metal oxide surfaces such as rutile TiO2(110), oxygen vacancies can help promote dissociation via heterolytic mechanisms in which a proton transfers to a neighboring surface oxygen, yielding two surface hydroxyls per defect."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work found solvent-assisted proton transfer pathways on pristine TiO2.",
+        "evidence_span": "in the case of pristine TiO2, water dissociation can proceed through solvent-assisted proton transfer pathways that vary from one-step to two-step processes depending on the facet."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Similar proton-transfer behavior was reported for solvated ZnO surfaces.",
+        "evidence_span": "Similar proton-transfer phenomena occur at solvated ZnO surfaces."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work established that pristine graphene does not dissociate water because interactions are weak.",
+        "evidence_span": "Under pristine conditions, graphene does not dissociate water due to weak graphene-water interactions."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Gas-phase DFT studies showed single water molecules chemisorb at the graphene single vacancy through a concerted transition state.",
+        "evidence_span": "For the case of water dissociation, gas-phase density functional theory (DFT) calculations have confirmed that single water molecules chemisorb at the SV, proceeding through a concerted transition state to form a series of increasingly stable products."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Previous ab initio MD studies of defective graphene-water interfaces also found enhanced adsorption linked to hydrogen bonding.",
+        "evidence_span": "consistent with previous ab initio molecular dynamics studies of defective graphene-water interfaces."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Traditional DFT is too expensive for fully solvated enhanced-sampling simulations on nanosecond timescales.",
+        "evidence_span": "Traditional DFT approaches, which have been used extensively to characterize the gas-phase SV reactivity, are too costly for modeling fully solvated systems over the nanosecond simulation times required for enhanced sampling."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Classical force fields cannot model bond formation and breaking adequately.",
+        "evidence_span": "Classical force fields, meanwhile, cannot adequately describe bond-making and bond-breaking."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Semi-local DFT functionals are not used because self-interaction errors distort the vacancy electronic structure and magnetization.",
+        "evidence_span": "Semi-local functionals suffer more severely from self-interaction errors that cause delocalized \u03c0 bands to cross the Fermi level, artificially reducing the magnetization from its expected value of 2 \u00b5B"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Modeling based on pristine graphene alone is positioned as insufficient for these phenomena.",
+        "evidence_span": "quantitative modeling of these phenomena requires moving beyond the pristine graphene approximation."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The Janus-like SV reactivity is compared to the ambiphilic character of molecular carbenes.",
+        "evidence_span": "The dual reactivity of the solvated Janus-like SV, accepting either the hydrogen or the hydroxyl fragment of the dissociating water molecule, is reminiscent of the ambiphilic character of carbenes in molecular chemistry."
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Solvation changes the reaction mechanism at a graphene single vacancy.",
+        "evidence_span": "We show that solvation qualitatively changes the reaction mechanism at a graphene single vacancy (SV), opening pathways that are absent for an isolated water molecule."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Solvation creates two competing dissociation pathways instead of one concerted gas-phase pathway.",
+        "evidence_span": "Whereas the gas-phase process proceeds via a single concerted channel, the solvated SV splits water through two competing pathways: a basic route forming SV-H and OH\u2013 an acidic route forming SV-OH and H3O+ (aq)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Lower-barrier solvated pathways generate intermediates that increase water adsorption.",
+        "evidence_span": "These lower-barrier pathways produce distinct chemisorbed intermediates that enhance graphene-water adsorption."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Vacancies and edge sites alter graphene properties.",
+        "evidence_span": "These defects have been observed experimentally and are known to alter the electronic, mechanical, and chemical properties of the graphene sheet."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Water first attacks the bare vacancy to form Hydroxy-SV.",
+        "evidence_span": "Water first attacks the bare vacancy and forms a Hydroxy-SV species containing C\u2013OH and C\u2013H groups."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Proton transfer from OH to the remaining dangling-bond carbon forms SV-Ketone.",
+        "evidence_span": "The OH group then transfers a proton to the remaining carbon with a dangling bond to form a SV-Ketone species."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Ketone reorganization forms the SV-Pyran motif.",
+        "evidence_span": "Finally, this ketone undergoes reorganization to form a SV-Pyran motif."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Combining the MLIP with multiple-walker well-tempered metadynamics enables multi-nanosecond hybrid-DFT-level trajectories.",
+        "evidence_span": "Combining our machine learning interatomic potential (MLIP) with multiple-walker well-tempered metadynamics, we enable multi-nanosecond trajectories of complex, reactive vacancy systems at a spin-polarized hybrid DFT level of theory"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Hydrogen bonding from chemisorbed groups drives enhanced water adsorption.",
+        "evidence_span": "Hydrogen bonding between the chemisorbed groups and the surrounding liquid is the primary impetus of enhanced water adsorption"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Chemisorption converts the vacancy from hydrophobic to hydrophilic while passivating it against further attack.",
+        "evidence_span": "Chemisorption therefore not only transforms the local electronic structure of the defect, but also converts it from a hydrophobic to a hydrophilic site while simultaneously passivating the SV against further chemical attack from water."
+      },
+      {
+        "role": "causal_claim",
+        "content": "In solvated conditions, the surrounding liquid stabilizes charged intermediates and opens lower-barrier heterolytic pathways absent in vacuum.",
+        "evidence_span": "solvated dissociation is a bimodal, stepwise process in which the surrounding liquid stabilizes charged intermediates and opens heterolytic pathways that are absent in vacuum. These solvated reaction routes offer lower forward barriers"
+      },
+      {
+        "role": "causal_claim",
+        "content": "A single atomic vacancy transforms a 2D carbon surface locally from physisorption to reactive chemisorption.",
+        "evidence_span": "a single atomic vacancy is sufficient to transform the local environment from physisorption to reactive chemisorption."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Machine-learned potentials trained on hybrid DFT plus enhanced sampling now make full free-energy mapping of rare reactive events at solvated interfaces feasible.",
+        "evidence_span": "our work demonstrates that machine-learned potentials trained on hybrid DFT, combined with enhanced-sampling techniques, now make it feasible to resolve the full free energy landscape of rare reactive events at explicitly solvated interfaces."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Surface water dissociation depends on surface electronic structure, geometry, coordination, and hydrogen-bonding environment.",
+        "evidence_span": "Whether a given surface dissociates water, and by which mechanism, depends sensitively on the electronic structure of the surface, its local coordination and geometry, and the hydrogen-bonding environment provided by the surrounding water."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The single vacancy is reactive because its \u03c3 and \u03c0 defect states can both donate and accept electron density.",
+        "evidence_span": "Together these defect states make the SV an effective reactive center, capable of both donating and accepting electron density from an incoming adsorbate \u2013 a Janus-style defect."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The difference between free energy and potential energy is attributed to entropy loss upon immobilizing water at the surface.",
+        "evidence_span": "a difference that we can attribute to the entropic cost of immobilising a free molecule at the surface."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The difference between gas-phase and solvated mechanisms is caused by stabilization of charged fragments by the liquid.",
+        "evidence_span": "The contrast between gaseous and solvated water dissociation arises directly from the surrounding liquid. Solvent molecules stabilize the charged H3O+ and OH\u2013 fragments through hydrogen bonding and dielectric screening, opening up heterolytic reaction channels that have no gas-phase counterpart."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Without charge stabilization in gas phase, dissociation must proceed through a concerted transition state forcing H through the graphene plane.",
+        "evidence_span": "Under gaseous conditions, where no charge stabilization is possible, dissociation proceeds through a concerted transition state that forces a hydrogen atom through the graphene plane."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "SV behaves like a surface analogue of carbenes because it has a similar pair of \u03c3 and \u03c0 orbitals.",
+        "evidence_span": "The graphene SV possesses a similar pair of \u03c3 and \u03c0 orbitals, and in this sense acts as a surface analogue of molecular carbenes."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "Using a MACE potential trained on spin-polarized hybrid DFT should overcome these simulation limitations.",
+        "evidence_span": "To overcome these limitations, we train a MACE interatomic potential on spin-polarized hybrid DFT data \u2013 specifically, revPBE0-D3 \u2013 to run enhanced-sampling simulations."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The more stable SV-OH intermediate implies the acidic pathway is thermodynamically favored and may locally enrich hydronium.",
+        "evidence_span": "The greater energetic stability of the SV-OH intermediate over SV-H suggests that the acidic pathway is thermodynamically favored, which may produce a local excess of hydronium ions at the defect sites."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Controlled defect chemistry could be used to tune wettability and friction at graphene-water interfaces.",
+        "evidence_span": "This suggests that controlled defect chemistry could offer a route to modulating wettability and friction at graphene\u2013water interfaces"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Solvated graphene vacancies may act as short-lived local hydronium sources, increasing interfacial acidity.",
+        "evidence_span": "suggest that solvated graphene vacancies may act as short-lived, local sources of hydronium, contributing to interfacial acidity beyond what is observed at pristine graphene surfaces."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Mechanistic changes caused by solvation are probably not unique to carbon and may require re-evaluating vacuum-only mechanisms.",
+        "evidence_span": "The qualitative changes we observe, i.e., solvation opening competing ionic channels, stabilizing intermediates, and lowering barriers, are unlikely to be unique to carbon and may require reassessment of reaction mechanisms previously characterized only under vacuum conditions."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "These solvation effects are expected to matter for other 2D materials such as hBN.",
+        "evidence_span": "We expect that these effects will also be relevant to other 2D material interfaces, for example, for monolayer hBN which exhibits strong surface charging effects."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Controlled defect engineering could tune wettability, friction, and selective ion transport in 2D membranes.",
+        "evidence_span": "controlled defect engineering could offer a route to tuning wettability, friction, and selective ion transport in 2D-membrane materials."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "The overall SV + H2O reaction is strongly exothermic, with products about 100 kcal/mol more stable.",
+        "evidence_span": "Overall, the SV + H2O reaction is highly exothermic, with the final products being roughly 100 kcal/mol more stable than the bare SV and physisorbed water."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The gas-phase reaction has a single channel from bare SV to product.",
+        "evidence_span": "The gaseous reaction presents a relatively simple free energy landscape, with a single reaction channel connecting the bare SV to the chemisorbed product"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Gas-phase water attacks the vacancy over a 28.4 kcal/mol concerted barrier to yield Hydroxy-SV.",
+        "evidence_span": "Water attacks the vacancy over a 28.4 kcal/mol barrier in a concerted step that simultaneously breaks an O\u2013H bond and forms C\u2013OH and C\u2013H bonds at the defect site, yielding the Hydroxy-SV intermediate."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The Hydroxy-SV to SV-Ketone conversion has a very small barrier.",
+        "evidence_span": "the Hydroxy-SV easily decomposes to form the SV-Ketone over a very small barrier."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Gas-phase water dissociation is strongly exergonic, with SV-Ketone 78 kcal/mol below reactants.",
+        "evidence_span": "Overall, gaseous water dissociation is strongly exergonic, with the SV-Ketone lying 78 kcal/mol below the bare SV + H2O reactant."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Under solvation, two distinct channels connect the bare SV to chemisorbed products.",
+        "evidence_span": "The solvated free energy landscape is more intricate (see Figure 2c/d). Two distinct reaction channels now connect the bare SV to the chemisorbed products"
+      },
+      {
+        "role": "evidence_result",
+        "content": "One solvated pathway forms SV-H and adjacent hydroxide by proton abstraction.",
+        "evidence_span": "In the first pathway, the SV abstracts a proton from the nearby water to form an SV\u2013H intermediate and an adjacent solvated hydroxide ion."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The other solvated pathway forms SV-OH and transfers a proton to the solvent via Grotthuss transport.",
+        "evidence_span": "In the second, water attacks the vacancy oxygen-first to form SV\u2013OH, transferring one of its protons to the surrounding media via the Grotthus mechanism."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The two solvated pathways have similar forward barriers, but SV-OH/H3O+ is about 20 kcal/mol more stable.",
+        "evidence_span": "Both processes occur with comparable forward free energy barriers \u2013 indicative of an early transition state governed primarily by O\u2013H bond cleavage \u2013 but with the SV\u2013OH/H3O+ intermediate being \u223c20 kcal/mol more stable in free energy."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Both solvated forward barriers are lower than the gas-phase concerted barrier.",
+        "evidence_span": "These forward barriers (21.9 kcal/mol for SV\u2013H/OH\u2013 formation, and 23.7 kcal/mol for SV\u2013OH/H3O+) are overall lower in free energy than for the concerted gas-phase process (28.4 kcal/mol)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "From either solvated intermediate, the system proceeds to Hydroxy-SV and then SV-Ketone.",
+        "evidence_span": "From either intermediate, the system proceeds to the Hydroxy-SV and then to the SV-Ketone, which lies 74 kcal/mol below the solvated bare SV."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Hydroxy-SV and SV-Ketone show much longer water residence times than bare SV or SV-Pyran.",
+        "evidence_span": "The Hydroxy-SV (\u03c4 = 55 ps) and SV-Ketone (\u03c4 = 27 ps) states, both of which present hydrogen-bond-active O\u2013H or C=O groups to the liquid, display water residence times several times greater than either the bare SV or the SV-Pyran, which are comparable to the pristine graphene lifetime."
+      },
+      {
+        "role": "evidence_result",
+        "content": "These solvated routes yield products that enhance local water adsorption.",
+        "evidence_span": "and yield chemisorbed products that, in turn, enhance local water adsorption at the defect site."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The final MACE model achieved low training errors.",
+        "evidence_span": "The final model exhibited training RMSEs of 1.3 meV/atom and 30.6 meV/\u02daA for the energies and forces, respectively."
+      },
+      {
+        "role": "evidence_result",
+        "content": "MACE reproduces revPBE0-D3 pathway energies and barriers within 2\u20133 kcal/mol.",
+        "evidence_span": "MACE energies and barriers agree with those of revPBE0-D3 reference values to within 2 \u22123 kcal/mol"
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Analysis is restricted to dissociation up to SV-Ketone because SV-Ketone to SV-Pyran is kinetically blocked under ambient conditions.",
+        "evidence_span": "For this analysis, we show the dissociation process only up to the SV-Ketone state: this species is kinetically stabilized under ambient conditions, separated from the thermodynamically more stable SV-Pyran by a forward free energy barrier of \u223c45 kcal/mol."
+      },
+      {
+        "role": "constraint",
+        "content": "Spin-unrestricted calculations were required for systems with undercoordinated carbons; spin-restricted otherwise.",
+        "evidence_span": "Spin-unrestricted Kohn-Sham calculations were used for configurations containing undercoordinated carbon atoms; spin-restricted calculations were used otherwise."
+      },
+      {
+        "role": "constraint",
+        "content": "The study sampled the lowest-energy electronic states to remain on the adiabatic energy surface.",
+        "evidence_span": "In this way, we selected the lowest-energy electronic states such that we were sampling the adiabatic energy surface."
+      },
+      {
+        "role": "constraint",
+        "content": "Restraints limited reactions to one water molecule reacting directly at the single vacancy at a time.",
+        "evidence_span": "Restraints were appropriately applied to restrict reaction to a single water molecule at any one time reacting directly at the single vacancy."
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "How solvation affects defect-mediated water dissociation at solid surfaces is not well understood.",
+        "evidence_span": "Defects often serve as reactive sites for dissociation, yet how solvation influences water dissociation at such sites remains poorly understood."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The coupling of defect-mediated reactivity and solvent-assisted proton transfer in 2D materials remains insufficiently understood.",
+        "evidence_span": "Yet, while defect-mediated reactivity and solvent-assisted proton transfer are well-established for metals and metal oxides, how these two phenomena couple together for 2D materials such as graphene, MoS2, or hBN remains far less understood."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The paper frames two open questions about solvation effects on mechanism/energetics and on surrounding water structure/adsorption.",
+        "evidence_span": "These gaps motivate two key open questions: (i) how does solvation alter the mechanism and energetics of water dissociation for these 2D materials, and (ii) how do the resulting chemisorbed species modify the structure and adsorption properties of the surrounding water?"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Bulk-solvation description of water dissociation at the graphene single vacancy is missing.",
+        "evidence_span": "However, a description of this process under bulk solvation conditions is missing."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Direct gas-phase versus solvated comparisons of water dissociation are rare across surfaces.",
+        "evidence_span": "More broadly, direct comparisons between gas-phase and solvated water dissociation remain rare for any surface."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "An important open issue is whether nearby vacancies react independently or cooperatively.",
+        "evidence_span": "An important next step is to understand cooperative effects and whether proximal vacancies react independently or exhibit coupled reactivity"
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Prior work on metals and metal oxides established that water can dissociate directly on flat transition-metal surfaces via concerted chemisorption, that solvation and undercoordinated sites such as corrugations/steps/kinks further enhance dissociation, and that on oxides such as rutile TiO2(110) oxygen vacancies promote heterolytic dissociation while pristine TiO2 can dissociate water through solvent-assisted proton-transfer pathways; similar proton-transfer behavior was also reported for solvated ZnO surfaces.",
+        "evidence_spans": [
+          "On flat transition metals, water molecules can undergo direct dissociative chemisorption, colliding with the metal surface and cleaving an O-H bond to deposit H and OH fragments via a concerted mechanism.",
+          "Solvation with other water molecules can facilitate this process.",
+          "When corrugations, steps, or kinks are introduced to the surface, metal-water dissociation can be further enhanced with binding to undercoordinated sites.",
+          "On metal oxide surfaces such as rutile TiO2(110), oxygen vacancies can help promote dissociation via heterolytic mechanisms in which a proton transfers to a neighboring surface oxygen, yielding two surface hydroxyls per defect.",
+          "in the case of pristine TiO2, water dissociation can proceed through solvent-assisted proton transfer pathways that vary from one-step to two-step processes depending on the facet.",
+          "Similar proton-transfer phenomena occur at solvated ZnO surfaces."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior work established that pristine graphene does not dissociate water because graphene-water interactions are weak.",
+        "evidence_spans": [
+          "Under pristine conditions, graphene does not dissociate water due to weak graphene-water interactions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior computational studies on defective graphene found that water dissociation is enabled at single-vacancy defects: gas-phase DFT showed single water molecules chemisorb and dissociate at the vacancy through a concerted transition state to increasingly stable products, and ab initio MD at defective graphene-water interfaces likewise reported enhanced adsorption associated with hydrogen bonding.",
+        "evidence_spans": [
+          "For the case of water dissociation, gas-phase density functional theory (DFT) calculations have confirmed that single water molecules chemisorb at the SV, proceeding through a concerted transition state to form a series of increasingly stable products.",
+          "consistent with previous ab initio molecular dynamics studies of defective graphene-water interfaces."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "Prior methods are inadequate for fully solvated enhanced-sampling studies of this reactivity: traditional DFT is too computationally expensive for nanosecond-timescale simulations, while classical force fields cannot adequately capture bond formation and bond breaking.",
+        "evidence_spans": [
+          "Traditional DFT approaches, which have been used extensively to characterize the gas-phase SV reactivity, are too costly for modeling fully solvated systems over the nanosecond simulation times required for enhanced sampling.",
+          "Classical force fields, meanwhile, cannot adequately describe bond-making and bond-breaking."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "Rejected alternatives include using semi-local DFT functionals and relying on the pristine-graphene approximation alone: semi-local functionals are avoided because self-interaction errors distort the vacancy electronic structure, causing delocalized \u03c0 bands to cross the Fermi level and artificially reduce the magnetization from its expected 2 \u00b5B, and quantitative modeling therefore must move beyond pristine graphene.",
+        "evidence_spans": [
+          "Semi-local functionals suffer more severely from self-interaction errors that cause delocalized \u03c0 bands to cross the Fermi level, artificially reducing the magnetization from its expected value of 2 \u00b5B",
+          "quantitative modeling of these phenomena requires moving beyond the pristine graphene approximation."
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The Janus-like SV reactivity is compared to the ambiphilic character of molecular carbenes.",
+        "evidence_span": "The dual reactivity of the solvated Janus-like SV, accepting either the hydrogen or the hydroxyl fragment of the dissociating water molecule, is reminiscent of the ambiphilic character of carbenes in molecular chemistry."
+      }
+    ],
+    "causal_claim": [
+      {
+        "content": "Solvation qualitatively changes water dissociation at a graphene single vacancy: instead of the single concerted gas-phase pathway, the surrounding liquid stabilizes charged intermediates and opens two competing lower-barrier heterolytic, stepwise pathways absent in vacuum.",
+        "evidence_spans": [
+          "We show that solvation qualitatively changes the reaction mechanism at a graphene single vacancy (SV), opening pathways that are absent for an isolated water molecule.)",
+          "Whereas the gas-phase process proceeds via a single concerted channel, the solvated SV splits water through two competing pathways: a basic route forming SV-H and OH\u2013 an acidic route forming SV-OH and H3O+ (aq).)",
+          "solvated dissociation is a bimodal, stepwise process in which the surrounding liquid stabilizes charged intermediates and opens heterolytic pathways that are absent in vacuum. These solvated reaction routes offer lower forward barriers)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The lower-barrier solvated dissociation pathways generate chemisorbed intermediates whose hydrogen bonding with the liquid enhances graphene-water adsorption.",
+        "evidence_spans": [
+          "These lower-barrier pathways produce distinct chemisorbed intermediates that enhance graphene-water adsorption.)",
+          "Hydrogen bonding between the chemisorbed groups and the surrounding liquid is the primary impetus of enhanced water adsorption)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Water attack at the bare single vacancy proceeds stepwise: water first forms a Hydroxy-SV species, proton transfer then yields an SV-Ketone species, and ketone reorganization finally forms the SV-Pyran motif.",
+        "evidence_spans": [
+          "Water first attacks the bare vacancy and forms a Hydroxy-SV species containing C\u2013OH and C\u2013H groups.)",
+          "The OH group then transfers a proton to the remaining carbon with a dangling bond to form a SV-Ketone species.)",
+          "Finally, this ketone undergoes reorganization to form a SV-Pyran motif.)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Chemisorption at a single atomic vacancy transforms the local graphene environment from physisorption/hydrophobic behavior to reactive, hydrophilic chemisorption, while passivating the vacancy against further water attack.",
+        "evidence_spans": [
+          "a single atomic vacancy is sufficient to transform the local environment from physisorption to reactive chemisorption.)",
+          "Chemisorption therefore not only transforms the local electronic structure of the defect, but also converts it from a hydrophobic to a hydrophilic site while simultaneously passivating the SV against further chemical attack from water.)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Vacancies and edge sites alter the electronic, mechanical, and chemical properties of graphene.",
+        "evidence_spans": [
+          "These defects have been observed experimentally and are known to alter the electronic, mechanical, and chemical properties of the graphene sheet.)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Combining hybrid-DFT-trained machine-learned interatomic potentials with enhanced sampling enables multi-nanosecond trajectories and full free-energy mapping of rare reactive events at solvated interfaces.",
+        "evidence_spans": [
+          "Combining our machine learning interatomic potential (MLIP) with multiple-walker well-tempered metadynamics, we enable multi-nanosecond trajectories of complex, reactive vacancy systems at a spin-polarized hybrid DFT level of theory)",
+          "our work demonstrates that machine-learned potentials trained on hybrid DFT, combined with enhanced-sampling techniques, now make it feasible to resolve the full free energy landscape of rare reactive events at explicitly solvated interfaces.)"
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "Whether water dissociates at a surface, and by which mechanism, depends sensitively on the surface electronic structure, local coordination/geometry, and the surrounding hydrogen-bonding environment.",
+        "evidence_spans": [
+          "Whether a given surface dissociates water, and by which mechanism, depends sensitively on the electronic structure of the surface, its local coordination and geometry, and the hydrogen-bonding environment provided by the surrounding water."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The graphene single vacancy (SV) acts as a surface analogue of a carbene because it has paired \u03c3 and \u03c0 defect orbitals; together these states make the defect a Janus-like reactive center able both to donate and accept electron density from adsorbates.",
+        "evidence_spans": [
+          "The graphene SV possesses a similar pair of \u03c3 and \u03c0 orbitals, and in this sense acts as a surface analogue of molecular carbenes.",
+          "Together these defect states make the SV an effective reactive center, capable of both donating and accepting electron density from an incoming adsorbate \u2013 a Janus-style defect."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The free-energy barrier differs from the potential-energy barrier because immobilizing a water molecule at the surface incurs an entropic penalty.",
+        "evidence_spans": [
+          "a difference that we can attribute to the entropic cost of immobilising a free molecule at the surface."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The difference between gas-phase and solvated water-dissociation mechanisms arises from solvent stabilization of charged fragments: in liquid water, hydrogen bonding and dielectric screening stabilize H3O+ and OH\u2212, enabling heterolytic channels, whereas in the gas phase, lacking such charge stabilization, dissociation must proceed through a concerted transition state that forces H through the graphene plane.",
+        "evidence_spans": [
+          "The contrast between gaseous and solvated water dissociation arises directly from the surrounding liquid. Solvent molecules stabilize the charged H3O+ and OH\u2013 fragments through hydrogen bonding and dielectric screening, opening up heterolytic reaction channels that have no gas-phase counterpart.",
+          "Under gaseous conditions, where no charge stabilization is possible, dissociation proceeds through a concerted transition state that forces a hydrogen atom through the graphene plane."
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "Using a MACE potential trained on spin-polarized hybrid DFT should overcome these simulation limitations.",
+        "evidence_span": "To overcome these limitations, we train a MACE interatomic potential on spin-polarized hybrid DFT data \u2013 specifically, revPBE0-D3 \u2013 to run enhanced-sampling simulations."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The more stable SV-OH intermediate implies the acidic pathway is thermodynamically favored and may locally enrich hydronium.",
+        "evidence_span": "The greater energetic stability of the SV-OH intermediate over SV-H suggests that the acidic pathway is thermodynamically favored, which may produce a local excess of hydronium ions at the defect sites."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Controlled defect chemistry could be used to tune wettability and friction at graphene-water interfaces.",
+        "evidence_span": "This suggests that controlled defect chemistry could offer a route to modulating wettability and friction at graphene\u2013water interfaces"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Solvated graphene vacancies may act as short-lived local hydronium sources, increasing interfacial acidity.",
+        "evidence_span": "suggest that solvated graphene vacancies may act as short-lived, local sources of hydronium, contributing to interfacial acidity beyond what is observed at pristine graphene surfaces."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Mechanistic changes caused by solvation are probably not unique to carbon and may require re-evaluating vacuum-only mechanisms.",
+        "evidence_span": "The qualitative changes we observe, i.e., solvation opening competing ionic channels, stabilizing intermediates, and lowering barriers, are unlikely to be unique to carbon and may require reassessment of reaction mechanisms previously characterized only under vacuum conditions."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "These solvation effects are expected to matter for other 2D materials such as hBN.",
+        "evidence_span": "We expect that these effects will also be relevant to other 2D material interfaces, for example, for monolayer hBN which exhibits strong surface charging effects."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Controlled defect engineering could tune wettability, friction, and selective ion transport in 2D membranes.",
+        "evidence_span": "controlled defect engineering could offer a route to tuning wettability, friction, and selective ion transport in 2D-membrane materials."
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "The SV + H2O reaction is strongly exothermic/exergonic overall, proceeding from bare SV to Hydroxy-SV and then SV-Ketone; in gas phase the final SV-Ketone product lies about 78 kcal/mol below reactants, and in solution about 74 kcal/mol below the solvated bare SV, with products broadly described as roughly 100 kcal/mol more stable than bare SV plus physisorbed water.",
+        "evidence_spans": [
+          "Overall, the SV + H2O reaction is highly exothermic, with the final products being roughly 100 kcal/mol more stable than the bare SV and physisorbed water.",
+          "Overall, gaseous water dissociation is strongly exergonic, with the SV-Ketone lying 78 kcal/mol below the bare SV + H2O reactant.",
+          "From either intermediate, the system proceeds to the Hydroxy-SV and then to the SV-Ketone, which lies 74 kcal/mol below the solvated bare SV."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the gas phase, the reaction follows a single channel from bare SV to chemisorbed product: water attacks the vacancy in a concerted step with a 28.4 kcal/mol barrier, simultaneously breaking an O\u2013H bond and forming C\u2013OH and C\u2013H bonds to yield Hydroxy-SV, which then converts to SV-Ketone over a very small barrier.",
+        "evidence_spans": [
+          "The gaseous reaction presents a relatively simple free energy landscape, with a single reaction channel connecting the bare SV to the chemisorbed product",
+          "Water attacks the vacancy over a 28.4 kcal/mol barrier in a concerted step that simultaneously breaks an O\u2013H bond and forms C\u2013OH and C\u2013H bonds at the defect site, yielding the Hydroxy-SV intermediate.",
+          "the Hydroxy-SV easily decomposes to form the SV-Ketone over a very small barrier."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Under solvation, two distinct reaction channels connect bare SV to chemisorbed products. One pathway forms an SV\u2013H intermediate plus adjacent hydroxide by proton abstraction; the other forms SV\u2013OH while transferring a proton to the solvent via Grotthuss transport. Both have similar forward barriers (21.9 and 23.7 kcal/mol), both lower than the 28.4 kcal/mol gas-phase barrier, and the SV\u2013OH/H3O+ intermediate is about 20 kcal/mol more stable. From either intermediate, the system proceeds to Hydroxy-SV and then SV-Ketone.",
+        "evidence_spans": [
+          "The solvated free energy landscape is more intricate (see Figure 2c/d). Two distinct reaction channels now connect the bare SV to the chemisorbed products)",
+          "In the first pathway, the SV abstracts a proton from the nearby water to form an SV\u2013H intermediate and an adjacent solvated hydroxide ion.",
+          "In the second, water attacks the vacancy oxygen-first to form SV\u2013OH, transferring one of its protons to the surrounding media via the Grotthus mechanism.",
+          "Both processes occur with comparable forward free energy barriers \u2013 indicative of an early transition state governed primarily by O\u2013H bond cleavage \u2013 but with the SV\u2013OH/H3O+ intermediate being \u223c20 kcal/mol more stable in free energy.",
+          "These forward barriers (21.9 kcal/mol for SV\u2013H/OH\u2013 formation, and 23.7 kcal/mol for SV\u2013OH/H3O+) are overall lower in free energy than for the concerted gas-phase process (28.4 kcal/mol).",
+          "From either intermediate, the system proceeds to the Hydroxy-SV and then to the SV-Ketone, which lies 74 kcal/mol below the solvated bare SV."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The chemisorbed oxygen-containing products formed in solution enhance local water adsorption at the defect site, as reflected by much longer water residence times for Hydroxy-SV (55 ps) and SV-Ketone (27 ps) than for bare SV or SV-Pyran.",
+        "evidence_spans": [
+          "The Hydroxy-SV (\u03c4 = 55 ps) and SV-Ketone (\u03c4 = 27 ps) states, both of which present hydrogen-bond-active O\u2013H or C=O groups to the liquid, display water residence times several times greater than either the bare SV or the SV-Pyran, which are comparable to the pristine graphene lifetime.",
+          "and yield chemisorbed products that, in turn, enhance local water adsorption at the defect site."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The final MACE model achieved low training errors and reproduced revPBE0-D3 pathway energies and barriers within about 2\u20133 kcal/mol.",
+        "evidence_spans": [
+          "The final model exhibited training RMSEs of 1.3 meV/atom and 30.6 meV/\u02daA for the energies and forces, respectively.",
+          "MACE energies and barriers agree with those of revPBE0-D3 reference values to within 2 \u22123 kcal/mol"
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Analysis is restricted to dissociation up to SV-Ketone because SV-Ketone to SV-Pyran is kinetically blocked under ambient conditions.",
+        "evidence_span": "For this analysis, we show the dissociation process only up to the SV-Ketone state: this species is kinetically stabilized under ambient conditions, separated from the thermodynamically more stable SV-Pyran by a forward free energy barrier of \u223c45 kcal/mol."
+      },
+      {
+        "role": "constraint",
+        "content": "Spin-unrestricted calculations were required for systems with undercoordinated carbons; spin-restricted otherwise.",
+        "evidence_span": "Spin-unrestricted Kohn-Sham calculations were used for configurations containing undercoordinated carbon atoms; spin-restricted calculations were used otherwise."
+      },
+      {
+        "role": "constraint",
+        "content": "The study sampled the lowest-energy electronic states to remain on the adiabatic energy surface.",
+        "evidence_span": "In this way, we selected the lowest-energy electronic states such that we were sampling the adiabatic energy surface."
+      },
+      {
+        "role": "constraint",
+        "content": "Restraints limited reactions to one water molecule reacting directly at the single vacancy at a time.",
+        "evidence_span": "Restraints were appropriately applied to restrict reaction to a single water molecule at any one time reacting directly at the single vacancy."
+      }
+    ],
+    "contradiction": []
+  }
+}

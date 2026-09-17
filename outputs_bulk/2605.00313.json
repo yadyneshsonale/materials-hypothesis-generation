@@ -1,0 +1,1281 @@
+{
+  "paper_id": "2605.00313",
+  "chunks_processed": 4,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "The current AI materials-discovery paradigm is limited by a synthesisability gap despite producing many candidate structures.",
+        "evidence_span": "The current structure-centric paradigm in artificial intelligence-\ndriven materials discovery, despite delivering thousands of\ncandidate structures, is stalling at a critical barrier: the\nsynthesisability gap."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Structure-centric generative and screening approaches fail at experimental realization, creating a synthesisability gap.",
+        "evidence_span": "The field now confronts a decisive bottleneck: structure-centric approaches-whether traditional DFT screening or modern artificial intelligence (AI) generative models often trained on DFT data-routinely falter when their predictions meet experimental synthesis, exposing a critical synthesisability gap."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The synthesisability gap is framed as a fundamental limitation of structure-centric approaches.",
+        "evidence_span": "Having established the synthesisability gap as a fundamental limitation of structure-centric approaches"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The practical utility of structure-centric generative models is limited by the synthesisability gap.",
+        "evidence_span": "the practical utility of structure-centric generative models is limited by the synthesisability gap"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The synthesisability gap exposes a fundamental limitation of the structure-property paradigm in de novo design.",
+        "evidence_span": "Ultimately, the synthesisability gap reveals a fundamental limitation of the structure-property paradigm in de novo design"
+      },
+      {
+        "role": "problem_motivation",
+        "content": "A synthesis-first paradigm requires new AI/ML tools for representing, predicting from, and inverting synthesis protocols.",
+        "evidence_span": "Realising the vision of a synthesis-first paradigm requires a new class of AI/ML tools."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Three core technical challenges are protocol representation, property prediction, and inverse design of new protocols.",
+        "evidence_span": "Three key technical challenges emerge: (i) how to represent a synthesis protocol, (ii) how to predict properties from that representation, and (iii) how to invert the model to design new protocols."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Data scarcity, low quality, and limited accessibility are the most immediate barrier to adoption.",
+        "evidence_span": "Data scarcity, quality and accessibility. This represents the most immediate barrier to widespread adoption."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "A primary challenge is robust transfer from narrow SDL regimes to broad literature chemistry.",
+        "evidence_span": "Primary challenge: Achieving robust transfer across domains- from narrow SDL regimes to literature-scale chemistry-requires principled domain adaptation and transfer learning, with careful handling of covariate and label shifts."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Diverse protocol formats hinder interoperability.",
+        "evidence_span": "The diversity of text snippets, SMILES strings, reaction graphs and action sequences hampers model interoperability."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Deep models trained on narrow domains often fail to generalize to unseen reactions.",
+        "evidence_span": "Deep models trained on narrow chemical domains often fail on unseen reactions."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Real robotic SDL platforms still have substantial failure rates, require oversight, and lack user-friendly interfaces.",
+        "evidence_span": "yet real-world robotic platforms still incur nontrivial failure rates (10%\u201330%), require human-in-the-loop oversight, and often lack chemist-friendly interfaces."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "There is an executability gap between abstract protocols and reliable robotic execution under hardware variability.",
+        "evidence_span": "Beyond algorithmic integration, there is an executability gap: mapping abstract protocols to reliable robotic execution under hardware variability (dispense precision, dead volumes, thermal lags, calibration drift)."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Benchmark coverage for inorganic synthesis and protocol-aware inverse design is still sparse.",
+        "evidence_span": "coverage across inorganic synthesis and protocol-aware inverse design remains sparse."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Structure-centric approaches fail when predictions meet experimental reality, reflecting a synthesisability gap.",
+        "evidence_span": "The prevailing structure-property paradigm has delivered profound scientific insights and enabled remarkable computational advances, but it falters when predictions confront experimental reality."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The synthesisability gap is a fundamental limitation of structure-centric methods.",
+        "evidence_span": "The persistent synthesisability gap-where fewer than 2% of computationally predicted phases are ever realised-represents not merely a technical hurdle but a fundamental architectural limitation of structure-centric approaches."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "High-throughput DFT workflows and major materials databases have been used to discover low-enthalpy candidates.",
+        "evidence_span": "High-throughput density functional theory (DFT) workflows and large databases such as the Materials Project, AFLOW and the open quantum materials database (OQMD) have delivered thousands of low-enthalpy candidates"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Related prior ideas include autonomous experimentation, retrosynthesis planning, and closed-loop reaction optimization.",
+        "evidence_span": "Related ideas already exist in autonomous experimentation, retrosynthesis planning and closed-loop reaction optimisation [6\u20139]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Organic retrosynthesis heuristics and planners such as synthetic accessibility metrics, ASKCOS, and AiZynthFinder are established prior tools.",
+        "evidence_span": "While organic retrosynthesis heuristics (e.g. synthetic accessibility, synthetic complexity, and retrosynthetic accessibility scores) and planners (e.g. ASKCOS and AiZynthFinder [7, 10]) are mature for molecular synthesis"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Generative AI models such as VAEs, GANs, diffusion, autoregressive, and flow models have been used to propose new materials structures.",
+        "evidence_span": "Generative AI models have emerged as powerful tools for exploring chemical space and proposing novel material structures de novo"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Post-hoc heuristic filters like SAScore, SCScore, and RAScore are used to compensate for synthesisability issues.",
+        "evidence_span": "post-hoc heuristics such as the synthetic accessibility score (SAScore) [18], synthetic complexity score (SCScore) [22], and retrosynthetic accessibility score (RAScore) [23] are often applied to filter generative outputs."
+      },
+      {
+        "role": "prior_approach",
+        "content": "A complementary prior approach is supervised learning to predict synthesisability directly for hypothetical crystalline materials.",
+        "evidence_span": "A complementary strategy is to predict synthesisability directly with supervised learning, treating it as a classification or ranking problem rather than as a downstream constraint applied post hoc."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Physics-informed neural networks and hybrid surrogate models embed differential-equation constraints for synthesis modeling.",
+        "evidence_span": "Physics-informed neural networks (PINNs) and other hybrid surrogate models that embed differential-equation constraints offer a promising but challenging avenue for synthesis modelling"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Physics-based simulators such as kinetic Monte Carlo, phase-field, CALPHAD-informed diffusion, and CFD provide mechanistic priors.",
+        "evidence_span": "physics-based synthesis models-including kinetic Monte Carlo for surface reactions and nucleation, phase-field models for crystallisation, coarsening and porosity evolution, CALculation of PHAse diagrams (CALPHAD)-informed diffusion models for multi-component solids, and computational fluid dynamics for reactor-scale transport-provide mechanistic constraints and synthetic inductive bias"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Structural resources and DFT workflows can contribute constraints, descriptors, route screening, and priors to protocol-centric design.",
+        "evidence_span": "Vast structural resources (e.g. Materials Project [2], OQMD [4]) and DFT workflows must be central to protocol-centric design, not peripheral. They contribute: (i) Phase-diagram and thermochemical constraints"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Bayesian optimization, reinforcement learning, generative models, and invertible inverse models are emerging approaches for protocol inverse design.",
+        "evidence_span": "Several complementary algorithmic families have emerged for this task:\n\u2022  BO\n\u2022  RL\n\u2022  Generative models\n\u2022  Invertible and probabilistic inverse models"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Rule-based symbolic retrosynthesis planners like ASKCOS and AiZynthFinder can be combined with BO or RL for hybrid planning.",
+        "evidence_span": "Rule-based symbolic retrosynthesis planners such as ASKCOS and AiZynthFinder provide chemistry-aware search primitives that can be combined with BO or RL for hybrid planning"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Examples include VAEs for multistep polymer syntheses, SynFormer for reaction sequences, MINERVA SDL, and autonomous flow quantum-dot synthesis.",
+        "evidence_span": "G\u00f3mez-Bombarelli et al [12] used VAEs to generate multi-step polymer syntheses (organic analogue), while Tadanki et al [47] introduced SynFormer, a Transformer that outputs full reaction sequences. More directly relevant to inorganic materials, SDL platforms such as MINERVA seamlessly link protocol generation with robotic execution [9], and autonomous flow platforms have demonstrated multistep quantum-dot synthesis"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Event-sourced and streaming architectures such as ESAMP and MDML have been proposed for provenance and experiment control.",
+        "evidence_span": "Event-sourced and streaming architectures adapted from distributed systems have been proposed for materials provenance and experiment control (e.g. ESAMP and MDML)"
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Many theoretically promising candidates from structure-centric pipelines remain unrealized experimentally.",
+        "evidence_span": "yet many theoretically promising structures remain unrealised in the laboratory"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Existing ingredients are not sufficiently unified for inorganic materials discovery under a protocol-first formalism.",
+        "evidence_span": "Our claim is not that these ingredients are themselves new, but that in inorganic materials discovery they remain insufficiently unified by a protocol-first formalism"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Organic retrosynthesis tools are only partially applicable to solid-state and solvothermal materials.",
+        "evidence_span": "they are only partially applicable to solid-state and solvothermal materials."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Even advanced structure-centric surrogate models remain fundamentally limited by their structure-centric basis.",
+        "evidence_span": "Even advanced surrogate models-such as energy-conserving equivariant graph neural networks [21] that provide symmetry-respecting predictions with near-DFT accuracy-remain fundamentally limited by their structure-centric foundation."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "These heuristics correlate only weakly with true experimental difficulty.",
+        "evidence_span": "These heuristics, however, are only loosely correlated with true experimental difficulty"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Explicit retrosynthesis at the scale of millions of generated candidates remains computationally prohibitive.",
+        "evidence_span": "explicit retrosynthesis for millions of candidates remains prohibitive at library-generation scale."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Direct synthesisability predictors inherit reporting and attempt biases, and the synthesisable label is context dependent.",
+        "evidence_span": "Such predictors are promising but must be interpreted carefully: they inherit biases in what the community has attempted and reported, and the target label (\u2018synthesisable\u2019) is itself time-, platform- and effort-dependent."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Protocol-centric implementation differs from organic synthesis because inorganic synthesis is affected by phase equilibria, non-equilibrium processing, and transport-limited kinetics.",
+        "evidence_span": "not assuming their direct transfer to inorganic synthesis governed by phase equilibria, non-equilibrium processing and transport-limited kinetics."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "No single protocol representation is universally best for inorganic synthesis.",
+        "evidence_span": "no single representation is universally best for inorganic synthesis."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Model accuracy is limited more by scarce and poor-quality paired protocol-property data than by algorithm choice.",
+        "evidence_span": "Model accuracy is limited less by algorithmic nuance than by the scarcity and quality of paired protocol-property datasets"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Practical end-to-end deployments of PINNs for full multi-step protocols are still difficult and rare.",
+        "evidence_span": "robust practical deployments for full, multi-step protocols remain difficult and comparatively scarce, with most demonstrations focusing on constrained unit operations rather than end-to-end recipes."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "These physics-based tools are computationally intensive, hard to parameterize for new chemistries, and limited for unknown multicomponent systems.",
+        "evidence_span": "Today, these tools are computationally intensive, difficult to parameterise for novel chemistries, and often limited in predictive power for unknown, multi-component systems."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Hybrid integration of structural knowledge is not plug-and-play because structural characterization is sparse, noisy, and multimodal.",
+        "evidence_span": "In practice, however, hybrid integration is rarely plug-and-play: structural characterisation is often sparse, noisy, and multi-modal"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Existing literature data are unstructured, biased, incomplete, and often proprietary.",
+        "evidence_span": "Existing literature is dominated by unstructured prose, publication bias toward positive results, missing metadata, and proprietary restrictions."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Text-mined literature data are heterogeneous and biased, while SDL datasets are narrow and domain-specific.",
+        "evidence_span": "data pulled from text-mined literature are heterogeneous and biased toward successful experiments, whereas self-driving laboratories yield highly structured but domain-specific datasets."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "These provenance architectures are complex and not widely adopted.",
+        "evidence_span": "but remain complex to implement and have not yet seen widespread community adoption."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Automating inorganic workflows is harder than liquid handling, especially for solids and furnace operations.",
+        "evidence_span": "For inorganic workflows, solids handling (grinding/milling, weighing powders), pellet pressing, high-temperature furnace loading/unloading, atmosphere control and thermal profile verification remain difficult to automate robustly compared to liquid handling."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Current atomistic and continuum simulations rarely provide end-to-end predictive control for complex inorganic synthesis.",
+        "evidence_span": "However, present-day atomistic and continuum tools rarely provide end-to-end predictive control over synthesis outcomes for complex inorganic systems."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than treating only atomic configurations as primary variables, the paper advocates treating executable synthesis protocols as primary design variables.",
+        "evidence_span": "We argue that closing this gap demands a pivot\nto a synthesis-first paradigm in which executable synthesis\n\nprotocols, not just atomic configurations, are treated as primary\ndesign variables."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The paper does not assume direct transfer of organic synthesis tools to inorganic synthesis because inorganic synthesis is governed by different phenomena.",
+        "evidence_span": "using organic tools (e.g. the simplified molecular input line entry system (SMILES), SELF-referencIng embedded strings (SELFIES), and retrosynthesis planners) as analogies where instructive but not assuming their direct transfer to inorganic synthesis governed by phase equilibria, non-equilibrium processing and transport-limited kinetics."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The perspective rejects treating autonomous labs only as execution layers or retrosynthesis only as route generators, instead coupling representation, modeling, design, characterization, and execution.",
+        "evidence_span": "This framing differs from treating autonomous laboratories merely as execution layers or treating retrosynthesis tools merely as route generators: here, representation, forward modelling, inverse design, characterisation and execution are posed as one coupled protocol-design problem."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Organic tools are not adopted as direct solutions; they are treated only as instructive analogues for inorganic synthesis.",
+        "evidence_span": "In this section we focus on inorganic-relevant approaches and treat organic tools as instructive analogues rather than direct solutions."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Fully lights-out autonomous operation is not the envisioned medium-term mode; human-AI collaboration is preferred because current robotic platforms are failure-prone and need oversight.",
+        "evidence_span": "In the medium term we therefore envision human\u2013AI collaboration as the dominant operating mode: AI assists chemists with planning, monitoring, and failure recovery rather than operating fully lights-out."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "A single monolithic model trained on all protocols is rejected in favor of interoperable foundation models.",
+        "evidence_span": "In our view, the most realistic route is not a single monolithic model trained on \u2018all protocols\u2019, but interoperable foundation models grounded in execution logs, characterisation streams and explicit ontologies"
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Relying on structure-first simulation alone is not the near-term path; protocol-centered modeling is chosen as a pragmatic alternative because current simulations lack end-to-end predictive control.",
+        "evidence_span": "Protocol-centred modelling therefore offers a pragmatic route to progress in the near and medium term, while leaving open the long-term possibility of deeper first-principles synthesis simulation."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "Organic synthesis tools are used as analogies to inform the new framework.",
+        "evidence_span": "using organic tools (e.g. the simplified molecular input line entry system (SMILES), SELF-referencIng embedded strings (SELFIES), and retrosynthesis planners) as analogies where instructive"
+      },
+      {
+        "role": "inspiration_source",
+        "content": "Protocol-centric discovery should adopt lessons from adjacent ML settings about the value of failed experiments.",
+        "evidence_span": "The value of failed experiments for materials ML has already been demonstrated in adjacent settings, and protocol-centric discovery will benefit from adopting the same lesson early [57]."
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Post-hoc synthesisability filters provide only weak correlation with experimental difficulty, so they do not solve the problem.",
+        "evidence_span": "Post-hoc synthesisability filters provide only weak correlation with experimental difficulty"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The systematic failure of major generative architectures indicates that a paradigm shift to protocol-first design is needed.",
+        "evidence_span": "This systematic failure across all major generative architectures-from VAEs to diffusion models-indicates that the solution lies not in incremental improvements to structure-centric methods, but in a fundamental paradigm shift that treats synthesis protocols as primary design objects."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Treating protocols as primary design variables directly addresses the synthesisability gap.",
+        "evidence_span": "This approach directly addresses the synthesisability gap by treating the recipe-not just the product-as the primary design variable."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Confining search to executable procedures improves practical relevance and enables more efficient optimization over real operations.",
+        "evidence_span": "it confines search to experimentally actionable procedures, improving relevance and enabling efficient optimisation over real operations"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Explicit protocol variables allow learning of properties sensitive to process conditions like temperature ramps, solvent, pH, and aging time.",
+        "evidence_span": "Properties that depend sensitively on temperature ramps, solvent, pH or ageing time can be learned because these variables are explicit inputs"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Protocol representations naturally map to robot instructions, enabling closed-loop self-driving laboratories.",
+        "evidence_span": "Protocol representations map naturally to robot instructions, enabling closed-loop, SDLs"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Correlating process variables with performance reveals non-equilibrium effects, defect formation, and morphology control that structure-only models miss.",
+        "evidence_span": "Correlating process variables with performance uncovers non-equilibrium effects, defect formation and morphology control invisible to equilibrium structure-only models"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Including green metrics and costs directly in optimization can steer design toward deployable solutions.",
+        "evidence_span": "Green-chemistry metrics (E-factor, process mass intensity (PMI), energy footprint) and economic costs (precursor cost, throughput, labour, equipment amortisation) can be included directly in multi-objective optimisation, steering design toward practically deployable solutions"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Recent protocol-aware and SDL examples show that embedding synthesis constraints improves experimental relevance compared with structure-only approaches.",
+        "evidence_span": "These successes, though nascent, confirm that embedding synthesis constraints can drastically improve experimental relevance compared to structure-only approaches."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Closed-loop optimization of fast-charging protocols improves Li-ion performance and mitigates degradation.",
+        "evidence_span": "Closed-loop optimisation of fast-charging protocols with ML improves performance and mitigates degradation in Li-ion cells"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Combining BO with mechanistic surrogate models in flow settings reduces the number of experiments and navigates multi-objective trade-offs.",
+        "evidence_span": "combining BO with mechanistic surrogate models reduces experiments and navigates multi-objective trade-offs"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Automated spin-coating with BO has been used to co-optimize perovskite precursor composition and processing conditions.",
+        "evidence_span": "Automated spin-coating coupled to BO has been used to co-optimise precursor composition and processing conditions for perovskite solar cells"
+      },
+      {
+        "role": "causal_claim",
+        "content": "ML-assisted real-time feedback control has steered quantum-dot growth by linking growth conditions to in situ structural observations.",
+        "evidence_span": "Machine-learning-assisted real-time feedback control has been used to steer InAs/GaAs quantum-dot growth by coupling growth conditions to in situ reflection high-energy electron diffraction videos, which act as structure-sensitive observations of the evolving surface and quantum-dot density"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Active learning with high-throughput experimentation accelerates electrocatalyst discovery and optimization.",
+        "evidence_span": "Active learning coupled to high-throughput experimentation accelerates discovery and optimisation of electrocatalysts for CO reduction and hydrogen evolution"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Interpretable ML helps reveal process-structure-property relationships for catalyst optimization.",
+        "evidence_span": "Interpretable ML (e.g. Shapley additive explanations, SHAP) elucidates process-structure-property relationships to guide catalyst optimisation"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Flow and continuous processing are especially suitable for protocol-centric optimization because they permit real-time parameter adjustment.",
+        "evidence_span": "Flow and continuous processing environments are particularly amenable to protocol-centric optimisation because they enable real-time parameter adjustment"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Embedding economic and environmental factors in protocol representations naturally supports multi-objective optimization.",
+        "evidence_span": "Multi-objective optimisation (performance, sustainability, cost) is naturally handled when economic and environmental factors are embedded in protocol representations"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Closed-loop operation with inline characterization provides the rapid feedback needed for effective learning.",
+        "evidence_span": "Closed-loop operation with inline characterisation provides the rapid feedback necessary for effective learning"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Applications are most successful when processing strongly influences final properties, the regime where structure-only methods fail.",
+        "evidence_span": "Critically, the highest-impact applications focus on problems where processing conditions strongly influence final properties-precisely where structure-only approaches fail."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The synthesis-centric paradigm provides a demonstrated pathway to bridge the synthesisability gap and accelerate materials discovery.",
+        "evidence_span": "The synthesis-centric paradigm is not merely a theoretical alternative but a demonstrated pathway to bridging the synthesisability gap and accelerating materials discovery."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Standardized structures and scalable structure-derived labels caused structure-centric ML to dominate historically.",
+        "evidence_span": "The community\u2019s historical fixation on structure is not accidental: crystal structures are comparatively well standardised; structure-derived labels (energies, band gaps, elastic constants) can be generated at scale with mature simulation workflows; and many property predictors are naturally formulated as structureproperty mappings."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Protocol heterogeneity, platform dependence, and underspecification make protocol-centered AI harder and more brittle.",
+        "evidence_span": "By contrast, protocol data are heterogeneous, platform-dependent and often underspecified, making protocol-centred AI both harder and more brittle."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Multimodal, simulator-coupled, or experiment-in-the-loop protocol models can increase training and deployment costs relative to structure-only models.",
+        "evidence_span": "Protocol-centric models-often featuring multimodal embeddings, simulator calls, or experiment-in-the-loop optimisation-can incur higher training and deployment costs than structure-only VAEs or diffusion networks"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Multi-fidelity, surrogate, and lightweight graph-based methods can reduce computational burdens.",
+        "evidence_span": "however, multi-fidelity, surrogate-model, and lightweight graph-based strategies can mitigate these burdens."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Protocol-aware systems can lower end-to-end discovery cost by quickly avoiding uninformative or failed experiments.",
+        "evidence_span": "protocol-aware systems can lower end-to-end discovery cost if they rapidly avoid uninformative or failed experiments."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Treating synthesis protocols as first-class design variables embeds feasibility constraints from the outset and provides a route to bridge the gap.",
+        "evidence_span": "By elevating synthesis protocols to first-class citizens in modelling and inverse design, the synthesis-first paradigm embeds feasibility constraints from the outset, offering a direct pathway to bridge this divide."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Embedding experimental constraints greatly improves hit rates relative to structure-only approaches.",
+        "evidence_span": "embedding experimental constraints dramatically improves hit rates compared to structure-only approaches."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Protocol representations, physics-informed models, and hybrid integration strategies together indicate a faster and more reliable path to functional materials.",
+        "evidence_span": "These advances collectively point toward an accelerated, more reliable route to functional materials."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Neglecting kinetics, precursor availability, and practical constraints explains the poor experimental realization of structure-centric predictions.",
+        "evidence_span": "underscoring the limitations of pipelines that neglect kinetics, precursor availability and practical constraints"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Unknown pathways, unavailable precursors, impractical conditions, kinetic traps, purification issues, scale-up, and safety constraints contribute to the synthesisability gap.",
+        "evidence_span": "Key contributing factors include:\n\u2022  Unknown or infeasible reaction pathways\n\u2022  Precursor availability and cost\n\u2022  Impractical reaction conditions\n\u2022  Kinetic traps and competing reactions\n\u2022  Purification and isolation challenges\n\u2022  Scalability\n\u2022  Regulatory, safety or environmental constraints"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Structure-only optimization fails because it assumes synthesis is a downstream solvable task, whereas synthetic constraints define accessible chemical space.",
+        "evidence_span": "Thus, structure-only optimisation implicitly assumes synthesis is a solvable downstream task, whereas in reality synthetic constraints define the accessible chemical space."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Higher success probability comes not from executability alone but from combining constraints with uncertainty-aware selection, structure-sensitive feedback, and iterative refinement.",
+        "evidence_span": "In practice, higher success probability comes not from executability alone but from combining such constraints with uncertainty-aware model selection, structure-sensitive feedback, and iterative closed-loop refinement."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "These structural differences explain why realistic roadmaps should prioritize standardization, provenance, and robust execution.",
+        "evidence_span": "Recognising these structural reasons is important for designing realistic roadmaps that prioritise standardisation, provenance and robust execution."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Because protocol-aware methods affect laboratory efficiency, scientific yield per total lab-plus-compute budget is the relevant metric.",
+        "evidence_span": "For this reason, the relevant metric is not model floating point operations in isolation but scientific yield per unit of combined laboratory and compute budget."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Protocol models are harder to universalize because protocols depend on platform-specific vocabularies, incomplete provenance, temporal logic, and multimodal hardware-linked data.",
+        "evidence_span": "because protocols depend on platform-specific action vocabularies, incomplete provenance, temporal control logic and the coupling of textual, sensor and hardware data."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors propose that closing the synthesisability gap requires shifting to a synthesis-first paradigm where executable protocols are primary design variables.",
+        "evidence_span": "We argue that closing this gap demands a pivot\nto a synthesis-first paradigm in which executable synthesis\n\nprotocols, not just atomic configurations, are treated as primary\ndesign variables."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Closing the synthesisability gap requires a synthesis-first paradigm using executable protocols as primary design variables.",
+        "evidence_span": "We contend that closing this gap demands a synthesis-first paradigm in which executable synthesis protocols, not just atomic configurations, are treated as the primary design variables."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Hybrid protocol-aware pipelines are needed because thermodynamic stability alone is insufficient for practical viability.",
+        "evidence_span": "thermodynamic stability alone is an insufficient metric of practical viability; hybrid pipelines that couple structure-centric tools with protocol-aware planners are needed to bridge from virtual candidates to executable recipes."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors propose elevating synthesis protocols to first-class design objects in a synthesis protocol-property framework.",
+        "evidence_span": "We propose elevating synthesis protocols to first-class design objects in a synthesis protocol\u2013property framework that embeds experimental feasibility from the outset."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors advocate hierarchical Bayesian or GP multi-fidelity models to combine literature and SDL data with error correction.",
+        "evidence_span": "We advocate hierarchical Bayesian or Gaussian-process multi-fidelity modelling to fuse literature-scale low-fidelity data with high-fidelity SDL measurements, coupled to explicit measurement-error models and batch-effect correction."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Adding physical priors, uncertainty quantification, and interpretable architectures should improve trust and insight.",
+        "evidence_span": "Incorporating physical priors, providing uncertainty quantification and employing interpretable architectures (e.g. latent-space attention visualisation, SHAP) will build trust and insight [53]."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Human-AI collaboration will likely dominate medium-term SDL operation rather than fully autonomous labs.",
+        "evidence_span": "In the medium term we therefore envision human\u2013AI collaboration as the dominant operating mode: AI assists chemists with planning, monitoring, and failure recovery rather than operating fully lights-out."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Protocol-space foundation models are plausible but harder to universalize than structure models.",
+        "evidence_span": "We consider protocol-space foundation models plausible, but harder to universalise than structure models because protocols depend on platform-specific action vocabularies, incomplete provenance, temporal control logic and the coupling of textual, sensor and hardware data."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The most realistic path is interoperable foundation models grounded in logs, characterization, and ontologies with uncertainty over out-of-distribution actions.",
+        "evidence_span": "In our view, the most realistic route is not a single monolithic model trained on \u2018all protocols\u2019, but interoperable foundation models grounded in execution logs, characterisation streams and explicit ontologies that permit transfer across platforms while preserving uncertainty about out-of-distribution actions."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Protocol-first and structure-first approaches are complementary.",
+        "evidence_span": "We view protocol-first and structure-first approaches as complementary."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors envision a 2035 ecosystem where synthesis protocols become primary design variables integrated with autonomy and real-time characterization.",
+        "evidence_span": "We envision a materials discovery ecosystem where synthesis protocols are the primary design variables, increasingly integrated with autonomous experimentation and real-time characterisation."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "They expect the synthesisability gap to narrow as these elements mature and interoperate.",
+        "evidence_span": "We expect the synthesisability gap to narrow substantially as these elements mature and interoperate."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Embedding experimental reality into computational frameworks can transform materials science into executable design.",
+        "evidence_span": "By embracing protocols as design objects and embedding experimental reality into our computational frameworks, we can transform materials science from a discipline of discovery to one of design-one executable recipe at a time."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "Only a small fraction of low-enthalpy phases found in high-throughput surveys have been realized experimentally.",
+        "evidence_span": "Fewer than 2\u2009% of over 50\u2009000 low-enthalpy phases identified in high-throughput surveys have been realised experimentally"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Experimental chemists often cannot realize computationally designed structures in the lab.",
+        "evidence_span": "Experimental chemists frequently struggle to realise these computationally designed structures in the laboratory."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Case studies show protocol-aware AI is moving from proof-of-concept to practical impact across materials domains.",
+        "evidence_span": "These case studies demonstrate that protocol-aware AI is transitioning from proof-of-concept to practical impact across diverse materials domains."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Earlier sections provide evidence that the synthesis-first paradigm is necessary and achievable.",
+        "evidence_span": "The evidence presented in sections 2\u20135 demonstrates that this paradigm shift is both necessary and achievable."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Early successes include protocol-optimized batteries and self-driving quantum-dot synthesis.",
+        "evidence_span": "Early successes-from protocol-optimised battery electrolytes to self-driving quantum dot synthesis-confirm"
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "Protocol refinement must account for experimental realities and sustainability constraints.",
+        "evidence_span": "(iii) integrating\nclosed-loop optimisation to refine protocols against experimental\nrealities and sustainability constraints."
+      },
+      {
+        "role": "constraint",
+        "content": "Protocol models must account for inorganic-specific issues such as multiphase outcomes, path dependence, reactor effects, and sparse or biased protocol data.",
+        "evidence_span": "Inorganic-specific constraints and failure modes: we highlight modelling and data issues that are distinctive for inorganic/solid-state synthesis (multiphase outcomes, path dependence, reactor effects, and sparse or biased protocol corpora)"
+      },
+      {
+        "role": "constraint",
+        "content": "Predicting structure from protocol is intrinsically difficult because the mapping is path-dependent and governed by non-equilibrium kinetics, transport, and reactor effects.",
+        "evidence_span": "The mapping is path-dependent and governed by non-equilibrium kinetics, multi-scale transport, and reactor/vessel effects."
+      },
+      {
+        "role": "constraint",
+        "content": "Validation must go beyond random train/test splits to include held-out chemistries, cross-lab transfer, calibration with characterization, and ablations.",
+        "evidence_span": "Validation must likewise go beyond random train/test splits and include chemically held-out systems, cross-laboratory transfer, calibration against operando or ex situ characterisation, and ablations"
+      },
+      {
+        "role": "constraint",
+        "content": "Executability of generated protocols is bounded by platform and safety constraints.",
+        "evidence_span": "Protocols generated within a constrained action/reaction grammar are, in principle and subject to platform and safety constraints, executable in a laboratory setting."
+      },
+      {
+        "role": "constraint",
+        "content": "Inverse design of protocols must satisfy experimental, safety, and resource constraints.",
+        "evidence_span": "inverse design corresponds to mapping target properties (and, where relevant, target structures) to one or more candidate protocols  under experimental, safety and resource constraints."
+      },
+      {
+        "role": "constraint",
+        "content": "Real-time robotic optimization must interface with scheduling and dead-time-aware planners and include failure recovery logic.",
+        "evidence_span": "For real-time robotic execution, optimisation algorithms must interface with job-shop scheduling or dead-time-aware planners and incorporate failure-recovery logic to maintain autonomous operation"
+      },
+      {
+        "role": "constraint",
+        "content": "Robust models must include failed and null experiments and be evaluated for cross-platform transfer, not just within-lab interpolation.",
+        "evidence_span": "Robust modelling under these conditions requires more than simple data accumulation: it demands deliberate capture of failed, null and low-yield experiments, chemistry-aware reweighting or stratified sampling, and evaluation protocols that distinguish interpolation within one laboratory from genuine transfer across platforms."
+      },
+      {
+        "role": "constraint",
+        "content": "Interoperability requires not just ontologies but reliable provenance capture and links between synthesis and characterization events.",
+        "evidence_span": "Protocol interoperability across laboratories requires more than shared ontologies: it requires reliable capture of execution provenance (what actually happened, with what deviations), and durable links between synthesis events and downstream characterisation."
+      },
+      {
+        "role": "constraint",
+        "content": "Standardized normalization and schema versioning are essential to avoid drift and ensure reproducibility.",
+        "evidence_span": "Standardised protocol normalisation (units, timing semantics, vessel context) and schema versioning are essential to prevent dataset drift and enable reproducible training."
+      },
+      {
+        "role": "constraint",
+        "content": "Ambiguous NLP outputs need human-in-the-loop curation and active error correction.",
+        "evidence_span": "Ambiguous NLP parses benefit from human-in-the-loop curation and active error-correction workflows."
+      },
+      {
+        "role": "constraint",
+        "content": "Robust transfer requires principled domain adaptation and careful handling of covariate and label shifts.",
+        "evidence_span": "requires principled domain adaptation and transfer learning, with careful handling of covariate and label shifts."
+      },
+      {
+        "role": "constraint",
+        "content": "Consensus ontologies and round-trippable parsers are crucial to avoid siloed datasets.",
+        "evidence_span": "Consensus ontologies and parsers capable of round-tripping between formats will be crucial to avoid siloed datasets [60]."
+      },
+      {
+        "role": "constraint",
+        "content": "Practical adoption requires scheduling, calibration/verification, and fail-safe recovery controls.",
+        "evidence_span": "Practical adoption will require job-shop scheduling with dead-time awareness, automatic calibration and verification routines, and fail-safe recovery policies"
+      },
+      {
+        "role": "constraint",
+        "content": "Scale-up effects like heat/mass transfer and economic amortization must be included when judging protocol viability.",
+        "evidence_span": "We further note that scale-up challenges (heat/mass transfer, economic amortisation of equipment and reagents) must be considered when evaluating protocol viability."
+      },
+      {
+        "role": "constraint",
+        "content": "Meaningful benchmarking needs curated benchmarks and evaluation protocols reflecting experimental constraints.",
+        "evidence_span": "Objective comparison of new algorithms demands curated benchmark suites and clear evaluation protocols."
+      },
+      {
+        "role": "constraint",
+        "content": "Immediate benchmarking priorities are tasks, transfer settings, calibration metrics, and reporting conventions that reflect real experiments.",
+        "evidence_span": "The more immediate priority is therefore to define benchmark tasks, transfer settings, calibration metrics and reporting conventions that reflect real experimental constraints rather than purely computational scores."
+      },
+      {
+        "role": "constraint",
+        "content": "Progress will be limited if improvements remain only algorithmic; robust platforms and interoperable execution are also necessary.",
+        "evidence_span": "progress will be limited if advances remain purely algorithmic: robust, scalable experimentation platforms and interoperable protocol execution are equally central."
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "The paper is motivated by a persistent synthesisability gap: structure-centric/structure-property materials-discovery approaches\u2014including DFT screening and AI generative models\u2014can produce many candidate structures and scientific insight, but often fail when predictions confront experimental synthesis, revealing a fundamental architectural limitation and limiting their practical utility in de novo design.",
+        "evidence_spans": [
+          "The current structure-centric paradigm in artificial intelligence-\ndriven materials discovery, despite delivering thousands of\ncandidate structures, is stalling at a critical barrier: the\nsynthesisability gap.",
+          "The field now confronts a decisive bottleneck: structure-centric approaches-whether traditional DFT screening or modern artificial intelligence (AI) generative models often trained on DFT data-routinely falter when their predictions meet experimental synthesis, exposing a critical synthesisability gap.",
+          "Having established the synthesisability gap as a fundamental limitation of structure-centric approaches",
+          "the practical utility of structure-centric generative models is limited by the synthesisability gap",
+          "Ultimately, the synthesisability gap reveals a fundamental limitation of the structure-property paradigm in de novo design",
+          "The prevailing structure-property paradigm has delivered profound scientific insights and enabled remarkable computational advances, but it falters when predictions confront experimental reality.",
+          "The persistent synthesisability gap-where fewer than 2% of computationally predicted phases are ever realised-represents not merely a technical hurdle but a fundamental architectural limitation of structure-centric approaches."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "This motivates a synthesis-first paradigm, which requires new AI/ML tools centered on synthesis protocols: representing protocols, predicting properties from them, and inverting models to design new protocols.",
+        "evidence_spans": [
+          "Realising the vision of a synthesis-first paradigm requires a new class of AI/ML tools.",
+          "Three key technical challenges emerge: (i) how to represent a synthesis protocol, (ii) how to predict properties from that representation, and (iii) how to invert the model to design new protocols."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A major near-term motivation is that adoption of synthesis-first AI is constrained by data and generalization barriers, including scarce/low-quality/inaccessible data, heterogeneous protocol formats that hinder interoperability, and weak transfer/generalization from narrow SDL or domain-specific datasets to broader literature chemistry and unseen reactions.",
+        "evidence_spans": [
+          "Data scarcity, quality and accessibility. This represents the most immediate barrier to widespread adoption.",
+          "Primary challenge: Achieving robust transfer across domains- from narrow SDL regimes to literature-scale chemistry-requires principled domain adaptation and transfer learning, with careful handling of covariate and label shifts.",
+          "The diversity of text snippets, SMILES strings, reaction graphs and action sequences hampers model interoperability.",
+          "Deep models trained on narrow chemical domains often fail on unseen reactions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Another motivation is the gap between proposed synthesis protocols and real-world execution: robotic SDL platforms still have substantial failure rates, require human oversight, and face an executability gap in translating abstract protocols into reliable hardware-specific actions under variability.",
+        "evidence_spans": [
+          "yet real-world robotic platforms still incur nontrivial failure rates (10%\u201330%), require human-in-the-loop oversight, and often lack chemist-friendly interfaces.",
+          "Beyond algorithmic integration, there is an executability gap: mapping abstract protocols to reliable robotic execution under hardware variability (dispense precision, dead volumes, thermal lags, calibration drift)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The field is also motivated by incomplete evaluation infrastructure, since benchmark coverage for inorganic synthesis and protocol-aware inverse design remains sparse.",
+        "evidence_spans": [
+          "coverage across inorganic synthesis and protocol-aware inverse design remains sparse."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "High-throughput DFT workflows and major materials databases/resources (e.g., Materials Project, AFLOW, OQMD) have been used to discover low-enthalpy candidates and provide structural, thermochemical, phase-diagram, descriptor, route-screening, and mechanistic-prior constraints for protocol-centric design.",
+        "evidence_spans": [
+          "High-throughput density functional theory (DFT) workflows and large databases such as the Materials Project, AFLOW and the open quantum materials database (OQMD) have delivered thousands of low-enthalpy candidates",
+          "Vast structural resources (e.g. Materials Project [2], OQMD [4]) and DFT workflows must be central to protocol-centric design, not peripheral. They contribute: (i) Phase-diagram and thermochemical constraints)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Related prior work includes autonomous experimentation, retrosynthesis planning, and closed-loop reaction optimization, including robotic/SDL and autonomous flow platforms that couple protocol generation with execution.",
+        "evidence_spans": [
+          "Related ideas already exist in autonomous experimentation, retrosynthesis planning and closed-loop reaction optimisation [6\u20139].",
+          "More directly relevant to inorganic materials, SDL platforms such as MINERVA seamlessly link protocol generation with robotic execution [9], and autonomous flow platforms have demonstrated multistep quantum-dot synthesis"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Organic retrosynthesis heuristics and rule-based/symbolic planners such as synthetic accessibility/complexity/retrosynthetic accessibility scores, ASKCOS, and AiZynthFinder are established prior tools; they can also be combined with BO or RL for hybrid planning.",
+        "evidence_spans": [
+          "While organic retrosynthesis heuristics (e.g. synthetic accessibility, synthetic complexity, and retrosynthetic accessibility scores) and planners (e.g. ASKCOS and AiZynthFinder [7, 10]) are mature for molecular synthesis",
+          "Rule-based symbolic retrosynthesis planners such as ASKCOS and AiZynthFinder provide chemistry-aware search primitives that can be combined with BO or RL for hybrid planning"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Generative AI models\u2014including VAEs, GANs, diffusion, autoregressive, flow, and sequence models\u2014have been used to propose novel materials structures or synthesis routes/sequences; examples include VAEs for multistep polymer synthesis and SynFormer for reaction sequences.",
+        "evidence_spans": [
+          "Generative AI models have emerged as powerful tools for exploring chemical space and proposing novel material structures de novo",
+          "G\u00f3mez-Bombarelli et al [12] used VAEs to generate multi-step polymer syntheses (organic analogue), while Tadanki et al [47] introduced SynFormer, a Transformer that outputs full reaction sequences."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Post-hoc heuristic filters such as SAScore, SCScore, and RAScore are commonly applied to generative outputs to address synthesisability issues.",
+        "evidence_spans": [
+          "post-hoc heuristics such as the synthetic accessibility score (SAScore) [18], synthetic complexity score (SCScore) [22], and retrosynthetic accessibility score (RAScore) [23] are often applied to filter generative outputs."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A complementary prior approach is supervised learning to predict synthesisability directly for hypothetical crystalline materials, treating it as a classification or ranking problem rather than a post-hoc constraint.",
+        "evidence_spans": [
+          "A complementary strategy is to predict synthesisability directly with supervised learning, treating it as a classification or ranking problem rather than as a downstream constraint applied post hoc."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Physics-informed neural networks and other hybrid surrogate models that embed differential-equation constraints have been proposed for synthesis modeling.",
+        "evidence_spans": [
+          "Physics-informed neural networks (PINNs) and other hybrid surrogate models that embed differential-equation constraints offer a promising but challenging avenue for synthesis modelling"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Physics-based simulators\u2014including kinetic Monte Carlo, phase-field models, CALPHAD-informed diffusion models, and CFD\u2014provide mechanistic constraints and synthetic inductive bias for synthesis modeling.",
+        "evidence_spans": [
+          "physics-based synthesis models-including kinetic Monte Carlo for surface reactions and nucleation, phase-field models for crystallisation, coarsening and porosity evolution, CALculation of PHAse diagrams (CALPHAD)-informed diffusion models for multi-component solids, and computational fluid dynamics for reactor-scale transport-provide mechanistic constraints and synthetic inductive bias"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Emerging algorithmic approaches for protocol inverse design include Bayesian optimization, reinforcement learning, generative models, and invertible/probabilistic inverse models.",
+        "evidence_spans": [
+          "Several complementary algorithmic families have emerged for this task:\n\u2022  BO\n\u2022  RL\n\u2022  Generative models\n\u2022  Invertible and probabilistic inverse models"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Event-sourced and streaming architectures such as ESAMP and MDML have been proposed for materials provenance and experiment control.",
+        "evidence_spans": [
+          "Event-sourced and streaming architectures adapted from distributed systems have been proposed for materials provenance and experiment control (e.g. ESAMP and MDML)"
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "Many theoretically promising structures from structure-centric pipelines remain unrealized experimentally, and even advanced structure-centric surrogate models remain fundamentally limited by their structure-centric foundation.",
+        "evidence_spans": [
+          "yet many theoretically promising structures remain unrealised in the laboratory",
+          "Even advanced surrogate models-such as energy-conserving equivariant graph neural networks [21] that provide symmetry-respecting predictions with near-DFT accuracy-remain fundamentally limited by their structure-centric foundation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Existing ingredients and representations are not yet sufficiently unified for inorganic materials discovery under a protocol-first formalism; no single protocol representation is universally best for inorganic synthesis.",
+        "evidence_spans": [
+          "Our claim is not that these ingredients are themselves new, but that in inorganic materials discovery they remain insufficiently unified by a protocol-first formalism",
+          "no single representation is universally best for inorganic synthesis."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Organic retrosynthesis tools are only partially transferable to inorganic solid-state and solvothermal synthesis, because inorganic synthesis is governed by phase equilibria, non-equilibrium processing, and transport-limited kinetics rather than allowing direct transfer from organic synthesis practice.",
+        "evidence_spans": [
+          "they are only partially applicable to solid-state and solvothermal materials.",
+          "not assuming their direct transfer to inorganic synthesis governed by phase equilibria, non-equilibrium processing and transport-limited kinetics."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Simple heuristics for synthesis difficulty correlate only weakly with true experimental difficulty.",
+        "evidence_spans": [
+          "These heuristics, however, are only loosely correlated with true experimental difficulty"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Explicit retrosynthesis remains computationally prohibitive at the scale of millions of generated candidates.",
+        "evidence_spans": [
+          "explicit retrosynthesis for millions of candidates remains prohibitive at library-generation scale."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Direct synthesisability predictors are limited because they inherit reporting and attempt biases, and the target label 'synthesisable' is itself context dependent across time, platform, and effort.",
+        "evidence_spans": [
+          "Such predictors are promising but must be interpreted carefully: they inherit biases in what the community has attempted and reported, and the target label (\u2018synthesisable\u2019) is itself time-, platform- and effort-dependent."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Model accuracy is constrained more by the scarcity and quality of paired protocol-property datasets than by algorithm choice.",
+        "evidence_spans": [
+          "Model accuracy is limited less by algorithmic nuance than by the scarcity and quality of paired protocol-property datasets"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Practical end-to-end deployment of physics-based protocol models remains limited: PINNs for full multi-step protocols are still difficult and rare, and current atomistic and continuum simulations rarely provide end-to-end predictive control for complex inorganic synthesis.",
+        "evidence_spans": [
+          "robust practical deployments for full, multi-step protocols remain difficult and comparatively scarce, with most demonstrations focusing on constrained unit operations rather than end-to-end recipes.",
+          "However, present-day atomistic and continuum tools rarely provide end-to-end predictive control over synthesis outcomes for complex inorganic systems."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Physics-based synthesis tools are computationally intensive, difficult to parameterize for novel chemistries, and often have limited predictive power for unknown multi-component systems.",
+        "evidence_spans": [
+          "Today, these tools are computationally intensive, difficult to parameterise for novel chemistries, and often limited in predictive power for unknown, multi-component systems."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Hybrid integration of structural knowledge is not plug-and-play because structural characterization data are sparse, noisy, and multimodal.",
+        "evidence_spans": [
+          "In practice, however, hybrid integration is rarely plug-and-play: structural characterisation is often sparse, noisy, and multi-modal"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Available data infrastructure is a major limitation: literature data are unstructured, biased, incomplete, and often proprietary; text-mined corpora are heterogeneous and biased toward successful experiments; SDL datasets are highly structured but narrow and domain-specific; and provenance architectures remain complex and are not widely adopted.",
+        "evidence_spans": [
+          "Existing literature is dominated by unstructured prose, publication bias toward positive results, missing metadata, and proprietary restrictions.",
+          "data pulled from text-mined literature are heterogeneous and biased toward successful experiments, whereas self-driving laboratories yield highly structured but domain-specific datasets.",
+          "but remain complex to implement and have not yet seen widespread community adoption."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Automating inorganic workflows is substantially harder than liquid-handling automation, especially for solids processing, pellet pressing, furnace operations, atmosphere control, and thermal profile verification.",
+        "evidence_spans": [
+          "For inorganic workflows, solids handling (grinding/milling, weighing powders), pellet pressing, high-temperature furnace loading/unloading, atmosphere control and thermal profile verification remain difficult to automate robustly compared to liquid handling."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "The paper rejects a structure-/atomic-configuration-first view and relying on structure-first simulation alone as the near-term path; instead it argues for a synthesis-first, protocol-centered paradigm in which executable synthesis protocols are primary design variables because current simulations do not yet provide end-to-end predictive control.",
+        "evidence_spans": [
+          "We argue that closing this gap demands a pivot to a synthesis-first paradigm in which executable synthesis protocols, not just atomic configurations, are treated as primary design variables.",
+          "Protocol-centred modelling therefore offers a pragmatic route to progress in the near and medium term, while leaving open the long-term possibility of deeper first-principles synthesis simulation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The paper rejects directly transferring organic-synthesis tools as solutions to inorganic synthesis; it treats them only as instructive analogies because inorganic synthesis is governed by distinct phenomena such as phase equilibria, non-equilibrium processing, and transport-limited kinetics.",
+        "evidence_spans": [
+          "using organic tools (e.g. the simplified molecular input line entry system (SMILES), SELF-referencIng embedded strings (SELFIES), and retrosynthesis planners) as analogies where instructive but not assuming their direct transfer to inorganic synthesis governed by phase equilibria, non-equilibrium processing and transport-limited kinetics.",
+          "In this section we focus on inorganic-relevant approaches and treat organic tools as instructive analogues rather than direct solutions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The perspective rejects modular framings in which autonomous labs are merely execution layers or retrosynthesis tools merely route generators; instead it frames representation, forward modelling, inverse design, characterisation, and execution as one coupled protocol-design problem.",
+        "evidence_spans": [
+          "This framing differs from treating autonomous laboratories merely as execution layers or treating retrosynthesis tools merely as route generators: here, representation, forward modelling, inverse design, characterisation and execution are posed as one coupled protocol-design problem."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The paper rejects fully lights-out autonomous operation as the medium-term target, favoring human\u2013AI collaboration because current robotic platforms remain failure-prone and require oversight and recovery support.",
+        "evidence_spans": [
+          "In the medium term we therefore envision human\u2013AI collaboration as the dominant operating mode: AI assists chemists with planning, monitoring, and failure recovery rather than operating fully lights-out."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The paper rejects a single monolithic model trained on all protocols in favor of interoperable foundation models grounded in execution logs, characterization streams, and explicit ontologies.",
+        "evidence_spans": [
+          "In our view, the most realistic route is not a single monolithic model trained on \u2018all protocols\u2019, but interoperable foundation models grounded in execution logs, characterisation streams and explicit ontologies"
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [
+      {
+        "content": "The framework is inspired by adjacent domains: it uses organic synthesis tools (e.g., SMILES, SELFIES, and retrosynthesis planners) as instructive analogies and adopts lessons from nearby ML settings, especially the demonstrated value of failed experiments for materials ML.",
+        "evidence_spans": [
+          "using organic tools (e.g. the simplified molecular input line entry system (SMILES), SELF-referencIng embedded strings (SELFIES), and retrosynthesis planners) as analogies where instructive",
+          "The value of failed experiments for materials ML has already been demonstrated in adjacent settings, and protocol-centric discovery will benefit from adopting the same lesson early [57]."
+        ],
+        "conflicting": false
+      }
+    ],
+    "causal_claim": [
+      {
+        "content": "Post-hoc synthesisability filters provide only weak correlation with experimental difficulty, so they do not solve the synthesisability problem.",
+        "evidence_spans": [
+          "Post-hoc synthesisability filters provide only weak correlation with experimental difficulty"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The systematic failure of major generative architectures indicates that solving the synthesisability gap requires a paradigm shift from structure-centric methods to protocol-first design, treating synthesis protocols as first-class design objects.",
+        "evidence_spans": [
+          "This systematic failure across all major generative architectures-from VAEs to diffusion models-indicates that the solution lies not in incremental improvements to structure-centric methods, but in a fundamental paradigm shift that treats synthesis protocols as primary design objects.",
+          "This approach directly addresses the synthesisability gap by treating the recipe-not just the product-as the primary design variable.",
+          "By elevating synthesis protocols to first-class citizens in modelling and inverse design, the synthesis-first paradigm embeds feasibility constraints from the outset, offering a direct pathway to bridge this divide."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Confining search to executable, experimentally actionable procedures improves practical relevance and enables more efficient optimization over real operations.",
+        "evidence_spans": [
+          "it confines search to experimentally actionable procedures, improving relevance and enabling efficient optimisation over real operations"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Making protocol variables explicit allows learning of properties that depend sensitively on process conditions such as temperature ramps, solvent, pH, and aging time.",
+        "evidence_spans": [
+          "Properties that depend sensitively on temperature ramps, solvent, pH or ageing time can be learned because these variables are explicit inputs"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Protocol representations naturally map to robot instructions, enabling closed-loop self-driving laboratories.",
+        "evidence_spans": [
+          "Protocol representations map naturally to robot instructions, enabling closed-loop, SDLs"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Correlating process variables with performance reveals non-equilibrium effects, defect formation, and morphology control that structure-only models miss.",
+        "evidence_spans": [
+          "Correlating process variables with performance uncovers non-equilibrium effects, defect formation and morphology control invisible to equilibrium structure-only models"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Including green-chemistry metrics, economic costs, and other practical factors directly in protocol-based multi-objective optimization can steer design toward deployable solutions.",
+        "evidence_spans": [
+          "Green-chemistry metrics (E-factor, process mass intensity (PMI), energy footprint) and economic costs (precursor cost, throughput, labour, equipment amortisation) can be included directly in multi-objective optimisation, steering design toward practically deployable solutions",
+          "Multi-objective optimisation (performance, sustainability, cost) is naturally handled when economic and environmental factors are embedded in protocol representations"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Recent protocol-aware and self-driving-lab examples show that embedding synthesis or experimental constraints improves experimental relevance and hit rates relative to structure-only approaches.",
+        "evidence_spans": [
+          "These successes, though nascent, confirm that embedding synthesis constraints can drastically improve experimental relevance compared to structure-only approaches.",
+          "embedding experimental constraints dramatically improves hit rates compared to structure-only approaches."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Closed-loop optimization of fast-charging protocols with ML improves Li-ion performance and mitigates degradation.",
+        "evidence_spans": [
+          "Closed-loop optimisation of fast-charging protocols with ML improves performance and mitigates degradation in Li-ion cells"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Combining Bayesian optimization with mechanistic surrogate models in flow settings reduces the number of experiments and helps navigate multi-objective trade-offs.",
+        "evidence_spans": [
+          "combining BO with mechanistic surrogate models reduces experiments and navigates multi-objective trade-offs"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Automated spin-coating coupled to Bayesian optimization can co-optimize perovskite precursor composition and processing conditions.",
+        "evidence_spans": [
+          "Automated spin-coating coupled to BO has been used to co-optimise precursor composition and processing conditions for perovskite solar cells"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "ML-assisted real-time feedback control can steer quantum-dot growth by linking growth conditions to in situ structural observations.",
+        "evidence_spans": [
+          "Machine-learning-assisted real-time feedback control has been used to steer InAs/GaAs quantum-dot growth by coupling growth conditions to in situ reflection high-energy electron diffraction videos, which act as structure-sensitive observations of the evolving surface and quantum-dot density"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Active learning coupled to high-throughput experimentation accelerates electrocatalyst discovery and optimization.",
+        "evidence_spans": [
+          "Active learning coupled to high-throughput experimentation accelerates discovery and optimisation of electrocatalysts for CO reduction and hydrogen evolution"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Interpretable ML can reveal process-structure-property relationships that guide catalyst optimization.",
+        "evidence_spans": [
+          "Interpretable ML (e.g. Shapley additive explanations, SHAP) elucidates process-structure-property relationships to guide catalyst optimisation"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Flow and continuous processing are especially suitable for protocol-centric optimization because they allow real-time parameter adjustment.",
+        "evidence_spans": [
+          "Flow and continuous processing environments are particularly amenable to protocol-centric optimisation because they enable real-time parameter adjustment"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Closed-loop operation with inline characterization provides the rapid feedback necessary for effective learning.",
+        "evidence_spans": [
+          "Closed-loop operation with inline characterisation provides the rapid feedback necessary for effective learning"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Protocol-centric applications are most successful when processing strongly influences final properties, precisely where structure-only methods fail.",
+        "evidence_spans": [
+          "Critically, the highest-impact applications focus on problems where processing conditions strongly influence final properties-precisely where structure-only approaches fail."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Overall, the synthesis-centric paradigm is presented as a demonstrated pathway to bridge the synthesisability gap and accelerate materials discovery, offering a faster and more reliable route to functional materials.",
+        "evidence_spans": [
+          "The synthesis-centric paradigm is not merely a theoretical alternative but a demonstrated pathway to bridging the synthesisability gap and accelerating materials discovery.",
+          "These advances collectively point toward an accelerated, more reliable route to functional materials."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Structure-centric ML historically dominated because structures are more standardized and scalable structure-derived labels are easier to generate.",
+        "evidence_spans": [
+          "The community\u2019s historical fixation on structure is not accidental: crystal structures are comparatively well standardised; structure-derived labels (energies, band gaps, elastic constants) can be generated at scale with mature simulation workflows; and many property predictors are naturally formulated as structureproperty mappings."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Protocol heterogeneity, platform dependence, and underspecification make protocol-centered AI harder and more brittle than structure-only approaches.",
+        "evidence_spans": [
+          "By contrast, protocol data are heterogeneous, platform-dependent and often underspecified, making protocol-centred AI both harder and more brittle."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Protocol-centric models can require higher training and deployment costs than structure-only models because they may rely on multimodal embeddings, simulator calls, or experiment-in-the-loop optimization, although multi-fidelity, surrogate, and lightweight graph-based methods can mitigate these burdens.",
+        "evidence_spans": [
+          "Protocol-centric models-often featuring multimodal embeddings, simulator calls, or experiment-in-the-loop optimisation-can incur higher training and deployment costs than structure-only VAEs or diffusion networks",
+          "however, multi-fidelity, surrogate-model, and lightweight graph-based strategies can mitigate these burdens."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Protocol-aware systems can lower end-to-end discovery cost by rapidly avoiding uninformative or failed experiments.",
+        "evidence_spans": [
+          "protocol-aware systems can lower end-to-end discovery cost if they rapidly avoid uninformative or failed experiments."
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "The synthesisability gap arises because structure-centric or structure-only optimization treats synthesis as a downstream solvable task and neglects the synthetic constraints that actually define accessible chemical space, including unknown or infeasible pathways, precursor availability and cost, impractical conditions, kinetic traps and competing reactions, purification and isolation challenges, scalability, and safety or regulatory constraints.",
+        "evidence_spans": [
+          "underscoring the limitations of pipelines that neglect kinetics, precursor availability and practical constraints",
+          "Key contributing factors include:\n\u2022  Unknown or infeasible reaction pathways\n\u2022  Precursor availability and cost\n\u2022  Impractical reaction conditions\n\u2022  Kinetic traps and competing reactions\n\u2022  Purification and isolation challenges\n\u2022  Scalability\n\u2022  Regulatory, safety or environmental constraints",
+          "Thus, structure-only optimisation implicitly assumes synthesis is a solvable downstream task, whereas in reality synthetic constraints define the accessible chemical space."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Higher experimental success probability comes not from executability alone but from combining synthetic or protocol constraints with uncertainty-aware model selection, structure-sensitive feedback, and iterative closed-loop refinement.",
+        "evidence_spans": [
+          "In practice, higher success probability comes not from executability alone but from combining such constraints with uncertainty-aware model selection, structure-sensitive feedback, and iterative closed-loop refinement."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because protocol-aware methods influence laboratory efficiency, evaluation should target scientific yield per combined lab-plus-compute budget rather than compute cost alone.",
+        "evidence_spans": [
+          "For this reason, the relevant metric is not model floating point operations in isolation but scientific yield per unit of combined laboratory and compute budget."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Protocol models are difficult to universalize because protocols are tied to platform-specific action vocabularies, incomplete provenance, temporal control logic, and multimodal coupling between text, sensors, and hardware; these structural differences motivate roadmaps that prioritize standardization, provenance, and robust execution.",
+        "evidence_spans": [
+          "because protocols depend on platform-specific action vocabularies, incomplete provenance, temporal control logic and the coupling of textual, sensor and hardware data.",
+          "Recognising these structural reasons is important for designing realistic roadmaps that prioritise standardisation, provenance and robust execution."
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "Closing the synthesisability gap requires a synthesis-first paradigm that elevates executable synthesis protocols to primary/first-class design variables within a synthesis protocol\u2013property framework, embedding experimental feasibility from the outset.",
+        "evidence_spans": [
+          "We argue that closing this gap demands a pivot to a synthesis-first paradigm in which executable synthesis protocols, not just atomic configurations, are treated as primary design variables.",
+          "We contend that closing this gap demands a synthesis-first paradigm in which executable synthesis protocols, not just atomic configurations, are treated as the primary design variables.",
+          "We propose elevating synthesis protocols to first-class design objects in a synthesis protocol\u2013property framework that embeds experimental feasibility from the outset."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Thermodynamic stability alone is insufficient for practical viability, so bridging virtual candidates to executable recipes requires hybrid protocol-aware pipelines that couple structure-centric tools with protocol-aware planners; protocol-first and structure-first approaches are complementary.",
+        "evidence_spans": [
+          "thermodynamic stability alone is an insufficient metric of practical viability; hybrid pipelines that couple structure-centric tools with protocol-aware planners are needed to bridge from virtual candidates to executable recipes.",
+          "We view protocol-first and structure-first approaches as complementary."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Hierarchical Bayesian or Gaussian-process multi-fidelity models should fuse literature-scale low-fidelity data with high-fidelity SDL measurements, alongside explicit measurement-error models and batch-effect correction.",
+        "evidence_spans": [
+          "We advocate hierarchical Bayesian or Gaussian-process multi-fidelity modelling to fuse literature-scale low-fidelity data with high-fidelity SDL measurements, coupled to explicit measurement-error models and batch-effect correction."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Incorporating physical priors, uncertainty quantification, and interpretable architectures should improve trust and insight.",
+        "evidence_spans": [
+          "Incorporating physical priors, providing uncertainty quantification and employing interpretable architectures (e.g. latent-space attention visualisation, SHAP) will build trust and insight [53]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the medium term, human\u2013AI collaboration will likely be the dominant SDL operating mode rather than fully autonomous lights-out laboratories.",
+        "evidence_spans": [
+          "In the medium term we therefore envision human\u2013AI collaboration as the dominant operating mode: AI assists chemists with planning, monitoring, and failure recovery rather than operating fully lights-out."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Protocol-space foundation models are plausible but harder to universalize than structure models; the more realistic path is interoperable foundation models grounded in execution logs, characterization streams, and explicit ontologies that preserve uncertainty over out-of-distribution actions and transfer across platforms.",
+        "evidence_spans": [
+          "We consider protocol-space foundation models plausible, but harder to universalise than structure models because protocols depend on platform-specific action vocabularies, incomplete provenance, temporal control logic and the coupling of textual, sensor and hardware data.",
+          "In our view, the most realistic route is not a single monolithic model trained on \u2018all protocols\u2019, but interoperable foundation models grounded in execution logs, characterisation streams and explicit ontologies that permit transfer across platforms while preserving uncertainty about out-of-distribution actions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The authors envision a future materials discovery ecosystem in which synthesis protocols are the primary design variables, increasingly integrated with autonomous experimentation and real-time characterization; as these elements mature and interoperate, the synthesisability gap should narrow and materials science can shift toward executable design.",
+        "evidence_spans": [
+          "We envision a materials discovery ecosystem where synthesis protocols are the primary design variables, increasingly integrated with autonomous experimentation and real-time characterisation.",
+          "We expect the synthesisability gap to narrow substantially as these elements mature and interoperate.",
+          "By embracing protocols as design objects and embedding experimental reality into our computational frameworks, we can transform materials science from a discipline of discovery to one of design-one executable recipe at a time."
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "Only a small fraction of low-enthalpy phases identified in high-throughput computational surveys have been realized experimentally, and experimental chemists often struggle to realize computationally designed structures in the laboratory.",
+        "evidence_spans": [
+          "Fewer than 2\u2009% of over 50\u2009000 low-enthalpy phases identified in high-throughput surveys have been realised experimentally",
+          "Experimental chemists frequently struggle to realise these computationally designed structures in the laboratory."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Case studies and early successes\u2014including protocol-optimized battery electrolytes and self-driving quantum-dot synthesis\u2014show that protocol-aware AI is transitioning from proof-of-concept to practical impact across diverse materials domains.",
+        "evidence_spans": [
+          "These case studies demonstrate that protocol-aware AI is transitioning from proof-of-concept to practical impact across diverse materials domains.",
+          "Early successes-from protocol-optimised battery electrolytes to self-driving quantum dot synthesis-confirm"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The evidence presented in earlier sections indicates that a synthesis-first paradigm shift is both necessary and achievable.",
+        "evidence_spans": [
+          "The evidence presented in sections 2\u20135 demonstrates that this paradigm shift is both necessary and achievable."
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "Protocol refinement and inverse design must operate under real experimental realities, including sustainability, safety, resource, platform, and scale-up constraints when judging protocol viability.",
+        "evidence_spans": [
+          "(iii) integrating closed-loop optimisation to refine protocols against experimental realities and sustainability constraints.",
+          "inverse design corresponds to mapping target properties (and, where relevant, target structures) to one or more candidate protocols  under experimental, safety and resource constraints.",
+          "Protocols generated within a constrained action/reaction grammar are, in principle and subject to platform and safety constraints, executable in a laboratory setting.",
+          "We further note that scale-up challenges (heat/mass transfer, economic amortisation of equipment and reagents) must be considered when evaluating protocol viability."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Protocol and synthesis models must account for inorganic-specific constraints and failure modes, including multiphase outcomes, path dependence, non-equilibrium kinetics, transport and reactor effects, and sparse or biased protocol data.",
+        "evidence_spans": [
+          "Inorganic-specific constraints and failure modes: we highlight modelling and data issues that are distinctive for inorganic/solid-state synthesis (multiphase outcomes, path dependence, reactor effects, and sparse or biased protocol corpora)",
+          "The mapping is path-dependent and governed by non-equilibrium kinetics, multi-scale transport, and reactor/vessel effects."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Validation and benchmarking must go beyond random train/test splits and purely computational scores to use curated benchmarks and evaluation protocols that reflect experimental constraints, including chemically held-out systems, cross-laboratory/cross-platform transfer, calibration against characterization, ablations, transfer settings, calibration metrics, and reporting conventions.",
+        "evidence_spans": [
+          "Validation must likewise go beyond random train/test splits and include chemically held-out systems, cross-laboratory transfer, calibration against operando or ex situ characterisation, and ablations",
+          "Objective comparison of new algorithms demands curated benchmark suites and clear evaluation protocols.",
+          "The more immediate priority is therefore to define benchmark tasks, transfer settings, calibration metrics and reporting conventions that reflect real experimental constraints rather than purely computational scores."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Robust modelling requires deliberate inclusion of failed, null, and low-yield experiments, chemistry-aware handling of data imbalance, and evaluation of genuine transfer across laboratories/platforms with principled domain adaptation for covariate and label shift, not just within-lab interpolation.",
+        "evidence_spans": [
+          "Robust modelling under these conditions requires more than simple data accumulation: it demands deliberate capture of failed, null and low-yield experiments, chemistry-aware reweighting or stratified sampling, and evaluation protocols that distinguish interpolation within one laboratory from genuine transfer across platforms.",
+          "requires principled domain adaptation and transfer learning, with careful handling of covariate and label shifts."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Real-time robotic and practical deployment is constrained by scheduling, dead-time awareness, calibration/verification, and failure-recovery or fail-safe control requirements for autonomous operation.",
+        "evidence_spans": [
+          "For real-time robotic execution, optimisation algorithms must interface with job-shop scheduling or dead-time-aware planners and incorporate failure-recovery logic to maintain autonomous operation",
+          "Practical adoption will require job-shop scheduling with dead-time awareness, automatic calibration and verification routines, and fail-safe recovery policies"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Interoperability across laboratories requires more than shared ontologies: it also needs consensus ontologies, round-trippable parsers, reliable execution provenance capture, and durable links between synthesis and characterization events to avoid siloed datasets.",
+        "evidence_spans": [
+          "Protocol interoperability across laboratories requires more than shared ontologies: it requires reliable capture of execution provenance (what actually happened, with what deviations), and durable links between synthesis events and downstream characterisation.",
+          "Consensus ontologies and parsers capable of round-tripping between formats will be crucial to avoid siloed datasets [60]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Standardized protocol normalization and schema versioning are necessary constraints to prevent dataset drift and support reproducible training.",
+        "evidence_spans": [
+          "Standardised protocol normalisation (units, timing semantics, vessel context) and schema versioning are essential to prevent dataset drift and enable reproducible training."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Ambiguous NLP-derived protocol representations require human-in-the-loop curation and active error-correction workflows.",
+        "evidence_spans": [
+          "Ambiguous NLP parses benefit from human-in-the-loop curation and active error-correction workflows."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Progress is constrained not only by algorithms but also by the availability of robust, scalable experimentation platforms and interoperable protocol execution.",
+        "evidence_spans": [
+          "progress will be limited if advances remain purely algorithmic: robust, scalable experimentation platforms and interoperable protocol execution are equally central."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

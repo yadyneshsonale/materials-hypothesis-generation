@@ -1,0 +1,1379 @@
+{
+  "paper_id": "2607.13688",
+  "chunks_processed": 6,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Optimizing materials with controllable microstructures needs efficient multiscale simulations.",
+        "evidence_span": "Optimizing these materials with controllable mi-\ncrostructures requires e\ufb00icient multiscale simulations."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Existing microscale surrogate models need large datasets, especially across varying microstructures.",
+        "evidence_span": "Data-driven surrogate models for the microscale\ncan accelerate multiscale simulations, but require large amounts of data even for a fixed microstruc-\nture. When a range of microstructures is considered, as is the case in multiscale optimization, even\nmore data is needed to train a surrogate."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Optimizing graded materials requires linking local microstructure to macroscopic response.",
+        "evidence_span": "However, optimizing such a grading requires relating the local microstructure to the macro-\nscopic response."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "FE2 is computationally expensive because it solves a microscale problem at every quadrature point.",
+        "evidence_span": "Solving a separate boundary value problem for every quadrature point makes this very computationally demanding."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Nonlinear surrogates for a single fixed microstructure cannot handle varying microstructures in graded composites.",
+        "evidence_span": "For nonlinear materials, however, surrogates are typically trained to map strains to homogenized stresses for a single, fixed microstructure, and therefore cannot account for varying un-\nderlying microstructures. This makes them unsuitable for simulating functionally graded composites,\nwhere the microstructure varies across the domain."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Experimentally optimizing the grading of woodchip distribution and angle is not feasible, and numerical optimization remains challenging.",
+        "evidence_span": "Experimentally\nfinding the optimal grading of woodchip distribution and angle is not feasible, and even numerically\nthis remains challenging."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Pointwise dataset loss is insufficient to judge full FE2 performance.",
+        "evidence_span": "Dataset losses quantify pointwise accuracy, but do not fully correlate with the surrogate performance in a full FE2 simulation."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "High data-generation cost makes data efficiency important for surrogate multiscale modeling.",
+        "evidence_span": "Still, this large data generation time illustrates the relevance of data requirements for surrogate modeling in multiscale analysis."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Exact control of microscale geometry is generally not yet feasible, and relating manufacturing variables to microscale geometry is difficult.",
+        "evidence_span": "Precisely controlling the microscale geometry as assumed in Section 5 is not yet feasible for most materials. Manufacturing process variables influence the microscale, but finding an exact relation between these variables and the microscale geometry is not straightforward."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The manufacturing-variable study is intended as a computational proof of concept to motivate future experiments.",
+        "evidence_span": "This serves as a computational proof-of-concept aiming to inspire future experimental work."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The work argues that multiscale simulations need surrogates that are aware of microstructure.",
+        "evidence_span": "Overall, this work highlights the\nnecessity of microstructure-aware data-driven surrogates for multiscale simulations."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Complete microstructure can be used as surrogate input via CNNs or GNNs.",
+        "evidence_span": "One way of overcoming this limitation is by using a surrogate model that takes the complete\nmicrostructure as input, for example, using a convolutional neural network (CNN) [6, 7] or a graph\nneural network (GNN) [8]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Microstructural geometric variables have been used to predict effective properties directly.",
+        "evidence_span": "Microstructural geometric variables can also be used to directly predict the\neffective properties of the material [9]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Microstructural variables have been added directly to recurrent or embedded network inputs.",
+        "evidence_span": "Alternatively, they can be directly passed as additional inputs,\nfor example to the hidden state in a gated recurrent unit [10], or encoded into a small vector before\nconcatenating it to the hidden embedding in a network [11]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Meta-learning or transfer learning adapts a base model to limited new data from another distribution.",
+        "evidence_span": "Meta-learning or transfer learning can adapt or fine-tune a base model to limited new data from\na different underlying distribution [12, 13, 14, 15]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "PRNNs incorporate physical bias and can learn from tiny datasets.",
+        "evidence_span": "Physically Recurrent Neural Networks (PRNNs) have recently shown\na remarkable ability to learn based on tiny datasets, overcoming the bottleneck of costly data genera-\ntion [16]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "DMN learns homogenization behavior while retaining microscale material models.",
+        "evidence_span": "In a similar vein, a Deep Material Network (DMN) learns the homogenization\nbehavior of a multi-phase material [18], while maintaining the microscale material models."
+      },
+      {
+        "role": "prior_approach",
+        "content": "DMNs have been conditioned on microstructure by interpolation, volume fraction, or latent-space conditioning.",
+        "evidence_span": "DMNs\nhave recently been conditioned on the microstructure, such as by interpolating between several DMNs\ntrained on different RVEs, by conditioning on the volume fraction [19], and by conditioning on a latent\nspace learned from the microscale geometry [20]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Hypernetworks have been used to predict DMN weights from microstructure.",
+        "evidence_span": "The weights of\nthe DMN are thus predicted by a separate neural network; such a second network is generally called a\nhypernetwork."
+      },
+      {
+        "role": "prior_approach",
+        "content": "HyperCANs use a hypernetwork to generate an input convex network from unit-cell geometry.",
+        "evidence_span": "HyperCANs follow the same principle, where, based on the geometry of a unit cell truss\nlattice, a hypernetwork learns the weight parameters of an input convex neural network that predicts\nthe strain energy density given a deformation gradient [21]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "A common prior strategy is to condition on a black-box latent space learned by a generative model.",
+        "evidence_span": "When the microstructure exhibits a complex geom-\netry that cannot be parametrized explicitly, a common strategy is to condition on a black-box\nlatent space learned by a generative model that captures its properties [20]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Earlier work showed PRNNs perform well in a finite-strain framework.",
+        "evidence_span": "In this work we will use PRNNs as a surrogate for the microscale model, building on earlier work\nthat demonstrated that PRNNs perform well in a finite strain framework [31]."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Existing microstructure-aware surrogate approaches generally need very large training datasets.",
+        "evidence_span": "These approaches have the potential to\nbe used in the optimization of a graded material, but generally still require vast amounts of training\ndata."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Meta-learning or transfer learning still needs new data for each setting, making continuous gradings infeasible.",
+        "evidence_span": "but still require separate data collection for each\nnew setting, making it infeasible for continuous gradings."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Guaranteeing valid predicted C tensors by scaling the linear encoder weights reduces encoder flexibility.",
+        "evidence_span": "While this guarantees a valid \u02c6C\u03c9 for any F\u2126, it limits the flexibility of the encoder."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Direct input concatenation is unsuitable for PRNNs because it conflicts with the encoder design, complicates the linear encoder, and prevents decoder adaptation.",
+        "evidence_span": "For the PRNN, this approach conflicts with the role of the encoder, which is meant to map only the\nmacroscopic strain onto a latent representation of microscopic strains. While the nonlinear encoder\ncould in theory support additional inputs, the linear encoder would require further modifications, and\nwould not allow the decoder to adapt either."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Using a 2D slice from the 3D deposition weakens the direct link between manufacturing variables and final microstructure.",
+        "evidence_span": "This approach of taking a 2D slice from the 3D deposition does somewhat disconnect the manufacturing variable from the generated microstructure; the final model used is only indirectly related to the process that simulated it."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Instead of DMNs or other alternatives, the work chooses PRNNs because they already handle variation in microscale material properties.",
+        "evidence_span": "In this work, we opt for PRNNs because they can already account for variations in the microscale\nmaterial properties, and extend them to be conditioned on microstructural variables using a hypernet-\nwork, which we refer to as a HyPRNN."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than conditioning on a black-box latent space from a generative model, the work conditions directly on manufacturing variables.",
+        "evidence_span": "When the microstructure exhibits a complex geom-\netry that cannot be parametrized explicitly, a common strategy is to condition on a black-box\nlatent space learned by a generative model that captures its properties [20]. We introduce a\nnew approach that instead conditions directly on the manufacturing variables generating the\nmicrostructure, eliminating the need for such an additional model."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than concatenating microstructural variables to the PRNN inputs, the work uses a hypernetwork because direct concatenation conflicts with the encoder role and limits architecture adaptation.",
+        "evidence_span": "The straightforward approach to condition\na data-driven model on additional parameters is by concatenating the variables as additional inputs.\nFor the PRNN, this approach conflicts with the role of the encoder, which is meant to map only the\nmacroscopic strain onto a latent representation of microscopic strains. While the nonlinear encoder\ncould in theory support additional inputs, the linear encoder would require further modifications, and\nwould not allow the decoder to adapt either.\n\nInstead, we preserve the existing PRNN architecture, and use a hypernetwork H that learns the\nPRNN encoder and decoder parameters based on microstructural variables."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Instead of uniformly sampling all (Vf, r) combinations with remeshing every time, the study uses a predefined grid of meshes to avoid generating a new mesh for each combination.",
+        "evidence_span": "Rather than generating a new mesh for every (Vf, r) combination that would arise from uniform sampling of r, we draw from a predefined set of (Vf, r) meshes."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The study grades microstructural parameters instead of the more conventional graded thickness.",
+        "evidence_span": "We adopt a similar setup but grade the microstructural parameters rather than the thickness under an internal pressure."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Instead of Bayesian optimization and related alternatives, the study uses CMA-ES, though optimizer choice is not expected to change conclusions.",
+        "evidence_span": "We use the Covariance Matrix Adaptation Evolution Strategy (CMA-ES) [40], an off-the-shelf, iterative, derivative-free algorithm, to optimize our objective function. Alternative optimization algorithms, such as Bayesian optimization, are also expected to work, and the choice of optimizer is not expected to affect our conclusions."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The authors deliberately avoid experimental calibration, choosing a pragmatic uncalibrated deposition model for demonstration purposes.",
+        "evidence_span": "As we focus here on demonstrating our approach, we make the pragmatic choice of not calibrating against experiments."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Ideally the full 3D deposition would be used directly, but the study transfers it to 2D to reduce mechanical-simulation cost.",
+        "evidence_span": "Ideally, the 3D deposition would be directly used, but we transfer it to 2D to reduce the computational cost of simulating the mechanical behavior of the microstructures."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Instead of adding a separate generative model to parameterize microstructural geometry, the study conditions directly on manufacturing variables.",
+        "evidence_span": "We circumvent the need for an additional model to parametrize microstructural geometries (e.g.,\na conditional variational autoencoder or a conditional denoising diffusion model) and instead condi-\ntion directly on the manufacturing variables used to generate the microstructure."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The authors did not fully grid-search hyperparameters, instead using a manual iterative tuning process.",
+        "evidence_span": "We did not perform a full grid sweep over the possible settings for each model, but followed a more manual iterative process."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "ReLU was dropped from further neural-network size trials because it performed worse than other activations.",
+        "evidence_span": "for the neural network, we found that reLU performed worse than the other activations, and therefore did not try all model sizes with it."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "An alternative hypernetwork setup that scaled hidden-layer sizes with the number of outputs was considered but abandoned because it gave no improvement.",
+        "evidence_span": "For the hypernetwork, we further considered an alternative setup that scaled the hidden layer sizes depending on the number of its outputs (the number of encoder weights), but found no gain."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Results from the NN (32) surrogate were omitted because its high errors would force much larger axis bounds and hinder comparison.",
+        "evidence_span": "We omit the results of the NN (32) surrogate, as its errors are high, and including its paths requires a substantial increase of the axes bounds, making the other paths more challenging to compare."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "Application requirements are motivated by functionally graded bio-based composites, especially mycelium-woodchip composites.",
+        "evidence_span": "While this work focuses on computational methods, we base our requirements on applications such\nas functionally graded bio-based composites. In particular, we are interested in mycelium-woodchip\ncomposites"
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The disk optimization setup is adapted from functionally graded materials studies that use graded thickness to reduce peak stresses.",
+        "evidence_span": "Disks subject to rotation or internal loads are commonly studied in the functionally graded materials literature [37, 38, 39], where a graded thickness is typically used to reduce peak stresses. We adopt a similar setup but grade the microstructural parameters rather than the thickness under an internal pressure."
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Conditioning on microstructural variables using a hypernetwork enables accurate multiscale mechanical predictions even with small training datasets.",
+        "evidence_span": "This approach enables accurate\npredictions of multiscale mechanical behavior for a mycelium-woodchip composite material, even when\ntrained on small datasets."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The conditioned surrogate makes simulations of functionally graded structures tractable.",
+        "evidence_span": "The conditioned surrogate makes multiscale simulations of functionally\ngraded structures tractable"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Conditioned surrogate models enable multiscale optimization of microarchitectured structures and thereby accelerate sustainable-material design.",
+        "evidence_span": "This contribution highlights the benefits of microarchitectured structures\nand demonstrates how conditioned surrogate models enable their multiscale optimization, which will\naccelerate the development and design of future sustainable materials and structures."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Embedding microscale constitutive models in PRNNs allows direct modification of material properties without retraining or new data.",
+        "evidence_span": "As the microscale constitutive models are embedded directly inside the PRNN architecture,\ntheir material properties can be modified directly without requiring retraining or additional data col-\nlection [17]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Heterogeneous materials in nature evolved because they are mechanically more efficient.",
+        "evidence_span": "However, in nature, many heterogeneous materials evolved, such as bones, teeth, wood, and\nbamboo, as these are more mechanically e\ufb00icient designs [1]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Precisely manufacturing a functionally graded material enables more efficient structural design.",
+        "evidence_span": "Precisely manufacturing a functionally graded material similarly enables the design of more e\ufb00icient\nstructures."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Controlling substrate properties and mycelium growth can tailor a functionally graded material to desired macroscale behavior.",
+        "evidence_span": "Controlling the substrate properties and mycelium growth can tailor a\nfunctionally graded material to specific macroscale behavior."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Mycelium acts as a binder to form a lightweight but stiff biodegradable composite when grown on woodchips or natural fibers.",
+        "evidence_span": "Growing on a substrate of woodchips or natural fibers, it acts as a binder that forms a lightweight\nyet stiff biodegradable composite [23, 24]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using E as encoder input ensures zero predicted microscopic strain in the undeformed state.",
+        "evidence_span": "We use E\u2126as input instead of F\u2126, as it helps satisfy the first condition. Because E\u2126is zero in the\nundeformed state, \u02c6E\u03c9\nm will be zero too, regardless of WE\nm."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Bounding the encoder weight eigenvalues guarantees a valid predicted C tensor for any admissible deformation gradient.",
+        "evidence_span": "This gives us the following criterion:\n\u03bbmax(WE\nm) \u22641 =\u21d2det( \u02c6C\u03c9\nm) > 0\n\u2200F\u2126: det(F\u2126) > 0.\n(14)\nWe enforce this by scaling WE\nm when its eigenvalues exceed this limit:"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Setting wmax to 1.25 keeps the predicted C tensor valid unless compression exceeds about 55%.",
+        "evidence_span": "For wmax = 1.25, \u02c6C\u03c9\nm is valid if\n\u03bbmin(F) >\n\u221a\n0.2 \u22480.447, meaning that one needs a compressive strain exceeding 55% to produce an\ninvalid \u02c6C\u03c9\nm."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Applying a zero-shift in the nonlinear encoder makes the latent variables zero in the undeformed state.",
+        "evidence_span": "Considering the first condition,\nwe apply a zero-shift to ensure \u03b8 is zero in the undeformed state:\n\u00af\u03b8 = NNE(E\u2126) \u2212NNE(0)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Cholesky-style parametrization makes the predicted C tensor positive definite by construction.",
+        "evidence_span": "In addition, this matrix is positive definite\nby definition, and thus satisfies the second condition."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The combined dataset has higher error because it is more complex and reaches higher stress values, increasing absolute prediction differences.",
+        "evidence_span": "This is because the dataset is more complex, and also reaches higher stress values, making the absolute difference larger than the relative difference in prediction."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Surrogate-based simulations are faster than RVE-based ones.",
+        "evidence_span": "The stark contrast between the RVE and surrogate based simulation time highlights the benefit of surrogate-based simulations."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The speed advantage of surrogates would grow for larger macroscale problems or longer simulations.",
+        "evidence_span": "This contrast would only increase for larger macroscopic simulations with more elements, or those running for more time steps."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Adding small mycelium pellets decreases the resulting woodchip volume fraction.",
+        "evidence_span": "First, small round mycelium pellets can be added to the mix, decreasing the resulting woodchip volume fraction."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Controlling initial woodchip orientation can induce anisotropy.",
+        "evidence_span": "Second, the initial orientation of the dropped woodchips can be controlled, for example by using a sieve, resulting in anisotropy."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Initializing chips with a common orientation but adding small random velocities causes deviations while preserving an anisotropic effect.",
+        "evidence_span": "All woodchips are initialized with the same orientation \u03b8... but a small random velocity is added to each to avoid an unrealistically aligned result. As a result, most woodchips deviate to some extent from their initial orientation, but the remaining effect does lead to anisotropy."
+      },
+      {
+        "role": "causal_claim",
+        "content": "A smaller dataset is used because the HyPRNN is conditioned on fewer parameters than before.",
+        "evidence_span": "Since the HyPRNN is conditioned on fewer parameters than before, we create a smaller dataset consisting of 512 samples, 256 used for training, and 128 each for validation and testing."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The example shows that a HyPRNN can identify manufacturing variables that produce desired mechanical behavior.",
+        "evidence_span": "This example demonstrates how a HyPRNN can be used to find the manufacturing variables that lead to a desired mechanical behavior."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The physics-based inductive bias enables strong low-data performance for the linear-encoder HyPRNN.",
+        "evidence_span": "The physics-\nbased inductive bias allows the HyPRNN with linear encoder to perform very well in the low-data\nregime."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using an additional nonlinear encoder improves performance when more data are available.",
+        "evidence_span": "An additional nonlinear encoder was introduced that performs better than the linear encoder\nwhen more data is available."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using woodchip material points worsens losses in the low-data regime.",
+        "evidence_span": "The woodchip material points cause significantly worse losses in the low-data regime."
+      },
+      {
+        "role": "causal_claim",
+        "content": "With sufficient data, the models learn to make good predictions despite the woodchip points.",
+        "evidence_span": "Given su\ufb00icient data, the models learn to make good predictions"
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Manufacturing variables can affect macroscale behavior through their complex influence on microstructure.",
+        "evidence_span": "manufacturing variables that can\nhave a complex influence on the microstructure. This is a practical route to engineer the microscale for\ndesired macroscale behavior."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "PRNNs can change material properties directly because the microscale constitutive models are embedded in the architecture.",
+        "evidence_span": "As the microscale constitutive models are embedded directly inside the PRNN architecture,\ntheir material properties can be modified directly without requiring retraining or additional data col-\nlection [17]."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Because DMN learns the homogenization scheme, conditioning must be implemented by changing network weights.",
+        "evidence_span": "Since a DMN essentially learns the homogenization\nscheme, this conditioning can only be done by modifying the weights of the network."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Because material nonlinearity is handled by the material model and homogenization by the decoder, the encoder is the natural place to capture geometric nonlinearity.",
+        "evidence_span": "With the material model capturing material nonlinearity, and the decoder mirroring the homogenization\nstep, the encoder is the natural place for capturing geometric effects."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Zero predicted microscopic strain follows because E is zero in the undeformed state.",
+        "evidence_span": "Because E\u2126is zero in the\nundeformed state, \u02c6E\u03c9\nm will be zero too, regardless of WE\nm."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The shifted softplus is chosen so that zero latent input yields the identity tensor, satisfying the undeformed-state condition.",
+        "evidence_span": "where \u03c3(x) = softplus(x) \u2212ln(2) + 1 is a shifted softplus chosen so that \u03c3(0) = 1. This ensures that\nwhen \u00af\u03b8m is zero, \u02c6C\u03c9\nm = I, satisfying the first condition."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The sparse decoder uses positive component-wise weights analogous to volume fractions in homogenization.",
+        "evidence_span": "By analogy with volumetric homogenization, the weights here represent the volume (or area), and the\nsoftplus function ensures these are positive."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The hypernetwork conditions the model by learning a continuous mapping from microstructural variables to PRNN weight space.",
+        "evidence_span": "In effect, the hypernetwork\nlearns a continuous mapping from microstructural variables to the space of PRNN weights, rather than\nproducing a single set of weights tied to one microstructure."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Nonlinear PRNN transfers material properties less well because it depends less on the material-model physics to reproduce the data.",
+        "evidence_span": "This is because the nonlinear PRNN relies less strongly on the physics in the material model for reproducing the data."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "FE2 performance can diverge from dataset loss because of nonlinear point interactions, importance of tangent stiffness, and different sampled-state distributions.",
+        "evidence_span": "The nonlinear interactions between the points might cause the solution to drift, the tangent stiffness plays a direct role, and the distribution of explored points differs from the test set distribution."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Penalty contact is used so the compression test can be replicated while allowing separation from the plate.",
+        "evidence_span": "This loading is imposed with a contact model using the penalty method in order to replicate a compression test and allow for separation from the plate."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "Conditioning a hybrid physics-data surrogate on microstructural variables via a hypernetwork can overcome the data challenge.",
+        "evidence_span": "To overcome this challenge, we condition a hybrid physics-\ndata surrogate on microstructural variables using a hypernetwork."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Conditioning directly on manufacturing variables is proposed as a practical route to control microscale structure for target macroscale behavior.",
+        "evidence_span": "Then, we go one step further, conditioning the network directly on manufacturing variables that can\nhave a complex influence on the microstructure. This is a practical route to engineer the microscale for\ndesired macroscale behavior."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "PRNNs can be extended with a hypernetwork to condition on microstructural variables.",
+        "evidence_span": "In this work, we opt for PRNNs because they can already account for variations in the microscale\nmaterial properties, and extend them to be conditioned on microstructural variables using a hypernet-\nwork, which we refer to as a HyPRNN."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Conditioning directly on manufacturing variables is proposed to remove the need for an additional latent-space model.",
+        "evidence_span": "We introduce a\nnew approach that instead conditions directly on the manufacturing variables generating the\nmicrostructure, eliminating the need for such an additional model."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "A nonlinear encoder with greater flexibility is proposed to capture geometric effects in finite-strain hyperelasticity.",
+        "evidence_span": "We therefore explore a nonlinear\nencoder with increased flexibility in addition to a linear encoder."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "A hypernetwork can map microstructural variables to PRNN weights, enabling conditioning while preserving the PRNN architecture.",
+        "evidence_span": "Instead, we preserve the existing PRNN architecture, and use a hypernetwork H that learns the\nPRNN encoder and decoder parameters based on microstructural variables."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Large stiffness contrast between mycelium and woodchip is suspected to harm training.",
+        "evidence_span": "We suspect that the large contrast between the stiffness of the mycelium and the woodchip degrades training performance."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper proposes conditioning the PRNN directly on manufacturing-process variables.",
+        "evidence_span": "We therefore showcase the ability to condition the PRNN on variables from the manufacturing process."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The paper proposes a HyPRNN surrogate conditioned on microstructural variables via a hypernetwork.",
+        "evidence_span": "we propose a\nHyPRNN: a PRNN conditioned on microstructural variables using a hypernetwork"
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "The conditioned surrogate was validated against a full FE2 simulation.",
+        "evidence_span": "we validate it against a full FE2 simulation."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Optimization of a graded multiscale disk reduced peak stress by 42% versus a random microstructure.",
+        "evidence_span": "We optimize a graded\nmultiscale disk, and reduce the peak stress by 42% compared to one with a random microstructure."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Prior work showed material parameters can be changed per sample without retraining, even for large changes.",
+        "evidence_span": "This has been shown to work even for large changes of parameters, and no retraining of the network is required [17]."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Linear PRNN performs best with little data and reaches low loss with few samples.",
+        "evidence_span": "The PRNN with a linear encoder performs well in the low-data regime and achieves a low loss with very few samples."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Linear PRNN performance saturates, after which NN and nonlinear PRNN become better.",
+        "evidence_span": "Its loss plateaus after a certain number of training samples, when the NN and PRNN with a nonlinear encoder overtake it."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Nonlinear PRNN starts worse than linear PRNN but avoids the same plateau.",
+        "evidence_span": "The nonlinear PRNN starts from a higher loss than the linear PRNN, but does not suffer the same plateau."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For geometric conditioning alone, the same trend holds: linear encoder is better at low data, while nonlinear encoder and NN are better with more data.",
+        "evidence_span": "A similar trend to before is observed, with the linear encoder performing better in the low-data regime, and the nonlinear encoder and neural network performing better for larger sample sizes."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The low final error supports effectiveness of hypernetwork conditioning for PRNNs.",
+        "evidence_span": "The error decreasing to a low value indicates that the hypernetwork approach to conditioning a PRNN is effective."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The larger low-data gap in Dmat confirms a specific benefit of linear PRNNs for transfer across material-property values.",
+        "evidence_span": "The gap in Figure 5a between the linear PRNN and the NN in the low-data regime is larger than the gap in Figure 5b, confirming the particular benefit that the linear PRNN offers in that it can transfer between different material property values without being trained for it."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Nonlinear PRNN is closer to NN, indicating weaker transfer across material properties than linear PRNN.",
+        "evidence_span": "The nonlinear PRNN loss is closer to that of the NN, showing that it does not transfer material properties as well as a linear PRNN."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Model-type differences are significant while hyperparameter differences within a type are smaller, suggesting robustness to specific settings.",
+        "evidence_span": "For all the datasets, the differences between the types of models are significant, and variations for specific hyperparameters within one type are smaller. This indicates that the overall results are not overly sensitive to the specific settings used, such as the number of material points or a specific number of neurons in a layer."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Sigmoid activations outperform ReLU in all considered networks.",
+        "evidence_span": "Sigmoid activation performs much better than ReLU activation in all networks (NN, nonlinear encoder, hypernetwork)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "With little data, HyPRNNs using only mycelium material points outperform those also including woodchip material points.",
+        "evidence_span": "Furthermore, HyPRNN models with only the mycelium material points perform better than those with additional woodchip material points when there is little available data."
+      },
+      {
+        "role": "evidence_result",
+        "content": "In multiscale beam simulations, all HyPRNN surrogates agree relatively well with the RVE-based solution.",
+        "evidence_span": "All HyPRNN-based surrogates show relatively good agreement, and the linear HyPRNN with 512 samples shows a near-perfect match."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The linear HyPRNN trained on 512 samples nearly matches the RVE-based simulation.",
+        "evidence_span": "All HyPRNN-based surrogates show relatively good agreement, and the linear HyPRNN with 512 samples shows a near-perfect match."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The neural network trained on 32 samples performs very poorly in the multiscale simulation.",
+        "evidence_span": "The NN with 32 samples shows very poor performance."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Neural network surrogates produce nonzero stress in the undeformed state, unlike HyPRNN models.",
+        "evidence_span": "showing how the neural network surrogate produces a nonzero stress in the undeformed state, whereas the HyPRNN models do not."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Surrogate models greatly reduce simulation time relative to RVE-based simulations.",
+        "evidence_span": "The results are presented in Table 2, showing the much lower simulation time with the surrogate models."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Uniform optimization reduces peak stress from the random reference to 2.73 MPa after 240 simulations.",
+        "evidence_span": "An efficient uniform parametrization with a low peak stress of 2.73 [MPa] is reached after 240 simulations."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Graded optimization further lowers peak stress to 2.59 MPa after 1006 simulations.",
+        "evidence_span": "The graded structure further decreases this peak stress to 2.59 [MPa] after 1006 simulations."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The optimizer prefers lower volume fraction and rcombi below one inside the disk rather than at the edge.",
+        "evidence_span": "The optimization finds that decreasing the volume fraction and setting rcombi below one is better inside the disk, rather than directly at the edge."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The optimized design greatly reduces bulging compared with the baseline.",
+        "evidence_span": "A clear difference is observed, with the baseline bulging significantly outward, whereas the optimized result barely moves horizontally."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The optimized design forms an X-like pattern with bands from the corners toward the left and right points.",
+        "evidence_span": "The optimized pattern shows an X-like structure that forms bands from the corners of the sample to the L and R points."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Keeping the optimized pellet fraction but fixing orientation at 90 degrees worsens performance, confirming the importance of orientation.",
+        "evidence_span": "To verify the effectiveness of the orientation, we rerun the simulation with the optimized pellet fraction but a fixed orientation of \u03b8=90\u25e6, which leads to a worse result with a bulge of 0.0623."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The graded multiscale surrogate reduced 3-point bending simulation time from 5900 s to 2 s while preserving accuracy.",
+        "evidence_span": "For a simple 3-point bending experiment of a graded multiscale beam,\nthe surrogate-based simulations reduced the computation time from 5900 seconds to 2 seconds, while\nmaintaining high accuracy."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Multiscale optimization found a material grading that significantly lowers peak stresses.",
+        "evidence_span": "By performing a multiscale optimization, we showed the ability to find a\nmaterial grading that significantly reduces peak stresses."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The manufacturing-conditioned model substantially changed the deformation pattern during compression optimization.",
+        "evidence_span": "The resulting model was used in an optimization loop to substan-\ntially alter the deformation pattern of a sample under compression."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Models with woodchip material points are among the worst-performing configurations even after learning.",
+        "evidence_span": "but are still among the worst relative to other configurations."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The NN shows nonzero stresses in the undeformed state, indicating significant bias.",
+        "evidence_span": "This figure clearly demonstrates how the NN is not constrained to have zero stresses in the undeformed state, showing a significant bias."
+      },
+      {
+        "role": "evidence_result",
+        "content": "All PRNN models closely match the ground-truth response.",
+        "evidence_span": "All PRNN models closely follow the ground truth response."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "The encoder must output zero microscopic strain in the undeformed state.",
+        "evidence_span": "First, in the undeformed state, we want all\nmicroscopic strains to vanish: F\u2126= I \u2192\u02c6E\u03c9\nm = 0."
+      },
+      {
+        "role": "constraint",
+        "content": "The encoder must output valid deformation tensors; for neo-Hookean behavior, the predicted C tensor must be positive definite.",
+        "evidence_span": "Second, to be able to compute the response of the fictitious material\npoints, which are given by a classical neo-Hookean model, the encoder must output valid deformation\ntensors. For this neo-Hookean model, this means ensuring that \u02c6C\u03c9\nm is positive definite."
+      },
+      {
+        "role": "constraint",
+        "content": "For guaranteed validity for any deformation, the encoder weight maximum eigenvalue must not exceed 1.",
+        "evidence_span": "\u03bbmax(WE\nm) \u22641 =\u21d2det( \u02c6C\u03c9\nm) > 0\n\u2200F\u2126: det(F\u2126) > 0."
+      },
+      {
+        "role": "constraint",
+        "content": "If a relaxed weight bound is used, validity depends on the expected deformation range.",
+        "evidence_span": "If the range of\nmacroscopic deformation gradients is known, this constraint can be relaxed:"
+      },
+      {
+        "role": "constraint",
+        "content": "Microscale orientations are handled by rotating deformation and stress, so orientation need not be part of the dataset directly.",
+        "evidence_span": "Microscale orientations can be accounted for by rotating the input deformation and output stress accordingly."
+      },
+      {
+        "role": "constraint",
+        "content": "Orientation is excluded from the dataset because it is treated through input/output rotation preprocessing.",
+        "evidence_span": "This way the orientation can be included by pre- and post-processing the surrogate\u2019s inputs and outputs, and does not need to be included in the dataset."
+      },
+      {
+        "role": "constraint",
+        "content": "Volume fraction values are discretized because ellipses are inserted as whole objects one at a time.",
+        "evidence_span": "Since whole ellipses are placed one at a time, Vf is restricted to discrete increments."
+      },
+      {
+        "role": "constraint",
+        "content": "Optimization seeks minimum peak Cauchy stress while enforcing a maximum deformation of 0.05 via a penalty.",
+        "evidence_span": "The optimization problem is defined as minimizing the peak Cauchy stress under a given load, subject to a maximum acceptable deformation. The maximum acceptable deformation is set to 0.05 (16.6% of the thickness) through a linearly scaling penalty on the loss when exceeded."
+      },
+      {
+        "role": "constraint",
+        "content": "Only meshes from one initial orientation are needed because orientation can be handled by rotating deformation and stress.",
+        "evidence_span": "Only meshes from a single initial orientation are required since it can be accounted for by rotating the deformation and stress tensor as discussed in Section 5.1.1; here we set the initial orientation to 0\u25e6."
+      },
+      {
+        "role": "constraint",
+        "content": "The deformation-optimization objective is to minimize horizontal hole bulging under 20% compression.",
+        "evidence_span": "The objective is to minimize the horizontal deformation of the hole, which we denote as bulging and quantify as: uR_x \u2212uL_x... The top plate is gradually lowered for a total deformation of 20% of the sample height."
+      },
+      {
+        "role": "constraint",
+        "content": "Because continuous grading is hard to realize in practice, the domain is partitioned into hexagonal regions for optimization.",
+        "evidence_span": "Since creating a continuous grading is challenging in practice, we instead partition the domain into hexagonal regions."
+      },
+      {
+        "role": "constraint",
+        "content": "The NN surrogate is not constrained to produce zero stress in the undeformed state.",
+        "evidence_span": "the NN is not constrained to have zero stresses in the undeformed state"
+      }
+    ],
+    "contradiction": [
+      {
+        "role": "contradiction",
+        "content": "Unlike the prior plasticity study, material parameters are varied during training here to enable fair comparison with a neural network.",
+        "evidence_span": "In contrast to that study, where only a single value is seen in training, the material parameter is varied in the training data here, in order to allow for a meaningful comparison with a neural network."
+      },
+      {
+        "role": "contradiction",
+        "content": "Despite lower test-set errors, the NN and nonlinear HyPRNN are less accurate in multiscale simulations than the linear HyPRNN.",
+        "evidence_span": "While the NN and nonlinear HyPRNN with 512 samples have lower errors on the test set, their displacements in these multiscale simulations are less accurate than the linear HyPRNN."
+      }
+    ]
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Optimizing materials with controllable or graded microstructures requires relating local microstructure to macroscopic response, which in turn needs efficient multiscale simulations.",
+        "evidence_spans": [
+          "Optimizing these materials with controllable mi-\ncrostructures requires e\ufb00icient multiscale simulations.",
+          "However, optimizing such a grading requires relating the local microstructure to the macro-\nscopic response."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Conventional FE2 is computationally expensive because it solves a separate microscale boundary value problem at every quadrature point.",
+        "evidence_spans": [
+          "Solving a separate boundary value problem for every quadrature point makes this very computationally demanding."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Existing microscale surrogate models are too data-hungry, and this problem worsens when varying microstructures must be covered; large data-generation cost therefore makes data efficiency crucial in multiscale surrogate modeling.",
+        "evidence_spans": [
+          "Data-driven surrogate models for the microscale\ncan accelerate multiscale simulations, but require large amounts of data even for a fixed microstruc-\nture. When a range of microstructures is considered, as is the case in multiscale optimization, even\nmore data is needed to train a surrogate.",
+          "Still, this large data generation time illustrates the relevance of data requirements for surrogate modeling in multiscale analysis."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For nonlinear materials, many surrogates are trained for a single fixed microstructure and therefore cannot handle varying microstructures, making them unsuitable for graded or functionally graded composites; this motivates microstructure-aware surrogates for multiscale simulations.",
+        "evidence_spans": [
+          "For nonlinear materials, however, surrogates are typically trained to map strains to homogenized stresses for a single, fixed microstructure, and therefore cannot account for varying un-\nderlying microstructures. This makes them unsuitable for simulating functionally graded composites,\nwhere the microstructure varies across the domain.",
+          "Overall, this work highlights the\nnecessity of microstructure-aware data-driven surrogates for multiscale simulations."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Experimentally optimizing the grading of woodchip distribution and angle is not feasible, and even numerical optimization remains challenging.",
+        "evidence_spans": [
+          "Experimentally\nfinding the optimal grading of woodchip distribution and angle is not feasible, and even numerically\nthis remains challenging."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Pointwise dataset loss is insufficient for assessing surrogate quality because it does not fully predict performance in full FE2 simulations.",
+        "evidence_spans": [
+          "Dataset losses quantify pointwise accuracy, but do not fully correlate with the surrogate performance in a full FE2 simulation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A practical limitation is that exact control of microscale geometry is generally not yet feasible, and manufacturing variables do not have a straightforward known mapping to microscale geometry.",
+        "evidence_spans": [
+          "Precisely controlling the microscale geometry as assumed in Section 5 is not yet feasible for most materials. Manufacturing process variables influence the microscale, but finding an exact relation between these variables and the microscale geometry is not straightforward."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The manufacturing-variable study is framed as a computational proof of concept intended to motivate future experimental work.",
+        "evidence_spans": [
+          "This serves as a computational proof-of-concept aiming to inspire future experimental work."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Prior surrogate approaches use the complete microstructure as input, e.g., via convolutional neural networks (CNNs) or graph neural networks (GNNs).",
+        "evidence_spans": [
+          "One way of overcoming this limitation is by using a surrogate model that takes the complete microstructure as input, for example, using a convolutional neural network (CNN) [6, 7] or a graph neural network (GNN) [8]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Another prior approach uses microstructural descriptors directly: geometric variables can predict effective properties, or be injected as additional inputs to sequence/embedded models, such as into a gated recurrent unit hidden state or as a small encoded vector concatenated to a hidden embedding.",
+        "evidence_spans": [
+          "Microstructural geometric variables can also be used to directly predict the effective properties of the material [9].",
+          "Alternatively, they can be directly passed as additional inputs, for example to the hidden state in a gated recurrent unit [10], or encoded into a small vector before concatenating it to the hidden embedding in a network [11]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Meta-learning and transfer-learning approaches adapt or fine-tune a base model to limited new data from a different underlying distribution.",
+        "evidence_spans": [
+          "Meta-learning or transfer learning can adapt or fine-tune a base model to limited new data from a different underlying distribution [12, 13, 14, 15]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Physically Recurrent Neural Networks (PRNNs) have been proposed as physically biased surrogates that can learn from tiny datasets, and earlier work showed they perform well in a finite-strain framework.",
+        "evidence_spans": [
+          "Physically Recurrent Neural Networks (PRNNs) have recently shown a remarkable ability to learn based on tiny datasets, overcoming the bottleneck of costly data generation [16].",
+          "In this work we will use PRNNs as a surrogate for the microscale model, building on earlier work that demonstrated that PRNNs perform well in a finite strain framework [31]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Deep Material Networks (DMNs) learn the homogenization behavior of multi-phase materials while retaining microscale material models.",
+        "evidence_spans": [
+          "In a similar vein, a Deep Material Network (DMN) learns the homogenization behavior of a multi-phase material [18], while maintaining the microscale material models."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior work has conditioned DMNs on microstructure in several ways: interpolating between DMNs trained on different RVEs, conditioning on volume fraction, conditioning on a latent space learned from microscale geometry, and using a hypernetwork to predict DMN weights from microstructure.",
+        "evidence_spans": [
+          "DMNs have recently been conditioned on the microstructure, such as by interpolating between several DMNs trained on different RVEs, by conditioning on the volume fraction [19], and by conditioning on a latent space learned from the microscale geometry [20].",
+          "The weights of the DMN are thus predicted by a separate neural network; such a second network is generally called a hypernetwork."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A related prior approach is HyperCANs, where a hypernetwork uses unit-cell truss-lattice geometry to generate the weights of an input-convex neural network that predicts strain energy density from deformation gradient.",
+        "evidence_spans": [
+          "HyperCANs follow the same principle, where, based on the geometry of a unit cell truss lattice, a hypernetwork learns the weight parameters of an input convex neural network that predicts the strain energy density given a deformation gradient [21]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "When microstructure geometry is too complex to parameterize explicitly, a common prior strategy is to condition models on a black-box latent space learned by a generative model.",
+        "evidence_spans": [
+          "When the microstructure exhibits a complex geometry that cannot be parametrized explicitly, a common strategy is to condition on a black-box latent space learned by a generative model that captures its properties [20]."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "Existing microstructure-aware surrogate approaches generally require very large training datasets, and even meta-learning or transfer learning still need separate new data collection for each setting, making continuous gradings infeasible.",
+        "evidence_spans": [
+          "These approaches have the potential to\nbe used in the optimization of a graded material, but generally still require vast amounts of training\ndata.",
+          "but still require separate data collection for each\nnew setting, making it infeasible for continuous gradings."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Guaranteeing valid predicted C tensors by scaling the linear encoder weights limits the encoder's flexibility.",
+        "evidence_spans": [
+          "While this guarantees a valid \u02c6C\u03c9 for any F\u2126, it limits the flexibility of the encoder."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Direct input concatenation is unsuitable for PRNNs because it conflicts with the encoder's role, would require modifications to the linear encoder, and would not allow the decoder to adapt.",
+        "evidence_spans": [
+          "For the PRNN, this approach conflicts with the role of the encoder, which is meant to map only the\nmacroscopic strain onto a latent representation of microscopic strains. While the nonlinear encoder\ncould in theory support additional inputs, the linear encoder would require further modifications, and\nwould not allow the decoder to adapt either."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using a 2D slice from the 3D deposition disconnects the manufacturing variable from the generated microstructure, leaving the final model only indirectly related to the process that simulated it.",
+        "evidence_spans": [
+          "This approach of taking a 2D slice from the 3D deposition does somewhat disconnect the manufacturing variable from the generated microstructure; the final model used is only indirectly related to the process that simulated it."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "content": "The study rejects conditioning on a black-box latent representation or an additional generative model of microstructure geometry (e.g., CVAE/diffusion) and instead conditions directly on the manufacturing variables that generate the microstructure.",
+        "evidence_spans": [
+          "When the microstructure exhibits a complex geom-\netry that cannot be parametrized explicitly, a common strategy is to condition on a black-box\nlatent space learned by a generative model that captures its properties [20]. We introduce a\nnew approach that instead conditions directly on the manufacturing variables generating the\nmicrostructure, eliminating the need for such an additional model.",
+          "We circumvent the need for an additional model to parametrize microstructural geometries (e.g.,\na conditional variational autoencoder or a conditional denoising diffusion model) and instead condi-\ntion directly on the manufacturing variables used to generate the microstructure."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Instead of alternative surrogate architectures such as DMNs, the work chooses and extends PRNNs because they already account for variations in microscale material properties.",
+        "evidence_spans": [
+          "In this work, we opt for PRNNs because they can already account for variations in the microscale\nmaterial properties, and extend them to be conditioned on microstructural variables using a hypernet-\nwork, which we refer to as a HyPRNN."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Rather than conditioning the PRNN by simply concatenating microstructural variables to its inputs, the study uses a hypernetwork to generate encoder/decoder parameters, because direct concatenation conflicts with the encoder\u2019s intended role and would limit adaptation of the architecture.",
+        "evidence_spans": [
+          "The straightforward approach to condition\na data-driven model on additional parameters is by concatenating the variables as additional inputs.\nFor the PRNN, this approach conflicts with the role of the encoder, which is meant to map only the\nmacroscopic strain onto a latent representation of microscopic strains. While the nonlinear encoder\ncould in theory support additional inputs, the linear encoder would require further modifications, and\nwould not allow the decoder to adapt either.\n\nInstead, we preserve the existing PRNN architecture, and use a hypernetwork H that learns the\nPRNN encoder and decoder parameters based on microstructural variables."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For dataset generation, the study avoids uniformly sampling all (Vf, r) combinations with remeshing each case; instead it draws from a predefined grid of (Vf, r) meshes to avoid generating a new mesh for every combination.",
+        "evidence_spans": [
+          "Rather than generating a new mesh for every (Vf, r) combination that would arise from uniform sampling of r, we draw from a predefined set of (Vf, r) meshes."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the functionally graded design setup, the study grades microstructural parameters rather than the more conventional thickness grading.",
+        "evidence_spans": [
+          "We adopt a similar setup but grade the microstructural parameters rather than the thickness under an internal pressure."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For optimization, the study uses CMA-ES instead of alternatives such as Bayesian optimization, while noting that optimizer choice is not expected to affect the conclusions.",
+        "evidence_spans": [
+          "We use the Covariance Matrix Adaptation Evolution Strategy (CMA-ES) [40], an off-the-shelf, iterative, derivative-free algorithm, to optimize our objective function. Alternative optimization algorithms, such as Bayesian optimization, are also expected to work, and the choice of optimizer is not expected to affect our conclusions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The authors deliberately forgo experimental calibration and use an uncalibrated deposition model for demonstration purposes.",
+        "evidence_spans": [
+          "As we focus here on demonstrating our approach, we make the pragmatic choice of not calibrating against experiments."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Although direct use of the full 3D deposition would be preferable, the study instead transfers it to 2D to reduce the computational cost of mechanical simulation.",
+        "evidence_spans": [
+          "Ideally, the 3D deposition would be directly used, but we transfer it to 2D to reduce the computational cost of simulating the mechanical behavior of the microstructures."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The authors did not perform a full hyperparameter grid search, instead relying on manual iterative tuning.",
+        "evidence_spans": [
+          "We did not perform a full grid sweep over the possible settings for each model, but followed a more manual iterative process."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "ReLU was dropped from further neural-network size experiments because it performed worse than the other activation functions.",
+        "evidence_spans": [
+          "for the neural network, we found that reLU performed worse than the other activations, and therefore did not try all model sizes with it."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "An alternative hypernetwork design that scaled hidden-layer sizes with the number of outputs was considered but rejected because it provided no improvement.",
+        "evidence_spans": [
+          "For the hypernetwork, we further considered an alternative setup that scaled the hidden layer sizes depending on the number of its outputs (the number of encoder weights), but found no gain."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The results of the NN (32) surrogate were omitted because its errors were high and including it would require much larger plot axes, making comparisons harder.",
+        "evidence_spans": [
+          "We omit the results of the NN (32) surrogate, as its errors are high, and including its paths requires a substantial increase of the axes bounds, making the other paths more challenging to compare."
+        ],
+        "conflicting": false
+      }
+    ],
+    "inspiration_source": [
+      {
+        "content": "The work is inspired by functionally graded materials/composites applications: requirements are motivated by functionally graded bio-based composites, especially mycelium-woodchip composites, and the disk optimization setup is adapted from functionally graded materials studies where graded thickness is used to reduce peak stresses.",
+        "evidence_spans": [
+          "While this work focuses on computational methods, we base our requirements on applications such as functionally graded bio-based composites. In particular, we are interested in mycelium-woodchip composites",
+          "Disks subject to rotation or internal loads are commonly studied in the functionally graded materials literature [37, 38, 39], where a graded thickness is typically used to reduce peak stresses. We adopt a similar setup but grade the microstructural parameters rather than the thickness under an internal pressure."
+        ],
+        "conflicting": false
+      }
+    ],
+    "causal_claim": [
+      {
+        "content": "Conditioning on microstructural/manufacturing variables with a hypernetwork (HyPRNN/conditioned surrogate) enables accurate multiscale mechanical predictions even in the low-data regime; this strong low-data performance is attributed to the model\u2019s physics-based inductive bias.",
+        "evidence_spans": [
+          "This approach enables accurate predictions of multiscale mechanical behavior for a mycelium-woodchip composite material, even when trained on small datasets.",
+          "The physics-\nbased inductive bias allows the HyPRNN with linear encoder to perform very well in the low-data\nregime."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Conditioned surrogate models make multiscale simulations of functionally graded structures tractable, are much faster than RVE-based simulations, and this speed advantage should increase for larger macroscale problems or longer simulations.",
+        "evidence_spans": [
+          "The conditioned surrogate makes multiscale simulations of functionally\ngraded structures tractable",
+          "The stark contrast between the RVE and surrogate based simulation time highlights the benefit of surrogate-based simulations.",
+          "This contrast would only increase for larger macroscopic simulations with more elements, or those running for more time steps."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Conditioned surrogate models enable multiscale optimization of microarchitectured/functionally graded structures, helping identify manufacturing variables that yield desired mechanical behavior and thereby accelerating sustainable-material design.",
+        "evidence_spans": [
+          "This contribution highlights the benefits of microarchitectured structures\nand demonstrates how conditioned surrogate models enable their multiscale optimization, which will\naccelerate the development and design of future sustainable materials and structures.",
+          "This example demonstrates how a HyPRNN can be used to find the manufacturing variables that lead to a desired mechanical behavior."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Embedding microscale constitutive models directly in PRNNs allows material properties to be modified directly without retraining or collecting additional data.",
+        "evidence_spans": [
+          "As the microscale constitutive models are embedded directly inside the PRNN architecture,\ntheir material properties can be modified directly without requiring retraining or additional data col-\nlection [17]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Heterogeneous/functionally graded materials are pursued because heterogeneity can improve mechanical efficiency: in nature such materials evolved as more mechanically efficient designs, and precise manufacture of functionally graded materials similarly enables more efficient structural design.",
+        "evidence_spans": [
+          "However, in nature, many heterogeneous materials evolved, such as bones, teeth, wood, and\nbamboo, as these are more mechanically e\ufb00icient designs [1].",
+          "Precisely manufacturing a functionally graded material similarly enables the design of more e\ufb00icient\nstructures."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Controlling substrate properties and mycelium growth can tailor a functionally graded material to desired macroscale behavior.",
+        "evidence_spans": [
+          "Controlling the substrate properties and mycelium growth can tailor a\nfunctionally graded material to specific macroscale behavior."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Growing mycelium on woodchips or natural fibers causes it to act as a binder, forming a lightweight yet stiff biodegradable composite.",
+        "evidence_spans": [
+          "Growing on a substrate of woodchips or natural fibers, it acts as a binder that forms a lightweight\nyet stiff biodegradable composite [23, 24]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using Green strain E as encoder input, rather than deformation gradient F, ensures zero predicted microscopic strain in the undeformed state.",
+        "evidence_spans": [
+          "We use E\u2126as input instead of F\u2126, as it helps satisfy the first condition. Because E\u2126is zero in the\nundeformed state, \u02c6E\u03c9\nm will be zero too, regardless of WE\nm."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Applying a zero-shift in the nonlinear encoder ensures the latent variables are zero in the undeformed state.",
+        "evidence_spans": [
+          "Considering the first condition,\nwe apply a zero-shift to ensure \u03b8 is zero in the undeformed state:\n\u00af\u03b8 = NNE(E\u2126) \u2212NNE(0)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Constraining encoder weights by bounding their eigenvalues guarantees a valid predicted microscopic C tensor for admissible deformations; with wmax = 1.25, validity is maintained unless compression exceeds about 55%.",
+        "evidence_spans": [
+          "This gives us the following criterion:\n\u03bbmax(WE\nm) \u22641 =\u21d2det( \u02c6C\u03c9\nm) > 0\n\u2200F\u2126: det(F\u2126) > 0.\n(14)\nWe enforce this by scaling WE\nm when its eigenvalues exceed this limit:",
+          "For wmax = 1.25, \u02c6C\u03c9\nm is valid if\n\u03bbmin(F) >\n\u221a\n0.2 \u22480.447, meaning that one needs a compressive strain exceeding 55% to produce an\ninvalid \u02c6C\u03c9\nm."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A Cholesky-style parametrization makes the predicted C tensor positive definite by construction.",
+        "evidence_spans": [
+          "In addition, this matrix is positive definite\nby definition, and thus satisfies the second condition."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The combined dataset yields higher error because it is more complex and reaches higher stress values, which increases absolute prediction differences.",
+        "evidence_spans": [
+          "This is because the dataset is more complex, and also reaches higher stress values, making the absolute difference larger than the relative difference in prediction."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Adding small round mycelium pellets to the mix decreases the resulting woodchip volume fraction.",
+        "evidence_spans": [
+          "First, small round mycelium pellets can be added to the mix, decreasing the resulting woodchip volume fraction."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Controlling the initial woodchip orientation induces anisotropy; even when chips start with a common orientation but receive small random velocities, they deviate somewhat yet retain a net anisotropic effect.",
+        "evidence_spans": [
+          "Second, the initial orientation of the dropped woodchips can be controlled, for example by using a sieve, resulting in anisotropy.",
+          "All woodchips are initialized with the same orientation \u03b8... but a small random velocity is added to each to avoid an unrealistically aligned result. As a result, most woodchips deviate to some extent from their initial orientation, but the remaining effect does lead to anisotropy."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because the HyPRNN is conditioned on fewer parameters than earlier versions, the authors use a smaller dataset.",
+        "evidence_spans": [
+          "Since the HyPRNN is conditioned on fewer parameters than before, we create a smaller dataset consisting of 512 samples, 256 used for training, and 128 each for validation and testing."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Adding an additional nonlinear encoder improves performance when more data are available.",
+        "evidence_spans": [
+          "An additional nonlinear encoder was introduced that performs better than the linear encoder\nwhen more data is available."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Including woodchip material points worsens losses in the low-data regime, but with sufficient data the models still learn to make good predictions despite those points.",
+        "evidence_spans": [
+          "The woodchip material points cause significantly worse losses in the low-data regime.",
+          "Given su\ufb00icient data, the models learn to make good predictions"
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "content": "Manufacturing variables affect macroscale behavior through their complex influence on microstructure; thus engineering the microscale is a practical route to obtain desired macroscale behavior.",
+        "evidence_spans": [
+          "manufacturing variables that can have a complex influence on the microstructure. This is a practical route to engineer the microscale for desired macroscale behavior."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "PRNN-based conditioning works by embedding microscale constitutive models directly in the architecture, so material properties can be modified directly without retraining; in contrast, because a DMN learns the homogenization scheme itself, conditioning there must be implemented by changing network weights.",
+        "evidence_spans": [
+          "As the microscale constitutive models are embedded directly inside the PRNN architecture, their material properties can be modified directly without requiring retraining or additional data col-lection [17].",
+          "Since a DMN essentially learns the homogenization scheme, this conditioning can only be done by modifying the weights of the network."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The hypernetwork conditions the model by learning a continuous mapping from microstructural variables to the PRNN weight space, rather than producing one fixed set of weights for a single microstructure.",
+        "evidence_spans": [
+          "In effect, the hypernetwork learns a continuous mapping from microstructural variables to the space of PRNN weights, rather than producing a single set of weights tied to one microstructure."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because material nonlinearity is handled by the material model and homogenization by the decoder, the encoder is the natural component for capturing geometric nonlinearity.",
+        "evidence_spans": [
+          "With the material model capturing material nonlinearity, and the decoder mirroring the homogenization step, the encoder is the natural place for capturing geometric effects."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The undeformed-state condition is enforced by construction: since E is zero in the undeformed state, the predicted microscopic strain is also zero, and a shifted softplus is chosen so that zero latent input yields the identity tensor.",
+        "evidence_spans": [
+          "Because E\u2126is zero in the undeformed state, \u02c6E\u03c9 m will be zero too, regardless of WE m.",
+          "where \u03c3(x) = softplus(x) \u2212ln(2) + 1 is a shifted softplus chosen so that \u03c3(0) = 1. This ensures that when \u00af\u03b8m is zero, \u02c6C\u03c9 m = I, satisfying the first condition."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The sparse decoder uses positive component-wise weights by analogy to volume fractions in homogenization, with softplus enforcing positivity.",
+        "evidence_spans": [
+          "By analogy with volumetric homogenization, the weights here represent the volume (or area), and the softplus function ensures these are positive."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A nonlinear PRNN transfers material properties less effectively because it relies less strongly on the embedded material-model physics to reproduce the data.",
+        "evidence_spans": [
+          "This is because the nonlinear PRNN relies less strongly on the physics in the material model for reproducing the data."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "FE2 performance can diverge from dataset loss because nonlinear interactions between points can cause solution drift, tangent stiffness directly affects the solution, and the distribution of states explored in FE2 differs from the test-set distribution.",
+        "evidence_spans": [
+          "The nonlinear interactions between the points might cause the solution to drift, the tangent stiffness plays a direct role, and the distribution of explored points differs from the test set distribution."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Penalty contact is used to replicate the compression test while allowing separation from the plate.",
+        "evidence_spans": [
+          "This loading is imposed with a contact model using the penalty method in order to replicate a compression test and allow for separation from the plate."
+        ],
+        "conflicting": false
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "content": "The paper hypothesizes/proposes that a PRNN surrogate can be extended into a HyPRNN by using a hypernetwork to map microstructural variables to the PRNN encoder/decoder weights, thereby conditioning on microstructure while preserving the underlying PRNN architecture; this conditioning is intended to help overcome the data challenge.",
+        "evidence_spans": [
+          "To overcome this challenge, we condition a hybrid physics-\ndata surrogate on microstructural variables using a hypernetwork.",
+          "In this work, we opt for PRNNs because they can already account for variations in the microscale\nmaterial properties, and extend them to be conditioned on microstructural variables using a hypernet-\nwork, which we refer to as a HyPRNN.",
+          "Instead, we preserve the existing PRNN architecture, and use a hypernetwork H that learns the\nPRNN encoder and decoder parameters based on microstructural variables.",
+          "we propose a\nHyPRNN: a PRNN conditioned on microstructural variables using a hypernetwork"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The paper further hypothesizes/proposes that conditioning the PRNN directly on manufacturing-process variables is a practical route to control microstructure for desired macroscale behavior and removes the need for an additional latent-space model.",
+        "evidence_spans": [
+          "Then, we go one step further, conditioning the network directly on manufacturing variables that can\nhave a complex influence on the microstructure. This is a practical route to engineer the microscale for\ndesired macroscale behavior.",
+          "We introduce a\nnew approach that instead conditions directly on the manufacturing variables generating the\nmicrostructure, eliminating the need for such an additional model.",
+          "We therefore showcase the ability to condition the PRNN on variables from the manufacturing process."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The paper proposes/hypothesizes that a nonlinear encoder with greater flexibility than a linear encoder can better capture geometric effects in finite-strain hyperelasticity.",
+        "evidence_spans": [
+          "We therefore explore a nonlinear\nencoder with increased flexibility in addition to a linear encoder."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The authors hypothesize that the large stiffness contrast between mycelium and woodchip degrades training performance.",
+        "evidence_spans": [
+          "We suspect that the large contrast between the stiffness of the mycelium and the woodchip degrades training performance."
+        ],
+        "conflicting": false
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "The conditioned surrogate was validated against a full FE2 simulation and, in multiscale beam/3-point bending tests, HyPRNN/PRNN surrogates agreed well with the RVE-based ground-truth response; the linear HyPRNN trained on 512 samples was near-perfect.",
+        "evidence_spans": [
+          "we validate it against a full FE2 simulation.",
+          "All HyPRNN-based surrogates show relatively good agreement, and the linear HyPRNN with 512 samples shows a near-perfect match.",
+          "All PRNN models closely follow the ground truth response.",
+          "For a simple 3-point bending experiment of a graded multiscale beam,\nthe surrogate-based simulations reduced the computation time from 5900 seconds to 2 seconds, while\nmaintaining high accuracy."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Optimization of graded multiscale structures reduced peak stress substantially: a graded multiscale disk reduced peak stress by 42% versus a random microstructure; in one study the random-reference peak stress was reduced to 2.73 MPa with uniform parametrization after 240 simulations and further to 2.59 MPa with graded optimization after 1006 simulations.",
+        "evidence_spans": [
+          "We optimize a graded\nmultiscale disk, and reduce the peak stress by 42% compared to one with a random microstructure.",
+          "An efficient uniform parametrization with a low peak stress of 2.73 [MPa] is reached after 240 simulations.",
+          "The graded structure further decreases this peak stress to 2.59 [MPa] after 1006 simulations.",
+          "By performing a multiscale optimization, we showed the ability to find a\nmaterial grading that significantly reduces peak stresses."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior work showed that material parameters can be changed per sample, even for large parameter changes, without retraining the network.",
+        "evidence_spans": [
+          "This has been shown to work even for large changes of parameters, and no retraining of the network is required [17]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In low-data regimes, PRNN/HyPRNN with a linear encoder performs best and reaches low loss with very few samples; for geometric conditioning alone the same low-data advantage holds.",
+        "evidence_spans": [
+          "The PRNN with a linear encoder performs well in the low-data regime and achieves a low loss with very few samples.",
+          "A similar trend to before is observed, with the linear encoder performing better in the low-data regime, and the nonlinear encoder and neural network performing better for larger sample sizes."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Linear PRNN performance plateaus as training data increases, after which the NN and PRNN with a nonlinear encoder become better; the nonlinear PRNN starts from higher loss than the linear PRNN but avoids the same plateau.",
+        "evidence_spans": [
+          "Its loss plateaus after a certain number of training samples, when the NN and PRNN with a nonlinear encoder overtake it.",
+          "The nonlinear PRNN starts from a higher loss than the linear PRNN, but does not suffer the same plateau.",
+          "A similar trend to before is observed, with the linear encoder performing better in the low-data regime, and the nonlinear encoder and neural network performing better for larger sample sizes."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The low final error supports the effectiveness of hypernetwork conditioning for PRNNs.",
+        "evidence_spans": [
+          "The error decreasing to a low value indicates that the hypernetwork approach to conditioning a PRNN is effective."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For transfer across material-property values, linear PRNNs provide a particular benefit in the low-data regime; the larger low-data gap on Dmat confirms this, while the nonlinear PRNN's loss being closer to the NN indicates weaker transfer than the linear PRNN.",
+        "evidence_spans": [
+          "The gap in Figure 5a between the linear PRNN and the NN in the low-data regime is larger than the gap in Figure 5b, confirming the particular benefit that the linear PRNN offers in that it can transfer between different material property values without being trained for it.",
+          "The nonlinear PRNN loss is closer to that of the NN, showing that it does not transfer material properties as well as a linear PRNN."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Differences between model types are significant, while hyperparameter differences within a model type are smaller, suggesting the results are robust to specific settings.",
+        "evidence_spans": [
+          "For all the datasets, the differences between the types of models are significant, and variations for specific hyperparameters within one type are smaller. This indicates that the overall results are not overly sensitive to the specific settings used, such as the number of material points or a specific number of neurons in a layer."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Sigmoid activations outperform ReLU across all considered networks.",
+        "evidence_spans": [
+          "Sigmoid activation performs much better than ReLU activation in all networks (NN, nonlinear encoder, hypernetwork)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "When little data is available, HyPRNNs using only mycelium material points outperform models that also include woodchip material points; configurations with woodchip points remain among the worst-performing even after learning.",
+        "evidence_spans": [
+          "Furthermore, HyPRNN models with only the mycelium material points perform better than those with additional woodchip material points when there is little available data.",
+          "but are still among the worst relative to other configurations."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A neural network trained on only 32 samples performs very poorly in the multiscale simulation.",
+        "evidence_spans": [
+          "The NN with 32 samples shows very poor performance."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Unlike HyPRNN/PRNN models, neural-network surrogates produce nonzero stress in the undeformed state, indicating significant bias.",
+        "evidence_spans": [
+          "showing how the neural network surrogate produces a nonzero stress in the undeformed state, whereas the HyPRNN models do not.",
+          "This figure clearly demonstrates how the NN is not constrained to have zero stresses in the undeformed state, showing a significant bias."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Surrogate models greatly reduce simulation time relative to RVE-based simulations; for a graded multiscale beam in 3-point bending, runtime dropped from 5900 s to 2 s while maintaining high accuracy.",
+        "evidence_spans": [
+          "The results are presented in Table 2, showing the much lower simulation time with the surrogate models.",
+          "For a simple 3-point bending experiment of a graded multiscale beam,\nthe surrogate-based simulations reduced the computation time from 5900 seconds to 2 seconds, while\nmaintaining high accuracy."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Optimization favored decreasing the volume fraction and setting rcombi below one inside the disk rather than at the edge.",
+        "evidence_spans": [
+          "The optimization finds that decreasing the volume fraction and setting rcombi below one is better inside the disk, rather than directly at the edge."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The optimized design greatly reduced bulging compared with the baseline and produced an X-like pattern with bands from the corners toward the left and right points.",
+        "evidence_spans": [
+          "A clear difference is observed, with the baseline bulging significantly outward, whereas the optimized result barely moves horizontally.",
+          "The optimized pattern shows an X-like structure that forms bands from the corners of the sample to the L and R points."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Keeping the optimized pellet fraction but fixing the orientation at 90 degrees worsened performance, confirming that orientation is important.",
+        "evidence_spans": [
+          "To verify the effectiveness of the orientation, we rerun the simulation with the optimized pellet fraction but a fixed orientation of \u03b8=90\u25e6, which leads to a worse result with a bulge of 0.0623."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The manufacturing-conditioned model was used in compression optimization to substantially alter the deformation pattern of the sample.",
+        "evidence_spans": [
+          "The resulting model was used in an optimization loop to substan-\ntially alter the deformation pattern of a sample under compression."
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "The encoder is constrained so that in the undeformed state it outputs zero microscopic strain, i.e. F\u2126 = I implies \u00ca\u03c9_m = 0.",
+        "evidence_spans": [
+          "First, in the undeformed state, we want all microscopic strains to vanish: F\u2126= I \u2192\u02c6E\u03c9 m = 0."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The encoder must output valid deformation tensors for the fictitious neo-Hookean material; in particular, the predicted \u0108\u03c9_m must be positive definite. A sufficient global guarantee is to bound the maximum eigenvalue of the encoder weights by 1, which ensures det(\u0108\u03c9_m) > 0 for any admissible macroscopic deformation. If a relaxed bound is used instead, validity depends on the expected deformation range.",
+        "evidence_spans": [
+          "Second, to be able to compute the response of the fictitious material points, which are given by a classical neo-Hookean model, the encoder must output valid deformation tensors. For this neo-Hookean model, this means ensuring that \u02c6C\u03c9 m is positive definite.",
+          "\u03bbmax(WE m) \u22641 =\u21d2det( \u02c6C\u03c9 m) > 0 \u2200F\u2126: det(F\u2126) > 0.",
+          "If the range of macroscopic deformation gradients is known, this constraint can be relaxed:"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Microscale orientation is handled through pre-/post-rotation of deformation and stress, so orientation does not need to be explicitly included in the dataset and only meshes from a single initial orientation are required.",
+        "evidence_spans": [
+          "Microscale orientations can be accounted for by rotating the input deformation and output stress accordingly.",
+          "This way the orientation can be included by pre- and post-processing the surrogate\u2019s inputs and outputs, and does not need to be included in the dataset.",
+          "Only meshes from a single initial orientation are required since it can be accounted for by rotating the deformation and stress tensor as discussed in Section 5.1.1; here we set the initial orientation to 0\u25e6."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Volume fraction values are restricted to discrete increments because whole ellipses are inserted one at a time.",
+        "evidence_spans": [
+          "Since whole ellipses are placed one at a time, Vf is restricted to discrete increments."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In one optimization setup, the objective is to minimize peak Cauchy stress under a given load while enforcing a maximum acceptable deformation of 0.05 via a linearly scaling penalty.",
+        "evidence_spans": [
+          "The optimization problem is defined as minimizing the peak Cauchy stress under a given load, subject to a maximum acceptable deformation. The maximum acceptable deformation is set to 0.05 (16.6% of the thickness) through a linearly scaling penalty on the loss when exceeded."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In another optimization setup, the objective is to minimize horizontal hole bulging under 20% compression.",
+        "evidence_spans": [
+          "The objective is to minimize the horizontal deformation of the hole, which we denote as bulging and quantify as: uR_x \u2212uL_x... The top plate is gradually lowered for a total deformation of 20% of the sample height."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because continuous grading is difficult to realize in practice, the domain is partitioned into hexagonal regions for optimization.",
+        "evidence_spans": [
+          "Since creating a continuous grading is challenging in practice, we instead partition the domain into hexagonal regions."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The NN surrogate is not constrained to produce zero stress in the undeformed state.",
+        "evidence_spans": [
+          "the NN is not constrained to have zero stresses in the undeformed state"
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": [
+      {
+        "content": "A contradiction is reported between evaluation metrics: although the NN and nonlinear HyPRNN achieve lower test-set errors, their displacements in multiscale simulations are less accurate than those of the linear HyPRNN.",
+        "evidence_spans": [
+          "While the NN and nonlinear HyPRNN with 512 samples have lower errors on the test set, their displacements in these multiscale simulations are less accurate than the linear HyPRNN."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Unlike a prior plasticity study that trained on only a single material-parameter value, this work varies the material parameter during training to enable a meaningful comparison with a neural network.",
+        "evidence_spans": [
+          "In contrast to that study, where only a single value is seen in training, the material parameter is varied in the training data here, in order to allow for a meaningful comparison with a neural network."
+        ],
+        "conflicting": false
+      }
+    ]
+  }
+}

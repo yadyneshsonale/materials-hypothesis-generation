@@ -1,0 +1,937 @@
+{
+  "paper_id": "2606.12520",
+  "chunks_processed": 9,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Predicting physical observables for specific compounds from first principles is still difficult.",
+        "evidence_span": "predicting physical observables for specific compounds from first principles remains challenging."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Electronic-structure calculations needed to distinguish metals from insulators are expensive and unreliable for strongly interacting systems.",
+        "evidence_span": "distinguishing metals from insulators requires electronic structure calculations, which are computationally intensive and often unreliable for strongly interacting systems."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Finding cross-material patterns requires repeating expensive calculations across materials.",
+        "evidence_span": "Moreover, finding patterns across materials typically requires repeating these calculations entirely."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Predicting superconductivity and Tc from first principles remains fundamentally hard because the governing chemical and structural properties are not unifiedly understood.",
+        "evidence_span": "Predicting superconductivity and the associated critical temperature (Tc) from first principles remains a fundamental challenge, largely because we lack a unified understanding \u2014 even statistically \u2014 of which chemical and structural properties govern superconducting behavior."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The lack of understanding of superconductivity motivates using it as a testbed.",
+        "evidence_span": "This gap in our understanding makes the problem an ideal testbed for our approach."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "The main challenge is to find a low-dimensional organization that is both predictive and interpretable.",
+        "evidence_span": "The central challenge is discovering a low-dimensional organization of the materials landscape that is both predictive and interpretable \u2014 ideally in terms of a few physically meaningful coordinates."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "There is a need for unsupervised methods that preserve geometric meaning in low-dimensional latent models.",
+        "evidence_span": "We therefore need unsupervised methods that construct low-dimensional models with their geometric meaning preserved, such that the latent axes correspond to regular variations in the collective features."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "Materials design lacks understanding of which microscopic unit-cell properties govern emergent phenomena.",
+        "evidence_span": "this approach leaves a fundamental gap in our understanding of materials design. The microscopic properties within the unit cell that govern these emergent phenomena are often unclear."
+      },
+      {
+        "role": "problem_motivation",
+        "content": "There is a need to overcome the limitations of standard nonlinear dimensionality reduction and build a quantitative low-dimensional coordinate system for materials space.",
+        "evidence_span": "To overcome these limitations and build a\nquantitative low-dimensional coordinate system for the\nspace of materials, we leverage a recently developed mani-\nfold construction technique"
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Supervised machine learning has been used to predict Tc from microscopic features.",
+        "evidence_span": "While supervised machine learning effectively predicts Tc from microscopic features [12, 14, 22\u201330]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Recent work identified interpretable features correlated with Tc across superconducting families.",
+        "evidence_span": "Recent work has identified specific interpretable features that correlate with Tc across superconducting families [20]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "UMAP is a standard unsupervised dimensionality-reduction method for low-dimensional mapping.",
+        "evidence_span": "Standard unsupervised dimensionality reduction techniques like UMAP [32, 33] map high-dimensional data to low-dimensional latent spaces"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Autoencoders have been used to learn continuous manifolds.",
+        "evidence_span": "Similarly, autoencoders [34] learn continuous manifolds"
+      },
+      {
+        "role": "prior_approach",
+        "content": "The method builds on existing ICSD data resources and prior feature-space embedding frameworks.",
+        "evidence_span": "Our method builds on two key resources: the curated ICSD database, which contains over 220,000 known stable compounds [10], along with their associated properties [11, 12]; and a systematic framework for embedding these compounds into a unified, high-dimensional feature space derived from atomic properties and crystal structure [12\u201321]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Superconducting compounds are labeled after training using the 3DSC-ICSD database via ICSD\u2013SuperCon matching.",
+        "evidence_span": "once we obtain the low-dimensional embedding, we use the database 3DSC-ICSD [11] to label the superconducting compounds. This is based on matching entries in ICSD to entries of the SuperCon database [47], which tabulates all known three-dimensional superconductors and their critical temperatures Tc."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior superconducting Tc prediction approaches include DFT and approximate Migdal-Eliashberg theory.",
+        "evidence_span": "density functional theory (DFT) [52, 53] and the approximate Migdal-Eliashberg theory [54, 55]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Theoretical understanding usually builds effective electronic models and solves them approximately.",
+        "evidence_span": "Theoretical understanding of collective phenomena in quantum materials typically relies on building effective electronic models and solving them using approximate methods."
+      },
+      {
+        "role": "prior_approach",
+        "content": "A simple prior featurization uses only chemical composition.",
+        "evidence_span": "The\nsimplest material featurization is based on their chemical\ncomposition [27]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The authors adopt a graph-based featurization approach similar to prior references.",
+        "evidence_span": "To incorporate more comprehensive information on a\ngiven compound, we take a graph-based approach, similar\nto Refs. [20, 21, 37\u201341, 43]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Common prior strategies for organizing materials are high-dimensional featurization with feature selection and unsupervised dimensionality reduction on subsets.",
+        "evidence_span": "To organize our understanding of the landscape of mate-\nrials, two approaches are commonly taken. The first is to\nuse high-dimensional featurization of materials datasets\nand perform feature selection for a particular material\nproperty [14]. The second is to perform unsupervised di-\nmensionality reduction on subsets of materials to discover\nunderlying organizing principles [69]."
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "Nonlinear supervised mappings hide which chemical or structural principles matter most for superconductivity.",
+        "evidence_span": "the resulting nonlinear mappings obscure which structural or chemical principles contribute most to superconductivity."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "UMAP embeddings distort distances and are not interpretable.",
+        "evidence_span": "but produce embeddings that distort distances and lack interpretable structure."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Autoencoder latents are uninterpretable and unstable, hurting interpretability and generalization.",
+        "evidence_span": "but remain uninterpretable; small shifts in latent coordinates can produce qualitatively different predictions of material features [35, 36], undermining both interpretability and generalization."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "First-principles Tc prediction in Li-based compounds requires special care and is difficult.",
+        "evidence_span": "This is especially interesting given the extra care required to predict Tc from first principles in Li-based compounds"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "That standard theory approach leaves a gap for materials design because key microscopic governing properties remain unclear.",
+        "evidence_span": "this approach leaves a fundamental gap in our understanding of materials design. The microscopic properties within the unit cell that govern these emergent phenomena are often unclear."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Conventional electronic-structure calculations often fail for topological materials with strong correlations.",
+        "evidence_span": "conventional electronic structure computations often fail in the presence of strong correlations"
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Composition-only featurization omits structural and electronic information in the unit cell.",
+        "evidence_span": "Note\nthat apart from the chemical composition, this featur-\nization does not include information on the underlying\nstructural or electronic properties within the unit cell."
+      },
+      {
+        "role": "prior_limitation",
+        "content": "Nonlinear dimensionality reduction methods distort data geometry, causing sensitivity to initialization and manifold distortion.",
+        "evidence_span": "However, nonlinear\ndimensionality reduction techniques such as UMAP [32],\ntSNE [70], and VAEs [44] are known to significantly dis-\ntort the geometry of the data due to the nonlinearities\ninherent in the methods, thereby leading to undesirable\ncharacteristics such as sensitivity of the embedding to\ninitial conditions [71] and distortions of the manifold ge-\nometry [72]."
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than using unsupervised methods that distort geometry or lack interpretability, the paper uses a geometry-controlled autoencoder.",
+        "evidence_span": "To address these challenges, we use the \u0393-autoencoder (\u0393AE) [36] \u2014 a data-driven technique using differential geometry to control distortions causing overfitting \u2014 to unveil a novel geometric organization for materials."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The paper positions its discovery approach against methods tied to theoretical approximations, favoring a complementary approximation-light route.",
+        "evidence_span": "thereby providing a complementary discovery approach free from various underlying theoretical approximations."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Instead of first-principles and effective-model approximations like DFT and Migdal-Eliashberg, the paper uses a Tc regression model on three latent features.",
+        "evidence_span": "instead of using density functional theory (DFT) [52, 53] and the approximate Migdal-Eliashberg theory [54, 55], we can use our Tc regression model based on only three latent space features to predict Tc."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The approach is shaped by differential geometry principles and the recently developed \u0393AE algorithm.",
+        "evidence_span": "By extending differential geometry principles to high-dimensional spaces, we verify this conjecture"
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The method draws on the recently developed \u0393AE algorithm.",
+        "evidence_span": "We extend the recently developed \u0393AE [36] algorithm to the present setting"
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The manifold construction technique is borrowed from a recently developed differential-geometry-based method.",
+        "evidence_span": "we leverage a recently developed mani-\nfold construction technique that uses differential geometry\nto control all of the nonlinearities involved in the mani-\nfold [36]."
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Comparable accuracy from multiple sparse feature subsets implies the landscape can be organized along several collective axes.",
+        "evidence_span": "implying that the materials landscape admits organization along several collective axes [31]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "If latent organization tracks increasing Tc, it must arise from systematic regular changes in collective features that can be read from the model.",
+        "evidence_span": "If materials in the latent space organize along an increase in a property such as Tc, that organization would have resulted from systematic and regular changes in the collective features that we could directly decipher from our model."
+      },
+      {
+        "role": "causal_claim",
+        "content": "This distortion makes latent ordering and feature changes difficult to interpret.",
+        "evidence_span": "As a result, interpreting the specific ordering of points in the latent space and the corresponding changes tied to the collective features becomes difficult."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Distorted geometry makes embeddings for new materials unreliable.",
+        "evidence_span": "Most importantly, identifying the embedding for new materials outside of the training data becomes unreliable."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The interpretable embedding enables analysis of feature importance for Tc.",
+        "evidence_span": "The interpretable embedding enables analyzing features importance for Tc"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Uncontrolled geometric distortion makes latent axes hard to interpret.",
+        "evidence_span": "If the latter is not accounted for, then the directions in data space that are traversed can change rapidly as we move smoothly along the latent space, making it difficult to interpret the latent space axes with respect to the data features."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Controlling extrinsic curvature makes straight latent paths correspond to gently bending data-space curves and slowly varying collective features.",
+        "evidence_span": "By controlling the extrinsic curvature, we ensure that a straight line in the latent space corresponds to a gently bending curve in the data space, such that the axes of the latent space correspond to slowly-varying collective features [Fig. 1(c)]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Because superconductors are less than 2% of the data, removing them from training should not affect the embedding.",
+        "evidence_span": "one might rationalize these results by noting that removing the superconductors, which make up less than 2% of the materials, from the training set should have no effect on the resulting embedding"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The network can distinguish superconductors from non-superconductors without seeing superconductors during training, implying out-of-distribution prediction capability.",
+        "evidence_span": "the network is able to make out-of-distribution predictions, by distinguishing superconducting materials from the rest without ever having encountered the former during training"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The embedding groups materials by more than chemical formula similarity alone.",
+        "evidence_span": "our autoencoder embedding goes well beyond clustering materials solely based on their chemical formulae"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Latent coordinates capture the key features governing paths to increasing Tc.",
+        "evidence_span": "Thus the latent space coordinates capture the salient features that determine the route to increasing Tc"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Having crystal structures available allows the \u0393AE embedding model to provide statistically reliable Tc prediction without assuming a superconducting mechanism.",
+        "evidence_span": "if the crystal structures are available, our \u0393AE model based on the low-dimensional geometric embedding provides a statistically reliable way of predicting Tc in broad agreement with the experiment, without making any assumptions regarding the superconducting mechanism itself"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Combining the geometric interpretation with first-principles structure calculations enables rational materials design.",
+        "evidence_span": "The geometric interpretation of our algorithm enables rational materials design when combined with first-principles computation of the structure."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Perturbing neighborhoods of desirable clusters and checking re-embedding can provide a validated pre-synthesis pipeline.",
+        "evidence_span": "By perturbing the neighborhood of clusters with desirable properties, one can verify the structural stability of candidate materials and confirm that optimized structures re-embed in the same cluster, thus providing a validated pipeline prior to experimental synthesis."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The embeddings and minimal feature subsets can support construction of effective low-energy models.",
+        "evidence_span": "the embeddings and associated minimal feature subset capturing the maximum variability can enable construction of effective low-energy models for the emergent properties of interest."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Penalizing parameter-effects and extrinsic curvature regularizes the manifold geometry.",
+        "evidence_span": "We regularize the geometry of the manifold by penaliz-\ning two curvatures: the parameter-effects curvature that\ndistorts the metric along the tangent bundle, and the\nextrinsic curvature that allows the low-dimensional man-\nifold to bend sharply"
+      },
+      {
+        "role": "causal_claim",
+        "content": "At zero curvature penalties, the manifold becomes flat, analogous to PCA.",
+        "evidence_span": "Hence, at the limit\nof full complete regularization of both of these curvatures\nby making their cost go to zero, the manifold becomes\nflat, analogous to PCA."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Adding graph-based features causes three clusters to appear at first order and become more segregated as featurization complexity increases.",
+        "evidence_span": "Interest-\ningly, with the introduction of graph-based features, the\nthree clusters emerge at first order and become increas-\ningly more segregated with more complexity."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Increasing graph-feature complexity to second and third order makes heavy fermion and other superconductors become increasingly clustered.",
+        "evidence_span": "The heavy fermion and other\nSC families are not clustered when using just first-order\ngraph features, but when increasing the complexity to\ninclude also second- and third-order graph features, they\nbecome increasingly clustered."
+      },
+      {
+        "role": "causal_claim",
+        "content": "This near-perfect overlap shows that \u0393AE captures the essence of cuprate superconductors without seeing similar examples during training.",
+        "evidence_span": "This demonstrates that \u0393AE can capture\nthe essence of cuprate superconductors without having seen\nanything resembling them."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Typical neural-network manifolds become hard to interpret because they can arbitrarily stretch and bend through high-dimensional data.",
+        "evidence_span": "the map between the latent space coordinates and the model manifold of predictions of material features becomes distorted because the manifold is allowed to stretch and bend to visit the high-dimensional data in any arbitrary order [36]."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Controlling parameter-effects curvature preserves local geometric meaning between latent and data spaces.",
+        "evidence_span": "By controlling the parameter-effects curvature, a regular grid of points in the latent space maps to a regular grid of points on the manifold in data space [Fig. 1(c)], which ensures that distances and angles at two points in the latent space do not map to dramatically different distances and angles on the manifold in data space."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Rapidly changing traversed directions in data space explain why latent axes become hard to interpret.",
+        "evidence_span": "the directions in data space that are traversed can change rapidly as we move smoothly along the latent space, making it difficult to interpret the latent space axes with respect to the data features."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Parameter-effects curvature distorts the metric along tangent directions, while extrinsic curvature causes sharp bending into new directions in materials space.",
+        "evidence_span": "the parameter-effects curvature that\ndistorts the metric along the tangent bundle, and the\nextrinsic curvature that allows the low-dimensional man-\nifold to bend sharply, if the curvature is not accounted\nfor, in new directions in materials space"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The flattening occurs because complete regularization drives both curvature costs to zero.",
+        "evidence_span": "at the limit\nof full complete regularization of both of these curvatures\nby making their cost go to zero, the manifold becomes\nflat"
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "Only a small number of microscopic features determine how stable materials are geometrically organized in the full combinatorial space.",
+        "evidence_span": "We conjecture that only a few microscopic features determine the geometric organization of experimentally stable materials within this combinatorial space."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Those collective features could provide leading empirical terms for a broader theory of Tc.",
+        "evidence_span": "These collective features could then serve as putative leading-order terms in developing a broader empirical theory of Tc."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The model identifies a small set of geometric and electronic properties that organize and distinguish superconducting materials.",
+        "evidence_span": "These results suggest that the \u0393AE model can identify the handful of geometric and electronic properties that capture the organizational aspects of superconducting materials, and maximally distinguish them from the rest."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The unsupervised algorithm learns a small, interpretable subset of microscopic features controlling superconducting behavior.",
+        "evidence_span": "Our unsupervised algorithm is able to learn the small subset of microscopic features that controls a material\u2019s superconducting character in an interpretable fashion."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The dimensionality reduction should identify collective coordinates capturing significant variance in the data.",
+        "evidence_span": "Ultimately, the dimensionality reduction\nalgorithm should be able to filter out the collective coordi-\nnates that capture a significant variance in the data."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Their decomposition should allow controlled deviations from PCA to capture a nonlinear low-dimensional materials landscape quantitatively.",
+        "evidence_span": "Our decomposition allows us to\nperturb the manifold geometry away from PCA to capture\nthe emergent, nonlinear, low-dimensional landscape of\nmaterials in a quantitative and hypothesis-driven way."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "Empirical evidence indicates multiple sparse feature subsets can achieve similar predictive accuracy.",
+        "evidence_span": "However, there is clear empirical evidence that suggests multiple sparse feature subsets achieve comparable accuracy [20]"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The learned manifold smoothly follows the data and yields interpretable collective axes.",
+        "evidence_span": "The resulting low-dimensional manifold smoothly follows the structure of the data in high-dimensional feature space, with materials projections onto manifold coordinates revealing organization along interpretable collective axes."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The geometric structure separates most superconductors and reveals feature combinations associated with higher Tc.",
+        "evidence_span": "Remarkably, this geometric structure separates most superconductors from other materials and reveals microscopic feature combinations correlating with higher Tc within superconducting families."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Training without superconductors leaves their embedding unchanged, indicating autonomous learning of superconductivity-related patterns.",
+        "evidence_span": "When trained without superconductors, the geometric embedding of superconductors relative to remaining materials stays unchanged, demonstrating autonomous learning of the patterns leading to superconductivity."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The embedding organizes materials into three well-separated clusters with superconducting Tc ordered across it.",
+        "evidence_span": "we find that the materials embedding is organized into three well-separated clusters"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Within a given cluster, only a few feature combinations vary strongly along latent axes, often by about an order of magnitude more than others.",
+        "evidence_span": "we have found that the relative variations of the above features along the respective latent space axes are approximately an order of magnitude larger than any other set of features"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Superconducting Tc shows a clear increasing trend across the low-dimensional embedding.",
+        "evidence_span": "Labeling all the materials in Fig. 2(a) according to their superconducting Tc reveals a clearly increasing trend across the low-dimensional embedding."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Embeddings of superconductors are nearly unchanged whether superconductors were included in training or excluded.",
+        "evidence_span": "Remarkably, the two embeddings appear to be nearly identical in terms of their overall structure and the relative placement of specific superconducting families"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Relative superconductor locations match strongly between the two embeddings, with near-perfect correlation.",
+        "evidence_span": "The Pearson correlation coefficient [48] evaluates to r = 0.998, suggesting an almost perfect linear correlation between the two embeddings."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The embedding captures more variance than three-component PCA.",
+        "evidence_span": "our embedding captures 67% of the variance of the full features, compared to a mere 46% captured by three-component principal component analysis (PCA)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Superconducting materials are segregated into chemically distinct families in the embedding.",
+        "evidence_span": "we find that the superconducting cluster is further segregated into chemically distinct families"
+      },
+      {
+        "role": "evidence_result",
+        "content": "All superconducting families cluster more strongly than expected by chance, including the 'other' category.",
+        "evidence_span": "We find that all superconducting families cluster significantly more than expected by chance (z < \u22122), which includes the \u201cother\u201d category"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Conventional superconductors cluster together despite chemical dissimilarity.",
+        "evidence_span": "they primarily include the conventional superconductors which are chemically dissimilar, and yet the unsupervised autoencoder clusters them together"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Cuprate superconductors cluster more strongly than the broader set of Cu- and O-containing compounds.",
+        "evidence_span": "We find that they are significantly more clustered compared to all compounds containing copper (Cu) and oxygen (O)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The qualitative clustering behavior persists in two-dimensional embeddings and with different featurizations.",
+        "evidence_span": "The qualitative behavior persists when we choose a two-dimensional embedding and different featurization schemes"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Only a small fraction of features show even modest correlation with the Tc-gradient direction.",
+        "evidence_span": "The distribution of Cohen\u2019s d values is shown in Fig. 4(a), where 2.9% of the features have a modest effect (d > 0.2)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Features varying along increasing-Tc trajectories overlap strongly with the top features ranked by Cohen's d.",
+        "evidence_span": "we find that these predominant features overlap significantly with the set of 20 features with largest Cohen\u2019s d"
+      },
+      {
+        "role": "evidence_result",
+        "content": "A Gaussian process using only the three latent coordinates predicts Tc with high test accuracy.",
+        "evidence_span": "Our model achieves a test R2 score of 0.912"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The three-latent-feature model outperforms models built from random triples of original features.",
+        "evidence_span": "significantly high compared to a distribution of 2,000 similar models trained on three randomly selected features from the original feature space"
+      },
+      {
+        "role": "evidence_result",
+        "content": "For LixBC, the latent-feature regression predicts Tc of 1.5\u20138 K depending on doping, consistent with experiment reporting Tc up to about 2 K.",
+        "evidence_span": "our Tc regression model based on the three latent space features predicts Tc = 1.5\u20138 K, depending on the doping, which is consistent with experiments reporting Tc \u22722 K"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The local embedding neighborhood of LixBC lacks high-Tc superconductors.",
+        "evidence_span": "The local environment of LixBC in our geometric embedding does not contain any high-Tc superconductors"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Despite complex unit cells, only a handful of covarying properties capture most of the variance.",
+        "evidence_span": "despite the complexity of unit cells containing tens of atoms, only a handful of covarying properties capture most of their variance."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Across all tested featurizations, superconductors cluster, with composition-only features showing the clearest geometric structure.",
+        "evidence_span": "Across\nall the featurization schemes, we observe clustering of\nsuperconductors, with the composition-only featurization\nshowing the most distinct geometric structure."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Most superconducting families are significantly clustered for all featurization schemes tested.",
+        "evidence_span": "We find\nthat most SC families are significantly clustered for all\nschemes we have tried."
+      },
+      {
+        "role": "evidence_result",
+        "content": "When Cu- and O-containing materials are removed from training, the two embeddings still overlap almost perfectly with Pearson r = 0.991.",
+        "evidence_span": "Notably,\neven with all these held out materials, the two embeddings\noverlap almost perfectly (Pearson r = 0.991 for pairwise\ndistances)."
+      },
+      {
+        "role": "evidence_result",
+        "content": "In two dimensions, the embedding preserves 57% of variance versus 34% for PCA.",
+        "evidence_span": "Recall that with the same GNN\nfeatures, the two-dimensional embedding preserves 57% of\nthe variance in the data, compared to 34% in PCA;"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The two-dimensional embedding shows general clustering of superconducting families similar to the three-dimensional case.",
+        "evidence_span": "We observe a general clustering of\nSC families, similar to the three-dimensional embedding."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The density map in two dimensions again reveals three high-density clusters.",
+        "evidence_span": "Interestingly,\nonce again we find that the materials are largely organized\ninto three high-density clusters."
+      },
+      {
+        "role": "evidence_result",
+        "content": "There is no clear positive correlation between superconducting properties and material density; superconductors are mostly confined to relatively low-density regions.",
+        "evidence_span": "Interestingly, we do not find a clear positive correlation\nbetween these superconducting properties and the den-\nsity of materials field; instead, the superconductors are\nlargely restricted to areas with a relatively low density of\nmaterials."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Latent-space features outperform the vast majority of random second-order feature combinations for Tc regression.",
+        "evidence_span": "We still find that\nthe latent space features outperform the vast majority of\ncombinations."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "A suitable model must penalize manifold irregularities and distortions to maintain geometric regularity.",
+        "evidence_span": "To achieve the geometric regularity necessary for such models, we must penalize irregularities and distortions of the manifold."
+      },
+      {
+        "role": "constraint",
+        "content": "The feature representation should include as much information as possible beyond chemical formula while avoiding redundant information that adds no latent-space variability.",
+        "evidence_span": "Our goal here is two-fold: to include as much information as possible,\nbeyond just the chemical formula tied to the crystalline\nunit cell, while ensuring that unnecessary redundancies\nthat do not capture any further variability in latent space\nare avoided."
+      }
+    ],
+    "contradiction": []
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Predicting physical observables for specific compounds from first principles remains difficult: distinguishing metals from insulators and predicting superconductivity/Tc require computationally intensive electronic-structure calculations that are often unreliable for strongly interacting systems, and more broadly we still lack a unified understanding of which chemical, structural, and microscopic unit-cell properties govern emergent phenomena.",
+        "evidence_spans": [
+          "predicting physical observables for specific compounds from first principles remains challenging.",
+          "distinguishing metals from insulators requires electronic structure calculations, which are computationally intensive and often unreliable for strongly interacting systems.",
+          "Predicting superconductivity and the associated critical temperature (Tc) from first principles remains a fundamental challenge, largely because we lack a unified understanding \u2014 even statistically \u2014 of which chemical and structural properties govern superconducting behavior.",
+          "this approach leaves a fundamental gap in our understanding of materials design. The microscopic properties within the unit cell that govern these emergent phenomena are often unclear."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Because current first-principles analysis is expensive and hard to generalize across compounds, finding cross-material patterns typically requires repeating costly calculations for each material.",
+        "evidence_spans": [
+          "Moreover, finding patterns across materials typically requires repeating these calculations entirely."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A central motivation is to discover a quantitative, low-dimensional organization of materials space that is both predictive and interpretable, with geometrically meaningful latent coordinates; this requires unsupervised methods that preserve geometric meaning and overcome the limitations of standard nonlinear dimensionality reduction.",
+        "evidence_spans": [
+          "The central challenge is discovering a low-dimensional organization of the materials landscape that is both predictive and interpretable \u2014 ideally in terms of a few physically meaningful coordinates.",
+          "We therefore need unsupervised methods that construct low-dimensional models with their geometric meaning preserved, such that the latent axes correspond to regular variations in the collective features.",
+          "To overcome these limitations and build a quantitative low-dimensional coordinate system for the space of materials, we leverage a recently developed manifold construction technique"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The lack of understanding of superconductivity makes it an ideal testbed for the proposed approach.",
+        "evidence_spans": [
+          "This gap in our understanding makes the problem an ideal testbed for our approach."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Prior work used supervised machine learning to predict superconducting critical temperature (Tc) from microscopic/material features, and also identified interpretable features correlated with Tc across superconducting families.",
+        "evidence_spans": [
+          "While supervised machine learning effectively predicts Tc from microscopic features [12, 14, 22\u201330]",
+          "Recent work has identified specific interpretable features that correlate with Tc across superconducting families [20]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Common prior strategies for understanding and organizing materials include high-dimensional featurization with feature selection for particular properties, supervised composition-based featurizations as a simple baseline, graph-based featurization approaches for richer compound information, and unsupervised dimensionality reduction on subsets of materials.",
+        "evidence_spans": [
+          "To organize our understanding of the landscape of mate-rials, two approaches are commonly taken. The first is to use high-dimensional featurization of materials datasets and perform feature selection for a particular material property [14]. The second is to perform unsupervised di-mensionality reduction on subsets of materials to discover underlying organizing principles [69].",
+          "The simplest material featurization is based on their chemical composition [27].",
+          "To incorporate more comprehensive information on a given compound, we take a graph-based approach, similar to Refs. [20, 21, 37\u201341, 43]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Standard prior unsupervised representation-learning methods include dimensionality-reduction techniques such as UMAP, which map high-dimensional data to low-dimensional latent spaces, and autoencoders, which learn continuous manifolds.",
+        "evidence_spans": [
+          "Standard unsupervised dimensionality reduction techniques like UMAP [32, 33] map high-dimensional data to low-dimensional latent spaces",
+          "Similarly, autoencoders [34] learn continuous manifolds"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior theoretical approaches to superconductivity and quantum materials include density functional theory (DFT), approximate Migdal-Eliashberg theory, and more generally building effective electronic models and solving them approximately.",
+        "evidence_spans": [
+          "density functional theory (DFT) [52, 53] and the approximate Migdal-Eliashberg theory [54, 55]",
+          "Theoretical understanding of collective phenomena in quantum materials typically relies on building effective electronic models and solving them using approximate methods."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The present method builds on existing data and representation resources: the curated ICSD database and prior frameworks for embedding compounds into a unified high-dimensional feature space; superconducting compounds can then be labeled using the 3DSC-ICSD database via ICSD\u2013SuperCon matching.",
+        "evidence_spans": [
+          "Our method builds on two key resources: the curated ICSD database, which contains over 220,000 known stable compounds [10], along with their associated properties [11, 12]; and a systematic framework for embedding these compounds into a unified, high-dimensional feature space derived from atomic properties and crystal structure [12\u201321].",
+          "once we obtain the low-dimensional embedding, we use the database 3DSC-ICSD [11] to label the superconducting compounds. This is based on matching entries in ICSD to entries of the SuperCon database [47], which tabulates all known three-dimensional superconductors and their critical temperatures Tc."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "Prior ML approaches based on nonlinear supervised mappings and latent-space methods are hard to interpret: they obscure which structural or chemical principles drive superconductivity, and autoencoder/related latent coordinates can be unstable, with small shifts causing qualitatively different predictions that hurt interpretability and generalization.",
+        "evidence_spans": [
+          "the resulting nonlinear mappings obscure which structural or chemical principles contribute most to superconductivity.",
+          "but remain uninterpretable; small shifts in latent coordinates can produce qualitatively different predictions of material features [35, 36], undermining both interpretability and generalization."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Nonlinear dimensionality-reduction methods such as UMAP, tSNE, and VAEs distort the geometry/distances of the data, produce embeddings that lack interpretable structure, and can be sensitive to initialization/manifold distortion.",
+        "evidence_spans": [
+          "but produce embeddings that distort distances and lack interpretable structure.",
+          "However, nonlinear dimensionality reduction techniques such as UMAP [32], tSNE [70], and VAEs [44] are known to significantly distort the geometry of the data due to the nonlinearities inherent in the methods, thereby leading to undesirable characteristics such as sensitivity of the embedding to initial conditions [71] and distortions of the manifold geometry [72]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Standard theory and first-principles approaches leave a gap for materials design: predicting Tc in Li-based compounds requires special care and is difficult, and the microscopic unit-cell properties governing the emergent phenomena often remain unclear.",
+        "evidence_spans": [
+          "This is especially interesting given the extra care required to predict Tc from first principles in Li-based compounds",
+          "this approach leaves a fundamental gap in our understanding of materials design. The microscopic properties within the unit cell that govern these emergent phenomena are often unclear."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Conventional electronic-structure calculations often fail for topological materials when strong correlations are present.",
+        "evidence_spans": [
+          "conventional electronic structure computations often fail in the presence of strong correlations"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Composition-only featurization is limited because it omits underlying structural and electronic information within the unit cell.",
+        "evidence_spans": [
+          "Note that apart from the chemical composition, this featurization does not include information on the underlying structural or electronic properties within the unit cell."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [
+      {
+        "role": "rejected_alternative",
+        "content": "Rather than using unsupervised methods that distort geometry or lack interpretability, the paper uses a geometry-controlled autoencoder.",
+        "evidence_span": "To address these challenges, we use the \u0393-autoencoder (\u0393AE) [36] \u2014 a data-driven technique using differential geometry to control distortions causing overfitting \u2014 to unveil a novel geometric organization for materials."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "The paper positions its discovery approach against methods tied to theoretical approximations, favoring a complementary approximation-light route.",
+        "evidence_span": "thereby providing a complementary discovery approach free from various underlying theoretical approximations."
+      },
+      {
+        "role": "rejected_alternative",
+        "content": "Instead of first-principles and effective-model approximations like DFT and Migdal-Eliashberg, the paper uses a Tc regression model on three latent features.",
+        "evidence_span": "instead of using density functional theory (DFT) [52, 53] and the approximate Migdal-Eliashberg theory [54, 55], we can use our Tc regression model based on only three latent space features to predict Tc."
+      }
+    ],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The approach is shaped by differential geometry principles and the recently developed \u0393AE algorithm.",
+        "evidence_span": "By extending differential geometry principles to high-dimensional spaces, we verify this conjecture"
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The method draws on the recently developed \u0393AE algorithm.",
+        "evidence_span": "We extend the recently developed \u0393AE [36] algorithm to the present setting"
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The manifold construction technique is borrowed from a recently developed differential-geometry-based method.",
+        "evidence_span": "we leverage a recently developed mani-\nfold construction technique that uses differential geometry\nto control all of the nonlinearities involved in the mani-\nfold [36]."
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Comparable accuracy from multiple sparse feature subsets implies the landscape can be organized along several collective axes.",
+        "evidence_span": "implying that the materials landscape admits organization along several collective axes [31]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "If latent organization tracks increasing Tc, it must arise from systematic regular changes in collective features that can be read from the model.",
+        "evidence_span": "If materials in the latent space organize along an increase in a property such as Tc, that organization would have resulted from systematic and regular changes in the collective features that we could directly decipher from our model."
+      },
+      {
+        "role": "causal_claim",
+        "content": "This distortion makes latent ordering and feature changes difficult to interpret.",
+        "evidence_span": "As a result, interpreting the specific ordering of points in the latent space and the corresponding changes tied to the collective features becomes difficult."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Distorted geometry makes embeddings for new materials unreliable.",
+        "evidence_span": "Most importantly, identifying the embedding for new materials outside of the training data becomes unreliable."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The interpretable embedding enables analysis of feature importance for Tc.",
+        "evidence_span": "The interpretable embedding enables analyzing features importance for Tc"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Uncontrolled geometric distortion makes latent axes hard to interpret.",
+        "evidence_span": "If the latter is not accounted for, then the directions in data space that are traversed can change rapidly as we move smoothly along the latent space, making it difficult to interpret the latent space axes with respect to the data features."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Controlling extrinsic curvature makes straight latent paths correspond to gently bending data-space curves and slowly varying collective features.",
+        "evidence_span": "By controlling the extrinsic curvature, we ensure that a straight line in the latent space corresponds to a gently bending curve in the data space, such that the axes of the latent space correspond to slowly-varying collective features [Fig. 1(c)]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Because superconductors are less than 2% of the data, removing them from training should not affect the embedding.",
+        "evidence_span": "one might rationalize these results by noting that removing the superconductors, which make up less than 2% of the materials, from the training set should have no effect on the resulting embedding"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The network can distinguish superconductors from non-superconductors without seeing superconductors during training, implying out-of-distribution prediction capability.",
+        "evidence_span": "the network is able to make out-of-distribution predictions, by distinguishing superconducting materials from the rest without ever having encountered the former during training"
+      },
+      {
+        "role": "causal_claim",
+        "content": "The embedding groups materials by more than chemical formula similarity alone.",
+        "evidence_span": "our autoencoder embedding goes well beyond clustering materials solely based on their chemical formulae"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Latent coordinates capture the key features governing paths to increasing Tc.",
+        "evidence_span": "Thus the latent space coordinates capture the salient features that determine the route to increasing Tc"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Having crystal structures available allows the \u0393AE embedding model to provide statistically reliable Tc prediction without assuming a superconducting mechanism.",
+        "evidence_span": "if the crystal structures are available, our \u0393AE model based on the low-dimensional geometric embedding provides a statistically reliable way of predicting Tc in broad agreement with the experiment, without making any assumptions regarding the superconducting mechanism itself"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Combining the geometric interpretation with first-principles structure calculations enables rational materials design.",
+        "evidence_span": "The geometric interpretation of our algorithm enables rational materials design when combined with first-principles computation of the structure."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Perturbing neighborhoods of desirable clusters and checking re-embedding can provide a validated pre-synthesis pipeline.",
+        "evidence_span": "By perturbing the neighborhood of clusters with desirable properties, one can verify the structural stability of candidate materials and confirm that optimized structures re-embed in the same cluster, thus providing a validated pipeline prior to experimental synthesis."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The embeddings and minimal feature subsets can support construction of effective low-energy models.",
+        "evidence_span": "the embeddings and associated minimal feature subset capturing the maximum variability can enable construction of effective low-energy models for the emergent properties of interest."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Penalizing parameter-effects and extrinsic curvature regularizes the manifold geometry.",
+        "evidence_span": "We regularize the geometry of the manifold by penaliz-\ning two curvatures: the parameter-effects curvature that\ndistorts the metric along the tangent bundle, and the\nextrinsic curvature that allows the low-dimensional man-\nifold to bend sharply"
+      },
+      {
+        "role": "causal_claim",
+        "content": "At zero curvature penalties, the manifold becomes flat, analogous to PCA.",
+        "evidence_span": "Hence, at the limit\nof full complete regularization of both of these curvatures\nby making their cost go to zero, the manifold becomes\nflat, analogous to PCA."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Adding graph-based features causes three clusters to appear at first order and become more segregated as featurization complexity increases.",
+        "evidence_span": "Interest-\ningly, with the introduction of graph-based features, the\nthree clusters emerge at first order and become increas-\ningly more segregated with more complexity."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Increasing graph-feature complexity to second and third order makes heavy fermion and other superconductors become increasingly clustered.",
+        "evidence_span": "The heavy fermion and other\nSC families are not clustered when using just first-order\ngraph features, but when increasing the complexity to\ninclude also second- and third-order graph features, they\nbecome increasingly clustered."
+      },
+      {
+        "role": "causal_claim",
+        "content": "This near-perfect overlap shows that \u0393AE captures the essence of cuprate superconductors without seeing similar examples during training.",
+        "evidence_span": "This demonstrates that \u0393AE can capture\nthe essence of cuprate superconductors without having seen\nanything resembling them."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Typical neural-network manifolds become hard to interpret because they can arbitrarily stretch and bend through high-dimensional data.",
+        "evidence_span": "the map between the latent space coordinates and the model manifold of predictions of material features becomes distorted because the manifold is allowed to stretch and bend to visit the high-dimensional data in any arbitrary order [36]."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Controlling parameter-effects curvature preserves local geometric meaning between latent and data spaces.",
+        "evidence_span": "By controlling the parameter-effects curvature, a regular grid of points in the latent space maps to a regular grid of points on the manifold in data space [Fig. 1(c)], which ensures that distances and angles at two points in the latent space do not map to dramatically different distances and angles on the manifold in data space."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Rapidly changing traversed directions in data space explain why latent axes become hard to interpret.",
+        "evidence_span": "the directions in data space that are traversed can change rapidly as we move smoothly along the latent space, making it difficult to interpret the latent space axes with respect to the data features."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Parameter-effects curvature distorts the metric along tangent directions, while extrinsic curvature causes sharp bending into new directions in materials space.",
+        "evidence_span": "the parameter-effects curvature that\ndistorts the metric along the tangent bundle, and the\nextrinsic curvature that allows the low-dimensional man-\nifold to bend sharply, if the curvature is not accounted\nfor, in new directions in materials space"
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The flattening occurs because complete regularization drives both curvature costs to zero.",
+        "evidence_span": "at the limit\nof full complete regularization of both of these curvatures\nby making their cost go to zero, the manifold becomes\nflat"
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "Only a small number of microscopic features determine how stable materials are geometrically organized in the full combinatorial space.",
+        "evidence_span": "We conjecture that only a few microscopic features determine the geometric organization of experimentally stable materials within this combinatorial space."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Those collective features could provide leading empirical terms for a broader theory of Tc.",
+        "evidence_span": "These collective features could then serve as putative leading-order terms in developing a broader empirical theory of Tc."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The model identifies a small set of geometric and electronic properties that organize and distinguish superconducting materials.",
+        "evidence_span": "These results suggest that the \u0393AE model can identify the handful of geometric and electronic properties that capture the organizational aspects of superconducting materials, and maximally distinguish them from the rest."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The unsupervised algorithm learns a small, interpretable subset of microscopic features controlling superconducting behavior.",
+        "evidence_span": "Our unsupervised algorithm is able to learn the small subset of microscopic features that controls a material\u2019s superconducting character in an interpretable fashion."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The dimensionality reduction should identify collective coordinates capturing significant variance in the data.",
+        "evidence_span": "Ultimately, the dimensionality reduction\nalgorithm should be able to filter out the collective coordi-\nnates that capture a significant variance in the data."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "Their decomposition should allow controlled deviations from PCA to capture a nonlinear low-dimensional materials landscape quantitatively.",
+        "evidence_span": "Our decomposition allows us to\nperturb the manifold geometry away from PCA to capture\nthe emergent, nonlinear, low-dimensional landscape of\nmaterials in a quantitative and hypothesis-driven way."
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "Empirical evidence indicates that multiple sparse feature subsets can achieve comparable predictive accuracy.",
+        "evidence_spans": [
+          "However, there is clear empirical evidence that suggests multiple sparse feature subsets achieve comparable accuracy [20]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The learned low-dimensional manifold/embedding smoothly follows the high-dimensional data structure, yields interpretable collective axes, and captures substantially more variance than PCA (67% vs 46% in 3D; 57% vs 34% in 2D), indicating that only a handful of covarying properties explain most of the variance despite complex unit cells.",
+        "evidence_spans": [
+          "The resulting low-dimensional manifold smoothly follows the structure of the data in high-dimensional feature space, with materials projections onto manifold coordinates revealing organization along interpretable collective axes.",
+          "our embedding captures 67% of the variance of the full features, compared to a mere 46% captured by three-component principal component analysis (PCA)",
+          "Recall that with the same GNN features, the two-dimensional embedding preserves 57% of the variance in the data, compared to 34% in PCA;",
+          "despite the complexity of unit cells containing tens of atoms, only a handful of covarying properties capture most of their variance."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The embedding has a robust global geometric structure organized into three well-separated/high-density clusters; this structure separates most superconductors from other materials, and superconducting Tc shows a clear increasing trend across the low-dimensional embedding.",
+        "evidence_spans": [
+          "we find that the materials embedding is organized into three well-separated clusters",
+          "Interestingly, once again we find that the materials are largely organized into three high-density clusters.",
+          "Remarkably, this geometric structure separates most superconductors from other materials and reveals microscopic feature combinations correlating with higher Tc within superconducting families.",
+          "Labeling all the materials in Fig. 2(a) according to their superconducting Tc reveals a clearly increasing trend across the low-dimensional embedding."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Within clusters and along latent axes, only a small subset of feature combinations varies strongly\u2014often about an order of magnitude more than others\u2014and the features changing along increasing-Tc trajectories overlap strongly with the top features identified by Cohen\u2019s d, even though only a small fraction of all features show modest correlation with the Tc-gradient direction.",
+        "evidence_spans": [
+          "we have found that the relative variations of the above features along the respective latent space axes are approximately an order of magnitude larger than any other set of features",
+          "The distribution of Cohen\u2019s d values is shown in Fig. 4(a), where 2.9% of the features have a modest effect (d > 0.2).",
+          "we find that these predominant features overlap significantly with the set of 20 features with largest Cohen\u2019s d"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The superconducting embedding structure is stable even when superconductors or related held-out materials are excluded from training: superconductors retain nearly unchanged relative placement, with near-perfect agreement between embeddings (Pearson r = 0.998; r = 0.991 when Cu- and O-containing materials are removed), indicating autonomous learning of superconductivity-related patterns.",
+        "evidence_spans": [
+          "When trained without superconductors, the geometric embedding of superconductors relative to remaining materials stays unchanged, demonstrating autonomous learning of the patterns leading to superconductivity.",
+          "Remarkably, the two embeddings appear to be nearly identical in terms of their overall structure and the relative placement of specific superconducting families",
+          "The Pearson correlation coefficient [48] evaluates to r = 0.998, suggesting an almost perfect linear correlation between the two embeddings.",
+          "Notably, even with all these held out materials, the two embeddings overlap almost perfectly (Pearson r = 0.991 for pairwise distances)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Superconducting materials cluster strongly in the embedding and are segregated into chemically distinct families; all or most families cluster significantly more than expected by chance across featurization schemes, including the 'other' category, and conventional superconductors cluster together despite chemical dissimilarity.",
+        "evidence_spans": [
+          "we find that the superconducting cluster is further segregated into chemically distinct families",
+          "We find that all superconducting families cluster significantly more than expected by chance (z < \u22122), which includes the \u201cother\u201d category",
+          "they primarily include the conventional superconductors which are chemically dissimilar, and yet the unsupervised autoencoder clusters them together",
+          "Across all the featurization schemes, we observe clustering of superconductors, with the composition-only featurization showing the most distinct geometric structure.",
+          "We find that most SC families are significantly clustered for all schemes we have tried."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Specific superconducting families show especially strong clustering: cuprates are significantly more clustered than the broader set of Cu- and O-containing compounds.",
+        "evidence_spans": [
+          "We find that they are significantly more clustered compared to all compounds containing copper (Cu) and oxygen (O)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The qualitative geometric organization is robust to dimensionality reduction choice and featurization: similar superconducting-family clustering appears in both two- and three-dimensional embeddings and under different featurization schemes, with composition-only features giving the clearest structure.",
+        "evidence_spans": [
+          "The qualitative behavior persists when we choose a two-dimensional embedding and different featurization schemes",
+          "Across all the featurization schemes, we observe clustering of superconductors, with the composition-only featurization showing the most distinct geometric structure.",
+          "We observe a general clustering of SC families, similar to the three-dimensional embedding."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A Gaussian process using only the three latent coordinates predicts Tc with high test accuracy (R2 = 0.912) and outperforms models built from random triples of original features as well as the vast majority of random second-order feature combinations.",
+        "evidence_spans": [
+          "Our model achieves a test R2 score of 0.912",
+          "significantly high compared to a distribution of 2,000 similar models trained on three randomly selected features from the original feature space",
+          "We still find that the latent space features outperform the vast majority of combinations."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For LixBC, the latent-feature regression predicts Tc of 1.5\u20138 K depending on doping, broadly consistent with experiments reporting Tc up to about 2 K, and its local embedding neighborhood contains no high-Tc superconductors.",
+        "evidence_spans": [
+          "our Tc regression model based on the three latent space features predicts Tc = 1.5\u20138 K, depending on the doping, which is consistent with experiments reporting Tc \u22722 K",
+          "The local environment of LixBC in our geometric embedding does not contain any high-Tc superconductors"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the two-dimensional embedding, there is no clear positive correlation between superconducting properties and material-density field; superconductors are instead largely confined to relatively low-density regions.",
+        "evidence_spans": [
+          "Interestingly, we do not find a clear positive correlation between these superconducting properties and the density of materials field; instead, the superconductors are largely restricted to areas with a relatively low density of materials."
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "A suitable model should maintain geometric regularity by penalizing manifold irregularities and distortions, and its feature representation should include as much information as possible beyond chemical formula while avoiding redundant information that does not add latent-space variability.",
+        "evidence_spans": [
+          "To achieve the geometric regularity necessary for such models, we must penalize irregularities and distortions of the manifold.",
+          "Our goal here is two-fold: to include as much information as possible,\nbeyond just the chemical formula tied to the crystalline\nunit cell, while ensuring that unnecessary redundancies\nthat do not capture any further variability in latent space\nare avoided."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": []
+  }
+}

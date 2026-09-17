@@ -1,0 +1,971 @@
+{
+  "paper_id": "2605.01440",
+  "chunks_processed": 12,
+  "raw_by_role": {
+    "problem_motivation": [
+      {
+        "role": "problem_motivation",
+        "content": "Prior literature presents the recursive FFT structure only for power-of-two system sizes, leaving more general radices undeveloped for fermionic FFT.",
+        "evidence_span": "This re- cursive structure for FFT is always presented in the literature for system sizes of the form N = 2k for k an integer [42, 43]. However, it also applies to other radix different than 2, namely to any system size of the form N = nk for n and k two inte- gers. Although it was developed for the non-fermionic quan- tum Fourier transform [44], it does not seem to have been developed for FFT."
+      }
+    ],
+    "prior_approach": [
+      {
+        "role": "prior_approach",
+        "content": "Existing literature presents the recursive FFT structure for system sizes N = 2^k.",
+        "evidence_span": "This re- cursive structure for FFT is always presented in the literature for system sizes of the form N = 2k for k an integer [42, 43]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "The generalized radix idea had been developed for the non-fermionic quantum Fourier transform.",
+        "evidence_span": "Although it was developed for the non-fermionic quan- tum Fourier transform [44], it does not seem to have been developed for FFT."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Ref. [45] introduced an efficient radix-2 interleave reorganization using CX ladders and parallelizable CZ sequences.",
+        "evidence_span": "In Ref. [45] was provided an efficient re- organization of this interleave operation for radix n = 2, using ladders of CXs and sequences of CZs that can be completely parallelized."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Prior work reported error dilution with increasing system size in many Hamiltonian-dynamics settings.",
+        "evidence_span": "It is for example known that in many settings of Hamiltonian dynamics, errors \u201cdilute\u201d with system size [50\u201353]."
+      },
+      {
+        "role": "prior_approach",
+        "content": "Previous approaches computed dynamical correlations to obtain spectral functions",
+        "evidence_span": "previous approaches based on computing dy- namical correlations"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Graph decimation was originally introduced for graph-state preparation.",
+        "evidence_span": "The graph decimation approach was originally designed to prepare the graph state UG |+ \u00b7 \u00b7 \u00b7 +\u27e9[49]"
+      },
+      {
+        "role": "prior_approach",
+        "content": "Beam search or reinforcement learning are alternative synthesis methods from prior work",
+        "evidence_span": "more sophisticated methods such as beam search or reinforcement learning"
+      }
+    ],
+    "prior_limitation": [
+      {
+        "role": "prior_limitation",
+        "content": "The direct recursion used in classical or non-fermionic Fourier transforms cannot be directly applied to the fermionic FFT.",
+        "evidence_span": "However, contrary to classical or non-fermionic Fourier transforms, the recursion cannot be directly applied at this stage, because these FFT differ from the original FFT on N modes for the following reason."
+      }
+    ],
+    "rejected_alternative": [],
+    "inspiration_source": [
+      {
+        "role": "inspiration_source",
+        "content": "The graph decimation technique was borrowed from graph-state preparation and adapted for CZ circuits.",
+        "evidence_span": "While this technique was originally describe to prepare graph states, it can be straightforwardly modified to implement CZ circuits, as described in Supplemental Material."
+      },
+      {
+        "role": "inspiration_source",
+        "content": "The method is modeled on the interaction between a system and environment as in ARPES experiments",
+        "evidence_span": "The method consists in a direct mod- eling of the interaction between the system and an environ- ment, as would occur in actual ARPES experiments (albeit in a simplified way)."
+      }
+    ],
+    "causal_claim": [
+      {
+        "role": "causal_claim",
+        "content": "Lower shot count can substantially improve the practicality of computing spectral functions on quantum computers as system size grows.",
+        "evidence_span": "Despite these overheads, the algorithm we presented displays a significant shot reduction that can have a fundamental impact on the practicality of the computation of spectral functions on quantum computers as systems of larger sizes are studied."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Reducing the number of shots by a factor scaling with N fundamentally improves scalability for utility-scale hardware.",
+        "evidence_span": "In this perspective, a reduction of N in the number of shots, especially for utility scale hardware where we envision N to be several hundreds or thousands, is a fundamental improvement in the scalability of quantum computing spectral functions."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Without the method, producing the same spectral-function color plot would have been roughly 11\u00d7 more expensive and likely hard to implement.",
+        "evidence_span": "To obtain the same color plot of the spectral function without our method, the total cost (in terms of runtime, or total num- ber of two-qubit gates implemented) would have been around \u223c11 times more expensive, and therefore probably difficult to implement."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The cost advantage grows with system size and dimensionality.",
+        "evidence_span": "This cost difference scales with system size and would be even larger for larger systems or two-dimensional systems."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Trotter error can make the spectral function computed from the standard approach negative.",
+        "evidence_span": "However, if there is Trotter error in the time evolution in (2), then the spectral function as computed in (2) can be negative."
+      },
+      {
+        "role": "causal_claim",
+        "content": "To make the fermionic-FFT recursion explicit, the fermionic modes must be swapped so they become adjacent for the smaller FFTs.",
+        "evidence_span": "To make the recursion explicit, one must swap the fermionic modes in such a way that they are adjacent for these FFTs on N/n sites."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Making all modes cnq+\u2113 adjacent requires applying an interleave operation that fermionically swaps the modes into grouped-by-modulo-n order.",
+        "evidence_span": "To make all the modes cnq+\u2113 for q = 0, ..., N/n \u22121 adjacent, one must apply an \u201cinter- leave\u201d operation that fermionic-swaps modes 0, 1, ..., N \u22121 into 0, n, 2n, ..., 1, n+1, 2n+1, ..., 2, n+2, 2n+2, ..., namely first all the N/n integers equal to 0 modulo n by increasing or- der, then all the N/n integers equal to 1 modulo n by increas- ing order, etc."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The depth of the fast fermionic Fourier transform scales as O(I_N log_n N), where I_N is the depth of one interleave operation.",
+        "evidence_span": "The depth scaling of the FFFT with N is O(IN logn N) where IN is the depth of one in- terleave operation."
+      },
+      {
+        "role": "causal_claim",
+        "content": "FFFT depth scales as O(I_N log_n N).",
+        "evidence_span": "The depth scaling of the FFFT with N is O(IN logn N) where IN is the depth of one interleave operation."
+      },
+      {
+        "role": "causal_claim",
+        "content": "This interleave implementation lowers gate count to O(N) but keeps depth O(N).",
+        "evidence_span": "Such an implementation of the interleave operation reduces the number of gates to O(N), but has still depth O(N)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Reorganizing each CX ladder with a unitary circuit can reduce depth to O(log N).",
+        "evidence_span": "To reduce the depth, each of these CX ladders (appearing in panel a of Fig 4) can be further reorga- nized into depth O(log N) with a unitary circuit [41, 46]"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using ancillas and measurement with feed-forward can reduce depth further to O(1).",
+        "evidence_span": "and even depth O(1) if one uses ancillas and measurement with feed-forward [45, 47, 48]."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Based on the benchmark, the authors choose the log2(N) compilation for the rest of the paper.",
+        "evidence_span": "Following this benchmark we will use the log2(N) compilation for the remainder of the pa- per."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Hardware noise damps the occupation distribution toward 1/2.",
+        "evidence_span": "We observe that with hardware noise, the distribu- tion is damped towards 1/2"
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using a free-fermion Hamiltonian enables exact simulation of the 54-qubit circuit for benchmarking.",
+        "evidence_span": "This free-fermion Hamil- tonian allows for an exact simulation of the 54-qubit circuit to benchmark our method."
+      },
+      {
+        "role": "causal_claim",
+        "content": "A 2-way interleave is performed to bring environment fermionic modes next to each other.",
+        "evidence_span": "At the end of the time evolution, we perform a 2-way interleave on the 54-qubit system+environment in order to bring all the environment fermionic modes next to each other."
+      },
+      {
+        "role": "causal_claim",
+        "content": "To preserve fermionic statistics when adding environment fermions after ground-state preparation, Z operations must be applied on alternating system qubits.",
+        "evidence_span": "The fermions in the environment are added after the ground state preparation, and in order to preserve the fermionic statistics, this requires acting with Zj on every other system qubit, starting with the first one."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Hardware noise attenuates the signal toward 1/2",
+        "evidence_span": "We observe a general attenuation of the signal due to hardware noise (for a completely depolarized state the expectation value would be 1/2)."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Hardware noise attenuates the band signal toward 1/2",
+        "evidence_span": "We see again a general attenuation towards signal equal to 1/2 due to hardware noise."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Hardware noise reduces contrast but does not alter band shape, leaving effective mass and group velocity unbiased",
+        "evidence_span": "However, besides the loss of contrast, hardware noise has no effect on the shape of the band, and thus physical quantities like the effective electron mass or the group velocity are ef- fectively unbiased."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The introduced method requires O(N) fewer shots than prior approaches",
+        "evidence_span": "We have introduced a method to compute spectral functions on quantum computers that require O(N) fewer shots than previous approaches based on computing dy- namical correlations."
+      },
+      {
+        "role": "causal_claim",
+        "content": "The shot reduction yields an O(N) runtime improvement",
+        "evidence_span": "This translates in a factor O(N) im- provement in runtime."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Although the method doubles qubits and adds two-qubit-gate overhead, saving O(N) shots gives a crucial runtime improvement on ion-trap hardware",
+        "evidence_span": "Although the method requires to double the number of qubits and comes with a two-qubit gate over- head due to environment interactions and need for fermionic Fourier transform, the sparing of a factor O(N) in the num- ber of shots provides a crucial runtime improvement for ion- trap quantum computers, where shot time is comparatively slow."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Reversing the decimation sequence yields an optimized circuit implementation of the target CZ unitary.",
+        "evidence_span": "Reversing this sequence then produces an opti- mized circuit realization of UG."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Reversing the graph-operation sequence produces an optimized circuit realization of the target unitary",
+        "evidence_span": "Reversing this sequence then produces an optimized circuit realization of UG."
+      },
+      {
+        "role": "causal_claim",
+        "content": "Using the other graph-operation rules judiciously can reduce the required gate count",
+        "evidence_span": "However, by judiciously applying the other rules, we can often implement UG using fewer gates."
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Ion-trap machines benefit especially because their slower operation makes shot count a bottleneck, while they already have low two-qubit gate infidelity and all-to-all connectivity.",
+        "evidence_span": "This is particularly true for ion-trap quantum computers. These platforms have significantly lower two-qubit gate infidelity than other platforms and enjoy effective all-to-all connectivity. They are however slower, which sometimes makes the shot count the actual bottleneck of quantum computations."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The equivalence between the proposed expression and the spectral function depends on preparing a state that is an eigenstate of the time-evolution operator; Trotter error breaks this condition.",
+        "evidence_span": "The equivalence between our approach (5) and the spectral function (2) crucially relies on the fact that the state prepared |E\u27e9is an eigenstate of the time evolution operator eitH. If this is not the case, for example because of Trotter error when implementing eitH on a digital quantum computer, then (5) and (2) will differ."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Their quantity remains positive because it is an expectation value of the occupation operator n(k), which only takes values 0 or 1, even when the prepared state is not an exact eigenstate due to Trotter error.",
+        "evidence_span": "On the other hand, the quantity (5) is always positive, because it is the expectation value of n(k) = c\u2020(k)c(k) which takes value 0 or 1, and that is 0 when \u03f5 = 0. This holds true even if the state prepared |E\u27e9is not an exact eigenstate of the time evolution operator due to Trotter error."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The recursion issue arises because, under Jordan-Wigner ordering, the relevant fermionic modes are not adjacent, so the same fermionic operations do not map to the same qubit operations as in the original FFT.",
+        "evidence_span": "When using a Jordan-Wigner transformation to implement the fermionic en- coding of cj into qubits, taking as JW order c0, c1, ..., cN\u22121, the modes cnq+\u2113are not adjacent, so that fermionic opera- tions on these modes will not be translated into the same qubit operations as for FN."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Because the modes are fermionic, the required swaps must be fermionic swaps, implemented by adding CZ gates when adjacent modes are swapped.",
+        "evidence_span": "Since the modes are fermionic, these swaps must be \u201cfermionic swaps\u201d. This cor- responds to adding a CZj,j+1 operation whenever two adja- cent modes j, j +1 are swapped."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The unexpectedly decent local-CZ performance may be due to lower ion transport time.",
+        "evidence_span": "This might be attributed to ... lower transport time of ions."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Non-Poisson wrong-mode statistics indicate each error affects several modes simultaneously, implying strong noise sensitivity.",
+        "evidence_span": "This means that each error occurring must violate several modes at the same time, suggesting a rather strong sensitivity to noise of this ground state preparation with FFT."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The approximately momentum-independent noise floor is explained by local noise on one or two qubits, which appears flat in momentum space.",
+        "evidence_span": "The \u201cnoise floor\u201d that appears, roughly independent of momentum k, can be inter- preted by the locality of noise: errors occur on single or pairs of qubits, which results in a flat effect in momentum space."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The momentum-independent noise floor is explained by local noise on one or two qubits, which looks flat in momentum space",
+        "evidence_span": "The \u201cnoise floor\u201d that appears, roughly independent of momentum k, can be inter- preted by the locality of noise: errors occur on single or pairs of qubits, which results in a flat effect in momentum space."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The synthesis problem is framed as graph decimation because graph operations progressively reduce edges and disentangle the graph.",
+        "evidence_span": "We consider operations that map UG to UG\u2032 where G\u2032 is a new graph, ideally with fewer edges than G. Thus, the circuit synthesis problem can be phrased as finding a minimal sequence of graph operations that completely disentangle the initial graph G, hence the name graph decimation."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The synthesis problem is viewed as graph decimation because graph operations reduce edges until the graph is disentangled",
+        "evidence_span": "Thus, the circuit synthesis problem can be phrased as finding a minimal sequence of graph operations that completely disentangle the initial graph G, hence the name graph decimation."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors argue that their expression should be more accurate than the standard one under imperfect time evolution because it better matches what experiments actually measure.",
+        "evidence_span": "However, one can argue that our expression (5) will be more accurate than (2), because it is closer to what is actually measured in experiments."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors propose extending the radix-2 procedure to arbitrary radix n for all-to-all architectures with software SWAPs.",
+        "evidence_span": "We propose a generalization of this procedure for arbitrary radix n that is adapted to all-to-all coupled devices where SWAP operations can be done implicitly in software."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "These observations suggest that error dilution may not hold for FFT.",
+        "evidence_span": "This suggests that error dilution does not hold for the FFT"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The advantage from shot reduction should grow with system size and become important at utility scale",
+        "evidence_span": "The shot reduction brought by our algorithm increases with system size, and will be- come fundamental for ion-trap quantum computers in the util- ity scale, where we expect to deal with 10 to 100 times larger system sizes."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors propose using a strong-coupling expansion in \u03bd while keeping \u03f5 fixed for generic system Hamiltonians.",
+        "evidence_span": "We perform a strong coupling expansion, namely an expansion in \u03bd, at fixed \u03f5."
+      }
+    ],
+    "evidence_result": [
+      {
+        "role": "evidence_result",
+        "content": "On Quantinuum H2-2, the method added 1298 two-qubit gates but still reduced the shots needed for equal precision by about 27\u00d7.",
+        "evidence_span": "Focusing on the free fermion experiment, we had 2172 two-qubit gates per circuit. The overhead due to our method (namely, all the two-qubit gates that apply on environment qubits) is 1298. Despite this two-qubit gate overhead, we spare a factor \u223c27 in the number of shots to get the same precision."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Figure 3 shows the proposed approach has much lower Trotter error as epsilon approaches zero, reaching the same precision with several times fewer Trotter steps.",
+        "evidence_span": "For \u03f5 \u21920, we observe indeed that our approach has significantly less Trotter error, achieving the same precision with a number of Trotter steps a multiple times smaller."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For finite epsilon, although there is residual discrepancy even in continuous-time evolution, at small to intermediate Trotter-step counts the overall error is still lower than with the dynamical-correlation approach.",
+        "evidence_span": "For finite \u03f5, there is a finite discrepancy even for continuous-time evolution. However, we observe that at small to intermediate number of Trotter steps, the overall error is smaller than for the dynamical correlation approach."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Their approach shows significantly less Trotter error, reaching the same precision with far fewer Trotter steps as epsilon goes to zero.",
+        "evidence_span": "For \u03f5 \u21920, we observe indeed that our approach has significantly less Trotter error, achieving the same precision with a number of Trotter steps a multiple times smaller."
+      },
+      {
+        "role": "evidence_result",
+        "content": "At finite epsilon, despite a residual discrepancy even in continuous-time evolution, the method has lower overall error than the dynamical-correlation approach for small to intermediate Trotter-step counts.",
+        "evidence_span": "For finite \u03f5, there is a finite discrepancy even for continuous-time evolution. However, we observe that at small to intermediate number of Trotter steps, the overall error is smaller than for the dynamical correlation approach."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The paper provides an explicit algorithm for arbitrary radix-n fast fermionic Fourier transform for sizes N = n^k.",
+        "evidence_span": "For completeness, we write in Fig. 5 an explicit algorithm for arbitrary radix-n FFFT, namely that applies to system sizes of the form N = nk with n, k some integers."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The paper gives an explicit arbitrary radix-n FFFT algorithm for sizes N = n^k.",
+        "evidence_span": "we write in Fig. 5 an explicit algorithm for arbitrary radix-n FFFT, namely that applies to system sizes of the form N = nk with n, k some integers."
+      },
+      {
+        "role": "evidence_result",
+        "content": "For N = 27, the CX-ladder decomposition had the minimum two-qubit gate count among tested methods.",
+        "evidence_span": "In fact, we observe that this decomposition into CX ladders has minimal two-qubit gate count among the different methods tested for N = 27."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Graph decimation achieved the minimum overall depth while keeping low two-qubit gate count.",
+        "evidence_span": "We find that this ap- proach gives gate sequences that have overall minimal depth, even compared to the non-unitary compilation, while retain- ing low two-qubit gate count"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The authors benchmarked five 27-mode FFFT implementations on hardware.",
+        "evidence_span": "We tested these five implementations of the FFFT on 27 modes on hardware."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The log2(N) compilation produced the lowest energies and infidelities.",
+        "evidence_span": "Overall, we observe that the log2(N) compilation [41] gives the lowest energies and infi- delities."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Graph decimation performed nearly as well as the best method.",
+        "evidence_span": "The graph decimation technique displays close per- formance."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The non-unitary measurement-and-feed-forward approach performed much worse.",
+        "evidence_span": "The non-unitary approach that involves measure- ment and feed-forward performs significantly worse."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The local-CZ implementation outperformed what its high gate count and depth would suggest.",
+        "evidence_span": "Finally, it is worth noting that the local CZ implementation, while giv- ing the worst performance among the unitary approaches, per- forms better than what its relatively large two-qubit gate count and depth could have suggested."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Local-CZ performs better than its high gate count and depth would suggest, though still worst among unitary methods.",
+        "evidence_span": "the local CZ implementation, while giv- ing the worst performance among the unitary approaches, per- forms better than what its relatively large two-qubit gate count and depth could have suggested."
+      },
+      {
+        "role": "evidence_result",
+        "content": "With hardware noise, the occupation distribution is damped toward 1/2 but remains strongly step-like.",
+        "evidence_span": "We observe that with hardware noise, the distribu- tion is damped towards 1/2 (which would be obtained with a completely depolarized state) but strongly remains step-like."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The distribution of incorrect measured modes is far from Poisson.",
+        "evidence_span": "Moreover, we also observe that the distribution of the number of incorrect modes measured is far from being a Pois- son distribution."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The implementation uses a 27-site system plus 27-site environment on 54 qubits total.",
+        "evidence_span": "We consider a N = 27-site sys- tem, together with a 27-site environment, using 54 qubits in total."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The system and environment are encoded with Jordan-Wigner ordering alternating system and environment modes.",
+        "evidence_span": "The system + environment is encoded with a Jordan-Wigner transformation, with a fermionic mode order- ing that alternates between system and environment, namely c1, d1, c2, d2, c3, d3, ...."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The studied system is a 1D periodic free-fermion Hamiltonian.",
+        "evidence_span": "We consider the one-dimensional Hamiltonian ... with periodic boundary conditions. This free-fermion Hamil- tonian allows for an exact simulation of the 54-qubit circuit to benchmark our method."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The protocol prepares the ground state with a 27-qubit FFFT, uses coupling epsilon=0.5, and performs 10 Trotter steps of dt=0.5.",
+        "evidence_span": "We prepare the ground state of this Hamiltonian using a 27-qubit FFFT on the system. Then we set a coupling \u03f5 = 0.5, perform 10 Trotter steps of time evo- lution of the full Hamiltonian H with time step dt = 0.5."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Hardware measurements show general attenuation of the signal due to noise.",
+        "evidence_span": "We observe a general attenuation of the signal due to hardware noise"
+      },
+      {
+        "role": "evidence_result",
+        "content": "Despite noise, the two peaks in A(k,\u03c9) remain clearly visible by several standard deviations.",
+        "evidence_span": "However, the two peaks are still clearly visible on A(k, \u03c9) by several standard deviations."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Despite noise, the two peaks in the spectral function remain clearly visible",
+        "evidence_span": "However, the two peaks are still clearly visible on A(k, \u03c9) by several standard deviations."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The measured band shape agrees very well with noiseless values",
+        "evidence_span": "We observe very good agreement of the shape of the band."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The algorithm was demonstrated on Quantinuum H2-2 for 27-site 1D fermionic spectral functions using 54 qubits",
+        "evidence_span": "We demonstrated our algorithm on Quantinuum\u2019s H2-2 ion-trap hardware with spectral functions of one-dimensional fermionic models on 27 sites, requiring 54 qubits."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The work developed and benchmarked a radix-3 fermionic Fourier transform on hardware",
+        "evidence_span": "This re- quired developing a radix-3 fermionic Fourier transform that we benchmarked on hardware."
+      },
+      {
+        "role": "evidence_result",
+        "content": "Mode occupation in the auxiliary space is derived to follow a specific time-dependent expression proportional to the initial occupation.",
+        "evidence_span": "Hence we find \u27e8nk(t)\u27e9= sin2(2\u03b8k) sin2(\u03b7kt)\u03c1k . (45)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The explicit occupation formula shows dependence on coupling, detuning, and initial mode occupation.",
+        "evidence_span": "Explicitly, this is \u27e8nk(t)\u27e9= \u03f52 sin2(t\u2126) \u03f52 + (\u03c9 \u22122\u03bd cos k)2 \u03c1k , \u2126= 1"
+      },
+      {
+        "role": "evidence_result",
+        "content": "In the small-coupling limit, the occupation scales as \u03f5 squared over the detuning squared times a sinusoidal factor.",
+        "evidence_span": "At small \u03f5 and fixed \u03bd, this is \u27e8nk(t)\u27e9= \u03f52 (\u03c9 \u22122\u03bd cos k)2 sin2 Let\u2019s compare to the generic formula (5) in the main text obtained at small \u03f5."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The Green function for the initial state is obtained as a delta peak weighted by the initial occupation.",
+        "evidence_span": "Hence G(k, \u03c9) = \u03c1k\u03b4(2\u03bd cos k \u2212\u03c9) . (50)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "The appendix confirms agreement between the generic main-text formula and the explicit calculation.",
+        "evidence_span": "So formula (5) in the main text agrees with (46) indeed."
+      },
+      {
+        "role": "evidence_result",
+        "content": "At leading order in the strong-coupling expansion, the auxiliary occupation is proportional to the system momentum occupation with a prefactor set by \u03c9 and \u03f5.",
+        "evidence_span": "We obtain thus \u27e8nk(t)\u27e9= sin2(t\u21260) \u03f52 \u03c92 + \u03f52 \u27e8E|c\u2020(k)c(k)|E\u27e9+ O(\u03bd) . (59)"
+      },
+      {
+        "role": "evidence_result",
+        "content": "More sophisticated search methods can yield better gate sequences than the simple greedy approach",
+        "evidence_span": "However, as shown in Ref. [49], we can obtain even better gate sequences by applying more sophisticated methods such as beam search or reinforcement learning."
+      },
+      {
+        "role": "evidence_result",
+        "content": "The simple greedy method performed comparably well for systems smaller than 30 qubits",
+        "evidence_span": "The sequences described below were obtained using the simple greedy method, which was found to perform comparably well for system sizes < 30 [49]."
+      }
+    ],
+    "constraint": [
+      {
+        "role": "constraint",
+        "content": "The method incurs extra hardware resources: twice as many qubits, additional two-qubit gates per Trotter step, and one extra fermionic Fourier transform.",
+        "evidence_span": "Nevertheless, the shot reduction of our method comes with a qubit overhead, namely one requires twice more qubits because of the need to include the environment in the simulation. It also comes with a two-qubit gate overhead, that is 2N extra two-qubit gates to perform per Trotter step, and one single extra fermionic Fourier transform"
+      },
+      {
+        "role": "constraint",
+        "content": "Ideally, occupied-mode probabilities should be 1 inside the Fermi interval and 0 outside it.",
+        "evidence_span": "In the ideal setting, all the modes be- tween \u2212\u03c0/2 and \u03c0/2 should have probability 1 of being mea- sured as occupied, and all other modes should be measured as empty."
+      },
+      {
+        "role": "constraint",
+        "content": "A systematic study over increasing system sizes is needed before drawing a firm conclusion.",
+        "evidence_span": "although a systematic study with increasing system sizes would be required to draw a conclusion."
+      },
+      {
+        "role": "constraint",
+        "content": "The number of graph edges gives an upper bound on the two-qubit gates needed to implement the unitary",
+        "evidence_span": "Note that |G| represents an upper bound on the number of two-qubit gates needed to implement UG, since we can simply remove the edges of G one-by-one using Eq. (61)."
+      }
+    ],
+    "contradiction": [
+      {
+        "role": "contradiction",
+        "content": "The FFT-prepared ground state is not thermal, contrary to what other methods produce.",
+        "evidence_span": "The ground state prepared with FFT is thus far from being a thermal state, contrary to what is obtained with other methods [54]."
+      }
+    ]
+  },
+  "reconciled_by_role": {
+    "problem_motivation": [
+      {
+        "content": "Prior literature presents the recursive FFT structure primarily for power-of-two system sizes, leaving its extension to more general radices/system sizes undeveloped for the fermionic FFT, even though analogous non-fermionic QFT constructions exist for sizes of the form N = n^k.",
+        "evidence_spans": [
+          "This re- cursive structure for FFT is always presented in the literature for system sizes of the form N = 2k for k an integer [42, 43]. However, it also applies to other radix different than 2, namely to any system size of the form N = nk for n and k two inte- gers. Although it was developed for the non-fermionic quan- tum Fourier transform [44], it does not seem to have been developed for FFT."
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_approach": [
+      {
+        "content": "Existing literature typically presents the recursive FFT structure only for system sizes of the form N = 2^k, while generalized-radix ideas had previously been developed for the non-fermionic quantum Fourier transform rather than for FFT.",
+        "evidence_spans": [
+          "This re- cursive structure for FFT is always presented in the literature for system sizes of the form N = 2k for k an integer [42, 43].",
+          "Although it was developed for the non-fermionic quan- tum Fourier transform [44], it does not seem to have been developed for FFT."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Ref. [45] introduced an efficient radix-2 interleave reorganization using CX ladders and fully parallelizable CZ sequences.",
+        "evidence_spans": [
+          "In Ref. [45] was provided an efficient re- organization of this interleave operation for radix n = 2, using ladders of CXs and sequences of CZs that can be completely parallelized."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior work reported that in many Hamiltonian-dynamics settings, errors dilute as system size increases.",
+        "evidence_spans": [
+          "It is for example known that in many settings of Hamiltonian dynamics, errors \u201cdilute\u201d with system size [50\u201353]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Previous approaches obtained spectral functions by computing dynamical correlations.",
+        "evidence_spans": [
+          "previous approaches based on computing dy- namical correlations"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Graph decimation was originally introduced for graph-state preparation.",
+        "evidence_spans": [
+          "The graph decimation approach was originally designed to prepare the graph state UG |+ \u00b7 \u00b7 \u00b7 +\u27e9[49]"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Prior work also used more sophisticated synthesis methods such as beam search or reinforcement learning.",
+        "evidence_spans": [
+          "more sophisticated methods such as beam search or reinforcement learning"
+        ],
+        "conflicting": false
+      }
+    ],
+    "prior_limitation": [
+      {
+        "content": "The direct recursion used in classical or non-fermionic Fourier transforms cannot be directly applied to the fermionic FFT.",
+        "evidence_spans": [
+          "However, contrary to classical or non-fermionic Fourier transforms, the recursion cannot be directly applied at this stage, because these FFT differ from the original FFT on N modes for the following reason."
+        ],
+        "conflicting": false
+      }
+    ],
+    "rejected_alternative": [],
+    "inspiration_source": [
+      {
+        "content": "The graph decimation technique was borrowed from graph-state preparation and adapted for implementing CZ circuits.",
+        "evidence_spans": [
+          "While this technique was originally describe to prepare graph states, it can be straightforwardly modified to implement CZ circuits, as described in Supplemental Material."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The method is inspired by directly modeling the interaction between a system and environment as it occurs in ARPES experiments, in a simplified form.",
+        "evidence_spans": [
+          "The method consists in a direct mod- eling of the interaction between the system and an environ- ment, as would occur in actual ARPES experiments (albeit in a simplified way)."
+        ],
+        "conflicting": false
+      }
+    ],
+    "causal_claim": [
+      {
+        "content": "The introduced method requires O(N) fewer shots than prior approaches, which yields an O(N) runtime improvement and fundamentally improves the practicality and scalability of computing spectral functions on quantum computers, especially for utility-scale hardware and larger system sizes.",
+        "evidence_spans": [
+          "Despite these overheads, the algorithm we presented displays a significant shot reduction that can have a fundamental impact on the practicality of the computation of spectral functions on quantum computers as systems of larger sizes are studied.",
+          "In this perspective, a reduction of N in the number of shots, especially for utility scale hardware where we envision N to be several hundreds or thousands, is a fundamental improvement in the scalability of quantum computing spectral functions.",
+          "We have introduced a method to compute spectral functions on quantum computers that require O(N) fewer shots than previous approaches based on computing dy- namical correlations.",
+          "This translates in a factor O(N) im- provement in runtime."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Although the method doubles qubits and adds two-qubit-gate overhead, the O(N) shot reduction provides a crucial runtime advantage; without the method, obtaining the same spectral-function color plot would be about 11\u00d7 more expensive and likely difficult to implement, and this cost advantage grows with system size and dimensionality.",
+        "evidence_spans": [
+          "To obtain the same color plot of the spectral function without our method, the total cost (in terms of runtime, or total num- ber of two-qubit gates implemented) would have been around \u223c11 times more expensive, and therefore probably difficult to implement.",
+          "This cost difference scales with system size and would be even larger for larger systems or two-dimensional systems.",
+          "Although the method requires to double the number of qubits and comes with a two-qubit gate over- head due to environment interactions and need for fermionic Fourier transform, the sparing of a factor O(N) in the num- ber of shots provides a crucial runtime improvement for ion- trap quantum computers, where shot time is comparatively slow."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Trotter error can cause the spectral function computed with the standard approach to become negative.",
+        "evidence_spans": [
+          "However, if there is Trotter error in the time evolution in (2), then the spectral function as computed in (2) can be negative."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "To make the fermionic-FFT recursion explicit, fermionic modes must be swapped so that modes belonging to each smaller FFT become adjacent; specifically, this is achieved by an interleave operation that fermionically swaps modes into grouped-by-modulo-n order.",
+        "evidence_spans": [
+          "To make the recursion explicit, one must swap the fermionic modes in such a way that they are adjacent for these FFTs on N/n sites.",
+          "To make all the modes cnq+\u2113 for q = 0, ..., N/n \u22121 adjacent, one must apply an \u201cinter- leave\u201d operation that fermionic-swaps modes 0, 1, ..., N \u22121 into 0, n, 2n, ..., 1, n+1, 2n+1, ..., 2, n+2, 2n+2, ..., namely first all the N/n integers equal to 0 modulo n by increasing or- der, then all the N/n integers equal to 1 modulo n by increas- ing order, etc."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The depth of the fast fermionic Fourier transform scales as O(I_N log_n N), where I_N is the depth of one interleave operation.",
+        "evidence_spans": [
+          "The depth scaling of the FFFT with N is O(IN logn N) where IN is the depth of one in- terleave operation.",
+          "The depth scaling of the FFFT with N is O(IN logn N) where IN is the depth of one interleave operation."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "This interleave implementation reduces gate count to O(N) but retains O(N) depth; reorganizing each CX ladder with a unitary circuit reduces depth to O(log N), and using ancillas plus measurement with feed-forward can reduce depth further to O(1).",
+        "evidence_spans": [
+          "Such an implementation of the interleave operation reduces the number of gates to O(N), but has still depth O(N).",
+          "To reduce the depth, each of these CX ladders (appearing in panel a of Fig 4) can be further reorga- nized into depth O(log N) with a unitary circuit [41, 46]",
+          "and even depth O(1) if one uses ancillas and measurement with feed-forward [45, 47, 48]."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Hardware noise attenuates or damps the occupation/band signal toward 1/2, reducing contrast, but it does not alter the band shape, so quantities such as effective mass and group velocity remain effectively unbiased.",
+        "evidence_spans": [
+          "We observe that with hardware noise, the distribu- tion is damped towards 1/2",
+          "We observe a general attenuation of the signal due to hardware noise (for a completely depolarized state the expectation value would be 1/2).",
+          "We see again a general attenuation towards signal equal to 1/2 due to hardware noise.",
+          "However, besides the loss of contrast, hardware noise has no effect on the shape of the band, and thus physical quantities like the effective electron mass or the group velocity are ef- fectively unbiased."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Using a free-fermion Hamiltonian enables exact simulation of the 54-qubit circuit for benchmarking.",
+        "evidence_spans": [
+          "This free-fermion Hamil- tonian allows for an exact simulation of the 54-qubit circuit to benchmark our method."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A 2-way interleave is performed at the end of time evolution to bring environment fermionic modes next to each other.",
+        "evidence_spans": [
+          "At the end of the time evolution, we perform a 2-way interleave on the 54-qubit system+environment in order to bring all the environment fermionic modes next to each other."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "To preserve fermionic statistics when environment fermions are added after ground-state preparation, Z operations must be applied on alternating system qubits.",
+        "evidence_spans": [
+          "The fermions in the environment are added after the ground state preparation, and in order to preserve the fermionic statistics, this requires acting with Zj on every other system qubit, starting with the first one."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Reversing the decimation/graph-operation sequence yields an optimized circuit realization of the target unitary U_G, and judicious use of the other graph-operation rules can further reduce the required gate count.",
+        "evidence_spans": [
+          "Reversing this sequence then produces an opti- mized circuit realization of UG.",
+          "Reversing this sequence then produces an optimized circuit realization of UG.",
+          "However, by judiciously applying the other rules, we can often implement UG using fewer gates."
+        ],
+        "conflicting": false
+      }
+    ],
+    "mechanism_principle": [
+      {
+        "role": "mechanism_principle",
+        "content": "Ion-trap machines benefit especially because their slower operation makes shot count a bottleneck, while they already have low two-qubit gate infidelity and all-to-all connectivity.",
+        "evidence_span": "This is particularly true for ion-trap quantum computers. These platforms have significantly lower two-qubit gate infidelity than other platforms and enjoy effective all-to-all connectivity. They are however slower, which sometimes makes the shot count the actual bottleneck of quantum computations."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The equivalence between the proposed expression and the spectral function depends on preparing a state that is an eigenstate of the time-evolution operator; Trotter error breaks this condition.",
+        "evidence_span": "The equivalence between our approach (5) and the spectral function (2) crucially relies on the fact that the state prepared |E\u27e9is an eigenstate of the time evolution operator eitH. If this is not the case, for example because of Trotter error when implementing eitH on a digital quantum computer, then (5) and (2) will differ."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Their quantity remains positive because it is an expectation value of the occupation operator n(k), which only takes values 0 or 1, even when the prepared state is not an exact eigenstate due to Trotter error.",
+        "evidence_span": "On the other hand, the quantity (5) is always positive, because it is the expectation value of n(k) = c\u2020(k)c(k) which takes value 0 or 1, and that is 0 when \u03f5 = 0. This holds true even if the state prepared |E\u27e9is not an exact eigenstate of the time evolution operator due to Trotter error."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The recursion issue arises because, under Jordan-Wigner ordering, the relevant fermionic modes are not adjacent, so the same fermionic operations do not map to the same qubit operations as in the original FFT.",
+        "evidence_span": "When using a Jordan-Wigner transformation to implement the fermionic en- coding of cj into qubits, taking as JW order c0, c1, ..., cN\u22121, the modes cnq+\u2113are not adjacent, so that fermionic opera- tions on these modes will not be translated into the same qubit operations as for FN."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Because the modes are fermionic, the required swaps must be fermionic swaps, implemented by adding CZ gates when adjacent modes are swapped.",
+        "evidence_span": "Since the modes are fermionic, these swaps must be \u201cfermionic swaps\u201d. This cor- responds to adding a CZj,j+1 operation whenever two adja- cent modes j, j +1 are swapped."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The unexpectedly decent local-CZ performance may be due to lower ion transport time.",
+        "evidence_span": "This might be attributed to ... lower transport time of ions."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "Non-Poisson wrong-mode statistics indicate each error affects several modes simultaneously, implying strong noise sensitivity.",
+        "evidence_span": "This means that each error occurring must violate several modes at the same time, suggesting a rather strong sensitivity to noise of this ground state preparation with FFT."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The approximately momentum-independent noise floor is explained by local noise on one or two qubits, which appears flat in momentum space.",
+        "evidence_span": "The \u201cnoise floor\u201d that appears, roughly independent of momentum k, can be inter- preted by the locality of noise: errors occur on single or pairs of qubits, which results in a flat effect in momentum space."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The momentum-independent noise floor is explained by local noise on one or two qubits, which looks flat in momentum space",
+        "evidence_span": "The \u201cnoise floor\u201d that appears, roughly independent of momentum k, can be inter- preted by the locality of noise: errors occur on single or pairs of qubits, which results in a flat effect in momentum space."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The synthesis problem is framed as graph decimation because graph operations progressively reduce edges and disentangle the graph.",
+        "evidence_span": "We consider operations that map UG to UG\u2032 where G\u2032 is a new graph, ideally with fewer edges than G. Thus, the circuit synthesis problem can be phrased as finding a minimal sequence of graph operations that completely disentangle the initial graph G, hence the name graph decimation."
+      },
+      {
+        "role": "mechanism_principle",
+        "content": "The synthesis problem is viewed as graph decimation because graph operations reduce edges until the graph is disentangled",
+        "evidence_span": "Thus, the circuit synthesis problem can be phrased as finding a minimal sequence of graph operations that completely disentangle the initial graph G, hence the name graph decimation."
+      }
+    ],
+    "hypothesis_statement": [
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors argue that their expression should be more accurate than the standard one under imperfect time evolution because it better matches what experiments actually measure.",
+        "evidence_span": "However, one can argue that our expression (5) will be more accurate than (2), because it is closer to what is actually measured in experiments."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors propose extending the radix-2 procedure to arbitrary radix n for all-to-all architectures with software SWAPs.",
+        "evidence_span": "We propose a generalization of this procedure for arbitrary radix n that is adapted to all-to-all coupled devices where SWAP operations can be done implicitly in software."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "These observations suggest that error dilution may not hold for FFT.",
+        "evidence_span": "This suggests that error dilution does not hold for the FFT"
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The advantage from shot reduction should grow with system size and become important at utility scale",
+        "evidence_span": "The shot reduction brought by our algorithm increases with system size, and will be- come fundamental for ion-trap quantum computers in the util- ity scale, where we expect to deal with 10 to 100 times larger system sizes."
+      },
+      {
+        "role": "hypothesis_statement",
+        "content": "The authors propose using a strong-coupling expansion in \u03bd while keeping \u03f5 fixed for generic system Hamiltonians.",
+        "evidence_span": "We perform a strong coupling expansion, namely an expansion in \u03bd, at fixed \u03f5."
+      }
+    ],
+    "evidence_result": [
+      {
+        "content": "In the free-fermion experiment on Quantinuum H2-2, the method incurred an overhead of 1298 additional two-qubit gates on top of 2172 two-qubit gates per circuit, yet reduced the number of shots needed to reach the same precision by about 27\u00d7.",
+        "evidence_spans": [
+          "Focusing on the free fermion experiment, we had 2172 two-qubit gates per circuit. The overhead due to our method (namely, all the two-qubit gates that apply on environment qubits) is 1298. Despite this two-qubit gate overhead, we spare a factor \u223c27 in the number of shots to get the same precision."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "As \u0003b5 \u001a 0, the proposed approach has significantly less Trotter error than the dynamical-correlation approach, achieving the same precision with several times fewer Trotter steps.",
+        "evidence_spans": [
+          "For \u03f5 \u21920, we observe indeed that our approach has significantly less Trotter error, achieving the same precision with a number of Trotter steps a multiple times smaller.",
+          "For \u03f5 \u21920, we observe indeed that our approach has significantly less Trotter error, achieving the same precision with a number of Trotter steps a multiple times smaller."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For finite \u0003b5, although a residual discrepancy remains even in continuous-time evolution, the proposed method still has lower overall error than the dynamical-correlation approach at small to intermediate numbers of Trotter steps.",
+        "evidence_spans": [
+          "For finite \u03f5, there is a finite discrepancy even for continuous-time evolution. However, we observe that at small to intermediate number of Trotter steps, the overall error is smaller than for the dynamical correlation approach.",
+          "For finite \u03f5, there is a finite discrepancy even for continuous-time evolution. However, we observe that at small to intermediate number of Trotter steps, the overall error is smaller than for the dynamical correlation approach."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The paper provides an explicit algorithm for arbitrary radix-n fermionic fast Fourier transform (FFFT) for system sizes of the form N = n^k.",
+        "evidence_spans": [
+          "For completeness, we write in Fig. 5 an explicit algorithm for arbitrary radix-n FFFT, namely that applies to system sizes of the form N = nk with n, k some integers.",
+          "we write in Fig. 5 an explicit algorithm for arbitrary radix-n FFFT, namely that applies to system sizes of the form N = nk with n, k some integers."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For N = 27, the CX-ladder decomposition achieved the minimum two-qubit gate count among the tested methods.",
+        "evidence_spans": [
+          "In fact, we observe that this decomposition into CX ladders has minimal two-qubit gate count among the different methods tested for N = 27."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Graph decimation produced gate sequences with minimal overall depth, even compared to the non-unitary compilation, while still retaining a low two-qubit gate count.",
+        "evidence_spans": [
+          "We find that this ap- proach gives gate sequences that have overall minimal depth, even compared to the non-unitary compilation, while retain- ing low two-qubit gate count"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The authors benchmarked five implementations of the 27-mode FFFT on hardware.",
+        "evidence_spans": [
+          "We tested these five implementations of the FFFT on 27 modes on hardware."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Overall, the log2(N) compilation achieved the lowest energies and infidelities among the tested implementations.",
+        "evidence_spans": [
+          "Overall, we observe that the log2(N) compilation [41] gives the lowest energies and infi- delities."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Graph decimation performed close to the best method.",
+        "evidence_spans": [
+          "The graph decimation technique displays close per- formance."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The non-unitary measurement-and-feed-forward approach performed significantly worse than the unitary approaches.",
+        "evidence_spans": [
+          "The non-unitary approach that involves measure- ment and feed-forward performs significantly worse."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The local-CZ implementation, although the worst-performing among the unitary approaches, still performed better than its relatively large two-qubit gate count and depth would suggest.",
+        "evidence_spans": [
+          "Finally, it is worth noting that the local CZ implementation, while giv- ing the worst performance among the unitary approaches, per- forms better than what its relatively large two-qubit gate count and depth could have suggested.",
+          "the local CZ implementation, while giv- ing the worst performance among the unitary approaches, per- forms better than what its relatively large two-qubit gate count and depth could have suggested."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "With hardware noise, the occupation distribution is damped toward 1/2, but it remains strongly step-like.",
+        "evidence_spans": [
+          "We observe that with hardware noise, the distribu- tion is damped towards 1/2 (which would be obtained with a completely depolarized state) but strongly remains step-like."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The distribution of the number of incorrectly measured modes is far from Poisson.",
+        "evidence_spans": [
+          "Moreover, we also observe that the distribution of the number of incorrect modes measured is far from being a Pois- son distribution."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The implementation used a 27-site system together with a 27-site environment, for a total of 54 qubits.",
+        "evidence_spans": [
+          "We consider a N = 27-site sys- tem, together with a 27-site environment, using 54 qubits in total."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The system and environment were encoded via a Jordan-Wigner transformation with alternating system and environment mode ordering, c1, d1, c2, d2, c3, d3, ....",
+        "evidence_spans": [
+          "The system + environment is encoded with a Jordan-Wigner transformation, with a fermionic mode order- ing that alternates between system and environment, namely c1, d1, c2, d2, c3, d3, ...."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The studied model was a one-dimensional free-fermion Hamiltonian with periodic boundary conditions, allowing exact simulation of the 54-qubit circuit for benchmarking.",
+        "evidence_spans": [
+          "We consider the one-dimensional Hamiltonian ... with periodic boundary conditions. This free-fermion Hamil- tonian allows for an exact simulation of the 54-qubit circuit to benchmark our method."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the demonstrated protocol, the ground state was prepared using a 27-qubit FFFT on the system, then the evolution used coupling \u0003b5 = 0.5 and 10 Trotter steps with dt = 0.5.",
+        "evidence_spans": [
+          "We prepare the ground state of this Hamiltonian using a 27-qubit FFFT on the system. Then we set a coupling \u03f5 = 0.5, perform 10 Trotter steps of time evo- lution of the full Hamiltonian H with time step dt = 0.5."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Hardware measurements show a general attenuation of the signal due to noise, but the two peaks in A(k,\u0003c9) remain clearly visible by several standard deviations, and the measured band shape agrees very well with noiseless values.",
+        "evidence_spans": [
+          "We observe a general attenuation of the signal due to hardware noise",
+          "However, the two peaks are still clearly visible on A(k, \u03c9) by several standard deviations.",
+          "However, the two peaks are still clearly visible on A(k, \u03c9) by several standard deviations.",
+          "We observe very good agreement of the shape of the band."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The algorithm was demonstrated on Quantinuum H2-2 for spectral functions of a 27-site one-dimensional fermionic model, using 54 qubits.",
+        "evidence_spans": [
+          "We demonstrated our algorithm on Quantinuum\u2019s H2-2 ion-trap hardware with spectral functions of one-dimensional fermionic models on 27 sites, requiring 54 qubits."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "The work developed a radix-3 fermionic Fourier transform and benchmarked it on hardware.",
+        "evidence_spans": [
+          "This re- quired developing a radix-3 fermionic Fourier transform that we benchmarked on hardware."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For the explicit free-fermion calculation, the auxiliary-space mode occupation was derived as a time-dependent expression proportional to the initial occupation, with explicit dependence on coupling and detuning: \u27e8n_k(t)\u27e9 = sin^2(2\u03b8_k) sin^2(\u03b7_k t) \u03c1_k = [\u03f5^2 sin^2(t\u03a9) / (\u03f5^2 + (\u03c9 - 2\u03bd cos k)^2)] \u03c1_k.",
+        "evidence_spans": [
+          "Hence we find \u27e8nk(t)\u27e9= sin2(2\u03b8k) sin2(\u03b7kt)\u03c1k . (45))",
+          "Explicitly, this is \u27e8nk(t)\u27e9= \u03f52 sin2(t\u2126) \u03f52 + (\u03c9 \u22122\u03bd cos k)2 \u03c1k , \u2126= 1)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "In the small-coupling limit, the auxiliary occupation scales as \u0003b5^2 divided by the detuning squared, times a sinusoidal factor, in agreement with the generic main-text formula.",
+        "evidence_spans": [
+          "At small \u03f5 and fixed \u03bd, this is \u27e8nk(t)\u27e9= \u03f52 (\u03c9 \u22122\u03bd cos k)2 sin2 Let\u2019s compare to the generic formula (5) in the main text obtained at small \u03f5.",
+          "So formula (5) in the main text agrees with (46) indeed."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "For the initial state, the Green function is a delta peak weighted by the initial occupation: G(k, \u0003c9) = \u0003c1_k \u03b4(2\u03bd cos k - \u0003c9).",
+        "evidence_spans": [
+          "Hence G(k, \u03c9) = \u03c1k\u03b4(2\u03bd cos k \u2212\u03c9) . (50)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "At leading order in the strong-coupling expansion, the auxiliary occupation is proportional to the system momentum occupation, with a prefactor determined by \u0003c9 and \u0003b5.",
+        "evidence_spans": [
+          "We obtain thus \u27e8nk(t)\u27e9= sin2(t\u21260) \u03f52 \u03c92 + \u03f52 \u27e8E|c\u2020(k)c(k)|E\u27e9+ O(\u03bd) . (59)"
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Although the sequences reported were obtained with a simple greedy method, which performed comparably well for system sizes below 30 qubits, more sophisticated methods such as beam search or reinforcement learning can yield even better gate sequences.",
+        "evidence_spans": [
+          "However, as shown in Ref. [49], we can obtain even better gate sequences by applying more sophisticated methods such as beam search or reinforcement learning.",
+          "The sequences described below were obtained using the simple greedy method, which was found to perform comparably well for system sizes < 30 [49]."
+        ],
+        "conflicting": false
+      }
+    ],
+    "constraint": [
+      {
+        "content": "The method incurs extra hardware resources: it requires roughly twice as many qubits because the environment must be included, plus additional gate overhead per simulation step\u2014specifically an upper-bounded increase in two-qubit gates (e.g. 2N extra two-qubit gates per Trotter step / bounded by the graph-edge count for implementing the unitary) and one extra fermionic Fourier transform.",
+        "evidence_spans": [
+          "Nevertheless, the shot reduction of our method comes with a qubit overhead, namely one requires twice more qubits because of the need to include the environment in the simulation. It also comes with a two-qubit gate overhead, that is 2N extra two-qubit gates to perform per Trotter step, and one single extra fermionic Fourier transform",
+          "Note that |G| represents an upper bound on the number of two-qubit gates needed to implement UG, since we can simply remove the edges of G one-by-one using Eq. (61)."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "Ideally, occupied-mode probabilities should be 1 inside the Fermi interval and 0 outside it.",
+        "evidence_spans": [
+          "In the ideal setting, all the modes be- tween \u2212\u03c0/2 and \u03c0/2 should have probability 1 of being mea- sured as occupied, and all other modes should be measured as empty."
+        ],
+        "conflicting": false
+      },
+      {
+        "content": "A systematic study over increasing system sizes is needed before drawing a firm conclusion.",
+        "evidence_spans": [
+          "although a systematic study with increasing system sizes would be required to draw a conclusion."
+        ],
+        "conflicting": false
+      }
+    ],
+    "contradiction": [
+      {
+        "content": "The FFT-prepared ground state is far from being a thermal state, contrary to what is obtained with other methods.",
+        "evidence_spans": [
+          "The ground state prepared with FFT is thus far from being a thermal state, contrary to what is obtained with other methods [54]."
+        ],
+        "conflicting": false
+      }
+    ]
+  }
+}
