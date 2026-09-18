@@ -1,12 +1,14 @@
 from __future__ import annotations
 
+import json
 import unittest
 from tempfile import TemporaryDirectory
 from pathlib import Path
 from unittest.mock import patch
 
 from adaptive_agent import Task, retrieve_evidence, run_workflow
-from evidence_model import EvidenceRelation, index_relations, load_relations
+from build_evidence_graph import _deterministic_annotations, _external_citations, _validate_bundle, build_paper
+from evidence_model import EvidenceEntity, EvidenceRelation, index_relations, load_relations
 from graph_build import Graph, Node
 
 
@@ -50,6 +52,25 @@ class EvidenceRelationTests(unittest.TestCase):
         self.assertIn("B", retrieved)
         self.assertEqual(retrieved["B"].retrieval_reason, "typed_relation:outperforms:R1")
 
+    def test_typed_entity_is_a_retrieval_seed(self) -> None:
+        entity = EvidenceEntity(
+            entity_id="material:lpscl",
+            entity_type="material_system",
+            name="Li6PS5Cl argyrodite",
+            description="solid electrolyte interface material",
+            source_paper_id="paper-a",
+            evidence_span="Li6PS5Cl solid electrolyte",
+        )
+        evidence = retrieve_evidence(
+            Task("T1", "Which argyrodite solid electrolyte is relevant?", "materials"),
+            Graph({}, {}),
+            entity_index={entity.entity_id: entity},
+        )
+
+        self.assertEqual(len(evidence), 1)
+        self.assertEqual(evidence[0].node_id, entity.entity_id)
+        self.assertEqual(evidence[0].retrieval_reason, "typed_entity_seed")
+
 
 class WorkflowRoutingTests(unittest.TestCase):
     def test_user_question_blocks_dependencies_and_synthesis(self) -> None:
@@ -81,6 +102,97 @@ class WorkflowRoutingTests(unittest.TestCase):
         self.assertEqual(result["tasks"][1]["status"], "blocked_by_user")
         self.assertEqual(result["events"][-1]["stage"], "await_user")
         synthesize.assert_not_called()
+
+
+class EvidenceGraphBuilderTests(unittest.TestCase):
+    def test_external_citations_are_canonicalized_by_identifier(self) -> None:
+        entities, relations = _external_citations(
+            "2604.00001",
+            "Introduction\nReferences\narXiv:2402.00729 and https://arxiv.org/abs/2402.00729\n"
+            "doi:10.1145/2939672.2939785\n",
+        )
+
+        self.assertEqual({entity.entity_id for entity in entities}, {
+            "paper:arxiv:2402.00729",
+            "paper:doi:10.1145/2939672.2939785",
+        })
+        self.assertEqual(len(relations), 2)
+        self.assertTrue(all(relation.relation_type == "cites" for relation in relations))
+
+    def test_negated_outperformance_is_a_nondirectional_comparison(self) -> None:
+        claims = [
+            {
+                "claim_id": "claim:baseline",
+                "role": "prior_approach",
+                "content": "The baseline uses separated design.",
+                "evidence": "The baseline uses separated design.",
+            },
+            {
+                "claim_id": "claim:result",
+                "role": "evidence_result",
+                "content": "The proposed method does not beat the baseline.",
+                "evidence": "The proposed method does not outperform the baseline.",
+            },
+        ]
+
+        _, relations = _deterministic_annotations("paper-1", claims)
+        relation_types = {relation.relation_type for relation in relations}
+
+        self.assertIn("compares_with", relation_types)
+        self.assertNotIn("outperforms", relation_types)
+
+    def test_builds_claim_hypothesis_and_source_element_entities(self) -> None:
+        record = {
+            "paper_id": "paper-1",
+            "reconciled_by_role": {
+                "hypothesis_statement": [{
+                    "content": "A coated interface should improve stability.",
+                    "evidence_spans": ["We hypothesize that a coated interface improves stability."],
+                }],
+            },
+        }
+        semantic_entities = [{
+            "entity_id": "method:test",
+            "entity_type": "method",
+            "name": "interface coating",
+            "description": "coating method",
+            "source_paper_id": "paper-1",
+            "evidence_span": "coated interface",
+            "source_element": "",
+            "attributes": {},
+            "confidence": 0.9,
+        }]
+        semantic_relations = [{
+            "relation_id": "relation:test",
+            "relation_type": "uses_method",
+            "source_entity_id": "paper-1::hypothesis_statement::0",
+            "target_entity_ids": ["method:test"],
+            "source_paper_id": "paper-1",
+            "evidence_span": "coated interface",
+            "source_element": "",
+            "metric": "",
+            "subject_value": None,
+            "reference_value": None,
+            "unit": "",
+            "conditions": {},
+            "confidence": 0.9,
+        }]
+        with TemporaryDirectory() as directory:
+            record_path = Path(directory) / "paper-1.json"
+            source_path = Path(directory) / "paper-1.txt"
+            record_path.write_text(json.dumps(record))
+            source_path.write_text("Paper title\nFigure 1: Coating cross-section\n")
+            with patch("build_evidence_graph._semantic_annotations", return_value=(
+                [EvidenceEntity.from_dict(row) for row in semantic_entities],
+                [EvidenceRelation.from_dict(row) for row in semantic_relations],
+            )):
+                bundle = build_paper(record_path, source_path, "Paper title")
+
+        _validate_bundle(bundle)
+        entity_types = {row["entity_type"] for row in bundle["entities"]}
+        relation_types = {row["relation_type"] for row in bundle["relations"]}
+        self.assertTrue({"paper", "atomic_claim", "hypothesis", "figure_table", "method"} <= entity_types)
+        self.assertTrue({"derived_from", "uses_method"} <= relation_types)
 
 
 if __name__ == "__main__":

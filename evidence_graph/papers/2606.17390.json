@@ -1,0 +1,4555 @@
+{
+  "paper_id": "2606.17390",
+  "entities": [
+    {
+      "entity_id": "paper:2606.17390",
+      "entity_type": "paper",
+      "name": "JAX-FEM-ANISO: Differentiable GPU-Accelerated Finite Element Framework for Inverse Identification of Finite-Strain Anisotropic Plasticity",
+      "description": "Materials-science paper 2606.17390",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "",
+      "source_element": "",
+      "attributes": {
+        "paper_id": "2606.17390"
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::problem_motivation::0",
+      "entity_type": "atomic_claim",
+      "name": "Inverse identification of Barlat models is difficult because they have many parameters and require highly informative data; furthermore, applying the framework ",
+      "description": "Inverse identification of Barlat models is difficult because they have many parameters and require highly informative data; furthermore, applying the framework to real experimental DIC data remains necessary because practical measurements introduce noise, imperfect boundary conditions, incomplete observations, and possible model discrepancy that can undermine optimization robustness and parameter uniqueness.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Inverse identification of Barlat models is challenging because these models contain many parameters and require highly informative experimental data.",
+      "source_element": "",
+      "attributes": {
+        "role": "problem_motivation",
+        "evidence_spans": [
+          "Inverse identification of Barlat models is challenging because these models contain many parameters and require highly informative experimental data.",
+          "Future work will focus on applying the framework to real experimental DIC data for inverse parameter identification. Experimental measurements introduce noise, imperfect boundary conditions, incomplete observations, and possible model discrepancy, which can affect optimization robustness and parameter uniqueness."
+        ],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::prior_approach::0",
+      "entity_type": "atomic_claim",
+      "name": "Conventional inverse characterization approaches rely on multiple standardized tests in different orientations, such as uniaxial tension and simple shear, to ge",
+      "description": "Conventional inverse characterization approaches rely on multiple standardized tests in different orientations, such as uniaxial tension and simple shear, to generate data for parameter identification.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Conventional inverse characterization approaches rely on multiple standardized tests, such as uniaxial tension and simple shear tests in different orientations, to generate data for parameter identification.",
+      "source_element": "",
+      "attributes": {
+        "role": "prior_approach",
+        "evidence_spans": [
+          "Conventional inverse characterization approaches rely on multiple standardized tests, such as uniaxial tension and simple shear tests in different orientations, to generate data for parameter identification."
+        ],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::prior_approach::1",
+      "entity_type": "atomic_claim",
+      "name": "Goncalves et al. used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, enhancing the information content of",
+      "description": "Goncalves et al. used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, enhancing the information content of experimental data for inverse identification.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Recently, Goncalves et al. [67,68] used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, thereby enhancing the information content of experimental data for inverse identification.",
+      "source_element": "",
+      "attributes": {
+        "role": "prior_approach",
+        "evidence_spans": [
+          "Recently, Goncalves et al. [67,68] used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, thereby enhancing the information content of experimental data for inverse identification."
+        ],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::prior_limitation::0",
+      "entity_type": "atomic_claim",
+      "name": "The conventional testing process is time-consuming and resource-intensive.",
+      "description": "The conventional testing process is time-consuming and resource-intensive.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "This process is time-consuming and resource-intensive.",
+      "source_element": "",
+      "attributes": {
+        "role": "prior_limitation",
+        "evidence_spans": [
+          "This process is time-consuming and resource-intensive."
+        ],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::rejected_alternative::0",
+      "entity_type": "atomic_claim",
+      "name": "Finite-difference-based gradient approaches are rejected in favor of AD/adjoint gradients because they scale poorly, are step-size sensitive, and become computa",
+      "description": "Finite-difference-based gradient approaches are rejected in favor of AD/adjoint gradients because they scale poorly, are step-size sensitive, and become computationally prohibitive in high-dimensional inverse problems.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "while avoiding the poor scaling and step-size sensitivity of finite-difference gradients",
+      "source_element": "",
+      "attributes": {
+        "role": "rejected_alternative",
+        "evidence_spans": [
+          "while avoiding the poor scaling and step-size sensitivity of finite-difference gradients",
+          "AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference-based approaches would be computationally prohibitive."
+        ],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::rejected_alternative::1",
+      "entity_type": "atomic_claim",
+      "name": "Direct differentiation of the local Newton iterations is rejected; instead, the method implicitly differentiates the converged state as a function of the inputs",
+      "description": "Direct differentiation of the local Newton iterations is rejected; instead, the method implicitly differentiates the converged state as a function of the inputs.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "For a prescribed perturbation \u02d9p of the input variables, the local Newton iterations are not differentiated directly. Instead, the converged state is treated as an implicitly defined function of p",
+      "source_element": "",
+      "attributes": {
+        "role": "rejected_alternative",
+        "evidence_spans": [
+          "For a prescribed perturbation \u02d9p of the input variables, the local Newton iterations are not differentiated directly. Instead, the converged state is treated as an implicitly defined function of p"
+        ],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::inspiration_source::0",
+      "entity_type": "atomic_claim",
+      "name": "The line-search update is adopted following Scherzinger.",
+      "description": "The line-search update is adopted following Scherzinger.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The line-search update is adopted following Scherzinger.",
+      "source_element": "",
+      "attributes": {
+        "role": "inspiration_source",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::inspiration_source::1",
+      "entity_type": "atomic_claim",
+      "name": "The implicit-differentiation approach follows the general framework of automatic implicit differentiation for solver-defined mappings.",
+      "description": "The implicit-differentiation approach follows the general framework of automatic implicit differentiation for solver-defined mappings.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The implicit-differentiation approach follows the general framework of automatic implicit differentiation for solver-defined mappings.",
+      "source_element": "",
+      "attributes": {
+        "role": "inspiration_source",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::causal_claim::0",
+      "entity_type": "atomic_claim",
+      "name": "The topology-optimized specimen creates a broad range of stress and strain states, making the data highly informative for inverse identification.",
+      "description": "The topology-optimized specimen creates a broad range of stress and strain states, making the data highly informative for inverse identification.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The topology-optimized specimen creates a broad range of stress and strain states, making the data highly informative for inverse identification.",
+      "source_element": "",
+      "attributes": {
+        "role": "causal_claim",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::causal_claim::1",
+      "entity_type": "atomic_claim",
+      "name": "Using previous-step displacement histories as initial guesses skips smaller time steps and speeds convergence.",
+      "description": "Using previous-step displacement histories as initial guesses skips smaller time steps and speeds convergence.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Using previous-step displacement histories as initial guesses skips smaller time steps and speeds convergence.",
+      "source_element": "",
+      "attributes": {
+        "role": "causal_claim",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::causal_claim::2",
+      "entity_type": "atomic_claim",
+      "name": "Warm-start initialization cuts overall inverse optimization time by about 1.6x.",
+      "description": "Warm-start initialization cuts overall inverse optimization time by about 1.6x.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Warm-start initialization cuts overall inverse optimization time by about 1.6x.",
+      "source_element": "",
+      "attributes": {
+        "role": "causal_claim",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::causal_claim::3",
+      "entity_type": "atomic_claim",
+      "name": "Highly informative specimen geometries can significantly reduce the experimental effort needed for characterization.",
+      "description": "Highly informative specimen geometries can significantly reduce the experimental effort needed for characterization.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Highly informative specimen geometries can significantly reduce the experimental effort needed for characterization.",
+      "source_element": "",
+      "attributes": {
+        "role": "causal_claim",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::causal_claim::4",
+      "entity_type": "atomic_claim",
+      "name": "Automatic vectorization, JIT, and GPU-resident computation make the framework scalable for forward simulation and inverse identification.",
+      "description": "Automatic vectorization, JIT, and GPU-resident computation make the framework scalable for forward simulation and inverse identification.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Automatic vectorization, JIT, and GPU-resident computation make the framework scalable for forward simulation and inverse identification.",
+      "source_element": "",
+      "attributes": {
+        "role": "causal_claim",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::causal_claim::5",
+      "entity_type": "atomic_claim",
+      "name": "AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference methods would be too expensive.",
+      "description": "AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference methods would be too expensive.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference methods would be too expensive.",
+      "source_element": "",
+      "attributes": {
+        "role": "causal_claim",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::causal_claim::6",
+      "entity_type": "atomic_claim",
+      "name": "The quadratic approximation plus Goldstein condition ensure meaningful merit reduction while preserving quadratic Newton convergence when full steps are admissi",
+      "description": "The quadratic approximation plus Goldstein condition ensure meaningful merit reduction while preserving quadratic Newton convergence when full steps are admissible.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The quadratic approximation plus Goldstein condition ensure meaningful merit reduction while preserving quadratic Newton convergence when full steps are admissible.",
+      "source_element": "",
+      "attributes": {
+        "role": "causal_claim",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::causal_claim::7",
+      "entity_type": "atomic_claim",
+      "name": "Choosing a reduced step length via the quadratic model substantially lowers the merit function and yields robust convergence.",
+      "description": "Choosing a reduced step length via the quadratic model substantially lowers the merit function and yields robust convergence.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Choosing a reduced step length via the quadratic model substantially lowers the merit function and yields robust convergence.",
+      "source_element": "",
+      "attributes": {
+        "role": "causal_claim",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::causal_claim::8",
+      "entity_type": "atomic_claim",
+      "name": "The line-search strategy significantly improves robustness for highly anisotropic yield surfaces and difficult trial stress states.",
+      "description": "The line-search strategy significantly improves robustness for highly anisotropic yield surfaces and difficult trial stress states.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The line-search strategy significantly improves robustness for highly anisotropic yield surfaces and difficult trial stress states.",
+      "source_element": "",
+      "attributes": {
+        "role": "causal_claim",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::causal_claim::9",
+      "entity_type": "atomic_claim",
+      "name": "Avoiding differentiation through Newton iterations preserves exact linearization while avoiding tracing the solver iterations.",
+      "description": "Avoiding differentiation through Newton iterations preserves exact linearization while avoiding tracing the solver iterations.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Avoiding differentiation through Newton iterations preserves exact linearization while avoiding tracing the solver iterations.",
+      "source_element": "",
+      "attributes": {
+        "role": "causal_claim",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::causal_claim::10",
+      "entity_type": "atomic_claim",
+      "name": "The construction yields a consistent constitutive linearization while avoiding explicit differentiation through the iterative return-mapping process.",
+      "description": "The construction yields a consistent constitutive linearization while avoiding explicit differentiation through the iterative return-mapping process.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The construction yields a consistent constitutive linearization while avoiding explicit differentiation through the iterative return-mapping process.",
+      "source_element": "",
+      "attributes": {
+        "role": "causal_claim",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::causal_claim::11",
+      "entity_type": "atomic_claim",
+      "name": "Performing sparse assembly directly on the accelerator benefits large systems.",
+      "description": "Performing sparse assembly directly on the accelerator benefits large systems.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Performing sparse assembly directly on the accelerator benefits large systems.",
+      "source_element": "",
+      "attributes": {
+        "role": "causal_claim",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::mechanism_principle::0",
+      "entity_type": "atomic_claim",
+      "name": "Negligible out-of-plane shear stresses justify identifying only a reduced parameter set.",
+      "description": "Negligible out-of-plane shear stresses justify identifying only a reduced parameter set.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Negligible out-of-plane shear stresses justify identifying only a reduced parameter set.",
+      "source_element": "",
+      "attributes": {
+        "role": "mechanism_principle",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::mechanism_principle::1",
+      "entity_type": "atomic_claim",
+      "name": "Complex plasticity can produce a nonsymmetric tangent stiffness matrix, making direct sparse solvers more robust and efficient than iterative solvers for modera",
+      "description": "Complex plasticity can produce a nonsymmetric tangent stiffness matrix, making direct sparse solvers more robust and efficient than iterative solvers for moderate-size problems.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Complex plasticity can produce a nonsymmetric tangent stiffness matrix, making direct sparse solvers more robust and efficient than iterative solvers for moderate-size problems.",
+      "source_element": "",
+      "attributes": {
+        "role": "mechanism_principle",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::mechanism_principle::2",
+      "entity_type": "atomic_claim",
+      "name": "Predicted parameter non-uniqueness arises because different parameter combinations can generate the same yield surface.",
+      "description": "Predicted parameter non-uniqueness arises because different parameter combinations can generate the same yield surface.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Predicted parameter non-uniqueness arises because different parameter combinations can generate the same yield surface.",
+      "source_element": "",
+      "attributes": {
+        "role": "mechanism_principle",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::mechanism_principle::3",
+      "entity_type": "atomic_claim",
+      "name": "Line search is added because full Newton steps can be too aggressive for highly anisotropic nonquadratic yield surfaces.",
+      "description": "Line search is added because full Newton steps can be too aggressive for highly anisotropic nonquadratic yield surfaces.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Line search is added because full Newton steps can be too aggressive for highly anisotropic nonquadratic yield surfaces.",
+      "source_element": "",
+      "attributes": {
+        "role": "mechanism_principle",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::mechanism_principle::4",
+      "entity_type": "atomic_claim",
+      "name": "The Newton direction guarantees local decrease of the merit function at the start of the line search.",
+      "description": "The Newton direction guarantees local decrease of the merit function at the start of the line search.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The Newton direction guarantees local decrease of the merit function at the start of the line search.",
+      "source_element": "",
+      "attributes": {
+        "role": "mechanism_principle",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::hypothesis_statement::0",
+      "entity_type": "atomic_claim",
+      "name": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+      "description": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+      "source_element": "",
+      "attributes": {
+        "role": "hypothesis_statement",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "hypothesis:79f5782e3e1d5d65",
+      "entity_type": "hypothesis",
+      "name": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+      "description": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+      "source_element": "",
+      "attributes": {
+        "claim_id": "2606.17390::hypothesis_statement::0",
+        "origin": "paper_hypothesis"
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::hypothesis_statement::1",
+      "entity_type": "atomic_claim",
+      "name": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+      "description": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+      "source_element": "",
+      "attributes": {
+        "role": "hypothesis_statement",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "hypothesis:df017cc90bf17010",
+      "entity_type": "hypothesis",
+      "name": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+      "description": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+      "source_element": "",
+      "attributes": {
+        "claim_id": "2606.17390::hypothesis_statement::1",
+        "origin": "paper_hypothesis"
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::evidence_result::0",
+      "entity_type": "atomic_claim",
+      "name": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "description": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "source_element": "",
+      "attributes": {
+        "role": "evidence_result",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::evidence_result::1",
+      "entity_type": "atomic_claim",
+      "name": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "description": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "source_element": "",
+      "attributes": {
+        "role": "evidence_result",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::evidence_result::2",
+      "entity_type": "atomic_claim",
+      "name": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "description": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "source_element": "",
+      "attributes": {
+        "role": "evidence_result",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::evidence_result::3",
+      "entity_type": "atomic_claim",
+      "name": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "description": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "source_element": "",
+      "attributes": {
+        "role": "evidence_result",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::evidence_result::4",
+      "entity_type": "atomic_claim",
+      "name": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "description": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "source_element": "",
+      "attributes": {
+        "role": "evidence_result",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::evidence_result::5",
+      "entity_type": "atomic_claim",
+      "name": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "description": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "source_element": "",
+      "attributes": {
+        "role": "evidence_result",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::evidence_result::6",
+      "entity_type": "atomic_claim",
+      "name": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "description": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "source_element": "",
+      "attributes": {
+        "role": "evidence_result",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::evidence_result::7",
+      "entity_type": "atomic_claim",
+      "name": "Line search converges within 20 iterations for most sampled trial states.",
+      "description": "Line search converges within 20 iterations for most sampled trial states.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Line search converges within 20 iterations for most sampled trial states.",
+      "source_element": "",
+      "attributes": {
+        "role": "evidence_result",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::evidence_result::8",
+      "entity_type": "atomic_claim",
+      "name": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "description": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "source_element": "",
+      "attributes": {
+        "role": "evidence_result",
+        "evidence_spans": [],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::constraint::0",
+      "entity_type": "atomic_claim",
+      "name": "Warm-start initialization is enabled only when the change in each parameter between consecutive forward passes is less than 10%.",
+      "description": "Warm-start initialization is enabled only when the change in each parameter between consecutive forward passes is less than 10%.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Warm-start initialization is enabled when the change in each parameter between the current and previous forward passes is less than 10%.",
+      "source_element": "",
+      "attributes": {
+        "role": "constraint",
+        "evidence_spans": [
+          "Warm-start initialization is enabled when the change in each parameter between the current and previous forward passes is less than 10%."
+        ],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "2606.17390::constraint::1",
+      "entity_type": "atomic_claim",
+      "name": "The line-search step length is constrained to the interval (0, 1], with a lower-bound parameter \u03b7 \u2208 (0, 1) enforced at each iteration to prevent it from becomin",
+      "description": "The line-search step length is constrained to the interval (0, 1], with a lower-bound parameter \u03b7 \u2208 (0, 1) enforced at each iteration to prevent it from becoming excessively small.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "a scalar step length \u03b6k \u2208(0, 1] is introduced",
+      "source_element": "",
+      "attributes": {
+        "role": "constraint",
+        "evidence_spans": [
+          "a scalar step length \u03b6k \u2208(0, 1] is introduced",
+          "To prevent the step length from becoming excessively small, a lower bound is enforced at each iteration through a parameter \u03b7 \u2208(0, 1)"
+        ],
+        "conflicting": false
+      },
+      "confidence": 1.0
+    },
+    {
+      "entity_id": "figure_table:34b4416770c0327a",
+      "entity_type": "figure_table",
+      "name": "Figure 1: Overview of the proposed differentiable GPU-accelerated framework for gradient-based parameter identification of",
+      "description": "Overview of the proposed differentiable GPU-accelerated framework for gradient-based parameter identification of",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 1: Overview of the proposed differentiable GPU-accelerated framework for gradient-based parameter identification of",
+      "source_element": "Figure 1",
+      "attributes": {
+        "kind": "figure",
+        "label": "1"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:5f7210c196c54def",
+      "entity_type": "figure_table",
+      "name": "Figure 2: Schematic of an elastoplastic solid body with displacement and traction boundary conditions.",
+      "description": "Schematic of an elastoplastic solid body with displacement and traction boundary conditions.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 2: Schematic of an elastoplastic solid body with displacement and traction boundary conditions.",
+      "source_element": "Figure 2",
+      "attributes": {
+        "kind": "figure",
+        "label": "2"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:734b0505557c645a",
+      "entity_type": "figure_table",
+      "name": "Figure 3: Overview of the differentiable GPU-accelerated forward-solve implementation.",
+      "description": "Overview of the differentiable GPU-accelerated forward-solve implementation.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 3: Overview of the differentiable GPU-accelerated forward-solve implementation.",
+      "source_element": "Figure 3",
+      "attributes": {
+        "kind": "figure",
+        "label": "3"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:392f42c7a390ac50",
+      "entity_type": "figure_table",
+      "name": "Table 1: Material parameters used in the circular sheet drawing benchmark.",
+      "description": "Material parameters used in the circular sheet drawing benchmark.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 1: Material parameters used in the circular sheet drawing benchmark.",
+      "source_element": "Table 1",
+      "attributes": {
+        "kind": "table",
+        "label": "1"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:70351e8d407b79f3",
+      "entity_type": "figure_table",
+      "name": "Figure 4: Schematic diagram of the thin circular flange considered for the drawing simulations. All dimensions are in mm.",
+      "description": "Schematic diagram of the thin circular flange considered for the drawing simulations. All dimensions are in mm.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 4: Schematic diagram of the thin circular flange considered for the drawing simulations. All dimensions are in mm.",
+      "source_element": "Figure 4",
+      "attributes": {
+        "kind": "figure",
+        "label": "4"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:f15f3bd1cf037245",
+      "entity_type": "figure_table",
+      "name": "Figure 5: Comparison of equivalent plastic strain in flange drawing simulations between JAX-FEM-ANISO and Abaqus. The",
+      "description": "Comparison of equivalent plastic strain in flange drawing simulations between JAX-FEM-ANISO and Abaqus. The",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 5: Comparison of equivalent plastic strain in flange drawing simulations between JAX-FEM-ANISO and Abaqus. The",
+      "source_element": "Figure 5",
+      "attributes": {
+        "kind": "figure",
+        "label": "5"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:3b645125c5c6e408",
+      "entity_type": "figure_table",
+      "name": "Figure 7: compares the stress plots obtained from JAX-FEM-ANISO and Abaqus. The two results are in excellent agreement, with the",
+      "description": "compares the stress plots obtained from JAX-FEM-ANISO and Abaqus. The two results are in excellent agreement, with the",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Fig. 7 compares the stress plots obtained from JAX-FEM-ANISO and Abaqus. The two results are in excellent agreement, with the",
+      "source_element": "Figure 7",
+      "attributes": {
+        "kind": "figure",
+        "label": "7"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:86b3ae6c7eed562a",
+      "entity_type": "figure_table",
+      "name": "Table 2: Material parameters used in the Barlat Yld2004-18p verification test [5].",
+      "description": "Material parameters used in the Barlat Yld2004-18p verification test [5].",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 2: Material parameters used in the Barlat Yld2004-18p verification test [5].",
+      "source_element": "Table 2",
+      "attributes": {
+        "kind": "table",
+        "label": "2"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:b0c6c2d93a548ef0",
+      "entity_type": "figure_table",
+      "name": "Figure 6: Verification setup for the Barlat Yld2004-18p model. (a) Unit-cube single-element benchmark with the applied boundary",
+      "description": "Verification setup for the Barlat Yld2004-18p model. (a) Unit-cube single-element benchmark with the applied boundary",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 6: Verification setup for the Barlat Yld2004-18p model. (a) Unit-cube single-element benchmark with the applied boundary",
+      "source_element": "Figure 6",
+      "attributes": {
+        "kind": "figure",
+        "label": "6"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:d025a9ce92cb994c",
+      "entity_type": "figure_table",
+      "name": "Figure 8: The left face of the cube is fixed, while the right face is displaced by 0.2 mm in the positive x-direction and 0.1 mm in",
+      "description": "The left face of the cube is fixed, while the right face is displaced by 0.2 mm in the positive x-direction and 0.1 mm in",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Fig. 8. The left face of the cube is fixed, while the right face is displaced by 0.2 mm in the positive x-direction and 0.1 mm in",
+      "source_element": "Figure 8",
+      "attributes": {
+        "kind": "figure",
+        "label": "8"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:43a46feb799cd874",
+      "entity_type": "figure_table",
+      "name": "Table 3: Material parameters used in the unit-cube performance simulations.",
+      "description": "Material parameters used in the unit-cube performance simulations.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 3: Material parameters used in the unit-cube performance simulations.",
+      "source_element": "Table 3",
+      "attributes": {
+        "kind": "table",
+        "label": "3"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:f7eb3a7604b4c75a",
+      "entity_type": "figure_table",
+      "name": "Table 4: Wall-clock time comparison between JAX-FEM-ANISO and Abaqus for the unit-cube benchmark at different problem sizes.",
+      "description": "Wall-clock time comparison between JAX-FEM-ANISO and Abaqus for the unit-cube benchmark at different problem sizes.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 4: Wall-clock time comparison between JAX-FEM-ANISO and Abaqus for the unit-cube benchmark at different problem sizes.",
+      "source_element": "Table 4",
+      "attributes": {
+        "kind": "table",
+        "label": "4"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:3a430ba7a9604cd2",
+      "entity_type": "figure_table",
+      "name": "Figure 9: Speed-up comparison between JAX-FEM-ANISO and Abaqus for the unit-cube benchmark with 100 \u00d7 100 \u00d7 100",
+      "description": "Speed-up comparison between JAX-FEM-ANISO and Abaqus for the unit-cube benchmark with 100 \u00d7 100 \u00d7 100",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 9: Speed-up comparison between JAX-FEM-ANISO and Abaqus for the unit-cube benchmark with 100 \u00d7 100 \u00d7 100",
+      "source_element": "Figure 9",
+      "attributes": {
+        "kind": "figure",
+        "label": "9"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:5363bd1dad638ea5",
+      "entity_type": "figure_table",
+      "name": "Figure 10: Speed-up comparison between JAX-FEM-ANISO and Abaqus for the larger unit-cube benchmark with approximately",
+      "description": "Speed-up comparison between JAX-FEM-ANISO and Abaqus for the larger unit-cube benchmark with approximately",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 10: Speed-up comparison between JAX-FEM-ANISO and Abaqus for the larger unit-cube benchmark with approximately",
+      "source_element": "Figure 10",
+      "attributes": {
+        "kind": "figure",
+        "label": "10"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:c041b0878735e2ed",
+      "entity_type": "figure_table",
+      "name": "Table 5: Elastic modulus, Hill\u201348 yield, and hardening parameters.",
+      "description": "Elastic modulus, Hill\u201348 yield, and hardening parameters.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 5: Elastic modulus, Hill\u201348 yield, and hardening parameters.",
+      "source_element": "Table 5",
+      "attributes": {
+        "kind": "table",
+        "label": "5"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:bea991f159b0ef5a",
+      "entity_type": "figure_table",
+      "name": "Table 6: Comparison of material-parameter sensitivities computed using JAX-AD and finite differences at step size h = 10\u22126.",
+      "description": "Comparison of material-parameter sensitivities computed using JAX-AD and finite differences at step size h = 10\u22126.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 6: Comparison of material-parameter sensitivities computed using JAX-AD and finite differences at step size h = 10\u22126.",
+      "source_element": "Table 6",
+      "attributes": {
+        "kind": "table",
+        "label": "6"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:93c3fa48c001fe0c",
+      "entity_type": "figure_table",
+      "name": "Figure 11: Loading and boundary conditions for the unit-cube domain considered for gradient verification.",
+      "description": "Loading and boundary conditions for the unit-cube domain considered for gradient verification.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 11: Loading and boundary conditions for the unit-cube domain considered for gradient verification.",
+      "source_element": "Figure 11",
+      "attributes": {
+        "kind": "figure",
+        "label": "11"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:1e53e54bc9b47a31",
+      "entity_type": "figure_table",
+      "name": "Figure 12: Finite-difference error check EFD,check as a function of step size h.",
+      "description": "Finite-difference error check EFD,check as a function of step size h.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 12: Finite-difference error check EFD,check as a function of step size h.",
+      "source_element": "Figure 12",
+      "attributes": {
+        "kind": "figure",
+        "label": "12"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:101f9c05c7a12fd5",
+      "entity_type": "figure_table",
+      "name": "Figure 13: Information-rich tensile specimen geometry adapted from Zhang et al. [19].",
+      "description": "Information-rich tensile specimen geometry adapted from Zhang et al. [19].",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 13: Information-rich tensile specimen geometry adapted from Zhang et al. [19].",
+      "source_element": "Figure 13",
+      "attributes": {
+        "kind": "figure",
+        "label": "13"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:d61ee96610d69bfe",
+      "entity_type": "figure_table",
+      "name": "Figure 14: (a) Distribution of equivalent plastic strain and (b) stress-state distribution for integration points subjected to plastic",
+      "description": "(a) Distribution of equivalent plastic strain and (b) stress-state distribution for integration points subjected to plastic",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 14: (a) Distribution of equivalent plastic strain and (b) stress-state distribution for integration points subjected to plastic",
+      "source_element": "Figure 14",
+      "attributes": {
+        "kind": "figure",
+        "label": "14"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:83e7fad4ea28ce78",
+      "entity_type": "figure_table",
+      "name": "Table 7: Inverse parameter identification for the tensile specimen with different initial guesses.",
+      "description": "Inverse parameter identification for the tensile specimen with different initial guesses.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 7: Inverse parameter identification for the tensile specimen with different initial guesses.",
+      "source_element": "Table 7",
+      "attributes": {
+        "kind": "table",
+        "label": "7"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:6fb85fb942afe1ab",
+      "entity_type": "figure_table",
+      "name": "Table 8: Computation time comparison between JAX-AD and FD approaches for a single iteration of the inverse problem.",
+      "description": "Computation time comparison between JAX-AD and FD approaches for a single iteration of the inverse problem.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 8: Computation time comparison between JAX-AD and FD approaches for a single iteration of the inverse problem.",
+      "source_element": "Table 8",
+      "attributes": {
+        "kind": "table",
+        "label": "8"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:c7346e6e873e8962",
+      "entity_type": "figure_table",
+      "name": "Table 9: Convergence criteria for the L-BFGS-B optimizer.",
+      "description": "Convergence criteria for the L-BFGS-B optimizer.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 9: Convergence criteria for the L-BFGS-B optimizer.",
+      "source_element": "Table 9",
+      "attributes": {
+        "kind": "table",
+        "label": "9"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:da3a1aaf29b57e82",
+      "entity_type": "figure_table",
+      "name": "Table 10: Comparison of iterations, function evaluations, and computation time for different cases.",
+      "description": "Comparison of iterations, function evaluations, and computation time for different cases.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 10: Comparison of iterations, function evaluations, and computation time for different cases.",
+      "source_element": "Table 10",
+      "attributes": {
+        "kind": "table",
+        "label": "10"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:7838bf0732a531a8",
+      "entity_type": "figure_table",
+      "name": "Figure 15: Objective-function histories until convergence of the optimization.",
+      "description": "Objective-function histories until convergence of the optimization.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 15: Objective-function histories until convergence of the optimization.",
+      "source_element": "Figure 15",
+      "attributes": {
+        "kind": "figure",
+        "label": "15"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:2733f41522862f8f",
+      "entity_type": "figure_table",
+      "name": "Figure 16: Comparison of hardening curves for different material-parameter initializations.",
+      "description": "Comparison of hardening curves for different material-parameter initializations.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 16: Comparison of hardening curves for different material-parameter initializations.",
+      "source_element": "Figure 16",
+      "attributes": {
+        "kind": "figure",
+        "label": "16"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:713982ab564faac6",
+      "entity_type": "figure_table",
+      "name": "Table 11: Inverse parameter identification for the cruciform specimen with noisy ground-truth data.",
+      "description": "Inverse parameter identification for the cruciform specimen with noisy ground-truth data.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 11: Inverse parameter identification for the cruciform specimen with noisy ground-truth data.",
+      "source_element": "Table 11",
+      "attributes": {
+        "kind": "table",
+        "label": "11"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:bc53fb8c6e9cae42",
+      "entity_type": "figure_table",
+      "name": "Table 12: Comparison of iterations, function evaluations, and computation time for different cases.",
+      "description": "Comparison of iterations, function evaluations, and computation time for different cases.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 12: Comparison of iterations, function evaluations, and computation time for different cases.",
+      "source_element": "Table 12",
+      "attributes": {
+        "kind": "table",
+        "label": "12"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:49a52e771a5d3ea6",
+      "entity_type": "figure_table",
+      "name": "Figure 17: Cruciform specimen geometry with the considered loading and boundary conditions.",
+      "description": "Cruciform specimen geometry with the considered loading and boundary conditions.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 17: Cruciform specimen geometry with the considered loading and boundary conditions.",
+      "source_element": "Figure 17",
+      "attributes": {
+        "kind": "figure",
+        "label": "17"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:8b098b3be949856e",
+      "entity_type": "figure_table",
+      "name": "Figure 18: Plastic-strain distribution at the final load step.",
+      "description": "Plastic-strain distribution at the final load step.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 18: Plastic-strain distribution at the final load step.",
+      "source_element": "Figure 18",
+      "attributes": {
+        "kind": "figure",
+        "label": "18"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:b58ba032eb1fc0f9",
+      "entity_type": "figure_table",
+      "name": "Figure 19: Visualization of noisy synthetic data used for inverse identification at different noise levels.",
+      "description": "Visualization of noisy synthetic data used for inverse identification at different noise levels.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 19: Visualization of noisy synthetic data used for inverse identification at different noise levels.",
+      "source_element": "Figure 19",
+      "attributes": {
+        "kind": "figure",
+        "label": "19"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:a168dff02130be5f",
+      "entity_type": "figure_table",
+      "name": "Figure 20: Convergence history for inverse identification using noise-free synthetic data.",
+      "description": "Convergence history for inverse identification using noise-free synthetic data.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 20: Convergence history for inverse identification using noise-free synthetic data.",
+      "source_element": "Figure 20",
+      "attributes": {
+        "kind": "figure",
+        "label": "20"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:5a4f2a8b969afa99",
+      "entity_type": "figure_table",
+      "name": "Figure 21: Convergence histories for inverse identification using noisy synthetic data: (a) objective function values and (b)",
+      "description": "Convergence histories for inverse identification using noisy synthetic data: (a) objective function values and (b)",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 21: Convergence histories for inverse identification using noisy synthetic data: (a) objective function values and (b)",
+      "source_element": "Figure 21",
+      "attributes": {
+        "kind": "figure",
+        "label": "21"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:3884325df68247c5",
+      "entity_type": "figure_table",
+      "name": "Figure 22: (a) Cruciform geometry with spatially varying material properties; (b) distribution of plastic strain at the final loading",
+      "description": "(a) Cruciform geometry with spatially varying material properties; (b) distribution of plastic strain at the final loading",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 22: (a) Cruciform geometry with spatially varying material properties; (b) distribution of plastic strain at the final loading",
+      "source_element": "Figure 22",
+      "attributes": {
+        "kind": "figure",
+        "label": "22"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:0bf4cda1a092e48f",
+      "entity_type": "figure_table",
+      "name": "Table 13: Inverse parameter identification for the cruciform specimen with spatially varying material properties.",
+      "description": "Inverse parameter identification for the cruciform specimen with spatially varying material properties.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 13: Inverse parameter identification for the cruciform specimen with spatially varying material properties.",
+      "source_element": "Table 13",
+      "attributes": {
+        "kind": "table",
+        "label": "13"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:d3d4b3cedfbccc5c",
+      "entity_type": "figure_table",
+      "name": "Figure 23: Convergence history for identifying spatially varying material properties.",
+      "description": "Convergence history for identifying spatially varying material properties.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 23: Convergence history for identifying spatially varying material properties.",
+      "source_element": "Figure 23",
+      "attributes": {
+        "kind": "figure",
+        "label": "23"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:d6a120efd2d2cade",
+      "entity_type": "figure_table",
+      "name": "Figure 24: Comparison of inverse-identified hardening curves with ground-truth results.",
+      "description": "Comparison of inverse-identified hardening curves with ground-truth results.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 24: Comparison of inverse-identified hardening curves with ground-truth results.",
+      "source_element": "Figure 24",
+      "attributes": {
+        "kind": "figure",
+        "label": "24"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:518366c820cf55d4",
+      "entity_type": "figure_table",
+      "name": "Table 14: The boundary and loading conditions are applied as shown in Fig. 25. A total displacement of 10 mm is applied in",
+      "description": "The boundary and loading conditions are applied as shown in Fig. 25. A total displacement of 10 mm is applied in",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 14. The boundary and loading conditions are applied as shown in Fig. 25. A total displacement of 10 mm is applied in",
+      "source_element": "Table 14",
+      "attributes": {
+        "kind": "table",
+        "label": "14"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:dc48f1dbe41fbb2b",
+      "entity_type": "figure_table",
+      "name": "Figure 26: (b) and Fig. 26(c) show the principal strain and stress-state diagrams at the final time step, respectively. Only material",
+      "description": "(b) and Fig. 26(c) show the principal strain and stress-state diagrams at the final time step, respectively. Only material",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Fig. 26(b) and Fig. 26(c) show the principal strain and stress-state diagrams at the final time step, respectively. Only material",
+      "source_element": "Figure 26",
+      "attributes": {
+        "kind": "figure",
+        "label": "26"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:ec612130c8d9e5eb",
+      "entity_type": "figure_table",
+      "name": "Figure 27: (b) compare the identified yield surfaces and hardening curves with the reference data, respectively. Fig. 28(a) shows",
+      "description": "(b) compare the identified yield surfaces and hardening curves with the reference data, respectively. Fig. 28(a) shows",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Fig. 27(b) compare the identified yield surfaces and hardening curves with the reference data, respectively. Fig. 28(a) shows",
+      "source_element": "Figure 27",
+      "attributes": {
+        "kind": "figure",
+        "label": "27"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:67c8a6af989ccff8",
+      "entity_type": "figure_table",
+      "name": "Figure 25: Topology-optimized specimen geometry used for inverse identification of Barlat\u2019s Yld2004-18p model, including the",
+      "description": "Topology-optimized specimen geometry used for inverse identification of Barlat\u2019s Yld2004-18p model, including the",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 25: Topology-optimized specimen geometry used for inverse identification of Barlat\u2019s Yld2004-18p model, including the",
+      "source_element": "Figure 25",
+      "attributes": {
+        "kind": "figure",
+        "label": "25"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:226873dea606fb0c",
+      "entity_type": "figure_table",
+      "name": "Figure 28: Inverse optimization for Barlat material parameter identification: (a) convergence history of the optimization, and (b)",
+      "description": "Inverse optimization for Barlat material parameter identification: (a) convergence history of the optimization, and (b)",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 28: Inverse optimization for Barlat material parameter identification: (a) convergence history of the optimization, and (b)",
+      "source_element": "Figure 28",
+      "attributes": {
+        "kind": "figure",
+        "label": "28"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:818a1cb5d5361dd3",
+      "entity_type": "figure_table",
+      "name": "Figure A1: Reduction of the anisotropic Barlat yield criterion to the von Mises and Hill\u201348 models in the \u03c0-plane under the",
+      "description": "Reduction of the anisotropic Barlat yield criterion to the von Mises and Hill\u201348 models in the \u03c0-plane under the",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure A1: Reduction of the anisotropic Barlat yield criterion to the von Mises and Hill\u201348 models in the \u03c0-plane under the",
+      "source_element": "Figure A1",
+      "attributes": {
+        "kind": "figure",
+        "label": "A1"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:fec93afb945a7e49",
+      "entity_type": "figure_table",
+      "name": "Figure B1: Line-search analysis for the single-point return-mapping problem with the Barlat Yld2004-18p yield function: (a)",
+      "description": "Line-search analysis for the single-point return-mapping problem with the Barlat Yld2004-18p yield function: (a)",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure B1: Line-search analysis for the single-point return-mapping problem with the Barlat Yld2004-18p yield function: (a)",
+      "source_element": "Figure B1",
+      "attributes": {
+        "kind": "figure",
+        "label": "B1"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:b15f5b90db60ec74",
+      "entity_type": "figure_table",
+      "name": "Figure B2: (a) and Fig. B2(b) further compare the convergence behavior of the two algorithms for a wide range of trial stress states",
+      "description": "(a) and Fig. B2(b) further compare the convergence behavior of the two algorithms for a wide range of trial stress states",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Fig. B2(a) and Fig. B2(b) further compare the convergence behavior of the two algorithms for a wide range of trial stress states",
+      "source_element": "Figure B2",
+      "attributes": {
+        "kind": "figure",
+        "label": "B2"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:645f60d33a1cac6f",
+      "entity_type": "figure_table",
+      "name": "Figure C1: Geometric interpretation of the closest-point projection algorithm.",
+      "description": "Geometric interpretation of the closest-point projection algorithm.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure C1: Geometric interpretation of the closest-point projection algorithm.",
+      "source_element": "Figure C1",
+      "attributes": {
+        "kind": "figure",
+        "label": "C1"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:e15cb981fef8b3b1",
+      "entity_type": "figure_table",
+      "name": "Table E1: Computation times in seconds for CSR sparse matrix assembly and row elimination using SciPy on CPU and CuPy",
+      "description": "Computation times in seconds for CSR sparse matrix assembly and row elimination using SciPy on CPU and CuPy",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table E1: Computation times in seconds for CSR sparse matrix assembly and row elimination using SciPy on CPU and CuPy",
+      "source_element": "Table E1",
+      "attributes": {
+        "kind": "table",
+        "label": "E1"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "figure_table:aed84724a6dc2e3d",
+      "entity_type": "figure_table",
+      "name": "Table F1: Computation times in seconds for different linear solvers",
+      "description": "Computation times in seconds for different linear solvers",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table F1: Computation times in seconds for different linear solvers",
+      "source_element": "Table F1",
+      "attributes": {
+        "kind": "table",
+        "label": "F1"
+      },
+      "confidence": 0.9
+    },
+    {
+      "entity_id": "paper:arxiv:2505.07801",
+      "entity_type": "paper",
+      "name": "arXiv:2505.07801",
+      "description": "External paper cited in the source paper's references",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "arXiv:2505.07801",
+      "source_element": "References",
+      "attributes": {
+        "external": true
+      },
+      "confidence": 0.95
+    },
+    {
+      "entity_id": "dataset:780448907e626db0",
+      "entity_type": "dataset",
+      "name": "Inverse identification of Barlat models is difficult because they have many parameters and require highly informative data; furthermore, applying the framework to real experimental DIC data remains ne",
+      "description": "Inverse identification of Barlat models is difficult because they have many parameters and require highly informative data; furthermore, applying the framework to real experimental DIC data remains necessary because practical measurements introduce noise, imperfect boundary conditions, incomplete observations, and possible model discrepancy that can undermine optimization robustness and parameter uniqueness.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Inverse identification of Barlat models is challenging because these models contain many parameters and require highly informative experimental data.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "method:00f652cc9a9337e1",
+      "entity_type": "method",
+      "name": "Conventional inverse characterization approaches rely on multiple standardized tests in different orientations, such as uniaxial tension and simple shear, to generate data for parameter identification",
+      "description": "Conventional inverse characterization approaches rely on multiple standardized tests in different orientations, such as uniaxial tension and simple shear, to generate data for parameter identification.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Conventional inverse characterization approaches rely on multiple standardized tests, such as uniaxial tension and simple shear tests in different orientations, to generate data for parameter identification.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "method:410bcc877aa84159",
+      "entity_type": "method",
+      "name": "Goncalves et al. used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, enhancing the information content of experimental data for inverse identific",
+      "description": "Goncalves et al. used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, enhancing the information content of experimental data for inverse identification.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Recently, Goncalves et al. [67,68] used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, thereby enhancing the information content of experimental data for inverse identification.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "dataset:410bcc877aa84159",
+      "entity_type": "dataset",
+      "name": "Goncalves et al. used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, enhancing the information content of experimental data for inverse identific",
+      "description": "Goncalves et al. used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, enhancing the information content of experimental data for inverse identification.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Recently, Goncalves et al. [67,68] used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, thereby enhancing the information content of experimental data for inverse identification.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "method:6dcfc419b0a79a93",
+      "entity_type": "method",
+      "name": "Finite-difference-based gradient approaches are rejected in favor of AD/adjoint gradients because they scale poorly, are step-size sensitive, and become computationally prohibitive in high-dimensional",
+      "description": "Finite-difference-based gradient approaches are rejected in favor of AD/adjoint gradients because they scale poorly, are step-size sensitive, and become computationally prohibitive in high-dimensional inverse problems.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "while avoiding the poor scaling and step-size sensitivity of finite-difference gradients",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "method:4fc7e2c9f78871ae",
+      "entity_type": "method",
+      "name": "Direct differentiation of the local Newton iterations is rejected; instead, the method implicitly differentiates the converged state as a function of the inputs.",
+      "description": "Direct differentiation of the local Newton iterations is rejected; instead, the method implicitly differentiates the converged state as a function of the inputs.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "For a prescribed perturbation \u02d9p of the input variables, the local Newton iterations are not differentiated directly. Instead, the converged state is treated as an implicitly defined function of p",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "method:d073ec6e1922eec0",
+      "entity_type": "method",
+      "name": "The line-search update is adopted following Scherzinger.",
+      "description": "The line-search update is adopted following Scherzinger.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The line-search update is adopted following Scherzinger.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "method:e5d2328d9f045688",
+      "entity_type": "method",
+      "name": "The implicit-differentiation approach follows the general framework of automatic implicit differentiation for solver-defined mappings.",
+      "description": "The implicit-differentiation approach follows the general framework of automatic implicit differentiation for solver-defined mappings.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The implicit-differentiation approach follows the general framework of automatic implicit differentiation for solver-defined mappings.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:328b42eaa6430e13",
+      "entity_type": "property",
+      "name": "The topology-optimized specimen creates a broad range of stress and strain states, making the data highly informative for inverse identification.",
+      "description": "The topology-optimized specimen creates a broad range of stress and strain states, making the data highly informative for inverse identification.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The topology-optimized specimen creates a broad range of stress and strain states, making the data highly informative for inverse identification.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:c26af778f5646946",
+      "entity_type": "property",
+      "name": "Using previous-step displacement histories as initial guesses skips smaller time steps and speeds convergence.",
+      "description": "Using previous-step displacement histories as initial guesses skips smaller time steps and speeds convergence.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Using previous-step displacement histories as initial guesses skips smaller time steps and speeds convergence.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:9d52d0d79b8e0ad5",
+      "entity_type": "property",
+      "name": "Warm-start initialization cuts overall inverse optimization time by about 1.6x.",
+      "description": "Warm-start initialization cuts overall inverse optimization time by about 1.6x.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Warm-start initialization cuts overall inverse optimization time by about 1.6x.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:e713ee1dde4d6e2e",
+      "entity_type": "property",
+      "name": "Highly informative specimen geometries can significantly reduce the experimental effort needed for characterization.",
+      "description": "Highly informative specimen geometries can significantly reduce the experimental effort needed for characterization.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Highly informative specimen geometries can significantly reduce the experimental effort needed for characterization.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:223e437030aa4742",
+      "entity_type": "property",
+      "name": "Automatic vectorization, JIT, and GPU-resident computation make the framework scalable for forward simulation and inverse identification.",
+      "description": "Automatic vectorization, JIT, and GPU-resident computation make the framework scalable for forward simulation and inverse identification.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Automatic vectorization, JIT, and GPU-resident computation make the framework scalable for forward simulation and inverse identification.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:4d324e54fde03664",
+      "entity_type": "property",
+      "name": "AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference methods would be too expensive.",
+      "description": "AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference methods would be too expensive.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference methods would be too expensive.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:9de68dae11777137",
+      "entity_type": "property",
+      "name": "The quadratic approximation plus Goldstein condition ensure meaningful merit reduction while preserving quadratic Newton convergence when full steps are admissible.",
+      "description": "The quadratic approximation plus Goldstein condition ensure meaningful merit reduction while preserving quadratic Newton convergence when full steps are admissible.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The quadratic approximation plus Goldstein condition ensure meaningful merit reduction while preserving quadratic Newton convergence when full steps are admissible.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:caa8d93347c1262b",
+      "entity_type": "property",
+      "name": "Choosing a reduced step length via the quadratic model substantially lowers the merit function and yields robust convergence.",
+      "description": "Choosing a reduced step length via the quadratic model substantially lowers the merit function and yields robust convergence.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Choosing a reduced step length via the quadratic model substantially lowers the merit function and yields robust convergence.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:6f5e37e846c03b81",
+      "entity_type": "property",
+      "name": "The line-search strategy significantly improves robustness for highly anisotropic yield surfaces and difficult trial stress states.",
+      "description": "The line-search strategy significantly improves robustness for highly anisotropic yield surfaces and difficult trial stress states.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The line-search strategy significantly improves robustness for highly anisotropic yield surfaces and difficult trial stress states.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:591052c65634e62f",
+      "entity_type": "property",
+      "name": "Avoiding differentiation through Newton iterations preserves exact linearization while avoiding tracing the solver iterations.",
+      "description": "Avoiding differentiation through Newton iterations preserves exact linearization while avoiding tracing the solver iterations.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Avoiding differentiation through Newton iterations preserves exact linearization while avoiding tracing the solver iterations.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:1d290425751ac1cc",
+      "entity_type": "property",
+      "name": "The construction yields a consistent constitutive linearization while avoiding explicit differentiation through the iterative return-mapping process.",
+      "description": "The construction yields a consistent constitutive linearization while avoiding explicit differentiation through the iterative return-mapping process.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The construction yields a consistent constitutive linearization while avoiding explicit differentiation through the iterative return-mapping process.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:89d85d114442af5a",
+      "entity_type": "property",
+      "name": "Performing sparse assembly directly on the accelerator benefits large systems.",
+      "description": "Performing sparse assembly directly on the accelerator benefits large systems.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Performing sparse assembly directly on the accelerator benefits large systems.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:74e076c4a8d78e6b",
+      "entity_type": "property",
+      "name": "Negligible out-of-plane shear stresses justify identifying only a reduced parameter set.",
+      "description": "Negligible out-of-plane shear stresses justify identifying only a reduced parameter set.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Negligible out-of-plane shear stresses justify identifying only a reduced parameter set.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:7acbe407a2745c9f",
+      "entity_type": "property",
+      "name": "Complex plasticity can produce a nonsymmetric tangent stiffness matrix, making direct sparse solvers more robust and efficient than iterative solvers for moderate-size problems.",
+      "description": "Complex plasticity can produce a nonsymmetric tangent stiffness matrix, making direct sparse solvers more robust and efficient than iterative solvers for moderate-size problems.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Complex plasticity can produce a nonsymmetric tangent stiffness matrix, making direct sparse solvers more robust and efficient than iterative solvers for moderate-size problems.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:5cc151545504da2c",
+      "entity_type": "property",
+      "name": "Predicted parameter non-uniqueness arises because different parameter combinations can generate the same yield surface.",
+      "description": "Predicted parameter non-uniqueness arises because different parameter combinations can generate the same yield surface.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Predicted parameter non-uniqueness arises because different parameter combinations can generate the same yield surface.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:78f7915ff1e545c6",
+      "entity_type": "property",
+      "name": "Line search is added because full Newton steps can be too aggressive for highly anisotropic nonquadratic yield surfaces.",
+      "description": "Line search is added because full Newton steps can be too aggressive for highly anisotropic nonquadratic yield surfaces.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Line search is added because full Newton steps can be too aggressive for highly anisotropic nonquadratic yield surfaces.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:0aec17a16489e568",
+      "entity_type": "property",
+      "name": "The Newton direction guarantees local decrease of the merit function at the start of the line search.",
+      "description": "The Newton direction guarantees local decrease of the merit function at the start of the line search.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The Newton direction guarantees local decrease of the merit function at the start of the line search.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:1b43676d97031c3c",
+      "entity_type": "property",
+      "name": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+      "description": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:7bd1426b0503f85c",
+      "entity_type": "property",
+      "name": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+      "description": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:31a004f96645466e",
+      "entity_type": "property",
+      "name": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "description": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "measurement:31a004f96645466e",
+      "entity_type": "measurement",
+      "name": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "description": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "source_element": "",
+      "attributes": {
+        "qualitative_result": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes."
+      },
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:f5425dd6eff5be6d",
+      "entity_type": "property",
+      "name": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "description": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "measurement:f5425dd6eff5be6d",
+      "entity_type": "measurement",
+      "name": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "description": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "source_element": "",
+      "attributes": {
+        "qualitative_result": "The framework provides automatic accurate sensitivities, validated against finite differences."
+      },
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:c13e4ab55e796b82",
+      "entity_type": "property",
+      "name": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "description": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "measurement:c13e4ab55e796b82",
+      "entity_type": "measurement",
+      "name": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "description": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "source_element": "",
+      "attributes": {
+        "qualitative_result": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields."
+      },
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:31b84ab49fdf05fe",
+      "entity_type": "property",
+      "name": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "description": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "measurement:31b84ab49fdf05fe",
+      "entity_type": "measurement",
+      "name": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "description": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "source_element": "",
+      "attributes": {
+        "qualitative_result": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable."
+      },
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:fa02e9383f1e23a1",
+      "entity_type": "property",
+      "name": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "description": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "measurement:fa02e9383f1e23a1",
+      "entity_type": "measurement",
+      "name": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "description": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "source_element": "",
+      "attributes": {
+        "qualitative_result": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step."
+      },
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:4c2fab6ce0251c21",
+      "entity_type": "property",
+      "name": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "description": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "measurement:4c2fab6ce0251c21",
+      "entity_type": "measurement",
+      "name": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "description": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "source_element": "",
+      "attributes": {
+        "qualitative_result": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size."
+      },
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:7cd8f4c3581bbbd4",
+      "entity_type": "property",
+      "name": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "description": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "measurement:7cd8f4c3581bbbd4",
+      "entity_type": "measurement",
+      "name": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "description": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "source_element": "",
+      "attributes": {
+        "qualitative_result": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points."
+      },
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:8469723f2d551cf0",
+      "entity_type": "property",
+      "name": "Line search converges within 20 iterations for most sampled trial states.",
+      "description": "Line search converges within 20 iterations for most sampled trial states.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Line search converges within 20 iterations for most sampled trial states.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "measurement:8469723f2d551cf0",
+      "entity_type": "measurement",
+      "name": "Line search converges within 20 iterations for most sampled trial states.",
+      "description": "Line search converges within 20 iterations for most sampled trial states.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Line search converges within 20 iterations for most sampled trial states.",
+      "source_element": "",
+      "attributes": {
+        "qualitative_result": "Line search converges within 20 iterations for most sampled trial states."
+      },
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "property:0e97d7dd24bdef0a",
+      "entity_type": "property",
+      "name": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "description": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "source_element": "",
+      "attributes": {},
+      "confidence": 0.7
+    },
+    {
+      "entity_id": "measurement:0e97d7dd24bdef0a",
+      "entity_type": "measurement",
+      "name": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "description": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "source_paper_id": "2606.17390",
+      "evidence_span": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "source_element": "",
+      "attributes": {
+        "qualitative_result": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes."
+      },
+      "confidence": 0.7
+    }
+  ],
+  "relations": [
+    {
+      "relation_id": "relation:beae41d90dd42ad8",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::problem_motivation::0",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Inverse identification of Barlat models is challenging because these models contain many parameters and require highly informative experimental data.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:79cb7018fc01efea",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::prior_approach::0",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Conventional inverse characterization approaches rely on multiple standardized tests, such as uniaxial tension and simple shear tests in different orientations, to generate data for parameter identification.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:86047857e2eb2b31",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::prior_approach::1",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Recently, Goncalves et al. [67,68] used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, thereby enhancing the information content of experimental data for inverse identification.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:830baac8062147f9",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::prior_limitation::0",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "This process is time-consuming and resource-intensive.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:1e8f87d05a2fd5ac",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::rejected_alternative::0",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "while avoiding the poor scaling and step-size sensitivity of finite-difference gradients",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:89883113ea4af4d6",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::rejected_alternative::1",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "For a prescribed perturbation \u02d9p of the input variables, the local Newton iterations are not differentiated directly. Instead, the converged state is treated as an implicitly defined function of p",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:81f9771b1d447e2b",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::inspiration_source::0",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The line-search update is adopted following Scherzinger.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:3c9c77437d8f9ca8",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::inspiration_source::1",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The implicit-differentiation approach follows the general framework of automatic implicit differentiation for solver-defined mappings.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:1496a95b293330af",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::causal_claim::0",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The topology-optimized specimen creates a broad range of stress and strain states, making the data highly informative for inverse identification.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:0fead0e07f32eb20",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::causal_claim::1",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Using previous-step displacement histories as initial guesses skips smaller time steps and speeds convergence.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:9366605b417da522",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::causal_claim::2",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Warm-start initialization cuts overall inverse optimization time by about 1.6x.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:5d3489cc057033f5",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::causal_claim::3",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Highly informative specimen geometries can significantly reduce the experimental effort needed for characterization.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:a74a0be5b8eeeb9d",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::causal_claim::4",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Automatic vectorization, JIT, and GPU-resident computation make the framework scalable for forward simulation and inverse identification.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:b2f1a5843013e61c",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::causal_claim::5",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference methods would be too expensive.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:e0fd6da54fb40bdf",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::causal_claim::6",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The quadratic approximation plus Goldstein condition ensure meaningful merit reduction while preserving quadratic Newton convergence when full steps are admissible.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:44cba502e0bc3716",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::causal_claim::7",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Choosing a reduced step length via the quadratic model substantially lowers the merit function and yields robust convergence.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:9c7106da22216b09",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::causal_claim::8",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The line-search strategy significantly improves robustness for highly anisotropic yield surfaces and difficult trial stress states.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:c86300d39f43a24c",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::causal_claim::9",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Avoiding differentiation through Newton iterations preserves exact linearization while avoiding tracing the solver iterations.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:67ed8cf984b0ee04",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::causal_claim::10",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The construction yields a consistent constitutive linearization while avoiding explicit differentiation through the iterative return-mapping process.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:6fe278822f0e90cc",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::causal_claim::11",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Performing sparse assembly directly on the accelerator benefits large systems.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:04b9df8f1f292e14",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::mechanism_principle::0",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Negligible out-of-plane shear stresses justify identifying only a reduced parameter set.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:bc9083e19d1eb568",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::mechanism_principle::1",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Complex plasticity can produce a nonsymmetric tangent stiffness matrix, making direct sparse solvers more robust and efficient than iterative solvers for moderate-size problems.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:d6605183dbe8251a",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::mechanism_principle::2",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Predicted parameter non-uniqueness arises because different parameter combinations can generate the same yield surface.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:979cb9381a47b882",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::mechanism_principle::3",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Line search is added because full Newton steps can be too aggressive for highly anisotropic nonquadratic yield surfaces.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:30a7e316f434c43d",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::mechanism_principle::4",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The Newton direction guarantees local decrease of the merit function at the start of the line search.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:4e77d7a62fc60c18",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::hypothesis_statement::0",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:ca6606f36ac64425",
+      "relation_type": "derived_from",
+      "source_entity_id": "hypothesis:79f5782e3e1d5d65",
+      "target_entity_ids": [
+        "2606.17390::hypothesis_statement::0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:ec7275b09b2dad34",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::hypothesis_statement::1",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:c7d5215659bdefdc",
+      "relation_type": "derived_from",
+      "source_entity_id": "hypothesis:df017cc90bf17010",
+      "target_entity_ids": [
+        "2606.17390::hypothesis_statement::1"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:ab90e1451cf15c13",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::evidence_result::0",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:6e9098791cc472d6",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::evidence_result::1",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:a2c1c32946082e23",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::evidence_result::2",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:b8ec5fa51988ae91",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::evidence_result::3",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:4613d924f74aa9c0",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::evidence_result::4",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:4a4aa94da714d456",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::evidence_result::5",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:9164cbdd2fae9f56",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::evidence_result::6",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:93d66adb3c54e7f4",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::evidence_result::7",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Line search converges within 20 iterations for most sampled trial states.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:ccf020dc9ea3dc4e",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::evidence_result::8",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:46981d50ab9e3a71",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::constraint::0",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Warm-start initialization is enabled when the change in each parameter between the current and previous forward passes is less than 10%.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:7962c9914eed3cbc",
+      "relation_type": "derived_from",
+      "source_entity_id": "2606.17390::constraint::1",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "a scalar step length \u03b6k \u2208(0, 1] is introduced",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:6a16f1b8e9c1a7fc",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:34b4416770c0327a",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 1: Overview of the proposed differentiable GPU-accelerated framework for gradient-based parameter identification of",
+      "source_element": "Figure 1",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:9ff8f6f6e95e60ae",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:5f7210c196c54def",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 2: Schematic of an elastoplastic solid body with displacement and traction boundary conditions.",
+      "source_element": "Figure 2",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:e0b0e170eba6fa57",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:734b0505557c645a",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 3: Overview of the differentiable GPU-accelerated forward-solve implementation.",
+      "source_element": "Figure 3",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:8adc3f33481e0a9b",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:392f42c7a390ac50",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 1: Material parameters used in the circular sheet drawing benchmark.",
+      "source_element": "Table 1",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:49961b4639d9dc94",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:70351e8d407b79f3",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 4: Schematic diagram of the thin circular flange considered for the drawing simulations. All dimensions are in mm.",
+      "source_element": "Figure 4",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:c1b67e361aad782f",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:f15f3bd1cf037245",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 5: Comparison of equivalent plastic strain in flange drawing simulations between JAX-FEM-ANISO and Abaqus. The",
+      "source_element": "Figure 5",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:bb125e453db7ad37",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:3b645125c5c6e408",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Fig. 7 compares the stress plots obtained from JAX-FEM-ANISO and Abaqus. The two results are in excellent agreement, with the",
+      "source_element": "Figure 7",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:0b861ef6cfc0ce31",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:86b3ae6c7eed562a",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 2: Material parameters used in the Barlat Yld2004-18p verification test [5].",
+      "source_element": "Table 2",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:f06538496edb6e77",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:b0c6c2d93a548ef0",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 6: Verification setup for the Barlat Yld2004-18p model. (a) Unit-cube single-element benchmark with the applied boundary",
+      "source_element": "Figure 6",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:e7d7c2e37f7b9ee2",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:d025a9ce92cb994c",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Fig. 8. The left face of the cube is fixed, while the right face is displaced by 0.2 mm in the positive x-direction and 0.1 mm in",
+      "source_element": "Figure 8",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:bcb5be809b3e8ea2",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:43a46feb799cd874",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 3: Material parameters used in the unit-cube performance simulations.",
+      "source_element": "Table 3",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:78c54ebf6d524800",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:f7eb3a7604b4c75a",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 4: Wall-clock time comparison between JAX-FEM-ANISO and Abaqus for the unit-cube benchmark at different problem sizes.",
+      "source_element": "Table 4",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:e4e311f038ad99ef",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:3a430ba7a9604cd2",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 9: Speed-up comparison between JAX-FEM-ANISO and Abaqus for the unit-cube benchmark with 100 \u00d7 100 \u00d7 100",
+      "source_element": "Figure 9",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:29c81e4db8442677",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:5363bd1dad638ea5",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 10: Speed-up comparison between JAX-FEM-ANISO and Abaqus for the larger unit-cube benchmark with approximately",
+      "source_element": "Figure 10",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:3f5934ac8dc4f330",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:c041b0878735e2ed",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 5: Elastic modulus, Hill\u201348 yield, and hardening parameters.",
+      "source_element": "Table 5",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:799641de78979f03",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:bea991f159b0ef5a",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 6: Comparison of material-parameter sensitivities computed using JAX-AD and finite differences at step size h = 10\u22126.",
+      "source_element": "Table 6",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:facb50becb2c7dce",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:93c3fa48c001fe0c",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 11: Loading and boundary conditions for the unit-cube domain considered for gradient verification.",
+      "source_element": "Figure 11",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:5b2b8dfac741871d",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:1e53e54bc9b47a31",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 12: Finite-difference error check EFD,check as a function of step size h.",
+      "source_element": "Figure 12",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:f9e90e90f0497d85",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:101f9c05c7a12fd5",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 13: Information-rich tensile specimen geometry adapted from Zhang et al. [19].",
+      "source_element": "Figure 13",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:6af2223b99a32b8d",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:d61ee96610d69bfe",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 14: (a) Distribution of equivalent plastic strain and (b) stress-state distribution for integration points subjected to plastic",
+      "source_element": "Figure 14",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:ad682333aa08b524",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:83e7fad4ea28ce78",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 7: Inverse parameter identification for the tensile specimen with different initial guesses.",
+      "source_element": "Table 7",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:b052d8190f34789d",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:6fb85fb942afe1ab",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 8: Computation time comparison between JAX-AD and FD approaches for a single iteration of the inverse problem.",
+      "source_element": "Table 8",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:7de342c9840b6ac5",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:c7346e6e873e8962",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 9: Convergence criteria for the L-BFGS-B optimizer.",
+      "source_element": "Table 9",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:0816d84bc38069ed",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:da3a1aaf29b57e82",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 10: Comparison of iterations, function evaluations, and computation time for different cases.",
+      "source_element": "Table 10",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:0b945873e8a12a5a",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:7838bf0732a531a8",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 15: Objective-function histories until convergence of the optimization.",
+      "source_element": "Figure 15",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:8e1d0ef0326a2acc",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:2733f41522862f8f",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 16: Comparison of hardening curves for different material-parameter initializations.",
+      "source_element": "Figure 16",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:436481f849bdadac",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:713982ab564faac6",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 11: Inverse parameter identification for the cruciform specimen with noisy ground-truth data.",
+      "source_element": "Table 11",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:d1c48d8ff0cf7e8f",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:bc53fb8c6e9cae42",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 12: Comparison of iterations, function evaluations, and computation time for different cases.",
+      "source_element": "Table 12",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:9d6b4d48e557b484",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:49a52e771a5d3ea6",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 17: Cruciform specimen geometry with the considered loading and boundary conditions.",
+      "source_element": "Figure 17",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:f0c5187bba93ea49",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:8b098b3be949856e",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 18: Plastic-strain distribution at the final load step.",
+      "source_element": "Figure 18",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:82863f818e4ab888",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:b58ba032eb1fc0f9",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 19: Visualization of noisy synthetic data used for inverse identification at different noise levels.",
+      "source_element": "Figure 19",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:55f6e03891388357",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:a168dff02130be5f",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 20: Convergence history for inverse identification using noise-free synthetic data.",
+      "source_element": "Figure 20",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:c79f19e06064d9a6",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:5a4f2a8b969afa99",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 21: Convergence histories for inverse identification using noisy synthetic data: (a) objective function values and (b)",
+      "source_element": "Figure 21",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:15a6612759439c7d",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:3884325df68247c5",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 22: (a) Cruciform geometry with spatially varying material properties; (b) distribution of plastic strain at the final loading",
+      "source_element": "Figure 22",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:4873addd18665b3e",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:0bf4cda1a092e48f",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 13: Inverse parameter identification for the cruciform specimen with spatially varying material properties.",
+      "source_element": "Table 13",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:3962394917d73043",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:d3d4b3cedfbccc5c",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 23: Convergence history for identifying spatially varying material properties.",
+      "source_element": "Figure 23",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:fb19679a0233b69f",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:d6a120efd2d2cade",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 24: Comparison of inverse-identified hardening curves with ground-truth results.",
+      "source_element": "Figure 24",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:33ac7b26776c423d",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:518366c820cf55d4",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table 14. The boundary and loading conditions are applied as shown in Fig. 25. A total displacement of 10 mm is applied in",
+      "source_element": "Table 14",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:3a3eb5cb5dea0777",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:dc48f1dbe41fbb2b",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Fig. 26(b) and Fig. 26(c) show the principal strain and stress-state diagrams at the final time step, respectively. Only material",
+      "source_element": "Figure 26",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:7127a26721951f7b",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:ec612130c8d9e5eb",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Fig. 27(b) compare the identified yield surfaces and hardening curves with the reference data, respectively. Fig. 28(a) shows",
+      "source_element": "Figure 27",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:cd60edb787442a9e",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:67c8a6af989ccff8",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 25: Topology-optimized specimen geometry used for inverse identification of Barlat\u2019s Yld2004-18p model, including the",
+      "source_element": "Figure 25",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:8e0bb438e02646da",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:226873dea606fb0c",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure 28: Inverse optimization for Barlat material parameter identification: (a) convergence history of the optimization, and (b)",
+      "source_element": "Figure 28",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:004dbbc34921033f",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:818a1cb5d5361dd3",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure A1: Reduction of the anisotropic Barlat yield criterion to the von Mises and Hill\u201348 models in the \u03c0-plane under the",
+      "source_element": "Figure A1",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:78793cc26090317e",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:fec93afb945a7e49",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure B1: Line-search analysis for the single-point return-mapping problem with the Barlat Yld2004-18p yield function: (a)",
+      "source_element": "Figure B1",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:facd619d952c1474",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:b15f5b90db60ec74",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Fig. B2(a) and Fig. B2(b) further compare the convergence behavior of the two algorithms for a wide range of trial stress states",
+      "source_element": "Figure B2",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:574543279ecd1c14",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:645f60d33a1cac6f",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Figure C1: Geometric interpretation of the closest-point projection algorithm.",
+      "source_element": "Figure C1",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:afd47296a718c2f1",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:e15cb981fef8b3b1",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table E1: Computation times in seconds for CSR sparse matrix assembly and row elimination using SciPy on CPU and CuPy",
+      "source_element": "Table E1",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:017b1802efef5171",
+      "relation_type": "derived_from",
+      "source_entity_id": "figure_table:aed84724a6dc2e3d",
+      "target_entity_ids": [
+        "paper:2606.17390"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Table F1: Computation times in seconds for different linear solvers",
+      "source_element": "Table F1",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 1.0
+    },
+    {
+      "relation_id": "relation:5977eac046acb241",
+      "relation_type": "cites",
+      "source_entity_id": "paper:2606.17390",
+      "target_entity_ids": [
+        "paper:arxiv:2505.07801"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "arXiv:2505.07801",
+      "source_element": "References",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.95
+    },
+    {
+      "relation_id": "relation:4bb55f70060a6594",
+      "relation_type": "derived_from",
+      "source_entity_id": "dataset:780448907e626db0",
+      "target_entity_ids": [
+        "2606.17390::problem_motivation::0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Inverse identification of Barlat models is challenging because these models contain many parameters and require highly informative experimental data.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:7ecf8efa7f69fcfa",
+      "relation_type": "derived_from",
+      "source_entity_id": "method:00f652cc9a9337e1",
+      "target_entity_ids": [
+        "2606.17390::prior_approach::0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Conventional inverse characterization approaches rely on multiple standardized tests, such as uniaxial tension and simple shear tests in different orientations, to generate data for parameter identification.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:fff721a649607427",
+      "relation_type": "uses_method",
+      "source_entity_id": "2606.17390::prior_approach::0",
+      "target_entity_ids": [
+        "method:00f652cc9a9337e1"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Conventional inverse characterization approaches rely on multiple standardized tests, such as uniaxial tension and simple shear tests in different orientations, to generate data for parameter identification.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:56fbe5a25156ab05",
+      "relation_type": "derived_from",
+      "source_entity_id": "method:410bcc877aa84159",
+      "target_entity_ids": [
+        "2606.17390::prior_approach::1"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Recently, Goncalves et al. [67,68] used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, thereby enhancing the information content of experimental data for inverse identification.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:272316b71eae9400",
+      "relation_type": "uses_method",
+      "source_entity_id": "2606.17390::prior_approach::1",
+      "target_entity_ids": [
+        "method:410bcc877aa84159"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Recently, Goncalves et al. [67,68] used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, thereby enhancing the information content of experimental data for inverse identification.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:0e2b8685f1f99954",
+      "relation_type": "derived_from",
+      "source_entity_id": "dataset:410bcc877aa84159",
+      "target_entity_ids": [
+        "2606.17390::prior_approach::1"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Recently, Goncalves et al. [67,68] used topology optimization to design specimen geometries that generate highly heterogeneous strain fields, thereby enhancing the information content of experimental data for inverse identification.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:2f51c87a7d11c129",
+      "relation_type": "derived_from",
+      "source_entity_id": "method:6dcfc419b0a79a93",
+      "target_entity_ids": [
+        "2606.17390::rejected_alternative::0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "while avoiding the poor scaling and step-size sensitivity of finite-difference gradients",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:535fabedbb9928cd",
+      "relation_type": "uses_method",
+      "source_entity_id": "2606.17390::rejected_alternative::0",
+      "target_entity_ids": [
+        "method:6dcfc419b0a79a93"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "while avoiding the poor scaling and step-size sensitivity of finite-difference gradients",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:48321059da02151a",
+      "relation_type": "derived_from",
+      "source_entity_id": "method:4fc7e2c9f78871ae",
+      "target_entity_ids": [
+        "2606.17390::rejected_alternative::1"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "For a prescribed perturbation \u02d9p of the input variables, the local Newton iterations are not differentiated directly. Instead, the converged state is treated as an implicitly defined function of p",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:6cbf9b042a321f76",
+      "relation_type": "uses_method",
+      "source_entity_id": "2606.17390::rejected_alternative::1",
+      "target_entity_ids": [
+        "method:4fc7e2c9f78871ae"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "For a prescribed perturbation \u02d9p of the input variables, the local Newton iterations are not differentiated directly. Instead, the converged state is treated as an implicitly defined function of p",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:66d18155026e4c03",
+      "relation_type": "derived_from",
+      "source_entity_id": "method:d073ec6e1922eec0",
+      "target_entity_ids": [
+        "2606.17390::inspiration_source::0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The line-search update is adopted following Scherzinger.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:83c2cc2b1608c5bb",
+      "relation_type": "uses_method",
+      "source_entity_id": "2606.17390::inspiration_source::0",
+      "target_entity_ids": [
+        "method:d073ec6e1922eec0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The line-search update is adopted following Scherzinger.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:24a210f2625cc64f",
+      "relation_type": "derived_from",
+      "source_entity_id": "method:e5d2328d9f045688",
+      "target_entity_ids": [
+        "2606.17390::inspiration_source::1"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The implicit-differentiation approach follows the general framework of automatic implicit differentiation for solver-defined mappings.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:129b969f22dc7326",
+      "relation_type": "uses_method",
+      "source_entity_id": "2606.17390::inspiration_source::1",
+      "target_entity_ids": [
+        "method:e5d2328d9f045688"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The implicit-differentiation approach follows the general framework of automatic implicit differentiation for solver-defined mappings.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:f69b0077dc053b91",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:328b42eaa6430e13",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The topology-optimized specimen creates a broad range of stress and strain states, making the data highly informative for inverse identification.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:0f02ff880943744c",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:c26af778f5646946",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::1"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Using previous-step displacement histories as initial guesses skips smaller time steps and speeds convergence.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:e148b9ce32359fa1",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:9d52d0d79b8e0ad5",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::2"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Warm-start initialization cuts overall inverse optimization time by about 1.6x.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:00779763a53860cf",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:e713ee1dde4d6e2e",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::3"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Highly informative specimen geometries can significantly reduce the experimental effort needed for characterization.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:0c5dffb57cae048f",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:223e437030aa4742",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::4"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Automatic vectorization, JIT, and GPU-resident computation make the framework scalable for forward simulation and inverse identification.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:bf844a9509fd3e45",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:4d324e54fde03664",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::5"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "AD-based adjoint gradients make high-dimensional inverse problems feasible where finite-difference methods would be too expensive.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:3b97e31944881b38",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:9de68dae11777137",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::6"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The quadratic approximation plus Goldstein condition ensure meaningful merit reduction while preserving quadratic Newton convergence when full steps are admissible.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:6be7e8c49f8ff3a6",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:caa8d93347c1262b",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::7"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Choosing a reduced step length via the quadratic model substantially lowers the merit function and yields robust convergence.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:212f6ed285867436",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:6f5e37e846c03b81",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::8"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The line-search strategy significantly improves robustness for highly anisotropic yield surfaces and difficult trial stress states.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:04d2098c0c226c3c",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:591052c65634e62f",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::9"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Avoiding differentiation through Newton iterations preserves exact linearization while avoiding tracing the solver iterations.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:2e4a8172a5718360",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:1d290425751ac1cc",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::10"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The construction yields a consistent constitutive linearization while avoiding explicit differentiation through the iterative return-mapping process.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:2843a15c0e632ba7",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:89d85d114442af5a",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::11"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Performing sparse assembly directly on the accelerator benefits large systems.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:80a2fa649859ef64",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:74e076c4a8d78e6b",
+      "target_entity_ids": [
+        "2606.17390::mechanism_principle::0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Negligible out-of-plane shear stresses justify identifying only a reduced parameter set.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:9a61723f8c8d77a5",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:7acbe407a2745c9f",
+      "target_entity_ids": [
+        "2606.17390::mechanism_principle::1"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Complex plasticity can produce a nonsymmetric tangent stiffness matrix, making direct sparse solvers more robust and efficient than iterative solvers for moderate-size problems.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:742f671640483f56",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:5cc151545504da2c",
+      "target_entity_ids": [
+        "2606.17390::mechanism_principle::2"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Predicted parameter non-uniqueness arises because different parameter combinations can generate the same yield surface.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:bb7bcc2df5f7ec10",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:78f7915ff1e545c6",
+      "target_entity_ids": [
+        "2606.17390::mechanism_principle::3"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Line search is added because full Newton steps can be too aggressive for highly anisotropic nonquadratic yield surfaces.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:37ef31d529b59c63",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:0aec17a16489e568",
+      "target_entity_ids": [
+        "2606.17390::mechanism_principle::4"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The Newton direction guarantees local decrease of the merit function at the start of the line search.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:8fc87e5cb7a9d322",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:1b43676d97031c3c",
+      "target_entity_ids": [
+        "2606.17390::hypothesis_statement::0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The proposed JAX-AD framework can identify complex constitutive models like Yld2004-18p from topology-optimized specimen data.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:7667ee805e321ce7",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:7bd1426b0503f85c",
+      "target_entity_ids": [
+        "2606.17390::hypothesis_statement::1"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Warm-start initialization is introduced to reduce forward-simulation cost during inverse optimization.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:5647e1c051e16e38",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:31a004f96645466e",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:235e19b6cf96f850",
+      "relation_type": "derived_from",
+      "source_entity_id": "measurement:31a004f96645466e",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:53d3acaf0a8afd17",
+      "relation_type": "measures",
+      "source_entity_id": "measurement:31a004f96645466e",
+      "target_entity_ids": [
+        "property:31a004f96645466e"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.75
+    },
+    {
+      "relation_id": "relation:9cde0bc57e24d3cb",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:f5425dd6eff5be6d",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::1"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:f46f5ee93b9cd260",
+      "relation_type": "derived_from",
+      "source_entity_id": "measurement:f5425dd6eff5be6d",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::1"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:83bcb2d4ca670306",
+      "relation_type": "measures",
+      "source_entity_id": "measurement:f5425dd6eff5be6d",
+      "target_entity_ids": [
+        "property:f5425dd6eff5be6d"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.75
+    },
+    {
+      "relation_id": "relation:f0c7906ea714885a",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:c13e4ab55e796b82",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::2"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:a66066aeb63390d2",
+      "relation_type": "derived_from",
+      "source_entity_id": "measurement:c13e4ab55e796b82",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::2"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:9c0a773441eea1b0",
+      "relation_type": "measures",
+      "source_entity_id": "measurement:c13e4ab55e796b82",
+      "target_entity_ids": [
+        "property:c13e4ab55e796b82"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.75
+    },
+    {
+      "relation_id": "relation:8d6ecac838762c0c",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:31b84ab49fdf05fe",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::3"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:fb5bdadba44673d4",
+      "relation_type": "derived_from",
+      "source_entity_id": "measurement:31b84ab49fdf05fe",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::3"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:e43008d609e6d67b",
+      "relation_type": "measures",
+      "source_entity_id": "measurement:31b84ab49fdf05fe",
+      "target_entity_ids": [
+        "property:31b84ab49fdf05fe"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.75
+    },
+    {
+      "relation_id": "relation:93e6338e88574d52",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:fa02e9383f1e23a1",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::4"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:b3f0e74be77db5fd",
+      "relation_type": "derived_from",
+      "source_entity_id": "measurement:fa02e9383f1e23a1",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::4"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:92913a7ca645b8ca",
+      "relation_type": "measures",
+      "source_entity_id": "measurement:fa02e9383f1e23a1",
+      "target_entity_ids": [
+        "property:fa02e9383f1e23a1"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.75
+    },
+    {
+      "relation_id": "relation:6880199e193fb39e",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:4c2fab6ce0251c21",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::5"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:28d54816b02c5651",
+      "relation_type": "derived_from",
+      "source_entity_id": "measurement:4c2fab6ce0251c21",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::5"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:3d2e3b7fcebcba07",
+      "relation_type": "measures",
+      "source_entity_id": "measurement:4c2fab6ce0251c21",
+      "target_entity_ids": [
+        "property:4c2fab6ce0251c21"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.75
+    },
+    {
+      "relation_id": "relation:35408801a37daeb2",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:7cd8f4c3581bbbd4",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::6"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:4fa60e3698296110",
+      "relation_type": "derived_from",
+      "source_entity_id": "measurement:7cd8f4c3581bbbd4",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::6"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:de4f066226ee40ea",
+      "relation_type": "measures",
+      "source_entity_id": "measurement:7cd8f4c3581bbbd4",
+      "target_entity_ids": [
+        "property:7cd8f4c3581bbbd4"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.75
+    },
+    {
+      "relation_id": "relation:0bc3ee3f12e1ec7a",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:8469723f2d551cf0",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::7"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Line search converges within 20 iterations for most sampled trial states.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:c6eb36f995101478",
+      "relation_type": "derived_from",
+      "source_entity_id": "measurement:8469723f2d551cf0",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::7"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Line search converges within 20 iterations for most sampled trial states.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:a8de13daec3044b3",
+      "relation_type": "measures",
+      "source_entity_id": "measurement:8469723f2d551cf0",
+      "target_entity_ids": [
+        "property:8469723f2d551cf0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Line search converges within 20 iterations for most sampled trial states.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.75
+    },
+    {
+      "relation_id": "relation:3fb5b37f0ca22ece",
+      "relation_type": "derived_from",
+      "source_entity_id": "property:0e97d7dd24bdef0a",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::8"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:6b690cf2f4204367",
+      "relation_type": "derived_from",
+      "source_entity_id": "measurement:0e97d7dd24bdef0a",
+      "target_entity_ids": [
+        "2606.17390::evidence_result::8"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.7
+    },
+    {
+      "relation_id": "relation:647df215fb244269",
+      "relation_type": "measures",
+      "source_entity_id": "measurement:0e97d7dd24bdef0a",
+      "target_entity_ids": [
+        "property:0e97d7dd24bdef0a"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.75
+    },
+    {
+      "relation_id": "relation:b1e563de677d8611",
+      "relation_type": "analogous_to",
+      "source_entity_id": "2606.17390::inspiration_source::0",
+      "target_entity_ids": [
+        "2606.17390::mechanism_principle::3"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The line-search update is adopted following Scherzinger.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.6
+    },
+    {
+      "relation_id": "relation:e3895ca353f0cd4b",
+      "relation_type": "analogous_to",
+      "source_entity_id": "2606.17390::inspiration_source::1",
+      "target_entity_ids": [
+        "2606.17390::hypothesis_statement::0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The implicit-differentiation approach follows the general framework of automatic implicit differentiation for solver-defined mappings.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.6
+    },
+    {
+      "relation_id": "relation:4b4115237a8c133c",
+      "relation_type": "supports",
+      "source_entity_id": "2606.17390::evidence_result::0",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::2"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Optimization converged in 65 iterations and 73 function evaluations; warm start reduced total time from 172 to 131 minutes.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.6
+    },
+    {
+      "relation_id": "relation:7acf094c68a2da12",
+      "relation_type": "supports",
+      "source_entity_id": "2606.17390::evidence_result::1",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::4"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The framework provides automatic accurate sensitivities, validated against finite differences.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.6
+    },
+    {
+      "relation_id": "relation:c8db93bd0225e859",
+      "relation_type": "supports",
+      "source_entity_id": "2606.17390::evidence_result::2",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::0"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Inverse identification examples accurately recovered anisotropic yield and hardening behavior from displacement fields.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.6
+    },
+    {
+      "relation_id": "relation:1ba8de3b125dea6d",
+      "relation_type": "supports",
+      "source_entity_id": "2606.17390::evidence_result::3",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::8"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton oscillates and does not stably approach the yield surface after the third iteration, while line search remains stable.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.6
+    },
+    {
+      "relation_id": "relation:e5c9e7cf2d9f28b1",
+      "relation_type": "supports",
+      "source_entity_id": "2606.17390::evidence_result::4",
+      "target_entity_ids": [
+        "2606.17390::mechanism_principle::4"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton does not converge within 10 iterations, whereas line search sharply reduces the merit function each step.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.6
+    },
+    {
+      "relation_id": "relation:d317aef8e14f8c59",
+      "relation_type": "supports",
+      "source_entity_id": "2606.17390::evidence_result::5",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::7"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "The full Newton step increases the merit function, and the true minimum occurs at a smaller step size.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.6
+    },
+    {
+      "relation_id": "relation:d7f5c81d117f8e08",
+      "relation_type": "supports",
+      "source_entity_id": "2606.17390::evidence_result::6",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::8"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Standard Newton fails for about 9,600 of roughly 16,000 sampled trial states, while line search converges for all sampled points.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.6
+    },
+    {
+      "relation_id": "relation:09d28dd219e8b168",
+      "relation_type": "supports",
+      "source_entity_id": "2606.17390::evidence_result::7",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::8"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "Line search converges within 20 iterations for most sampled trial states.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.6
+    },
+    {
+      "relation_id": "relation:2895114cf51dd660",
+      "relation_type": "supports",
+      "source_entity_id": "2606.17390::evidence_result::8",
+      "target_entity_ids": [
+        "2606.17390::causal_claim::4"
+      ],
+      "source_paper_id": "2606.17390",
+      "evidence_span": "GPU-resident CuPy sparse assembly is faster than CPU SciPy assembly across all reported DOF sizes.",
+      "source_element": "",
+      "metric": "",
+      "subject_value": null,
+      "reference_value": null,
+      "unit": "",
+      "conditions": {},
+      "confidence": 0.6
+    }
+  ]
+}

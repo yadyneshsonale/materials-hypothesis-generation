@@ -14,5 +14,6 @@ This directory documents the prompts used by the pipeline. Braced fields such as
 | `gold-comparison-judge.md` | Compare extracted claims with gold abstracts | `compare_with_gold.py` |
 | `masked-recovery-judge.md` | Score recovery of a withheld paper | `validate_masked.py` |
 | `adaptive-workflow.md` | Decompose, assess, adjudicate, and synthesize adaptively | `adaptive_agent.py` |
+| `evidence-normalization.md` | Normalize claims into typed entities and relations | `build_evidence_graph.py` |
 
 The Python constants remain the executable source of truth; these files expose the complete templates for review and experiment reporting.

@@ -9,7 +9,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
 
-from evidence_model import EvidenceRelation, index_relations, load_relations
+from evidence_model import EvidenceEntity, EvidenceRelation, index_relations, load_entities, load_relations
 from graph_build import Graph, Node, _keywords, build_graph
 from hypothesis_agent import critique
 from llm_client import provider_info, resilient_chat_json
@@ -109,6 +109,7 @@ def retrieve_evidence(
     task: Task,
     graph: Graph,
     relation_index: dict[str, list[EvidenceRelation]] | None = None,
+    entity_index: dict[str, EvidenceEntity] | None = None,
 ) -> list[EvidenceItem]:
     query_terms = _keywords(task.question)
     scored: list[tuple[float, Node]] = []
@@ -146,22 +147,7 @@ def retrieve_evidence(
         if len(expanded) >= MAX_GRAPH_HITS:
             break
 
-    combined = selected + expanded
-    if relation_index:
-        for score, node, _ in selected:
-            for relation in relation_index.get(node.node_id, []):
-                linked_ids = [relation.source_entity_id, *relation.target_entity_ids]
-                for linked_id in linked_ids:
-                    if linked_id in seen or linked_id not in graph.nodes:
-                        continue
-                    seen.add(linked_id)
-                    combined.append((
-                        score * relation.confidence,
-                        graph.nodes[linked_id],
-                        f"typed_relation:{relation.relation_type}:{relation.relation_id}",
-                    ))
-
-    return [
+    evidence = [
         EvidenceItem(
             node_id=node.node_id,
             paper_id=node.paper_id,
@@ -171,8 +157,69 @@ def retrieve_evidence(
             score=round(score, 4),
             retrieval_reason=reason,
         )
-        for score, node, reason in combined
+        for score, node, reason in selected + expanded
     ]
+
+    if entity_index:
+        typed_scored = []
+        for entity in entity_index.values():
+            if entity.entity_type in {"atomic_claim", "paper"}:
+                continue
+            terms = _keywords(f"{entity.name} {entity.description} {json.dumps(entity.attributes)}")
+            overlap = len(query_terms & terms)
+            if overlap:
+                typed_scored.append((overlap, entity))
+        typed_scored.sort(key=lambda value: (-value[0], value[1].entity_id))
+        typed_paper_counts: dict[str, int] = {}
+        for score, entity in typed_scored:
+            if entity.entity_id in seen or typed_paper_counts.get(entity.source_paper_id, 0) >= MAX_PER_PAPER:
+                continue
+            seen.add(entity.entity_id)
+            typed_paper_counts[entity.source_paper_id] = typed_paper_counts.get(entity.source_paper_id, 0) + 1
+            evidence.append(EvidenceItem(
+                node_id=entity.entity_id,
+                paper_id=entity.source_paper_id,
+                role=entity.entity_type,
+                content=entity.description or entity.name,
+                evidence_spans=[entity.evidence_span] if entity.evidence_span else [],
+                score=float(score),
+                retrieval_reason="typed_entity_seed",
+            ))
+            if sum(item.retrieval_reason == "typed_entity_seed" for item in evidence) >= MAX_DIRECT_HITS:
+                break
+
+    if relation_index:
+        for seed in list(evidence):
+            for relation in relation_index.get(seed.node_id, []):
+                linked_ids = [relation.source_entity_id, *relation.target_entity_ids]
+                for linked_id in linked_ids:
+                    if linked_id in seen:
+                        continue
+                    seen.add(linked_id)
+                    reason = f"typed_relation:{relation.relation_type}:{relation.relation_id}"
+                    if linked_id in graph.nodes:
+                        node = graph.nodes[linked_id]
+                        evidence.append(EvidenceItem(
+                            node_id=node.node_id,
+                            paper_id=node.paper_id,
+                            role=node.role,
+                            content=node.content,
+                            evidence_spans=node.evidence_spans,
+                            score=round(seed.score * relation.confidence, 4),
+                            retrieval_reason=reason,
+                        ))
+                    elif entity_index and linked_id in entity_index:
+                        entity = entity_index[linked_id]
+                        evidence.append(EvidenceItem(
+                            node_id=entity.entity_id,
+                            paper_id=entity.source_paper_id,
+                            role=entity.entity_type,
+                            content=entity.description or entity.name,
+                            evidence_spans=[entity.evidence_span] if entity.evidence_span else [],
+                            score=round(seed.score * relation.confidence, 4),
+                            retrieval_reason=reason,
+                        ))
+    return evidence
 
 
 def assess_sufficiency(task: Task, evidence: list[EvidenceItem]) -> dict[str, Any]:
@@ -230,10 +277,13 @@ def run_workflow(
     trace_path: Path,
     max_depth: int = 1,
     relations_path: Path | None = None,
+    entities_path: Path | None = None,
 ) -> dict[str, Any]:
     graph = build_graph(outputs_dir)
     relations = load_relations(relations_path)
     relation_index = index_relations(relations)
+    entities = load_entities(entities_path) if entities_path else []
+    entity_index = {entity.entity_id: entity for entity in entities}
     tasks = decompose_goal(goal)
     trace: dict[str, Any] = {
         "run_id": str(uuid.uuid4()),
@@ -244,6 +294,7 @@ def run_workflow(
             "nodes": len(graph.nodes),
             "papers": len({node.paper_id for node in graph.nodes.values()}),
             "typed_relations": len(relations),
+            "typed_entities": len(entities),
         },
         "events": [{"stage": "decompose", "tasks": [asdict(task) for task in tasks]}],
     }
@@ -272,7 +323,7 @@ def run_workflow(
             break
 
         for task in ready:
-            evidence = retrieve_evidence(task, graph, relation_index)
+            evidence = retrieve_evidence(task, graph, relation_index, entity_index)
             for item in evidence:
                 evidence_by_id[item.node_id] = item
             assessment = assess_sufficiency(task, evidence)
@@ -330,8 +381,9 @@ def main() -> None:
     parser.add_argument("trace_path", type=Path)
     parser.add_argument("--max-depth", type=int, default=1)
     parser.add_argument("--relations", type=Path, help="optional JSONL file of typed evidence relations")
+    parser.add_argument("--entities", type=Path, help="optional JSONL file of typed evidence entities")
     args = parser.parse_args()
-    result = run_workflow(args.goal, args.outputs_dir, args.trace_path, args.max_depth, args.relations)
+    result = run_workflow(args.goal, args.outputs_dir, args.trace_path, args.max_depth, args.relations, args.entities)
     print(f"[adaptive] status={result['status']} tasks={len(result['tasks'])} candidates={len(result['candidates'])}")
     print(f"[adaptive] trace={args.trace_path}")
 

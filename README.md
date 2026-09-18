@@ -6,9 +6,12 @@ A materials-science hypothesis generation pipeline that extracts argumentative r
 
 1. Convert scientific PDFs to column-aware text with `pdf_convert.py`.
 2. Extract and reconcile typed research roles with `run_extraction.py`.
-3. Build a cross-paper lexical knowledge graph with `graph_build.py`.
-4. Retrieve, compose, refine, merge, and critique hypotheses with `hypothesis_agent.py`.
-5. Evaluate extraction and generation with abstract comparison, audits, and masked-paper recovery.
+3. Normalize each paper into typed entities and evidence-backed relations with
+  `build_evidence_graph.py`.
+4. Build a cross-paper claim graph with `graph_build.py`.
+5. Retrieve, compose, refine, merge, and critique hypotheses with `adaptive_agent.py` or
+  the simpler `hypothesis_agent.py` baseline.
+6. Evaluate extraction and generation with abstract comparison, audits, and masked-paper recovery.
 
 ## Adaptive Agent Workflow
 
@@ -134,14 +137,42 @@ expansion, sufficiency routing, one-level recursive gap decomposition, user-ques
 conflict adjudication, cited synthesis, criticism, and a complete JSON execution trace. The
 existing `hypothesis_agent.py` remains the simpler direct retrieval and beam-search baseline.
 
-The next ingestion step is extracting citation and table/figure comparisons at corpus scale.
-`evidence_model.py` already validates these as typed relations such as `cites`, `supports`,
-`contradicts`, `compares_with`, `outperforms`, and `underperforms`. Each relation records the
-linked entity IDs, source paper and element, verbatim evidence, metric, values, units,
-conditions, and confidence. Pass a JSONL relation file with `--relations`; the retriever will
-follow those links and record the exact relation in `retrieval_reason`. A semantic vector index
-and the extraction pipeline that populates these relations from citations and tables remain to
-be implemented; current seed retrieval is lexical plus role-aware.
+`evidence_model.py` validates typed relations such as `cites`, `supports`, `contradicts`,
+`compares_with`, `outperforms`, and `underperforms`. Each relation records the linked entity
+IDs, source paper and element, verbatim evidence, metric, values, units, conditions, and
+confidence. The retriever follows these links and records the exact relation in
+`retrieval_reason`. Current seed retrieval is lexical plus role-aware; a semantic vector index
+remains future work.
+
+### Typed evidence model
+
+The evidence graph uses ten entity types: `Paper`, `Atomic claim`, `Method`,
+`Material/system`, `Property`, `Experimental condition`, `Measurement`, `Dataset`,
+`Figure/table`, and `Hypothesis`. It uses eleven relation types: `CITES`, `SUPPORTS`,
+`CONTRADICTS`, `USES_METHOD`, `COMPARES_WITH`, `OUTPERFORMS`, `UNDERPERFORMS`,
+`APPLIES_UNDER`, `MEASURES`, `DERIVED_FROM`, and `ANALOGOUS_TO`.
+
+Role extraction and semantic normalization are separate checkpoints. This is intentional:
+normalization starts as soon as one paper's extraction succeeds, but a normalization failure
+does not rerun extraction or discard the paper's claims. Each paper gets an atomic bundle under
+`evidence_graph/papers/`; only validated bundles are merged into `entities.jsonl` and
+`relations.jsonl`.
+
+The checked-in deterministic build covers all 67 papers and contains 11,481 unique entities
+and 14,453 relations, including 4,271 atomic claims and 857 `CITES` edges. External papers are
+canonicalized by DOI or arXiv ID while each citing paper retains its own evidence-backed edge.
+See `evidence_graph/summary.json` for complete type counts.
+
+Deterministic normalization is the robust corpus-scale baseline and requires no model call.
+Use `--normalizer llm` for richer semantic enrichment. The deterministic comparison detector
+is intentionally conservative about `OUTPERFORMS` and `UNDERPERFORMS`, but `COMPARES_WITH`
+remains lexical and can include general contrastive prose; inspect its evidence span before
+treating it as a quantitative benchmark.
+
+See [`examples/relations.example.jsonl`](examples/relations.example.jsonl) for citation and
+condition-aware comparison records. `OUTPERFORMS` and `UNDERPERFORMS` are never stored as bare
+edges: they carry the metric, compared values, unit, operating conditions, source table or
+figure, evidence span, and extraction confidence.
 
 ## Setup
 
@@ -167,6 +198,23 @@ MATHG_PROVIDER=trapi .venv/bin/python run_extraction.py \
   --input_dir texts --out_dir outputs --max_passes 0 --retry_delay 120
 ```
 
+Extract and immediately build typed evidence for each completed paper:
+
+```bash
+MATHG_PROVIDER=trapi .venv/bin/python run_extraction.py \
+  --input_dir texts --out_dir outputs --max_passes 0 --retry_delay 120 \
+  --evidence_graph_dir evidence_graph --metadata results/new_candidates.json
+```
+
+For an already extracted corpus, run only the new stage:
+
+```bash
+MATHG_PROVIDER=trapi .venv/bin/python build_evidence_graph.py \
+  --outputs-dir outputs_bulk --graph-dir evidence_graph \
+  --source-dir texts_bulk --metadata results/new_candidates.json \
+  --normalizer deterministic --max-passes 0 --retry-delay 120
+```
+
 Generate and branch hypotheses:
 
 ```bash
@@ -180,13 +228,14 @@ Run the adaptive, traceable workflow:
 ```bash
 MATHG_PROVIDER=trapi .venv/bin/python adaptive_agent.py \
   "Improve stability of lithium-metal solid-electrolyte interfaces" \
-  outputs_bulk results/adaptive_run.json --max-depth 1
+  outputs_bulk results/adaptive_run.json --max-depth 1 \
+  --entities evidence_graph/entities.jsonl \
+  --relations evidence_graph/relations.jsonl
 ```
 
-Add `--relations path/to/relations.jsonl` when a typed relation file is available. The output
-JSON contains the task graph, evidence returned for
-each task, sufficiency decisions, child questions, unresolved gaps, conflict assessments,
-ranked candidates, critic results, and cited entity IDs.
+The output JSON contains the task graph, evidence returned for each task, sufficiency
+decisions, child questions, unresolved gaps, conflict assessments, ranked candidates, critic
+results, and cited entity IDs.
 
 Run masked-paper recovery:
 
