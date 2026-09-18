@@ -331,15 +331,27 @@ def load_context_index(context_dir: Path | None) -> dict[str, list[dict[str, Any
             })
         tables_by_passage: dict[str, list[dict[str, Any]]] = {}
         for table in bundle["tables"]:
-            if table.get("passage_id"):
-                tables_by_passage.setdefault(table["passage_id"], []).append({
+            table_context = {
+                "passage_id": table.get("passage_id", ""),
+                "section": passages.get(table.get("passage_id", ""), {}).get("section", ""),
+                "text": table["raw_text"],
+                "match_score": table["confidence"],
+                "evidence_span": table["caption"],
+                "citations": [],
+                "tables": [{
                     "table_id": table["table_id"],
                     "label": table["label"],
                     "caption": table["caption"],
                     "raw_text": table["raw_text"],
                     "extraction_level": table["extraction_level"],
                     "confidence": table["confidence"],
-                })
+                }],
+                "context_type": "table",
+                "paper_id": bundle["paper_id"],
+            }
+            index.setdefault(table["table_id"], []).append(table_context)
+            if table.get("passage_id"):
+                tables_by_passage.setdefault(table["passage_id"], []).extend(table_context["tables"])
         for claim_id, anchors in bundle["claim_passage_ids"].items():
             for anchor in anchors:
                 passage = passages.get(anchor["passage_id"])
@@ -353,7 +365,33 @@ def load_context_index(context_dir: Path | None) -> dict[str, list[dict[str, Any
                     "evidence_span": anchor["evidence_span"],
                     "citations": list(mentions_by_passage.get(passage["passage_id"], {}).values()),
                     "tables": tables_by_passage.get(passage["passage_id"], []),
+                    "context_type": "claim_passage",
+                    "paper_id": bundle["paper_id"],
                 })
+        for comparison in bundle.get("comparison_contexts", []):
+            citations = [{
+                "reference_number": reference["reference_number"],
+                "mention_text": f"[{reference['reference_number']}]",
+                "reference_id": reference["reference_id"],
+                "reference_text": reference["raw_text"],
+                "doi": reference["doi"],
+                "arxiv_id": reference["arxiv_id"],
+                "resolution_status": reference["resolution_status"],
+            } for reference in comparison["cited_references"]]
+            index.setdefault(comparison["comparison_id"], []).append({
+                "passage_id": comparison["passage_id"],
+                "section": comparison["section"],
+                "text": comparison["text"],
+                "match_score": 1.0,
+                "evidence_span": comparison["text"],
+                "citations": citations,
+                "tables": comparison["tables"],
+                "context_type": "comparison",
+                "paper_id": bundle["paper_id"],
+                "cross_paper": comparison["cross_paper"],
+                "cited_content_status": comparison["cited_content_status"],
+                "claim_ids": comparison["claim_ids"],
+            })
     return index
 
 

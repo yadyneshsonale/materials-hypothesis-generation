@@ -178,6 +178,11 @@ conversion does not reliably preserve merged cells or column geometry, so table 
 raw text and an extraction confidence rather than inventing structured rows. External cited-paper
 content is marked `requires_resolution` until full text or an abstract is fetched.
 
+The adaptive agent also searches `comparison_contexts` and tables directly, so a relevant
+comparison can seed retrieval even when no atomic claim matches the query. Agent prompts label
+unresolved bibliography entries as routing metadata, preserve table confidence, and prohibit
+treating a cited paper's title as evidence about its methods or results.
+
 See [`examples/relations.example.jsonl`](examples/relations.example.jsonl) for citation and
 condition-aware comparison records. `OUTPERFORMS` and `UNDERPERFORMS` are never stored as bare
 edges: they carry the metric, compared values, unit, operating conditions, source table or

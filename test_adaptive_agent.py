@@ -6,11 +6,11 @@ from tempfile import TemporaryDirectory
 from pathlib import Path
 from unittest.mock import patch
 
-from adaptive_agent import Task, retrieve_evidence, run_workflow
+from adaptive_agent import EvidenceItem, Task, _evidence_text, retrieve_evidence, run_workflow
 from build_evidence_graph import _deterministic_annotations, _external_citations, _validate_bundle, build_paper
 from evidence_model import EvidenceEntity, EvidenceRelation, index_relations, load_relations
 from graph_build import Graph, Node
-from source_context import build_source_bundle
+from source_context import build_source_bundle, load_context_index
 
 
 class EvidenceRelationTests(unittest.TestCase):
@@ -167,6 +167,68 @@ class EvidenceGraphBuilderTests(unittest.TestCase):
         self.assertEqual(len(comparisons), 1)
         self.assertEqual(comparisons[0]["cited_references"][0]["reference_number"], "2")
         self.assertEqual(comparisons[0]["cited_content_status"], "requires_resolution")
+        with TemporaryDirectory() as directory:
+            paper_dir = Path(directory) / "papers"
+            paper_dir.mkdir()
+            (paper_dir / "paper-1.json").write_text(json.dumps(bundle))
+            context_index = load_context_index(Path(directory))
+
+        self.assertIn(comparisons[0]["comparison_id"], context_index)
+        self.assertIn(bundle["tables"][0]["table_id"], context_index)
+
+    def test_comparison_context_can_seed_retrieval_without_a_claim_match(self) -> None:
+        context = {
+            "passage_id": "passage:comparison",
+            "section": "Results",
+            "text": "HSE06 predicts a 2.1 eV gap compared with 1.8 eV in prior work.",
+            "match_score": 1.0,
+            "evidence_span": "HSE06 predicts a 2.1 eV gap compared with 1.8 eV in prior work.",
+            "citations": [],
+            "tables": [],
+            "context_type": "comparison",
+            "paper_id": "paper-1",
+            "cross_paper": True,
+            "cited_content_status": "requires_resolution",
+            "claim_ids": [],
+        }
+
+        evidence = retrieve_evidence(
+            Task("T1", "Compare HSE06 band gaps", "conflicts"),
+            Graph({}, {}),
+            context_index={"comparison:test": [context]},
+        )
+
+        self.assertEqual(len(evidence), 1)
+        self.assertEqual(evidence[0].retrieval_reason, "comparison_seed")
+
+    def test_unresolved_citation_is_labeled_as_routing_metadata(self) -> None:
+        item = EvidenceItem(
+            node_id="claim:1",
+            paper_id="paper-1",
+            role="evidence_result",
+            content="A comparison was reported.",
+            evidence_spans=[],
+            score=1.0,
+            retrieval_reason="lexical_role_seed",
+            source_contexts=[{
+                "passage_id": "passage:1",
+                "section": "Results",
+                "text": "A comparison was reported [2].",
+                "match_score": 1.0,
+                "tables": [],
+                "citations": [{
+                    "mention_text": "[2]",
+                    "reference_text": "Smith, Baseline study.",
+                    "resolution_status": "metadata_only",
+                }],
+                "cited_content_status": "requires_resolution",
+            }],
+        )
+
+        prompt_text = _evidence_text(item)
+
+        self.assertIn("ROUTING_METADATA_ONLY", prompt_text)
+        self.assertIn("REQUIRES_RESOLUTION", prompt_text)
 
     def test_builds_claim_hypothesis_and_source_element_entities(self) -> None:
         record = {

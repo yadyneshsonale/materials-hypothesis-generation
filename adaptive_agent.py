@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import time
 import uuid
 from dataclasses import asdict, dataclass, field
@@ -20,6 +21,17 @@ MAX_GRAPH_HITS = 8
 MAX_PER_PAPER = 2
 SUFFICIENCY_DECISIONS = {"sufficient", "reason_with_caveat", "decompose_further", "ask_user", "unresolved"}
 
+
+def _context_keywords(text: str) -> set[str]:
+    terms = set()
+    for term in re.findall(r"[a-z][a-z0-9-]{2,}", text.lower()):
+        if term.startswith("compar"):
+            term = "compare"
+        elif term.endswith("s") and len(term) > 4:
+            term = term[:-1]
+        terms.add(term)
+    return terms
+
 _DECOMPOSE_SYSTEM = """You plan evidence gathering for materials hypothesis generation.
 Convert the user's goal into a small directed acyclic graph of retrieval questions. Tasks must
 cover mechanisms, interventions or transferable analogies, boundary conditions and failure modes,
@@ -35,6 +47,9 @@ sufficient, reason_with_caveat, decompose_further, ask_user, unresolved. Include
 grounded in cited entity IDs, a reason, missing_questions, and user_question. Use
 decompose_further only when narrower literature questions can close the gap; ask_user only when a
 missing preference or constraint would materially change the search.
+Bibliography metadata and citations marked METADATA_ONLY or REQUIRES_RESOLUTION are routing
+information, not substantive evidence from the cited paper. Do not infer the cited paper's methods,
+conditions, or results from its title. Treat low-confidence raw table text as provisional.
 Schema: {"decision": "...", "finding": "...", "cited_ids": ["..."], "reason": "...",
 "missing_questions": ["..."], "user_question": "..."}."""
 
@@ -42,7 +57,8 @@ _ADJUDICATE_SYSTEM = """You adjudicate potentially conflicting materials-science
 choosing a winner from citation count or venue prestige. First test whether the claims differ in
 material, composition, operating conditions, measurement protocol, scale, or model assumptions.
 Weight directness, condition match, controls, uncertainty, sample size, replication, and method
-quality. Return JSON: {"conflicts": [{"claim_ids": ["..."], "classification":
+quality. Bibliography metadata is not evidence about a cited paper's methods or results. Return
+JSON: {"conflicts": [{"claim_ids": ["..."], "classification":
 "direct_contradiction|different_regime|methodological_disagreement|different_property|insufficient_information",
 "assessment": "...", "preferred_id": null, "reason": "..."}]}. Preserve both sides."""
 
@@ -50,6 +66,8 @@ _SYNTHESIZE_SYSTEM = """You generate auditable materials-science hypotheses from
 tasks. Propose mechanism-specific candidates that combine claims from at least two papers. Every
 literature-backed statement must cite a supplied entity ID; label any new connection as a proposed
 inference. Include boundary conditions, predicted outcome, uncertainty, and a falsifying experiment.
+Never treat METADATA_ONLY or REQUIRES_RESOLUTION citations as evidence from the cited paper, and
+treat low-confidence raw table extraction as provisional.
 Return JSON: {"candidates": [{"hypothesis": "...", "mechanism": "...", "predicted_outcome":
 "...", "boundary_conditions": ["..."], "falsifying_experiment": "...", "uncertainties":
 ["..."], "cited_ids": ["..."], "proposed_inferences": ["..."]}]}."""
@@ -238,24 +256,69 @@ def retrieve_evidence(
                             relation_context=relation_context,
                         ))
     if context_index:
+        context_query_terms = _context_keywords(task.question)
+        contextual_seeds: list[tuple[int, str, dict[str, Any]]] = []
+        for context_id, contexts in context_index.items():
+            if not context_id.startswith(("comparison:", "table:")):
+                continue
+            for context in contexts:
+                overlap = len(context_query_terms & _context_keywords(
+                    f"{context.get('text', '')} {context.get('evidence_span', '')}"
+                ))
+                if overlap:
+                    contextual_seeds.append((overlap, context_id, context))
+        contextual_seeds.sort(key=lambda value: (-value[0], value[1]))
+        for score, context_id, context in contextual_seeds[:MAX_DIRECT_HITS]:
+            if context_id in seen:
+                continue
+            seen.add(context_id)
+            evidence.append(EvidenceItem(
+                node_id=context_id,
+                paper_id=context.get("paper_id", ""),
+                role=f"{context.get('context_type', 'source')}_context",
+                content=context.get("evidence_span") or context.get("text", ""),
+                evidence_spans=[context.get("text", "")],
+                score=float(score),
+                retrieval_reason=f"{context.get('context_type', 'source')}_seed",
+                source_contexts=[context],
+            ))
         for item in evidence:
-            item.source_contexts.extend(context_index.get(item.node_id, []))
+            if not item.source_contexts:
+                item.source_contexts.extend(context_index.get(item.node_id, []))
     return evidence
 
 
 def _evidence_text(item: EvidenceItem) -> str:
     blocks = [f"id={item.node_id} paper={item.paper_id} role={item.role}: {item.content}"]
     if item.relation_context:
-        blocks.append(f"RELATION: {json.dumps(item.relation_context, ensure_ascii=False)}")
+        relation = item.relation_context
+        blocks.append(
+            f"RELATION {relation.get('relation_type', '')}: metric={relation.get('metric') or 'unspecified'}; "
+            f"subject={relation.get('subject_value')}; reference={relation.get('reference_value')}; "
+            f"unit={relation.get('unit') or 'unspecified'}; conditions={relation.get('conditions') or {}}; "
+            f"confidence={relation.get('confidence')}"
+        )
     for context in item.source_contexts[:2]:
         blocks.append(
             f"SOURCE passage={context['passage_id']} section={context['section']} "
             f"match={context['match_score']}:\n{context['text']}"
         )
         if context["tables"]:
-            blocks.append(f"TABLE CONTEXT:\n{json.dumps(context['tables'], ensure_ascii=False)}")
+            blocks.append(
+                "TABLE CONTEXT (raw extraction; obey each confidence field):\n"
+                f"{json.dumps(context['tables'], ensure_ascii=False)}"
+            )
         if context["citations"]:
-            blocks.append(f"CITED REFERENCES:\n{json.dumps(context['citations'], ensure_ascii=False)}")
+            citations = []
+            for citation in context["citations"]:
+                status = citation.get("resolution_status", "unresolved").upper()
+                citations.append(
+                    f"{citation.get('mention_text', '')} [{status}; ROUTING_METADATA_ONLY]: "
+                    f"{citation.get('reference_text', '')}"
+                )
+            blocks.append("CITED REFERENCES:\n" + "\n".join(citations))
+        if context.get("cited_content_status") == "requires_resolution":
+            blocks.append("CITED CONTENT: REQUIRES_RESOLUTION; no cited-paper passage is available.")
     return "\n".join(blocks)
 
 
@@ -282,7 +345,7 @@ def adjudicate_conflicts(goal: str, evidence: list[EvidenceItem]) -> dict[str, A
     candidates = [item for item in evidence if item.role in {"contradiction", "rejected_alternative", "prior_limitation"}]
     if not candidates:
         return {"conflicts": []}
-    block = "\n".join(f"- id={item.node_id} paper={item.paper_id}: {item.content}" for item in candidates)
+    block = "\n\n".join(f"- {_evidence_text(item)}" for item in candidates)
     result = resilient_chat_json(_ADJUDICATE_SYSTEM, f"GOAL:\n{goal}\n\nCLAIMS:\n{block}", max_tokens=1400)
     return result if isinstance(result, dict) and isinstance(result.get("conflicts"), list) else {"conflicts": []}
 
