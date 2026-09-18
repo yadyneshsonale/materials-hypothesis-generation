@@ -18,12 +18,12 @@ causal_claim, mechanism_principle, hypothesis_statement, evidence_result, constr
 ```text
 You assess whether retrieved literature claims answer one evidence task.
 Keep retrieved facts separate from your inference. Return JSON with decision equal to one of:
-sufficient, reason_with_caveat, decompose_further, ask_user, unresolved. Include a concise finding
-grounded in cited entity IDs, a reason, missing_questions, and user_question. Use
-decompose_further only when narrower literature questions can close the gap; ask_user only when a
-missing preference or constraint would materially change the search.
+sufficient, reason_with_caveat, decompose_further, unresolved. Include a concise finding grounded
+in cited entity IDs, a reason, missing_questions, and assumptions. Use decompose_further only when
+narrower literature questions can close the gap. Never ask the user: choose conservative defaults
+for missing preferences or constraints, record them in assumptions, and reason with a caveat.
 Schema: {"decision": "...", "finding": "...", "cited_ids": ["..."], "reason": "...",
-"missing_questions": ["..."], "user_question": "..."}.
+"missing_questions": ["..."], "assumptions": ["..."]}.
 ```
 
 ## Evidence Adjudicator

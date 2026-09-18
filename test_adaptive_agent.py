@@ -74,7 +74,7 @@ class EvidenceRelationTests(unittest.TestCase):
 
 
 class WorkflowRoutingTests(unittest.TestCase):
-    def test_user_question_blocks_dependencies_and_synthesis(self) -> None:
+    def test_missing_constraint_becomes_assumption_and_does_not_block_synthesis(self) -> None:
         tasks = [
             Task("T1", "Which operating temperature should be used?", "constraints"),
             Task("T2", "Find mechanisms at that temperature.", "mechanisms", ["T1"]),
@@ -95,14 +95,16 @@ class WorkflowRoutingTests(unittest.TestCase):
                 patch("adaptive_agent.retrieve_evidence", return_value=[]),
                 patch("adaptive_agent.assess_sufficiency", return_value=assessment),
                 patch("adaptive_agent.adjudicate_conflicts", return_value={"conflicts": []}),
-                patch("adaptive_agent.synthesize") as synthesize,
+                patch("adaptive_agent.synthesize", return_value=[]) as synthesize,
             ):
                 result = run_workflow("goal", Path(directory), trace_path)
 
-        self.assertEqual(result["status"], "needs_user")
-        self.assertEqual(result["tasks"][1]["status"], "blocked_by_user")
-        self.assertEqual(result["events"][-1]["stage"], "await_user")
-        synthesize.assert_not_called()
+        self.assertEqual(result["status"], "complete_without_candidates")
+        self.assertEqual(result["tasks"][0]["decision"], "reason_with_caveat")
+        self.assertEqual(result["tasks"][1]["status"], "complete")
+        self.assertEqual(result["events"][-1]["stage"], "synthesis")
+        self.assertIn("What operating temperature", result["tasks"][0]["assumptions"][0])
+        synthesize.assert_called_once()
 
 
 class EvidenceGraphBuilderTests(unittest.TestCase):

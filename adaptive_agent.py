@@ -19,7 +19,7 @@ from source_context import load_context_index
 MAX_DIRECT_HITS = 8
 MAX_GRAPH_HITS = 8
 MAX_PER_PAPER = 2
-SUFFICIENCY_DECISIONS = {"sufficient", "reason_with_caveat", "decompose_further", "ask_user", "unresolved"}
+SUFFICIENCY_DECISIONS = {"sufficient", "reason_with_caveat", "decompose_further", "unresolved"}
 
 
 def _context_keywords(text: str) -> set[str]:
@@ -43,15 +43,15 @@ causal_claim, mechanism_principle, hypothesis_statement, evidence_result, constr
 
 _SUFFICIENCY_SYSTEM = """You assess whether retrieved literature claims answer one evidence task.
 Keep retrieved facts separate from your inference. Return JSON with decision equal to one of:
-sufficient, reason_with_caveat, decompose_further, ask_user, unresolved. Include a concise finding
-grounded in cited entity IDs, a reason, missing_questions, and user_question. Use
-decompose_further only when narrower literature questions can close the gap; ask_user only when a
-missing preference or constraint would materially change the search.
+sufficient, reason_with_caveat, decompose_further, unresolved. Include a concise finding grounded
+in cited entity IDs, a reason, missing_questions, and assumptions. Use decompose_further only when
+narrower literature questions can close the gap. Never ask the user: when a preference or constraint
+is absent, choose a conservative default, record it in assumptions, and use reason_with_caveat.
 Bibliography metadata and citations marked METADATA_ONLY or REQUIRES_RESOLUTION are routing
 information, not substantive evidence from the cited paper. Do not infer the cited paper's methods,
 conditions, or results from its title. Treat low-confidence raw table text as provisional.
 Schema: {"decision": "...", "finding": "...", "cited_ids": ["..."], "reason": "...",
-"missing_questions": ["..."], "user_question": "..."}."""
+"missing_questions": ["..."], "assumptions": ["..."]}."""
 
 _ADJUDICATE_SYSTEM = """You adjudicate potentially conflicting materials-science claims without
 choosing a winner from citation count or venue prestige. First test whether the claims differ in
@@ -85,6 +85,7 @@ class Task:
     finding: str = ""
     decision: str = ""
     cited_ids: list[str] = field(default_factory=list)
+    assumptions: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -326,7 +327,12 @@ def assess_sufficiency(task: Task, evidence: list[EvidenceItem]) -> dict[str, An
     evidence_block = "\n\n".join(f"- {_evidence_text(item)}" for item in evidence) or "(no evidence retrieved)"
     user = f"TASK:\n{task.question}\n\nEVIDENCE:\n{evidence_block}"
     result = resilient_chat_json(_SUFFICIENCY_SYSTEM, user, max_tokens=1200)
+    if isinstance(result, dict) and result.get("decision") == "ask_user":
+        question = str(result.get("user_question", "")).strip()
+        result["decision"] = "reason_with_caveat"
+        result["assumptions"] = [question] if question else ["A missing constraint was conservatively assumed."]
     if isinstance(result, dict) and result.get("decision") in SUFFICIENCY_DECISIONS:
+        result.setdefault("assumptions", [])
         return result
 
     distinct_papers = {item.paper_id for item in evidence}
@@ -337,7 +343,7 @@ def assess_sufficiency(task: Task, evidence: list[EvidenceItem]) -> dict[str, An
         "cited_ids": [item.node_id for item in evidence[:6]],
         "reason": "Deterministic fallback based on evidence count and paper diversity.",
         "missing_questions": [],
-        "user_question": "",
+        "assumptions": ["No domain-specific preference was supplied; conservative defaults were used."],
     }
 
 
@@ -386,6 +392,10 @@ def run_workflow(
         "created_at": time.time(),
         "provider": provider_info(),
         "goal": goal,
+        "subagents": [
+            "planner", "retriever", "context_assembler", "sufficiency_assessor",
+            "gap_resolver", "conflict_adjudicator", "hypothesis_synthesizer", "critic",
+        ],
         "graph": {
             "nodes": len(graph.nodes),
             "papers": len({node.paper_id for node in graph.nodes.values()}),
@@ -393,20 +403,11 @@ def run_workflow(
             "typed_entities": len(entities),
             "contextualized_claims": len(context_index),
         },
-        "events": [{"stage": "decompose", "tasks": [asdict(task) for task in tasks]}],
+        "events": [{"stage": "decompose", "agent": "planner", "tasks": [asdict(task) for task in tasks]}],
     }
     evidence_by_id: dict[str, EvidenceItem] = {}
 
     while any(task.status == "pending" for task in tasks):
-        for task in tasks:
-            dependency_states = {
-                parent.status for parent in tasks
-                if parent.task_id in task.depends_on
-            }
-            if task.status == "pending" and dependency_states & {"ask_user", "blocked_by_user"}:
-                task.status = "blocked_by_user"
-                task.decision = "ask_user"
-                task.finding = "A dependency requires clarification from the user."
         ready = [
             task for task in tasks if task.status == "pending"
             and all(next((parent.status for parent in tasks if parent.task_id == dep), "unresolved") != "pending" for dep in task.depends_on)
@@ -424,9 +425,17 @@ def run_workflow(
             for item in evidence:
                 evidence_by_id[item.node_id] = item
             assessment = assess_sufficiency(task, evidence)
+            if assessment.get("decision") == "ask_user":
+                assessment = dict(assessment)
+                question = str(assessment.get("user_question", "")).strip()
+                assessment["decision"] = "reason_with_caveat"
+                assessment["assumptions"] = [
+                    question or "A missing constraint was conservatively assumed."
+                ]
             task.decision = str(assessment.get("decision", "unresolved"))
             task.finding = str(assessment.get("finding", ""))
             task.cited_ids = [str(value) for value in assessment.get("cited_ids", []) if str(value) in evidence_by_id]
+            task.assumptions = [str(value) for value in assessment.get("assumptions", [])]
             task.status = "complete" if task.decision in {"sufficient", "reason_with_caveat"} else task.decision
 
             children: list[Task] = []
@@ -439,6 +448,7 @@ def run_workflow(
 
             trace["events"].append({
                 "stage": "subtask",
+                "agents": ["retriever", "context_assembler", "sufficiency_assessor"],
                 "task_id": task.task_id,
                 "question": task.question,
                 "retrieved": [asdict(item) for item in evidence],
@@ -446,10 +456,10 @@ def run_workflow(
                 "children": [asdict(child) for child in children],
             })
 
-    needs_user = any(task.status == "ask_user" for task in tasks)
     all_evidence = list(evidence_by_id.values())
     conflicts = adjudicate_conflicts(goal, all_evidence)
-    candidates = [] if needs_user else synthesize(goal, tasks, all_evidence, conflicts)
+    trace["events"].append({"stage": "adjudication", "agent": "conflict_adjudicator", "conflicts": conflicts})
+    candidates = synthesize(goal, tasks, all_evidence, conflicts)
     valid_ids = set(evidence_by_id)
     candidate_records = []
     for candidate in candidates:
@@ -457,15 +467,24 @@ def run_workflow(
         candidate["cited_ids"] = cited_ids
         candidate["critics"] = critique(goal, candidate)
         candidate_records.append(candidate)
+        trace["events"].append({
+            "stage": "critique",
+            "agent": "critic",
+            "candidate_index": len(candidate_records) - 1,
+            "result": candidate["critics"],
+        })
 
     trace.update({
         "tasks": [asdict(task) for task in tasks],
         "conflicts": conflicts,
         "candidates": candidate_records,
-        "status": "needs_user" if needs_user else ("complete" if candidate_records else "complete_without_candidates"),
+        "status": "complete" if candidate_records else "complete_without_candidates",
     })
-    final_stage = "await_user" if needs_user else "synthesis"
-    trace["events"].append({"stage": final_stage, "candidate_count": len(candidate_records)})
+    trace["events"].append({
+        "stage": "synthesis",
+        "agent": "hypothesis_synthesizer",
+        "candidate_count": len(candidate_records),
+    })
     trace_path.parent.mkdir(parents=True, exist_ok=True)
     trace_path.write_text(json.dumps(trace, indent=2))
     return trace
