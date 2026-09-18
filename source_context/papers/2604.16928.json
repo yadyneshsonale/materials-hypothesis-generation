@@ -1,0 +1,1373 @@
+{
+  "paper_id": "2604.16928",
+  "passages": [
+    {
+      "passage_id": "passage:a7303ce4c5334e8a",
+      "paper_id": "2604.16928",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 0,
+      "text": "Correlation-Converged Virtual Orbitals for Accurate and Efficient Quantum\nMolecular Simulations\nQian Wang,1, \u2217Calvin Ku,2, 1, \u2217Jyh-Pin Chou,3, 4 Peng-Jen Chen,1, \u2020 Alice Hu,1, 5, \u2021 and Min-Hsiu Hsieh2, \u00a7\n1Department of Mechanical Engineering, City University of Hong Kong, Kowloon, Hong Kong 999077, China\n2Hon Hai Research Institute, Taipei, Taiwan\n3Graduate School of Advanced Technology, National Taiwan University, Taipei 10617, Taiwan\n4Physics Division, National Center for Theoretical Sciences,\nNational Taiwan University, Taipei 106319, Taiwan\n5Department of Material Science and Engineering,\nCity University of Hong Kong, Kowloon, Hong Kong 999077, China\narXiv:2604.16928v1  [physics.chem-ph]  18 Apr 2026\nDensity functional theory with plane-wave basis sets is widely employed in computational materi-\nals science, including applications to isolated molecular systems. However, the inadequate descrip-\ntion of electron correlation remains a fundamental limitation. Accurate correlation treatments based\non many-body Hamiltonians require reliable representations of both occupied and virtual orbitals,\nyet virtual orbitals are often poorly described in conventional computational schemes, resulting in\nreduced accuracy. In this work, we introduce localized correlation-converged virtual orbitals (LC-\nCVOs) as an efficient basis for constructing accurate many-body Hamiltonians in molecular systems.\nUsing a substantially reduced number of orbitals, the LCCVO framework yields dissociation ener-\ngies for singlet, doublet, and triplet molecules that are comparable to, and in many cases exceed,\nthose obtained with high-level correlation-consistent basis sets such as cc-pVXZ (X = D, T, Q, 5).\nThese results demonstrate the efficiency, scalability, and robustness of the LCCVO approach for\nhigh-accuracy quantum chemical calculations.",
+      "word_count": 243,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:84f829a8013bd1a3",
+      "paper_id": "2604.16928",
+      "section": "Introduction",
+      "section_index": 1,
+      "passage_index": 0,
+      "text": "The quantum many-body problem lies at the heart of\nelectronic structure theory and remains computationally\nchallenging, particularly for systems with strong elec-\ntronic correlations1. Quantum computing has been pro-\nposed as a potential route to overcome these limitations,\nwith numerous algorithms designed for future fault-\ntolerant hardware that utilize a variety of basis sets and\nquantizations schemes2\u20136.\nHowever, current and near-\nterm quantum implementations remains constrained by\na limited number of quantum bits (qubits), which in turn\nrestrict the size of available basis sets7.\nMost many-\nbody methods implemented on near-term devices rely\non second-quantized Hamiltonians using the molecular\norbital (MO) basis, where the accuracy is strictly bottle-\nnecked by the steep hardware cost required to represent\nmany-electron wavefunctions in a finite basis7,8.\nAs a\nresult, quantum chemistry calculations are typically lim-\nited to minimal Gaussian basis sets, which are compu-\ntationally efficient but often lack quantitative reliability.\nWhile higher-level basis sets provide systematic conver-\ngence, their rapidly growing orbital spaces render them\nimpractical for near-term quantum devices9.\nPlane-wave (PW) basis sets offer systematic conver-\ngence and a structured Hamiltonian that is particu-\nlarly attractive from an algorithmic perspective. How-\never, many-body Hamiltonians constructed from PW-\nderived eigenstates, such as Kohn-Sham (KS) orbitals\n\u2217These authors contributed equally to this work.\n\u2020 pjchen1015@gmail.com\n\u2021 alicehu@cityu.edu.hk\n\u00a7 min-hsiu.hsieh@foxconn.com\nobtained from density functional theory (DFT), often\nyield poor results even for simple molecules due to highly\ndelocalized virtual orbitals that weakly couple to oc-\ncupied states, leading to inefficient recovery of correla-\ntion energy10. Previous efforts, such as the correlation-\noptimized virtual orbital (COVO) method, demonstrated\nimproved performance for small, spin-unpolarized sys-\ntems but suffer from limited scalability and poor appli-\ncability to larger or spin-polarized molecules10,11.\nIn this work,\nwe introduce localized correlation-\nconverged virtual orbitals (LCCVOs), a plane-wave-\nbased framework that preserves orbital localization while\nsystematically improving the description of correlation\nenergy.\nBy optimizing virtual orbitals with respect to",
+      "word_count": 318,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:9c4d01e1de8ddb75",
+      "paper_id": "2604.16928",
+      "section": "Introduction",
+      "section_index": 1,
+      "passage_index": 1,
+      "text": "energy.\nBy optimizing virtual orbitals with respect to\ntheir interactions with occupied states, LCCVOs form\ncompact active spaces that significantly reduce the num-\nber of orbitals required for accurate many-body calcu-\nlations, with advantages that become increasingly pro-\nnounced for larger molecular systems. In addition, ex-\ntrapolation to the complete basis set (CBS) limit and\ncorrection of the finite size effect are adopted.",
+      "word_count": 63,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:a84bb7f9480ce589",
+      "paper_id": "2604.16928",
+      "section": "Results",
+      "section_index": 2,
+      "passage_index": 0,
+      "text": "The PW-derived LCCVO method is applied to inves-\ntigate several molecules, including singlet (closed-shell\nH2 and N2 molecules and open-shell C2 molecule), dou-\nblet (CN), and triplet (O2) molecules. For comparison\nwith experimental dissociation energies D0, measured\nzero-point energy (ZPE) of each molecule is subtracted\nfrom the calculated electronic dissociation energy De:\nD0 = De \u2212ZPE12\u201319. As listed in Table I, it is apparent\nthat the equilibrium bond length is insensitive to the ba-\nsis set. Nonetheless, the dissociation energy show strong",
+      "word_count": 82,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:1a4e948d9540f578",
+      "paper_id": "2604.16928",
+      "section": "Results",
+      "section_index": 2,
+      "passage_index": 1,
+      "text": "TABLE I. The ground state energies of diatomic molecules using different basis-sets along with the number of orbitals N orb\nused. Equilibrium bond length (Re) and dissociation energy (D0) are displayed in \u02daAand eV, respectively. The error in D0 is\nrepresented in percentages.",
+      "word_count": 43,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": [
+        "table:95a81f8303f6baf5"
+      ]
+    },
+    {
+      "passage_id": "passage:c167636a92024eec",
+      "paper_id": "2604.16928",
+      "section": "Method",
+      "section_index": 3,
+      "passage_index": 0,
+      "text": "N orb\nRe\nE0\nerror in D0\nN orb\nRe\nE0\nerror in D0\nH2 (ZPE = 0.270 eV)\nN2 (ZPE = 0.146 eV)\nLCCVO\n15\n0.735\n4.73\n\u22120.70\n40\n1.100\n9.69\n\u22122.20\nSTO-3G\n2\n0.735\n5.31\n11.79\n10\n1.100\n5.59\n\u221243.59\n6-31G\n4\n0.746\n4.22\n\u221211.16\n18\n1.200\n6.62\n\u221233.20\ncc-pVDZ\n10\n0.760\n4.49\n\u22125.47\n28\n1.110\n8.19\n\u221217.36\ncc-pVTZ\n28\n0.743\n4.70\n\u22121.05\n60\n1.110\n8.94\n\u22129.79\ncc-pVQZ\n60\n0.742\n4.73\n\u22120.42\n110\n1.110\n9.26\n\u22126.56\ncc-pV5Z\n110\n0.742\n4.74\n\u22120.21\n182\n1.110\n9.37\n\u22125.45\nCBS-limit\n\u2013\n\u2013\n4.75\n0.00\n\u2013\n\u2013\n9.43\n\u22124.84\nExperiment\n\u2013\n0.741\n4.7512\n\u2013\n\u2013\n1.110\n9.9113,14\n\u2013\nO2 (ZPE = 0.098 eV)\nCN (ZPE = 0.128 eV)\nLCCVO\n50\n1.200\n4.99\n\u22124.32\n40\n1.200\n7.42\n\u22125.74\nSTO-3G\n10\n1.280\n2.50\n\u221252.11\n10\n1.200\n5.41\n\u221231.26\n6-31G\n18\n1.270\n2.64\n\u221249.43\n18\n1.200\n5.54\n\u221229.61\ncc-pVDZ\n28\n1.210\n3.97\n\u221223.95\n28\n1.170\n6.33\n\u221219.57\ncc-pVTZ\n60\n1.190\n4.47\n\u221214.37\n60\n1.160\n6.93\n\u221211.94\ncc-pVQZ\n110\n1.190\n4.69\n\u221210.15\n110\n1.160\n7.19\n\u22128.64\ncc-pV5Z\n182\n1.190\n4.77\n\u22128.62\n182\n1.160\n7.28\n\u22127.50\nCBS-limit\n\u2013\n\u2013\n4.82\n\u22127.66\n\u2013\n\u2013\n7.32\n\u22126.99\nExperiment\n\u2013\n1.210\n5.2214,15\n\u2013\n\u2013\n1.170\n7.8716,17\n\u2013\nC2 (ZPE = 0.115 eV)\nLCCVO\n40\n1.250\n5.53\n\u221213.85\nSTO-3G\n10\n1.250\n5.33\n\u221216.98\n6-31G\n18\n1.250\n4.74\n\u221226.17\ncc-pVDZ\n28\n1.270\n4.79\n\u221225.39\ncc-pVTZ\n60\n1.270\n5.20\n\u221219.00\ncc-pVQZ\n110\n1.240\n5.37\n\u221216.36\ncc-pV5Z\n182\n1.240\n5.43\n\u221215.42\nCBS-limit\n\u2013\n\u2013\n5.46\n\u221214.95\nExperiment\n\u2013\n1.243\n6.4214,16,18\n\u2013\ndependence on the basis set. Although STO-3G and 6-\n31G basis sets require few orbitals for calculations, they\nyield unsatisfactory dissociation energies for the simplest\nmolecule H2, let alone for more complex molecules such\nas N2.\nThe use of the cc-pVXZ bases enhances the\naccuracy at the cost of increasing number of required\norbitals, with acceptable results obtained using the cc-\npVQZ or cc-pV5Z bases. However, the large number of\nrequired orbitals makes the calculations inefficient and\nalmost prohibits the application of near-term quantum\ncomputing to solve the problem. On the contrary, our\nLCCVO framework gives accurate dissociation energies\nwith a moderate number of required orbitals. It is worth-\nwhile to mention that the dissociation energies obtained\nby LCCVO are more accurate than that from cc-pVQZ\nand cc-pV5Z, except for the case of H2 where the latter\ntwo yield slightly higher accuracy. The advantage of the\nLCCVO framework becomes pronounced for molecules\ncontaining more electrons. For instance, the error in dis-\nsociation energy of N2 is only \u22122.20%, surpassing the cc-",
+      "word_count": 417,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:784a834acb3daf33",
+      "paper_id": "2604.16928",
+      "section": "Method",
+      "section_index": 3,
+      "passage_index": 1,
+      "text": "containing more electrons. For instance, the error in dis-\nsociation energy of N2 is only \u22122.20%, surpassing the cc-\npV5Z basis and even the extrapolated-CBS limit derived\n2\nfrom the cc-pVXZ basis-sets.\nThe total energy versus\natomic distance is shown in Supplementary Figures 1-3.\nMoreover, LCCVO can also be used to study open-\nshell molecules, in contrast to the original COVO method\nwhich only considers closed-shell molecules. As Table I\nshows, the dissociation energies of triplet O2 and doublet\nCN from LCCVO are in good agreement with the exper-\nimental values. LCCVO also performs better than both\nthe large cc-pV5Z basis and the extrapolated-CBS limit,\nwith fewer number of required orbitals. At the end, we\nalso apply our method to the singlet C2 molecule. Al-\nthough some people consider the singlet ground state of\nC2 to be closed-shell, it behaves differently from typical\nclosed-shell molecules. Despite obtaining the best calcu-\nlated dissociation energies compared with experimental\nvalues, the error of the LCCVO method still exceeds 10%\nas shown in Table I. The relatively poor dissociation en-\nergy results of this unstable C2 molecule is discussed in\nSupplementary Note 1.",
+      "word_count": 189,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:484346e672751643",
+      "paper_id": "2604.16928",
+      "section": "Discussion",
+      "section_index": 4,
+      "passage_index": 0,
+      "text": "In pioneering works that employ quantum computing al-\ngorithms to study molecular properties, simple basis sets\n(such as STO-3G and 6-31G) are commonly adopted to\nconstruct the many-body Hamiltonians, which can be\nsolved using either real quantum hardware or quantum\nsimulators. However, the resulting dissociation energies\nare often unsatisfactory, even for the H2 molecule. Al-\nthough the error, which is approximately 18%, is known\nto originate from the use of a minimal basis set, employ-\ning higher-level basis sets to improve the accuracy is im-\npractical due to the limited number of available qubits.\nThis limitation motivates the development of a numer-\nical scheme that can effectively interface with quantum\ncomputing algorithms while preserving quantitative ac-\ncuracy. Since the commonly adopted basis sets are rel-\natively inflexible, we instead focus on a PW-based ap-\nproach.\nFor this purpose, the first step is to identify the ori-\ngin of the inaccurate total energies obtained from many-\nbody Hamiltonians constructed using PW-derived or-\nbitals.\nWhile dissociation energies computed directly\nfrom DFT are reasonably accurate, the corresponding\nmany-body calculations based on the KS orbitals yield\npoor results. This discrepancy stems from the fact that\nvirtual orbitals produced by DFT calculations are not\nexplicitly optimized for correlation effects due to the\ndensity-dependent nature of DFT20. Furthermore, those\nvirtual orbitals often include artificial vacuum states\nfor isolated systems that require an explicit vacuum re-\ngions21. Detailed analysis reveals that this issue is closely\nrelated to the delocalization of certain virtual orbitals.\nSince molecular virtual orbitals should be intrinsically\nlocalized, the presence of such delocalized orbitals repre-\nsents an artifact inherent to the plane-wave basis, which\nmust be eliminated to achieve high accuracy. At the same\ntime, the proposed numerical scheme must remain com-\nputationally efficient.\nIn light of the above issues, we propose a quantum\ncomputational framework that incorporate the concept of\nCOVOs with an improved correlation-optimization pro-\ncedure, together with the extrapolation to the CBS limit\nand correction of the finite size effect, called LCCVO.\nThis approach yields improved molecular orbitals and\nenhances the fidelity of the resulting many-body Hamil-",
+      "word_count": 346,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:11c037936d202f8a",
+      "paper_id": "2604.16928",
+      "section": "Discussion",
+      "section_index": 4,
+      "passage_index": 1,
+      "text": "This approach yields improved molecular orbitals and\nenhances the fidelity of the resulting many-body Hamil-\ntonians, enabling accurate determination of dissociation\nenergies for both spin-unpolarized and spin-polarized\nmolecular systems.\nThe calculated results show excel-\nlent agreement with experimental data, while requiring\nsignificantly fewer orbitals. These findings highlight the\ncritical role of basis-set design in quantum computational\nchemistry.\nThe LCCVO framework achieves accuracy\ncomparable to that of classical high-level basis sets while\ndemanding substantially fewer quantum resources. As a\nresult, it provides a scalable route toward simulations of\nlarger and more complex molecular systems on near-term\nquantum hardware. Its close agreement with experimen-\ntal values further underscores its reliability for practical\n3\napplications.\nFigure 1 compares the spatial distributions of 35\nvirtual orbitals of N2 obtained with and without our\nLCCVO framework. The virtual orbitals under LCCVO\nare clearly centred around the N2 molecule, whereas the\nvirtual orbitals obtained directly from DFT are strongly\nmixed with the vacuum states, except for a few low-\nenergy orbitals.\nUnder these circumstances, correla-\ntion effects are expected to be poorly captured without\nLCCVO. The improved performance of the LCCVO may\nbe attributed to their enhanced ability to extract corre-\nlation effects from orbitals that would otherwise be ei-\nther weakly coupled or contaminated by vacuum char-\nacter. These observations are consistent with previous\nbenchmarks demonstrating the superiority of LCCVOs\nin systems characterized by strong correlation and com-\nplex orbital behaviours. Overall, the results highlight the\nmethodological advantage of LCCVOs in accurately de-\nscribing correlation energy contributions associated with\nvirtual orbitals. The bar chart in Supplementary Figure\n4 compares the correlation energies obtained with and\nwithout LCCVO for different numbers of virtual orbitals,\nwhere the LCCVO method recovers substantially more\ncorrelation energies, indicating a more effective treatment\nof electron correlation.\nFurthermore, a closer examination of the results sum-\nmarized in Table I shows that most dissociation energies\nare slightly underestimated, indicating that correlation\nenergy is not yet fully recovered. We attribute this resid-",
+      "word_count": 328,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:2073415a87fcfcff",
+      "paper_id": "2604.16928",
+      "section": "Discussion",
+      "section_index": 4,
+      "passage_index": 2,
+      "text": "are slightly underestimated, indicating that correlation\nenergy is not yet fully recovered. We attribute this resid-\nual error primarily to the use of CCSD for total energy\ncalculations and expect that the inclusion of higher-order\nexcitations, such as CCSDT, or the use of full configura-\ntion interaction would further improve accuracy. Basis-\nset extrapolation, discussed in Supplementary Informa-\ntion, may also contribute to the remaining discrepancy,\nalthough its effect is expected to be minor.",
+      "word_count": 74,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:9f26c9b02e40c73a",
+      "paper_id": "2604.16928",
+      "section": "Conclusion",
+      "section_index": 5,
+      "passage_index": 0,
+      "text": "In this work, we present a framework for constructing\naccurate many-body Hamiltonians for molecular systems\nusing LCCVOs. By systematically improving the repre-\nsentation of virtual orbital spaces, the LCCVO approach\novercomes a key limitation of conventional electronic-\nstructure schemes, in which inadequately described un-\noccupied states lead to poor correlation treatments. We\ndemonstrate that, with a substantially reduced num-\nber of orbitals, the resulting many-body Hamiltonians\nyield dissociation energies for both closed- and open-\nshell molecules that are comparable to, or even exceed,\nthose obtained using large correlation-consistent basis\nsets.\nThese results highlight the efficiency, scalability,\nand robustness of the LCCVO framework, offering a prac-\ntical route toward high-accuracy quantum chemical cal-\nculations with reduced computational cost. Extension of\nthis approach to periodic systems with explicit k-point\nsampling will be an important direction for future work.",
+      "word_count": 136,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:028bae9ec0302f96",
+      "paper_id": "2604.16928",
+      "section": "Conclusion",
+      "section_index": 5,
+      "passage_index": 1,
+      "text": "FIG. 1.\nSpatial distribution of LCCVOs and virtual Kohn-Sham orbitals of N2. Comparison shows that the artificial vacuum\nstates are effectively eliminated in the LCCVOs, resulting in virtual orbitals (orbitals 7-35) that are centred around the molecule.",
+      "word_count": 37,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:7801917474a8c856",
+      "paper_id": "2604.16928",
+      "section": "Methods",
+      "section_index": 6,
+      "passage_index": 0,
+      "text": "Plane-Wave Many-Body Hamiltonian and Second\nQuantization\nMotivated by Bloch\u2019s theorem, PWs can be seen as\na grid basis in momentum space22. By expanding the\none-electron KS wavefunctions \u03d5\u03c3,nk(x) in terms of Bloch\nstates, the molecular orbitals are represented as\n\u03d5\u03c3,nk(x) = eik\u00b7x\nX\nc\u03c3,nk(G)eiG\u00b7x,\n(1)\n\u221a\n\u2126\nG\nwhere \u03c3 \u2208{\u2191, \u2193} indicates the spin projection (spin-up\nor spin-down), n the band index, k the wave vector, \u2126\nthe volume of the primitive cell, G the reciprocal lattice\nvectors, and c\u03c3,nk(G) the coefficients of the PWs describ-\ning the wavefunction. As we focus on molecular systems\n(k = \u0393) in this study, we omit k hereafter.\nThe PW basis set is limited to a sphere in recipro-\ncal space, with radius |Gmax| satisfying 1\n2|Gmax|2 \u2264Ecut\nwhere Ecut is the cut-off energy. This framework enables\ngranular control over the basis-set size via Ecut, allowing\nsystematic convergence of the ground-state energy.\nIn\ncontrast, Gaussian-type orbitals offer less flexibility, as\ntheir basis-set expansion relies on discrete function forms\nwith fixed increments in basis-set sizes.\nGiven a set of molecular orbitals for each of the studied\nspecies, the electronic Hamiltonian in second-quantized\nform is described as the following\nM\nX\nM\nX\npaq + 1\nhpqa\u2020\nhpqrsa\u2020\npa\u2020\nH =\nqaras.\n(2)\n2\npq\npqrs\nHere, hpq represents the one-electron integrals, which has\ncontributions from the electron\u2019s kinetic energies and the\n4\nelectron-ion pseudopotential energies, while hpqrs repre-\nsents the two-electron integrals, which accounts for the\nelectron-electron Coulombic interactions.\nConvention-\nally, the Hartree-Fock (HF) states are used as the basis\nto compute hpq and hpqrs. Recently, the PW basis set\nhas been used to construct the one-electron wavefunc-\ntions, on top of which the many-body Hamiltonian can\nbe solved by methods such as FCI, CC, M\u00f8ller-Plesset\nperturbation theory. While the PW basis set is mostly\nadopted for the periodic systems, it can also be useful\nfor molecular systems due to the granular control of the\nbasis-set error23 and lack of basis-set superposition error.\nFurthermore, Kohn-Sham (KS) states obtained via DFT\ncalculations can also be used instead of the HF states,\nwhich may serve as a better single-particle basis to con-\nstruct the many-body Hamiltonian due to the partial in-\nclusion of electron correlation in the KS wavefunction.\nCorrelation-Optimized Virtual Orbitals and",
+      "word_count": 378,
+      "claim_ids": [
+        "2604.16928::prior_approach::0",
+        "2604.16928::prior_approach::1",
+        "2604.16928::rejected_alternative::0",
+        "2604.16928::inspiration_source::0",
+        "2604.16928::mechanism_principle::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:94d6dd75079d23a3",
+      "paper_id": "2604.16928",
+      "section": "Methods",
+      "section_index": 6,
+      "passage_index": 1,
+      "text": "clusion of electron correlation in the KS wavefunction.\nCorrelation-Optimized Virtual Orbitals and\nLocalized Correlation Converged Virtual Orbitals\nPerforming many-body calculations of isolated systems\nusing the plane-wave basis requires additional consider-\nations. Due the periodic nature of plane-waves, spurious\ninteractions with the periodic images of the molecules\nmay be inadvertently introduced. While this is typically\nremedied by including a large vacuum region between the\nperiodic images, the uniform nature of the plane-waves\ntreats the isolated molecule and the vacuum region on\nan equal footing.\nAs a result, PW-based DFT calcu-\nlations will yield unoccupied electronic states with sig-\nnificant contributions from the vacuum region, including\npure vacuum states and mixed vacuum-molecule states",
+      "word_count": 111,
+      "claim_ids": [
+        "2604.16928::problem_motivation::0",
+        "2604.16928::causal_claim::0",
+        "2604.16928::causal_claim::1",
+        "2604.16928::mechanism_principle::1"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:c8ea8c0defe2d039",
+      "paper_id": "2604.16928",
+      "section": "Methods",
+      "section_index": 6,
+      "passage_index": 2,
+      "text": "(referred to as partial vacuum states hereafter). The in-\nclusion of such vacuum states considerably reduces the\ncorrelation energies captured in many-body calculations.\nTo address this issue, the concept of COVOs was pro-\nposed.\nIn the original COVO method, the KS virtual\norbitals are initially sorted in ascending KS orbital ener-\ngies. Using these as an initial guess, new virtual orbitals\nare then obtained by optimizing the correlation energies\nof a very small active space consisting of only the highest\noccupied orbital and the single target virtual orbital10.\nDespite the use of a minuscule active space, the COVO\nmethod has proven its success in capturing significant\ncorrelation energies, although its accuracy is often sacri-\nficed.\nAnother important issue in quantum molecular com-\nputation is the determination of active space. Due to lim-\nited computational resources, it is impossible to utilize a\ntruly complete basis set. Therefore, one has to compro-\nmise between accuracy and computational efficiency. It\nis especially so when using PW-based DFT calculations\nwhere much more unoccupied virtual orbitals can be ob-\ntained compared to an equivalent calculation using an\natom-centred basis-set. While simply sorting the virtual\norbitals by their KS orbital energies has proved reason-\nably successful for the original COVO method11, virtual\norbitals considered in this manner may not have signif-\nicant correlation energies, making it an inaccurate and\ninefficient basis.\nWe introduced LCCVOs, derived from the same PW-\nbased DFT calculations, to address these issues. As men-\ntioned previously, the pure and partial vacuum states\nmay cause problems during correlation energy optimiza-\ntion. Thus when constructing the LCCVOs, we include\nthe KS states in an energy-ascending manner and discard\nthose with insignificant contributions to the correlation\nenergy obtained by a CCSD calculation. We demonstrate\nthe LCCVO algorithm on several molecules, including\nsinglet, doublet, and triplet molecules such as H2, O2,\nCN, N2, and C2 (see Supplementary algorithms 1 and\n2). To evaluate the dissociation energies, the LCCVO\ncalculations are also performed on the H, C, O, and N\natoms, and the resulting molecular dissociation energies\nare compared with experimental values to assess the ac-\ncuracy of our method.\nThe results reproduce the ex-",
+      "word_count": 358,
+      "claim_ids": [
+        "2604.16928::problem_motivation::0",
+        "2604.16928::prior_approach::2",
+        "2604.16928::prior_approach::2",
+        "2604.16928::prior_approach::2",
+        "2604.16928::prior_limitation::0",
+        "2604.16928::prior_limitation::0",
+        "2604.16928::causal_claim::2",
+        "2604.16928::causal_claim::3",
+        "2604.16928::mechanism_principle::2",
+        "2604.16928::hypothesis_statement::0",
+        "2604.16928::evidence_result::0",
+        "2604.16928::constraint::0",
+        "2604.16928::constraint::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:891c3ed1dba820ef",
+      "paper_id": "2604.16928",
+      "section": "Methods",
+      "section_index": 6,
+      "passage_index": 3,
+      "text": "curacy of our method.\nThe results reproduce the ex-\npected O(1/N orb) error scaling with respect to the num-\nber of orbitals N orb (see Supplementary Figure 5). Re-\nmarkably, our method reduces the number of required\nspatial orbitals from 110\u2013182 (using cc-pV5Z) to only\n[1] D. S. Abrams and S. Lloyd, Simulation of many-body\nfermi systems on a universal quantum computer, Physical\nReview Letters 79, 2586 (1997).\n[2] C. Ku, Y.-C. Chen, A. Hu, and M.-H. Hsieh, Optimizing\nquantum chemistry simulations with a hybrid quantiza-\ntion scheme, Communications Physics 10.1038/s42005-\n026-02577-9 (2026).\n5\n15\u201350, while maintaining (and sometimes surpassing) the\naccuracy of the much larger basis sets. Therefore, out\nmethod allows for more flexibility in the choice of N orb\nand achieves comparable correlation energy recovery with\nsubstantially fewer orbitals.\nComputational Methods\nAll the DFT calculation of the molecular systems are\nperformed using the Quantum ESPRESSO24,25 software\npackage, using the norm-conserving ONCV26 pseudopo-\ntential with a wavefunction cutoff of 80 Ry.\nThe re-\nsulting Kohn-Sham wavefunctions are then used as an\ninitial guess for the LCCVO method, implemented ac-\ncording to Supplementary Algorithms 1 and 2, with\nPySCF27,28 used to perform the required CCSD calcu-\nlations. To account for finite size effects inherent in the\nplane-wave basis, each calculation is performed using a\nseries of simple cubic simulation cells with edge lengths\nof L = 10 \u02daA, 12 \u02daA, 14 \u02daA, 16 \u02daA and 18 \u02daA, and the final\nenergy is obtained by extrapolating the results to L = \u221e\n(see Supplementary Figure 6). We also benchmarked our\nresults against CBS extrapolations derived from the cc-\npVXZ (X = T, Q, 5)29\u201331 bases. For these basis sets,\nCCSD calculations are performed on a classical computer\nusing the PySCF code27,28.",
+      "word_count": 290,
+      "claim_ids": [
+        "2604.16928::causal_claim::4",
+        "2604.16928::evidence_result::1",
+        "2604.16928::evidence_result::2",
+        "2604.16928::constraint::1"
+      ],
+      "citation_ids": [
+        "citation:ec341dffcc46dc4d",
+        "citation:7e3d1ce35ccbc74b"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:7135b2c61355ddf3",
+      "paper_id": "2604.16928",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 0,
+      "text": "A.H. gratefully acknowledges the sponsorship from Na-\ntional Natural Science Foundation of China (NSFC)\n(Grant No. 62541160274), City University of Hong Kong\n(Project No.\n7006103), CityU Seed Fund in Micro-\nelectronics (Project No.\n9229135), and Hon Hai Re-\nsearch Institute (Project No. 9231594, 9239182). This\nwork was carried out using the computational facilities,\nCityU Burgundy, managed and provided by the Com-\nputing Services Centre at City University of Hong Kong\n(https://www.cityu.edu.hk).\nAUTHOR CONTRIBUTIONS\nQ.W. and C.K. contributed equally to this work. The\nproject was conceived by P.C., J.C., A.H., and M.H. Soft-\nware development and numerical simulations were per-\nformed by Q.W. and C.K. Analysis of the data was per-\nformed by Q.W., P.C., and J.C. All authors participated\nin the discussion and approved the final manuscript.\n[3] D. W. Berry, C. Gidney, M. Motta, J. R. McClean, and\nR. Babbush, Qubitization of Arbitrary Basis Quantum\nChemistry Leveraging Sparsity and Low Rank Factoriza-\ntion, Quantum 3, 208 (2019).\n[4] V. Von Burg, G. H. Low, T. H\u00a8aner, D. S. Steiger, M. Rei-\nher, M. Roetteler, and M. Troyer, Quantum computing\nenhanced computational catalysis, Physical Review Re-",
+      "word_count": 186,
+      "claim_ids": [],
+      "citation_ids": [
+        "citation:e3ac2185d6d9989e",
+        "citation:e4faed28ae8e7f83"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:1fc52159551d4143",
+      "paper_id": "2604.16928",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 1,
+      "text": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-",
+      "word_count": 376,
+      "claim_ids": [],
+      "citation_ids": [
+        "citation:bb71706f1538de9e",
+        "citation:499c690f4a839165",
+        "citation:2dc305cf7343a1b7",
+        "citation:fa2143302ed48105",
+        "citation:7a03a6b57cb119bf",
+        "citation:b5574f21a83168e0",
+        "citation:5df4737b298a5ea0",
+        "citation:1626a8c34e2daa4a",
+        "citation:1967ac66d76b7851",
+        "citation:46f74e2c95f594eb",
+        "citation:b9291d301077e1c0",
+        "citation:e0b680c3f02a1344",
+        "citation:1d7355670ac423fb"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:151cf4882e314e26",
+      "paper_id": "2604.16928",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 2,
+      "text": "ical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-\ntion of the cyanogen radical, Journal of Physical Chem-\nistry 96, 425 (1992).\n[18] P. Su, J. Wu, J. Gu, W. Wu, S. Shaik, and P. C. Hiberty,\nBonding conundrums in the C2 molecule: A valence bond\nstudy, Journal of Chemical Theory and Computation 7,\n121 (2011).\n[19] J. D. D. Martin and J. W. Hepburn, Electric field in-\nduced dissociation of molecules in rydberg-like highly vi-\nbrationally excited ion-pair states, Physical Review Let-\nters 79, 3154 (1997).\n[20] A. J. Cohen, P. Mori-S\u00b4anchez, and W. Yang, Fractional\nspins and static correlation error in density functional\ntheory, Journal of Chemical Physics 129, 121104 (2008).\n[21] M. G. Medvedev, I. S. Bushmarinov, J. Sun, J. P.\nPerdew, and K. A. Lyssenko, Density functional theory\n6\nis straying from the path toward the exact functional,\nScience 355, 49 (2017).\n[22] G. Grosso and G. Pastori Parravicini, Solid State Physics\n(Academic Press, San Diego, 2000).\n[23] M. Qiu, Z. Zhang, Z. Zhang, Y. Lin, Y. Li, J. Yang, and\nW. Hu, Improved correlation optimized virtual orbital al-\ngorithm for plane-wave full configuration interaction cal-\nculations, Journal of Chemical Theory and Computation\n21, 6559 (2025).\n[24] P. Giannozzi, S. Baroni, N. Bonini, M. Calandra, R. Car,\nC. Cavazzoni, D. Ceresoli, G. L. Chiarotti, M. Cococ-\ncioni, I. Dabo, A. D. Corso, S. de Gironcoli, S. Fabris,\nG. Fratesi, R. Gebauer, U. Gerstmann, C. Gougoussis,\nA. Kokalj, M. Lazzeri, L. Martin-Samos, N. Marzari,\nF. Mauri, R. Mazzarello, S. Paolini, A. Pasquarello,\nL. Paulatto, C. Sbraccia, S. Scandolo, G. Sclauzero, A. P.\nSeitsonen, A. Smogunov, P. Umari, and R. M. Wentz-\ncovitch, QUANTUM ESPRESSO: A modular and open-\nsource software project for quantum simulations of mate-\nrials, Journal of Physics: Condensed Matter 21, 395502\n(2009).\n[25] P. Giannozzi, O. Andreussi, T. Brumme, O. Bunau,\nM. B. Nardelli, M. Calandra, R. Car, C. Cavazzoni,\nD. Ceresoli, M. Cococcioni, N. Colonna, I. Carnimeo,\nA. D. Corso, S. de Gironcoli, P. Delugas, R. A. DiStasio,\nA. Ferretti, A. Floris, G. Fratesi, G. Fugallo, R. Gebauer,\nU. Gerstmann, F. Giustino, T. Gorni, J. Jia, M. Kawa-\nmura, H.-Y. Ko, A. Kokalj, E. K\u00a8u\u00b8c\u00a8ukbenli, M. Lazzeri,\nM. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,",
+      "word_count": 391,
+      "claim_ids": [],
+      "citation_ids": [
+        "citation:6c998dedb1de26a7",
+        "citation:6f1e6fd9698fb049",
+        "citation:9a8e5d072d2a113c",
+        "citation:8f5fd4738355cb8d",
+        "citation:59a90ae3601a3552",
+        "citation:def2eb7e5f258188",
+        "citation:5e79b91aac21cc62",
+        "citation:d10b6ad17e23ffe4",
+        "citation:3a74b7479a6f389b"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:d93b2a9fc2095cf9",
+      "paper_id": "2604.16928",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 3,
+      "text": "M. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,\nD. Rocca, R. Sabatini, B. Santra, M. Schlipf, A. P. Seitso-\nnen, A. Smogunov, I. Timrov, T. Thonhauser, P. Umari,\nN. Vast, X. Wu, and S. Baroni, Advanced capabilities for\nmaterials modelling with Quantum ESPRESSO, Journal\nof Physics: Condensed Matter 29, 465901 (2017).\n[26] D. R. Hamann, Optimized norm-conserving Vanderbilt\npseudopotentials, Physical Review B 88, 085117 (2013).\n[27] Q. Sun, X. Zhang, S. Banerjee, P. Bao, M. Barbry, N. S.\nBlunt, N. A. Bogdanov, G. H. Booth, J. Chen, Z.-H.\nCui, J. J. Eriksen, Y. Gao, S. Guo, J. Hermann, M. R.\nHermes, K. Koh, P. Koval, S. Lehtola, Z. Li, J. Liu,\nN. Mardirossian, J. D. McClain, M. Motta, B. Mussard,\nH. Q. Pham, A. Pulkin, W. Purwanto, P. J. Robin-\nson, E. Ronca, E. R. Sayfutyarova, M. Scheurer, H. F.\nSchurkus, J. E. T. Smith, C. Sun, S.-N. Sun, S. Upad-\nhyay, L. K. Wagner, X. Wang, A. White, J. D. Whitfield,\nM. J. Williamson, S. Wouters, J. Yang, J. M. Yu, T. Zhu,\nT. C. Berkelbach, S. Sharma, A. Y. Sokolov, and G. K.-\nL. Chan, Recent developments in the PySCF program\npackage, The Journal of Chemical Physics 153, 024109\n(2020).\n[28] Q. Sun, T. C. Berkelbach, N. S. Blunt, G. H. Booth,\nS. Guo, Z. Li, J. Liu, J. D. McClain, E. R. Sayfut-\nyarova, S. Sharma, S. Wouters, and G. K.-L. Chan,\nPySCF: The python-based simulations of chemistry\nframework, WIREs Computational Molecular Science 8,\ne1340 (2018).\n[29] A. Halkier, T. Helgaker, P. J\u00f8rgensen, W. Klopper, and\nJ. Olsen, Basis-set convergence of the energy in molecu-\nlar Hartree\u2013Fock calculations, Chemical Physics Letters\n302, 437 (1999).\n[30] K. A. Peterson, R. A. Kendall, and T. H. Dunning,\nBenchmark calculations with correlated molecular wave\nfunctions. II. Configuration interaction calculations on",
+      "word_count": 310,
+      "claim_ids": [],
+      "citation_ids": [
+        "citation:dc1c761969fd1af7",
+        "citation:a961aa933d2acdf9",
+        "citation:59f12e597eae1214",
+        "citation:25d0288756423d59",
+        "citation:2611aeb62cb1776f"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:a0005929f2094329",
+      "paper_id": "2604.16928",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 4,
+      "text": "first row diatomic hydrides, The Journal of Chemical\nPhysics 99, 1930 (1993).\n[31] K. A. Peterson and T. H. Dunning, Intrinsic errors in\nseveral ab initio methods: The dissociation energy of N2,\nThe Journal of Physical Chemistry 99, 3898 (1995).\n7",
+      "word_count": 41,
+      "claim_ids": [],
+      "citation_ids": [
+        "citation:747027a860484a91"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:e2e04815f3a07a82",
+      "paper_id": "2604.16928",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 5,
+      "text": "SUPPLEMENTARY NOTE 1: REMARKS ON THE DISSOCIATION ENERGY OF C2\nAs mentioned in the main text, the error in the dissociation energy of C2 exceeds 10% when using the proposed\nPW-derived LCCVO approach. Although this deviation remains unsatisfactory in absolute terms, it is important to\nemphasize that the present method still yields the smallest error among all approaches considered in this study. Since\nthe same framework provides reliable results for open-shell systems such as triplet O2 and the doublet CN radical,\nthe open-shell character of C2 is unlikely to be the dominant source of error.\nInstead, the discrepancy may be partly attributed to the uncertainty associated with experimental methods. In\npractice, C2 is typically generated under conditions where weak interactions with surrounding species or transient\nenvironments cannot be completely eliminated. Even subtle perturbations may influence its geometric and electronic\nstructures, which in turn affect the experimentally inferred dissociation energy. Additional ambiguity is reflected in\nthe determination of the ground-state electronic structure of C2. Although it is commonly assigned as a singlet X1\u03a3+\ng\nstate in experiments, its characterization is known to be highly sensitive, suggesting that subtle factors may influence\nthe interpretation of experimental observations.\nTaken together, these considerations indicate that the relatively large error in the dissociation energy is unlikely\nto arise solely from the LCCVO method itself, but may also be related to the intrinsic difficulty in establishing a\ndefinitive experimental reference for C2. Therefore, the present results should be interpreted in the context of this\ninherent uncertainty.\nSUPPLEMENTARY FIGURES\n\u2022 Supplementary Figure 1: The total energies as a function of interatomic distance using LCCVO for singlet state\nsystems, along with comparisons of dissociation energies with atom-centred bases.\n\u2022 Supplementary Figure 2: The total energies as a function of interatomic distance using LCCVO for doublet\nstate systems, along with comparisons of dissociation energies with atom-centred bases.\n\u2022 Supplementary Figure 3: The total energies as a function of interatomic distance using LCCVO for triplet state\nsystems, along with comparisons of dissociation energies with atom-centred bases.",
+      "word_count": 336,
+      "claim_ids": [
+        "2604.16928::prior_limitation::1",
+        "2604.16928::causal_claim::5",
+        "2604.16928::mechanism_principle::3",
+        "2604.16928::mechanism_principle::4",
+        "2604.16928::hypothesis_statement::1",
+        "2604.16928::evidence_result::0",
+        "2604.16928::constraint::2"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:7c2858df29760513",
+      "paper_id": "2604.16928",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 6,
+      "text": "\u2022 Supplementary Figure 3: The total energies as a function of interatomic distance using LCCVO for triplet state\nsystems, along with comparisons of dissociation energies with atom-centred bases.\n\u2022 Supplementary Figure 4: Bar chart comparing the correlation energies obtained with and without LCCVO.\n\u2022 Supplementary Figure 5: Plot of CCSD energies of the N2 system with varying numbers of LCCVOs, illustrating\nthe O(1/N) relationship between CCSD energies and the number of LCCVOs.\n\u2022 Supplementary Figure 6: Plot of CCSD energies of the N2 system with varying cell parameters, illustrating the\nO(1/L) relationship between the CCSD energies and the cell parameters.\n1",
+      "word_count": 101,
+      "claim_ids": [
+        "2604.16928::evidence_result::1",
+        "2604.16928::evidence_result::3",
+        "2604.16928::evidence_result::4"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:9b37a63d983b2d4b",
+      "paper_id": "2604.16928",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 7,
+      "text": "(a)\n(b)\n(c)\n(d)\n(e)\n(f)\nSupplementary Figure 1.\nThe total energies as a function of interatomic distance using LCCVO for singlet state systems,\nalong with comparisons of dissociation energies with atom-centred bases. (a), (c), and (e) shows the LCCVO total energies of\nH2, N2, and C2, respectively. (b), (d), and (f) shows the LCCVO dissociation energies De at the equilibrium bond lengths,\ncomparing it against various atom-centred basis-sets for H2, N2, and C2, respectively. The blue dashed line shows the CBS\nlimit value of the cc-pVXZ basis-sets.\n2",
+      "word_count": 89,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:e5ee26d376d171bc",
+      "paper_id": "2604.16928",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 8,
+      "text": "(a)\n(b)\nSupplementary Figure 2.\nThe total energies as a function of interatomic distance using LCCVO for doublet state systems,\nalong with comparisons of dissociation energies with atom-centred bases. (a) shows the LCCVO total energies of CN. (b) shows\nthe LCCVO dissociation energies De at the equilibrium bond lengths, comparing it against various atom-centred basis-sets for\nCN. The blue dashed line shows the extrapolated energies of the cc-pVXZ basis-sets.\n(a)\n(b)\nSupplementary Figure 3.\nThe total energies as a function of interatomic distance using LCCVO for triplet state systems,\nalong with comparisons of dissociation energies with atom-centred bases. (a) shows the LCCVO total energies of O2. (b) shows\nthe LCCVO dissociation energies De at the equilibrium bond lengths, comparing it against various atom-centred basis-sets for\nO2. The blue dashed line shows the extrapolated energies of the cc-pVXZ basis-sets.\n3",
+      "word_count": 139,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:ac97b12f027b6619",
+      "paper_id": "2604.16928",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 9,
+      "text": "1\n3\n5\n7\n9\n11\n13\n15\n17\n19\n21\n23\n25\n27\n29\n31\n33\n35\nVirtual Orbital Index\n0\n2\nCorrelation Energy (eV)\n4\n6\n8\n10\n12\nSupplementary Figure 4.\nBar chart comparing the correlation energies obtained with and without LCCVO. This was performed\nfor the N2 system using 1\u201335 virtual orbitals at its equilibrium bond lengths of 1.10 \u02daA using a cubic simulation cell of 16 \u02daA side\nlength.\n502\n504\n506\n508\nCCSD Energy (eV)\n510\n512\n514\n516\n518\n520\n1/5\n1/10\n1/20\n1/40\nN 1\nSupplementary Figure 5.\nPlot of CCSD energies of the N2 system with varying numbers of LCCVOs, illustrating the O(1/N)\nrelationship between CCSD energies and the number of LCCVOs. The y-axis represents the CCSD energies, while the x-axis is\nthe reciprocal of the number of spatial orbitals. The dotted line shows the O(1/N) energy scaling for calculations larger than\n16 LCCVOs.\n4\nWith LCCVO\nWithout LCCVO",
+      "word_count": 158,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:f5449f18603849ca",
+      "paper_id": "2604.16928",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 10,
+      "text": "516\n518\n520\nCCSD Energy (eV)\n522\n524\n526\n528\n530\n532\n1/10\n1/12\n1/14\n1/16\n1/18\nL 1\nSupplementary Figure 6.\nPlot of CCSD energies of the N2 system with varying cell parameters, illustrating the O(1/L)\nrelationship between the CCSD energies and the cell parameters. The y-axis represents the CCSD energies, while the x-axis\nis the reciprocal of the cell parameters. The dotted line shows the extrapolation process that take advantage of this energy\nscaling, using the energy at L = \u221e.\n5",
+      "word_count": 84,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:bc417d5d75f8b1c2",
+      "paper_id": "2604.16928",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 11,
+      "text": "SUPPLEMENTARY ALGORITHMS\n\u2022 Supplementary Algorithm 1: Pseudocode to obtain a single LCCVO \u02c6\u03c8N+t for the singlet state system.\n\u2022 Supplementary Algorithm 2: Pseudocode to obtain a single LCCVO \u02c6\u03c8(\u03c3,N+t) (\u03c3 =\u2191, \u2193) for the doublet and\ntriplet state system.\nSupplementary Algorithm 1 Pseudocode to obtain a single LCCVO \u02c6\u03c8N+t for the singlet state system.\n1: Input:\n\u2022 Initial virtual orbitals: \u03c8N+t\n\u2022 Occupied orbitals: \u03c81, \u03c82, . . . , \u03c8N\u22121, \u03c8N\n\u2022 Previously generated virtual orbitals: \u02c6\u03c8N+1, \u02c6\u03c8N+2, . . . , \u02c6\u03c8N+(t\u22121)\n\u2022 Convergence thresholds: \u03f51, \u03f52\n\u2022 Maximum iterations: M\n2: Output: Optimized orbital \u02c6\u03c8N+t\n3: Construct set S:\nS = {\u03c81, \u03c82, . . . , \u03c8N\u22121, \u03c8N, \u02c6\u03c8N+1, \u02c6\u03c8N+2, . . . , \u02c6\u03c8N+(t\u22121)}\n4: Initialize iteration counter k \u21900, error error 1 \u2190\u221e, error 2 \u2190\u221e, learning rate \u03b3 \u2190\u03b30\n5: while (error 1 > \u03f51 or error 2 > \u03f52) and k < M do\n6:\nOrthogonalize and normalize \u03c8k\nN+t with respect to all orbitals in S\n7:\nConstruct HCCSD for 2N-electron system with N + t spatial orbitals (\u03c8N+t and S)\n8:\nCompute gradient:\n\u2202Ek\nCCSD\n\u2202\u03c8k\n9:\nUpdate parameters:\nN+t \u2212\u03b3 \u2202Ek\nN+t \u2190\u03c8k\n\u03c8k+1\n10:\nCompute new energy error: error 1 \u2190Ek+1\nCCSD \u2212Ek\nCCSD\n11:\nCompute new wavefunction error: error 2 \u2190\n\u03c8k+1\nN+t \u2212\u03c8k\n12:\nif Ek+1\nCCSD > Ek\nCCSD then\n13:\nReduce learning rate: \u03b3 \u2190\u03b3/2\n14:\nReset descent counter: consecutive descent \u21900\n15:\ncontinue\n16:\nelse\n17:\nconsecutive descent \u2190consecutive descent + 1\n18:\nif consecutive descent > 5 then\n19:\nSlightly increase learning rate: \u03b3 \u2190\u03b3 \u00d7 1.1\n20:\nend if\n21:\nend if\n22:\nIncrement iteration counter: k \u2190k + 1\n23: end while\n24: Orthogonalize and normalize \u03c8N+t with respect to all orbitals in S\n25: return optimized orbital \u02c6\u03c8N+t\n6\nN+t\nCCSD\n\u2202\u03c8k\nN+t\nN+t",
+      "word_count": 305,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:3c80e4f7b645aabe",
+      "paper_id": "2604.16928",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 12,
+      "text": "Supplementary Algorithm 2 Pseudocode to obtain a single LCCVO \u02c6\u03c8(\u03c3,N+t) (\u03c3 =\u2191, \u2193) for the doublet and triplet\nstate system. We assume N + 1 spin-up occupied orbitals and N \u22121 spin-down occupied orbitals for this example.\n1: Input:\n\u2022 Initial virtual orbitals: \u03c8(\u2191,N+t), \u03c8(\u2193,N+t)\n\u2022 Occupied orbitals: \u03c8(\u2191,1), \u03c8(\u2193,1), \u03c8(\u2191,2), \u03c8(\u2193,2), . . . , \u03c8(\u2191,N\u22121), \u03c8(\u2193,N\u22121), \u03c8(\u2191,N), \u03c8(\u2191,N+1)\n\u2022 Previously generated virtual orbitals: \u02c6\u03c8(\u2193,N), \u02c6\u03c8(\u2193,N+1), \u02c6\u03c8(\u2193,N+2), \u02c6\u03c8(\u2193,N+2), . . . , \u02c6\u03c8(\u2191,N+t\u22121), \u02c6\u03c8(\u2193,N+t\u22121)\n\u2022 Convergence thresholds: \u03f51, \u03f52\n\u2022 Maximum iterations: M\n2: Output: Optimized orbitals \u02c6\u03c8(\u2191,N+t) and \u02c6\u03c8(\u2193,N+t)\n3: Construct set S:\nS = {\u03c8(\u2191,1), \u03c8(\u2193,1), \u03c8(\u2191,2), \u03c8(\u2193,2), . . . , \u03c8(\u2191,N\u22121), \u03c8(\u2193,N\u22121), \u03c8(\u2191,N), \u03c8(\u2191,N+1),\n\u02c6\u03c8(\u2193,N), \u02c6\u03c8(\u2193,N+1), \u02c6\u03c8(\u2191,N+2), \u02c6\u03c8(\u2193,N+2), . . . , \u02c6\u03c8(\u2191,N+t\u22121), \u02c6\u03c8(\u2193,N+t\u22121)}\n4: Initialize iteration counter k \u21900, error error 1 \u2190\u221e, error 2 \u2190\u221e, learning rate \u03b3 \u2190\u03b30\n5: while (error 1 > \u03f51 or error 2 > \u03f52) and k < M do\n6:\nOrthogonalize and normalize \u03c8k\n(\u2191,N+t) and \u03c8k\n(\u2193,N+t) with respect to all orbitals in S\n7:\nConstruct HCCSD for (2N \u22121)-electron system with 2(N + t) spin orbitals (\u03c8(\u2191,N+t), \u03c8(\u2193,N+t) and S)\n8:\nCompute gradients:\nand\n\u2202Ek\n\u2202Ek\nCCSD\n\u2202\u03c8k\n(\u2191,N+t)\n9:\nUpdate parameters:\n(\u2191,N+t) \u2212\u03b3 \u2202Ek\n\u03c8k+1\n(\u2191,N+t) \u2190\u03c8k\n(\u2193,N+t) \u2212\u03b3 \u2202Ek\n\u03c8k+1\n(\u2193,N+t) \u2190\u03c8k\n10:\nCompute new energy error: error 1 \u2190Ek+1\nCCSD \u2212Ek\nCCSD\n11:\nCompute new wavefunction error: error 2 \u2190max\n\u2225\u03c8k+1\n(\u2191,N+t) \u2212\u03c8k\n\u0000\n12:\nif Ek+1\nCCSD > Ek\nCCSD then\n13:\nReduce learning rate: \u03b3 \u2190\u03b3/2;\n14:\nReset descent counter: consecutive descent \u21900\n15:\ncontinue\n16:\nelse\n17:\nconsecutive descent \u2190consecutive descent + 1\n18:\nif consecutive descent > 5 then\n19:\nSlightly increase learning rate: \u03b3 \u2190\u03b3 \u00d7 1.1\n20:\nend if\n21:\nend if\n22:\nIncrement iteration counter: k \u2190k + 1\n23: end while\n24: Orthogonalize and normalize \u03d5(\u2191,N+t) and \u03d5(\u2193,N+t) with respect to all orbitals in S\n25: return optimized orbitals \u02c6\u03c8(\u2191,N+t) and \u02c6\u03c8(\u2193,N+t)\n7\nCCSD\n\u2202\u03c8k\n(\u2193,N+t)\nCCSD\n\u2202\u03c8k\n(\u2191,N+t)\nCCSD\n\u2202\u03c8k\n(\u2193,N+t)\n(\u2191,N+t)\u2225, \u2225\u03c8k+1\n(\u2193,N+t) \u2212\u03c8k\n\u0001\n(\u2193,N+t)\u2225",
+      "word_count": 334,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    }
+  ],
+  "references": [
+    {
+      "reference_id": "reference:747f1cf848a44048",
+      "paper_id": "2604.16928",
+      "reference_number": "1",
+      "raw_text": "D. S. Abrams and S. Lloyd, Simulation of many-body fermi systems on a universal quantum computer, Physical Review Letters 79, 2586 (1997).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:0dcdd1791b763f62",
+      "paper_id": "2604.16928",
+      "reference_number": "2",
+      "raw_text": "C. Ku, Y.-C. Chen, A. Hu, and M.-H. Hsieh, Optimizing quantum chemistry simulations with a hybrid quantiza- tion scheme, Communications Physics 10.1038/s42005- 026-02577-9 (2026). 5 15\u201350, while maintaining (and sometimes surpassing) the accuracy of the much larger basis sets. Therefore, out method allows for more flexibility in the choice of N orb and achieves comparable correlation energy recovery with substantially fewer orbitals. Computational Methods All the DFT calculation of the molecular systems are performed using the Quantum ESPRESSO24,25 software package, using the norm-conserving ONCV26 pseudopo- tential with a wavefunction cutoff of 80 Ry. The re- sulting Kohn-Sham wavefunctions are then used as an initial guess for the LCCVO method, implemented ac- cording to Supplementary Algorithms 1 and 2, with PySCF27,28 used to perform the required CCSD calcu- lations. To account for finite size effects inherent in the plane-wave basis, each calculation is performed using a series of simple cubic simulation cells with edge lengths of L = 10 \u02daA, 12 \u02daA, 14 \u02daA, 16 \u02daA and 18 \u02daA, and the final energy is obtained by extrapolating the results to L = \u221e (see Supplementary Figure 6). We also benchmarked our results against CBS extrapolations derived from the cc- pVXZ (X = T, Q, 5)29\u201331 bases. For these basis sets, CCSD calculations are performed on a classical computer using the PySCF code27,28. ACKNOWLEDGEMENTS A.H. gratefully acknowledges the sponsorship from Na- tional Natural Science Foundation of China (NSFC) (Grant No. 62541160274), City University of Hong Kong (Project No. 7006103), CityU Seed Fund in Micro- electronics (Project No. 9229135), and Hon Hai Re- search Institute (Project No. 9231594, 9239182). This work was carried out using the computational facilities, CityU Burgundy, managed and provided by the Com- puting Services Centre at City University of Hong Kong (https://www.cityu.edu.hk). AUTHOR CONTRIBUTIONS Q.W. and C.K. contributed equally to this work. The project was conceived by P.C., J.C., A.H., and M.H. Soft- ware development and numerical simulations were per- formed by Q.W. and C.K. Analysis of the data was per- formed by Q.W., P.C., and J.C. All authors participated in the discussion and approved the final manuscript.",
+      "doi": "10.1038/s42005-",
+      "arxiv_id": "",
+      "resolution_status": "identifier_available"
+    },
+    {
+      "reference_id": "reference:d63e87e627eaa076",
+      "paper_id": "2604.16928",
+      "reference_number": "3",
+      "raw_text": "D. W. Berry, C. Gidney, M. Motta, J. R. McClean, and R. Babbush, Qubitization of Arbitrary Basis Quantum Chemistry Leveraging Sparsity and Low Rank Factoriza- tion, Quantum 3, 208 (2019).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:cbfa21c3a57df288",
+      "paper_id": "2604.16928",
+      "reference_number": "4",
+      "raw_text": "V. Von Burg, G. H. Low, T. H\u00a8aner, D. S. Steiger, M. Rei- her, M. Roetteler, and M. Troyer, Quantum computing enhanced computational catalysis, Physical Review Re-",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:530e363abbe62ce9",
+      "paper_id": "2604.16928",
+      "reference_number": "5",
+      "raw_text": "J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc- Clean, N. Wiebe, and R. Babbush, Even More Efficient Quantum Computations of Chemistry Through Tensor Hypercontraction, PRX Quantum 2, 030305 (2021).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:a7936bda9cb102ce",
+      "paper_id": "2604.16928",
+      "reference_number": "6",
+      "raw_text": "T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson, R. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of chemistry in first quantization with any basis set, npj Quantum Information 11, 55 (2025).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:17abdc08e4ba0f2d",
+      "paper_id": "2604.16928",
+      "reference_number": "7",
+      "raw_text": "B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan, Quantum algorithms for quantum chemistry and quan- tum materials science, Chemical Reviews 120, 12685 (2020).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:3cbe96edf01e1e32",
+      "paper_id": "2604.16928",
+      "reference_number": "8",
+      "raw_text": "J. Preskill, Quantum computing in the NISQ era and beyond, Quantum 2, 79 (2018).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:a53a98dccb89ff0c",
+      "paper_id": "2604.16928",
+      "reference_number": "9",
+      "raw_text": "T. H. Dunning, Jr., Gaussian basis sets for use in corre- lated molecular calculations. I. The atoms boron through neon and hydrogen, Journal of Chemical Physics 90, 1007 (1989).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:9b91bc2c632b3676",
+      "paper_id": "2604.16928",
+      "reference_number": "10",
+      "raw_text": "D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng, C. Granade, K. M. Rosso, G. H. Low, M. Roetteler, K. Kowalski, and E. J. Bylaska, Periodic plane-wave elec- tronic structure calculations on quantum computers, Ma- terials Theory 7, 2 (2023).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:f52144772d3ba5c3",
+      "paper_id": "2604.16928",
+      "reference_number": "11",
+      "raw_text": "E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal- ski, D. Claudino, and T. S. Humble, Quantum solvers for plane-wave hamiltonians: Abridging virtual spaces through the optimization of pairwise correlations, Fron- tiers in Chemistry 9, 603019 (2021).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:2d4943393bbdef2c",
+      "paper_id": "2604.16928",
+      "reference_number": "12",
+      "raw_text": "G. Herzberg, The dissociation energy of the hydrogen molecule, Journal of Molecular Spectroscopy 33, 147 (1970).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:4a59cbb02f9ee3bd",
+      "paper_id": "2604.16928",
+      "reference_number": "13",
+      "raw_text": "L. Lu, P. Jiang, and H. Gao, Observation of continuum state dissociation enables the determination of N2 bond dissociation energy to spectroscopic accuracy, Journal of Physical Chemistry Letters 14, 10974 (2023).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:ce67bd9e9b39a2af",
+      "paper_id": "2604.16928",
+      "reference_number": "14",
+      "raw_text": "L. Bytautas and K. Ruedenberg, Correlation energy ex- trapolation by intrinsic scaling. IV. Accurate binding en- ergies of the homonuclear diatomic molecules carbon, ni- trogen, oxygen, and fluorine, Journal of Chemical Physics 122, 154110 (2005).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:e94b50593754175d",
+      "paper_id": "2604.16928",
+      "reference_number": "15",
+      "raw_text": "P. Wang, S. Gong, and Y. Mo, Bond dissociation energy of O2 measured by fully state-to-state resolved threshold fragment yield spectra, Journal of Chemical Physics 160, 164302 (2024).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:517eee8f609d2653",
+      "paper_id": "2604.16928",
+      "reference_number": "16",
+      "raw_text": "A. D. Pradhan, H. Partridge, and C. W. Bauschlicher, The dissociation energy of CN and C2, Journal of Chem- ical Physics 101, 3857 (1994).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:98f51b849a9973c1",
+      "paper_id": "2604.16928",
+      "reference_number": "17",
+      "raw_text": "Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma- tion of the cyanogen radical, Journal of Physical Chem- istry 96, 425 (1992).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:4609ae8142074239",
+      "paper_id": "2604.16928",
+      "reference_number": "18",
+      "raw_text": "P. Su, J. Wu, J. Gu, W. Wu, S. Shaik, and P. C. Hiberty, Bonding conundrums in the C2 molecule: A valence bond study, Journal of Chemical Theory and Computation 7, 121 (2011).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:dbce687fde09e549",
+      "paper_id": "2604.16928",
+      "reference_number": "19",
+      "raw_text": "J. D. D. Martin and J. W. Hepburn, Electric field in- duced dissociation of molecules in rydberg-like highly vi- brationally excited ion-pair states, Physical Review Let- ters 79, 3154 (1997).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:191851ff6760bab9",
+      "paper_id": "2604.16928",
+      "reference_number": "20",
+      "raw_text": "A. J. Cohen, P. Mori-S\u00b4anchez, and W. Yang, Fractional spins and static correlation error in density functional theory, Journal of Chemical Physics 129, 121104 (2008).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:3987029e55575de3",
+      "paper_id": "2604.16928",
+      "reference_number": "21",
+      "raw_text": "M. G. Medvedev, I. S. Bushmarinov, J. Sun, J. P. Perdew, and K. A. Lyssenko, Density functional theory 6 is straying from the path toward the exact functional, Science 355, 49 (2017).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:7869e0d40b6ab89e",
+      "paper_id": "2604.16928",
+      "reference_number": "22",
+      "raw_text": "G. Grosso and G. Pastori Parravicini, Solid State Physics (Academic Press, San Diego, 2000).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:5e494571bcdb202a",
+      "paper_id": "2604.16928",
+      "reference_number": "23",
+      "raw_text": "M. Qiu, Z. Zhang, Z. Zhang, Y. Lin, Y. Li, J. Yang, and W. Hu, Improved correlation optimized virtual orbital al- gorithm for plane-wave full configuration interaction cal- culations, Journal of Chemical Theory and Computation 21, 6559 (2025).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:671d769a190818bd",
+      "paper_id": "2604.16928",
+      "reference_number": "24",
+      "raw_text": "P. Giannozzi, S. Baroni, N. Bonini, M. Calandra, R. Car, C. Cavazzoni, D. Ceresoli, G. L. Chiarotti, M. Cococ- cioni, I. Dabo, A. D. Corso, S. de Gironcoli, S. Fabris, G. Fratesi, R. Gebauer, U. Gerstmann, C. Gougoussis, A. Kokalj, M. Lazzeri, L. Martin-Samos, N. Marzari, F. Mauri, R. Mazzarello, S. Paolini, A. Pasquarello, L. Paulatto, C. Sbraccia, S. Scandolo, G. Sclauzero, A. P. Seitsonen, A. Smogunov, P. Umari, and R. M. Wentz- covitch, QUANTUM ESPRESSO: A modular and open- source software project for quantum simulations of mate- rials, Journal of Physics: Condensed Matter 21, 395502 (2009).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:9978eb950669b277",
+      "paper_id": "2604.16928",
+      "reference_number": "25",
+      "raw_text": "P. Giannozzi, O. Andreussi, T. Brumme, O. Bunau, M. B. Nardelli, M. Calandra, R. Car, C. Cavazzoni, D. Ceresoli, M. Cococcioni, N. Colonna, I. Carnimeo, A. D. Corso, S. de Gironcoli, P. Delugas, R. A. DiStasio, A. Ferretti, A. Floris, G. Fratesi, G. Fugallo, R. Gebauer, U. Gerstmann, F. Giustino, T. Gorni, J. Jia, M. Kawa- mura, H.-Y. Ko, A. Kokalj, E. K\u00a8u\u00b8c\u00a8ukbenli, M. Lazzeri, M. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.- V. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e, D. Rocca, R. Sabatini, B. Santra, M. Schlipf, A. P. Seitso- nen, A. Smogunov, I. Timrov, T. Thonhauser, P. Umari, N. Vast, X. Wu, and S. Baroni, Advanced capabilities for materials modelling with Quantum ESPRESSO, Journal of Physics: Condensed Matter 29, 465901 (2017).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:9362f7ddffbb0344",
+      "paper_id": "2604.16928",
+      "reference_number": "26",
+      "raw_text": "D. R. Hamann, Optimized norm-conserving Vanderbilt pseudopotentials, Physical Review B 88, 085117 (2013).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:8be16d4750deb3f2",
+      "paper_id": "2604.16928",
+      "reference_number": "27",
+      "raw_text": "Q. Sun, X. Zhang, S. Banerjee, P. Bao, M. Barbry, N. S. Blunt, N. A. Bogdanov, G. H. Booth, J. Chen, Z.-H. Cui, J. J. Eriksen, Y. Gao, S. Guo, J. Hermann, M. R. Hermes, K. Koh, P. Koval, S. Lehtola, Z. Li, J. Liu, N. Mardirossian, J. D. McClain, M. Motta, B. Mussard, H. Q. Pham, A. Pulkin, W. Purwanto, P. J. Robin- son, E. Ronca, E. R. Sayfutyarova, M. Scheurer, H. F. Schurkus, J. E. T. Smith, C. Sun, S.-N. Sun, S. Upad- hyay, L. K. Wagner, X. Wang, A. White, J. D. Whitfield, M. J. Williamson, S. Wouters, J. Yang, J. M. Yu, T. Zhu, T. C. Berkelbach, S. Sharma, A. Y. Sokolov, and G. K.- L. Chan, Recent developments in the PySCF program package, The Journal of Chemical Physics 153, 024109 (2020).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:f65002ed9c0d8149",
+      "paper_id": "2604.16928",
+      "reference_number": "28",
+      "raw_text": "Q. Sun, T. C. Berkelbach, N. S. Blunt, G. H. Booth, S. Guo, Z. Li, J. Liu, J. D. McClain, E. R. Sayfut- yarova, S. Sharma, S. Wouters, and G. K.-L. Chan, PySCF: The python-based simulations of chemistry framework, WIREs Computational Molecular Science 8, e1340 (2018).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:f68149ce46b309ba",
+      "paper_id": "2604.16928",
+      "reference_number": "29",
+      "raw_text": "A. Halkier, T. Helgaker, P. J\u00f8rgensen, W. Klopper, and J. Olsen, Basis-set convergence of the energy in molecu- lar Hartree\u2013Fock calculations, Chemical Physics Letters 302, 437 (1999).",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:0c61761ef9dc36f3",
+      "paper_id": "2604.16928",
+      "reference_number": "30",
+      "raw_text": "K. A. Peterson, R. A. Kendall, and T. H. Dunning, Benchmark calculations with correlated molecular wave functions. II. Configuration interaction calculations on",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:668e5806ec8eced8",
+      "paper_id": "2604.16928",
+      "reference_number": "31",
+      "raw_text": "K. A. Peterson and T. H. Dunning, Intrinsic errors in several ab initio methods: The dissociation energy of N2, The Journal of Physical Chemistry 99, 3898 (1995). 7",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    }
+  ],
+  "citation_mentions": [
+    {
+      "citation_id": "citation:ec341dffcc46dc4d",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:891c3ed1dba820ef",
+      "reference_id": "reference:747f1cf848a44048",
+      "reference_number": "1",
+      "mention_text": "[1]",
+      "context": "curacy of our method.\nThe results reproduce the ex-\npected O(1/N orb) error scaling with respect to the num-\nber of orbitals N orb (see Supplementary Figure 5). Re-\nmarkably, our method reduces the number of required\nspatial orbitals from 110\u2013182 (using cc-pV5Z) to only\n[1] D. S. Abrams and S. Lloyd, Simulation of many-body\nfermi systems on a universal quantum computer, Physical\nReview Letters 79, 2586 (1997).\n[2] C. Ku, Y.-C. Chen, A. Hu, and M.-H. Hsieh, Optimizing\nquantum chemistry simulations with a hybrid quantiza-\ntion scheme, Communications Physics 10.1038/s42005-\n026-02577-9 (2026).\n5\n15\u201350, while maintaining (and sometimes surpassing) the\naccuracy of the much larger basis sets. Therefore, out\nmethod allows for more flexibility in the choice of N orb\nand achieves comparable correlation energy recovery with\nsubstantially fewer orbitals.\nComputational Methods\nAll the DFT calculation of the molecular systems are\nperformed using the Quantum ESPRESSO24,25 software\npackage, using the norm-conserving ONCV26 pseudopo-\ntential with a wavefunction cutoff of 80 Ry.\nThe re-\nsulting Kohn-Sham wavefunctions are then used as an\ninitial guess for the LCCVO method, implemented ac-\ncording to Supplementary Algorithms 1 and 2, with\nPySCF27,28 used to perform the required CCSD calcu-\nlations. To account for finite size effects inherent in the\nplane-wave basis, each calculation is performed using a\nseries of simple cubic simulation cells with edge lengths\nof L = 10 \u02daA, 12 \u02daA, 14 \u02daA, 16 \u02daA and 18 \u02daA, and the final\nenergy is obtained by extrapolating the results to L = \u221e\n(see Supplementary Figure 6). We also benchmarked our\nresults against CBS extrapolations derived from the cc-\npVXZ (X = T, Q, 5)29\u201331 bases. For these basis sets,\nCCSD calculations are performed on a classical computer\nusing the PySCF code27,28."
+    },
+    {
+      "citation_id": "citation:7e3d1ce35ccbc74b",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:891c3ed1dba820ef",
+      "reference_id": "reference:0dcdd1791b763f62",
+      "reference_number": "2",
+      "mention_text": "[2]",
+      "context": "curacy of our method.\nThe results reproduce the ex-\npected O(1/N orb) error scaling with respect to the num-\nber of orbitals N orb (see Supplementary Figure 5). Re-\nmarkably, our method reduces the number of required\nspatial orbitals from 110\u2013182 (using cc-pV5Z) to only\n[1] D. S. Abrams and S. Lloyd, Simulation of many-body\nfermi systems on a universal quantum computer, Physical\nReview Letters 79, 2586 (1997).\n[2] C. Ku, Y.-C. Chen, A. Hu, and M.-H. Hsieh, Optimizing\nquantum chemistry simulations with a hybrid quantiza-\ntion scheme, Communications Physics 10.1038/s42005-\n026-02577-9 (2026).\n5\n15\u201350, while maintaining (and sometimes surpassing) the\naccuracy of the much larger basis sets. Therefore, out\nmethod allows for more flexibility in the choice of N orb\nand achieves comparable correlation energy recovery with\nsubstantially fewer orbitals.\nComputational Methods\nAll the DFT calculation of the molecular systems are\nperformed using the Quantum ESPRESSO24,25 software\npackage, using the norm-conserving ONCV26 pseudopo-\ntential with a wavefunction cutoff of 80 Ry.\nThe re-\nsulting Kohn-Sham wavefunctions are then used as an\ninitial guess for the LCCVO method, implemented ac-\ncording to Supplementary Algorithms 1 and 2, with\nPySCF27,28 used to perform the required CCSD calcu-\nlations. To account for finite size effects inherent in the\nplane-wave basis, each calculation is performed using a\nseries of simple cubic simulation cells with edge lengths\nof L = 10 \u02daA, 12 \u02daA, 14 \u02daA, 16 \u02daA and 18 \u02daA, and the final\nenergy is obtained by extrapolating the results to L = \u221e\n(see Supplementary Figure 6). We also benchmarked our\nresults against CBS extrapolations derived from the cc-\npVXZ (X = T, Q, 5)29\u201331 bases. For these basis sets,\nCCSD calculations are performed on a classical computer\nusing the PySCF code27,28."
+    },
+    {
+      "citation_id": "citation:e3ac2185d6d9989e",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:7135b2c61355ddf3",
+      "reference_id": "reference:d63e87e627eaa076",
+      "reference_number": "3",
+      "mention_text": "[3]",
+      "context": "A.H. gratefully acknowledges the sponsorship from Na-\ntional Natural Science Foundation of China (NSFC)\n(Grant No. 62541160274), City University of Hong Kong\n(Project No.\n7006103), CityU Seed Fund in Micro-\nelectronics (Project No.\n9229135), and Hon Hai Re-\nsearch Institute (Project No. 9231594, 9239182). This\nwork was carried out using the computational facilities,\nCityU Burgundy, managed and provided by the Com-\nputing Services Centre at City University of Hong Kong\n(https://www.cityu.edu.hk).\nAUTHOR CONTRIBUTIONS\nQ.W. and C.K. contributed equally to this work. The\nproject was conceived by P.C., J.C., A.H., and M.H. Soft-\nware development and numerical simulations were per-\nformed by Q.W. and C.K. Analysis of the data was per-\nformed by Q.W., P.C., and J.C. All authors participated\nin the discussion and approved the final manuscript.\n[3] D. W. Berry, C. Gidney, M. Motta, J. R. McClean, and\nR. Babbush, Qubitization of Arbitrary Basis Quantum\nChemistry Leveraging Sparsity and Low Rank Factoriza-\ntion, Quantum 3, 208 (2019).\n[4] V. Von Burg, G. H. Low, T. H\u00a8aner, D. S. Steiger, M. Rei-\nher, M. Roetteler, and M. Troyer, Quantum computing\nenhanced computational catalysis, Physical Review Re-"
+    },
+    {
+      "citation_id": "citation:e4faed28ae8e7f83",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:7135b2c61355ddf3",
+      "reference_id": "reference:cbfa21c3a57df288",
+      "reference_number": "4",
+      "mention_text": "[4]",
+      "context": "A.H. gratefully acknowledges the sponsorship from Na-\ntional Natural Science Foundation of China (NSFC)\n(Grant No. 62541160274), City University of Hong Kong\n(Project No.\n7006103), CityU Seed Fund in Micro-\nelectronics (Project No.\n9229135), and Hon Hai Re-\nsearch Institute (Project No. 9231594, 9239182). This\nwork was carried out using the computational facilities,\nCityU Burgundy, managed and provided by the Com-\nputing Services Centre at City University of Hong Kong\n(https://www.cityu.edu.hk).\nAUTHOR CONTRIBUTIONS\nQ.W. and C.K. contributed equally to this work. The\nproject was conceived by P.C., J.C., A.H., and M.H. Soft-\nware development and numerical simulations were per-\nformed by Q.W. and C.K. Analysis of the data was per-\nformed by Q.W., P.C., and J.C. All authors participated\nin the discussion and approved the final manuscript.\n[3] D. W. Berry, C. Gidney, M. Motta, J. R. McClean, and\nR. Babbush, Qubitization of Arbitrary Basis Quantum\nChemistry Leveraging Sparsity and Low Rank Factoriza-\ntion, Quantum 3, 208 (2019).\n[4] V. Von Burg, G. H. Low, T. H\u00a8aner, D. S. Steiger, M. Rei-\nher, M. Roetteler, and M. Troyer, Quantum computing\nenhanced computational catalysis, Physical Review Re-"
+    },
+    {
+      "citation_id": "citation:bb71706f1538de9e",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:1fc52159551d4143",
+      "reference_id": "reference:530e363abbe62ce9",
+      "reference_number": "5",
+      "mention_text": "[5]",
+      "context": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-"
+    },
+    {
+      "citation_id": "citation:499c690f4a839165",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:1fc52159551d4143",
+      "reference_id": "reference:a7936bda9cb102ce",
+      "reference_number": "6",
+      "mention_text": "[6]",
+      "context": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-"
+    },
+    {
+      "citation_id": "citation:2dc305cf7343a1b7",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:1fc52159551d4143",
+      "reference_id": "reference:17abdc08e4ba0f2d",
+      "reference_number": "7",
+      "mention_text": "[7]",
+      "context": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-"
+    },
+    {
+      "citation_id": "citation:fa2143302ed48105",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:1fc52159551d4143",
+      "reference_id": "reference:3cbe96edf01e1e32",
+      "reference_number": "8",
+      "mention_text": "[8]",
+      "context": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-"
+    },
+    {
+      "citation_id": "citation:7a03a6b57cb119bf",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:1fc52159551d4143",
+      "reference_id": "reference:a53a98dccb89ff0c",
+      "reference_number": "9",
+      "mention_text": "[9]",
+      "context": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-"
+    },
+    {
+      "citation_id": "citation:b5574f21a83168e0",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:1fc52159551d4143",
+      "reference_id": "reference:9b91bc2c632b3676",
+      "reference_number": "10",
+      "mention_text": "[10]",
+      "context": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-"
+    },
+    {
+      "citation_id": "citation:5df4737b298a5ea0",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:1fc52159551d4143",
+      "reference_id": "reference:f52144772d3ba5c3",
+      "reference_number": "11",
+      "mention_text": "[11]",
+      "context": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-"
+    },
+    {
+      "citation_id": "citation:1626a8c34e2daa4a",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:1fc52159551d4143",
+      "reference_id": "reference:2d4943393bbdef2c",
+      "reference_number": "12",
+      "mention_text": "[12]",
+      "context": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-"
+    },
+    {
+      "citation_id": "citation:1967ac66d76b7851",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:1fc52159551d4143",
+      "reference_id": "reference:4a59cbb02f9ee3bd",
+      "reference_number": "13",
+      "mention_text": "[13]",
+      "context": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-"
+    },
+    {
+      "citation_id": "citation:46f74e2c95f594eb",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:1fc52159551d4143",
+      "reference_id": "reference:ce67bd9e9b39a2af",
+      "reference_number": "14",
+      "mention_text": "[14]",
+      "context": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-"
+    },
+    {
+      "citation_id": "citation:b9291d301077e1c0",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:1fc52159551d4143",
+      "reference_id": "reference:e94b50593754175d",
+      "reference_number": "15",
+      "mention_text": "[15]",
+      "context": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-"
+    },
+    {
+      "citation_id": "citation:e0b680c3f02a1344",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:1fc52159551d4143",
+      "reference_id": "reference:517eee8f609d2653",
+      "reference_number": "16",
+      "mention_text": "[16]",
+      "context": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-"
+    },
+    {
+      "citation_id": "citation:1d7355670ac423fb",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:1fc52159551d4143",
+      "reference_id": "reference:98f51b849a9973c1",
+      "reference_number": "17",
+      "mention_text": "[17]",
+      "context": "search 3, 033055 (2021).\n[5] J. Lee, D. W. Berry, C. Gidney, W. J. Huggins, J. R. Mc-\nClean, N. Wiebe, and R. Babbush, Even More Efficient\nQuantum Computations of Chemistry Through Tensor\nHypercontraction, PRX Quantum 2, 030305 (2021).\n[6] T. N. Georges, M. Bothe, C. S\u00a8underhauf, B. K. Berntson,\nR. Izs\u00b4ak, and A. V. Ivanov, Quantum simulations of\nchemistry in first quantization with any basis set, npj\nQuantum Information 11, 55 (2025).\n[7] B. Bauer, S. Bravyi, M. Motta, and G. K.-L. Chan,\nQuantum algorithms for quantum chemistry and quan-\ntum materials science, Chemical Reviews 120, 12685\n(2020).\n[8] J. Preskill, Quantum computing in the NISQ era and\nbeyond, Quantum 2, 79 (2018).\n[9] T. H. Dunning, Jr., Gaussian basis sets for use in corre-\nlated molecular calculations. I. The atoms boron through\nneon and hydrogen, Journal of Chemical Physics 90, 1007\n(1989).\n[10] D. Song, N. P. Bauman, G. Prawiroatmodjo, B. Peng,\nC. Granade, K. M. Rosso, G. H. Low, M. Roetteler,\nK. Kowalski, and E. J. Bylaska, Periodic plane-wave elec-\ntronic structure calculations on quantum computers, Ma-\nterials Theory 7, 2 (2023).\n[11] E. J. Bylaska, D. Song, N. P. Bauman, K. Kowal-\nski, D. Claudino, and T. S. Humble, Quantum solvers\nfor plane-wave hamiltonians: Abridging virtual spaces\nthrough the optimization of pairwise correlations, Fron-\ntiers in Chemistry 9, 603019 (2021).\n[12] G. Herzberg, The dissociation energy of the hydrogen\nmolecule, Journal of Molecular Spectroscopy 33, 147\n(1970).\n[13] L. Lu, P. Jiang, and H. Gao, Observation of continuum\nstate dissociation enables the determination of N2 bond\ndissociation energy to spectroscopic accuracy, Journal of\nPhysical Chemistry Letters 14, 10974 (2023).\n[14] L. Bytautas and K. Ruedenberg, Correlation energy ex-\ntrapolation by intrinsic scaling. IV. Accurate binding en-\nergies of the homonuclear diatomic molecules carbon, ni-\ntrogen, oxygen, and fluorine, Journal of Chemical Physics\n122, 154110 (2005).\n[15] P. Wang, S. Gong, and Y. Mo, Bond dissociation energy\nof O2 measured by fully state-to-state resolved threshold\nfragment yield spectra, Journal of Chemical Physics 160,\n164302 (2024).\n[16] A. D. Pradhan, H. Partridge, and C. W. Bauschlicher,\nThe dissociation energy of CN and C2, Journal of Chem-\nical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-"
+    },
+    {
+      "citation_id": "citation:6c998dedb1de26a7",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:151cf4882e314e26",
+      "reference_id": "reference:98f51b849a9973c1",
+      "reference_number": "17",
+      "mention_text": "[17]",
+      "context": "ical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-\ntion of the cyanogen radical, Journal of Physical Chem-\nistry 96, 425 (1992).\n[18] P. Su, J. Wu, J. Gu, W. Wu, S. Shaik, and P. C. Hiberty,\nBonding conundrums in the C2 molecule: A valence bond\nstudy, Journal of Chemical Theory and Computation 7,\n121 (2011).\n[19] J. D. D. Martin and J. W. Hepburn, Electric field in-\nduced dissociation of molecules in rydberg-like highly vi-\nbrationally excited ion-pair states, Physical Review Let-\nters 79, 3154 (1997).\n[20] A. J. Cohen, P. Mori-S\u00b4anchez, and W. Yang, Fractional\nspins and static correlation error in density functional\ntheory, Journal of Chemical Physics 129, 121104 (2008).\n[21] M. G. Medvedev, I. S. Bushmarinov, J. Sun, J. P.\nPerdew, and K. A. Lyssenko, Density functional theory\n6\nis straying from the path toward the exact functional,\nScience 355, 49 (2017).\n[22] G. Grosso and G. Pastori Parravicini, Solid State Physics\n(Academic Press, San Diego, 2000).\n[23] M. Qiu, Z. Zhang, Z. Zhang, Y. Lin, Y. Li, J. Yang, and\nW. Hu, Improved correlation optimized virtual orbital al-\ngorithm for plane-wave full configuration interaction cal-\nculations, Journal of Chemical Theory and Computation\n21, 6559 (2025).\n[24] P. Giannozzi, S. Baroni, N. Bonini, M. Calandra, R. Car,\nC. Cavazzoni, D. Ceresoli, G. L. Chiarotti, M. Cococ-\ncioni, I. Dabo, A. D. Corso, S. de Gironcoli, S. Fabris,\nG. Fratesi, R. Gebauer, U. Gerstmann, C. Gougoussis,\nA. Kokalj, M. Lazzeri, L. Martin-Samos, N. Marzari,\nF. Mauri, R. Mazzarello, S. Paolini, A. Pasquarello,\nL. Paulatto, C. Sbraccia, S. Scandolo, G. Sclauzero, A. P.\nSeitsonen, A. Smogunov, P. Umari, and R. M. Wentz-\ncovitch, QUANTUM ESPRESSO: A modular and open-\nsource software project for quantum simulations of mate-\nrials, Journal of Physics: Condensed Matter 21, 395502\n(2009).\n[25] P. Giannozzi, O. Andreussi, T. Brumme, O. Bunau,\nM. B. Nardelli, M. Calandra, R. Car, C. Cavazzoni,\nD. Ceresoli, M. Cococcioni, N. Colonna, I. Carnimeo,\nA. D. Corso, S. de Gironcoli, P. Delugas, R. A. DiStasio,\nA. Ferretti, A. Floris, G. Fratesi, G. Fugallo, R. Gebauer,\nU. Gerstmann, F. Giustino, T. Gorni, J. Jia, M. Kawa-\nmura, H.-Y. Ko, A. Kokalj, E. K\u00a8u\u00b8c\u00a8ukbenli, M. Lazzeri,\nM. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,"
+    },
+    {
+      "citation_id": "citation:6f1e6fd9698fb049",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:151cf4882e314e26",
+      "reference_id": "reference:4609ae8142074239",
+      "reference_number": "18",
+      "mention_text": "[18]",
+      "context": "ical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-\ntion of the cyanogen radical, Journal of Physical Chem-\nistry 96, 425 (1992).\n[18] P. Su, J. Wu, J. Gu, W. Wu, S. Shaik, and P. C. Hiberty,\nBonding conundrums in the C2 molecule: A valence bond\nstudy, Journal of Chemical Theory and Computation 7,\n121 (2011).\n[19] J. D. D. Martin and J. W. Hepburn, Electric field in-\nduced dissociation of molecules in rydberg-like highly vi-\nbrationally excited ion-pair states, Physical Review Let-\nters 79, 3154 (1997).\n[20] A. J. Cohen, P. Mori-S\u00b4anchez, and W. Yang, Fractional\nspins and static correlation error in density functional\ntheory, Journal of Chemical Physics 129, 121104 (2008).\n[21] M. G. Medvedev, I. S. Bushmarinov, J. Sun, J. P.\nPerdew, and K. A. Lyssenko, Density functional theory\n6\nis straying from the path toward the exact functional,\nScience 355, 49 (2017).\n[22] G. Grosso and G. Pastori Parravicini, Solid State Physics\n(Academic Press, San Diego, 2000).\n[23] M. Qiu, Z. Zhang, Z. Zhang, Y. Lin, Y. Li, J. Yang, and\nW. Hu, Improved correlation optimized virtual orbital al-\ngorithm for plane-wave full configuration interaction cal-\nculations, Journal of Chemical Theory and Computation\n21, 6559 (2025).\n[24] P. Giannozzi, S. Baroni, N. Bonini, M. Calandra, R. Car,\nC. Cavazzoni, D. Ceresoli, G. L. Chiarotti, M. Cococ-\ncioni, I. Dabo, A. D. Corso, S. de Gironcoli, S. Fabris,\nG. Fratesi, R. Gebauer, U. Gerstmann, C. Gougoussis,\nA. Kokalj, M. Lazzeri, L. Martin-Samos, N. Marzari,\nF. Mauri, R. Mazzarello, S. Paolini, A. Pasquarello,\nL. Paulatto, C. Sbraccia, S. Scandolo, G. Sclauzero, A. P.\nSeitsonen, A. Smogunov, P. Umari, and R. M. Wentz-\ncovitch, QUANTUM ESPRESSO: A modular and open-\nsource software project for quantum simulations of mate-\nrials, Journal of Physics: Condensed Matter 21, 395502\n(2009).\n[25] P. Giannozzi, O. Andreussi, T. Brumme, O. Bunau,\nM. B. Nardelli, M. Calandra, R. Car, C. Cavazzoni,\nD. Ceresoli, M. Cococcioni, N. Colonna, I. Carnimeo,\nA. D. Corso, S. de Gironcoli, P. Delugas, R. A. DiStasio,\nA. Ferretti, A. Floris, G. Fratesi, G. Fugallo, R. Gebauer,\nU. Gerstmann, F. Giustino, T. Gorni, J. Jia, M. Kawa-\nmura, H.-Y. Ko, A. Kokalj, E. K\u00a8u\u00b8c\u00a8ukbenli, M. Lazzeri,\nM. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,"
+    },
+    {
+      "citation_id": "citation:9a8e5d072d2a113c",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:151cf4882e314e26",
+      "reference_id": "reference:dbce687fde09e549",
+      "reference_number": "19",
+      "mention_text": "[19]",
+      "context": "ical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-\ntion of the cyanogen radical, Journal of Physical Chem-\nistry 96, 425 (1992).\n[18] P. Su, J. Wu, J. Gu, W. Wu, S. Shaik, and P. C. Hiberty,\nBonding conundrums in the C2 molecule: A valence bond\nstudy, Journal of Chemical Theory and Computation 7,\n121 (2011).\n[19] J. D. D. Martin and J. W. Hepburn, Electric field in-\nduced dissociation of molecules in rydberg-like highly vi-\nbrationally excited ion-pair states, Physical Review Let-\nters 79, 3154 (1997).\n[20] A. J. Cohen, P. Mori-S\u00b4anchez, and W. Yang, Fractional\nspins and static correlation error in density functional\ntheory, Journal of Chemical Physics 129, 121104 (2008).\n[21] M. G. Medvedev, I. S. Bushmarinov, J. Sun, J. P.\nPerdew, and K. A. Lyssenko, Density functional theory\n6\nis straying from the path toward the exact functional,\nScience 355, 49 (2017).\n[22] G. Grosso and G. Pastori Parravicini, Solid State Physics\n(Academic Press, San Diego, 2000).\n[23] M. Qiu, Z. Zhang, Z. Zhang, Y. Lin, Y. Li, J. Yang, and\nW. Hu, Improved correlation optimized virtual orbital al-\ngorithm for plane-wave full configuration interaction cal-\nculations, Journal of Chemical Theory and Computation\n21, 6559 (2025).\n[24] P. Giannozzi, S. Baroni, N. Bonini, M. Calandra, R. Car,\nC. Cavazzoni, D. Ceresoli, G. L. Chiarotti, M. Cococ-\ncioni, I. Dabo, A. D. Corso, S. de Gironcoli, S. Fabris,\nG. Fratesi, R. Gebauer, U. Gerstmann, C. Gougoussis,\nA. Kokalj, M. Lazzeri, L. Martin-Samos, N. Marzari,\nF. Mauri, R. Mazzarello, S. Paolini, A. Pasquarello,\nL. Paulatto, C. Sbraccia, S. Scandolo, G. Sclauzero, A. P.\nSeitsonen, A. Smogunov, P. Umari, and R. M. Wentz-\ncovitch, QUANTUM ESPRESSO: A modular and open-\nsource software project for quantum simulations of mate-\nrials, Journal of Physics: Condensed Matter 21, 395502\n(2009).\n[25] P. Giannozzi, O. Andreussi, T. Brumme, O. Bunau,\nM. B. Nardelli, M. Calandra, R. Car, C. Cavazzoni,\nD. Ceresoli, M. Cococcioni, N. Colonna, I. Carnimeo,\nA. D. Corso, S. de Gironcoli, P. Delugas, R. A. DiStasio,\nA. Ferretti, A. Floris, G. Fratesi, G. Fugallo, R. Gebauer,\nU. Gerstmann, F. Giustino, T. Gorni, J. Jia, M. Kawa-\nmura, H.-Y. Ko, A. Kokalj, E. K\u00a8u\u00b8c\u00a8ukbenli, M. Lazzeri,\nM. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,"
+    },
+    {
+      "citation_id": "citation:8f5fd4738355cb8d",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:151cf4882e314e26",
+      "reference_id": "reference:191851ff6760bab9",
+      "reference_number": "20",
+      "mention_text": "[20]",
+      "context": "ical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-\ntion of the cyanogen radical, Journal of Physical Chem-\nistry 96, 425 (1992).\n[18] P. Su, J. Wu, J. Gu, W. Wu, S. Shaik, and P. C. Hiberty,\nBonding conundrums in the C2 molecule: A valence bond\nstudy, Journal of Chemical Theory and Computation 7,\n121 (2011).\n[19] J. D. D. Martin and J. W. Hepburn, Electric field in-\nduced dissociation of molecules in rydberg-like highly vi-\nbrationally excited ion-pair states, Physical Review Let-\nters 79, 3154 (1997).\n[20] A. J. Cohen, P. Mori-S\u00b4anchez, and W. Yang, Fractional\nspins and static correlation error in density functional\ntheory, Journal of Chemical Physics 129, 121104 (2008).\n[21] M. G. Medvedev, I. S. Bushmarinov, J. Sun, J. P.\nPerdew, and K. A. Lyssenko, Density functional theory\n6\nis straying from the path toward the exact functional,\nScience 355, 49 (2017).\n[22] G. Grosso and G. Pastori Parravicini, Solid State Physics\n(Academic Press, San Diego, 2000).\n[23] M. Qiu, Z. Zhang, Z. Zhang, Y. Lin, Y. Li, J. Yang, and\nW. Hu, Improved correlation optimized virtual orbital al-\ngorithm for plane-wave full configuration interaction cal-\nculations, Journal of Chemical Theory and Computation\n21, 6559 (2025).\n[24] P. Giannozzi, S. Baroni, N. Bonini, M. Calandra, R. Car,\nC. Cavazzoni, D. Ceresoli, G. L. Chiarotti, M. Cococ-\ncioni, I. Dabo, A. D. Corso, S. de Gironcoli, S. Fabris,\nG. Fratesi, R. Gebauer, U. Gerstmann, C. Gougoussis,\nA. Kokalj, M. Lazzeri, L. Martin-Samos, N. Marzari,\nF. Mauri, R. Mazzarello, S. Paolini, A. Pasquarello,\nL. Paulatto, C. Sbraccia, S. Scandolo, G. Sclauzero, A. P.\nSeitsonen, A. Smogunov, P. Umari, and R. M. Wentz-\ncovitch, QUANTUM ESPRESSO: A modular and open-\nsource software project for quantum simulations of mate-\nrials, Journal of Physics: Condensed Matter 21, 395502\n(2009).\n[25] P. Giannozzi, O. Andreussi, T. Brumme, O. Bunau,\nM. B. Nardelli, M. Calandra, R. Car, C. Cavazzoni,\nD. Ceresoli, M. Cococcioni, N. Colonna, I. Carnimeo,\nA. D. Corso, S. de Gironcoli, P. Delugas, R. A. DiStasio,\nA. Ferretti, A. Floris, G. Fratesi, G. Fugallo, R. Gebauer,\nU. Gerstmann, F. Giustino, T. Gorni, J. Jia, M. Kawa-\nmura, H.-Y. Ko, A. Kokalj, E. K\u00a8u\u00b8c\u00a8ukbenli, M. Lazzeri,\nM. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,"
+    },
+    {
+      "citation_id": "citation:59a90ae3601a3552",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:151cf4882e314e26",
+      "reference_id": "reference:3987029e55575de3",
+      "reference_number": "21",
+      "mention_text": "[21]",
+      "context": "ical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-\ntion of the cyanogen radical, Journal of Physical Chem-\nistry 96, 425 (1992).\n[18] P. Su, J. Wu, J. Gu, W. Wu, S. Shaik, and P. C. Hiberty,\nBonding conundrums in the C2 molecule: A valence bond\nstudy, Journal of Chemical Theory and Computation 7,\n121 (2011).\n[19] J. D. D. Martin and J. W. Hepburn, Electric field in-\nduced dissociation of molecules in rydberg-like highly vi-\nbrationally excited ion-pair states, Physical Review Let-\nters 79, 3154 (1997).\n[20] A. J. Cohen, P. Mori-S\u00b4anchez, and W. Yang, Fractional\nspins and static correlation error in density functional\ntheory, Journal of Chemical Physics 129, 121104 (2008).\n[21] M. G. Medvedev, I. S. Bushmarinov, J. Sun, J. P.\nPerdew, and K. A. Lyssenko, Density functional theory\n6\nis straying from the path toward the exact functional,\nScience 355, 49 (2017).\n[22] G. Grosso and G. Pastori Parravicini, Solid State Physics\n(Academic Press, San Diego, 2000).\n[23] M. Qiu, Z. Zhang, Z. Zhang, Y. Lin, Y. Li, J. Yang, and\nW. Hu, Improved correlation optimized virtual orbital al-\ngorithm for plane-wave full configuration interaction cal-\nculations, Journal of Chemical Theory and Computation\n21, 6559 (2025).\n[24] P. Giannozzi, S. Baroni, N. Bonini, M. Calandra, R. Car,\nC. Cavazzoni, D. Ceresoli, G. L. Chiarotti, M. Cococ-\ncioni, I. Dabo, A. D. Corso, S. de Gironcoli, S. Fabris,\nG. Fratesi, R. Gebauer, U. Gerstmann, C. Gougoussis,\nA. Kokalj, M. Lazzeri, L. Martin-Samos, N. Marzari,\nF. Mauri, R. Mazzarello, S. Paolini, A. Pasquarello,\nL. Paulatto, C. Sbraccia, S. Scandolo, G. Sclauzero, A. P.\nSeitsonen, A. Smogunov, P. Umari, and R. M. Wentz-\ncovitch, QUANTUM ESPRESSO: A modular and open-\nsource software project for quantum simulations of mate-\nrials, Journal of Physics: Condensed Matter 21, 395502\n(2009).\n[25] P. Giannozzi, O. Andreussi, T. Brumme, O. Bunau,\nM. B. Nardelli, M. Calandra, R. Car, C. Cavazzoni,\nD. Ceresoli, M. Cococcioni, N. Colonna, I. Carnimeo,\nA. D. Corso, S. de Gironcoli, P. Delugas, R. A. DiStasio,\nA. Ferretti, A. Floris, G. Fratesi, G. Fugallo, R. Gebauer,\nU. Gerstmann, F. Giustino, T. Gorni, J. Jia, M. Kawa-\nmura, H.-Y. Ko, A. Kokalj, E. K\u00a8u\u00b8c\u00a8ukbenli, M. Lazzeri,\nM. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,"
+    },
+    {
+      "citation_id": "citation:def2eb7e5f258188",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:151cf4882e314e26",
+      "reference_id": "reference:7869e0d40b6ab89e",
+      "reference_number": "22",
+      "mention_text": "[22]",
+      "context": "ical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-\ntion of the cyanogen radical, Journal of Physical Chem-\nistry 96, 425 (1992).\n[18] P. Su, J. Wu, J. Gu, W. Wu, S. Shaik, and P. C. Hiberty,\nBonding conundrums in the C2 molecule: A valence bond\nstudy, Journal of Chemical Theory and Computation 7,\n121 (2011).\n[19] J. D. D. Martin and J. W. Hepburn, Electric field in-\nduced dissociation of molecules in rydberg-like highly vi-\nbrationally excited ion-pair states, Physical Review Let-\nters 79, 3154 (1997).\n[20] A. J. Cohen, P. Mori-S\u00b4anchez, and W. Yang, Fractional\nspins and static correlation error in density functional\ntheory, Journal of Chemical Physics 129, 121104 (2008).\n[21] M. G. Medvedev, I. S. Bushmarinov, J. Sun, J. P.\nPerdew, and K. A. Lyssenko, Density functional theory\n6\nis straying from the path toward the exact functional,\nScience 355, 49 (2017).\n[22] G. Grosso and G. Pastori Parravicini, Solid State Physics\n(Academic Press, San Diego, 2000).\n[23] M. Qiu, Z. Zhang, Z. Zhang, Y. Lin, Y. Li, J. Yang, and\nW. Hu, Improved correlation optimized virtual orbital al-\ngorithm for plane-wave full configuration interaction cal-\nculations, Journal of Chemical Theory and Computation\n21, 6559 (2025).\n[24] P. Giannozzi, S. Baroni, N. Bonini, M. Calandra, R. Car,\nC. Cavazzoni, D. Ceresoli, G. L. Chiarotti, M. Cococ-\ncioni, I. Dabo, A. D. Corso, S. de Gironcoli, S. Fabris,\nG. Fratesi, R. Gebauer, U. Gerstmann, C. Gougoussis,\nA. Kokalj, M. Lazzeri, L. Martin-Samos, N. Marzari,\nF. Mauri, R. Mazzarello, S. Paolini, A. Pasquarello,\nL. Paulatto, C. Sbraccia, S. Scandolo, G. Sclauzero, A. P.\nSeitsonen, A. Smogunov, P. Umari, and R. M. Wentz-\ncovitch, QUANTUM ESPRESSO: A modular and open-\nsource software project for quantum simulations of mate-\nrials, Journal of Physics: Condensed Matter 21, 395502\n(2009).\n[25] P. Giannozzi, O. Andreussi, T. Brumme, O. Bunau,\nM. B. Nardelli, M. Calandra, R. Car, C. Cavazzoni,\nD. Ceresoli, M. Cococcioni, N. Colonna, I. Carnimeo,\nA. D. Corso, S. de Gironcoli, P. Delugas, R. A. DiStasio,\nA. Ferretti, A. Floris, G. Fratesi, G. Fugallo, R. Gebauer,\nU. Gerstmann, F. Giustino, T. Gorni, J. Jia, M. Kawa-\nmura, H.-Y. Ko, A. Kokalj, E. K\u00a8u\u00b8c\u00a8ukbenli, M. Lazzeri,\nM. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,"
+    },
+    {
+      "citation_id": "citation:5e79b91aac21cc62",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:151cf4882e314e26",
+      "reference_id": "reference:5e494571bcdb202a",
+      "reference_number": "23",
+      "mention_text": "[23]",
+      "context": "ical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-\ntion of the cyanogen radical, Journal of Physical Chem-\nistry 96, 425 (1992).\n[18] P. Su, J. Wu, J. Gu, W. Wu, S. Shaik, and P. C. Hiberty,\nBonding conundrums in the C2 molecule: A valence bond\nstudy, Journal of Chemical Theory and Computation 7,\n121 (2011).\n[19] J. D. D. Martin and J. W. Hepburn, Electric field in-\nduced dissociation of molecules in rydberg-like highly vi-\nbrationally excited ion-pair states, Physical Review Let-\nters 79, 3154 (1997).\n[20] A. J. Cohen, P. Mori-S\u00b4anchez, and W. Yang, Fractional\nspins and static correlation error in density functional\ntheory, Journal of Chemical Physics 129, 121104 (2008).\n[21] M. G. Medvedev, I. S. Bushmarinov, J. Sun, J. P.\nPerdew, and K. A. Lyssenko, Density functional theory\n6\nis straying from the path toward the exact functional,\nScience 355, 49 (2017).\n[22] G. Grosso and G. Pastori Parravicini, Solid State Physics\n(Academic Press, San Diego, 2000).\n[23] M. Qiu, Z. Zhang, Z. Zhang, Y. Lin, Y. Li, J. Yang, and\nW. Hu, Improved correlation optimized virtual orbital al-\ngorithm for plane-wave full configuration interaction cal-\nculations, Journal of Chemical Theory and Computation\n21, 6559 (2025).\n[24] P. Giannozzi, S. Baroni, N. Bonini, M. Calandra, R. Car,\nC. Cavazzoni, D. Ceresoli, G. L. Chiarotti, M. Cococ-\ncioni, I. Dabo, A. D. Corso, S. de Gironcoli, S. Fabris,\nG. Fratesi, R. Gebauer, U. Gerstmann, C. Gougoussis,\nA. Kokalj, M. Lazzeri, L. Martin-Samos, N. Marzari,\nF. Mauri, R. Mazzarello, S. Paolini, A. Pasquarello,\nL. Paulatto, C. Sbraccia, S. Scandolo, G. Sclauzero, A. P.\nSeitsonen, A. Smogunov, P. Umari, and R. M. Wentz-\ncovitch, QUANTUM ESPRESSO: A modular and open-\nsource software project for quantum simulations of mate-\nrials, Journal of Physics: Condensed Matter 21, 395502\n(2009).\n[25] P. Giannozzi, O. Andreussi, T. Brumme, O. Bunau,\nM. B. Nardelli, M. Calandra, R. Car, C. Cavazzoni,\nD. Ceresoli, M. Cococcioni, N. Colonna, I. Carnimeo,\nA. D. Corso, S. de Gironcoli, P. Delugas, R. A. DiStasio,\nA. Ferretti, A. Floris, G. Fratesi, G. Fugallo, R. Gebauer,\nU. Gerstmann, F. Giustino, T. Gorni, J. Jia, M. Kawa-\nmura, H.-Y. Ko, A. Kokalj, E. K\u00a8u\u00b8c\u00a8ukbenli, M. Lazzeri,\nM. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,"
+    },
+    {
+      "citation_id": "citation:d10b6ad17e23ffe4",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:151cf4882e314e26",
+      "reference_id": "reference:671d769a190818bd",
+      "reference_number": "24",
+      "mention_text": "[24]",
+      "context": "ical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-\ntion of the cyanogen radical, Journal of Physical Chem-\nistry 96, 425 (1992).\n[18] P. Su, J. Wu, J. Gu, W. Wu, S. Shaik, and P. C. Hiberty,\nBonding conundrums in the C2 molecule: A valence bond\nstudy, Journal of Chemical Theory and Computation 7,\n121 (2011).\n[19] J. D. D. Martin and J. W. Hepburn, Electric field in-\nduced dissociation of molecules in rydberg-like highly vi-\nbrationally excited ion-pair states, Physical Review Let-\nters 79, 3154 (1997).\n[20] A. J. Cohen, P. Mori-S\u00b4anchez, and W. Yang, Fractional\nspins and static correlation error in density functional\ntheory, Journal of Chemical Physics 129, 121104 (2008).\n[21] M. G. Medvedev, I. S. Bushmarinov, J. Sun, J. P.\nPerdew, and K. A. Lyssenko, Density functional theory\n6\nis straying from the path toward the exact functional,\nScience 355, 49 (2017).\n[22] G. Grosso and G. Pastori Parravicini, Solid State Physics\n(Academic Press, San Diego, 2000).\n[23] M. Qiu, Z. Zhang, Z. Zhang, Y. Lin, Y. Li, J. Yang, and\nW. Hu, Improved correlation optimized virtual orbital al-\ngorithm for plane-wave full configuration interaction cal-\nculations, Journal of Chemical Theory and Computation\n21, 6559 (2025).\n[24] P. Giannozzi, S. Baroni, N. Bonini, M. Calandra, R. Car,\nC. Cavazzoni, D. Ceresoli, G. L. Chiarotti, M. Cococ-\ncioni, I. Dabo, A. D. Corso, S. de Gironcoli, S. Fabris,\nG. Fratesi, R. Gebauer, U. Gerstmann, C. Gougoussis,\nA. Kokalj, M. Lazzeri, L. Martin-Samos, N. Marzari,\nF. Mauri, R. Mazzarello, S. Paolini, A. Pasquarello,\nL. Paulatto, C. Sbraccia, S. Scandolo, G. Sclauzero, A. P.\nSeitsonen, A. Smogunov, P. Umari, and R. M. Wentz-\ncovitch, QUANTUM ESPRESSO: A modular and open-\nsource software project for quantum simulations of mate-\nrials, Journal of Physics: Condensed Matter 21, 395502\n(2009).\n[25] P. Giannozzi, O. Andreussi, T. Brumme, O. Bunau,\nM. B. Nardelli, M. Calandra, R. Car, C. Cavazzoni,\nD. Ceresoli, M. Cococcioni, N. Colonna, I. Carnimeo,\nA. D. Corso, S. de Gironcoli, P. Delugas, R. A. DiStasio,\nA. Ferretti, A. Floris, G. Fratesi, G. Fugallo, R. Gebauer,\nU. Gerstmann, F. Giustino, T. Gorni, J. Jia, M. Kawa-\nmura, H.-Y. Ko, A. Kokalj, E. K\u00a8u\u00b8c\u00a8ukbenli, M. Lazzeri,\nM. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,"
+    },
+    {
+      "citation_id": "citation:3a74b7479a6f389b",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:151cf4882e314e26",
+      "reference_id": "reference:9978eb950669b277",
+      "reference_number": "25",
+      "mention_text": "[25]",
+      "context": "ical Physics 101, 3857 (1994).\n[17] Y. Huang, S. A. Barts, and J. B. Halpern, Heat of forma-\ntion of the cyanogen radical, Journal of Physical Chem-\nistry 96, 425 (1992).\n[18] P. Su, J. Wu, J. Gu, W. Wu, S. Shaik, and P. C. Hiberty,\nBonding conundrums in the C2 molecule: A valence bond\nstudy, Journal of Chemical Theory and Computation 7,\n121 (2011).\n[19] J. D. D. Martin and J. W. Hepburn, Electric field in-\nduced dissociation of molecules in rydberg-like highly vi-\nbrationally excited ion-pair states, Physical Review Let-\nters 79, 3154 (1997).\n[20] A. J. Cohen, P. Mori-S\u00b4anchez, and W. Yang, Fractional\nspins and static correlation error in density functional\ntheory, Journal of Chemical Physics 129, 121104 (2008).\n[21] M. G. Medvedev, I. S. Bushmarinov, J. Sun, J. P.\nPerdew, and K. A. Lyssenko, Density functional theory\n6\nis straying from the path toward the exact functional,\nScience 355, 49 (2017).\n[22] G. Grosso and G. Pastori Parravicini, Solid State Physics\n(Academic Press, San Diego, 2000).\n[23] M. Qiu, Z. Zhang, Z. Zhang, Y. Lin, Y. Li, J. Yang, and\nW. Hu, Improved correlation optimized virtual orbital al-\ngorithm for plane-wave full configuration interaction cal-\nculations, Journal of Chemical Theory and Computation\n21, 6559 (2025).\n[24] P. Giannozzi, S. Baroni, N. Bonini, M. Calandra, R. Car,\nC. Cavazzoni, D. Ceresoli, G. L. Chiarotti, M. Cococ-\ncioni, I. Dabo, A. D. Corso, S. de Gironcoli, S. Fabris,\nG. Fratesi, R. Gebauer, U. Gerstmann, C. Gougoussis,\nA. Kokalj, M. Lazzeri, L. Martin-Samos, N. Marzari,\nF. Mauri, R. Mazzarello, S. Paolini, A. Pasquarello,\nL. Paulatto, C. Sbraccia, S. Scandolo, G. Sclauzero, A. P.\nSeitsonen, A. Smogunov, P. Umari, and R. M. Wentz-\ncovitch, QUANTUM ESPRESSO: A modular and open-\nsource software project for quantum simulations of mate-\nrials, Journal of Physics: Condensed Matter 21, 395502\n(2009).\n[25] P. Giannozzi, O. Andreussi, T. Brumme, O. Bunau,\nM. B. Nardelli, M. Calandra, R. Car, C. Cavazzoni,\nD. Ceresoli, M. Cococcioni, N. Colonna, I. Carnimeo,\nA. D. Corso, S. de Gironcoli, P. Delugas, R. A. DiStasio,\nA. Ferretti, A. Floris, G. Fratesi, G. Fugallo, R. Gebauer,\nU. Gerstmann, F. Giustino, T. Gorni, J. Jia, M. Kawa-\nmura, H.-Y. Ko, A. Kokalj, E. K\u00a8u\u00b8c\u00a8ukbenli, M. Lazzeri,\nM. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,"
+    },
+    {
+      "citation_id": "citation:dc1c761969fd1af7",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:d93b2a9fc2095cf9",
+      "reference_id": "reference:9362f7ddffbb0344",
+      "reference_number": "26",
+      "mention_text": "[26]",
+      "context": "M. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,\nD. Rocca, R. Sabatini, B. Santra, M. Schlipf, A. P. Seitso-\nnen, A. Smogunov, I. Timrov, T. Thonhauser, P. Umari,\nN. Vast, X. Wu, and S. Baroni, Advanced capabilities for\nmaterials modelling with Quantum ESPRESSO, Journal\nof Physics: Condensed Matter 29, 465901 (2017).\n[26] D. R. Hamann, Optimized norm-conserving Vanderbilt\npseudopotentials, Physical Review B 88, 085117 (2013).\n[27] Q. Sun, X. Zhang, S. Banerjee, P. Bao, M. Barbry, N. S.\nBlunt, N. A. Bogdanov, G. H. Booth, J. Chen, Z.-H.\nCui, J. J. Eriksen, Y. Gao, S. Guo, J. Hermann, M. R.\nHermes, K. Koh, P. Koval, S. Lehtola, Z. Li, J. Liu,\nN. Mardirossian, J. D. McClain, M. Motta, B. Mussard,\nH. Q. Pham, A. Pulkin, W. Purwanto, P. J. Robin-\nson, E. Ronca, E. R. Sayfutyarova, M. Scheurer, H. F.\nSchurkus, J. E. T. Smith, C. Sun, S.-N. Sun, S. Upad-\nhyay, L. K. Wagner, X. Wang, A. White, J. D. Whitfield,\nM. J. Williamson, S. Wouters, J. Yang, J. M. Yu, T. Zhu,\nT. C. Berkelbach, S. Sharma, A. Y. Sokolov, and G. K.-\nL. Chan, Recent developments in the PySCF program\npackage, The Journal of Chemical Physics 153, 024109\n(2020).\n[28] Q. Sun, T. C. Berkelbach, N. S. Blunt, G. H. Booth,\nS. Guo, Z. Li, J. Liu, J. D. McClain, E. R. Sayfut-\nyarova, S. Sharma, S. Wouters, and G. K.-L. Chan,\nPySCF: The python-based simulations of chemistry\nframework, WIREs Computational Molecular Science 8,\ne1340 (2018).\n[29] A. Halkier, T. Helgaker, P. J\u00f8rgensen, W. Klopper, and\nJ. Olsen, Basis-set convergence of the energy in molecu-\nlar Hartree\u2013Fock calculations, Chemical Physics Letters\n302, 437 (1999).\n[30] K. A. Peterson, R. A. Kendall, and T. H. Dunning,\nBenchmark calculations with correlated molecular wave\nfunctions. II. Configuration interaction calculations on"
+    },
+    {
+      "citation_id": "citation:a961aa933d2acdf9",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:d93b2a9fc2095cf9",
+      "reference_id": "reference:8be16d4750deb3f2",
+      "reference_number": "27",
+      "mention_text": "[27]",
+      "context": "M. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,\nD. Rocca, R. Sabatini, B. Santra, M. Schlipf, A. P. Seitso-\nnen, A. Smogunov, I. Timrov, T. Thonhauser, P. Umari,\nN. Vast, X. Wu, and S. Baroni, Advanced capabilities for\nmaterials modelling with Quantum ESPRESSO, Journal\nof Physics: Condensed Matter 29, 465901 (2017).\n[26] D. R. Hamann, Optimized norm-conserving Vanderbilt\npseudopotentials, Physical Review B 88, 085117 (2013).\n[27] Q. Sun, X. Zhang, S. Banerjee, P. Bao, M. Barbry, N. S.\nBlunt, N. A. Bogdanov, G. H. Booth, J. Chen, Z.-H.\nCui, J. J. Eriksen, Y. Gao, S. Guo, J. Hermann, M. R.\nHermes, K. Koh, P. Koval, S. Lehtola, Z. Li, J. Liu,\nN. Mardirossian, J. D. McClain, M. Motta, B. Mussard,\nH. Q. Pham, A. Pulkin, W. Purwanto, P. J. Robin-\nson, E. Ronca, E. R. Sayfutyarova, M. Scheurer, H. F.\nSchurkus, J. E. T. Smith, C. Sun, S.-N. Sun, S. Upad-\nhyay, L. K. Wagner, X. Wang, A. White, J. D. Whitfield,\nM. J. Williamson, S. Wouters, J. Yang, J. M. Yu, T. Zhu,\nT. C. Berkelbach, S. Sharma, A. Y. Sokolov, and G. K.-\nL. Chan, Recent developments in the PySCF program\npackage, The Journal of Chemical Physics 153, 024109\n(2020).\n[28] Q. Sun, T. C. Berkelbach, N. S. Blunt, G. H. Booth,\nS. Guo, Z. Li, J. Liu, J. D. McClain, E. R. Sayfut-\nyarova, S. Sharma, S. Wouters, and G. K.-L. Chan,\nPySCF: The python-based simulations of chemistry\nframework, WIREs Computational Molecular Science 8,\ne1340 (2018).\n[29] A. Halkier, T. Helgaker, P. J\u00f8rgensen, W. Klopper, and\nJ. Olsen, Basis-set convergence of the energy in molecu-\nlar Hartree\u2013Fock calculations, Chemical Physics Letters\n302, 437 (1999).\n[30] K. A. Peterson, R. A. Kendall, and T. H. Dunning,\nBenchmark calculations with correlated molecular wave\nfunctions. II. Configuration interaction calculations on"
+    },
+    {
+      "citation_id": "citation:59f12e597eae1214",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:d93b2a9fc2095cf9",
+      "reference_id": "reference:f65002ed9c0d8149",
+      "reference_number": "28",
+      "mention_text": "[28]",
+      "context": "M. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,\nD. Rocca, R. Sabatini, B. Santra, M. Schlipf, A. P. Seitso-\nnen, A. Smogunov, I. Timrov, T. Thonhauser, P. Umari,\nN. Vast, X. Wu, and S. Baroni, Advanced capabilities for\nmaterials modelling with Quantum ESPRESSO, Journal\nof Physics: Condensed Matter 29, 465901 (2017).\n[26] D. R. Hamann, Optimized norm-conserving Vanderbilt\npseudopotentials, Physical Review B 88, 085117 (2013).\n[27] Q. Sun, X. Zhang, S. Banerjee, P. Bao, M. Barbry, N. S.\nBlunt, N. A. Bogdanov, G. H. Booth, J. Chen, Z.-H.\nCui, J. J. Eriksen, Y. Gao, S. Guo, J. Hermann, M. R.\nHermes, K. Koh, P. Koval, S. Lehtola, Z. Li, J. Liu,\nN. Mardirossian, J. D. McClain, M. Motta, B. Mussard,\nH. Q. Pham, A. Pulkin, W. Purwanto, P. J. Robin-\nson, E. Ronca, E. R. Sayfutyarova, M. Scheurer, H. F.\nSchurkus, J. E. T. Smith, C. Sun, S.-N. Sun, S. Upad-\nhyay, L. K. Wagner, X. Wang, A. White, J. D. Whitfield,\nM. J. Williamson, S. Wouters, J. Yang, J. M. Yu, T. Zhu,\nT. C. Berkelbach, S. Sharma, A. Y. Sokolov, and G. K.-\nL. Chan, Recent developments in the PySCF program\npackage, The Journal of Chemical Physics 153, 024109\n(2020).\n[28] Q. Sun, T. C. Berkelbach, N. S. Blunt, G. H. Booth,\nS. Guo, Z. Li, J. Liu, J. D. McClain, E. R. Sayfut-\nyarova, S. Sharma, S. Wouters, and G. K.-L. Chan,\nPySCF: The python-based simulations of chemistry\nframework, WIREs Computational Molecular Science 8,\ne1340 (2018).\n[29] A. Halkier, T. Helgaker, P. J\u00f8rgensen, W. Klopper, and\nJ. Olsen, Basis-set convergence of the energy in molecu-\nlar Hartree\u2013Fock calculations, Chemical Physics Letters\n302, 437 (1999).\n[30] K. A. Peterson, R. A. Kendall, and T. H. Dunning,\nBenchmark calculations with correlated molecular wave\nfunctions. II. Configuration interaction calculations on"
+    },
+    {
+      "citation_id": "citation:25d0288756423d59",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:d93b2a9fc2095cf9",
+      "reference_id": "reference:f68149ce46b309ba",
+      "reference_number": "29",
+      "mention_text": "[29]",
+      "context": "M. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,\nD. Rocca, R. Sabatini, B. Santra, M. Schlipf, A. P. Seitso-\nnen, A. Smogunov, I. Timrov, T. Thonhauser, P. Umari,\nN. Vast, X. Wu, and S. Baroni, Advanced capabilities for\nmaterials modelling with Quantum ESPRESSO, Journal\nof Physics: Condensed Matter 29, 465901 (2017).\n[26] D. R. Hamann, Optimized norm-conserving Vanderbilt\npseudopotentials, Physical Review B 88, 085117 (2013).\n[27] Q. Sun, X. Zhang, S. Banerjee, P. Bao, M. Barbry, N. S.\nBlunt, N. A. Bogdanov, G. H. Booth, J. Chen, Z.-H.\nCui, J. J. Eriksen, Y. Gao, S. Guo, J. Hermann, M. R.\nHermes, K. Koh, P. Koval, S. Lehtola, Z. Li, J. Liu,\nN. Mardirossian, J. D. McClain, M. Motta, B. Mussard,\nH. Q. Pham, A. Pulkin, W. Purwanto, P. J. Robin-\nson, E. Ronca, E. R. Sayfutyarova, M. Scheurer, H. F.\nSchurkus, J. E. T. Smith, C. Sun, S.-N. Sun, S. Upad-\nhyay, L. K. Wagner, X. Wang, A. White, J. D. Whitfield,\nM. J. Williamson, S. Wouters, J. Yang, J. M. Yu, T. Zhu,\nT. C. Berkelbach, S. Sharma, A. Y. Sokolov, and G. K.-\nL. Chan, Recent developments in the PySCF program\npackage, The Journal of Chemical Physics 153, 024109\n(2020).\n[28] Q. Sun, T. C. Berkelbach, N. S. Blunt, G. H. Booth,\nS. Guo, Z. Li, J. Liu, J. D. McClain, E. R. Sayfut-\nyarova, S. Sharma, S. Wouters, and G. K.-L. Chan,\nPySCF: The python-based simulations of chemistry\nframework, WIREs Computational Molecular Science 8,\ne1340 (2018).\n[29] A. Halkier, T. Helgaker, P. J\u00f8rgensen, W. Klopper, and\nJ. Olsen, Basis-set convergence of the energy in molecu-\nlar Hartree\u2013Fock calculations, Chemical Physics Letters\n302, 437 (1999).\n[30] K. A. Peterson, R. A. Kendall, and T. H. Dunning,\nBenchmark calculations with correlated molecular wave\nfunctions. II. Configuration interaction calculations on"
+    },
+    {
+      "citation_id": "citation:2611aeb62cb1776f",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:d93b2a9fc2095cf9",
+      "reference_id": "reference:0c61761ef9dc36f3",
+      "reference_number": "30",
+      "mention_text": "[30]",
+      "context": "M. Marsili, N. Marzari, F. Mauri, N. L. Nguyen, H.-\nV. Nguyen, A. Otero-de-la-Roza, L. Paulatto, S. Ponc\u00b4e,\nD. Rocca, R. Sabatini, B. Santra, M. Schlipf, A. P. Seitso-\nnen, A. Smogunov, I. Timrov, T. Thonhauser, P. Umari,\nN. Vast, X. Wu, and S. Baroni, Advanced capabilities for\nmaterials modelling with Quantum ESPRESSO, Journal\nof Physics: Condensed Matter 29, 465901 (2017).\n[26] D. R. Hamann, Optimized norm-conserving Vanderbilt\npseudopotentials, Physical Review B 88, 085117 (2013).\n[27] Q. Sun, X. Zhang, S. Banerjee, P. Bao, M. Barbry, N. S.\nBlunt, N. A. Bogdanov, G. H. Booth, J. Chen, Z.-H.\nCui, J. J. Eriksen, Y. Gao, S. Guo, J. Hermann, M. R.\nHermes, K. Koh, P. Koval, S. Lehtola, Z. Li, J. Liu,\nN. Mardirossian, J. D. McClain, M. Motta, B. Mussard,\nH. Q. Pham, A. Pulkin, W. Purwanto, P. J. Robin-\nson, E. Ronca, E. R. Sayfutyarova, M. Scheurer, H. F.\nSchurkus, J. E. T. Smith, C. Sun, S.-N. Sun, S. Upad-\nhyay, L. K. Wagner, X. Wang, A. White, J. D. Whitfield,\nM. J. Williamson, S. Wouters, J. Yang, J. M. Yu, T. Zhu,\nT. C. Berkelbach, S. Sharma, A. Y. Sokolov, and G. K.-\nL. Chan, Recent developments in the PySCF program\npackage, The Journal of Chemical Physics 153, 024109\n(2020).\n[28] Q. Sun, T. C. Berkelbach, N. S. Blunt, G. H. Booth,\nS. Guo, Z. Li, J. Liu, J. D. McClain, E. R. Sayfut-\nyarova, S. Sharma, S. Wouters, and G. K.-L. Chan,\nPySCF: The python-based simulations of chemistry\nframework, WIREs Computational Molecular Science 8,\ne1340 (2018).\n[29] A. Halkier, T. Helgaker, P. J\u00f8rgensen, W. Klopper, and\nJ. Olsen, Basis-set convergence of the energy in molecu-\nlar Hartree\u2013Fock calculations, Chemical Physics Letters\n302, 437 (1999).\n[30] K. A. Peterson, R. A. Kendall, and T. H. Dunning,\nBenchmark calculations with correlated molecular wave\nfunctions. II. Configuration interaction calculations on"
+    },
+    {
+      "citation_id": "citation:747027a860484a91",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:a0005929f2094329",
+      "reference_id": "reference:668e5806ec8eced8",
+      "reference_number": "31",
+      "mention_text": "[31]",
+      "context": "first row diatomic hydrides, The Journal of Chemical\nPhysics 99, 1930 (1993).\n[31] K. A. Peterson and T. H. Dunning, Intrinsic errors in\nseveral ab initio methods: The dissociation energy of N2,\nThe Journal of Physical Chemistry 99, 3898 (1995).\n7"
+    }
+  ],
+  "tables": [
+    {
+      "table_id": "table:95a81f8303f6baf5",
+      "paper_id": "2604.16928",
+      "label": "I",
+      "caption": "The ground state energies of diatomic molecules using different basis-sets along with the number of orbitals N orb",
+      "raw_text": "TABLE I. The ground state energies of diatomic molecules using different basis-sets along with the number of orbitals N orb\nused. Equilibrium bond length (Re) and dissociation energy (D0) are displayed in \u02daAand eV, respectively. The error in D0 is\nrepresented in percentages.\nMethod\nN orb\nRe\nE0\nerror in D0\nN orb\nRe\nE0\nerror in D0\nH2 (ZPE = 0.270 eV)\nN2 (ZPE = 0.146 eV)\nLCCVO\n15\n0.735\n4.73\n\u22120.70\n40\n1.100\n9.69\n\u22122.20\nSTO-3G\n2\n0.735\n5.31\n11.79\n10\n1.100\n5.59\n\u221243.59\n6-31G\n4\n0.746\n4.22\n\u221211.16\n18\n1.200\n6.62\n\u221233.20\ncc-pVDZ\n10\n0.760\n4.49\n\u22125.47\n28\n1.110\n8.19\n\u221217.36\ncc-pVTZ\n28\n0.743\n4.70\n\u22121.05\n60\n1.110\n8.94\n\u22129.79\ncc-pVQZ\n60\n0.742\n4.73\n\u22120.42\n110\n1.110\n9.26\n\u22126.56\ncc-pV5Z\n110\n0.742\n4.74\n\u22120.21\n182\n1.110\n9.37\n\u22125.45\nCBS-limit\n\u2013\n\u2013",
+      "numeric_lines": [
+        "used. Equilibrium bond length (Re) and dissociation energy (D0) are displayed in \u02daAand eV, respectively. The error in D0 is",
+        "H2 (ZPE = 0.270 eV)",
+        "N2 (ZPE = 0.146 eV)",
+        "6-31G"
+      ],
+      "structured_rows": [],
+      "extraction_level": "raw_numeric_lines",
+      "confidence": 0.6,
+      "passage_id": "passage:1a4e948d9540f578"
+    }
+  ],
+  "comparison_contexts": [
+    {
+      "comparison_id": "comparison:00120ae4ab2e6529",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:a7303ce4c5334e8a",
+      "section": "Front matter",
+      "text": "Correlation-Converged Virtual Orbitals for Accurate and Efficient Quantum\nMolecular Simulations\nQian Wang,1, \u2217Calvin Ku,2, 1, \u2217Jyh-Pin Chou,3, 4 Peng-Jen Chen,1, \u2020 Alice Hu,1, 5, \u2021 and Min-Hsiu Hsieh2, \u00a7\n1Department of Mechanical Engineering, City University of Hong Kong, Kowloon, Hong Kong 999077, China\n2Hon Hai Research Institute, Taipei, Taiwan\n3Graduate School of Advanced Technology, National Taiwan University, Taipei 10617, Taiwan\n4Physics Division, National Center for Theoretical Sciences,\nNational Taiwan University, Taipei 106319, Taiwan\n5Department of Material Science and Engineering,\nCity University of Hong Kong, Kowloon, Hong Kong 999077, China\narXiv:2604.16928v1  [physics.chem-ph]  18 Apr 2026\nDensity functional theory with plane-wave basis sets is widely employed in computational materi-\nals science, including applications to isolated molecular systems. However, the inadequate descrip-\ntion of electron correlation remains a fundamental limitation. Accurate correlation treatments based\non many-body Hamiltonians require reliable representations of both occupied and virtual orbitals,\nyet virtual orbitals are often poorly described in conventional computational schemes, resulting in\nreduced accuracy. In this work, we introduce localized correlation-converged virtual orbitals (LC-\nCVOs) as an efficient basis for constructing accurate many-body Hamiltonians in molecular systems.\nUsing a substantially reduced number of orbitals, the LCCVO framework yields dissociation ener-\ngies for singlet, doublet, and triplet molecules that are comparable to, and in many cases exceed,\nthose obtained with high-level correlation-consistent basis sets such as cc-pVXZ (X = D, T, Q, 5).\nThese results demonstrate the efficiency, scalability, and robustness of the LCCVO approach for\nhigh-accuracy quantum chemical calculations.",
+      "claim_ids": [],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:d3890959d0c96064",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:a84bb7f9480ce589",
+      "section": "Results",
+      "text": "The PW-derived LCCVO method is applied to inves-\ntigate several molecules, including singlet (closed-shell\nH2 and N2 molecules and open-shell C2 molecule), dou-\nblet (CN), and triplet (O2) molecules. For comparison\nwith experimental dissociation energies D0, measured\nzero-point energy (ZPE) of each molecule is subtracted\nfrom the calculated electronic dissociation energy De:\nD0 = De \u2212ZPE12\u201319. As listed in Table I, it is apparent\nthat the equilibrium bond length is insensitive to the ba-\nsis set. Nonetheless, the dissociation energy show strong",
+      "claim_ids": [],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:e6eab516436e25cb",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:784a834acb3daf33",
+      "section": "Method",
+      "text": "containing more electrons. For instance, the error in dis-\nsociation energy of N2 is only \u22122.20%, surpassing the cc-\npV5Z basis and even the extrapolated-CBS limit derived\n2\nfrom the cc-pVXZ basis-sets.\nThe total energy versus\natomic distance is shown in Supplementary Figures 1-3.\nMoreover, LCCVO can also be used to study open-\nshell molecules, in contrast to the original COVO method\nwhich only considers closed-shell molecules. As Table I\nshows, the dissociation energies of triplet O2 and doublet\nCN from LCCVO are in good agreement with the exper-\nimental values. LCCVO also performs better than both\nthe large cc-pV5Z basis and the extrapolated-CBS limit,\nwith fewer number of required orbitals. At the end, we\nalso apply our method to the singlet C2 molecule. Al-\nthough some people consider the singlet ground state of\nC2 to be closed-shell, it behaves differently from typical\nclosed-shell molecules. Despite obtaining the best calcu-\nlated dissociation energies compared with experimental\nvalues, the error of the LCCVO method still exceeds 10%\nas shown in Table I. The relatively poor dissociation en-\nergy results of this unstable C2 molecule is discussed in\nSupplementary Note 1.",
+      "claim_ids": [],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:9f9f6d69df4867ef",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:9f26c9b02e40c73a",
+      "section": "Conclusion",
+      "text": "In this work, we present a framework for constructing\naccurate many-body Hamiltonians for molecular systems\nusing LCCVOs. By systematically improving the repre-\nsentation of virtual orbital spaces, the LCCVO approach\novercomes a key limitation of conventional electronic-\nstructure schemes, in which inadequately described un-\noccupied states lead to poor correlation treatments. We\ndemonstrate that, with a substantially reduced num-\nber of orbitals, the resulting many-body Hamiltonians\nyield dissociation energies for both closed- and open-\nshell molecules that are comparable to, or even exceed,\nthose obtained using large correlation-consistent basis\nsets.\nThese results highlight the efficiency, scalability,\nand robustness of the LCCVO framework, offering a prac-\ntical route toward high-accuracy quantum chemical cal-\nculations with reduced computational cost. Extension of\nthis approach to periodic systems with explicit k-point\nsampling will be an important direction for future work.",
+      "claim_ids": [],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:cdbe9558f606c67a",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:028bae9ec0302f96",
+      "section": "Conclusion",
+      "text": "FIG. 1.\nSpatial distribution of LCCVOs and virtual Kohn-Sham orbitals of N2. Comparison shows that the artificial vacuum\nstates are effectively eliminated in the LCCVOs, resulting in virtual orbitals (orbitals 7-35) that are centred around the molecule.",
+      "claim_ids": [],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:e3f2b56746e3ab02",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:c8ea8c0defe2d039",
+      "section": "Methods",
+      "text": "(referred to as partial vacuum states hereafter). The in-\nclusion of such vacuum states considerably reduces the\ncorrelation energies captured in many-body calculations.\nTo address this issue, the concept of COVOs was pro-\nposed.\nIn the original COVO method, the KS virtual\norbitals are initially sorted in ascending KS orbital ener-\ngies. Using these as an initial guess, new virtual orbitals\nare then obtained by optimizing the correlation energies\nof a very small active space consisting of only the highest\noccupied orbital and the single target virtual orbital10.\nDespite the use of a minuscule active space, the COVO\nmethod has proven its success in capturing significant\ncorrelation energies, although its accuracy is often sacri-\nficed.\nAnother important issue in quantum molecular com-\nputation is the determination of active space. Due to lim-\nited computational resources, it is impossible to utilize a\ntruly complete basis set. Therefore, one has to compro-\nmise between accuracy and computational efficiency. It\nis especially so when using PW-based DFT calculations\nwhere much more unoccupied virtual orbitals can be ob-\ntained compared to an equivalent calculation using an\natom-centred basis-set. While simply sorting the virtual\norbitals by their KS orbital energies has proved reason-\nably successful for the original COVO method11, virtual\norbitals considered in this manner may not have signif-\nicant correlation energies, making it an inaccurate and\ninefficient basis.\nWe introduced LCCVOs, derived from the same PW-\nbased DFT calculations, to address these issues. As men-\ntioned previously, the pure and partial vacuum states\nmay cause problems during correlation energy optimiza-\ntion. Thus when constructing the LCCVOs, we include\nthe KS states in an energy-ascending manner and discard\nthose with insignificant contributions to the correlation\nenergy obtained by a CCSD calculation. We demonstrate\nthe LCCVO algorithm on several molecules, including\nsinglet, doublet, and triplet molecules such as H2, O2,\nCN, N2, and C2 (see Supplementary algorithms 1 and\n2). To evaluate the dissociation energies, the LCCVO\ncalculations are also performed on the H, C, O, and N\natoms, and the resulting molecular dissociation energies\nare compared with experimental values to assess the ac-\ncuracy of our method.\nThe results reproduce the ex-",
+      "claim_ids": [
+        "2604.16928::problem_motivation::0",
+        "2604.16928::prior_approach::2",
+        "2604.16928::prior_approach::2",
+        "2604.16928::prior_approach::2",
+        "2604.16928::prior_limitation::0",
+        "2604.16928::prior_limitation::0",
+        "2604.16928::causal_claim::2",
+        "2604.16928::causal_claim::3",
+        "2604.16928::mechanism_principle::2",
+        "2604.16928::hypothesis_statement::0",
+        "2604.16928::evidence_result::0",
+        "2604.16928::constraint::0",
+        "2604.16928::constraint::0"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:f541f545d1e2a744",
+      "paper_id": "2604.16928",
+      "passage_id": "passage:e2e04815f3a07a82",
+      "section": "Acknowledgements",
+      "text": "SUPPLEMENTARY NOTE 1: REMARKS ON THE DISSOCIATION ENERGY OF C2\nAs mentioned in the main text, the error in the dissociation energy of C2 exceeds 10% when using the proposed\nPW-derived LCCVO approach. Although this deviation remains unsatisfactory in absolute terms, it is important to\nemphasize that the present method still yields the smallest error among all approaches considered in this study. Since\nthe same framework provides reliable results for open-shell systems such as triplet O2 and the doublet CN radical,\nthe open-shell character of C2 is unlikely to be the dominant source of error.\nInstead, the discrepancy may be partly attributed to the uncertainty associated with experimental methods. In\npractice, C2 is typically generated under conditions where weak interactions with surrounding species or transient\nenvironments cannot be completely eliminated. Even subtle perturbations may influence its geometric and electronic\nstructures, which in turn affect the experimentally inferred dissociation energy. Additional ambiguity is reflected in\nthe determination of the ground-state electronic structure of C2. Although it is commonly assigned as a singlet X1\u03a3+\ng\nstate in experiments, its characterization is known to be highly sensitive, suggesting that subtle factors may influence\nthe interpretation of experimental observations.\nTaken together, these considerations indicate that the relatively large error in the dissociation energy is unlikely\nto arise solely from the LCCVO method itself, but may also be related to the intrinsic difficulty in establishing a\ndefinitive experimental reference for C2. Therefore, the present results should be interpreted in the context of this\ninherent uncertainty.\nSUPPLEMENTARY FIGURES\n\u2022 Supplementary Figure 1: The total energies as a function of interatomic distance using LCCVO for singlet state\nsystems, along with comparisons of dissociation energies with atom-centred bases.\n\u2022 Supplementary Figure 2: The total energies as a function of interatomic distance using LCCVO for doublet\nstate systems, along with comparisons of dissociation energies with atom-centred bases.\n\u2022 Supplementary Figure 3: The total energies as a function of interatomic distance using LCCVO for triplet state\nsystems, along with comparisons of dissociation energies with atom-centred bases.",
+      "claim_ids": [
+        "2604.16928::prior_limitation::1",
+        "2604.16928::causal_claim::5",
+        "2604.16928::mechanism_principle::3",
+        "2604.16928::mechanism_principle::4",
+        "2604.16928::hypothesis_statement::1",
+        "2604.16928::evidence_result::0",
+        "2604.16928::constraint::2"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    }
+  ],
+  "claim_passage_ids": {
+    "2604.16928::problem_motivation::0": [
+      {
+        "passage_id": "passage:94d6dd75079d23a3",
+        "match_score": 0.875,
+        "evidence_span": "Performing many-body calculations of isolated systems using the plane-wave basis requires additional consider-ations."
+      },
+      {
+        "passage_id": "passage:c8ea8c0defe2d039",
+        "match_score": 0.8571,
+        "evidence_span": "Another important issue in quantum molecular com-putation is the determination of active space."
+      }
+    ],
+    "2604.16928::prior_approach::0": [
+      {
+        "passage_id": "passage:7801917474a8c856",
+        "match_score": 0.875,
+        "evidence_span": "Convention-ally, the Hartree-Fock (HF) states are used as the basis to compute hpq and hpqrs."
+      }
+    ],
+    "2604.16928::prior_approach::1": [
+      {
+        "passage_id": "passage:7801917474a8c856",
+        "match_score": 0.9429,
+        "evidence_span": "Recently, the PW basis set has been used to construct the one-electron wavefunc-tions, on top of which the many-body Hamiltonian can be solved by methods such as FCI, CC, M\u00f8ller-Plesset perturbation theory."
+      }
+    ],
+    "2604.16928::prior_approach::2": [
+      {
+        "passage_id": "passage:c8ea8c0defe2d039",
+        "match_score": 0.8182,
+        "evidence_span": "To address this issue, the concept of COVOs was pro-posed."
+      },
+      {
+        "passage_id": "passage:c8ea8c0defe2d039",
+        "match_score": 0.9524,
+        "evidence_span": "In the original COVO method, the KS virtual orbitals are initially sorted in ascending KS orbital ener-gies. Using these as an initial guess, new virtual orbitals are then obtained by optimizing the correlation energies of a very small active space consisting of only the highest occupied orbital and the single target virtual orbital10."
+      },
+      {
+        "passage_id": "passage:c8ea8c0defe2d039",
+        "match_score": 0.9,
+        "evidence_span": "While simply sorting the virtual orbitals by their KS orbital energies has proved reason-ably successful for the original COVO method11"
+      }
+    ],
+    "2604.16928::prior_limitation::0": [
+      {
+        "passage_id": "passage:c8ea8c0defe2d039",
+        "match_score": 0.7143,
+        "evidence_span": "although its accuracy is often sacri-ficed."
+      },
+      {
+        "passage_id": "passage:c8ea8c0defe2d039",
+        "match_score": 0.9,
+        "evidence_span": "virtual orbitals considered in this manner may not have signif-icant correlation energies, making it an inaccurate and inefficient basis."
+      }
+    ],
+    "2604.16928::prior_limitation::1": [
+      {
+        "passage_id": "passage:e2e04815f3a07a82",
+        "match_score": 1.0,
+        "evidence_span": "the error in the dissociation energy of C2 exceeds 10% when using the proposed PW-derived LCCVO approach. Although this deviation remains unsatisfactory in absolute terms"
+      }
+    ],
+    "2604.16928::rejected_alternative::0": [
+      {
+        "passage_id": "passage:7801917474a8c856",
+        "match_score": 1.0,
+        "evidence_span": "In contrast, Gaussian-type orbitals offer less flexibility, as their basis-set expansion relies on discrete function forms with fixed increments in basis-set sizes."
+      }
+    ],
+    "2604.16928::inspiration_source::0": [
+      {
+        "passage_id": "passage:7801917474a8c856",
+        "match_score": 1.0,
+        "evidence_span": "Motivated by Bloch\u2019s theorem, PWs can be seen as a grid basis in momentum space22."
+      }
+    ],
+    "2604.16928::causal_claim::0": [
+      {
+        "passage_id": "passage:94d6dd75079d23a3",
+        "match_score": 1.0,
+        "evidence_span": "Due the periodic nature of plane-waves, spurious interactions with the periodic images of the molecules may be inadvertently introduced."
+      }
+    ],
+    "2604.16928::causal_claim::1": [
+      {
+        "passage_id": "passage:94d6dd75079d23a3",
+        "match_score": 0.8462,
+        "evidence_span": "As a result, PW-based DFT calcu-lations will yield unoccupied electronic states with sig-nificant contributions from the vacuum region, including pure vacuum states and mixed vacuum-molecule states"
+      }
+    ],
+    "2604.16928::causal_claim::2": [
+      {
+        "passage_id": "passage:c8ea8c0defe2d039",
+        "match_score": 0.9333,
+        "evidence_span": "The in-clusion of such vacuum states considerably reduces the correlation energies captured in many-body calculations."
+      }
+    ],
+    "2604.16928::causal_claim::3": [
+      {
+        "passage_id": "passage:c8ea8c0defe2d039",
+        "match_score": 1.0,
+        "evidence_span": "Thus when constructing the LCCVOs, we include the KS states in an energy-ascending manner and discard those with insignificant contributions to the correlation energy obtained by a CCSD calculation."
+      }
+    ],
+    "2604.16928::causal_claim::4": [
+      {
+        "passage_id": "passage:891c3ed1dba820ef",
+        "match_score": 1.0,
+        "evidence_span": "Therefore, out method allows for more flexibility in the choice of N orb and achieves comparable correlation energy recovery with substantially fewer orbitals."
+      }
+    ],
+    "2604.16928::causal_claim::5": [
+      {
+        "passage_id": "passage:e2e04815f3a07a82",
+        "match_score": 1.0,
+        "evidence_span": "Since the same framework provides reliable results for open-shell systems such as triplet O2 and the doublet CN radical, the open-shell character of C2 is unlikely to be the dominant source of error."
+      }
+    ],
+    "2604.16928::mechanism_principle::0": [
+      {
+        "passage_id": "passage:7801917474a8c856",
+        "match_score": 0.9211,
+        "evidence_span": "Kohn-Sham (KS) states obtained via DFT calculations can also be used instead of the HF states, which may serve as a better single-particle basis to con-struct the many-body Hamiltonian due to the partial in-clusion of electron correlation in the KS wavefunction."
+      }
+    ],
+    "2604.16928::mechanism_principle::1": [
+      {
+        "passage_id": "passage:94d6dd75079d23a3",
+        "match_score": 1.0,
+        "evidence_span": "While this is typically remedied by including a large vacuum region between the periodic images"
+      }
+    ],
+    "2604.16928::mechanism_principle::2": [
+      {
+        "passage_id": "passage:c8ea8c0defe2d039",
+        "match_score": 0.7778,
+        "evidence_span": "As men-tioned previously, the pure and partial vacuum states may cause problems during correlation energy optimiza-tion."
+      }
+    ],
+    "2604.16928::mechanism_principle::3": [
+      {
+        "passage_id": "passage:e2e04815f3a07a82",
+        "match_score": 1.0,
+        "evidence_span": "In practice, C2 is typically generated under conditions where weak interactions with surrounding species or transient environments cannot be completely eliminated. Even subtle perturbations may influence its geometric and electronic structures, which in turn affect the experimentally inferred dissociation energy."
+      }
+    ],
+    "2604.16928::mechanism_principle::4": [
+      {
+        "passage_id": "passage:e2e04815f3a07a82",
+        "match_score": 1.0,
+        "evidence_span": "Although it is commonly assigned as a singlet X1\u03a3+ g state in experiments, its characterization is known to be highly sensitive, suggesting that subtle factors may influence the interpretation of experimental observations."
+      }
+    ],
+    "2604.16928::hypothesis_statement::0": [
+      {
+        "passage_id": "passage:c8ea8c0defe2d039",
+        "match_score": 1.0,
+        "evidence_span": "We introduced LCCVOs, derived from the same PW-based DFT calculations, to address these issues."
+      }
+    ],
+    "2604.16928::hypothesis_statement::1": [
+      {
+        "passage_id": "passage:e2e04815f3a07a82",
+        "match_score": 1.0,
+        "evidence_span": "Taken together, these considerations indicate that the relatively large error in the dissociation energy is unlikely to arise solely from the LCCVO method itself, but may also be related to the intrinsic difficulty in establishing a definitive experimental reference for C2."
+      }
+    ],
+    "2604.16928::evidence_result::0": [
+      {
+        "passage_id": "passage:c8ea8c0defe2d039",
+        "match_score": 1.0,
+        "evidence_span": "the COVO method has proven its success in capturing significant correlation energies"
+      },
+      {
+        "passage_id": "passage:e2e04815f3a07a82",
+        "match_score": 1.0,
+        "evidence_span": "the present method still yields the smallest error among all approaches considered in this study."
+      }
+    ],
+    "2604.16928::evidence_result::1": [
+      {
+        "passage_id": "passage:891c3ed1dba820ef",
+        "match_score": 0.8182,
+        "evidence_span": "The results reproduce the ex-pected O(1/N orb) error scaling with respect to the num-ber of orbitals N orb (see Supplementary Figure 5)."
+      },
+      {
+        "passage_id": "passage:7c2858df29760513",
+        "match_score": 1.0,
+        "evidence_span": "Supplementary Figure 5. Plot of CCSD energies of the N2 system with varying numbers of LCCVOs, illustrating the O(1/N) relationship between CCSD energies and the number of LCCVOs."
+      }
+    ],
+    "2604.16928::evidence_result::2": [
+      {
+        "passage_id": "passage:891c3ed1dba820ef",
+        "match_score": 1.0,
+        "evidence_span": "Remarkably, our method reduces the number of required spatial orbitals from 110\u2013182 (using cc-pV5Z) to only 15\u201350, while maintaining (and sometimes surpassing) the accuracy of the much larger basis sets."
+      }
+    ],
+    "2604.16928::evidence_result::3": [
+      {
+        "passage_id": "passage:7c2858df29760513",
+        "match_score": 1.0,
+        "evidence_span": "Supplementary Figure 4. Bar chart comparing the correlation energies obtained with and without LCCVO."
+      }
+    ],
+    "2604.16928::evidence_result::4": [
+      {
+        "passage_id": "passage:7c2858df29760513",
+        "match_score": 1.0,
+        "evidence_span": "Supplementary Figure 6. Plot of CCSD energies of the N2 system with varying cell parameters, illustrating the O(1/L) relationship between the CCSD energies and the cell parameters."
+      }
+    ],
+    "2604.16928::constraint::0": [
+      {
+        "passage_id": "passage:c8ea8c0defe2d039",
+        "match_score": 0.8667,
+        "evidence_span": "Due to lim-ited computational resources, it is impossible to utilize a truly complete basis set."
+      },
+      {
+        "passage_id": "passage:c8ea8c0defe2d039",
+        "match_score": 0.8182,
+        "evidence_span": "Therefore, one has to compro-mise between accuracy and computational efficiency."
+      }
+    ],
+    "2604.16928::constraint::1": [
+      {
+        "passage_id": "passage:891c3ed1dba820ef",
+        "match_score": 1.0,
+        "evidence_span": "To account for finite size effects inherent in the plane-wave basis, each calculation is performed using a series of simple cubic simulation cells with edge lengths of L = 10 \u02daA, 12 \u02daA, 14 \u02daA, 16 \u02daA and 18 \u02daA, and the final energy is obtained by extrapolating the results to L = \u221e"
+      }
+    ],
+    "2604.16928::constraint::2": [
+      {
+        "passage_id": "passage:e2e04815f3a07a82",
+        "match_score": 1.0,
+        "evidence_span": "Therefore, the present results should be interpreted in the context of this inherent uncertainty."
+      }
+    ]
+  }
+}

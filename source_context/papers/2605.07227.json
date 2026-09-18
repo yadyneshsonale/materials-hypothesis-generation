@@ -1,0 +1,1260 @@
+{
+  "paper_id": "2605.07227",
+  "passages": [
+    {
+      "passage_id": "passage:ea7fffcae37c023e",
+      "paper_id": "2605.07227",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 0,
+      "text": "Physics Aware Representation Learning on\nElectronic Charge Density for Materials Property\narXiv:2605.07227v1  [cond-mat.mtrl-sci]  8 May 2026\nPrediction\nKammampati Sai Kumar, Albert Linda,\u2217Shubham Kumar Maurya, and\nSomnath Bhowmick\u2217\nDepartment of Materials Science & Engineering, Indian Institute of Technology, Kanpur,\nKanpur 208016, India\nE-mail: albert20@iitk.ac.in; bsomnath@iitk.ac.in",
+      "word_count": 44,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:5fd2ce2acef5cf7f",
+      "paper_id": "2605.07227",
+      "section": "Abstract",
+      "section_index": 1,
+      "passage_index": 0,
+      "text": "The fundamental quantity governing the mechanical and thermodynamic properties\nof a crystalline solid is its electronic charge density. Yet, its direct use for the rapid\nprediction of materials properties remains challenging due to its high dimensionality.\nHere, we present a physics-informed deep learning framework that directly predicts me-\nchanical and thermodynamic properties from the three-dimensional electronic charge\ndensity derived from density functional theory (DFT). The proposed approach first\nutilizes a three-dimensional convolutional autoencoder for unsupervised dimensional-\nity reduction, compressing a high-resolution charge-density grid (128 \u00d7 128 \u00d7 128) into\na compact latent representation (16 \u00d7 16 \u00d7 16 \u00d7 16) while preserving physically mean-\ningful features, as confirmed by negligible reconstruction errors across diverse crystal\nsystems. The compressed latent-space representation of charge density is then used by\ntwo different regression models for property prediction: Light Gradient Boosting Ma-\nchine (LightGBM) and Attention-based 3D Convolutional Neural Networks (Att CNN),\n1",
+      "word_count": 149,
+      "claim_ids": [
+        "2605.07227::problem_motivation::0",
+        "2605.07227::causal_claim::0",
+        "2605.07227::hypothesis_statement::0",
+        "2605.07227::evidence_result::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:1eeb617ea6bb2cc1",
+      "paper_id": "2605.07227",
+      "section": "Abstract",
+      "section_index": 1,
+      "passage_index": 1,
+      "text": "and their performance is compared. Combining composition-based descriptors (Mate-\nrial Agnostic Platform for Informatics and Exploration or MAGPIE) with electronic\ncharge density data further improves the model accuracy. Using a dataset of about\n6059 inorganic compounds spanning multiple crystal symmetries, the models achieve\nstrong predictive performance for bulk modulus K (R2 = 0.94), Young\u2019s modulus E\n(R2 = 0.88), shear modulus G (R2 = 0.87), formation energy Eform (R2 = 0.96), and\nDebye temperature \u0398 (R2 = 0.89). This work establishes electronic charge density as a\ntransferable, physics-grounded descriptor for materials property prediction, requiring\n\u22481/25 the computational resources of full-fledged DFT calculations.",
+      "word_count": 102,
+      "claim_ids": [
+        "2605.07227::causal_claim::4",
+        "2605.07227::causal_claim::7",
+        "2605.07227::hypothesis_statement::0",
+        "2605.07227::evidence_result::2"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:3ac376ff6c431520",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 0,
+      "text": "Machine learning (ML) has found widespread applications across materials science,1\u20134 encom-\npassing tasks such as crystal structure classification,5 microstructure segmentation,6 image\ndenoising,7 modeling of microstructural evolution,8\u201310 and the generation of hypothetical\nmaterials with targeted properties.11 Concurrently, density functional theory (DFT) has\nbeen pivotal in facilitating first-principles evaluations of fundamental material properties,\nsuch as elastic constants,12,13 thereby accelerating materials design by efficiently screening\ncandidate materials and minimizing experimental effort. Combining ML with DFT opens\nnew avenues for designing materials with customized properties.14,15\nML has revolutionized computational materials science by providing robust frameworks\nfor property prediction and the accelerated discovery of new materials.\nAmong various\napproaches, ensemble methods are very popular due to their higher accuracy, reduced over-\nfitting, and increased robustness to noise and outliers. Their effectiveness has been demon-\nstrated for predicting elastic properties of BCC Ti and Zr alloys14 and elastic moduli of the\nhigh-entropy alloy Al0.3CoCrFeNi.15 Another popular class is convolutional neural networks\n(CNNs), especially their three-dimensional (3D) variants, which have demonstrated remark-\nable ability to capture intricate correlations between a material\u2019s electronic charge density\n2",
+      "word_count": 178,
+      "claim_ids": [
+        "2605.07227::prior_approach::0",
+        "2605.07227::prior_approach::1"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:f4b4e42c28167faf",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 1,
+      "text": "and its macroscopic properties, such as elastic properties. Applications to FCC high-entropy\nalloys have demonstrated that these models can extract key information from the spatial\narrangement of charge density that correlates strongly with elastic constants, providing a\ndata-driven alternative to computationally intensive DFT calculations16. Features learned\nfrom the spatial distribution of electron density are more transferable and robust to compo-\nsitional changes than composition-based descriptors, which highlights the ability of charge\ndensity to capture intrinsic, physically meaningful structural patterns17.\nBeyond direct property prediction, deep learning approaches utilizing three-dimensional\n(3D) data have found diverse applications across materials science.\nFor instance, mod-\nels trained on sparse 3D electron density distributions have been employed for symmetry\nclassification in inorganic materials18. In another work, deep neural networks have been de-\nveloped to predict charge densities19. Recent studies have also explored optimized network\narchitectures, such as lean convolutional networks, for mapping electron charge density to\nmaterial properties, achieving reliable predictions with reduced computational cost20. Ma-\nchine learning has further been applied to develop lossless multiscale constitutive models\nand to predict full elasticity tensors, demonstrating its potential to capture complex mate-\nrial responses across multiple scales21. Additionally, high-throughput frameworks combining\nab initio calculations with machine learning have been introduced to predict the properties\nof hard-coating alloys22.\nWorking with high-dimensional data, such as the 3D charge densities of materials, poses\na significant computational challenge. Autoencoders offer an elegant solution for dimension-\nality reduction, adept at learning compact, low-dimensional representations from such inputs\nin an unsupervised manner. The effectiveness of autoencoders for dimensionality reduction\nhas recently been demonstrated, particularly in compressing sparse, high-dimensional scien-\ntific data.23,24 The resulting compressed latent space then serves as a highly efficient and\ninformative input for downstream modeling, such as ensemble-based regression or 3D-CNN\nregression.\n3",
+      "word_count": 293,
+      "claim_ids": [
+        "2605.07227::prior_approach::1",
+        "2605.07227::prior_approach::2",
+        "2605.07227::prior_approach::2",
+        "2605.07227::prior_approach::3",
+        "2605.07227::causal_claim::0",
+        "2605.07227::causal_claim::2",
+        "2605.07227::causal_claim::3",
+        "2605.07227::causal_claim::11",
+        "2605.07227::mechanism_principle::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:9c87f549aa1cf00b",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 2,
+      "text": "Building upon this extensive body of work, this study introduces a novel, two-stage hy-\nbrid approach to predict material properties, including bulk modulus (K), shear modulus\n(G), Young\u2019s modulus (E), formation energy per atom (Eform), and Debye temperature (\u0398)\ndirectly from ground state charge density, the fundamental variable representing the spatial\ndistribution of electrons in a system\u2019s lowest energy state. Determining elastic modulus from\nDFT requires a series of at least 15-20 calculations on strained unit cells. The Debye tem-\nperature requires a computationally intensive first-principles phonon dispersion calculation.\nReplacing those with a single charge density-based prediction has an obvious advantage,\nparticularly for accelerated high-throughput screening of materials for specific applications.\nFigure 1: The original charge density data (128 \u00d7 128 \u00d7 128) is passed through the encoder\nto obtain a compressed latent representation (16\u00d716\u00d716\u00d716). The autoencoder is trained\nby minimizing the reconstruction loss between the input and output. The compressed latent\nrepresentation is utilized for two purposes: (a) One can decode and get back the original\ncharge density, which is readable by the VESTA software,25 (b) It can be further flattened\nand used as input to a regression model for predicting materials properties. Two simple\ngraphical user interfaces (GUIs) are provided for charge density extraction and materials\nproperty prediction. We have also provided a database of compressed latent charge densities\n(requiring only \u22481/117 of the storage compared to the original charge densities), which\ncan be downloaded and extracted by the GUI. The property prediction module can read\nthe user-provided charge density for any new material not in the database and predict its\nproperties. All the codes and data are available at GitHub.\nThe overall model architecture and its capabilities are illustrated in Figure 1. To tackle\n4",
+      "word_count": 288,
+      "claim_ids": [
+        "2605.07227::problem_motivation::1",
+        "2605.07227::causal_claim::7",
+        "2605.07227::hypothesis_statement::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:b1309bb47b17a658",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 3,
+      "text": "the curse of dimensionality imposed by large N \u00d7 N \u00d7 N data grids, which leads to substan-\ntial computational overhead and potential overfitting, our work integrates an autoencoder\nfor efficient, unsupervised dimensionality reduction of the charge density. The autoencoder\nlearns a compact, low-dimensional latent representation (a \u201cdigital fingerprint\u201d of the elec-\ntronic structure) that effectively preserves the essential, physically meaningful features while\ndiscarding redundant information. Once the original charge density data (128 \u00d7 128 \u00d7 128)\ngoes through the encoder, it yields a compressed latent representation (16 \u00d7 16 \u00d7 16 \u00d7 16).\nThis allows us to provide a vast database of compressed latent charge densities (requiring\nonly \u22481/117 of the storage compared to the original charge densities), which can be decoded\nusing a simple GUI to reconstruct the original charge density (GitHub).\nThis compressed latent space then serves as the high-quality, reduced-feature input for\nthe subsequent regression model. The pre-processing step not only renders the downstream\nregression task computationally more tractable but also, crucially, enhances the model\u2019s\nefficiency and predictive accuracy. We compare different regression models: the Attention-\nEnhanced CNN and LightGBM. We have also used composition-based material descriptors\n(Material Agnostic Platform for Informatics and Exploration, or MAGPIE26,27) along with\nthe latent charge density to enhance the model\u2019s predictive power. One can provide the\ncharge density for any new material not in the database, and the trained model will predict\nits properties. A simple GUI is provided for materials property prediction (GitHub). The\nfollowing sections describe the technical details of the model.\nInput charge density calculation\nThe charge density maps used as inputs for the deep learning models were generated from\ndensity functional theory (DFT) calculations performed using the Vienna Ab initio Sim-\nulation Package (VASP, version 5.4.4).28 The corresponding crystal structures were ob-\ntained from the Materials Project database.29 The projector augmented wave (PAW) method\n5",
+      "word_count": 309,
+      "claim_ids": [
+        "2605.07227::problem_motivation::0",
+        "2605.07227::causal_claim::0",
+        "2605.07227::causal_claim::0",
+        "2605.07227::causal_claim::4",
+        "2605.07227::causal_claim::8"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:7b0a0890851fe172",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 4,
+      "text": "within the generalized gradient approximation using the Perdew\u2013Burke\u2013Ernzerhof exchange-\ncorrelation functional (PAW\u2013PBE)30,31 was employed to describe the electron\u2013ion interac-\ntions. The electronic wavefunctions were expanded in a plane-wave basis set with an energy\ncutoff of 500 eV to ensure an accurate representation of the electronic charge density.\nDuring structural relaxation, electronic self-consistency was achieved using a Gaussian\nsmearing scheme to ensure stable convergence of metallic and semimetallic systems, with\nan energy convergence threshold of 10\u22125 eV. Structural relaxation was performed using\nthe conjugate gradient algorithm, simultaneously optimizing ionic positions, cell shape, and\nvolume until the residual forces were below 10\u22123 eV\u00b7\u02daA\u22121. Instead of using a fixed number of\nk-points, reciprocal space sampling was controlled using a uniform k-point spacing of 0.1 \u02daA\u22121,\nensuring consistent Brillouin-zone resolution for materials with different lattice parameters.\nFollowing structural convergence, the electronic charge density was recalculated using the\ntetrahedron method with Blochl corrections to obtain a high-fidelity, smearing-independent\ncharge density. The resulting three-dimensional charge density distributions were extracted\nin volumetric form and used as inputs for subsequent regression analysis.\nFigure 2: Representative crystal structures and their distribution across crystal systems.\nThe panel on the left illustrates one representative structure from each crystal system, high-\nlighting the diversity of structural motifs: (a) cubic, (b) tetragonal, (c) orthorhombic, (d)\nhexagonal, (e) trigonal, (f) monoclinic, (g) triclinic. The panel on the right presents a bar\nplot of the number of structures per crystal system, providing a quantitative overview of the\ndataset\u2019s composition.\n6\n2245\nCubic\n877\nHexagonal\n458\nTrigonal\nCrystal System\n1193\nTetragonal\n940\nOrthorhombic\n312\nMonoclinic\n34\nTriclinic\n0\n500\n1000\n1500\n2000\n2500\nNumber of Structures",
+      "word_count": 270,
+      "claim_ids": [
+        "2605.07227::rejected_alternative::0",
+        "2605.07227::mechanism_principle::2"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:ed41e5b8faea4f6a",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 5,
+      "text": "The charge density values were transformed into array-based representations to enable ef-\nficient processing within the deep learning framework, using the Atomic Simulation Environ-\nment (ASE).32 Owing to inherent structural variations among different materials (Figure 2),\nthe dimensions of these 3D arrays varied substantially across the dataset. To facilitate batch\nprocessing and convolutional operations, all input samples were padded to a uniform shape\nof 128 \u00d7 128 \u00d7 128. This dimension was chosen for its compatibility with the deep learning\nmodel architecture, as it enables two successive max-pooling operations with a pool size of 2\n(specifically, 16\u00d723 = 128), making it easier to apply the max-pooling operations efficiently.\nThe input charge density data were not scaled during autoencoder training to preserve the\noriginal distribution. However, after obtaining the latent features from the trained encoder,\nthey were standardized before training the regression model.\nThis step was essential to\nensuring stable, efficient learning.\nInput property database\nThe target properties considered in this work include the bulk modulus (K), shear modulus\n(G), Young\u2019s modulus (E), formation energy per atom (Eform), and Debye temperature(\u0398).\nExcept for the formation energy per atom, the remaining quantities were sourced from\nthe Materials Project database,29 which provides results from standardized calculations for\nthese mechanical and thermodynamic parameters. We calculated Eform ourselves, using free\natoms as a reference. The dataset encompasses a diverse range of crystal classes and space\ngroups. The distribution of samples across different crystal classes is presented in Figure 2.\nTheir corresponding property distributions are visualized using histograms and boxplots in\nFigure 3. Across all target properties, the dataset exhibits significant variability and strong\nnon-Gaussian behavior. These plots highlight the chemically and mechanically diverse nature\nof the dataset, providing essential context for interpreting subsequent predictive analyses.\nThe following texts present a detailed statistical analysis of the data.\n7",
+      "word_count": 302,
+      "claim_ids": [
+        "2605.07227::rejected_alternative::1",
+        "2605.07227::causal_claim::10",
+        "2605.07227::mechanism_principle::3",
+        "2605.07227::constraint::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:53be77a7645413fd",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 6,
+      "text": "Figure 3: Statistical distributions of five key material properties: bulk modulus (K), Young\u2019s\nmodulus (E), shear modulus (G), formation energy (Eform), and Debye temperature (\u0398), are\npresented. The main panels display histograms of each property, overlaid with Kernel Density\nEstimation (KDE) curves (black solid lines).\nInset box plots provide a complementary\nsummary of the data, indicating the median, interquartile range, whiskers, and potential\noutliers. The bottom-right section summarizes key statistics of 6059 materials, including\nmean, standard deviation, percentiles, and extremes.\n8",
+      "word_count": 81,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:966f84f78c4828e8",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 7,
+      "text": "The distribution of bulk modulus values spans a wide range, from approximately 0.1\nGPa to 424.2 GPa, with a mean value of 104.5 GPa and a standard deviation of 71.4 GPa.\nThe median bulk modulus is 87.7 GPa, indicating a moderately right-skewed distribution\ndominated by materials with low to intermediate stiffness. The interquartile range spans\n48.7 GPa (25th percentile) to 149.7 GPa (75th percentile), highlighting the substantial di-\nversity in volumetric stiffness across the dataset. The long tail toward higher bulk modulus\nvalues corresponds to a limited number of ultra-stiff materials, typically associated with\nstrong covalent or mixed covalent-ionic bonding. The observed skewness possibly reflects\nthe natural imbalance in available materials data, where mechanically soft and moderately\nstiff compounds are more prevalent than extremely incompressible systems.\nYoung\u2019s modulus exhibits a broad range, from approximately 0.4 GPa to 762.7 GPa, with\na mean of 133.5 GPa and a standard deviation of 101.7 GPa. The median value of 108.5\nGPa lies noticeably below the mean, due to the right-skewed distribution. The interquartile\nrange, spanning 57.7 GPa to 185.4 GPa, suggests that the majority of materials cluster\nwithin a moderate stiffness regime, while a small fraction of outliers exhibit exceptionally\nhigh tensile stiffness.\nThe shear modulus distribution extends from values as low as 0.12 GPa to a maximum of\n292.4 GPa, with a mean of 52.6 GPa and a standard deviation of 41.2 GPa. The median shear\nmodulus is 42.3 GPa, indicating a concentration of materials with relatively low resistance\nto shear deformation. The interquartile range, spanning from 22.4 GPa to 72.3 GPa, reveals\nthat shear stiffness is generally lower and more narrowly distributed than bulk and Young\u2019s\nmoduli.\nThe formation energy per atom exhibits a distinctly different distribution compared to\nthe elastic properties, spanning from -24.415 eV/atom to values close to 0 eV/atom. The\nmean formation energy is -4.873 eV/atom, with a standard deviation of 1.697 eV/atom and\na median value of -4.796 eV/atom. The narrow clustering of values around strongly negative\nenergies indicates that thermodynamically stable compounds dominate the dataset. Such\n9",
+      "word_count": 341,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:c45afbd768fe652c",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 8,
+      "text": "a distribution is characteristic of a curated materials database, where only experimentally\nreported or computationally stable compounds are included.\nDebye temperature values span a wide range from approximately 25.8 K to 1679.2 K, with\na mean of 331.6 K and a large standard deviation of 173.0 K. The median Debye temperature\nis 303.6 K, with an interquartile range extending from 213.2 K to 409.6 K. The outliers\nrepresent a smaller subset of compounds having exceptionally high Debye temperatures,\ntypically associated with light elements and strong interatomic bonding.\nLatent representation of charge density\nEncoder\nDecoder\n128x128x128x16\n128x128x128\n64x64x64x16\n64x64x64x32\n32x32x32x32\n16x16x16x16\nConv3D(16 filters) \nMaxPooling3D(2\u00d72\u00d72)\nConv3D(16 filters)\nConv3D(32 filters)\nMaxPooling3D(2\u00d72\u00d72)\nConv3D(32 filters)\nFigure 4: Schematic representation of the 3D convolutional autoencoder architecture. The\nencoder progressively reduces the input volume of size 128\u00d7128\u00d7128\u00d71 through convolution\nand max-pooling operations, compressing it into a latent representation of size 16 \u00d7 16 \u00d7\n16 \u00d7 16.\nA 3D convolutional autoencoder was trained on raw charge density grids to obtain com-\npact latent representations of the electronic structure. During autoencoder training, rota-\ntional data augmentation was applied to the charge density grids. Each sample was rotated\nalong the principal axes to generate 12 distinct orientations, which were included in the\ntraining set.\nAs shown in Figure 1, the encoder compresses the high-dimensional input\ninto a latent tensor, which is subsequently passed to a downstream regression model. This\ntwo-stage framework enabled accurate estimation of elastic properties, formation energy,\n10\n128x128x128x16\n64x64x64x16\n128x128x128\n32x32x32x32\n16x16x16x32\nUpSampling3D(2\u00d72\u00d72)\nConv3D(16 filters)\nUpSampling3D(2\u00d72\u00d72)\nConv3D(1 filter, linear)",
+      "word_count": 253,
+      "claim_ids": [
+        "2605.07227::causal_claim::2"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:69cea11e2b20eecb",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 9,
+      "text": "and Debye temperature directly from charge-density data, without relying on hand-crafted\ndescriptors.\nThe autoencoder is a fully convolutional neural network comprising two main parts: the\nencoder and the decoder. Both components utilize three-dimensional (3D) convolutional\noperations, making the architecture well-suited for handling the spatial complexity of volu-\nmetric charge density data. The architecture of the autoencoder is shown in Figure 4. The\nencoder compresses the high-dimensional input volume of shape (128 \u00d7 128 \u00d7 128 \u00d7 1) into a\ncompact latent representation of shape (16\u00d716\u00d716\u00d716). This is achieved by applying two\nconsecutive blocks, each consisting of a 3D convolutional layer followed by a ReLU activa-\ntion and max pooling, and then one final 3D convolution with ReLU to produce the latent\nspace. The decoder mirrors this structure, reconstructing the original input by applying\ntwo 3D convolutional blocks with ReLU activation and upsampling, followed by a final 3D\nconvolution to recover the output volume.\nTo ensure training stability and enhance generalization, each convolutional block is fol-\nlowed by batch normalization and dropout regularization.\nBatch normalization helps to\naccelerate convergence and mitigate internal covariate shift, while dropout randomly turns\noff a fraction of neurons during training, reducing the risk of overfitting. The final out-\nput of the decoder retains the same shape as the original input, enabling direct voxel-wise\ncomparison during training.\nThe dataset was randomly split into 80% for training, 10% for validation, and 10% for\ntesting to ensure robust model evaluation on unseen data. The training setup was carefully\ndesigned to strike a balance between learning efficiency and model generalization. These\nconfigurations aim to ensure stable convergence while preventing overfitting and optimizing\ntraining time. Early stopping based on the validation loss was used to avoid overfitting\nand optimize training time. The model\u2019s performance was continuously monitored on the\nvalidation set to ensure stable convergence and reliable generalization. The autoencoder was\noptimized by minimizing the mean squared error (MSE) loss, which computes the average\n11",
+      "word_count": 324,
+      "claim_ids": [
+        "2605.07227::causal_claim::12",
+        "2605.07227::causal_claim::12",
+        "2605.07227::causal_claim::12"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:0750bbccfc7b110a",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 10,
+      "text": "squared difference between each voxel in the input and its reconstruction across the entire\nbatch, depth, height, and width dimensions.\nFurther details are provided in Figure S1,\nSupporting Information (SI).\nOriginal \nReconstructed\nDi\ufb00erence\nMg2Pd\nK3BiTe3\nFigure 5: Comparison of the charge density distributions for representative cubic compounds.\nThe first column shows the original charge density, the second column presents the recon-\nstructed charge density from the machine learning model, and the third column shows the\ndifference between the original and reconstructed charge densities.\nTo evaluate the reconstruction performance of the trained autoencoder, two test com-\npounds, Mg2Pd and K3BiTe3, were randomly selected, as shown in Figure 5. The figure\npresents three-dimensional visualizations and two-dimensional cross-sectional slices of the\n12",
+      "word_count": 119,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:67e562cd08c4813a",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 11,
+      "text": "original and reconstructed charge densities, along with their corresponding difference maps.\nThe differences are consistently negligible across both samples, indicating that the autoen-\ncoder successfully learns a compact latent representation while preserving the essential struc-\ntural features of the input data. This confirms that the latent space is sufficiently expressive\nfor subsequent downstream tasks.\nTo evaluate model performance across the entire test set, reconstruction errors were\ncomputed. On average, the MSE was 2.1 \u00d7 10\u22124, and the average MAE was 0.00402. These\nvalues confirm that the autoencoder produces consistent, accurate reconstructions across\ndiverse samples, with no significant deviations or outliers, thereby demonstrating the model\u2019s\nability to encode and regenerate complex volumetric features effectively.\nOther than the selected (16 \u00d7 16 \u00d7 16 \u00d7 16) latent representation, two more latent\nconfigurations were explored.\nA strongly compressed model produced a latent tensor of\n(8 \u00d7 8 \u00d7 8 \u00d7 8), which reduced storage requirements but led to noticeable loss in the recon-\nstructed charge densities [Figure S2 and Figure S3, SI], and it was discarded. Conversely, a\nhigher-dimensional model with a latent space of (32 \u00d7 32 \u00d7 32 \u00d7 32) preserved fine-grained\nfeatures and yielded slightly improved reconstruction quality [Figure S2 and Figure S3,\nSI]. When higher-dimensional latent representations were processed through appropriately\nadapted regression models for property prediction, this significantly increased computational\ncost without affecting the final outcome. This exercise confirmed that the intermediate la-\ntent space dimension of (16\u00d716\u00d716\u00d716) offers the optimal balance between reconstruction\nfidelity, predictive performance, and computational efficiency.\nRegression Model: LightGBM\nProperty predictions were done using a hybrid tree-fusion learning framework that integrates\nlatent charge density (dimension: 16\u00d716\u00d716\u00d716, derived from DFT-calculated 3D charge\ndensity) with composition-based descriptors. This approach is designed to simultaneously\n13",
+      "word_count": 288,
+      "claim_ids": [
+        "2605.07227::prior_limitation::0",
+        "2605.07227::rejected_alternative::2",
+        "2605.07227::causal_claim::1",
+        "2605.07227::evidence_result::0",
+        "2605.07227::evidence_result::0",
+        "2605.07227::evidence_result::1",
+        "2605.07227::evidence_result::1"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:4e9621f120a7d325",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 12,
+      "text": "Flatten latent\ntensors\nStandard\nLatent\nScaler\nPCA\nSpace\nMagpie\nfeature\ngenerator\nChemical\nDrop\nidenti\ufb01ers\nStandard\nformulas\nScaler\nFigure 6: Schematic of the hybrid feature-fusion workflow for materials property prediction,\ncombining PCA-reduced latent features from a deep-learning model with standardized MAG-\nPIE compositional descriptors, followed by K-fold training and prediction using a LightGBM\nregressor.\ncapture local electronic-structure features and global chemical trends within a unified regres-\nsion model. A schematic overview of the complete tree-fusion learning workflow, including\nfeature generation, dimensionality reduction, feature concatenation, and model training, is\nshown in Figure 6.\nAs described in the previous section, latent representations of the charge density were\nobtained from a pretrained autoencoder and stored as three-dimensional tensors for each\ncompound. These tensors were flattened into one-dimensional feature vectors and standard-\nized using a zero-mean, unit-variance transformation. The dimensionality of the flattened\nlatent space was further reduced using principal component analysis (PCA) to minimize\nfeature redundancy, suppress noise, and preserve the dominant variance. A fixed number of\n512 principal components was retained, capturing the majority of the explained variance and\nproviding a compact yet information-rich representation of the latent electronic features.\nIn parallel, composition-derived MAGPIE descriptors were extracted for each compound,\nencompassing averaged elemental properties such as atomic mass, electronegativity, valence-\nelectron count, and periodic table attributes [Section S1, SI]. These descriptors were indepen-\ndently standardized to ensure numerical compatibility with the PCA-reduced latent features.\nThe final input feature vector was constructed by concatenating the PCA-compressed latent\nfeatures with the scaled MAGPIE descriptors, yielding a fused representation that encodes\nboth electronic charge density and compositional information. Prior to model training, nu-\nmerical outliers in the target bulk modulus values were removed to improve model robustness\n14\nKFold\nTrain/Val/Test\nConcatenate\nLightGBM\nRegressorn\nfeatures\nsplit\nestimator",
+      "word_count": 290,
+      "claim_ids": [
+        "2605.07227::causal_claim::9",
+        "2605.07227::causal_claim::13",
+        "2605.07227::constraint::1"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:3490d67dc9a6508d",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 13,
+      "text": "and prevent undue influence from extreme values. The cleaned dataset was then partitioned\nusing a shuffled five-fold cross-validation, yielding distinct training, validation, and test sub-\nsets. The validation set was used exclusively for hyperparameter optimization, while the test\nset remained completely unseen during model selection and evaluation.\nThe regression model was implemented using the Light Gradient Boosting Machine\n(LightGBM), a gradient-boosted decision tree ensemble particularly well-suited to high-\ndimensional, heterogeneous feature spaces. LightGBM iteratively constructs decision trees\nby minimizing a regularized least-squares loss function, enabling the efficient learning of\ncomplex non-linear interactions between latent and compositional features. Hyperparame-\nters governing tree depth, number of leaves, learning rate, sub-sampling ratios, and regular-\nization strengths were optimized using Bayesian optimization as implemented in the Optuna\nframework. The optimization objective was the validation root mean square error (RMSE),\nand early stopping was employed during training to mitigate overfitting.\nAfter hyperparameter optimization, the final LightGBM model was retrained using the\noptimal parameter set with a larger number of boosting iterations.\nModel performance\nwas assessed on the independent test set using the coefficient of determination (R2), mean\nabsolute error (MAE), and root mean square error (RMSE) [Section S2, SI]. All computations\nwere performed with fixed random seeds to ensure full reproducibility. The trained model\nwas serialized for subsequent deployment and analysis, enabling consistent property-value\npredictions for previously unseen compounds.\nRegression Model: Attention based 3D CNN\nThe materials were represented using volumetric electronic structure descriptors in conjunc-\ntion with composition-based MAGPIE features [Figure 7]. The volumetric latent tensors\nwere normalized to ensure numerical stability, while the composition-derived descriptors\nwere standardized using zero-mean, unit-variance scaling. Target values were scaled to the\n15",
+      "word_count": 275,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:fc00fce3f2a909f2",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 14,
+      "text": "Magpie Input\n8x8x8x128\n8x8x8x64\nLatent Space\n16x16x16x16\n8x8x8x64\nResidual block (128):\nConv3D\u00d72 + BatchNorm + \nSwish, 1\u00d71 Conv shortcut (if\nResidual block \n(64): Conv3D\u00d72 +\nConv3D + BatchNorm\nSwish  +\nMaxPool3D(2)\nBatch N orm +\nchannels change),\nSwish + skip \n(matched ch.) + \nDualAttention3D\nDualAttention3D\nFigure 7: Attention 3D CNN model: The architecture consists of stacked residual 3D convo-\nlutional blocks with batch normalization and Swish activation, where dual-attention mod-\nules selectively emphasize physically relevant spatial regions and feature channels within\nthe charge-density representation. Global average pooling condenses the learned descriptors\ninto a fixed-length feature vector, which is combined with Magpie descriptors to incorporate\nchemical information. The resulting hybrid representation is processed through fully con-\nnected layers with batch normalization and dropout to produce the final output.\n16\n256 Dimensional\nFeatures\n128 Dimensional\nFeatures\nDense(256) +\nReLU\nBatchNorm +\nDropout(0.3)\nDense(128) +\n8x8x8x256\nReLU\nBatchNorm +\nDropout(0.3)\n256-d\nTunable\nHead\nOutput\nConcentrate\nResidual blocks\n1\u20133 \u00d7 \n[Dense(128\u2013512,\nDualAttention3D\n(256):\nConv3D\u00d72 + \nBatchNorm +\nCNN(256) + \nMagpie(128) \u2192 \nConcatenate \u2192 384-\n(final) + \nGlobalAverage \nPooling3D \u2192 256-d\nSwish) + \nBatchNorm + \nDropout(0.1\u2013\n0.5)] + L2 (1e-5\u2013\n1e-3)\nSwish + skip \nconnections + \nDualAttention3D\nd fused vector\nfeature vector",
+      "word_count": 197,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:9de1ed18a4a9755a",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 15,
+      "text": "unit interval during training and subsequently transformed back to their original physical\nunits for evaluation.\nThe 3D CNN model is composed of stacked residual convolutional blocks with batch\nnormalization and Swish activation. Dual-attention modules were incorporated within the\nnetwork to enhance the representation of physically relevant spatial regions and feature\nchannels in the volumetric data.\nGlobal average pooling was applied to obtain a fixed-\nlength descriptor of the electronic charge density. In parallel, composition-derived MAGPIE\ndescriptors were transformed using a multilayer perceptron with fully connected layers, batch\nnormalization, and dropout regularization. The outputs of the volumetric and compositional\nbranches were concatenated to form a hybrid representation, which was further processed\nthrough a regression head composed of one to three dense layers before producing the final\ntarget property prediction.\nModel hyperparameters, including the depth and width of the regression head, regular-\nization strength, dropout rates, optimizer choice, and learning rate, were optimized using\nrandom search with validation loss as the objective. Training was performed using the mean\nsquared error loss function with early stopping to prevent overfitting.\nThe dataset was\ndivided into training, validation, and test subsets using fixed random seeds to ensure repro-\nducibility. The final model\u2019s performance was assessed on the independent test set using R2\nand MAE.\nResults and Discussions\nThe effectiveness of the first hybrid ML architecture (latent charge density + MAGPIE\nfeatures, LightGBM regression) is quantitatively evaluated using the actual-versus-predicted\nplots shown in Figure 8, which provide a direct assessment of model accuracy across the\nentire test dataset. Evidently, the model shows excellent performance across all five target\nproperties. Among the elastic properties, the bulk modulus shows the highest accuracy, with\n17",
+      "word_count": 276,
+      "claim_ids": [
+        "2605.07227::causal_claim::14"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:6e04397ad68a655f",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 16,
+      "text": "Figure 8: LightGBM model: Actual versus predicted values for the five material properties\nconsidered: bulk modulus, Young\u2019s modulus, shear modulus, formation energy, and Debye\ntemperature. The diagonal black line represents the ideal case of perfect prediction. The\nbottom-right panel compares the impact of charge density and MAGPIE features on predic-\ntions, indicating that the latter contribute more across the evaluated properties.\nan R2 of 0.94. Young\u2019s modulus and shear modulus are also predicted with high accuracy,\nachieving R2 values of 0.88 and 0.87, respectively. The formation energy per atom exhibits\nthe strongest correlation between predicted and actual values, with an R2 of 0.96.\nThe\nDebye temperature, which reflects lattice vibrational characteristics and elastic stiffness, is\nalso predicted with reasonable accuracy (R2 = 0.89). The bottom-right panel of Figure 8\ncompares the impact of charge density and MAGPIE features on predictions, estimated using\nSHAP (SHapley Additive exPlanations), indicating that the latter contribute more across\nthe evaluated properties, although they still complement each other.\nThe effectiveness of the second hybrid ML architecture (latent charge density + MAG-\nPIE features, Attention CNN regression) is quantitatively evaluated using the actual-versus-\n18",
+      "word_count": 187,
+      "claim_ids": [
+        "2605.07227::evidence_result::2",
+        "2605.07227::evidence_result::3",
+        "2605.07227::evidence_result::3"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:19a07ad6c1a02aca",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 17,
+      "text": "Figure 9: Attention CNN model: Actual versus predicted values for the five material prop-\nerties considered: bulk modulus, Young\u2019s modulus, shear modulus, formation energy, and\nDebye temperature. The diagonal black line represents the ideal case of perfect prediction.\nThe bottom-right panel compares the impact of charge density and MAGPIE features on\npredictions, indicating that the former contributes more across the evaluated properties.\npredicted plots shown in Figure 9, providing a direct assessment of model accuracy across\nthe entire test dataset. Similar to the previous model, this also shows very good performance\nacross all five target properties. Among the elastic properties, the bulk modulus shows the\nhighest accuracy, with an R2 of 0.94. Young\u2019s modulus and shear modulus are also predicted\nwith high accuracy, achieving R2 values of 0.87 and 0.85, respectively. The formation en-\nergy per atom achieves an R2 of 0.88, while the Debye temperature is also predicted with\nreasonable accuracy (R2 = 0.86). The bottom-right panel of Figure 9 compares the impact\nof charge density and MAGPIE features on predictions. Unlike the LightGBM regression\nmodel, the charge density features contribute more across the evaluated properties in the\ncase of the Attention CNN regression model.\n19",
+      "word_count": 197,
+      "claim_ids": [
+        "2605.07227::evidence_result::4",
+        "2605.07227::contradiction::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:871b743f4c78f80e",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 18,
+      "text": "Table 1: R2 values obtained from different ML models. The first two rows highlight the\nmodels trained only on the Latent charge density (CD) and only on Magpie features. The\nlast two rows highlight the models trained with hybrid features (charge density + MAGPIE),\nand predictions are done using LightGBM and Attention CNN. Our results compare well\nwith Crystal Graph Convolutional Neural Networks (CGCNN),33 which achieves R2 values\nof 0.93, 0.89, 0.88, and 0.94 for K, E, G, and \u0398, respectively.\nInput\nK\nE\nG\nEform\n\u0398\nLatent CD + CNN\n0.90\n0.79\n0.80\n0.68\n0.73\nMagpie + Att CNN\n0.92\n0.85\n0.85\n0.88\n0.90\nLatent CD + MAGPIE + LightGBM\n0.94\n0.88\n0.87\n0.96\n0.89\nLatent CD + MAGPIE + Att CNN\n0.94\n0.87\n0.85\n0.88\n0.86\nHaving observed contrasting behavior of the two hybrid models in terms of feature im-\nportance analysis, we now analyze further to quantify the effect of charge density and Mag-\npie descriptors systematically. For this purpose, two additional deep learning models were\ntrained and evaluated on the same dataset using the same train-validation-test splits. The\nfirst model [Section S3, Figure S4, SI] is trained only on the Latent charge density (CD). As\nreported in Table 1, the model performs reasonably well for elastic moduli prediction, but not\nso well for formation energy and Debye temperature. The underlying bonding characteristic\nis encoded in the charge density, allowing a reasonable prediction of elastic moduli. Debye\ntemperature, on the other hand, not only depends on elastic moduli, but also is inversely\nproportional to the molecular weight, which is not encoded in the Latent CD. Similarly, for-\nmation energy depends on factors such as electronegativity, ionization energy, and electron\naffinity, which are not encoded in the Latent CD. As shown below, inclusion of MAGPIE\nfeatures significantly improves the prediction of Debye temperature and formation energy.\nThe second model [Section S4, Figure S5, SI] is trained only on the MAGPIE features\nand outperforms the Latent CD-only model comprehensively. However, compared to end-to-\nend models based solely on composition, the charge density provides an explicit electronic\nrepresentation of bonding, charge redistribution, and screening effects.\nThis representa-\ntion improves physical interpretability and enables potential transferability in certain cases",
+      "word_count": 368,
+      "claim_ids": [
+        "2605.07227::prior_limitation::1",
+        "2605.07227::causal_claim::4",
+        "2605.07227::causal_claim::5",
+        "2605.07227::causal_claim::6",
+        "2605.07227::mechanism_principle::0",
+        "2605.07227::mechanism_principle::0",
+        "2605.07227::evidence_result::5",
+        "2605.07227::evidence_result::5"
+      ],
+      "citation_ids": [],
+      "table_ids": [
+        "table:236d5049ca840147"
+      ]
+    },
+    {
+      "passage_id": "passage:d878f0e4cdca22db",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 19,
+      "text": "This representa-\ntion improves physical interpretability and enables potential transferability in certain cases\nwhere composition-only models may struggle. For example, in the case of polymorphs, the\n20",
+      "word_count": 27,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:f06e772a09d568df",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 20,
+      "text": "chemical formula remains the same, although the charge density changes. In such a case,\ncharge-density-based predictions are the only option. This further underscores the useful-\nness of a hybrid model combining CD and MAGPIE features. Overall, incorporating charge\ndensity\u2013based features significantly enhances the model\u2019s ability to capture the underlying\nphysics governing material properties.\nTo verify the model robustness, we have carried out multiple tests. First, we confirmed the\nrotational invariance by rotating the input charge density by different angles and predicting\nproperties using the rotated charge density. The predicted values lie within a narrow range,\nwith a standard deviation up to \u22485% [see Fig S6, SI], indicating that our model is robust\nto rotations. Next, we also confirmed that the outcome does not depend on the choice of\nthe unit cell. For Cu3Al and Mg2Ca, we have compared the results of a small simulation cell\nand a big supercell, and obtained a very good agreement [see Fig S7, SI].\nLet us highlight the significant difference between our method and similar approaches\nused to predict elastic properties from charge densities of materials16,17 [see Figure S8, SI].\nOther previously reported combined DFT-ML work dealt with a specific type of material,\nlike face-centered cubic high entropy alloys by Mirzaee et al.16 or face-centered cubic ma-\nterials by Zhao et al.,17 and lacks the generality of the present work in terms of type of\nbonding and crystal symmetry. Similarly, Sidnov et al. proposed a two-stage CatBoost-\nbased framework for predicting elastic properties of BCC Ti and Zr alloys,14 and Kim et al.\nemployed Gradient-Boosted Trees (GB-Trees) to predict the bulk and shear moduli of the\nhigh-entropy alloy Al0.3CoCrFeNi.15 The dataset\u2019s restricted nature limits its applicability\nto more general crystal systems.\nNotably, many descriptor-based studies consistently identify valence electron configura-\ntion as a dominant feature governing elastic behavior,34\u201338 highlighting the central role of\nelectronic interactions in determining mechanical properties. These interactions are inher-\nently encoded in the electronic charge density distribution, motivating the development of\ndirect charge-density-based learning approaches. Ground state electron charge density \u03c1(r)\n21",
+      "word_count": 341,
+      "claim_ids": [
+        "2605.07227::prior_approach::0",
+        "2605.07227::prior_approach::4",
+        "2605.07227::prior_limitation::2",
+        "2605.07227::rejected_alternative::3",
+        "2605.07227::inspiration_source::0",
+        "2605.07227::inspiration_source::0",
+        "2605.07227::causal_claim::2",
+        "2605.07227::mechanism_principle::1",
+        "2605.07227::hypothesis_statement::0",
+        "2605.07227::evidence_result::6",
+        "2605.07227::evidence_result::6"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:885d9f447880b827",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 21,
+      "text": "is the central, fundamental quantity in DFT, as the Hohenberg-Kohn theorems state that\nall ground-state properties, including energy, forces, and electronic structure, are unique\nfunctionals of \u03c1(r). Thus, DFT-based charge density is a natural choice, as it is guaranteed\nto provide a rich set of features for property prediction.\nTo facilitate the practical adoption of the proposed framework, a Python-based GUI\n(GitHub) has been developed that enables direct interaction with the trained models. The\nGUI serves two primary purposes. First, it allows users to load three-dimensional electronic\ncharge density data directly from VASP CHGCAR files and predict key material properties,\nincluding bulk modulus, Young\u2019s modulus, shear modulus, formation energy per atom, and\nDebye temperature, using either the trained LightGBM model or the Attention CNN model.\nThis functionality eliminates the need for manual data preprocessing and provides an efficient\npathway for rapid property evaluation from first-principles electronic structure calculations.\nA model VASP INCAR file has been provided in Section S5, SI, showing the recommended\nparameters, particularly ENCUT and KSPACING.\nThe second utility of the GUI enables users to load compressed latent-space represen-\ntations of 6059 materials generated by the autoencoder and reconstruct the corresponding\nthree-dimensional charge density fields. This might be a valuable ground-state charge density\ndataset readily available to researchers and easily accessible due to its compressed format,\nwhich would otherwise require massive storage. Together, these functionalities demonstrate\nthe practical utility of the proposed deep learning framework and highlight its potential for\nintegration into high-throughput computational materials workflows.\nIn conventional DFT workflows, the computational cost of obtaining elastic properties\nand related quantities depends on the symmetry.\nFor example, in cubic systems, three\nindependent deformation modes are required to determine the elastic stiffness matrix. Each\ndeformation mode typically involves at least seven total-energy calculations at different strain\nmagnitudes, resulting in approximately 21 calculations.\nFor lower-symmetry structures,\ncomputational effort increases substantially; for example, 21 independent deformation modes\n22",
+      "word_count": 316,
+      "claim_ids": [
+        "2605.07227::causal_claim::8",
+        "2605.07227::causal_claim::15",
+        "2605.07227::mechanism_principle::0",
+        "2605.07227::evidence_result::7"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:d816f83b61f45939",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 22,
+      "text": "are required in triclinic crystals, with at least 7 calculations per deformation, resulting in\napproximately 147 total DFT calculations. The method described in this work can predict\nmultiple properties from a single self-consistent DFT calculation, requiring \u22481/25 (or even\nless for low-symmetry systems) of the computational resources required for full-fledged DFT\ncalculations.\nConclusions\nThis work establishes a robust and scalable deep learning framework that directly links three-\ndimensional electronic charge density from ab initio calculations to macroscopic mechanical\nand thermodynamic properties. By combining a 3D convolutional autoencoder for unsuper-\nvised dimensionality reduction with a regression model, the proposed approach effectively\nbridges the quantum-mechanical electronic structure and material response.\nThe 3D convolutional autoencoder compresses high-dimensional charge density grids\n(128 \u00d7 128 \u00d7 128) into a compact latent representation (16 \u00d7 16 \u00d7 16 \u00d7 16) while pre-\nserving physically meaningful features, as confirmed by negligible reconstruction errors for\nrepresentative compounds.\nComposition-based MAGPIE descriptors are combined with the latent charge-density,\nand the combined feature set is used for the regression. The resulting hybrid model consis-\ntently outperforms solely charge density-based deep learning approaches, achieving excellent\npredictive accuracy across all target properties, using LightVBM and Attention CNN-based\nregression.\nThe ability to predict multiple properties from a single self-consistent DFT output, to-\ngether with the developed Python-based graphical user interface (GUI), highlights the po-\ntential of this approach for high-throughput and practical materials screening, requiring\n\u22481/25 the computational resources of full-fledged DFT calculations. Overall, this study\ndemonstrates that electronic charge density is a unified, transferable, and physics-informed\n23",
+      "word_count": 254,
+      "claim_ids": [
+        "2605.07227::causal_claim::7"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:e719a6dc42378962",
+      "paper_id": "2605.07227",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 23,
+      "text": "descriptor that can capture complex structure-property relationships within a single learning\nframework.\nData and Software Availability\nData and code are available on GitHub https://github.com/CMSLabIITK/LatentMatFusion.",
+      "word_count": 24,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:626c43b3ff32e8a2",
+      "paper_id": "2605.07227",
+      "section": "Acknowledgement",
+      "section_index": 3,
+      "passage_index": 0,
+      "text": "We acknowledge the National Super Computing Mission (NSM) for providing computing\nresources of \u201cPARAM Sanganak\u201d at IIT Kanpur, which is implemented by CDAC and\nsupported by the Ministry of Electronics and Information Technology (MeitY) and the De-\npartment of Science and Technology (DST), Government of India. We also thank the ICME\nNational Hub, IIT Kanpur, and CC, IIT Kanpur, for providing an HPC facility.",
+      "word_count": 64,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:438d6f1de26f130a",
+      "paper_id": "2605.07227",
+      "section": "Supporting Information",
+      "section_index": 4,
+      "passage_index": 0,
+      "text": "Additional details are provided regarding: Training and validation loss curve of the au-\ntoencoder model, Charge density reconstruction with different latent dimensions, Details of\nMAGPIE features, Details of loss function, Charge density-only CNN model, MAGPIE-only\nML model, Model robustness in terms of rotation and cell size, Comparison with literature,\nModel VASP INCAR file.",
+      "word_count": 53,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:285e6dfe2f3bc5d5",
+      "paper_id": "2605.07227",
+      "section": "References",
+      "section_index": 5,
+      "passage_index": 0,
+      "text": "(1) Kumar, R.; Joshi, A.; Khan, S. A.; Misra, S. Automated extraction of synthesis pa-\nrameters of pulsed laser-deposited materials from scientific literature. Digital Discovery\n2024, 3, 944\u2013953.\n24",
+      "word_count": 29,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:cbde3dc138d2459c",
+      "paper_id": "2605.07227",
+      "section": "References",
+      "section_index": 5,
+      "passage_index": 1,
+      "text": "(2) Sinha, P.; Joshi, A.; Dey, R.; Misra, S. Machine-Learning-Assisted Materials Discovery\nfrom Electronic Band Structure. Journal of Chemical Information and Modeling 2024,\n64, 8404\u20138413.\n(3) Casey, A. D.; Son, S. F.; Bilionis, I.; Barnes, B. C. Prediction of Energetic Material\nProperties from Electronic Structure Using 3D Convolutional Neural Networks. Journal\nof Chemical Information and Modeling 2020, 60, 4457\u20134473, PMID: 33054184.\n(4) Cuevas-Zuvir\u00b4\u0131a, B.; Pacios, L. F. Analytical Model of Electron Density and Its Machine\nLearning Inference. Journal of Chemical Information and Modeling 2020, 60, 3831\u2013\n3842, PMID: 32786704.\n(5) Ziletti, A.; Kumar, D.; Scheffler, M.; Ghiringhelli, L. M. Insightful classification of\ncrystal structures using deep learning. Nature Communications 2018, 9, 2775.\n(6) DeCost, B. L.; Francis, T.; Holm, E. A. High throughput quantitative metallography\nfor complex microstructures using deep learning: A case study in ultrahigh carbon\nsteel. Integrating Materials and Manufacturing Innovation 2020, 9, 114\u2013124.\n(7) Ahmad, O.; Linda, A.; Jha, S. R.; Bhowmick, S. A robust method of denoising ex-\nperimental micrographs using deep learning. Materials Characterization 2023, 203,\n112515.\n(8) Ahmad, O.; Kumar, N.; Mukherjee, R.; Bhowmick, S. Accelerating microstructure\nmodeling via machine learning: A method combining Autoencoder and ConvLSTM.\nPhys. Rev. Mater. 2023, 7, 083802.\n(9) Ahmad, O.; Panwar, V.; Das, K.; Mukherjee, R.; Bhowmick, S. Scope of generative\nartificial intelligence in microstructural studies: a case study. Physica Scripta 2025,\n100, 076020.\n25",
+      "word_count": 227,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:7b792a1178a6be28",
+      "paper_id": "2605.07227",
+      "section": "References",
+      "section_index": 5,
+      "passage_index": 2,
+      "text": "(10) Gaikwad, S.; Kasilingam, T.; Ahmad, O.; Mukherjee, R.; Bhowmick, S. Deep learning-\ndriven prediction of microstructure evolution via latent space interpolation. Phys. Rev.\nMater. 2025, 9, 103804.\n(11) Dan, Y.; Zhao, Y.; Li, X.; Li, S.; Hu, M.; Hu, J. Generative adversarial networks (GAN)\nbased efficient sampling of chemical composition space for inverse design of inorganic\nmaterials. npj Computational Materials 2020, 6.\n(12) Hafner, J. Ab-initio simulations of materials using VASP: Density-functional theory\nand beyond. Journal of Computational Chemistry 2008, 29, 2044\u20132078.\n(13) Linda, A.; Akhtar, M. F.; Bhowmick, S. Deformation in Metals: Insights from ab-initio\nCalculations. Proceedings of the International Conference on Metallurgical Engineering\nand Centenary Celebration. Singapore, 2024; pp 83\u201392.\n(14) Sidnov, K.; Konov, D.; Smirnova, E. A.; Ponomareva, A. V.; Belov, M. P. Machine\nLearning-Based Prediction of Elastic Properties Using Reduced Datasets of Accurate\nCalculations Results. Metals 2024, 14, 438.\n(15) Kim, G.; Diao, H.; Lee, C.; Samaei, A.; Phan, T.; de Jong, M.; An, K.; Ma, D.;\nLiaw, P. K.; Chen, W. First-principles and machine learning predictions of elasticity in\nseverely lattice-distorted high-entropy alloys with experimental validation. Acta Mate-\nrialia 2019, 181, 124\u2013138.\n(16) Mirzaee, H.; Soltanmohammadi, R.; Linton, N.; Fischer, J.; Kamrava, S.; Tah-\nmasebi, P.; Aidhy, D. S. Elastic constants from charge density distribution in FCC\nhigh-entropy alloys using CNN and DFT. APL Machine Learning 2024, 2, 046104.\n(17) Zhao, Y.; Yuan, K.; Liu, Y.; Louis, S.-Y.; Hu, M.; Hu, J. Predicting Elastic Properties\nof Materials from Electronic Charge Density Using 3D Deep Convolutional Neural\nNetworks. The Journal of Physical Chemistry C 2020, 124, 17262\u201317273.\n26",
+      "word_count": 263,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:d331e25c4c3457fb",
+      "paper_id": "2605.07227",
+      "section": "References",
+      "section_index": 5,
+      "passage_index": 3,
+      "text": "(18) Kim, S.; Lee, B. D.; Cho, M. Y.; Pyo, M.; Lee, Y.-K.; Park, W. B.; Sohn, K.-S. Deep\nlearning for symmetry classification using sparse 3D electron density data for inorganic\ncompounds. npj Computational Materials 2024, 10.\n(19) Kamal, D.; Chandrasekaran, A.; Batra, R.; Ramprasad, R. A charge density prediction\nmodel for hydrocarbons using deep neural networks. Machine Learning: Science and\nTechnology 2020, 1, 025003.\n(20) Ray, P.; Choudhary, K.; Kalidindi, S. R. Lean CNNs for Mapping Electron Charge Den-\nsity Fields to Material Properties. Integrating Materials and Manufacturing Innovation\n2025, 14, 1\u201313.\n(21) Mianroodi, J. R.; Rezaei, S.; Siboni, N. H.; Xu, B.-X.; Raabe, D. Lossless Multi-Scale\nConstitutive Elastic Relations with Artificial Intelligence. npj Computational Materials\n2022, 8.\n(22) Lev\u00a8am\u00a8aki, H.; Tasn\u00b4adi, F.; Sangiovanni, D. G.; Johnson, L. J. S.; Armiento, R.;\nAbrikosov, I. A. Predicting Elastic Properties of Hard-Coating Alloys Using Ab-Initio\nand Machine Learning Methods. npj Computational Materials 2022, 8.\n(23) Huang, Y.; Ren, Y.; Yoo, S.; Huang, J. Efficient Data Compression for 3D Sparse TPC\nvia Bicephalous Convolutional Autoencoder. 2021 20th IEEE International Conference\non Machine Learning and Applications (ICMLA). 2021; pp 1094\u20131099.\n(24) Alsenan, S.; Al-Turaiki, I.; Hafez, A. Autoencoder-based Dimensionality Reduction\nfor QSAR Modeling. 2020 3rd International Conference on Computer Applications &\nInformation Security (ICCAIS). 2020; pp 1\u20134.\n(25) Momma, K.; Izumi, F. VESTA: a three-dimensional visualization system for electronic\nand structural analysis. Journal of Applied Crystallography 2008, 41, 653\u2013658.\n27",
+      "word_count": 237,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:ad16fda9ad83219d",
+      "paper_id": "2605.07227",
+      "section": "References",
+      "section_index": 5,
+      "passage_index": 4,
+      "text": "(26) Ward, L.; Agrawal, A.; Choudhary, A.; Wolverton, C. A general-purpose machine learn-\ning framework for predicting properties of inorganic materials. npj Computational Ma-\nterials 2016, 2.\n(27) Persaud, D.; Ward, L.; Hattrick-Simpers, J. Reproducibility in materials informatics:\nlessons from \u2018A general-purpose machine learning framework for predicting properties\nof inorganic materials\u2019. Digital Discovery 2024, 3, 281\u2013286.\n(28) Kresse, G.; Furthm\u00a8uller, J. Efficient iterative schemes for ab initio total-energy calcu-\nlations using a plane-wave basis set. Physical Review B 1996, 54, 11169.\n(29) Jain, A.; Ong, S. P.; Hautier, G.; Chen, W.; Richards, W. D.; Gamst, S.; Persson, K. A.;\nothers The Materials Project: A materials database and online interface for high-\nthroughput materials computation. APL Materials 2013, 1, 011002.\n(30) Bl\u00a8ochl, P. E. Projector augmented-wave method. Phys. Rev. B 1994, 50, 17953\u201317979.\n(31) Perdew, J. P.; Burke, K.; Ernzerhof, M. Generalized Gradient Approximation Made\nSimple. Phys. Rev. Lett. 1996, 77, 3865\u20133868.\n(32) Larsen, A. H. et al. The Atomic Simulation Environment\u2014a Python library for working\nwith atoms. Journal of Physics: Condensed Matter 2017, 29, 273002.\n(33) Xie, T.; Grossman, J. C. Crystal Graph Convolutional Neural Networks for an Accurate\nand Interpretable Prediction of Material Properties. Phys. Rev. Lett. 2018, 120, 145301.\n(34) Vazquez, G.; Singh, P.; Sauceda, D.; Couperthwaite, R.; Britt, N.; Youssef, K.; John-\nson, D. D.; Arr\u00b4oyave, R. Efficient machine-learning model for fast assessment of elastic\nproperties of high-entropy alloys. Acta Materialia 2022, 232, 117924.\n(35) Revi, V.; Kasodariya, S.; Talapatra, A.; Pilania, G.; Alankar, A. Machine learning\nelastic constants of multi-component alloys. Computational Materials Science 2021,\n198, 110671.\n28",
+      "word_count": 262,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:ad5e8013344ffa8d",
+      "paper_id": "2605.07227",
+      "section": "References",
+      "section_index": 5,
+      "passage_index": 5,
+      "text": "(36) Grant, M.; Kunz, M. R.; Iyer, K.; Held, L. I.; Tasdizen, T.; Aguiar, J. A.; Dho-\nlabhai, P. P. Integrating atomistic simulations and machine learning to design multi-\nprincipal element alloys with superior elastic modulus. Journal of Materials Research\n2022, 37, 1497\u20131512.\n(37) Khakurel, H.; Taufique, M. F. N.; Roy, A.; Balasubramanian, G.; Ouyang, G.; Cui, J.;\nJohnson, D. D.; Devanathan, R. Machine learning assisted prediction of the Young\u2019s\nmodulus of compositionally complex alloys. Scientific Reports 2021, 11, 17149.\n(38) Mei, W.; Zhang, G.; Yu, K. Predicting elastic properties of refractory high-entropy\nalloys via machine-learning approach. Computational Materials Science 2023, 226,\n112249.\n29",
+      "word_count": 104,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    }
+  ],
+  "references": [],
+  "citation_mentions": [],
+  "tables": [
+    {
+      "table_id": "table:236d5049ca840147",
+      "paper_id": "2605.07227",
+      "label": "1",
+      "caption": "R2 values obtained from different ML models. The first two rows highlight the",
+      "raw_text": "Table 1: R2 values obtained from different ML models. The first two rows highlight the\nmodels trained only on the Latent charge density (CD) and only on Magpie features. The\nlast two rows highlight the models trained with hybrid features (charge density + MAGPIE),\nand predictions are done using LightGBM and Attention CNN. Our results compare well\nwith Crystal Graph Convolutional Neural Networks (CGCNN),33 which achieves R2 values\nof 0.93, 0.89, 0.88, and 0.94 for K, E, G, and \u0398, respectively.\nInput\nK\nE\nG\nEform\n\u0398\nLatent CD + CNN\n0.90\n0.79\n0.80\n0.68\n0.73\nMagpie + Att CNN\n0.92\n0.85\n0.85\n0.88\n0.90\nLatent CD + MAGPIE + LightGBM\n0.94\n0.88\n0.87\n0.96\n0.89\nLatent CD + MAGPIE + Att CNN\n0.94\n0.87\n0.85\n0.88\n0.86\nHaving observed contrasting behavior of the two hybrid models in terms of feature im-\nportance analysis, we now analyze further to quantify the effect of charge density and Mag-\npie descriptors systematically. For this purpose, two additional deep learning models were\ntrained and evaluated on the same dataset using the same train-validation-test splits. The\nfirst model [Section S3, Figure S4, SI] is trained only on the Latent charge density (CD). As\nreported in Table 1, the model performs reasonably well for elastic moduli prediction, but not\nso well for formation energy and Debye temperature. The underlying bonding characteristic\nis encoded in the charge density, allowing a reasonable prediction of elastic moduli. Debye\ntemperature, on the other hand, not only depends on elastic moduli, but also is inversely\nproportional to the molecular weight, which is not encoded in the Latent CD. Similarly, for-\nmation energy depends on factors such as electronegativity, ionization energy, and electron\naffinity, which are not encoded in the Latent CD. As shown below, inclusion of MAGPIE\nfeatures significantly improves the prediction of Debye temperature and formation energy.\nThe second model [Section S4, Figure S5, SI] is trained only on the MAGPIE features\nand outperforms the Latent CD-only model comprehensively. However, compared to end-to-\nend models based solely on composition, the charge density provides an explicit electronic\nrepresentation of bonding, charge redistribution, and screening effects.\nThis representa-\ntion improves physical interpretability and enables potential transferability in certain cases\nwhere composition-only models may struggle. For example, in the case of polymorphs, the\n20\nchemical formula remains the same, although the charge density changes. In such a case,\ncharge-density-based predictions are the only option. This further underscores the useful-\nness of a hybrid model combining CD and MAGPIE features. Overall, incorporating charge\ndensity\u2013based features significantly enhances the model\u2019s ability to capture the underlying\nphysics governing material properties.\nTo verify the model robustness, we have carried out multiple tests. First, we confirmed the\nrotational invariance by rotating the input charge density by different angles and predicting\nproperties using the rotated charge density. The predicted values lie within a narrow range,\nwith a standard deviation up to \u22485% [see Fig S6, SI], indicating that our model is robust\nto rotations. Next, we also confirmed that the outcome does not depend on the choice of\nthe unit cell. For Cu3Al and Mg2Ca, we have compared the results of a small simulation cell\nand a big supercell, and obtained a very good agreement [see Fig S7, SI].\nLet us highlight the significant difference between our method and similar approaches\nused to predict elastic properties from charge densities of materials16,17 [see Figure S8, SI].\nOther previously reported combined DFT-ML work dealt with a specific type of material,\nlike face-centered cubic high entropy alloys by Mirzaee et al.16 or face-centered cubic ma-\nterials by Zhao et al.,17 and lacks the generality of the present work in terms of type of\nbonding and crystal symmetry. Similarly, Sidnov et al. proposed a two-stage CatBoost-\nbased framework for predicting elastic properties of BCC Ti and Zr alloys,14 and Kim et al.\nemployed Gradient-Boosted Trees (GB-Trees) to predict the bulk and shear moduli of the\nhigh-entropy alloy Al0.3CoCrFeNi.15 The dataset\u2019s restricted nature limits its applicability\nto more general crystal systems.",
+      "numeric_lines": [
+        "with Crystal Graph Convolutional Neural Networks (CGCNN),33 which achieves R2 values",
+        "of 0.93, 0.89, 0.88, and 0.94 for K, E, G, and \u0398, respectively.",
+        "first model [Section S3, Figure S4, SI] is trained only on the Latent charge density (CD). As",
+        "The second model [Section S4, Figure S5, SI] is trained only on the MAGPIE features",
+        "with a standard deviation up to \u22485% [see Fig S6, SI], indicating that our model is robust",
+        "the unit cell. For Cu3Al and Mg2Ca, we have compared the results of a small simulation cell",
+        "used to predict elastic properties from charge densities of materials16,17 [see Figure S8, SI].",
+        "high-entropy alloy Al0.3CoCrFeNi.15 The dataset\u2019s restricted nature limits its applicability"
+      ],
+      "structured_rows": [],
+      "extraction_level": "raw_numeric_lines",
+      "confidence": 0.6,
+      "passage_id": "passage:871b743f4c78f80e"
+    }
+  ],
+  "comparison_contexts": [
+    {
+      "comparison_id": "comparison:15a40ad5224302ad",
+      "paper_id": "2605.07227",
+      "passage_id": "passage:1eeb617ea6bb2cc1",
+      "section": "Abstract",
+      "text": "and their performance is compared. Combining composition-based descriptors (Mate-\nrial Agnostic Platform for Informatics and Exploration or MAGPIE) with electronic\ncharge density data further improves the model accuracy. Using a dataset of about\n6059 inorganic compounds spanning multiple crystal symmetries, the models achieve\nstrong predictive performance for bulk modulus K (R2 = 0.94), Young\u2019s modulus E\n(R2 = 0.88), shear modulus G (R2 = 0.87), formation energy Eform (R2 = 0.96), and\nDebye temperature \u0398 (R2 = 0.89). This work establishes electronic charge density as a\ntransferable, physics-grounded descriptor for materials property prediction, requiring\n\u22481/25 the computational resources of full-fledged DFT calculations.",
+      "claim_ids": [
+        "2605.07227::causal_claim::4",
+        "2605.07227::causal_claim::7",
+        "2605.07227::hypothesis_statement::0",
+        "2605.07227::evidence_result::2"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:6a3dbaa1ebcf8741",
+      "paper_id": "2605.07227",
+      "passage_id": "passage:9c87f549aa1cf00b",
+      "section": "Introduction",
+      "text": "Building upon this extensive body of work, this study introduces a novel, two-stage hy-\nbrid approach to predict material properties, including bulk modulus (K), shear modulus\n(G), Young\u2019s modulus (E), formation energy per atom (Eform), and Debye temperature (\u0398)\ndirectly from ground state charge density, the fundamental variable representing the spatial\ndistribution of electrons in a system\u2019s lowest energy state. Determining elastic modulus from\nDFT requires a series of at least 15-20 calculations on strained unit cells. The Debye tem-\nperature requires a computationally intensive first-principles phonon dispersion calculation.\nReplacing those with a single charge density-based prediction has an obvious advantage,\nparticularly for accelerated high-throughput screening of materials for specific applications.\nFigure 1: The original charge density data (128 \u00d7 128 \u00d7 128) is passed through the encoder\nto obtain a compressed latent representation (16\u00d716\u00d716\u00d716). The autoencoder is trained\nby minimizing the reconstruction loss between the input and output. The compressed latent\nrepresentation is utilized for two purposes: (a) One can decode and get back the original\ncharge density, which is readable by the VESTA software,25 (b) It can be further flattened\nand used as input to a regression model for predicting materials properties. Two simple\ngraphical user interfaces (GUIs) are provided for charge density extraction and materials\nproperty prediction. We have also provided a database of compressed latent charge densities\n(requiring only \u22481/117 of the storage compared to the original charge densities), which\ncan be downloaded and extracted by the GUI. The property prediction module can read\nthe user-provided charge density for any new material not in the database and predict its\nproperties. All the codes and data are available at GitHub.\nThe overall model architecture and its capabilities are illustrated in Figure 1. To tackle\n4",
+      "claim_ids": [
+        "2605.07227::problem_motivation::1",
+        "2605.07227::causal_claim::7",
+        "2605.07227::hypothesis_statement::0"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:8be499988b4c1774",
+      "paper_id": "2605.07227",
+      "passage_id": "passage:b1309bb47b17a658",
+      "section": "Introduction",
+      "text": "the curse of dimensionality imposed by large N \u00d7 N \u00d7 N data grids, which leads to substan-\ntial computational overhead and potential overfitting, our work integrates an autoencoder\nfor efficient, unsupervised dimensionality reduction of the charge density. The autoencoder\nlearns a compact, low-dimensional latent representation (a \u201cdigital fingerprint\u201d of the elec-\ntronic structure) that effectively preserves the essential, physically meaningful features while\ndiscarding redundant information. Once the original charge density data (128 \u00d7 128 \u00d7 128)\ngoes through the encoder, it yields a compressed latent representation (16 \u00d7 16 \u00d7 16 \u00d7 16).\nThis allows us to provide a vast database of compressed latent charge densities (requiring\nonly \u22481/117 of the storage compared to the original charge densities), which can be decoded\nusing a simple GUI to reconstruct the original charge density (GitHub).\nThis compressed latent space then serves as the high-quality, reduced-feature input for\nthe subsequent regression model. The pre-processing step not only renders the downstream\nregression task computationally more tractable but also, crucially, enhances the model\u2019s\nefficiency and predictive accuracy. We compare different regression models: the Attention-\nEnhanced CNN and LightGBM. We have also used composition-based material descriptors\n(Material Agnostic Platform for Informatics and Exploration, or MAGPIE26,27) along with\nthe latent charge density to enhance the model\u2019s predictive power. One can provide the\ncharge density for any new material not in the database, and the trained model will predict\nits properties. A simple GUI is provided for materials property prediction (GitHub). The\nfollowing sections describe the technical details of the model.\nInput charge density calculation\nThe charge density maps used as inputs for the deep learning models were generated from\ndensity functional theory (DFT) calculations performed using the Vienna Ab initio Sim-\nulation Package (VASP, version 5.4.4).28 The corresponding crystal structures were ob-\ntained from the Materials Project database.29 The projector augmented wave (PAW) method\n5",
+      "claim_ids": [
+        "2605.07227::problem_motivation::0",
+        "2605.07227::causal_claim::0",
+        "2605.07227::causal_claim::0",
+        "2605.07227::causal_claim::4",
+        "2605.07227::causal_claim::8"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:237aef1e0b77ca12",
+      "paper_id": "2605.07227",
+      "passage_id": "passage:966f84f78c4828e8",
+      "section": "Introduction",
+      "text": "The distribution of bulk modulus values spans a wide range, from approximately 0.1\nGPa to 424.2 GPa, with a mean value of 104.5 GPa and a standard deviation of 71.4 GPa.\nThe median bulk modulus is 87.7 GPa, indicating a moderately right-skewed distribution\ndominated by materials with low to intermediate stiffness. The interquartile range spans\n48.7 GPa (25th percentile) to 149.7 GPa (75th percentile), highlighting the substantial di-\nversity in volumetric stiffness across the dataset. The long tail toward higher bulk modulus\nvalues corresponds to a limited number of ultra-stiff materials, typically associated with\nstrong covalent or mixed covalent-ionic bonding. The observed skewness possibly reflects\nthe natural imbalance in available materials data, where mechanically soft and moderately\nstiff compounds are more prevalent than extremely incompressible systems.\nYoung\u2019s modulus exhibits a broad range, from approximately 0.4 GPa to 762.7 GPa, with\na mean of 133.5 GPa and a standard deviation of 101.7 GPa. The median value of 108.5\nGPa lies noticeably below the mean, due to the right-skewed distribution. The interquartile\nrange, spanning 57.7 GPa to 185.4 GPa, suggests that the majority of materials cluster\nwithin a moderate stiffness regime, while a small fraction of outliers exhibit exceptionally\nhigh tensile stiffness.\nThe shear modulus distribution extends from values as low as 0.12 GPa to a maximum of\n292.4 GPa, with a mean of 52.6 GPa and a standard deviation of 41.2 GPa. The median shear\nmodulus is 42.3 GPa, indicating a concentration of materials with relatively low resistance\nto shear deformation. The interquartile range, spanning from 22.4 GPa to 72.3 GPa, reveals\nthat shear stiffness is generally lower and more narrowly distributed than bulk and Young\u2019s\nmoduli.\nThe formation energy per atom exhibits a distinctly different distribution compared to\nthe elastic properties, spanning from -24.415 eV/atom to values close to 0 eV/atom. The\nmean formation energy is -4.873 eV/atom, with a standard deviation of 1.697 eV/atom and\na median value of -4.796 eV/atom. The narrow clustering of values around strongly negative\nenergies indicates that thermodynamically stable compounds dominate the dataset. Such\n9",
+      "claim_ids": [],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:a1efd14c3a61b33c",
+      "paper_id": "2605.07227",
+      "passage_id": "passage:69cea11e2b20eecb",
+      "section": "Introduction",
+      "text": "and Debye temperature directly from charge-density data, without relying on hand-crafted\ndescriptors.\nThe autoencoder is a fully convolutional neural network comprising two main parts: the\nencoder and the decoder. Both components utilize three-dimensional (3D) convolutional\noperations, making the architecture well-suited for handling the spatial complexity of volu-\nmetric charge density data. The architecture of the autoencoder is shown in Figure 4. The\nencoder compresses the high-dimensional input volume of shape (128 \u00d7 128 \u00d7 128 \u00d7 1) into a\ncompact latent representation of shape (16\u00d716\u00d716\u00d716). This is achieved by applying two\nconsecutive blocks, each consisting of a 3D convolutional layer followed by a ReLU activa-\ntion and max pooling, and then one final 3D convolution with ReLU to produce the latent\nspace. The decoder mirrors this structure, reconstructing the original input by applying\ntwo 3D convolutional blocks with ReLU activation and upsampling, followed by a final 3D\nconvolution to recover the output volume.\nTo ensure training stability and enhance generalization, each convolutional block is fol-\nlowed by batch normalization and dropout regularization.\nBatch normalization helps to\naccelerate convergence and mitigate internal covariate shift, while dropout randomly turns\noff a fraction of neurons during training, reducing the risk of overfitting. The final out-\nput of the decoder retains the same shape as the original input, enabling direct voxel-wise\ncomparison during training.\nThe dataset was randomly split into 80% for training, 10% for validation, and 10% for\ntesting to ensure robust model evaluation on unseen data. The training setup was carefully\ndesigned to strike a balance between learning efficiency and model generalization. These\nconfigurations aim to ensure stable convergence while preventing overfitting and optimizing\ntraining time. Early stopping based on the validation loss was used to avoid overfitting\nand optimize training time. The model\u2019s performance was continuously monitored on the\nvalidation set to ensure stable convergence and reliable generalization. The autoencoder was\noptimized by minimizing the mean squared error (MSE) loss, which computes the average\n11",
+      "claim_ids": [
+        "2605.07227::causal_claim::12",
+        "2605.07227::causal_claim::12",
+        "2605.07227::causal_claim::12"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:6fa1b8e657f12b65",
+      "paper_id": "2605.07227",
+      "passage_id": "passage:0750bbccfc7b110a",
+      "section": "Introduction",
+      "text": "squared difference between each voxel in the input and its reconstruction across the entire\nbatch, depth, height, and width dimensions.\nFurther details are provided in Figure S1,\nSupporting Information (SI).\nOriginal \nReconstructed\nDi\ufb00erence\nMg2Pd\nK3BiTe3\nFigure 5: Comparison of the charge density distributions for representative cubic compounds.\nThe first column shows the original charge density, the second column presents the recon-\nstructed charge density from the machine learning model, and the third column shows the\ndifference between the original and reconstructed charge densities.\nTo evaluate the reconstruction performance of the trained autoencoder, two test com-\npounds, Mg2Pd and K3BiTe3, were randomly selected, as shown in Figure 5. The figure\npresents three-dimensional visualizations and two-dimensional cross-sectional slices of the\n12",
+      "claim_ids": [],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:cfb428e3d75fae5b",
+      "paper_id": "2605.07227",
+      "passage_id": "passage:9de1ed18a4a9755a",
+      "section": "Introduction",
+      "text": "unit interval during training and subsequently transformed back to their original physical\nunits for evaluation.\nThe 3D CNN model is composed of stacked residual convolutional blocks with batch\nnormalization and Swish activation. Dual-attention modules were incorporated within the\nnetwork to enhance the representation of physically relevant spatial regions and feature\nchannels in the volumetric data.\nGlobal average pooling was applied to obtain a fixed-\nlength descriptor of the electronic charge density. In parallel, composition-derived MAGPIE\ndescriptors were transformed using a multilayer perceptron with fully connected layers, batch\nnormalization, and dropout regularization. The outputs of the volumetric and compositional\nbranches were concatenated to form a hybrid representation, which was further processed\nthrough a regression head composed of one to three dense layers before producing the final\ntarget property prediction.\nModel hyperparameters, including the depth and width of the regression head, regular-\nization strength, dropout rates, optimizer choice, and learning rate, were optimized using\nrandom search with validation loss as the objective. Training was performed using the mean\nsquared error loss function with early stopping to prevent overfitting.\nThe dataset was\ndivided into training, validation, and test subsets using fixed random seeds to ensure repro-\nducibility. The final model\u2019s performance was assessed on the independent test set using R2\nand MAE.\nResults and Discussions\nThe effectiveness of the first hybrid ML architecture (latent charge density + MAGPIE\nfeatures, LightGBM regression) is quantitatively evaluated using the actual-versus-predicted\nplots shown in Figure 8, which provide a direct assessment of model accuracy across the\nentire test dataset. Evidently, the model shows excellent performance across all five target\nproperties. Among the elastic properties, the bulk modulus shows the highest accuracy, with\n17",
+      "claim_ids": [
+        "2605.07227::causal_claim::14"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:ab09467bbc92e9d2",
+      "paper_id": "2605.07227",
+      "passage_id": "passage:6e04397ad68a655f",
+      "section": "Introduction",
+      "text": "Figure 8: LightGBM model: Actual versus predicted values for the five material properties\nconsidered: bulk modulus, Young\u2019s modulus, shear modulus, formation energy, and Debye\ntemperature. The diagonal black line represents the ideal case of perfect prediction. The\nbottom-right panel compares the impact of charge density and MAGPIE features on predic-\ntions, indicating that the latter contribute more across the evaluated properties.\nan R2 of 0.94. Young\u2019s modulus and shear modulus are also predicted with high accuracy,\nachieving R2 values of 0.88 and 0.87, respectively. The formation energy per atom exhibits\nthe strongest correlation between predicted and actual values, with an R2 of 0.96.\nThe\nDebye temperature, which reflects lattice vibrational characteristics and elastic stiffness, is\nalso predicted with reasonable accuracy (R2 = 0.89). The bottom-right panel of Figure 8\ncompares the impact of charge density and MAGPIE features on predictions, estimated using\nSHAP (SHapley Additive exPlanations), indicating that the latter contribute more across\nthe evaluated properties, although they still complement each other.\nThe effectiveness of the second hybrid ML architecture (latent charge density + MAG-\nPIE features, Attention CNN regression) is quantitatively evaluated using the actual-versus-\n18",
+      "claim_ids": [
+        "2605.07227::evidence_result::2",
+        "2605.07227::evidence_result::3",
+        "2605.07227::evidence_result::3"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:fb9be1a3e7be644d",
+      "paper_id": "2605.07227",
+      "passage_id": "passage:19a07ad6c1a02aca",
+      "section": "Introduction",
+      "text": "Figure 9: Attention CNN model: Actual versus predicted values for the five material prop-\nerties considered: bulk modulus, Young\u2019s modulus, shear modulus, formation energy, and\nDebye temperature. The diagonal black line represents the ideal case of perfect prediction.\nThe bottom-right panel compares the impact of charge density and MAGPIE features on\npredictions, indicating that the former contributes more across the evaluated properties.\npredicted plots shown in Figure 9, providing a direct assessment of model accuracy across\nthe entire test dataset. Similar to the previous model, this also shows very good performance\nacross all five target properties. Among the elastic properties, the bulk modulus shows the\nhighest accuracy, with an R2 of 0.94. Young\u2019s modulus and shear modulus are also predicted\nwith high accuracy, achieving R2 values of 0.87 and 0.85, respectively. The formation en-\nergy per atom achieves an R2 of 0.88, while the Debye temperature is also predicted with\nreasonable accuracy (R2 = 0.86). The bottom-right panel of Figure 9 compares the impact\nof charge density and MAGPIE features on predictions. Unlike the LightGBM regression\nmodel, the charge density features contribute more across the evaluated properties in the\ncase of the Attention CNN regression model.\n19",
+      "claim_ids": [
+        "2605.07227::evidence_result::4",
+        "2605.07227::contradiction::0"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:46c79b434af5721c",
+      "paper_id": "2605.07227",
+      "passage_id": "passage:871b743f4c78f80e",
+      "section": "Introduction",
+      "text": "Table 1: R2 values obtained from different ML models. The first two rows highlight the\nmodels trained only on the Latent charge density (CD) and only on Magpie features. The\nlast two rows highlight the models trained with hybrid features (charge density + MAGPIE),\nand predictions are done using LightGBM and Attention CNN. Our results compare well\nwith Crystal Graph Convolutional Neural Networks (CGCNN),33 which achieves R2 values\nof 0.93, 0.89, 0.88, and 0.94 for K, E, G, and \u0398, respectively.\nInput\nK\nE\nG\nEform\n\u0398\nLatent CD + CNN\n0.90\n0.79\n0.80\n0.68\n0.73\nMagpie + Att CNN\n0.92\n0.85\n0.85\n0.88\n0.90\nLatent CD + MAGPIE + LightGBM\n0.94\n0.88\n0.87\n0.96\n0.89\nLatent CD + MAGPIE + Att CNN\n0.94\n0.87\n0.85\n0.88\n0.86\nHaving observed contrasting behavior of the two hybrid models in terms of feature im-\nportance analysis, we now analyze further to quantify the effect of charge density and Mag-\npie descriptors systematically. For this purpose, two additional deep learning models were\ntrained and evaluated on the same dataset using the same train-validation-test splits. The\nfirst model [Section S3, Figure S4, SI] is trained only on the Latent charge density (CD). As\nreported in Table 1, the model performs reasonably well for elastic moduli prediction, but not\nso well for formation energy and Debye temperature. The underlying bonding characteristic\nis encoded in the charge density, allowing a reasonable prediction of elastic moduli. Debye\ntemperature, on the other hand, not only depends on elastic moduli, but also is inversely\nproportional to the molecular weight, which is not encoded in the Latent CD. Similarly, for-\nmation energy depends on factors such as electronegativity, ionization energy, and electron\naffinity, which are not encoded in the Latent CD. As shown below, inclusion of MAGPIE\nfeatures significantly improves the prediction of Debye temperature and formation energy.\nThe second model [Section S4, Figure S5, SI] is trained only on the MAGPIE features\nand outperforms the Latent CD-only model comprehensively. However, compared to end-to-\nend models based solely on composition, the charge density provides an explicit electronic\nrepresentation of bonding, charge redistribution, and screening effects.\nThis representa-\ntion improves physical interpretability and enables potential transferability in certain cases",
+      "claim_ids": [
+        "2605.07227::prior_limitation::1",
+        "2605.07227::causal_claim::4",
+        "2605.07227::causal_claim::5",
+        "2605.07227::causal_claim::6",
+        "2605.07227::mechanism_principle::0",
+        "2605.07227::mechanism_principle::0",
+        "2605.07227::evidence_result::5",
+        "2605.07227::evidence_result::5"
+      ],
+      "cited_references": [],
+      "tables": [
+        {
+          "table_id": "table:236d5049ca840147",
+          "paper_id": "2605.07227",
+          "label": "1",
+          "caption": "R2 values obtained from different ML models. The first two rows highlight the",
+          "raw_text": "Table 1: R2 values obtained from different ML models. The first two rows highlight the\nmodels trained only on the Latent charge density (CD) and only on Magpie features. The\nlast two rows highlight the models trained with hybrid features (charge density + MAGPIE),\nand predictions are done using LightGBM and Attention CNN. Our results compare well\nwith Crystal Graph Convolutional Neural Networks (CGCNN),33 which achieves R2 values\nof 0.93, 0.89, 0.88, and 0.94 for K, E, G, and \u0398, respectively.\nInput\nK\nE\nG\nEform\n\u0398\nLatent CD + CNN\n0.90\n0.79\n0.80\n0.68\n0.73\nMagpie + Att CNN\n0.92\n0.85\n0.85\n0.88\n0.90\nLatent CD + MAGPIE + LightGBM\n0.94\n0.88\n0.87\n0.96\n0.89\nLatent CD + MAGPIE + Att CNN\n0.94\n0.87\n0.85\n0.88\n0.86\nHaving observed contrasting behavior of the two hybrid models in terms of feature im-\nportance analysis, we now analyze further to quantify the effect of charge density and Mag-\npie descriptors systematically. For this purpose, two additional deep learning models were\ntrained and evaluated on the same dataset using the same train-validation-test splits. The\nfirst model [Section S3, Figure S4, SI] is trained only on the Latent charge density (CD). As\nreported in Table 1, the model performs reasonably well for elastic moduli prediction, but not\nso well for formation energy and Debye temperature. The underlying bonding characteristic\nis encoded in the charge density, allowing a reasonable prediction of elastic moduli. Debye\ntemperature, on the other hand, not only depends on elastic moduli, but also is inversely\nproportional to the molecular weight, which is not encoded in the Latent CD. Similarly, for-\nmation energy depends on factors such as electronegativity, ionization energy, and electron\naffinity, which are not encoded in the Latent CD. As shown below, inclusion of MAGPIE\nfeatures significantly improves the prediction of Debye temperature and formation energy.\nThe second model [Section S4, Figure S5, SI] is trained only on the MAGPIE features\nand outperforms the Latent CD-only model comprehensively. However, compared to end-to-\nend models based solely on composition, the charge density provides an explicit electronic\nrepresentation of bonding, charge redistribution, and screening effects.\nThis representa-\ntion improves physical interpretability and enables potential transferability in certain cases\nwhere composition-only models may struggle. For example, in the case of polymorphs, the\n20\nchemical formula remains the same, although the charge density changes. In such a case,\ncharge-density-based predictions are the only option. This further underscores the useful-\nness of a hybrid model combining CD and MAGPIE features. Overall, incorporating charge\ndensity\u2013based features significantly enhances the model\u2019s ability to capture the underlying\nphysics governing material properties.\nTo verify the model robustness, we have carried out multiple tests. First, we confirmed the\nrotational invariance by rotating the input charge density by different angles and predicting\nproperties using the rotated charge density. The predicted values lie within a narrow range,\nwith a standard deviation up to \u22485% [see Fig S6, SI], indicating that our model is robust\nto rotations. Next, we also confirmed that the outcome does not depend on the choice of\nthe unit cell. For Cu3Al and Mg2Ca, we have compared the results of a small simulation cell\nand a big supercell, and obtained a very good agreement [see Fig S7, SI].\nLet us highlight the significant difference between our method and similar approaches\nused to predict elastic properties from charge densities of materials16,17 [see Figure S8, SI].\nOther previously reported combined DFT-ML work dealt with a specific type of material,\nlike face-centered cubic high entropy alloys by Mirzaee et al.16 or face-centered cubic ma-\nterials by Zhao et al.,17 and lacks the generality of the present work in terms of type of\nbonding and crystal symmetry. Similarly, Sidnov et al. proposed a two-stage CatBoost-\nbased framework for predicting elastic properties of BCC Ti and Zr alloys,14 and Kim et al.\nemployed Gradient-Boosted Trees (GB-Trees) to predict the bulk and shear moduli of the\nhigh-entropy alloy Al0.3CoCrFeNi.15 The dataset\u2019s restricted nature limits its applicability\nto more general crystal systems.",
+          "numeric_lines": [
+            "with Crystal Graph Convolutional Neural Networks (CGCNN),33 which achieves R2 values",
+            "of 0.93, 0.89, 0.88, and 0.94 for K, E, G, and \u0398, respectively.",
+            "first model [Section S3, Figure S4, SI] is trained only on the Latent charge density (CD). As",
+            "The second model [Section S4, Figure S5, SI] is trained only on the MAGPIE features",
+            "with a standard deviation up to \u22485% [see Fig S6, SI], indicating that our model is robust",
+            "the unit cell. For Cu3Al and Mg2Ca, we have compared the results of a small simulation cell",
+            "used to predict elastic properties from charge densities of materials16,17 [see Figure S8, SI].",
+            "high-entropy alloy Al0.3CoCrFeNi.15 The dataset\u2019s restricted nature limits its applicability"
+          ],
+          "structured_rows": [],
+          "extraction_level": "raw_numeric_lines",
+          "confidence": 0.6,
+          "passage_id": "passage:871b743f4c78f80e"
+        }
+      ],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:028d7b714eeca898",
+      "paper_id": "2605.07227",
+      "passage_id": "passage:f06e772a09d568df",
+      "section": "Introduction",
+      "text": "chemical formula remains the same, although the charge density changes. In such a case,\ncharge-density-based predictions are the only option. This further underscores the useful-\nness of a hybrid model combining CD and MAGPIE features. Overall, incorporating charge\ndensity\u2013based features significantly enhances the model\u2019s ability to capture the underlying\nphysics governing material properties.\nTo verify the model robustness, we have carried out multiple tests. First, we confirmed the\nrotational invariance by rotating the input charge density by different angles and predicting\nproperties using the rotated charge density. The predicted values lie within a narrow range,\nwith a standard deviation up to \u22485% [see Fig S6, SI], indicating that our model is robust\nto rotations. Next, we also confirmed that the outcome does not depend on the choice of\nthe unit cell. For Cu3Al and Mg2Ca, we have compared the results of a small simulation cell\nand a big supercell, and obtained a very good agreement [see Fig S7, SI].\nLet us highlight the significant difference between our method and similar approaches\nused to predict elastic properties from charge densities of materials16,17 [see Figure S8, SI].\nOther previously reported combined DFT-ML work dealt with a specific type of material,\nlike face-centered cubic high entropy alloys by Mirzaee et al.16 or face-centered cubic ma-\nterials by Zhao et al.,17 and lacks the generality of the present work in terms of type of\nbonding and crystal symmetry. Similarly, Sidnov et al. proposed a two-stage CatBoost-\nbased framework for predicting elastic properties of BCC Ti and Zr alloys,14 and Kim et al.\nemployed Gradient-Boosted Trees (GB-Trees) to predict the bulk and shear moduli of the\nhigh-entropy alloy Al0.3CoCrFeNi.15 The dataset\u2019s restricted nature limits its applicability\nto more general crystal systems.\nNotably, many descriptor-based studies consistently identify valence electron configura-\ntion as a dominant feature governing elastic behavior,34\u201338 highlighting the central role of\nelectronic interactions in determining mechanical properties. These interactions are inher-\nently encoded in the electronic charge density distribution, motivating the development of\ndirect charge-density-based learning approaches. Ground state electron charge density \u03c1(r)\n21",
+      "claim_ids": [
+        "2605.07227::prior_approach::0",
+        "2605.07227::prior_approach::4",
+        "2605.07227::prior_limitation::2",
+        "2605.07227::rejected_alternative::3",
+        "2605.07227::inspiration_source::0",
+        "2605.07227::inspiration_source::0",
+        "2605.07227::causal_claim::2",
+        "2605.07227::mechanism_principle::1",
+        "2605.07227::hypothesis_statement::0",
+        "2605.07227::evidence_result::6",
+        "2605.07227::evidence_result::6"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:d309cda892e8f55c",
+      "paper_id": "2605.07227",
+      "passage_id": "passage:d816f83b61f45939",
+      "section": "Introduction",
+      "text": "are required in triclinic crystals, with at least 7 calculations per deformation, resulting in\napproximately 147 total DFT calculations. The method described in this work can predict\nmultiple properties from a single self-consistent DFT calculation, requiring \u22481/25 (or even\nless for low-symmetry systems) of the computational resources required for full-fledged DFT\ncalculations.\nConclusions\nThis work establishes a robust and scalable deep learning framework that directly links three-\ndimensional electronic charge density from ab initio calculations to macroscopic mechanical\nand thermodynamic properties. By combining a 3D convolutional autoencoder for unsuper-\nvised dimensionality reduction with a regression model, the proposed approach effectively\nbridges the quantum-mechanical electronic structure and material response.\nThe 3D convolutional autoencoder compresses high-dimensional charge density grids\n(128 \u00d7 128 \u00d7 128) into a compact latent representation (16 \u00d7 16 \u00d7 16 \u00d7 16) while pre-\nserving physically meaningful features, as confirmed by negligible reconstruction errors for\nrepresentative compounds.\nComposition-based MAGPIE descriptors are combined with the latent charge-density,\nand the combined feature set is used for the regression. The resulting hybrid model consis-\ntently outperforms solely charge density-based deep learning approaches, achieving excellent\npredictive accuracy across all target properties, using LightVBM and Attention CNN-based\nregression.\nThe ability to predict multiple properties from a single self-consistent DFT output, to-\ngether with the developed Python-based graphical user interface (GUI), highlights the po-\ntential of this approach for high-throughput and practical materials screening, requiring\n\u22481/25 the computational resources of full-fledged DFT calculations. Overall, this study\ndemonstrates that electronic charge density is a unified, transferable, and physics-informed\n23",
+      "claim_ids": [
+        "2605.07227::causal_claim::7"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:392cc85a815dedcd",
+      "paper_id": "2605.07227",
+      "passage_id": "passage:438d6f1de26f130a",
+      "section": "Supporting Information",
+      "text": "Additional details are provided regarding: Training and validation loss curve of the au-\ntoencoder model, Charge density reconstruction with different latent dimensions, Details of\nMAGPIE features, Details of loss function, Charge density-only CNN model, MAGPIE-only\nML model, Model robustness in terms of rotation and cell size, Comparison with literature,\nModel VASP INCAR file.",
+      "claim_ids": [],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    }
+  ],
+  "claim_passage_ids": {
+    "2605.07227::problem_motivation::0": [
+      {
+        "passage_id": "passage:5fd2ce2acef5cf7f",
+        "match_score": 1.0,
+        "evidence_span": "Yet, its direct use for the rapid prediction of materials properties remains challenging due to its high dimensionality."
+      },
+      {
+        "passage_id": "passage:b1309bb47b17a658",
+        "match_score": 0.9524,
+        "evidence_span": "To tackle 4 the curse of dimensionality imposed by large N \u00d7 N \u00d7 N data grids, which leads to substantial computational overhead and potential overfitting"
+      }
+    ],
+    "2605.07227::problem_motivation::1": [
+      {
+        "passage_id": "passage:9c87f549aa1cf00b",
+        "match_score": 1.0,
+        "evidence_span": "Determining elastic modulus from DFT requires a series of at least 15-20 calculations on strained unit cells. The Debye tem- perature requires a computationally intensive first-principles phonon dispersion calculation."
+      }
+    ],
+    "2605.07227::prior_approach::0": [
+      {
+        "passage_id": "passage:3ac376ff6c431520",
+        "match_score": 1.0,
+        "evidence_span": "Among various approaches, ensemble methods are very popular due to their higher accuracy, reduced over-\nfitting, and increased robustness to noise and outliers. Their effectiveness has been demon-\nstrated for predicting elastic properties of BCC Ti and Zr alloys14 and elastic moduli of the\nhigh-entropy alloy Al0.3CoCrFeNi.15"
+      },
+      {
+        "passage_id": "passage:f06e772a09d568df",
+        "match_score": 1.0,
+        "evidence_span": "Similarly, Sidnov et al. proposed a two-stage CatBoost-\nbased framework for predicting elastic properties of BCC Ti and Zr alloys,14 and Kim et al.\nemployed Gradient-Boosted Trees (GB-Trees) to predict the bulk and shear moduli of the\nhigh-entropy alloy Al0.3CoCrFeNi.15)"
+      }
+    ],
+    "2605.07227::prior_approach::1": [
+      {
+        "passage_id": "passage:3ac376ff6c431520",
+        "match_score": 0.9459,
+        "evidence_span": "Another popular class is convolutional neural networks\n(CNNs), especially their three-dimensional (3D) variants, which have demonstrated remark-\nable ability to capture intricate correlations between a material\u2019s electronic charge density\nand its macroscopic properties, such as elastic properties."
+      },
+      {
+        "passage_id": "passage:f4b4e42c28167faf",
+        "match_score": 1.0,
+        "evidence_span": "For instance, mod-\nels trained on sparse 3D electron density distributions have been employed for symmetry\nclassification in inorganic materials18.)"
+      }
+    ],
+    "2605.07227::prior_approach::2": [
+      {
+        "passage_id": "passage:f4b4e42c28167faf",
+        "match_score": 1.0,
+        "evidence_span": "In another work, deep neural networks have been de-\nveloped to predict charge densities19."
+      },
+      {
+        "passage_id": "passage:f4b4e42c28167faf",
+        "match_score": 1.0,
+        "evidence_span": "Recent studies have also explored optimized network\narchitectures, such as lean convolutional networks, for mapping electron charge density to\nmaterial properties"
+      }
+    ],
+    "2605.07227::prior_approach::3": [
+      {
+        "passage_id": "passage:f4b4e42c28167faf",
+        "match_score": 1.0,
+        "evidence_span": "The effectiveness of autoencoders for dimensionality reduction\nhas recently been demonstrated, particularly in compressing sparse, high-dimensional scien-\ntific data.23,24)"
+      }
+    ],
+    "2605.07227::prior_approach::4": [
+      {
+        "passage_id": "passage:f06e772a09d568df",
+        "match_score": 1.0,
+        "evidence_span": "Other previously reported combined DFT-ML work dealt with a specific type of material,\nlike face-centered cubic high entropy alloys by Mirzaee et al.16 or face-centered cubic ma-\nterials by Zhao et al.,17)"
+      }
+    ],
+    "2605.07227::prior_limitation::0": [
+      {
+        "passage_id": "passage:67e562cd08c4813a",
+        "match_score": 1.0,
+        "evidence_span": "When higher-dimensional latent representations were processed through appropriately adapted regression models for property prediction, this significantly increased computational cost without affecting the final outcome."
+      }
+    ],
+    "2605.07227::prior_limitation::1": [
+      {
+        "passage_id": "passage:871b743f4c78f80e",
+        "match_score": 0.9189,
+        "evidence_span": "However, compared to end-to-end models based solely on composition, the charge density provides an explicit electronic representation of bonding, charge redistribution, and screening effects. This representation improves physical interpretability and enables potential transferability in certain cases where composition-only models may struggle."
+      }
+    ],
+    "2605.07227::prior_limitation::2": [
+      {
+        "passage_id": "passage:f06e772a09d568df",
+        "match_score": 1.0,
+        "evidence_span": "The dataset\u2019s restricted nature limits its applicability to more general crystal systems."
+      }
+    ],
+    "2605.07227::rejected_alternative::0": [
+      {
+        "passage_id": "passage:7b0a0890851fe172",
+        "match_score": 1.0,
+        "evidence_span": "Instead of using a fixed number of\nk-points, reciprocal space sampling was controlled using a uniform k-point spacing of 0.1 \u02daA\u22121,\nensuring consistent Brillouin-zone resolution for materials with different lattice parameters."
+      }
+    ],
+    "2605.07227::rejected_alternative::1": [
+      {
+        "passage_id": "passage:ed41e5b8faea4f6a",
+        "match_score": 1.0,
+        "evidence_span": "The input charge density data were not scaled during autoencoder training to preserve the\noriginal distribution."
+      }
+    ],
+    "2605.07227::rejected_alternative::2": [
+      {
+        "passage_id": "passage:67e562cd08c4813a",
+        "match_score": 1.0,
+        "evidence_span": "A strongly compressed model produced a latent tensor of\n(8 \u00d7 8 \u00d7 8 \u00d7 8), which reduced storage requirements but led to noticeable loss in the recon-\nstructed charge densities [Figure S2 and Figure S3, SI], and it was discarded."
+      }
+    ],
+    "2605.07227::rejected_alternative::3": [
+      {
+        "passage_id": "passage:f06e772a09d568df",
+        "match_score": 1.0,
+        "evidence_span": "Let us highlight the significant difference between our method and similar approaches\nused to predict elastic properties from charge densities of materials16,17 [see Figure S8, SI].\nOther previously reported combined DFT-ML work dealt with a specific type of material,\nlike face-centered cubic high entropy alloys by Mirzaee et al.16 or face-centered cubic ma-\nterials by Zhao et al.,17 and lacks the generality of the present work in terms of type of\nbonding and crystal symmetry."
+      }
+    ],
+    "2605.07227::inspiration_source::0": [
+      {
+        "passage_id": "passage:f06e772a09d568df",
+        "match_score": 1.0,
+        "evidence_span": "Notably, many descriptor-based studies consistently identify valence electron configura- tion as a dominant feature governing elastic behavior,34\u201338 highlighting the central role of electronic interactions in determining mechanical properties."
+      },
+      {
+        "passage_id": "passage:f06e772a09d568df",
+        "match_score": 1.0,
+        "evidence_span": "These interactions are inher- ently encoded in the electronic charge density distribution, motivating the development of direct charge-density-based learning approaches."
+      }
+    ],
+    "2605.07227::causal_claim::0": [
+      {
+        "passage_id": "passage:5fd2ce2acef5cf7f",
+        "match_score": 1.0,
+        "evidence_span": "The proposed approach first utilizes a three-dimensional convolutional autoencoder for unsupervised dimensionality reduction, compressing a high-resolution charge-density grid (128 \u00d7 128 \u00d7 128) into a compact latent representation (16 \u00d7 16 \u00d7 16 \u00d7 16) while preserving physically meaningful features"
+      },
+      {
+        "passage_id": "passage:b1309bb47b17a658",
+        "match_score": 1.0,
+        "evidence_span": "The autoencoder learns a compact, low-dimensional latent representation (a \u201cdigital fingerprint\u201d of the electronic structure) that effectively preserves the essential, physically meaningful features while discarding redundant information."
+      },
+      {
+        "passage_id": "passage:f4b4e42c28167faf",
+        "match_score": 1.0,
+        "evidence_span": "The resulting compressed latent space then serves as a highly efficient and informative input for downstream modeling, such as ensemble-based regression or 3D-CNN regression."
+      },
+      {
+        "passage_id": "passage:b1309bb47b17a658",
+        "match_score": 1.0,
+        "evidence_span": "The pre-processing step not only renders the downstream regression task computationally more tractable but also, crucially, enhances the model\u2019s efficiency and predictive accuracy."
+      }
+    ],
+    "2605.07227::causal_claim::1": [
+      {
+        "passage_id": "passage:67e562cd08c4813a",
+        "match_score": 1.0,
+        "evidence_span": "This exercise confirmed that the intermediate la- tent space dimension of (16\u00d716\u00d716\u00d716) offers the optimal balance between reconstruction fidelity, predictive performance, and computational efficiency."
+      }
+    ],
+    "2605.07227::causal_claim::2": [
+      {
+        "passage_id": "passage:f4b4e42c28167faf",
+        "match_score": 1.0,
+        "evidence_span": "Applications to FCC high-entropy alloys have demonstrated that these models can extract key information from the spatial arrangement of charge density that correlates strongly with elastic constants, providing a data-driven alternative to computationally intensive DFT calculations16."
+      },
+      {
+        "passage_id": "passage:c45afbd768fe652c",
+        "match_score": 0.85,
+        "evidence_span": "This two-stage framework enabled accurate estimation of elastic properties, formation energy, 10 128x128x128x16 64x64x64x16 128x128x128 32x32x32x32 16x16x16x32 UpSampling3D(2\u00d72\u00d72) Conv3D(16 filters) UpSampling3D(2\u00d72\u00d72) Conv3D(1 filter, linear) and Debye temperature directly from charge-density data, without relying on hand-crafted descriptors."
+      },
+      {
+        "passage_id": "passage:f06e772a09d568df",
+        "match_score": 1.0,
+        "evidence_span": "Overall, incorporating charge density\u2013based features significantly enhances the model\u2019s ability to capture the underlying physics governing material properties."
+      }
+    ],
+    "2605.07227::causal_claim::3": [
+      {
+        "passage_id": "passage:f4b4e42c28167faf",
+        "match_score": 1.0,
+        "evidence_span": "Features learned from the spatial distribution of electron density are more transferable and robust to compo- sitional changes than composition-based descriptors"
+      }
+    ],
+    "2605.07227::causal_claim::4": [
+      {
+        "passage_id": "passage:1eeb617ea6bb2cc1",
+        "match_score": 1.0,
+        "evidence_span": "Combining composition-based descriptors (Material Agnostic Platform for Informatics and Exploration or MAGPIE) with electronic charge density data further improves the model accuracy."
+      },
+      {
+        "passage_id": "passage:b1309bb47b17a658",
+        "match_score": 1.0,
+        "evidence_span": "We have also used composition-based material descriptors (Material Agnostic Platform for Informatics and Exploration, or MAGPIE26,27) along with the latent charge density to enhance the model\u2019s predictive power."
+      },
+      {
+        "passage_id": "passage:871b743f4c78f80e",
+        "match_score": 1.0,
+        "evidence_span": "As shown below, inclusion of MAGPIE features significantly improves the prediction of Debye temperature and formation energy."
+      }
+    ],
+    "2605.07227::causal_claim::5": [
+      {
+        "passage_id": "passage:871b743f4c78f80e",
+        "match_score": 1.0,
+        "evidence_span": "Debye temperature, on the other hand, not only depends on elastic moduli, but also is inversely proportional to the molecular weight, which is not encoded in the Latent CD."
+      }
+    ],
+    "2605.07227::causal_claim::6": [
+      {
+        "passage_id": "passage:871b743f4c78f80e",
+        "match_score": 1.0,
+        "evidence_span": "Similarly, for- mation energy depends on factors such as electronegativity, ionization energy, and electron affinity, which are not encoded in the Latent CD."
+      }
+    ],
+    "2605.07227::causal_claim::7": [
+      {
+        "passage_id": "passage:1eeb617ea6bb2cc1",
+        "match_score": 1.0,
+        "evidence_span": "requiring \u22481/25 the computational resources of full-fledged DFT calculations."
+      },
+      {
+        "passage_id": "passage:d816f83b61f45939",
+        "match_score": 1.0,
+        "evidence_span": "The method described in this work can predict multiple properties from a single self-consistent DFT calculation, requiring \u22481/25 (or even less for low-symmetry systems) of the computational resources required for full-fledged DFT calculations."
+      },
+      {
+        "passage_id": "passage:9c87f549aa1cf00b",
+        "match_score": 1.0,
+        "evidence_span": "Replacing those with a single charge density-based prediction has an obvious advantage, particularly for accelerated high-throughput screening of materials for specific applications."
+      }
+    ],
+    "2605.07227::causal_claim::8": [
+      {
+        "passage_id": "passage:b1309bb47b17a658",
+        "match_score": 1.0,
+        "evidence_span": "This allows us to provide a vast database of compressed latent charge densities (requiring only \u22481/117 of the storage compared to the original charge densities))"
+      },
+      {
+        "passage_id": "passage:885d9f447880b827",
+        "match_score": 1.0,
+        "evidence_span": "This might be a valuable ground-state charge density dataset readily available to researchers and easily accessible due to its compressed format, which would otherwise require massive storage."
+      }
+    ],
+    "2605.07227::causal_claim::9": [
+      {
+        "passage_id": "passage:4e9621f120a7d325",
+        "match_score": 1.0,
+        "evidence_span": "The dimensionality of the flattened latent space was further reduced using principal component analysis (PCA) to minimize feature redundancy, suppress noise, and preserve the dominant variance."
+      }
+    ],
+    "2605.07227::causal_claim::10": [
+      {
+        "passage_id": "passage:ed41e5b8faea4f6a",
+        "match_score": 1.0,
+        "evidence_span": "However, after obtaining the latent features from the trained encoder, they were standardized before training the regression model. This step was essential to ensuring stable, efficient learning."
+      }
+    ],
+    "2605.07227::causal_claim::11": [
+      {
+        "passage_id": "passage:f4b4e42c28167faf",
+        "match_score": 1.0,
+        "evidence_span": "achieving reliable predictions with reduced computational cost20."
+      }
+    ],
+    "2605.07227::causal_claim::12": [
+      {
+        "passage_id": "passage:69cea11e2b20eecb",
+        "match_score": 1.0,
+        "evidence_span": "Batch normalization helps to accelerate convergence and mitigate internal covariate shift"
+      },
+      {
+        "passage_id": "passage:69cea11e2b20eecb",
+        "match_score": 1.0,
+        "evidence_span": "while dropout randomly turns off a fraction of neurons during training, reducing the risk of overfitting."
+      },
+      {
+        "passage_id": "passage:69cea11e2b20eecb",
+        "match_score": 1.0,
+        "evidence_span": "Early stopping based on the validation loss was used to avoid overfitting and optimize training time."
+      }
+    ],
+    "2605.07227::causal_claim::13": [
+      {
+        "passage_id": "passage:4e9621f120a7d325",
+        "match_score": 0.8788,
+        "evidence_span": "Prior to model training, nu- merical outliers in the target bulk modulus values were removed to improve model robustness 14 KFold Train/Val/Test Concatenate LightGBM Regressorn features split estimator and prevent undue influence from extreme values."
+      }
+    ],
+    "2605.07227::causal_claim::14": [
+      {
+        "passage_id": "passage:9de1ed18a4a9755a",
+        "match_score": 1.0,
+        "evidence_span": "Dual-attention modules were incorporated within the network to enhance the representation of physically relevant spatial regions and feature channels in the volumetric data."
+      }
+    ],
+    "2605.07227::causal_claim::15": [
+      {
+        "passage_id": "passage:885d9f447880b827",
+        "match_score": 1.0,
+        "evidence_span": "This functionality eliminates the need for manual data preprocessing and provides an efficient pathway for rapid property evaluation from first-principles electronic structure calculations."
+      }
+    ],
+    "2605.07227::mechanism_principle::0": [
+      {
+        "passage_id": "passage:885d9f447880b827",
+        "match_score": 0.9783,
+        "evidence_span": "Ground state electron charge density \u03c1(r)\n21\n\nis the central, fundamental quantity in DFT, as the Hohenberg-Kohn theorems state that\nall ground-state properties, including energy, forces, and electronic structure, are unique\nfunctionals of \u03c1(r). Thus, DFT-based charge density is a natural choice, as it is guaranteed\nto provide a rich set of features for property prediction."
+      },
+      {
+        "passage_id": "passage:f4b4e42c28167faf",
+        "match_score": 1.0,
+        "evidence_span": "which highlights the ability of charge\ndensity to capture intrinsic, physically meaningful structural patterns17."
+      },
+      {
+        "passage_id": "passage:871b743f4c78f80e",
+        "match_score": 1.0,
+        "evidence_span": "The underlying bonding characteristic\nis encoded in the charge density, allowing a reasonable prediction of elastic moduli."
+      },
+      {
+        "passage_id": "passage:871b743f4c78f80e",
+        "match_score": 1.0,
+        "evidence_span": "the charge density provides an explicit electronic\nrepresentation of bonding, charge redistribution, and screening effects.\nThis representa-\ntion improves physical interpretability and enables potential transferability"
+      }
+    ],
+    "2605.07227::mechanism_principle::1": [
+      {
+        "passage_id": "passage:f06e772a09d568df",
+        "match_score": 0.8696,
+        "evidence_span": "For example, in the case of polymorphs, the\n20\n\nchemical formula remains the same, although the charge density changes. In such a case,\ncharge-density-based predictions are the only option."
+      }
+    ],
+    "2605.07227::mechanism_principle::2": [
+      {
+        "passage_id": "passage:7b0a0890851fe172",
+        "match_score": 1.0,
+        "evidence_span": "ensuring consistent Brillouin-zone resolution for materials with different lattice parameters."
+      }
+    ],
+    "2605.07227::mechanism_principle::3": [
+      {
+        "passage_id": "passage:ed41e5b8faea4f6a",
+        "match_score": 1.0,
+        "evidence_span": "This dimension was chosen for its compatibility with the deep learning\nmodel architecture, as it enables two successive max-pooling operations with a pool size of 2\n(specifically, 16\u00d723 = 128), making it easier to apply the max-pooling operations efficiently."
+      }
+    ],
+    "2605.07227::hypothesis_statement::0": [
+      {
+        "passage_id": "passage:5fd2ce2acef5cf7f",
+        "match_score": 1.0,
+        "evidence_span": "Here, we present a physics-informed deep learning framework that directly predicts mechanical and thermodynamic properties from the three-dimensional electronic charge density derived from density functional theory (DFT)."
+      },
+      {
+        "passage_id": "passage:1eeb617ea6bb2cc1",
+        "match_score": 1.0,
+        "evidence_span": "This work establishes electronic charge density as a transferable, physics-grounded descriptor for materials property prediction"
+      },
+      {
+        "passage_id": "passage:9c87f549aa1cf00b",
+        "match_score": 1.0,
+        "evidence_span": "Building upon this extensive body of work, this study introduces a novel, two-stage hy- brid approach to predict material properties, including bulk modulus (K), shear modulus (G), Young\u2019s modulus (E), formation energy per atom (Eform), and Debye temperature (\u0398) directly from ground state charge density"
+      },
+      {
+        "passage_id": "passage:f06e772a09d568df",
+        "match_score": 1.0,
+        "evidence_span": "This further underscores the useful- ness of a hybrid model combining CD and MAGPIE features."
+      }
+    ],
+    "2605.07227::evidence_result::0": [
+      {
+        "passage_id": "passage:5fd2ce2acef5cf7f",
+        "match_score": 1.0,
+        "evidence_span": "as confirmed by negligible reconstruction errors across diverse crystal systems."
+      },
+      {
+        "passage_id": "passage:67e562cd08c4813a",
+        "match_score": 1.0,
+        "evidence_span": "The differences are consistently negligible across both samples, indicating that the autoencoder successfully learns a compact latent representation while preserving the essential structural features of the input data."
+      },
+      {
+        "passage_id": "passage:67e562cd08c4813a",
+        "match_score": 1.0,
+        "evidence_span": "On average, the MSE was 2.1 \u00d7 10\u22124, and the average MAE was 0.00402. These values confirm that the autoencoder produces consistent, accurate reconstructions across diverse samples, with no significant deviations or outliers"
+      }
+    ],
+    "2605.07227::evidence_result::1": [
+      {
+        "passage_id": "passage:67e562cd08c4813a",
+        "match_score": 1.0,
+        "evidence_span": "A strongly compressed model produced a latent tensor of (8 \u00d7 8 \u00d7 8 \u00d7 8), which reduced storage requirements but led to noticeable loss in the reconstructed charge densities [Figure S2 and Figure S3, SI], and it was discarded."
+      },
+      {
+        "passage_id": "passage:67e562cd08c4813a",
+        "match_score": 1.0,
+        "evidence_span": "Conversely, a higher-dimensional model with a latent space of (32 \u00d7 32 \u00d7 32 \u00d7 32) preserved fine-grained features and yielded slightly improved reconstruction quality [Figure S2 and Figure S3, SI]."
+      }
+    ],
+    "2605.07227::evidence_result::2": [
+      {
+        "passage_id": "passage:1eeb617ea6bb2cc1",
+        "match_score": 1.0,
+        "evidence_span": "Using a dataset of about 6059 inorganic compounds spanning multiple crystal symmetries, the models achieve strong predictive performance for bulk modulus K (R2 = 0.94), Young\u2019s modulus E (R2 = 0.88), shear modulus G (R2 = 0.87), formation energy Eform (R2 = 0.96), and Debye temperature \u0398 (R2 = 0.89)."
+      },
+      {
+        "passage_id": "passage:6e04397ad68a655f",
+        "match_score": 0.9388,
+        "evidence_span": "Among the elastic properties, the bulk modulus shows the highest accuracy, with an R2 of 0.94. Young\u2019s modulus and shear modulus are also predicted with high accuracy, achieving R2 values of 0.88 and 0.87, respectively. The formation energy per atom exhibits the strongest correlation between predicted and actual values, with an R2 of 0.96. The Debye temperature, which reflects lattice vibrational characteristics and elastic stiffness, is also predicted with reasonable accuracy (R2 = 0.89)."
+      }
+    ],
+    "2605.07227::evidence_result::3": [
+      {
+        "passage_id": "passage:6e04397ad68a655f",
+        "match_score": 0.9529,
+        "evidence_span": "Among the elastic properties, the bulk modulus shows the highest accuracy, with\n17\n\nFigure 8: LightGBM model: Actual versus predicted values for the five material properties\nconsidered: bulk modulus, Young\u2019s modulus, shear modulus, formation energy, and Debye\ntemperature. The diagonal black line represents the ideal case of perfect prediction. The\nbottom-right panel compares the impact of charge density and MAGPIE features on predic-\ntions, indicating that the latter contribute more across the evaluated properties.\nan R2 of 0.94. Young\u2019s modulus and shear modulus are also predicted with high accuracy,\nachieving R2 values of 0.88 and 0.87, respectively. The formation energy per atom exhibits\nthe strongest correlation between predicted and actual values, with an R2 of 0.96.\nThe\nDebye temperature, which reflects lattice vibrational characteristics and elastic stiffness, is\nalso predicted with reasonable accuracy (R2 = 0.89)."
+      },
+      {
+        "passage_id": "passage:6e04397ad68a655f",
+        "match_score": 1.0,
+        "evidence_span": "The bottom-right panel of Figure 8\ncompares the impact of charge density and MAGPIE features on predictions, estimated using\nSHAP (SHapley Additive exPlanations), indicating that the latter contribute more across\nthe evaluated properties, although they still complement each other.)"
+      }
+    ],
+    "2605.07227::evidence_result::4": [
+      {
+        "passage_id": "passage:19a07ad6c1a02aca",
+        "match_score": 1.0,
+        "evidence_span": "Among the elastic properties, the bulk modulus shows the\nhighest accuracy, with an R2 of 0.94. Young\u2019s modulus and shear modulus are also predicted\nwith high accuracy, achieving R2 values of 0.87 and 0.85, respectively. The formation en-\nergy per atom achieves an R2 of 0.88, while the Debye temperature is also predicted with\nreasonable accuracy (R2 = 0.86)."
+      }
+    ],
+    "2605.07227::evidence_result::5": [
+      {
+        "passage_id": "passage:871b743f4c78f80e",
+        "match_score": 1.0,
+        "evidence_span": "As\nreported in Table 1, the model performs reasonably well for elastic moduli prediction, but not\nso well for formation energy and Debye temperature."
+      },
+      {
+        "passage_id": "passage:871b743f4c78f80e",
+        "match_score": 1.0,
+        "evidence_span": "The second model [Section S4, Figure S5, SI] is trained only on the MAGPIE features\nand outperforms the Latent CD-only model comprehensively."
+      }
+    ],
+    "2605.07227::evidence_result::6": [
+      {
+        "passage_id": "passage:f06e772a09d568df",
+        "match_score": 1.0,
+        "evidence_span": "The predicted values lie within a narrow range,\nwith a standard deviation up to \u22485% [see Fig S6, SI], indicating that our model is robust\nto rotations."
+      },
+      {
+        "passage_id": "passage:f06e772a09d568df",
+        "match_score": 1.0,
+        "evidence_span": "For Cu3Al and Mg2Ca, we have compared the results of a small simulation cell\nand a big supercell, and obtained a very good agreement [see Fig S7, SI]."
+      }
+    ],
+    "2605.07227::evidence_result::7": [
+      {
+        "passage_id": "passage:885d9f447880b827",
+        "match_score": 0.9167,
+        "evidence_span": "For example, in cubic systems, three\nindependent deformation modes are required to determine the elastic stiffness matrix. Each\ndeformation mode typically involves at least seven total-energy calculations at different strain\nmagnitudes, resulting in approximately 21 calculations.\nFor lower-symmetry structures,\ncomputational effort increases substantially; for example, 21 independent deformation modes\n22\n\nare required in triclinic crystals, with at least 7 calculations per deformation, resulting in\napproximately 147 total DFT calculations."
+      }
+    ],
+    "2605.07227::constraint::0": [
+      {
+        "passage_id": "passage:ed41e5b8faea4f6a",
+        "match_score": 1.0,
+        "evidence_span": "To facilitate batch processing and convolutional operations, all input samples were padded to a uniform shape of 128 \u00d7 128 \u00d7 128."
+      }
+    ],
+    "2605.07227::constraint::1": [
+      {
+        "passage_id": "passage:4e9621f120a7d325",
+        "match_score": 1.0,
+        "evidence_span": "A fixed number of 512 principal components was retained"
+      }
+    ],
+    "2605.07227::contradiction::0": [
+      {
+        "passage_id": "passage:19a07ad6c1a02aca",
+        "match_score": 1.0,
+        "evidence_span": "Unlike the LightGBM regression model, the charge density features contribute more across the evaluated properties in the case of the Attention CNN regression model."
+      }
+    ]
+  }
+}

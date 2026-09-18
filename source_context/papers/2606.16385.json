@@ -1,0 +1,1403 @@
+{
+  "paper_id": "2606.16385",
+  "passages": [
+    {
+      "passage_id": "passage:a848e8f9ec22eda4",
+      "paper_id": "2606.16385",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 0,
+      "text": "Melt\u2013Quench Failures and Practical Solutions for Universal\nMachine-Learning Interatomic Potentials in Amorphous\nStructure Generation\nShuwei Li1\u2020, Yuqi An1\u2020, Xingyu Guo2, Wenqiang Yang3*, Zhenbin Wang1,4*\n1Department of Materials Science and Engineering, City University of Hong Kong, Hong Kong\nSAR, 999077, China\n2Department of Data Science, City University of Hong Kong, Hong Kong SAR, 999077, China\n3Department of Chemical Engineering, University of South Carolina, Columbia, South Carolina,\nUSA\n4School of Energy and Environment, City University of Hong Kong, Hong Kong SAR, 999077,\nChina\n\u2020These authors contributed equally to this work.\n*Corresponding author, E-mail: wenqiang@email.sc.edu; zwan22@cityu.edu.hk\n1",
+      "word_count": 94,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:2241ee419a280945",
+      "paper_id": "2606.16385",
+      "section": "Abstract",
+      "section_index": 1,
+      "passage_index": 0,
+      "text": "Generating experimentally relevant amorphous structures via melt\u2013quench molecular dynamics is\nprohibitively expensive at the first-principles level. Universal machine-learning interatomic\npotentials (uMLIPs) could accelerate such simulations, but their reliability under non-equilibrium\nconditions remains unclear. Here, we examine eight leading uMLIPs for generating amorphous\nIrO2, using this electrocatalytically relevant oxide as a diagnostic case. Under the conventional\nmelt\u2013quench protocol, all models yield unphysically expanded structures with densities of 1\u20134\ng/cm3, far below the ab initio molecular dynamics (AIMD) reference value of 10.04 g/cm3.\nComparisons against ab initio references show that accurate energies and forces alone do not\nensure stable NPT dynamics; correct energy\u2013volume responses and pressure predictions are also\nessential. We identify two practical remedies: pressure-targeted fine-tuning and a revised NVT-\nquench/NPT-equilibration protocol that avoids unphysical volume expansion without additional\nab initio training data. Both recover IrO2 densities and local structures consistent with AIMD.\nAcross 30 chemically diverse materials, the volume-expansion failure proves general, and the\nrevised protocol substantially improves density predictions, reducing the AIMD-referenced MAE\nfrom 2.46 to 0.35 g/cm3. This work establishes practical validation criteria and simulation\nstrategies for robust uMLIP-driven amorphous structure generation.",
+      "word_count": 184,
+      "claim_ids": [
+        "2606.16385::problem_motivation::0",
+        "2606.16385::problem_motivation::1",
+        "2606.16385::rejected_alternative::0",
+        "2606.16385::causal_claim::0",
+        "2606.16385::causal_claim::4",
+        "2606.16385::mechanism_principle::0",
+        "2606.16385::hypothesis_statement::0",
+        "2606.16385::hypothesis_statement::1",
+        "2606.16385::evidence_result::0",
+        "2606.16385::evidence_result::7",
+        "2606.16385::evidence_result::8",
+        "2606.16385::constraint::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:58b548f58db39685",
+      "paper_id": "2606.16385",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 0,
+      "text": "Amorphous materials underpin a broad range of technologies, from catalysis and energy storage\nto optoelectronics1,2. Unlike crystalline phases, amorphous materials lack long-range periodicity\nand exhibit diverse local coordination environments, structural heterogeneity, and complex\npotential-energy landscapes3. These features can give rise to unusual and highly tunable properties,\nbut they also make predictive atomistic modeling substantially more challenging than for their\ncrystalline counterparts4. In practice, representative amorphous structures are commonly generated\nusing melt\u2013quench molecular dynamics (MD), which requires extensive sampling over large\nsystem sizes and long timescales. Although ab initio molecular dynamics (AIMD) provides a\nreliable first-principles route, its computational cost remains prohibitive for generating statistically\nmeaningful amorphous models. This sampling bottleneck continues to limit the reliable modeling\nand rational design of amorphous materials3.\n2",
+      "word_count": 123,
+      "claim_ids": [
+        "2606.16385::problem_motivation::0",
+        "2606.16385::problem_motivation::0",
+        "2606.16385::problem_motivation::0",
+        "2606.16385::prior_approach::0",
+        "2606.16385::prior_approach::1",
+        "2606.16385::prior_limitation::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:b3129ba8504d06cb",
+      "paper_id": "2606.16385",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 1,
+      "text": "Machine-learning interatomic potentials (MLIPs) offer a promising route to overcome this\nlimitation by combining near-ab initio accuracy with orders-of-magnitude lower computational\ncost5,6. System-specific MLIPs have already enabled accurate large-scale simulations of\namorphous systems such as carbon7,8 and silicon9,10. More recently, universal MLIPs (uMLIPs),\ntrained on large and chemically diverse datasets11\u201313, have emerged as general-purpose atomistic\nmodels with broad transferability across materials classes, bonding environments, and\nthermodynamic conditions14. Their strong performance in applications ranging from elastic-\nproperty prediction15 and defect energetics16 to phonon calculations17, phase-diagram exploration18,\nand metal\u2013organic framework modeling19 has underscored their potential for accelerating\natomistic simulations. However, most existing benchmarks focus on crystalline or near-\nequilibrium configurations, and whether uMLIPs are reliable under the strongly non-equilibrium\nconditions encountered during melt\u2013quench simulations remains largely unexplored.\nThis raises a practical question: how can the unphysical expansion observed in uMLIP-driven\nNPT-MD simulations be corrected? This is a demanding task because melt\u2013quench trajectories\nsample high-temperature, high-energy configurations that are poorly represented in current uMLIP\ntraining datasets. Here, we address this question using amorphous IrO2 (am-IrO2), a benchmark\nelectrocatalyst for the oxygen evolution reaction in acidic water electrolysis20,21, as a diagnostic\ntest case. We evaluate eight leading uMLIPs (GRACE, ORB, SevenNet, MACE, MatterSim, UMA,\nUPET, and NequIP) under melt\u2013quench conditions, diagnose the physical origins of their behavior,\nand develop practical strategies to restore realistic amorphous structure generation. We find that\nall examined models fail under the conventional melt\u2013quench protocol, producing unphysically\nexpanded structures with densities far below the AIMD reference. By comparing energies, forces,\nand virial pressures against ab initio reference calculations, we show that accurate energy\u2013volume\nrelations and pressure predictions across non-equilibrium states are prerequisites for reliable\namorphous structure generation. We further propose and validate two remedies: targeted fine-",
+      "word_count": 286,
+      "claim_ids": [
+        "2606.16385::problem_motivation::1",
+        "2606.16385::problem_motivation::2",
+        "2606.16385::problem_motivation::2",
+        "2606.16385::prior_approach::2",
+        "2606.16385::prior_approach::3",
+        "2606.16385::prior_limitation::1",
+        "2606.16385::causal_claim::0",
+        "2606.16385::mechanism_principle::0",
+        "2606.16385::evidence_result::0",
+        "2606.16385::evidence_result::3",
+        "2606.16385::constraint::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:eacb6d176ff20e5c",
+      "paper_id": "2606.16385",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 2,
+      "text": "relations and pressure predictions across non-equilibrium states are prerequisites for reliable\namorphous structure generation. We further propose and validate two remedies: targeted fine-\ntuning of uMLIPs with explicit emphasis on virial-pressure fidelity, and a revised simulation\nprotocol that mitigates catastrophic expansion when fine-tuning is not feasible. More broadly, our\nresults establish diagnostic criteria and actionable strategies for robust uMLIP-driven modeling of\namorphous materials.\n3",
+      "word_count": 64,
+      "claim_ids": [
+        "2606.16385::hypothesis_statement::0",
+        "2606.16385::hypothesis_statement::1"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:6e66a6d3bc1ea178",
+      "paper_id": "2606.16385",
+      "section": "Results And Discussion",
+      "section_index": 3,
+      "passage_index": 0,
+      "text": "Failure of uMLIPs under conventional melt\u2013quench simulations\nThe melt\u2013quench method is widely used for generating amorphous structures22,23. In this approach\n(Fig. 1a), melting is performed in the NVT ensemble, followed by quenching and equilibration in\nthe NPT ensemble to allow volume evolution during cooling. We calculated the density of am-\nIrO2 using eight uMLIPs (Table S1) and compared the results with those from AIMD. As shown\nin Fig. 1b, AIMD yields a density of 10.04 g/cm3, close to the previously reported theoretical\nvalue24 of 10.70 g/cm3. This small difference can be attributed to the choice of exchange-\ncorrelation functional: the previous study used optB86b, whereas we used PBE, which tends to\noverestimate lattice parameters and volume, thereby giving a slightly lower density. In contrast,\nall eight uMLIPs (GRACE, ORB, SevenNet, MACE, MatterSim, UMA, UPET, and NequIP)\npredict unphysically low densities of 1\u20134 g/cm3. Reducing the quench rate does not correct this\nbehavior; instead, slower quenching leads to even lower predicted densities of 0.2\u20131.1 g/cm3\nacross all eight uMLIPs (Fig. S1). These results indicate that current uMLIPs fail to reproduce the\nformation of a physically realistic am-IrO2 phase during melt\u2013quench simulations.\nImportantly, this failure is not unique to IrO2. To assess its generality, we selected 30 representative\nmaterials, including binary oxides, nitrides, sulfides, halides and ternary oxides, and performed\nmelt\u2013quench MD simulations. Of these, 19 produced densities substantially below the\ncorresponding reference densities (Table S2), indicating that unphysical expansion is a generic\nproblem in uMLIP-driven amorphous structure generation.\nFig. 1c and 1d show the density and structural evolution during MD quenching. Using GRACE as\na representative example, we observe that the density drops sharply to below 1.00 g/cm3 within\nthe first 10 ps of quenching, indicating strong volumetric expansion. The structural snapshots\nconfirm this picture by showing rapid expansion of the system: by 1.0 ps the structure already\nappears gas-like, and by 10 ps it has become a highly dispersed configuration with no condensed-\nphase continuity. Together, these observations indicate that uMLIP simulations do not form a\nstable amorphous network during cooling, but instead evolve toward an unphysical low-density\nstate.\n4",
+      "word_count": 350,
+      "claim_ids": [
+        "2606.16385::prior_approach::0",
+        "2606.16385::prior_approach::4",
+        "2606.16385::causal_claim::1",
+        "2606.16385::causal_claim::3",
+        "2606.16385::mechanism_principle::4",
+        "2606.16385::evidence_result::0",
+        "2606.16385::evidence_result::0",
+        "2606.16385::evidence_result::1",
+        "2606.16385::evidence_result::1",
+        "2606.16385::evidence_result::2",
+        "2606.16385::evidence_result::8"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:327f26d212e049a8",
+      "paper_id": "2606.16385",
+      "section": "Results And Discussion",
+      "section_index": 3,
+      "passage_index": 1,
+      "text": "Fig. 1 | Failure of uMLIPs to reproduce amorphous IrO2 density under the conventional\nmelt\u2013quench protocol. (a) Schematic illustration of amorphous structures generated by a typical\nmelt\u2013quench MD simulation. (b) Density of am-IrO2 obtained from melt\u2013quench MD simulations\nusing AIMD and uMLIPs at a quench rate of 580 K/ps. Each error bar represents the average\ndensity from five independent simulations, and the black error bars indicate the corresponding\nstandard deviation. (c) Temporal evolution of the am-IrO2 density during quenching, obtained\nfrom GRACE MD simulations with an extended quench time of 100 ps, corresponding to a quench\nrate of 37 K/ps. (d) Selected structural snapshots illustrating the structural evolution during\nquenching. Blue and red spheres represent iridium and oxygen atoms, respectively.\nEnergy\u2013volume and pressure errors behind unphysical expansion\nTo understand the origin of this anomalously large volume expansion, we extracted configurations\nevery 0.01 ps from the first 1.0 ps of the quench trajectory and benchmarked their energies, forces,\nand pressures against density functional theory (DFT) calculations (Fig. 2). We also computed\nthese quantities for the same configurations using our previously developed moment tensor\npotential (MTP)25, a system-specific MLIP reference that reproduces the AIMD behavior of am-\nIrO2 (see Methods). In contrast to the uMLIPs, the MTP predicts an amorphous density of 10.20\n5",
+      "word_count": 212,
+      "claim_ids": [
+        "2606.16385::prior_approach::2"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:c5662663445bec43",
+      "paper_id": "2606.16385",
+      "section": "Results And Discussion",
+      "section_index": 3,
+      "passage_index": 2,
+      "text": "g/cm3, close to the AIMD value of 10.04 g/cm3, and shows little sensitivity to the quench rate (Fig.\nS2). Thus, comparison with the MTP helps identify which model properties distinguish successful\nfrom failed NPT quenches.\nGRACE tracks the DFT reference energies more closely than the MTP throughout the quench (Fig.\n2a). The MTP\u2013DFT energy difference increases with quench time, reaching approximately 0.60\neV/atom at 1.0 ps (Fig. 2b). This indicates that the MTP systematically overestimates the energy\nas the system expands into the low-density regime. By contrast, GRACE remains much closer to\nDFT in absolute magnitude, but its error drifts from near zero to approximately \u22120.08 eV/atom\nover the same interval (Fig. 2c), indicating that GRACE increasingly underestimates the energy as\nthe density decreases. The two MLIPs therefore exhibit opposite density-dependent energy errors\nunder expansion: the MTP increases the energetic cost of volume growth, whereas GRACE\nreduces it. This difference, rather than the absolute magnitude of the energy error, is central to\ntheir distinct quench behavior.\nThe mean-force discrepancies are smaller than the energy discrepancies. Both GRACE and MTP\nbroadly reproduce the DFT force evolution during the first 1.0 ps (Fig. 2d). The MTP force\ndeviations fluctuate around the DFT values, with increased scatter at later times, but remain within\n~0.50 eV/\u212b (Fig. 2e), whereas GRACE exhibits smaller deviations, within ~0.15 eV/\u212b (Fig. 2f).\nThus, in terms of instantaneous mean-force accuracy, GRACE outperforms the am-IrO2-specific\nMTP.\nThe pressures also track the DFT trend qualitatively for both MLIPs but differ in magnitude (Fig.\n2g). The MTP exhibits a larger pressure deviation that grows with quench time, reaching ~6 \u00d7 104\nbar (Fig. 2h), whereas GRACE gives smaller deviations, generally within ~1.5 \u00d7 104 bar (Fig. 2i).\nThus, for the early-stage quench configurations, GRACE shows smaller instantaneous errors than\nthe MTP in energy, mean-force, and pressure (Fig. S3). Nevertheless, GRACE drives a\npronounced density decrease during NPT quenching, whereas MTP does not.\nThese results reveal an apparent paradox: MTP, the less accurate model on these instantaneous\nmetrics, produces the physically correct density, whereas GRACE, the more accurate model,\n6",
+      "word_count": 347,
+      "claim_ids": [
+        "2606.16385::causal_claim::2",
+        "2606.16385::causal_claim::2",
+        "2606.16385::causal_claim::2",
+        "2606.16385::evidence_result::10",
+        "2606.16385::evidence_result::10",
+        "2606.16385::evidence_result::10",
+        "2606.16385::evidence_result::10",
+        "2606.16385::contradiction::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:5fcab978db42ff15",
+      "paper_id": "2606.16385",
+      "section": "Results And Discussion",
+      "section_index": 3,
+      "passage_index": 3,
+      "text": "drives the unphysical expansion. The resolution lies in the sign of the energy\u2013volume (E\u2013V) error\nrather than its magnitude. The MTP\u2019s positive error penalizes volume expansion and preserves the\ncorrect density, whereas GRACE\u2019s negative error promotes further expansion and destabilizes the\nsystem. An MLIP can therefore be more accurate than a domain-specific reference on every\ninstantaneous quantity yet still fail catastrophically under NPT dynamics if the sign of its E\u2013V\nresponse is wrong. Long-time stability in NPT quench simulations is governed not by pointwise\nagreement with DFT on isolated snapshots, but by the fidelity of the density-dependent energy\nresponse under expansion.\nFig. 2 | Per-snapshot benchmarking of GRACE and MTP during early-stage NPT quenching.\nTemporal evolution of energy (E), mean force (Fmean), and virial pressure (P) during the first 1.0\nps of quenching is shown in panels (a), (d) and (g), respectively. Panels (b,c), (e,f), and (h,i) show\nthe corresponding deviations of MTP and GRACE from DFT for energy, mean force, and virial\npressure, respectively.\nTo further examine the E\u2013V relationship, we calculated the energies of approximately 2,400\nconfigurations spanning a range of densities, or equivalently volumes, sampled during NPT-MD\n7",
+      "word_count": 191,
+      "claim_ids": [
+        "2606.16385::causal_claim::2",
+        "2606.16385::mechanism_principle::0",
+        "2606.16385::mechanism_principle::1"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:d5d200c8d6b64073",
+      "paper_id": "2606.16385",
+      "section": "Results And Discussion",
+      "section_index": 3,
+      "passage_index": 4,
+      "text": "quenching using eight uMLIPs. These results were benchmarked against DFT and MTP\ncalculations, as shown in Fig. 3. For the DFT-calculated E\u2013V curve, the system energy initially\ndecreases, reaches a minimum at approximately 9.0\u201310.0 g/cm3, and then increases as the system\ncontinues to expand. MTP exhibits a similar trend but significantly overestimates the energy in the\nlow-density region relative to DFT. In contrast, GRACE, ORB, SevenNet, MACE, MatterSim,\nand UMA predict a monotonic decrease in system energy with decreasing density (Fig. 3c\u2013h).\nConsequently, during NPT simulations, these uMLIPs incorrectly predict abnormally low-density\nstates to be energetically favorable. Interestingly, UPET and NequIP exhibit E\u2013V relationships\nthat closely match the DFT results (Fig. 3i\u2013j), reproducing both the characteristic energy minimum\nand a reasonable increase in energy upon expansion. The absolute energy errors of UPET and\nNequIP are significantly smaller than those of MTP across the entire density range. However,\nNPT-MD simulations using these two uMLIPs still yield unphysically low densities of 3.87 g/cm3\nfor UPET and 3.24 g/cm3 for NequIP in am-IrO2 (Fig. 1b).\n8",
+      "word_count": 173,
+      "claim_ids": [
+        "2606.16385::causal_claim::1",
+        "2606.16385::evidence_result::4",
+        "2606.16385::evidence_result::4",
+        "2606.16385::evidence_result::5",
+        "2606.16385::contradiction::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:799693804cc47d08",
+      "paper_id": "2606.16385",
+      "section": "Results And Discussion",
+      "section_index": 3,
+      "passage_index": 5,
+      "text": "Fig. 3 | Energy\u2013volume responses of amorphous IrO2 from DFT, MTP, and uMLIPs. Energy\nof am-IrO2 as a function of density (bottom x-axis) and volume (top x-axis) from (a) DFT, (b)\nMTP, and (c\u2013j) eight uMLIPs. Shaded regions indicate the standard deviation, and the color map\ndenotes the sampling count at each density.\n9",
+      "word_count": 54,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:619b029be1cbb9e0",
+      "paper_id": "2606.16385",
+      "section": "Results And Discussion",
+      "section_index": 3,
+      "passage_index": 6,
+      "text": "To investigate the origin of this discrepancy, we benchmarked the energies, forces, and pressures\npredicted by UPET and NequIP against AIMD reference values. UPET accurately reproduces the\nAIMD energies, with a mean absolute error (MAE) of 44.6 meV/atom and an R2 of 0.963 (Fig.\n4a). Its force predictions also agree closely with AIMD, yielding an MAE of 0.029 eV/\u00c5 and an\nR2 of 0.998 (Fig. 4b). The pressure, however, is poorly reproduced: although the UPET-predicted\npressures broadly follow the AIMD trend, their magnitudes are substantially overestimated,\nresulting in a large MAE of 79,414.2 bar and a negative R2 of \u22129.574 (Fig. 4c). NequIP exhibits\nthe same behavior (Fig. S4), reproducing energies and forces accurately but systematically\noverestimating pressure. This shared deficiency in pressure prediction likely explains the\nunphysical expansion observed in NPT-MD simulations with both models.\nFig. 4 | Pressure-targeted fine-tuning of UPET for improved pressure prediction. Parity plots\nof (a\u2013c) UPET and (d\u2013f) fine-tuned UPET (UPET-FT) predictions against AIMD reference values\nfor energy [(a), (d)], mean force [(b), (e)], and pressure [(c), (f)], using configurations sampled\nduring AIMD. The color map denotes the sampling count in each bin.\n10",
+      "word_count": 190,
+      "claim_ids": [
+        "2606.16385::causal_claim::1",
+        "2606.16385::evidence_result::5",
+        "2606.16385::evidence_result::5",
+        "2606.16385::evidence_result::5"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:45a0d588eed67287",
+      "paper_id": "2606.16385",
+      "section": "Results And Discussion",
+      "section_index": 3,
+      "passage_index": 7,
+      "text": "Pressure-targeted fine-tuning of uMLIPs\nThis raises a critical question: how can the unphysical expansion observed in uMLIP-driven NPT-\nMD simulations be corrected? The most straightforward approach is to fine-tune the foundation\npotential models. Taking UPET as an example, we first tested whether pressure-targeted fine-\ntuning could improve NPT quenching performance. During fine-tuning, the stress component was\nstrongly weighted (wS = 10.0) to emphasize pressure correction, whereas the already accurate\nenergy and force terms were downweighted (wE = 0.1, wF = 0.1) (see Methods). The results for the\nfine-tuned model, UPET-FT, are shown in Fig. 4d\u2013f. UPET-FT preserves excellent agreement with\nAIMD for energies, with an MAE of 41.6 meV/atom and an R2 of 0.977, and remains accurate for\nforces, with an MAE of 0.046 eV/\u00c5 and an R2 of 0.995. Crucially, its pressure predictions are\nsubstantially improved, yielding an MAE of 1,980.3 bar and an R2 of 0.988 relative to AIMD.\nWe next evaluated UPET-FT by computing the density of am-IrO2 and comparing it with the\nAIMD reference and the original UPET prediction (Fig. 5a). UPET-FT yields 10.66 g/cm3, in good\nagreement with the AIMD value of 10.04 g/cm3 and a substantial improvement over the 3.87 g/cm3\npredicted by the original UPET. This improved accuracy also extends to the local atomic structure.\nThe UPET-FT radial distribution functions (RDFs, g(r)) reproduce the characteristic Ir\u2013O, O\u2013O,\nand Ir\u2013Ir peak positions at 1.96, 2.76, and 3.48 \u00c5, respectively, in excellent agreement with the\nAIMD reference (Fig. 5b and 5c). These results confirm that pressure-targeted fine-tuning enables\nthe uMLIP to accurately reproduce both the density and the local structure of am-IrO2.\n11",
+      "word_count": 268,
+      "claim_ids": [
+        "2606.16385::causal_claim::4",
+        "2606.16385::hypothesis_statement::0",
+        "2606.16385::evidence_result::6",
+        "2606.16385::evidence_result::6",
+        "2606.16385::evidence_result::6"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:da67571f2c75b34f",
+      "paper_id": "2606.16385",
+      "section": "Results And Discussion",
+      "section_index": 3,
+      "passage_index": 8,
+      "text": "Fig. 5 | Density and local-structure recovery by pressure-targeted UPET fine-tuning. (a)\nDensities of am-IrO2 obtained from AIMD, the original UPET, and fine-tuned UPET (UPET-FT).\nEach error bar represents the average density from five independent simulations, and the black\nerror bars indicate the corresponding standard deviation. RDFs of am-IrO2 from (b) AIMD and (c)\nUPET-FT, with insets showing the atomic structures.\nRevised NVT-quench/NPT-equilibration protocol\nAlthough fine-tuning is an effective strategy for improving large foundation models, it requires\nsufficient complementary training data and thus additional computational effort. We therefore\ndeveloped a revised melt\u2013quench protocol that avoids the need for additional fine-tuning data. The\noriginal UPET model shows a pronounced temperature dependence in its pressure error, with\nsubstantially smaller errors at low temperature than at high temperature (Fig. 6a). Notably, the\nlow-temperature pressure error is comparable to the pressure MAE achieved by the fine-tuned\nUPET model (Fig. 4f), and the same trend is observed for the other tested uMLIPs (Fig. S5). This\nmotivates a modified quenching protocol in which NVT simulations are used for the high-\ntemperature quench, while NPT simulations are applied only during low-temperature equilibration\n(Fig. 6b). Because NVT quenching fixes the cell volume, high-temperature energy\u2013volume errors\nno longer drive volume evolution during the quench. Using this protocol, all tested uMLIPs\n12",
+      "word_count": 212,
+      "claim_ids": [
+        "2606.16385::prior_limitation::2",
+        "2606.16385::rejected_alternative::0",
+        "2606.16385::inspiration_source::0",
+        "2606.16385::mechanism_principle::2",
+        "2606.16385::hypothesis_statement::1",
+        "2606.16385::evidence_result::5"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:a3c1cc4bfbf9422a",
+      "paper_id": "2606.16385",
+      "section": "Results And Discussion",
+      "section_index": 3,
+      "passage_index": 9,
+      "text": "produce densities of ~10.00 g/cm3, in good agreement with the AIMD reference value (Fig. 6c).\nThe resulting amorphous structures also show good agreement with the AIMD reference, as\nevidenced by the RDFs (Fig. 6d). The Ir\u2013O, O\u2013O, and Ir\u2013Ir RDF peaks predicted by GRACE occur\nat 1.96, 2.76, and 3.56 \u00c5, respectively, closely matching the corresponding AIMD peak positions\n(Fig. 5b). The RDFs from other uMLIP models are provided in Fig. S6. These results indicate that\nthe revised NVT-quench protocol provides a practical route to amorphous models that accurately\nreproduce both the density and local structure of am-IrO2, without requiring model fine-tuning.\nBeyond IrO2, we extended the revised protocol to all 30 benchmark materials and compared the\npredicted amorphous densities with reference values taken from AIMD, experiment, or the\ncorresponding crystalline phases (Table S2). As shown in Fig. 6e, the densities predicted by\nGRACE using the revised NVT-quench protocol agree closely with the reference values, which\nspan 1\u20138 g/cm3, giving an MAE of 0.50 g/cm3. When the comparison is restricted to AIMD\nreference values, the MAE decreases to 0.35 g/cm3, providing a more meaningful metric because\nuMLIP-predicted properties are most appropriately evaluated against AIMD-level reference data.\nIn contrast, the conventional NPT-quench protocol yields a substantially larger MAE of 2.95 g/cm3,\nor 2.46 g/cm3 when restricted to AIMD references. This degradation arises primarily because most\nmaterials undergo unphysical volume expansion during NPT quenching, producing gas-like\ndensities with absolute relative errors exceeding 90% (Fig. 6f). This broad benchmark validation\nfurther demonstrates the robustness of the revised protocol for uMLIP-driven amorphous structure\nmodeling.\n13",
+      "word_count": 261,
+      "claim_ids": [
+        "2606.16385::causal_claim::5",
+        "2606.16385::causal_claim::5",
+        "2606.16385::mechanism_principle::3",
+        "2606.16385::evidence_result::7",
+        "2606.16385::evidence_result::7",
+        "2606.16385::evidence_result::9",
+        "2606.16385::evidence_result::9",
+        "2606.16385::evidence_result::9"
+      ],
+      "citation_ids": [],
+      "table_ids": [
+        "table:2e649292f4330dd1"
+      ]
+    },
+    {
+      "passage_id": "passage:e6affab2fb99dc4b",
+      "paper_id": "2606.16385",
+      "section": "Results And Discussion",
+      "section_index": 3,
+      "passage_index": 10,
+      "text": "Fig. 6 | Revised melt\u2013quench protocol for uMLIP-driven amorphous structure generation.\n(a) Pressure difference between the original UPET and AIMD for IrO2 as a function of energy,\nwith points colored by temperature. Data points and error bars represent the mean and standard\ndeviation within each energy bin, respectively. (b) Schematic illustration of the revised melt\u2013\nquench protocol. (c) Densities of am-IrO2 obtained from AIMD and the original eight uMLIPs\nusing the revised protocol. Each error bar represents the average density from five independent\nsimulations, and the black error bars indicate the corresponding standard deviation. (d) RDFs of\n14",
+      "word_count": 98,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:9062fb31836844b7",
+      "paper_id": "2606.16385",
+      "section": "Results And Discussion",
+      "section_index": 3,
+      "passage_index": 11,
+      "text": "the am-IrO2 structure generated by GRACE using the revised protocol, with an inset showing the\natomic structure. (e) Amorphous densities of the 30 benchmark materials predicted by GRACE\nusing the revised NVT-quench (blue) and NPT-quench (red) protocols, plotted against their\nreference densities. Marker shapes denote the source of the reference density: circles for AIMD,\nsquares for experiment, and diamonds for the corresponding crystalline phase. (f) Absolute relative\nerrors of the predicted densities for each material under the revised NVT-quench (blue) and NPT-\nquench (red) protocols.",
+      "word_count": 85,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:0aa5c13b4f436f7d",
+      "paper_id": "2606.16385",
+      "section": "Conclusion",
+      "section_index": 4,
+      "passage_index": 0,
+      "text": "In summary, we have systematically evaluated eight leading uMLIPs for generating amorphous\nIrO2 through melt\u2013quench MD simulations. Although several models show good agreement with\nDFT for energies and forces, all tested uMLIPs fail under the conventional melt\u2013quench protocol,\nproducing unphysically expanded structures with densities far below the AIMD reference. This\nfailure extends beyond IrO2, generalizing across a 30-material benchmark and indicating that\nunphysical expansion is a broad challenge in uMLIP-driven amorphous structure generation. Our\nanalysis identifies two key origins of this failure: erroneous E\u2013V behavior, which incorrectly\nfavors low-density configurations, and inaccurate pressure predictions, which drive incorrect\nvolume evolution even when the E\u2013V relationship is reasonable. We further demonstrate two\npractical solutions. Pressure-targeted fine-tuning of UPET substantially reduces the pressure error\nand restores both the density and local structure of am-IrO2 in agreement with AIMD. Alternatively,\na revised protocol using NVT quenching followed by low-temperature NPT equilibration produces\nrealistic amorphous structures for all tested uMLIPs without additional fine-tuning data. The 30-\nmaterial benchmark further confirms the broader applicability of this strategy, showing that the\nrevised protocol suppresses unphysical volume expansion and reduces the mean absolute density\nerror from 2.46 to 0.35 g/cm3 across diverse chemistries. Overall, our results show that reliable\nuMLIP-driven amorphous structure modeling requires validation beyond conventional energy and\nforce benchmarks, with E\u2013V behavior and pressure accuracy serving as essential criteria for\nassessing thermodynamic stability under melt\u2013quench conditions.\n15",
+      "word_count": 231,
+      "claim_ids": [
+        "2606.16385::problem_motivation::2",
+        "2606.16385::causal_claim::1",
+        "2606.16385::causal_claim::1",
+        "2606.16385::hypothesis_statement::2",
+        "2606.16385::evidence_result::0",
+        "2606.16385::evidence_result::3",
+        "2606.16385::evidence_result::6",
+        "2606.16385::evidence_result::7",
+        "2606.16385::evidence_result::8"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:8d652aac32cbb664",
+      "paper_id": "2606.16385",
+      "section": "Methods",
+      "section_index": 5,
+      "passage_index": 0,
+      "text": "Molecular Dynamics Simulations\nuMLIP-driven molecular dynamics: Melt\u2013quench molecular dynamics (MD) simulations driven\nby universal machine-learning interatomic potentials (uMLIPs) were performed using the Atomic\nSimulation Environment (ASE)26. Temperature was controlled with a Langevin thermostat in the\ncanonical (NVT) ensemble, whereas pressure control in the isothermal\u2013isobaric (NPT) ensemble\nwas achieved using the Berendsen-style barostat implemented in ASE. Unless otherwise stated, a\ntime step of 1 fs was used for all MD simulations. Energies and forces were evaluated using the\ncorresponding pretrained uMLIP models interfaced with ASE, including GRACE27, ORB28,\nSevenNet29, MACE30, MatterSim31, UMA32, UPET33, and NequIP34.\nMTP-driven molecular dynamics: Moment tensor potential (MTP) simulations were performed\nusing LAMMPS35. The MTP was developed with the MLIP-336 package through an active learning\nworkflow. Initial training configurations were sampled from AIMD trajectories of both crystalline\nrutile IrO2 (120-atoms) and disordered IrO2 (96-atoms) phases over a temperature range of 300\u2013\n2500 K and applied strains from -0.05 to +0.05. From these trajectories, 1,800 representative\nsnapshots were selected for high-fidelity DFT static calculations of energies, forces, and stresses.\nThe MTP was then refined using a learning-on-the-fly (LOTF) protocol with a 5.0 \u00c5 cutoff and\nlevmax = 16. The relative weights assigned to energy, force and stress were 1:0.001:0.01. Active\nlearning was performed systematically in both NVT and NPT ensembles, covering melting at 2500\nK, controlled cooling to 300 K, and final equilibration. Further details of the MTP training and\nvalidation procedure are provided in Ref. 25. Because the MTP workflow is implemented through\nLAMMPS rather than an ASE calculator, all MTP-driven melt\u2013quench simulations were\nperformed separately in LAMMPS.\nMelt\u2013quench protocol: The melt\u2013quench protocol used for the uMLIP- and MTP-driven\nsimulations is summarized in Fig. 1a and 6b. For IrO2, the simulation was initialized from the\ncrystalline structure. For the other benchmark materials, initial configurations were generated as\nrandom atomic packings using Packmol37, with the packing density set to 1.05 times that of the\nground-state crystalline phase obtained from Materials Project38. In each simulation, the initial",
+      "word_count": 328,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:2021ab90b0b7cf53",
+      "paper_id": "2606.16385",
+      "section": "Methods",
+      "section_index": 5,
+      "passage_index": 1,
+      "text": "random atomic packings using Packmol37, with the packing density set to 1.05 times that of the\nground-state crystalline phase obtained from Materials Project38. In each simulation, the initial\nmodel was first melted at 4000 K for 10 ps, then quenched to 300 K at the prescribed cooling rate,\nand finally equilibrated at 300 K for 10 ps. The cooling rates used for IrO2 in the different\n16",
+      "word_count": 67,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:3e3b068cbb3efabc",
+      "paper_id": "2606.16385",
+      "section": "Methods",
+      "section_index": 5,
+      "passage_index": 2,
+      "text": "simulations are provided in the corresponding figure captions, whereas a cooling rate of 37 K/ps\nwas used for all 30 benchmark materials.\nAb initio Molecular Dynamics and DFT Reference Calculations\nAIMD simulations: Ab initio molecular dynamics (AIMD) simulations were performed using the\nVienna Ab initio Simulation Package (VASP)39,40. The Perdew-Burke-Ernzerhof (PBE)\nfunctional41 was used to describe exchange\u2013correlation interactions. A plane-wave energy cutoff\nof 400 eV was applied. The Brillouin zone was sampled at the \u0393 point. The electronic energy\nconvergence criterion was set to 10-5 eV. Reference amorphous structures were generated\nfollowing the melt\u2013quench protocol of Lee et al.24. Initial supercells containing 96 atoms were\nsimulated in the NPT ensemble using Parrinello\u2013Rahman dynamics combined with a Langevin\nthermostat. The systems were melted at 3000 K for 10 ps, linearly quenched from 3000 to 100 K\nover 5 ps, and subsequently equilibrated at 300 K for 10 ps. A 1 fs time step was used throughout\nthe AIMD simulations.\nDFT reference calculations: Static DFT calculations were performed for configurations sampled\nfrom the uMLIP-MD trajectories to provide reference energies, forces, and stresses for\nbenchmarking. These calculations used VASP with the PBE functional and a plane-wave energy\ncutoff of 520 eV. To maintain a comparable reciprocal-space sampling density across\nconfigurations with different cell volumes, the Monkhorst\u2013Pack k1\u00d7k2\u00d7k3 meshes were selected\nsuch that ki|ai| \u2265 20 \u00c5 for each lattice direction, where |ai| is the length of lattice vector ai and ki is\nthe number of k points along that direction. The electronic convergence criterion was set to 10\u22125\neV.\nMLIP Benchmarking and Fine-Tuning\nBenchmarking metrics: The uMLIPs and MTP were benchmarked against DFT and AIMD\nreference data using three configuration-level quantities relevant to melt\u2013quench simulations: the\nenergy per atom (E), the mean atomic force magnitude (Fmean), and the virial pressure (P) derived\nfrom the stress tensor. These quantities were defined as:\nE = Etot/N \n(1)\n!\n\" \u2211\n|$#|\n\"\n#$!",
+      "word_count": 318,
+      "claim_ids": [
+        "2606.16385::prior_approach::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:5461e793d3c4f18d",
+      "paper_id": "2606.16385",
+      "section": "Methods",
+      "section_index": 5,
+      "passage_index": 3,
+      "text": "(2)\nFmean =\n17",
+      "word_count": 4,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:186893c07b4e3a7a",
+      "paper_id": "2606.16385",
+      "section": "Methods",
+      "section_index": 5,
+      "passage_index": 4,
+      "text": "!\n%Tr(%) \n(3)\nP = \u2212\nwhere Etot is the total energy of a structure, N is the number of atoms, Fi is the force vector acting\non atom i, and \u03c3 is the stress tensor. The sign convention for pressure follows Equation (3).\nUPET fine-tuning: UPET was fine-tuned from the pretrained checkpoint pet-oam-xl-v1.0.0.ckpt\nusing configurations extracted from the AIMD trajectory. The dataset was randomly divided into\ntraining, validation, and test subsets at a ratio of 0.8:0.1:0.1. Fine-tuning was performed for 100\nepochs with a learning rate of 1 \u00d7 10\u22125. The optimization objective combined energy, force, and\nstress losses according to\nL = 0.1LE + 0.1LF + 10.0&& \n(4)\nThe stress term was assigned a larger weight to improve the prediction of pressure and volume\nevolution during melt\u2013quench simulations. The energy and force terms were assigned smaller\nweights to preserve the accuracy of the pretrained model for these quantities during fine-tuning.\nStructural analysis and visualization: Radial distribution functions (RDFs) were calculated\nusing OVITO42. Atomic configurations were rendered in OVITO using the element-specific color\nschemes described in the corresponding Figure captions.\nData Availability\nAll the data supporting this study are included in the article and its supplementary information.\n18",
+      "word_count": 199,
+      "claim_ids": [
+        "2606.16385::causal_claim::4"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:b59553bfda705288",
+      "paper_id": "2606.16385",
+      "section": "References",
+      "section_index": 6,
+      "passage_index": 0,
+      "text": "1. Kang, J. Recent progress of amorphous nanomaterials. Chem. Rev. 123, 8859\u20138941 (2023).\n2.  Lei, Z. Automatic discovery and optimal generation of amorphous high-entropy\nelectrocatalysts. J. Am. Chem. Soc. 147, 21743\u201321753 (2025).\n3. Liu, Y., Madanchi, A., Anker, A. S., Simine, L. & Deringer, V. L. The amorphous state as a\nfrontier in computational materials design. Nat. Rev. Mater. 10, 228\u2013241 (2025).\n4. Madanchi, A. Is the future of materials amorphous? Challenges and opportunities in simulations\nof amorphous materials. ACS Phys. Chem. Au 5, 3\u201316 (2024).\n5. Kalita, B., Gokcan, H. & Isayev, O. Machine learning interatomic potentials at the centennial\ncrossroads of quantum mechanics. Nat. Comput. Sci. 5, 1120\u20131132 (2025).\n6. Yuan, E. C.-Y. et al. Foundation models for atomistic simulation of chemistry and materials.\nNat. Rev. Chem. 10, 212\u2013230 (2026).\n7. Deringer, V. L. & Cs\u00e1nyi, G. Machine learning based interatomic potential for amorphous\ncarbon. Phys. Rev. B 95, 94203 (2017).\n8. Deringer, V. L. Computational surface chemistry of tetrahedral amorphous carbon by\ncombining machine learning and density functional theory. Chem. Mater. 30, 7438\u20137445\n(2018).\n9. Deringer, V. L. Origins of structural and electronic transitions in disordered silicon. Nature 589,\n59\u201364 (2021).\n10. Rosset, L. A., Drabold, D. A. & Deringer, V. L. Signatures of paracrystallinity in amorphous\nsilicon from machine-learning-driven molecular dynamics. Nat. Commun. 16, 2360 (2025).\n11. Barros-Luque, L. et al. The open materials 2024 (OMat24) inorganic materials dataset and\nmodels. Nat. Comput. Sci. 1\u201311 (2026) doi:10.1038/s43588-026-00996-w.\n19",
+      "word_count": 242,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:4dfbec8edc930bae",
+      "paper_id": "2606.16385",
+      "section": "References",
+      "section_index": 6,
+      "passage_index": 1,
+      "text": "12. Schmidt, J. Machine-learning-assisted determination of the global zero-temperature phase\ndiagram of materials. Adv. Mater. 35, 2210788 (2023).\n13. Horton, M. K. Accelerated data-driven materials science with the materials project. Nat. Mater.\n24, 1522\u20131532 (2025).\n14. Xia, J., Zhang, Y. & Jiang, B. The evolution of machine learning potentials for molecules,\nreactions and materials. Chem. Soc. Rev. 54, 4790\u20134821 (2025).\n15. Gao, P. & Wang, H. Benchmarking universal machine learning interatomic potentials for\nelastic property prediction. Preprint at https://doi.org/10.48550/arXiv.2510.22999 (2026).\n16. Berger, E., Bagheri, M. & Komsa, H.-P. Screening of Material Defects using Universal\nMachine-Learning Interatomic Potentials. Small 21, e03956 (2025).\n17. Loew, A., Sun, D., Wang, H.-C., Botti, S. & Marques, M. A. L. Universal machine learning\ninteratomic potentials are ready for phonons. npj Comput. Mater. 11, 178 (2025).\n18. Zhu, S., Sar\u0131t\u00fcrk, D. & Arr\u00f3yave, R. Machine learning potentials for alloys: a detailed\nworkflow to predict phase diagrams and benchmark accuracy. npj Comput Mater. 11, 340\n(2025).\n19. Kra\u00df, H., Huang, J. & Moosavi, S. M. MOFSimBench: evaluating universal machine learning\ninteratomic potentials in metal-organic framework molecular modeling. npj Comput Mater.\n12, 4 (2025).\n20. Seitz, L. C. A highly active and stable IrOx/SrIrO3 catalyst for the oxygen evolution reaction.\nScience 353, 1011\u20131014 (2016).\n21. Wei, C. Benchmarking electrocatalyst stability for acidic oxygen evolution reaction: the\ncrucial role of dissolved ion concentration. ACS Catal. 13, 14058\u201314069 (2023).\n20",
+      "word_count": 230,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:6b5118d4bef2831c",
+      "paper_id": "2606.16385",
+      "section": "References",
+      "section_index": 6,
+      "passage_index": 2,
+      "text": "22. Yang, K. New insights into the atomic structure of amorphous TiO2 using tight-binding\nmolecular dynamics. J. Chem. Phys. 149, (2018).\n23. Li, X. Cooling rate effects in sodium silicate glasses: bridging the gap between molecular\ndynamics simulations and experiments. J. Chem. Phys. 147, (2017).\n24. Lee, S., Lee, Y.-J., Lee, G. & Soon, A. Activated chemical bonds in nanoporous and\namorphous iridium oxides favor low overpotential for oxygen evolution reaction. Nat Commun.\n13, 3171 (2022).\n25. Li, J., Li, S. & Wang, Z. Machine learning reveals activity-stability trade-offs in amorphous\niridium oxide electrocatalysts. in In preparation.\n26. Hjorth Larsen, A. The atomic simulation environment\u2014a python library for working with\natoms. J. Phys.: Condens. Matter 29, 273002 (2017).\n27. Lysogorskiy, Y., Bochkarev, A. & Drautz, R. Graph atomic cluster expansion for foundational\nmachine learning interatomic potentials. npj Comput Mater. 12, 114 (2026).\n28. Rhodes, \nB. \net \nal. \nOrb-v3: \natomistic \nsimulation \nat \nscale. \nPreprint \nat\nhttps://doi.org/10.48550/arXiv.2504.06231 (2025).\n29. Kim, J. et al. Optimizing cross-domain transfer for universal machine learning interatomic\npotentials. Nat Commun. 17, 3432 (2026).\n30. Batatia, I. The design space of E (3)-equivariant atom-centred interatomic potentials. Nat.\nMach. Intell. 7, 56\u201367 (2025).\n31. Yang, H. et al. MatterSim: a deep learning atomistic model across elements, temperatures and\npressures. Preprint at https://doi.org/10.48550/arXiv.2405.04967 (2024).\n32. Wood, B. M. et al. UMA: A Family of Universal Models for Atoms. Preprint at\nhttps://doi.org/10.48550/arXiv.2506.23971 (2026).\n21",
+      "word_count": 232,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:0207902d49dbea9f",
+      "paper_id": "2606.16385",
+      "section": "References",
+      "section_index": 6,
+      "passage_index": 3,
+      "text": "33. Bigi, F., Pegolo, P., Mazitov, A., Schmidt, J. & Ceriotti, M. Pushing the limits of unconstrained\nmachine-learned \ninteratomic \npotentials. \nPreprint \nat\nhttps://doi.org/10.48550/arXiv.2601.16195 (2026).\n34. Tan, C. W. et al. High-performance training and inference for deep equivariant interatomic\npotentials. Digital Discovery 5, 1558\u20131567 (2026).\n35. Thompson, A. P. LAMMPS-a flexible simulation tool for particle-based materials modeling\nat the atomic, meso, and continuum scales. Comput. Phys. Commun. 271, 108171 (2022).\n36. Podryabinkin, E., Garifullin, K., Shapeev, A. & Novikov, I. MLIP-3: active learning on atomic\nenvironments with moment tensor potentials. J. Chem. Phys. 159, (2023).\n37. Mart\u00ednez, L., Andrade, R., Birgin, E. & Mart\u00ednez, J. M. PACKMOL: A package for building\ninitial configurations for molecular dynamics simulations. Journal of Computational\nChemistry 30, 2157\u20132164 (2009).\n38. Jain, A. et al. Commentary: the materials project: a materials genome approach to accelerating\nmaterials innovation. APL Mater. 1, (2013).\n39. Kresse, G. & Hafner, J. Ab initio molecular dynamics for liquid metals. Phys. Rev. B 47, 558\u2013\n561 (1993).\n40. Kresse, G. & Furthm\u00fcller, J. Efficiency of ab-initio total energy calculations for metals and\nsemiconductors using a plane-wave basis set. Comput. Mater. Sci. 6, 15\u201350 (1996).\n41. Perdew, J. P., Burke, K. & Ernzerhof, M. Generalized gradient approximation made simple.\nPhys. Rev. Lett. 77, 3865\u20133868 (1996).\n42. Stukowski, A. Visualization and analysis of atomistic simulation data with OVITO\u2013the open\nvisualization tool. Modell. Simul. Mater. Sci. Eng. 18, 15012 (2010).\n22",
+      "word_count": 235,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:b78fbac2715e2c8c",
+      "paper_id": "2606.16385",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 0,
+      "text": "This work was supported by the City University of Hong Kong Start-up Grant (No. 9020004).\nSome calculations were performed on the CityU Burgundy computational facilities, managed and\nprovided by the Computing Services Centre at the City University of Hong Kong.\nAuthor Contributions\nZ.W. conceived the project and supervised the research. S.L. and Y.A. performed the calculations,\nanalyzed the data, and wrote the original draft. X.G. contributed to the data analysis. W.Y.\nperformed the UMA calculations. Z.W. reviewed and edited the manuscript. All authors discussed\nthe results and commented on the manuscript.\nCompeting Interests\nThe authors declare no competing interests.\nAdditional information\nAdditional supporting information can be found online in the Supporting Information section.\n23",
+      "word_count": 114,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:26446c6d8897b25e",
+      "paper_id": "2606.16385",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 1,
+      "text": "Supplementary Information\nMelt\u2013Quench Failures and Practical Solutions for Universal\nMachine-Learning Interatomic Potentials in Amorphous\nStructure Generation\nShuwei Li1\u2020, Yuqi An1\u2020, Xingyu Guo2, Wenqiang Yang3*, Zhenbin Wang1,4*\n1Department of Materials Science and Engineering, City University of Hong Kong, Hong Kong\nSAR, 999077, China\n2Department of Data Science, City University of Hong Kong, Hong Kong SAR, 999077, China\n3Department of Chemical Engineering, University of South Carolina, Columbia, South Carolina,\nUSA\n4School of Energy and Environment, City University of Hong Kong, Hong Kong SAR, 999077,\nChina\n\u2020These authors contributed equally to this work.\n*Corresponding author, E-mail: wenqiang@email.sc.edu; zwan22@cityu.edu.hk\n1",
+      "word_count": 96,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:4b05242fbac03389",
+      "paper_id": "2606.16385",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 2,
+      "text": "Supplementary Table 1 | Universal machine-learning interatomic potentials (uMLIPs) used\nin this study. Model variants and training-data sources for the uMLIPs benchmarked for\namorphous IrO2 generation.\nuMLIPs \nModel \nTraining data source\nGRACE \nGRACE-2L-OMAT1 \nOMat242\nORB \nORB-v33 \nMPtrj4+Alex5+OMat242\nSevenNet \nSevenNet-Omin-i126 \nCOSMOS6 (15 publicly available ab initio databases)\nMACE \nMACE-MPA-07 \nMPtrj4+sAlex2,5\nMatterSim \nMatterSim-v1-5M8 \nMatterSim8\nUMA \nUMA-S9 \nOMol2510+OMat242+OC2011+ODAC2512+OMC2513\nUPET \nPET-OAM-XL14 \nOMat242+sAlex2,5+MPtrj4\nNequIP \nNequip-OAM-XL15 \nOMat242+sAlex2,5+MPtrj4\n2",
+      "word_count": 62,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": [
+        "table:c5307632c5610f4a"
+      ]
+    },
+    {
+      "passage_id": "passage:3bdf7fb7bc03a622",
+      "paper_id": "2606.16385",
+      "section": "Acknowledgements",
+      "section_index": 7,
+      "passage_index": 3,
+      "text": "Supplementary Table 2 | Comparison of amorphous densities predicted by GRACE against\nreference values for 30 diverse materials. For each material, the table lists the chemical \nformula, the GRACE-predicted density from the NVT-quench and NPT-quench methods, the \nreference density, and the source of that reference. Reference values are selected by \navailability in the following priority order: (1) densities from ab initio molecular dynamics at \nthe PBE level unless otherwise noted (AIMD), (2) experimental amorphous densities obtained \nfrom the literature (Exp.), and (3) crystalline-phase densities from the Materials Project16 \n(Crystal).\nNVT quench \nPredicted density\nNPT quench \nPredicted density",
+      "word_count": 97,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:9417f21d1301408b",
+      "paper_id": "2606.16385",
+      "section": "Materials",
+      "section_index": 8,
+      "passage_index": 0,
+      "text": "(g/cm3)\n(g/cm3)\nSiO2 \n2.4 \n2.1 \n2.1 \nAIMD17\nAl2O3 \n3.5 \n2.9 \n3.0 \nAIMD18\nTiO2 \n3.6 \n2.2 \n3.7 \nAIMD19\nSnO2 \n6.5 \n0.2 \n6.5 \nAIMD20\nWO3 \n6.5 \n0.5 \n7.2 \nAIMD*21\nZrO2 \n5.5 \n4.9 \n5.1 \nAIMD17\nIn2O3 \n7.1 \n0.3 \n7.1 \nAIMD22\nNb2O5 \n3.9 \n2.9 \n4.2 \nAIMD23\nGa2O3 \n5.4 \n4.7 \n4.5 \nAIMD24\nRuO2 \n6.4 \n0.2 \n6.3 \nAIMD25\nSrTiO3 \n3.9 \n3.6 \n3.8 \nAIMD26\nBaTiO3 \n4.0 \n4.1 \n4.1 \nAIMD27\nGaN \n5.6 \n0.2 \n5.1 \nAIMD28\nLi3N \n1.2 \n0.1 \n1.0 \nAIMD29\nAlN \n3.2 \n3.0 \n2.8 \nAIMD30\nBN \n1.9 \n0.2 \n2.0 \nAIMD31\nMoS2 \n4.2 \n0.5 \n4.8 \nAIMD32\nCdS \n4.4 \n0.2 \n3.6 \nAIMD29\nLiF \n2.4 \n0.1 \n1.9 \nAIMD29\nMoO3 \n3.0 \n0.3 \n3.7 \nExp.33\nV2O5 \n2.6 \n0.2 \n3.4 \nCrystal\nGeO2 \n4.5 \n0.1 \n6.2 \nCrystal\n3\nReference density\nReference\n(g/cm3)\nsource",
+      "word_count": 118,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:e7b8dc5fdd6c5c11",
+      "paper_id": "2606.16385",
+      "section": "Materials",
+      "section_index": 8,
+      "passage_index": 1,
+      "text": "LiCoO2 \n4.5 \n3.5 \n5.1 \nCrystal\nBaZrO3 \n5.5 \n4.6 \n6.1 \nCrystal\nPbS \n6.7 \n0.7 \n7.4 \nCrystal\nZnS \n3.7 \n0.1 \n4.1 \nCrystal\nNaCl \n2.0 \n0.1 \n2.2 \nCrystal\nAgCl \n4.1 \n0.2 \n5.6 \nCrystal\nKBr \n2.4 \n0.1 \n2.8 \nCrystal\nPbI2 \n4.7 \n0.4 \n5.6 \nCrystal\nAIMD only (n = 19)\nMAE (g/cm3) \n0.35 \n2.46\nRMSE (g/cm3) \n0.44 \n3.51\nAll (n = 30)\nMAE (g/cm3) \n0.50 \n2.95\nRMSE (g/cm3) \n0.64 \n3.77\n*Note: The AIMD reference density was obtained using the LDA functional.\n4",
+      "word_count": 77,
+      "claim_ids": [
+        "2606.16385::evidence_result::9",
+        "2606.16385::evidence_result::9"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:b6fd5dc52ff19375",
+      "paper_id": "2606.16385",
+      "section": "Materials",
+      "section_index": 8,
+      "passage_index": 2,
+      "text": "Supplementary Fig. 1 | Density of am-IrO2 generated by conventional melt-quench \nsimulations. Final density of am-IrO2 structures generated using eight uMLIPs in conventional \nmelt-quench MD simulations. Simulations used a quench rate of 37 K/ps and a quench time of 100 \nps. Each bar represents the average density from five independent simulations, and the black error \nbars indicate the corresponding standard deviation.\n5",
+      "word_count": 62,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:d846110b76861ede",
+      "paper_id": "2606.16385",
+      "section": "Materials",
+      "section_index": 8,
+      "passage_index": 3,
+      "text": "Supplementary Fig. 2 | Effect of quench rate on MTP-generated am-IrO2 density. (a) Final \ndensity of am-IrO2 generated by MTP at quench rates of 580 and 37 K/ps. Each bar represents the \naverage density from five independent simulations, and the black error bars indicate the \ncorresponding standard deviation. (b, c) Time evolution of the system density during quenching at \n580 and 37 K/ps, respectively.\n6",
+      "word_count": 65,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:41678af0fa978b80",
+      "paper_id": "2606.16385",
+      "section": "Materials",
+      "section_index": 8,
+      "passage_index": 4,
+      "text": "Supplementary Fig. 3 | GRACE and MTP predictions compared with DFT references. Parity \nplots compare predictions from GRACE (a, c, e) and MTP (b, d, f) with DFT reference values for \n(a, b) energy, (c, d) mean atomic force and (e, f) virial pressure.\n7",
+      "word_count": 45,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:a7c2431c66b1da1a",
+      "paper_id": "2606.16385",
+      "section": "Materials",
+      "section_index": 8,
+      "passage_index": 5,
+      "text": "Supplementary Fig. 4 | NequIP predictions validated against AIMD reference data. Parity \nplots compare NequIP predictions with AIMD reference values for configurations sampled during \nAIMD: (a) energy, (b) mean atomic force and (c) virial pressure. Dashed black lines indicate one-\nto-one agreement, color maps show the number of sampled configurations in each bin and purple \nmarginal distributions show the corresponding reference and predicted value distributions.\n8",
+      "word_count": 66,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:91bca2073fddda53",
+      "paper_id": "2606.16385",
+      "section": "Materials",
+      "section_index": 8,
+      "passage_index": 6,
+      "text": "Supplementary Fig. 5 | Temperature-dependent virial pressure deviations of uMLIPs from \nAIMD. Virial pressure deviation, PuMLIP - PAIMD, is plotted as a function of energy for (a) GRACE, \n(b) ORB, (c) SevenNet, (d) MACE, (e) MatterSim, (f) UMA and (g) NequIP. Data points and error \nbars represent the mean and standard deviation within each energy bin, respectively. Point color \ndenotes temperature. Arrows mark the relaxation process.\n9",
+      "word_count": 67,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:e8f686c0a4adad67",
+      "paper_id": "2606.16385",
+      "section": "Materials",
+      "section_index": 8,
+      "passage_index": 7,
+      "text": "Supplementary Fig. 6 | Structural characterization of am-IrO2 generated with the revised \nprotocol. Radial distribution functions (RDFs), g(r), for amorphous IrO2 generated using the \nrevised protocol with (a) ORB, (b) SevenNet, (c) MACE, (d) MatterSim, (e) UMA, (f) UPET and \n(g) NequIP. The inset shows the atomic configurations, with blue and red spheres denoting Ir and \nO atoms, respectively.\n10",
+      "word_count": 60,
+      "claim_ids": [
+        "2606.16385::rejected_alternative::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:b7ed4053eaec22a6",
+      "paper_id": "2606.16385",
+      "section": "Materials",
+      "section_index": 8,
+      "passage_index": 8,
+      "text": "Reference \n1. Bochkarev, A., Lysogorskiy, Y. & Drautz, R. Graph Atomic Cluster Expansion for Semilocal\nInteractions beyond Equivariant Message Passing. Phys. Rev. X 14, 21036 (2024).\n2. Barroso-Luque, L. et al. Open materials 2024 (OMat24) inorganic materials dataset and\nmodels. 1\u201319.\n3. Rhodes, \nB. \net \nal. \nOrb-v3: \natomistic \nsimulation \nat \nscale. \nPreprint \nat\nhttps://doi.org/10.48550/arXiv.2504.06231 (2025).\n4. Deng, B. et al. CHGNet as a pretrained universal neural network potential for charge-informed\natomistic modelling. Nat. Mach. Intell. 5, 1031\u20131041 (2023).\n5. Schmidt, J. et al. Machine-Learning-Assisted Determination of the Global Zero-Temperature\nPhase Diagram of Materials. Adv. Mater. 35, 2210788 (2023).\n6. Kim, J. et al. Optimizing cross-domain transfer for universal machine learning interatomic\npotentials. Nat. Commun. 17, 3432 (2026).\n7. Batatia, I. et al. A foundation model for atomistic materials chemistry. J. Chem. Phys. 163,\n184110 (2025).\n8. Yang, H. et al. MatterSim: a deep learning atomistic model across elements, temperatures and\npressures. Preprint at https://doi.org/10.48550/arXiv.2405.04967 (2024).\n9. Wood, B. M. et al. UMA: A Family of Universal Models for Atoms. Preprint at\nhttps://doi.org/10.48550/arXiv.2506.23971 (2026).\n10. Levine, D. S. et al. The Open Molecules 2025 (OMol25) Dataset, Evaluations, and Models.\nPreprint at https://doi.org/10.48550/arXiv.2505.08762 (2026).\n11. Chanussot, L. et al. Open Catalyst 2020 (OC20) Dataset and Community Challenges. ACS\nCatal. 11, 6059\u20136072 (2021).\n11",
+      "word_count": 211,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:867dbc160686f426",
+      "paper_id": "2606.16385",
+      "section": "Materials",
+      "section_index": 8,
+      "passage_index": 9,
+      "text": "12. Sriram, A. et al. The Open DAC 2025 Dataset for Sorbent Discovery in Direct Air Capture.\nPreprint at https://doi.org/10.48550/arXiv.2508.03162 (2025).\n13. Gharakhanyan, V. et al. Open Molecular Crystals 2025 (OMC25) dataset and models. Sci.\nData 13, 354 (2026).\n14. Bigi, F., Pegolo, P., Mazitov, A., Schmidt, J. & Ceriotti, M. Pushing the limits of unconstrained\nmachine-learned \ninteratomic \npotentials. \nPreprint \nat\nhttps://doi.org/10.48550/arXiv.2601.16195 (2026).\n15. Tan, C. W. et al. High-performance training and inference for deep equivariant interatomic\npotentials. Preprint at https://doi.org/10.48550/arXiv.2504.16068 (2025).\n16. Jain, A. et al. Commentary: The Materials Project: A materials genome approach to\naccelerating materials innovation. APL Mater. 1, 011002 (2013).\n17. Sulimov, V. B., Kutov, D. C., Sulimov, A. V., Grigoriev, F. V. & Tikhonravov, A. V. Density\nfunctional modeling of structural and electronic properties of amorphous high temperature\noxides. J. Non-Cryst. Solids 578, 121170 (2022).\n18. Harper, A. F., Iwanowski, K., Witt, W. C., Payne, M. C. & Simoncelli, M. Vibrational and\nthermal properties of amorphous alumina from first principles. Phys. Rev. Mater. 8, 43601\n(2024).\n19. Mavra\u010di\u0107, J., Mocanu, F. C., Deringer, V. L., Cs\u00e1nyi, G. & Elliott, S. R. Similarity Between\nAmorphous and Crystalline Phases: The Case of TiO2. J. Phys. Chem. Lett. 9, 2985\u20132990\n(2018).\n20. Medvedeva, J. E., Santy, J. & Pollard, M. Stability, binding, and charge localization in\namorphous tin monoxide: a-SnO and a-Sn\u2013Ta\u2013O with variable composition. J. Appl. Phys.\n137, 155703 (2025).\n12",
+      "word_count": 234,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:613880ef3d429eab",
+      "paper_id": "2606.16385",
+      "section": "Materials",
+      "section_index": 8,
+      "passage_index": 10,
+      "text": "21. De Wijs, G. A. & De Groot, R. A. Structure and electronic properties of amorphous WO 3.\nPhys. Rev. B 60, 16463\u201316474 (1999).\n22. Buchholz, D. B. et al. The Structure and Properties of Amorphous Indium Oxide. Chem. Mater.\n26, 5401\u20135411 (2014).\n23. Sheridan, E. et al. Microscopic theory of magnetic disorder-induced decoherence in\nsuperconducting Nb films. Preprint at https://doi.org/10.48550/arXiv.2111.11684 (2021).\n24. Zhang, X., Cai, D., Tong, J. & Liu, H. Electronic structure and optical properties for neutral\nvacancy defects in amorphous Ga2O3: a first-principle approach. J. Electron. Mater. 55, 748\u2013\n758 (2026).\n25. Jabraoui, H., Pech, D., Rouhani, M. D., Rossi, C. & Esteve, A. Insights into amorphous low-\ndensity hydrous RuO2 for supercapacitors using ab initio molecular dynamics simulations. J.\nEnergy Storage 98, 112926 (2024).\n26. Medvedeva, J. E. et al. Structure and electronic properties of amorphous strontium titanate.\nPhys. Rev. Mater. 6, 75605 (2022).\n27. Hashimoto, T. & Moriwake, H. Structure of amorphous BaTiO3 by molecular dynamics\nsimulations using a shell model. Phys. B Condens. Matter 579, 411799 (2020).\n28. Cai, B. & Drabold, D. A. Properties of amorphous GaN from first-principles simulations. Phys.\nRev. B 84, 75216 (2011).\n29. Zheng, H. et al. The ab initio non-crystalline structure database: empowering machine learning\nto decode diffusivity. Npj Comput. Mater. 10, 295 (2024).\n30. Hwang, T. & Cho, K. Thermal phonon mechanism of amorphous AlN and thermal transport\nof thin amorphous layers at the interface. J. Mater. Chem. C 13, 9042\u20139050 (2025).\n13",
+      "word_count": 246,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:05ec0a72a0ba305a",
+      "paper_id": "2606.16385",
+      "section": "Materials",
+      "section_index": 8,
+      "passage_index": 11,
+      "text": "31. Hinojosa-Romero, D., Valladares, A., Valladares, R. M., Rodr\u00edguez, I. & Valladares, A. A.\nAb initio study of the vibrational spectra of amorphous boron nitride. Sci. Rep. 14, 7949 (2024).\n32. Krbal, M. et al. Amorphous-to-Crystal Transition in Quasi-Two-Dimensional MoS2:\nImplications for 2D Electronic Devices. ACS Appl. Nano Mater. 4, 8834\u20138844 (2021).\n33. Saito, Y., Kaito, C. & Naiki, T. Structure of thin amorphous MoO3 films prepared by vacuum-\ndeposition. J. Cryst. Growth 79, 436\u2013442 (1986).\n14",
+      "word_count": 77,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    }
+  ],
+  "references": [],
+  "citation_mentions": [],
+  "tables": [
+    {
+      "table_id": "table:c5307632c5610f4a",
+      "paper_id": "2606.16385",
+      "label": "1",
+      "caption": "| Universal machine-learning interatomic potentials (uMLIPs) used",
+      "raw_text": "Supplementary Table 1 | Universal machine-learning interatomic potentials (uMLIPs) used\nin this study. Model variants and training-data sources for the uMLIPs benchmarked for\namorphous IrO2 generation.\nuMLIPs \nModel \nTraining data source\nGRACE \nGRACE-2L-OMAT1 \nOMat242\nORB \nORB-v33 \nMPtrj4+Alex5+OMat242\nSevenNet \nSevenNet-Omin-i126 \nCOSMOS6 (15 publicly available ab initio databases)\nMACE \nMACE-MPA-07 \nMPtrj4+sAlex2,5\nMatterSim \nMatterSim-v1-5M8 \nMatterSim8\nUMA \nUMA-S9 \nOMol2510+OMat242+OC2011+ODAC2512+OMC2513\nUPET \nPET-OAM-XL14 \nOMat242+sAlex2,5+MPtrj4\nNequIP \nNequip-OAM-XL15 \nOMat242+sAlex2,5+MPtrj4\n2",
+      "numeric_lines": [
+        "GRACE-2L-OMAT1 ",
+        "MPtrj4+Alex5+OMat242",
+        "COSMOS6 (15 publicly available ab initio databases)",
+        "MPtrj4+sAlex2,5",
+        "MatterSim-v1-5M8 ",
+        "OMol2510+OMat242+OC2011+ODAC2512+OMC2513",
+        "OMat242+sAlex2,5+MPtrj4",
+        "OMat242+sAlex2,5+MPtrj4"
+      ],
+      "structured_rows": [],
+      "extraction_level": "raw_numeric_lines",
+      "confidence": 0.6,
+      "passage_id": "passage:4b05242fbac03389"
+    },
+    {
+      "table_id": "table:2e649292f4330dd1",
+      "paper_id": "2606.16385",
+      "label": "2",
+      "caption": "| Comparison of amorphous densities predicted by GRACE against",
+      "raw_text": "Supplementary Table 2 | Comparison of amorphous densities predicted by GRACE against\nreference values for 30 diverse materials. For each material, the table lists the chemical \nformula, the GRACE-predicted density from the NVT-quench and NPT-quench methods, the \nreference density, and the source of that reference. Reference values are selected by \navailability in the following priority order: (1) densities from ab initio molecular dynamics at \nthe PBE level unless otherwise noted (AIMD), (2) experimental amorphous densities obtained \nfrom the literature (Exp.), and (3) crystalline-phase densities from the Materials Project16 \n(Crystal).\nNVT quench \nPredicted density\nNPT quench \nPredicted density\nMaterials\n(g/cm3)\n(g/cm3)\nSiO2 \n2.4 \n2.1 \n2.1 \nAIMD17\nAl2O3 \n3.5 \n2.9 \n3.0 \nAIMD18\nTiO2 \n3.6 \n2.2 \n3.7 \nAIMD19\nSnO2 \n6.5 \n0.2 \n6.5 \nAIMD20\nWO3 \n6.5 \n0.5 \n7.2 \nAIMD*21\nZrO2 \n5.5 \n4.9 \n5.1 \nAIMD17\nIn2O3 \n7.1 \n0.3 \n7.1 \nAIMD22\nNb2O5 \n3.9 \n2.9 \n4.2 \nAIMD23\nGa2O3 \n5.4 \n4.7 \n4.5 \nAIMD24\nRuO2 \n6.4 \n0.2 \n6.3 \nAIMD25\nSrTiO3 \n3.9 \n3.6 \n3.8 \nAIMD26\nBaTiO3 \n4.0 \n4.1 \n4.1 \nAIMD27\nGaN \n5.6 \n0.2 \n5.1 \nAIMD28",
+      "numeric_lines": [
+        "from the literature (Exp.), and (3) crystalline-phase densities from the Materials Project16 ",
+        "Al2O3 ",
+        "In2O3 ",
+        "Nb2O5 ",
+        "Ga2O3 "
+      ],
+      "structured_rows": [],
+      "extraction_level": "raw_numeric_lines",
+      "confidence": 0.6,
+      "passage_id": "passage:a3c1cc4bfbf9422a"
+    }
+  ],
+  "comparison_contexts": [
+    {
+      "comparison_id": "comparison:917237510e8ae4bd",
+      "paper_id": "2606.16385",
+      "passage_id": "passage:6e66a6d3bc1ea178",
+      "section": "Results And Discussion",
+      "text": "Failure of uMLIPs under conventional melt\u2013quench simulations\nThe melt\u2013quench method is widely used for generating amorphous structures22,23. In this approach\n(Fig. 1a), melting is performed in the NVT ensemble, followed by quenching and equilibration in\nthe NPT ensemble to allow volume evolution during cooling. We calculated the density of am-\nIrO2 using eight uMLIPs (Table S1) and compared the results with those from AIMD. As shown\nin Fig. 1b, AIMD yields a density of 10.04 g/cm3, close to the previously reported theoretical\nvalue24 of 10.70 g/cm3. This small difference can be attributed to the choice of exchange-\ncorrelation functional: the previous study used optB86b, whereas we used PBE, which tends to\noverestimate lattice parameters and volume, thereby giving a slightly lower density. In contrast,\nall eight uMLIPs (GRACE, ORB, SevenNet, MACE, MatterSim, UMA, UPET, and NequIP)\npredict unphysically low densities of 1\u20134 g/cm3. Reducing the quench rate does not correct this\nbehavior; instead, slower quenching leads to even lower predicted densities of 0.2\u20131.1 g/cm3\nacross all eight uMLIPs (Fig. S1). These results indicate that current uMLIPs fail to reproduce the\nformation of a physically realistic am-IrO2 phase during melt\u2013quench simulations.\nImportantly, this failure is not unique to IrO2. To assess its generality, we selected 30 representative\nmaterials, including binary oxides, nitrides, sulfides, halides and ternary oxides, and performed\nmelt\u2013quench MD simulations. Of these, 19 produced densities substantially below the\ncorresponding reference densities (Table S2), indicating that unphysical expansion is a generic\nproblem in uMLIP-driven amorphous structure generation.\nFig. 1c and 1d show the density and structural evolution during MD quenching. Using GRACE as\na representative example, we observe that the density drops sharply to below 1.00 g/cm3 within\nthe first 10 ps of quenching, indicating strong volumetric expansion. The structural snapshots\nconfirm this picture by showing rapid expansion of the system: by 1.0 ps the structure already\nappears gas-like, and by 10 ps it has become a highly dispersed configuration with no condensed-\nphase continuity. Together, these observations indicate that uMLIP simulations do not form a\nstable amorphous network during cooling, but instead evolve toward an unphysical low-density\nstate.\n4",
+      "claim_ids": [
+        "2606.16385::prior_approach::0",
+        "2606.16385::prior_approach::4",
+        "2606.16385::causal_claim::1",
+        "2606.16385::causal_claim::3",
+        "2606.16385::mechanism_principle::4",
+        "2606.16385::evidence_result::0",
+        "2606.16385::evidence_result::0",
+        "2606.16385::evidence_result::1",
+        "2606.16385::evidence_result::1",
+        "2606.16385::evidence_result::2",
+        "2606.16385::evidence_result::8"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:0c2bd7eed1a5fb62",
+      "paper_id": "2606.16385",
+      "passage_id": "passage:c5662663445bec43",
+      "section": "Results And Discussion",
+      "text": "g/cm3, close to the AIMD value of 10.04 g/cm3, and shows little sensitivity to the quench rate (Fig.\nS2). Thus, comparison with the MTP helps identify which model properties distinguish successful\nfrom failed NPT quenches.\nGRACE tracks the DFT reference energies more closely than the MTP throughout the quench (Fig.\n2a). The MTP\u2013DFT energy difference increases with quench time, reaching approximately 0.60\neV/atom at 1.0 ps (Fig. 2b). This indicates that the MTP systematically overestimates the energy\nas the system expands into the low-density regime. By contrast, GRACE remains much closer to\nDFT in absolute magnitude, but its error drifts from near zero to approximately \u22120.08 eV/atom\nover the same interval (Fig. 2c), indicating that GRACE increasingly underestimates the energy as\nthe density decreases. The two MLIPs therefore exhibit opposite density-dependent energy errors\nunder expansion: the MTP increases the energetic cost of volume growth, whereas GRACE\nreduces it. This difference, rather than the absolute magnitude of the energy error, is central to\ntheir distinct quench behavior.\nThe mean-force discrepancies are smaller than the energy discrepancies. Both GRACE and MTP\nbroadly reproduce the DFT force evolution during the first 1.0 ps (Fig. 2d). The MTP force\ndeviations fluctuate around the DFT values, with increased scatter at later times, but remain within\n~0.50 eV/\u212b (Fig. 2e), whereas GRACE exhibits smaller deviations, within ~0.15 eV/\u212b (Fig. 2f).\nThus, in terms of instantaneous mean-force accuracy, GRACE outperforms the am-IrO2-specific\nMTP.\nThe pressures also track the DFT trend qualitatively for both MLIPs but differ in magnitude (Fig.\n2g). The MTP exhibits a larger pressure deviation that grows with quench time, reaching ~6 \u00d7 104\nbar (Fig. 2h), whereas GRACE gives smaller deviations, generally within ~1.5 \u00d7 104 bar (Fig. 2i).\nThus, for the early-stage quench configurations, GRACE shows smaller instantaneous errors than\nthe MTP in energy, mean-force, and pressure (Fig. S3). Nevertheless, GRACE drives a\npronounced density decrease during NPT quenching, whereas MTP does not.\nThese results reveal an apparent paradox: MTP, the less accurate model on these instantaneous\nmetrics, produces the physically correct density, whereas GRACE, the more accurate model,\n6",
+      "claim_ids": [
+        "2606.16385::causal_claim::2",
+        "2606.16385::causal_claim::2",
+        "2606.16385::causal_claim::2",
+        "2606.16385::evidence_result::10",
+        "2606.16385::evidence_result::10",
+        "2606.16385::evidence_result::10",
+        "2606.16385::evidence_result::10",
+        "2606.16385::contradiction::0"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:92916ede1e6aa054",
+      "paper_id": "2606.16385",
+      "passage_id": "passage:d5d200c8d6b64073",
+      "section": "Results And Discussion",
+      "text": "quenching using eight uMLIPs. These results were benchmarked against DFT and MTP\ncalculations, as shown in Fig. 3. For the DFT-calculated E\u2013V curve, the system energy initially\ndecreases, reaches a minimum at approximately 9.0\u201310.0 g/cm3, and then increases as the system\ncontinues to expand. MTP exhibits a similar trend but significantly overestimates the energy in the\nlow-density region relative to DFT. In contrast, GRACE, ORB, SevenNet, MACE, MatterSim,\nand UMA predict a monotonic decrease in system energy with decreasing density (Fig. 3c\u2013h).\nConsequently, during NPT simulations, these uMLIPs incorrectly predict abnormally low-density\nstates to be energetically favorable. Interestingly, UPET and NequIP exhibit E\u2013V relationships\nthat closely match the DFT results (Fig. 3i\u2013j), reproducing both the characteristic energy minimum\nand a reasonable increase in energy upon expansion. The absolute energy errors of UPET and\nNequIP are significantly smaller than those of MTP across the entire density range. However,\nNPT-MD simulations using these two uMLIPs still yield unphysically low densities of 3.87 g/cm3\nfor UPET and 3.24 g/cm3 for NequIP in am-IrO2 (Fig. 1b).\n8",
+      "claim_ids": [
+        "2606.16385::causal_claim::1",
+        "2606.16385::evidence_result::4",
+        "2606.16385::evidence_result::4",
+        "2606.16385::evidence_result::5",
+        "2606.16385::contradiction::0"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:c57a3cf1d3b8420f",
+      "paper_id": "2606.16385",
+      "passage_id": "passage:45a0d588eed67287",
+      "section": "Results And Discussion",
+      "text": "Pressure-targeted fine-tuning of uMLIPs\nThis raises a critical question: how can the unphysical expansion observed in uMLIP-driven NPT-\nMD simulations be corrected? The most straightforward approach is to fine-tune the foundation\npotential models. Taking UPET as an example, we first tested whether pressure-targeted fine-\ntuning could improve NPT quenching performance. During fine-tuning, the stress component was\nstrongly weighted (wS = 10.0) to emphasize pressure correction, whereas the already accurate\nenergy and force terms were downweighted (wE = 0.1, wF = 0.1) (see Methods). The results for the\nfine-tuned model, UPET-FT, are shown in Fig. 4d\u2013f. UPET-FT preserves excellent agreement with\nAIMD for energies, with an MAE of 41.6 meV/atom and an R2 of 0.977, and remains accurate for\nforces, with an MAE of 0.046 eV/\u00c5 and an R2 of 0.995. Crucially, its pressure predictions are\nsubstantially improved, yielding an MAE of 1,980.3 bar and an R2 of 0.988 relative to AIMD.\nWe next evaluated UPET-FT by computing the density of am-IrO2 and comparing it with the\nAIMD reference and the original UPET prediction (Fig. 5a). UPET-FT yields 10.66 g/cm3, in good\nagreement with the AIMD value of 10.04 g/cm3 and a substantial improvement over the 3.87 g/cm3\npredicted by the original UPET. This improved accuracy also extends to the local atomic structure.\nThe UPET-FT radial distribution functions (RDFs, g(r)) reproduce the characteristic Ir\u2013O, O\u2013O,\nand Ir\u2013Ir peak positions at 1.96, 2.76, and 3.48 \u00c5, respectively, in excellent agreement with the\nAIMD reference (Fig. 5b and 5c). These results confirm that pressure-targeted fine-tuning enables\nthe uMLIP to accurately reproduce both the density and the local structure of am-IrO2.\n11",
+      "claim_ids": [
+        "2606.16385::causal_claim::4",
+        "2606.16385::hypothesis_statement::0",
+        "2606.16385::evidence_result::6",
+        "2606.16385::evidence_result::6",
+        "2606.16385::evidence_result::6"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:7515a99217b4da1f",
+      "paper_id": "2606.16385",
+      "passage_id": "passage:a3c1cc4bfbf9422a",
+      "section": "Results And Discussion",
+      "text": "produce densities of ~10.00 g/cm3, in good agreement with the AIMD reference value (Fig. 6c).\nThe resulting amorphous structures also show good agreement with the AIMD reference, as\nevidenced by the RDFs (Fig. 6d). The Ir\u2013O, O\u2013O, and Ir\u2013Ir RDF peaks predicted by GRACE occur\nat 1.96, 2.76, and 3.56 \u00c5, respectively, closely matching the corresponding AIMD peak positions\n(Fig. 5b). The RDFs from other uMLIP models are provided in Fig. S6. These results indicate that\nthe revised NVT-quench protocol provides a practical route to amorphous models that accurately\nreproduce both the density and local structure of am-IrO2, without requiring model fine-tuning.\nBeyond IrO2, we extended the revised protocol to all 30 benchmark materials and compared the\npredicted amorphous densities with reference values taken from AIMD, experiment, or the\ncorresponding crystalline phases (Table S2). As shown in Fig. 6e, the densities predicted by\nGRACE using the revised NVT-quench protocol agree closely with the reference values, which\nspan 1\u20138 g/cm3, giving an MAE of 0.50 g/cm3. When the comparison is restricted to AIMD\nreference values, the MAE decreases to 0.35 g/cm3, providing a more meaningful metric because\nuMLIP-predicted properties are most appropriately evaluated against AIMD-level reference data.\nIn contrast, the conventional NPT-quench protocol yields a substantially larger MAE of 2.95 g/cm3,\nor 2.46 g/cm3 when restricted to AIMD references. This degradation arises primarily because most\nmaterials undergo unphysical volume expansion during NPT quenching, producing gas-like\ndensities with absolute relative errors exceeding 90% (Fig. 6f). This broad benchmark validation\nfurther demonstrates the robustness of the revised protocol for uMLIP-driven amorphous structure\nmodeling.\n13",
+      "claim_ids": [
+        "2606.16385::causal_claim::5",
+        "2606.16385::causal_claim::5",
+        "2606.16385::mechanism_principle::3",
+        "2606.16385::evidence_result::7",
+        "2606.16385::evidence_result::7",
+        "2606.16385::evidence_result::9",
+        "2606.16385::evidence_result::9",
+        "2606.16385::evidence_result::9"
+      ],
+      "cited_references": [],
+      "tables": [
+        {
+          "table_id": "table:2e649292f4330dd1",
+          "paper_id": "2606.16385",
+          "label": "2",
+          "caption": "| Comparison of amorphous densities predicted by GRACE against",
+          "raw_text": "Supplementary Table 2 | Comparison of amorphous densities predicted by GRACE against\nreference values for 30 diverse materials. For each material, the table lists the chemical \nformula, the GRACE-predicted density from the NVT-quench and NPT-quench methods, the \nreference density, and the source of that reference. Reference values are selected by \navailability in the following priority order: (1) densities from ab initio molecular dynamics at \nthe PBE level unless otherwise noted (AIMD), (2) experimental amorphous densities obtained \nfrom the literature (Exp.), and (3) crystalline-phase densities from the Materials Project16 \n(Crystal).\nNVT quench \nPredicted density\nNPT quench \nPredicted density\nMaterials\n(g/cm3)\n(g/cm3)\nSiO2 \n2.4 \n2.1 \n2.1 \nAIMD17\nAl2O3 \n3.5 \n2.9 \n3.0 \nAIMD18\nTiO2 \n3.6 \n2.2 \n3.7 \nAIMD19\nSnO2 \n6.5 \n0.2 \n6.5 \nAIMD20\nWO3 \n6.5 \n0.5 \n7.2 \nAIMD*21\nZrO2 \n5.5 \n4.9 \n5.1 \nAIMD17\nIn2O3 \n7.1 \n0.3 \n7.1 \nAIMD22\nNb2O5 \n3.9 \n2.9 \n4.2 \nAIMD23\nGa2O3 \n5.4 \n4.7 \n4.5 \nAIMD24\nRuO2 \n6.4 \n0.2 \n6.3 \nAIMD25\nSrTiO3 \n3.9 \n3.6 \n3.8 \nAIMD26\nBaTiO3 \n4.0 \n4.1 \n4.1 \nAIMD27\nGaN \n5.6 \n0.2 \n5.1 \nAIMD28",
+          "numeric_lines": [
+            "from the literature (Exp.), and (3) crystalline-phase densities from the Materials Project16 ",
+            "Al2O3 ",
+            "In2O3 ",
+            "Nb2O5 ",
+            "Ga2O3 "
+          ],
+          "structured_rows": [],
+          "extraction_level": "raw_numeric_lines",
+          "confidence": 0.6,
+          "passage_id": "passage:a3c1cc4bfbf9422a"
+        }
+      ],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:40c1d8f3d50f2d48",
+      "paper_id": "2606.16385",
+      "passage_id": "passage:3bdf7fb7bc03a622",
+      "section": "Acknowledgements",
+      "text": "Supplementary Table 2 | Comparison of amorphous densities predicted by GRACE against\nreference values for 30 diverse materials. For each material, the table lists the chemical \nformula, the GRACE-predicted density from the NVT-quench and NPT-quench methods, the \nreference density, and the source of that reference. Reference values are selected by \navailability in the following priority order: (1) densities from ab initio molecular dynamics at \nthe PBE level unless otherwise noted (AIMD), (2) experimental amorphous densities obtained \nfrom the literature (Exp.), and (3) crystalline-phase densities from the Materials Project16 \n(Crystal).\nNVT quench \nPredicted density\nNPT quench \nPredicted density",
+      "claim_ids": [],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:d51bce25fb49c693",
+      "paper_id": "2606.16385",
+      "passage_id": "passage:41678af0fa978b80",
+      "section": "Materials",
+      "text": "Supplementary Fig. 3 | GRACE and MTP predictions compared with DFT references. Parity \nplots compare predictions from GRACE (a, c, e) and MTP (b, d, f) with DFT reference values for \n(a, b) energy, (c, d) mean atomic force and (e, f) virial pressure.\n7",
+      "claim_ids": [],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:abacac5171ab0c35",
+      "paper_id": "2606.16385",
+      "passage_id": "passage:a7c2431c66b1da1a",
+      "section": "Materials",
+      "text": "Supplementary Fig. 4 | NequIP predictions validated against AIMD reference data. Parity \nplots compare NequIP predictions with AIMD reference values for configurations sampled during \nAIMD: (a) energy, (b) mean atomic force and (c) virial pressure. Dashed black lines indicate one-\nto-one agreement, color maps show the number of sampled configurations in each bin and purple \nmarginal distributions show the corresponding reference and predicted value distributions.\n8",
+      "claim_ids": [],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    }
+  ],
+  "claim_passage_ids": {
+    "2606.16385::problem_motivation::0": [
+      {
+        "passage_id": "passage:58b548f58db39685",
+        "match_score": 1.0,
+        "evidence_span": "they also make predictive atomistic modeling substantially more challenging than for their crystalline counterparts4."
+      },
+      {
+        "passage_id": "passage:2241ee419a280945",
+        "match_score": 1.0,
+        "evidence_span": "Generating experimentally relevant amorphous structures via melt\u2013quench molecular dynamics is prohibitively expensive at the first-principles level."
+      },
+      {
+        "passage_id": "passage:58b548f58db39685",
+        "match_score": 1.0,
+        "evidence_span": "Although ab initio molecular dynamics (AIMD) provides a reliable first-principles route, its computational cost remains prohibitive for generating statistically meaningful amorphous models."
+      },
+      {
+        "passage_id": "passage:58b548f58db39685",
+        "match_score": 1.0,
+        "evidence_span": "This sampling bottleneck continues to limit the reliable modeling and rational design of amorphous materials3."
+      }
+    ],
+    "2606.16385::problem_motivation::1": [
+      {
+        "passage_id": "passage:2241ee419a280945",
+        "match_score": 1.0,
+        "evidence_span": "Universal machine-learning interatomic potentials (uMLIPs) could accelerate such simulations, but their reliability under non-equilibrium conditions remains unclear."
+      },
+      {
+        "passage_id": "passage:b3129ba8504d06cb",
+        "match_score": 1.0,
+        "evidence_span": "whether uMLIPs are reliable under the strongly non-equilibrium conditions encountered during melt\u2013quench simulations remains largely unexplored."
+      }
+    ],
+    "2606.16385::problem_motivation::2": [
+      {
+        "passage_id": "passage:b3129ba8504d06cb",
+        "match_score": 1.0,
+        "evidence_span": "This raises a practical question: how can the unphysical expansion observed in uMLIP-driven NPT-MD simulations be corrected?"
+      },
+      {
+        "passage_id": "passage:b3129ba8504d06cb",
+        "match_score": 0.9474,
+        "evidence_span": "This raises a critical question: how can the unphysical expansion observed in uMLIP-driven NPT-MD simulations be corrected?"
+      },
+      {
+        "passage_id": "passage:0aa5c13b4f436f7d",
+        "match_score": 1.0,
+        "evidence_span": "This failure extends beyond IrO2, generalizing across a 30-material benchmark and indicating that unphysical expansion is a broad challenge in uMLIP-driven amorphous structure generation."
+      }
+    ],
+    "2606.16385::prior_approach::0": [
+      {
+        "passage_id": "passage:58b548f58db39685",
+        "match_score": 1.0,
+        "evidence_span": "In practice, representative amorphous structures are commonly generated using melt\u2013quench molecular dynamics (MD), which requires extensive sampling over large system sizes and long timescales."
+      },
+      {
+        "passage_id": "passage:6e66a6d3bc1ea178",
+        "match_score": 1.0,
+        "evidence_span": "The melt\u2013quench method is widely used for generating amorphous structures22,23. In this approach (Fig. 1a), melting is performed in the NVT ensemble, followed by quenching and equilibration in the NPT ensemble to allow volume evolution during cooling."
+      },
+      {
+        "passage_id": "passage:3e3b068cbb3efabc",
+        "match_score": 1.0,
+        "evidence_span": "Reference amorphous structures were generated following the melt\u2013quench protocol of Lee et al.24."
+      }
+    ],
+    "2606.16385::prior_approach::1": [
+      {
+        "passage_id": "passage:58b548f58db39685",
+        "match_score": 1.0,
+        "evidence_span": "Although ab initio molecular dynamics (AIMD) provides a reliable first-principles route"
+      }
+    ],
+    "2606.16385::prior_approach::2": [
+      {
+        "passage_id": "passage:b3129ba8504d06cb",
+        "match_score": 1.0,
+        "evidence_span": "System-specific MLIPs have already enabled accurate large-scale simulations of amorphous systems such as carbon7,8 and silicon9,10."
+      },
+      {
+        "passage_id": "passage:327f26d212e049a8",
+        "match_score": 1.0,
+        "evidence_span": "We also computed these quantities for the same configurations using our previously developed moment tensor potential (MTP)25, a system-specific MLIP reference that reproduces the AIMD behavior of am-IrO2 (see Methods)."
+      }
+    ],
+    "2606.16385::prior_approach::3": [
+      {
+        "passage_id": "passage:b3129ba8504d06cb",
+        "match_score": 1.0,
+        "evidence_span": "More recently, universal MLIPs (uMLIPs), trained on large and chemically diverse datasets11\u201313, have emerged as general-purpose atomistic models with broad transferability across materials classes, bonding environments, and thermodynamic conditions14."
+      }
+    ],
+    "2606.16385::prior_approach::4": [
+      {
+        "passage_id": "passage:6e66a6d3bc1ea178",
+        "match_score": 1.0,
+        "evidence_span": "the previous study used optB86b, whereas we used PBE"
+      }
+    ],
+    "2606.16385::prior_limitation::0": [
+      {
+        "passage_id": "passage:58b548f58db39685",
+        "match_score": 1.0,
+        "evidence_span": "which requires extensive sampling over large system sizes and long timescales."
+      }
+    ],
+    "2606.16385::prior_limitation::1": [
+      {
+        "passage_id": "passage:b3129ba8504d06cb",
+        "match_score": 1.0,
+        "evidence_span": "However, most existing benchmarks focus on crystalline or near-equilibrium configurations, and whether uMLIPs are reliable under the strongly non-equilibrium conditions encountered during melt\u2013quench simulations remains largely unexplored."
+      }
+    ],
+    "2606.16385::prior_limitation::2": [
+      {
+        "passage_id": "passage:da67571f2c75b34f",
+        "match_score": 1.0,
+        "evidence_span": "Although fine-tuning is an effective strategy for improving large foundation models, it requires sufficient complementary training data and thus additional computational effort."
+      }
+    ],
+    "2606.16385::rejected_alternative::0": [
+      {
+        "passage_id": "passage:2241ee419a280945",
+        "match_score": 0.9688,
+        "evidence_span": "Under the conventional melt\u2013quench protocol, all models yield unphysically expanded structures ... We identify two practical remedies: pressure-targeted fine-tuning and a revised NVT-quench/NPT-equilibration protocol that avoids unphysical volume expansion"
+      },
+      {
+        "passage_id": "passage:e8f686c0a4adad67",
+        "match_score": 0.8685,
+        "evidence_span": "We find that all examined models fail under the conventional melt\u2013quench protocol... We further propose and validate two remedies: targeted fine-tuning of uMLIPs with explicit emphasis on virial-pressure fidelity, and a revised simulation protocol that mitigates catastrophic expansion when fine-tuning is not feasible."
+      },
+      {
+        "passage_id": "passage:da67571f2c75b34f",
+        "match_score": 1.0,
+        "evidence_span": "We therefore developed a revised melt\u2013quench protocol that avoids the need for additional fine-tuning data."
+      }
+    ],
+    "2606.16385::inspiration_source::0": [
+      {
+        "passage_id": "passage:da67571f2c75b34f",
+        "match_score": 1.0,
+        "evidence_span": "Notably, the low-temperature pressure error is comparable to the pressure MAE achieved by the fine-tuned UPET model (Fig. 4f), and the same trend is observed for the other tested uMLIPs (Fig. S5). This motivates a modified quenching protocol"
+      }
+    ],
+    "2606.16385::causal_claim::0": [
+      {
+        "passage_id": "passage:2241ee419a280945",
+        "match_score": 1.0,
+        "evidence_span": "Comparisons against ab initio references show that accurate energies and forces alone do not ensure stable NPT dynamics; correct energy\u2013volume responses and pressure predictions are also essential."
+      },
+      {
+        "passage_id": "passage:b3129ba8504d06cb",
+        "match_score": 1.0,
+        "evidence_span": "we show that accurate energy\u2013volume relations and pressure predictions across non-equilibrium states are prerequisites for reliable amorphous structure generation."
+      }
+    ],
+    "2606.16385::causal_claim::1": [
+      {
+        "passage_id": "passage:6e66a6d3bc1ea178",
+        "match_score": 1.0,
+        "evidence_span": "Together, these observations indicate that uMLIP simulations do not form a stable amorphous network during cooling, but instead evolve toward an unphysical low-density state."
+      },
+      {
+        "passage_id": "passage:d5d200c8d6b64073",
+        "match_score": 1.0,
+        "evidence_span": "Consequently, during NPT simulations, these uMLIPs incorrectly predict abnormally low-density states to be energetically favorable."
+      },
+      {
+        "passage_id": "passage:0aa5c13b4f436f7d",
+        "match_score": 1.0,
+        "evidence_span": "Our analysis identifies two key origins of this failure: erroneous E\u2013V behavior, which incorrectly favors low-density configurations"
+      },
+      {
+        "passage_id": "passage:0aa5c13b4f436f7d",
+        "match_score": 1.0,
+        "evidence_span": "and inaccurate pressure predictions, which drive incorrect volume evolution even when the E\u2013V relationship is reasonable."
+      },
+      {
+        "passage_id": "passage:619b029be1cbb9e0",
+        "match_score": 1.0,
+        "evidence_span": "This shared deficiency in pressure prediction likely explains the unphysical expansion observed in NPT-MD simulations with both models."
+      }
+    ],
+    "2606.16385::causal_claim::2": [
+      {
+        "passage_id": "passage:c5662663445bec43",
+        "match_score": 1.0,
+        "evidence_span": "This difference, rather than the absolute magnitude of the energy error, is central to their distinct quench behavior."
+      },
+      {
+        "passage_id": "passage:c5662663445bec43",
+        "match_score": 1.0,
+        "evidence_span": "This indicates that the MTP systematically overestimates the energy as the system expands into the low-density regime."
+      },
+      {
+        "passage_id": "passage:c5662663445bec43",
+        "match_score": 1.0,
+        "evidence_span": "indicating that GRACE increasingly underestimates the energy as the density decreases."
+      },
+      {
+        "passage_id": "passage:5fcab978db42ff15",
+        "match_score": 1.0,
+        "evidence_span": "The MTP\u2019s positive error penalizes volume expansion and preserves the correct density, whereas GRACE\u2019s negative error promotes further expansion and destabilizes the system."
+      }
+    ],
+    "2606.16385::causal_claim::3": [
+      {
+        "passage_id": "passage:6e66a6d3bc1ea178",
+        "match_score": 1.0,
+        "evidence_span": "Reducing the quench rate does not correct this behavior; instead, slower quenching leads to even lower predicted densities of 0.2\u20131.1 g/cm3 across all eight uMLIPs (Fig. S1)."
+      }
+    ],
+    "2606.16385::causal_claim::4": [
+      {
+        "passage_id": "passage:186893c07b4e3a7a",
+        "match_score": 1.0,
+        "evidence_span": "The stress term was assigned a larger weight to improve the prediction of pressure and volume evolution during melt\u2013quench simulations."
+      },
+      {
+        "passage_id": "passage:45a0d588eed67287",
+        "match_score": 1.0,
+        "evidence_span": "These results confirm that pressure-targeted fine-tuning enables the uMLIP to accurately reproduce both the density and the local structure of am-IrO2."
+      },
+      {
+        "passage_id": "passage:2241ee419a280945",
+        "match_score": 1.0,
+        "evidence_span": "the revised protocol substantially improves density predictions, reducing the AIMD-referenced MAE from 2.46 to 0.35 g/cm3."
+      }
+    ],
+    "2606.16385::causal_claim::5": [
+      {
+        "passage_id": "passage:a3c1cc4bfbf9422a",
+        "match_score": 1.0,
+        "evidence_span": "These results indicate that the revised NVT-quench protocol provides a practical route to amorphous models that accurately reproduce both the density and local structure of am-IrO2, without requiring model fine-tuning."
+      },
+      {
+        "passage_id": "passage:a3c1cc4bfbf9422a",
+        "match_score": 1.0,
+        "evidence_span": "This broad benchmark validation further demonstrates the robustness of the revised protocol for uMLIP-driven amorphous structure modeling."
+      }
+    ],
+    "2606.16385::mechanism_principle::0": [
+      {
+        "passage_id": "passage:2241ee419a280945",
+        "match_score": 1.0,
+        "evidence_span": "correct energy\u2013volume responses and pressure predictions are also essential"
+      },
+      {
+        "passage_id": "passage:b3129ba8504d06cb",
+        "match_score": 1.0,
+        "evidence_span": "we show that accurate energy\u2013volume relations and pressure predictions across non-equilibrium states are prerequisites for reliable amorphous structure generation."
+      },
+      {
+        "passage_id": "passage:5fcab978db42ff15",
+        "match_score": 1.0,
+        "evidence_span": "Long-time stability in NPT quench simulations is governed not by pointwise agreement with DFT on isolated snapshots, but by the fidelity of the density-dependent energy response under expansion."
+      }
+    ],
+    "2606.16385::mechanism_principle::1": [
+      {
+        "passage_id": "passage:5fcab978db42ff15",
+        "match_score": 1.0,
+        "evidence_span": "The resolution lies in the sign of the energy\u2013volume (E\u2013V) error rather than its magnitude."
+      }
+    ],
+    "2606.16385::mechanism_principle::2": [
+      {
+        "passage_id": "passage:da67571f2c75b34f",
+        "match_score": 1.0,
+        "evidence_span": "Because NVT quenching fixes the cell volume, high-temperature energy\u2013volume errors no longer drive volume evolution during the quench."
+      }
+    ],
+    "2606.16385::mechanism_principle::3": [
+      {
+        "passage_id": "passage:a3c1cc4bfbf9422a",
+        "match_score": 1.0,
+        "evidence_span": "This degradation arises primarily because most materials undergo unphysical volume expansion during NPT quenching, producing gas-like densities with absolute relative errors exceeding 90% (Fig. 6f)."
+      }
+    ],
+    "2606.16385::mechanism_principle::4": [
+      {
+        "passage_id": "passage:6e66a6d3bc1ea178",
+        "match_score": 0.9394,
+        "evidence_span": "This small difference can be attributed to the choice of exchange-correlation functional: the previous study used optB86b, whereas we used PBE, which tends to overestimate lattice parameters and volume, thereby giving a slightly lower density."
+      }
+    ],
+    "2606.16385::hypothesis_statement::0": [
+      {
+        "passage_id": "passage:2241ee419a280945",
+        "match_score": 0.9643,
+        "evidence_span": "We identify two practical remedies: pressure-targeted fine-tuning and a revised NVT-quench/NPT-equilibration protocol that avoids unphysical volume expansion without additional ab initio training data."
+      },
+      {
+        "passage_id": "passage:eacb6d176ff20e5c",
+        "match_score": 1.0,
+        "evidence_span": "We further propose and validate two remedies: targeted fine-tuning of uMLIPs with explicit emphasis on virial-pressure fidelity, and a revised simulation protocol that mitigates catastrophic expansion when fine-tuning is not feasible."
+      },
+      {
+        "passage_id": "passage:45a0d588eed67287",
+        "match_score": 1.0,
+        "evidence_span": "we first tested whether pressure-targeted fine-tuning could improve NPT quenching performance."
+      }
+    ],
+    "2606.16385::hypothesis_statement::1": [
+      {
+        "passage_id": "passage:2241ee419a280945",
+        "match_score": 0.9643,
+        "evidence_span": "We identify two practical remedies: pressure-targeted fine-tuning and a revised NVT-quench/NPT-equilibration protocol that avoids unphysical volume expansion without additional ab initio training data."
+      },
+      {
+        "passage_id": "passage:eacb6d176ff20e5c",
+        "match_score": 1.0,
+        "evidence_span": "We further propose and validate two remedies: targeted fine-tuning of uMLIPs with explicit emphasis on virial-pressure fidelity, and a revised simulation protocol that mitigates catastrophic expansion when fine-tuning is not feasible."
+      },
+      {
+        "passage_id": "passage:da67571f2c75b34f",
+        "match_score": 1.0,
+        "evidence_span": "This motivates a modified quenching protocol in which NVT simulations are used for the high-temperature quench, while NPT simulations are applied only during low-temperature equilibration (Fig. 6b)."
+      }
+    ],
+    "2606.16385::hypothesis_statement::2": [
+      {
+        "passage_id": "passage:0aa5c13b4f436f7d",
+        "match_score": 1.0,
+        "evidence_span": "Overall, our results show that reliable uMLIP-driven amorphous structure modeling requires validation beyond conventional energy and force benchmarks, with E\u2013V behavior and pressure accuracy serving as essential criteria for assessing thermodynamic stability under melt\u2013quench conditions."
+      }
+    ],
+    "2606.16385::evidence_result::0": [
+      {
+        "passage_id": "passage:2241ee419a280945",
+        "match_score": 1.0,
+        "evidence_span": "Under the conventional melt\u2013quench protocol, all models yield unphysically expanded structures with densities of 1\u20134 g/cm3, far below the ab initio molecular dynamics (AIMD) reference value of 10.04 g/cm3."
+      },
+      {
+        "passage_id": "passage:b3129ba8504d06cb",
+        "match_score": 1.0,
+        "evidence_span": "We find that all examined models fail under the conventional melt\u2013quench protocol, producing unphysically expanded structures with densities far below the AIMD reference."
+      },
+      {
+        "passage_id": "passage:6e66a6d3bc1ea178",
+        "match_score": 1.0,
+        "evidence_span": "In contrast, all eight uMLIPs (GRACE, ORB, SevenNet, MACE, MatterSim, UMA, UPET, and NequIP) predict unphysically low densities of 1\u20134 g/cm3."
+      },
+      {
+        "passage_id": "passage:6e66a6d3bc1ea178",
+        "match_score": 1.0,
+        "evidence_span": "These results indicate that current uMLIPs fail to reproduce the formation of a physically realistic am-IrO2 phase during melt\u2013quench simulations."
+      },
+      {
+        "passage_id": "passage:0aa5c13b4f436f7d",
+        "match_score": 1.0,
+        "evidence_span": "Although several models show good agreement with DFT for energies and forces, all tested uMLIPs fail under the conventional melt\u2013quench protocol, producing unphysically expanded structures with densities far below the AIMD reference."
+      }
+    ],
+    "2606.16385::evidence_result::1": [
+      {
+        "passage_id": "passage:6e66a6d3bc1ea178",
+        "match_score": 1.0,
+        "evidence_span": "Using GRACE as a representative example, we observe that the density drops sharply to below 1.00 g/cm3 within the first 10 ps of quenching, indicating strong volumetric expansion."
+      },
+      {
+        "passage_id": "passage:6e66a6d3bc1ea178",
+        "match_score": 0.9706,
+        "evidence_span": "The structural snapshots confirm this picture by showing rapid expansion of the system: by 1.0 ps the structure already appears gas-like, and by 10 ps it has become a highly dispersed configuration with no condensed-phase continuity."
+      }
+    ],
+    "2606.16385::evidence_result::2": [
+      {
+        "passage_id": "passage:6e66a6d3bc1ea178",
+        "match_score": 1.0,
+        "evidence_span": "As shown in Fig. 1b, AIMD yields a density of 10.04 g/cm3, close to the previously reported theoretical value24 of 10.70 g/cm3."
+      }
+    ],
+    "2606.16385::evidence_result::3": [
+      {
+        "passage_id": "passage:b3129ba8504d06cb",
+        "match_score": 1.0,
+        "evidence_span": "By comparing energies, forces, and virial pressures against ab initio reference calculations, we show that accurate energy\u2013volume relations and pressure predictions across non-equilibrium states are prerequisites for reliable amorphous structure generation."
+      },
+      {
+        "passage_id": "passage:0aa5c13b4f436f7d",
+        "match_score": 1.0,
+        "evidence_span": "Although several models show good agreement with DFT for energies and forces, all tested uMLIPs fail under the conventional melt\u2013quench protocol, producing unphysically expanded structures with densities far below the AIMD reference."
+      }
+    ],
+    "2606.16385::evidence_result::4": [
+      {
+        "passage_id": "passage:d5d200c8d6b64073",
+        "match_score": 1.0,
+        "evidence_span": "For the DFT-calculated E\u2013V curve, the system energy initially decreases, reaches a minimum at approximately 9.0\u201310.0 g/cm3, and then increases as the system continues to expand."
+      },
+      {
+        "passage_id": "passage:d5d200c8d6b64073",
+        "match_score": 1.0,
+        "evidence_span": "In contrast, GRACE, ORB, SevenNet, MACE, MatterSim, and UMA predict a monotonic decrease in system energy with decreasing density (Fig. 3c\u2013h)."
+      }
+    ],
+    "2606.16385::evidence_result::5": [
+      {
+        "passage_id": "passage:d5d200c8d6b64073",
+        "match_score": 1.0,
+        "evidence_span": "Interestingly, UPET and NequIP exhibit E\u2013V relationships that closely match the DFT results (Fig. 3i\u2013j), reproducing both the characteristic energy minimum and a reasonable increase in energy upon expansion. The absolute energy errors of UPET and NequIP are significantly smaller than those of MTP across the entire density range."
+      },
+      {
+        "passage_id": "passage:619b029be1cbb9e0",
+        "match_score": 1.0,
+        "evidence_span": "UPET accurately reproduces the AIMD energies, with a mean absolute error (MAE) of 44.6 meV/atom and an R2 of 0.963 (Fig. 4a). Its force predictions also agree closely with AIMD, yielding an MAE of 0.029 eV/\u00c5 and an R2 of 0.998 (Fig. 4b). The pressure, however, is poorly reproduced"
+      },
+      {
+        "passage_id": "passage:619b029be1cbb9e0",
+        "match_score": 1.0,
+        "evidence_span": "their magnitudes are substantially overestimated, resulting in a large MAE of 79,414.2 bar and a negative R2 of \u22129.574 (Fig. 4c)."
+      },
+      {
+        "passage_id": "passage:619b029be1cbb9e0",
+        "match_score": 1.0,
+        "evidence_span": "NequIP exhibits the same behavior (Fig. S4), reproducing energies and forces accurately but systematically overestimating pressure."
+      },
+      {
+        "passage_id": "passage:da67571f2c75b34f",
+        "match_score": 1.0,
+        "evidence_span": "The original UPET model shows a pronounced temperature dependence in its pressure error, with substantially smaller errors at low temperature than at high temperature (Fig. 6a)."
+      }
+    ],
+    "2606.16385::evidence_result::6": [
+      {
+        "passage_id": "passage:45a0d588eed67287",
+        "match_score": 1.0,
+        "evidence_span": "UPET-FT preserves excellent agreement with AIMD for energies, with an MAE of 41.6 meV/atom and an R2 of 0.977, and remains accurate for forces, with an MAE of 0.046 eV/\u00c5 and an R2 of 0.995. Crucially, its pressure predictions are substantially improved, yielding an MAE of 1,980.3 bar and an R2 of 0.988 relative to AIMD."
+      },
+      {
+        "passage_id": "passage:45a0d588eed67287",
+        "match_score": 1.0,
+        "evidence_span": "UPET-FT yields 10.66 g/cm3, in good agreement with the AIMD value of 10.04 g/cm3 and a substantial improvement over the 3.87 g/cm3 predicted by the original UPET."
+      },
+      {
+        "passage_id": "passage:45a0d588eed67287",
+        "match_score": 1.0,
+        "evidence_span": "The UPET-FT radial distribution functions (RDFs, g(r)) reproduce the characteristic Ir\u2013O, O\u2013O, and Ir\u2013Ir peak positions at 1.96, 2.76, and 3.48 \u00c5, respectively, in excellent agreement with the AIMD reference (Fig. 5b and 5c)."
+      },
+      {
+        "passage_id": "passage:0aa5c13b4f436f7d",
+        "match_score": 1.0,
+        "evidence_span": "Pressure-targeted fine-tuning of UPET substantially reduces the pressure error and restores both the density and local structure of am-IrO2 in agreement with AIMD."
+      }
+    ],
+    "2606.16385::evidence_result::7": [
+      {
+        "passage_id": "passage:a3c1cc4bfbf9422a",
+        "match_score": 0.913,
+        "evidence_span": "Using this protocol, all tested uMLIPs produce densities of ~10.00 g/cm3, in good agreement with the AIMD reference value (Fig. 6c)."
+      },
+      {
+        "passage_id": "passage:a3c1cc4bfbf9422a",
+        "match_score": 1.0,
+        "evidence_span": "The resulting amorphous structures also show good agreement with the AIMD reference, as evidenced by the RDFs (Fig. 6d)."
+      },
+      {
+        "passage_id": "passage:0aa5c13b4f436f7d",
+        "match_score": 1.0,
+        "evidence_span": "Alternatively, a revised protocol using NVT quenching followed by low-temperature NPT equilibration produces realistic amorphous structures for all tested uMLIPs without additional fine-tuning data."
+      },
+      {
+        "passage_id": "passage:2241ee419a280945",
+        "match_score": 1.0,
+        "evidence_span": "Both recover IrO2 densities and local structures consistent with AIMD."
+      }
+    ],
+    "2606.16385::evidence_result::8": [
+      {
+        "passage_id": "passage:2241ee419a280945",
+        "match_score": 1.0,
+        "evidence_span": "Across 30 chemically diverse materials, the volume-expansion failure proves general, and the revised protocol substantially improves density predictions, reducing the AIMD-referenced MAE from 2.46 to 0.35 g/cm3."
+      },
+      {
+        "passage_id": "passage:6e66a6d3bc1ea178",
+        "match_score": 1.0,
+        "evidence_span": "Of these, 19 produced densities substantially below the corresponding reference densities (Table S2), indicating that unphysical expansion is a generic problem in uMLIP-driven amorphous structure generation."
+      },
+      {
+        "passage_id": "passage:0aa5c13b4f436f7d",
+        "match_score": 1.0,
+        "evidence_span": "The 30-material benchmark further confirms the broader applicability of this strategy, showing that the revised protocol suppresses unphysical volume expansion and reduces the mean absolute density error from 2.46 to 0.35 g/cm3 across diverse chemistries."
+      }
+    ],
+    "2606.16385::evidence_result::9": [
+      {
+        "passage_id": "passage:a3c1cc4bfbf9422a",
+        "match_score": 1.0,
+        "evidence_span": "When the comparison is restricted to AIMD reference values, the MAE decreases to 0.35 g/cm3"
+      },
+      {
+        "passage_id": "passage:a3c1cc4bfbf9422a",
+        "match_score": 1.0,
+        "evidence_span": "In contrast, the conventional NPT-quench protocol yields a substantially larger MAE of 2.95 g/cm3, or 2.46 g/cm3 when restricted to AIMD references."
+      },
+      {
+        "passage_id": "passage:e7b8dc5fdd6c5c11",
+        "match_score": 1.0,
+        "evidence_span": "AIMD only (n = 19)\nMAE (g/cm3) \n0.35 \n2.46\nRMSE (g/cm3) \n0.44 \n3.51)"
+      },
+      {
+        "passage_id": "passage:e7b8dc5fdd6c5c11",
+        "match_score": 1.0,
+        "evidence_span": "All (n = 30)\nMAE (g/cm3) \n0.50 \n2.95\nRMSE (g/cm3) \n0.64 \n3.77)"
+      },
+      {
+        "passage_id": "passage:a3c1cc4bfbf9422a",
+        "match_score": 1.0,
+        "evidence_span": "As shown in Fig. 6e, the densities predicted by GRACE using the revised NVT-quench protocol agree closely with the reference values, which span 1\u20138 g/cm3, giving an MAE of 0.50 g/cm3."
+      }
+    ],
+    "2606.16385::evidence_result::10": [
+      {
+        "passage_id": "passage:c5662663445bec43",
+        "match_score": 0.8519,
+        "evidence_span": "In contrast to the uMLIPs, the MTP predicts an amorphous density of 10.20 g/cm3, close to the AIMD value of 10.04 g/cm3, and shows little sensitivity to the quench rate (Fig. S2)."
+      },
+      {
+        "passage_id": "passage:c5662663445bec43",
+        "match_score": 1.0,
+        "evidence_span": "GRACE tracks the DFT reference energies more closely than the MTP throughout the quench (Fig. 2a)."
+      },
+      {
+        "passage_id": "passage:c5662663445bec43",
+        "match_score": 1.0,
+        "evidence_span": "Both GRACE and MTP broadly reproduce the DFT force evolution during the first 1.0 ps (Fig. 2d)."
+      },
+      {
+        "passage_id": "passage:c5662663445bec43",
+        "match_score": 1.0,
+        "evidence_span": "The pressures also track the DFT trend qualitatively for both MLIPs but differ in magnitude (Fig. 2g). The MTP exhibits a larger pressure deviation that grows with quench time, reaching ~6 \u00d7 104 bar (Fig. 2h), whereas GRACE gives smaller deviations, generally within ~1.5 \u00d7 104 bar (Fig. 2i)."
+      }
+    ],
+    "2606.16385::constraint::0": [
+      {
+        "passage_id": "passage:2241ee419a280945",
+        "match_score": 0.9444,
+        "evidence_span": "a revised NVT-quench/NPT-equilibration protocol that avoids unphysical volume expansion without additional ab initio training data"
+      },
+      {
+        "passage_id": "passage:b3129ba8504d06cb",
+        "match_score": 1.0,
+        "evidence_span": "This is a demanding task because melt\u2013quench trajectories sample high-temperature, high-energy configurations that are poorly represented in current uMLIP training datasets."
+      }
+    ],
+    "2606.16385::contradiction::0": [
+      {
+        "passage_id": "passage:c5662663445bec43",
+        "match_score": 0.9583,
+        "evidence_span": "These results reveal an apparent paradox: MTP, the less accurate model on these instantaneous metrics, produces the physically correct density, whereas GRACE, the more accurate model, drives the unphysical expansion."
+      },
+      {
+        "passage_id": "passage:d5d200c8d6b64073",
+        "match_score": 1.0,
+        "evidence_span": "However, NPT-MD simulations using these two uMLIPs still yield unphysically low densities of 3.87 g/cm3 for UPET and 3.24 g/cm3 for NequIP in am-IrO2 (Fig. 1b)."
+      }
+    ]
+  }
+}

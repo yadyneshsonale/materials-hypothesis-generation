@@ -10,6 +10,7 @@ from adaptive_agent import Task, retrieve_evidence, run_workflow
 from build_evidence_graph import _deterministic_annotations, _external_citations, _validate_bundle, build_paper
 from evidence_model import EvidenceEntity, EvidenceRelation, index_relations, load_relations
 from graph_build import Graph, Node
+from source_context import build_source_bundle
 
 
 class EvidenceRelationTests(unittest.TestCase):
@@ -140,6 +141,32 @@ class EvidenceGraphBuilderTests(unittest.TestCase):
 
         self.assertIn("compares_with", relation_types)
         self.assertNotIn("outperforms", relation_types)
+
+    def test_source_context_anchors_fallback_claims_and_cited_table_comparisons(self) -> None:
+        record = {
+            "paper_id": "paper-1",
+            "reconciled_by_role": {
+                "evidence_result": [{
+                    "content": "The new method exceeds the baseline.",
+                    "evidence_span": "The new method exceeds the baseline [2].",
+                }],
+            },
+        }
+        text = (
+            "Results\n"
+            "The new method exceeds the baseline [2].\n\n"
+            "TABLE I. Retention compared with previous work\n"
+            "Method  Retention\nNew  92\nBaseline  74\n\n"
+            "References\n[2] A. Smith, Baseline electrolyte method, Journal 1, 10 (2025).\n"
+        )
+
+        bundle = build_source_bundle("paper-1", text, record)
+
+        self.assertIn("paper-1::evidence_result::0", bundle["claim_passage_ids"])
+        comparisons = [row for row in bundle["comparison_contexts"] if row["cross_paper"]]
+        self.assertEqual(len(comparisons), 1)
+        self.assertEqual(comparisons[0]["cited_references"][0]["reference_number"], "2")
+        self.assertEqual(comparisons[0]["cited_content_status"], "requires_resolution")
 
     def test_builds_claim_hypothesis_and_source_element_entities(self) -> None:
         record = {

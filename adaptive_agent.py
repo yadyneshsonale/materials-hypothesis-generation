@@ -13,6 +13,7 @@ from evidence_model import EvidenceEntity, EvidenceRelation, index_relations, lo
 from graph_build import Graph, Node, _keywords, build_graph
 from hypothesis_agent import critique
 from llm_client import provider_info, resilient_chat_json
+from source_context import load_context_index
 
 MAX_DIRECT_HITS = 8
 MAX_GRAPH_HITS = 8
@@ -77,6 +78,8 @@ class EvidenceItem:
     evidence_spans: list[str]
     score: float
     retrieval_reason: str
+    source_contexts: list[dict[str, Any]] = field(default_factory=list)
+    relation_context: dict[str, Any] = field(default_factory=dict)
 
 
 def _default_tasks(goal: str) -> list[Task]:
@@ -110,6 +113,7 @@ def retrieve_evidence(
     graph: Graph,
     relation_index: dict[str, list[EvidenceRelation]] | None = None,
     entity_index: dict[str, EvidenceEntity] | None = None,
+    context_index: dict[str, list[dict[str, Any]]] | None = None,
 ) -> list[EvidenceItem]:
     query_terms = _keywords(task.question)
     scored: list[tuple[float, Node]] = []
@@ -197,6 +201,18 @@ def retrieve_evidence(
                         continue
                     seen.add(linked_id)
                     reason = f"typed_relation:{relation.relation_type}:{relation.relation_id}"
+                    relation_context = {
+                        "relation_id": relation.relation_id,
+                        "relation_type": relation.relation_type,
+                        "metric": relation.metric,
+                        "subject_value": relation.subject_value,
+                        "reference_value": relation.reference_value,
+                        "unit": relation.unit,
+                        "conditions": relation.conditions,
+                        "evidence_span": relation.evidence_span,
+                        "source_element": relation.source_element,
+                        "confidence": relation.confidence,
+                    }
                     if linked_id in graph.nodes:
                         node = graph.nodes[linked_id]
                         evidence.append(EvidenceItem(
@@ -207,6 +223,7 @@ def retrieve_evidence(
                             evidence_spans=node.evidence_spans,
                             score=round(seed.score * relation.confidence, 4),
                             retrieval_reason=reason,
+                            relation_context=relation_context,
                         ))
                     elif entity_index and linked_id in entity_index:
                         entity = entity_index[linked_id]
@@ -218,15 +235,32 @@ def retrieve_evidence(
                             evidence_spans=[entity.evidence_span] if entity.evidence_span else [],
                             score=round(seed.score * relation.confidence, 4),
                             retrieval_reason=reason,
+                            relation_context=relation_context,
                         ))
+    if context_index:
+        for item in evidence:
+            item.source_contexts.extend(context_index.get(item.node_id, []))
     return evidence
 
 
+def _evidence_text(item: EvidenceItem) -> str:
+    blocks = [f"id={item.node_id} paper={item.paper_id} role={item.role}: {item.content}"]
+    if item.relation_context:
+        blocks.append(f"RELATION: {json.dumps(item.relation_context, ensure_ascii=False)}")
+    for context in item.source_contexts[:2]:
+        blocks.append(
+            f"SOURCE passage={context['passage_id']} section={context['section']} "
+            f"match={context['match_score']}:\n{context['text']}"
+        )
+        if context["tables"]:
+            blocks.append(f"TABLE CONTEXT:\n{json.dumps(context['tables'], ensure_ascii=False)}")
+        if context["citations"]:
+            blocks.append(f"CITED REFERENCES:\n{json.dumps(context['citations'], ensure_ascii=False)}")
+    return "\n".join(blocks)
+
+
 def assess_sufficiency(task: Task, evidence: list[EvidenceItem]) -> dict[str, Any]:
-    evidence_block = "\n".join(
-        f"- id={item.node_id} paper={item.paper_id} role={item.role}: {item.content}"
-        for item in evidence
-    ) or "(no evidence retrieved)"
+    evidence_block = "\n\n".join(f"- {_evidence_text(item)}" for item in evidence) or "(no evidence retrieved)"
     user = f"TASK:\n{task.question}\n\nEVIDENCE:\n{evidence_block}"
     result = resilient_chat_json(_SUFFICIENCY_SYSTEM, user, max_tokens=1200)
     if isinstance(result, dict) and result.get("decision") in SUFFICIENCY_DECISIONS:
@@ -258,10 +292,7 @@ def synthesize(goal: str, tasks: list[Task], evidence: list[EvidenceItem], confl
         f"- {task.task_id} [{task.decision}]: {task.finding} (citations: {', '.join(task.cited_ids)})"
         for task in tasks if task.finding
     )
-    evidence_block = "\n".join(
-        f"- id={item.node_id} paper={item.paper_id} role={item.role}: {item.content}"
-        for item in evidence
-    )
+    evidence_block = "\n\n".join(f"- {_evidence_text(item)}" for item in evidence)
     user = (
         f"GOAL:\n{goal}\n\nSUBTASK FINDINGS:\n{findings or '(none)'}\n\n"
         f"EVIDENCE ENTITIES:\n{evidence_block or '(none)'}\n\n"
@@ -278,12 +309,14 @@ def run_workflow(
     max_depth: int = 1,
     relations_path: Path | None = None,
     entities_path: Path | None = None,
+    source_context_dir: Path | None = None,
 ) -> dict[str, Any]:
     graph = build_graph(outputs_dir)
     relations = load_relations(relations_path)
     relation_index = index_relations(relations)
     entities = load_entities(entities_path) if entities_path else []
     entity_index = {entity.entity_id: entity for entity in entities}
+    context_index = load_context_index(source_context_dir)
     tasks = decompose_goal(goal)
     trace: dict[str, Any] = {
         "run_id": str(uuid.uuid4()),
@@ -295,6 +328,7 @@ def run_workflow(
             "papers": len({node.paper_id for node in graph.nodes.values()}),
             "typed_relations": len(relations),
             "typed_entities": len(entities),
+            "contextualized_claims": len(context_index),
         },
         "events": [{"stage": "decompose", "tasks": [asdict(task) for task in tasks]}],
     }
@@ -323,7 +357,7 @@ def run_workflow(
             break
 
         for task in ready:
-            evidence = retrieve_evidence(task, graph, relation_index, entity_index)
+            evidence = retrieve_evidence(task, graph, relation_index, entity_index, context_index)
             for item in evidence:
                 evidence_by_id[item.node_id] = item
             assessment = assess_sufficiency(task, evidence)
@@ -382,8 +416,17 @@ def main() -> None:
     parser.add_argument("--max-depth", type=int, default=1)
     parser.add_argument("--relations", type=Path, help="optional JSONL file of typed evidence relations")
     parser.add_argument("--entities", type=Path, help="optional JSONL file of typed evidence entities")
+    parser.add_argument("--source-context", type=Path, help="optional directory of passage, citation, and table context bundles")
     args = parser.parse_args()
-    result = run_workflow(args.goal, args.outputs_dir, args.trace_path, args.max_depth, args.relations, args.entities)
+    result = run_workflow(
+        args.goal,
+        args.outputs_dir,
+        args.trace_path,
+        args.max_depth,
+        args.relations,
+        args.entities,
+        args.source_context,
+    )
     print(f"[adaptive] status={result['status']} tasks={len(result['tasks'])} candidates={len(result['candidates'])}")
     print(f"[adaptive] trace={args.trace_path}")
 

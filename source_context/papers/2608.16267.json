@@ -1,0 +1,1299 @@
+{
+  "paper_id": "2608.16267",
+  "passages": [
+    {
+      "passage_id": "passage:f386d1358d224f59",
+      "paper_id": "2608.16267",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 0,
+      "text": "Print-Aware Synthesis and Physical Design\nMethodologies for 3D-Printed Microfluidic Biochips\nYushen Zhang\nTechnical University of Munich\nTsun-Ming Tseng\nTechnical University of Munich\nyushen.zhang@tum.de\ntsun-ming.tseng@tum.de\nAbstract\u2014Microfluidic devices are widely used in diagnostics,\nchemical synthesis, and biological analysis, but their development\noften depends on complex fabrication and design processes.\nResin-based three-dimensional (3D) printing has emerged as a\npromising alternative to conventional microfabrication because it\nenables low-cost, rapid prototyping of complex multi-layer struc-\ntures. However, the practical realization of 3D-printed microflu-\nidic biochips remains challenging due to manual and expertise-\nintensive design workflows, the rigid nature of commonly used\nprinting materials, and fabrication inaccuracies such as over-\ncuring that distort internal features and may block narrow\nchannels. In this paper, we present a cohesive design automation\nframework for 3D-printed microfluidics that addresses these chal-\nlenges across both device design and fabrication. The framework\ncombines interactive design tools, automated synthesis methods\nfor functional 3D microfluidic devices, techniques for developing\nlow-cost 3D-printed mixers, and design-for-manufacturing strate-\ngies to improve print fidelity on low-cost resin printers.\narXiv:2608.16267v1  [cs.ET]  17 Aug 2026\nI. INTRODUCTION\nMicrofluidic biochips have emerged as a powerful tech-\nnology in both research and industry, enabling the precise\nhandling of small fluid volumes for applications including\npoint-of-care diagnostics, drug delivery, chemical synthesis,\nand biological analysis [1]\u2013[3]. Traditionally, microfluidic\nfabrication has relied on processes such as soft lithography\nand polydimethylsiloxane (PDMS)\u2013glass bonding. Although\nthese methods can produce high-quality devices, they are typ-\nically labor-intensive, require specialized facilities, and depend\nheavily on cleanroom infrastructure [4]. These constraints limit\naccessibility and slow down iterative development.\nIn\nrecent\nyears,\nadditive\nmanufacturing,\nor\nthree-\ndimensional\n(3D)\nprinting,\nparticularly\nresin-based",
+      "word_count": 270,
+      "claim_ids": [],
+      "citation_ids": [
+        "citation:7333c29482f95844",
+        "citation:98e6c3d463fca496",
+        "citation:fc84c24322042c22"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:7f4232401ae5b319",
+      "paper_id": "2608.16267",
+      "section": "Methods",
+      "section_index": 1,
+      "passage_index": 0,
+      "text": "such\nas\nstereolithography\n(SLA)\nand\ndigital\nlight processing (DLP), has attracted increasing attention\nas\nan\nalternative\nfabrication\nroute\nfor\nmicrofluidics.\nCompared\nwith\nconventional\napproaches,\n3D\nprinting\noffers several compelling advantages: rapid prototyping,\nreduced infrastructure requirements, lower production costs,\nand the ability to fabricate complex three-dimensional and\nmulti-layered structures that are difficult or even impossible\nto realize using planar manufacturing techniques. An example\nof such a multi-layer 3D-printed microfluidic chip is shown\nin Figure 1. The availability of low-cost SLA printers, many\nof which cost only a few hundred dollars, further strengthens\nthe appeal of this approach, especially for laboratories\nand facilities with limited resources. In this sense, 3D\nprinting has the potential not only to simplify fabrication,\nbut also to democratize access to microfluidic technology.\nHowever, despite these advances in manufacturing, the\nUlf Schlichtmann\nTechnical University of Munich\nulf.schlichtmann@tum.de\ndesign of 3D-printed microfluidic systems remains a major\nchallenge.\nDeveloping\nsuch\ndevices\nrequires\nexpertise\nspanning fluid dynamics, mechanical design, and fabrication-\naware engineering. In practice, the design workflow still\nrelies heavily on manual computer-aided design (CAD),\nwhich is time-consuming, difficult to scale, and increasingly\nerror-prone as device complexity grows. This challenge\nbecomes even more pronounced for multi-layer architectures,\nwhere\nthe\nspatial\narrangement\nof\nchannels,\nchambers,\nand\ninterconnections\nmust\nsatisfy\nboth\nfunctional\nand\nmanufacturing constraints. While earlier design automation\ntools [5]\u2013[11] have improved the design of conventional\nplanar microfluidic chips, they do not adequately address the\ndistinctive requirements of 3D-printed systems.\nA further limitation arises from the material properties of\ncommonly available 3D-printing resins. Off-the-shelf mate-\nrials for resin printing generally produce rigid and inelastic\nstructures, in contrast to PDMS-based devices, which can\nexploit the elasticity of the substrate to implement active\nelements such as pneumatic valves and pumps. As a result, 3D-\nprinted microfluidic devices often cannot rely on deformable\ncomponents for active flow control and must instead achieve\nfunctionality primarily through the careful design of internal",
+      "word_count": 316,
+      "claim_ids": [
+        "2608.16267::problem_motivation::0",
+        "2608.16267::problem_motivation::1",
+        "2608.16267::prior_approach::0",
+        "2608.16267::prior_limitation::2",
+        "2608.16267::causal_claim::0",
+        "2608.16267::mechanism_principle::0"
+      ],
+      "citation_ids": [
+        "citation:c568712e59e94bae",
+        "citation:a535f56dd4a18e88"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:821ab4c2f2f87ce5",
+      "paper_id": "2608.16267",
+      "section": "Methods",
+      "section_index": 1,
+      "passage_index": 1,
+      "text": "components for active flow control and must instead achieve\nfunctionality primarily through the careful design of internal\ngeometries and fluidic pathways. This strong dependence\non geometry places greater demands on the design process:\nchannel lengths, volumes, resistances, and timing relationships\nmust be coordinated precisely to ensure correct fluid handling,\nsynchronized reactions, and accurate dispensing behavior [13].\nAt the same time, the physical realization of these designs\nis constrained by the fabrication inaccuracies inherent to resin-\nbased printing. During printing, light penetration and scatter-\ning can cause polymerization outside the intended exposure\nregion, a phenomenon commonly referred to as over-curing.\nThis effect introduces geometric deviations from the nominal\ndesign and is especially problematic in narrow channels and\nin fine, complex internal features. In severe cases, over-curing\nMulti-Layer Microfluidic Design\n3D-Printed Device\nLv. 0\nLv. 1\n5mm\n5mm\nLv. 2\nFig. 1. Multi-layer microfluidic chip fabricated by 3D printing [12].",
+      "word_count": 148,
+      "claim_ids": [
+        "2608.16267::causal_claim::0",
+        "2608.16267::causal_claim::1",
+        "2608.16267::causal_claim::1",
+        "2608.16267::constraint::0"
+      ],
+      "citation_ids": [
+        "citation:5b2927b2af1b4d7c",
+        "citation:58e96744608ee52e"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:0e44eca9dad9b8c3",
+      "paper_id": "2608.16267",
+      "section": "Methods",
+      "section_index": 1,
+      "passage_index": 2,
+      "text": "3D Printing Process\nRepeat Until All Layers Are Printed\nBuild \nPlatform\nPrinted\nObject\nResin\nResin\nVat\nLCD\nMask\n1. Build Platform\nDescents to Next\n2. UV Exposure \nThrough\nLCD Mask\n3. Build Platform \nLifts to\nRelease Part\nUV Light\nLayer's Position\nSource\nFig. 2. Illustration demonstrating how a resin-based SLA 3D printer creates\nan object.\ncan partially or completely block channels, rendering a device\nunusable. Taken together, these issues reveal a critical gap\nbetween the promise of 3D printing for microfluidics and its\npractical adoption. Although 3D printing has made fabrication\nmore accessible, persistent challenges in design complexity,\nfunctional synthesis, material limitations, and fabrication fi-\ndelity continue to slow the broader dissemination of 3D-\nprinted microfluidics. These issues are particularly significant\nin the context of low-cost fabrication. Hobby-grade printers are\nhighly attractive for making microfluidics more accessible, yet\nthey are also more susceptible to inaccuracies such as light-\ninduced feature distortion. High-end printers may alleviate\nsome of these problems, but they do so at the expense of\naffordability, thereby weakening one of the most compelling\nmotivations for using 3D printing in the first place.\nTo address these challenges, this paper presents a cohesive\ndesign automation framework for 3D-printed microfluidics that\nunifies a series of interconnected methods across design and\nfabrication. Specifically, the framework spans interactive tools\nto lower the barrier to manual design of 3D microfluidic\ngeometries, methods for automated synthesis of 3D-printable\nmicrofluidic devices, approaches for synthesizing low-cost 3D-\nprintable mixing systems, and design-for-manufacturing tech-\nniques to improve fabrication fidelity on low-cost resin print-\ners. By integrating interactive design support, constraint-driven\nfunctional synthesis, and machine-learning-assisted manufac-\nturing compensation, the presented methodologies lower the\nbarrier to entry for non-expert users and reduce the time\nand cost required to develop complex microfluidic systems.\nIn doing so, it advances the goal of making 3D-printed\nmicrofluidics not only technically viable, but also broadly\naccessible.\nII. BACKGROUND\nA. 3D Printing Technologies for Microfluidics\nThe fabrication of microfluidic devices has historically been",
+      "word_count": 327,
+      "claim_ids": [
+        "2608.16267::problem_motivation::0",
+        "2608.16267::problem_motivation::0",
+        "2608.16267::causal_claim::2",
+        "2608.16267::causal_claim::3",
+        "2608.16267::hypothesis_statement::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:f12d483be615a5d0",
+      "paper_id": "2608.16267",
+      "section": "Methods",
+      "section_index": 1,
+      "passage_index": 3,
+      "text": "A. 3D Printing Technologies for Microfluidics\nThe fabrication of microfluidic devices has historically been\ndominated by soft lithography and PDMS molding, which\nrequire specialized cleanroom environments and extensive\nmanual labor. In response to these limitations, researchers\nhave increasingly turned to diverse 3D printing techniques for\nmicrofluidic fabrication, including stereolithography (SLA),\ndigital light processing (DLP), fused deposition modeling\n(FDM), and two-photon polymerization (2PP) [14]. Among\nthese methods, resin-based printing approaches, particularly\nSLA and DLP, have recently emerged as highly accessible\nalternatives that offer high-resolution features at low cost. In\nLight  Penetration\nLight Penetration Affection\nBuild \nPlatform\nMicrofluidic\nBiochip\nOver-Curing\nIntended\nFabricated\nIntended\nUV Light\nPenetration\nFig. 3.\nUV light penetration cures unintended areas during the printing\nprocess: (left) illustration of how UV penetrates through the printed layers;\n(right) light penetration affects the yield of 3D-printed microfluidic biochips.\nthese processes, a liquid photosensitive resin is selectively\nexposed to a UV light source, curing and solidifying the\nmaterial layer-by-layer to build the desired 3D geometry, as\nillustrated in Figure 2. The 3D printing process can be viewed\nas dragging the object from the resin vat.\nB. Light Penetration and Fabrication Artifacts\nWhile SLA and DLP printing offer high resolution, the\nphysical nature of photopolymerization introduces significant\nfabrication challenges, particularly for internal microfluidic\nvoids. During the layer-by-layer printing process, UV light\ninevitably penetrates through the currently exposed layer and\nscatters into previously solidified layers or adjacent void\nregions, as illustrated in Figure 3(left). This phenomenon,\nknown as light penetration or over-curing, causes unintended\npolymerization of the residual liquid resin trapped inside the\nmicrochannels.\nThe extent of this light penetration depth is governed by the\nBeer-Lambert law, which dictates an exponential decay of light\nintensity as it travels through the resin. Neighboring structural\nfeatures also reflect, refract, and scatter this light, creating\nlocalized variations in the over-curing effect. This cumulative\nUV exposure severely distorts the fabricated dimensions of",
+      "word_count": 313,
+      "claim_ids": [
+        "2608.16267::prior_approach::1",
+        "2608.16267::prior_approach::2",
+        "2608.16267::prior_limitation::0",
+        "2608.16267::causal_claim::1",
+        "2608.16267::mechanism_principle::3"
+      ],
+      "citation_ids": [
+        "citation:caf2a6f29364686b"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:75b853f6277cfab4",
+      "paper_id": "2608.16267",
+      "section": "Methods",
+      "section_index": 1,
+      "passage_index": 4,
+      "text": "localized variations in the over-curing effect. This cumulative\nUV exposure severely distorts the fabricated dimensions of\nthe features, altering their intended hydraulic resistance and,\nin extreme cases, completely clogging the fluidic pathways, as\nshown in Figure 3 (right).\nC. Microfluidic Design Automation\nAs the complexity of microfluidic networks increases, man-\nual design using standard mechanical CAD software becomes\na significant bottleneck. Designing a functional chip requires\nrouting channels, calculating precise channel lengths to sat-\nisfy hydraulic resistance requirements, and ensuring that no\ncomponents overlap. To address these challenges, Electronic\nDesign Automation (EDA) tools for microfluidics have ad-\nvanced rapidly in recent years, automating many of these\nlabor-intensive tasks. Several state-of-the-art design automa-\ntion tools, such as 3D\u00b5F [8], Cloud Columba [6], [7], Micado\n[10], and Fluigi [11], have significantly facilitated the design of\ncontinuous-flow microfluidic devices. For instance, 3D\u00b5F pro-\nvides an interactive environment for planar chip design, while\nCloud Columba supports synthesis for continuous-flow mLSI\nsystems. These tools can automatically generate 2D layouts,\nvector graphics, or CAD scripts compatible with conventional\nfabrication methods. However, despite their capabilities, most\nexisting microfluidic design automation solutions are funda-\nmentally limited to 2D architectures, often relying on layered",
+      "word_count": 195,
+      "claim_ids": [
+        "2608.16267::problem_motivation::1",
+        "2608.16267::prior_approach::0",
+        "2608.16267::prior_approach::0",
+        "2608.16267::prior_limitation::2",
+        "2608.16267::causal_claim::1"
+      ],
+      "citation_ids": [
+        "citation:37ab013d02dc0677",
+        "citation:aa69e25c3ac8b01c",
+        "citation:40635e83ddbe4ff1",
+        "citation:83edbfb1ac9b8004",
+        "citation:6ee1c14f70fabf42"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:dea3ee6b9a8357e1",
+      "paper_id": "2608.16267",
+      "section": "Methods",
+      "section_index": 1,
+      "passage_index": 5,
+      "text": "Design Interface\nDesign Workflow (Simplified)\nSelect Component\nPlace Component\nDraw Channel\nOutput Options\n3D Model\nFig. 4.\nFlui3d simplifies the design of 3D-printable microfluidic biochips: (left) user interface of the design platform; (right) simplified design workflow\nillustrating the key design steps.\nflow and control designs. As a result, they are not directly\napplicable to the design of microfluidic devices intended for\n3D printing. This limitation highlights the growing need for\ndomain-specific CAD and design automation tools tailored to\nfully leverage the advantages of 3D-printed microfluidics. This\nlack of integrated, 3D-capable design synthesis tools forces\nresearchers into tedious, iterative manual design cycles to\nsatisfy specific timing, volumetric, or mixing constraints.\nIII. INTERACTIVE DESIGN AUTOMATION FOR\nMULTI-LAYER ARCHITECTURES\nAs the field of microfluidics grows from planar, single-\nlayer devices to complex, multi-layer 3D architectures, the\nlimitations of traditional mechanical CAD software become\nincreasingly apparent. Standard CAD tools are not optimized\nfor fluidic routing, requiring manual, tedious adjustments for\nevery channel bend, layer transition, and component place-\nment. To overcome these infrastructural bottlenecks, we de-\nveloped a foundational web-based interactive design automa-\ntion platform\u2014Flui3d\u2014specifically tailored for 3D-printed\nmicrofluidics [15]. Without installing any software, Flui3d can\nbe easily accessed via the web at https://flui3d.org.\nDesign user interface. Flui3d provides a web-based, WYSI-\nWYG (What-You-See-Is-What-You-Get) design environment\nin which users can create microfluidic layouts through a\nfamiliar 2D interaction paradigm, while the tool automatically\ngenerates the corresponding 3D geometry and fabrication-\nready output. Figure 4 shows the user interface and the key\ndesign steps. The platform includes a parameterized compo-\nnent library, support for multi-layer device design, and export\noptions including STL, SVG, and a human-readable JSON\nrepresentation for sharing and reuse.\nParameterized component library. A central element of\nFlui3d is its parametric component library, which abstracts mi-\ncrofluidic design away from low-level geometry construction\ntoward domain-specific building blocks. Instead of manually\ndefining channels and volumes in 3D space, users compose",
+      "word_count": 316,
+      "claim_ids": [
+        "2608.16267::problem_motivation::1",
+        "2608.16267::problem_motivation::2",
+        "2608.16267::problem_motivation::2",
+        "2608.16267::prior_limitation::1",
+        "2608.16267::prior_limitation::2",
+        "2608.16267::hypothesis_statement::0"
+      ],
+      "citation_ids": [
+        "citation:c49c63f7f8d0bf24"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:cf323bbcc45f7eb6",
+      "paper_id": "2608.16267",
+      "section": "Methods",
+      "section_index": 1,
+      "passage_index": 6,
+      "text": "toward domain-specific building blocks. Instead of manually\ndefining channels and volumes in 3D space, users compose\ndevices from functional primitives such as channels, cham-\nbers, mixers, Tesla valves, ports, and inter-layer connections.\nEach component is parameterized, allowing users to adjust\ndimensions and properties while maintaining internal consis-\ntency and connectivity constraints. This approach encapsulates\ndomain knowledge directly into the design representation,\nenabling rapid iteration and reducing the likelihood of invalid\ngeometries. As a result, the platform shifts the design task from\ngeometric modeling to the configuration and composition of\nmicrofluidic functionality.\nSimple design workflow. Complementing the component-\nbased abstraction, Flui3d structures the design process as a\nguided workflow that reflects the logical steps of microfluidic\ndevice development. Users first define global device dimen-\nsions and default geometric parameters, then create and orga-\nnize layers, place and parameterize components, add ports, de-\nfine inter-layer connections (vias), and route channels between\nelements. The workflow is completed by design rule checking\nand automated generation of printable output. In this way,\nFlui3d turns the design of multi-layer 3D-printed microfluidics\ninto a structured sequence of high-level operations rather than\na manual 3D modeling task. For example, the three-layer\nmixing device from Figure 1 could be taken from initial setup\nto a print-ready design in less than five minutes, demonstrating\nthe efficiency of this interaction model.\nIV. DESIGN SYNTHESIS FOR 3D-PRINTED MICROFLUIDICS\nA. Multi-Layer Architectural Synthesis\nA central bottleneck in 3D-printed microfluidics is the lack\nof synthesis tools that can jointly handle multi-layer physical\nlayout generation and user-defined fluid-delivery behavior. In\npassive chips, this challenge is particularly acute because\nfunctional correctness is encoded directly in geometry. De-\nsigners must simultaneously satisfy spatial constraints\u2014such\nas placement, routing, non-overlap, and layer usage\u2014and hy-\ndraulic constraints, including flow, timing, and filling volume.\nWhile manual CAD workflows can meet these requirements\nfor simple devices, they become highly iterative and error-\nprone as designs scale to multiple layers and involve tightly",
+      "word_count": 320,
+      "claim_ids": [
+        "2608.16267::problem_motivation::2",
+        "2608.16267::prior_limitation::1",
+        "2608.16267::causal_claim::4",
+        "2608.16267::causal_claim::4",
+        "2608.16267::mechanism_principle::0",
+        "2608.16267::evidence_result::0",
+        "2608.16267::constraint::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:1ed3eafa01ef868e",
+      "paper_id": "2608.16267",
+      "section": "Methods",
+      "section_index": 1,
+      "passage_index": 7,
+      "text": "for simple devices, they become highly iterative and error-\nprone as designs scale to multiple layers and involve tightly\ncoupled timing and volume targets. To address this problem,\nwe introduced 3M-DeSyn [16].\nInput model and specification. 3M-DeSyn begins from\na high-level schematic that specifies functional components\n(e.g., mixers, chambers, sinks), connectivity, and available\ninlets. The user can add optional directives, including preferred\nlayer counts, placement hints for critical modules, target\ninlet flow conditions, synchronization constraints (equal arrival\ntimes), shifted-arrival constraints (prescribed delays between\npaths), and volumetric constraints (absolute target volumes or\ntarget volume ratios at sinks). This representation decouples\nfunctional intent from final geometry and enables automated\nexploration of physical realizations.\nGraph abstraction and physical embedding. The schematic\nis mapped to a graph whose vertices represent components and\nwhose edges represent channels to be synthesized. Physical\nembedding introduces geometric variables for node locations,\nlayer assignments, channel lengths, and routing segments.",
+      "word_count": 150,
+      "claim_ids": [
+        "2608.16267::hypothesis_statement::1"
+      ],
+      "citation_ids": [
+        "citation:e920b64991e5fdb4"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:375b2e7f30980d4f",
+      "paper_id": "2608.16267",
+      "section": "Methods",
+      "section_index": 1,
+      "passage_index": 8,
+      "text": "Multi-Layer Design Synthesis \nLow-Cost Mixing System Synthesis\nC1\nS2\nT Req.\nLv. 1\nLv. 0\nI1\nQ1\nI1\nI3\nQ2\nI2\nI2\n2mm\nC2\nS3\nS1\nLv. 2\nI3\nQ3\nO1\nO1\nFig. 5. Automated design synthesis examples: (left) multi-layer architecture generation under timing constraint, from abstract schematic to fabricated chip;\n(right) passive 3D-printed mixer synthesis with user-defined multi-reagent ratios.\nAdditional constraints enforce manufacturable spacing, pre-\nvent overlap among components and channels, and guarantee\nlegal inter-layer transitions. This formalization allows layout\nsynthesis to be solved together with hydraulic design rather\nthan as separate sequential steps.\nHydraulic and temporal formulation. Under laminar-flow\nassumptions, 3M-DeSyn couples geometry to behavior us-\ning resistance- and flow-based relationships, together with a\nvolume-to-time relation (T = V/Q). For each constrained\npath, timing requirements are encoded as equalities or in-\nequalities with tolerances. Simultaneous-arrival constraints are\nmodeled by equalizing effective path delays, while shifted-\narrival constraints are implemented by introducing calibrated\nvolume offsets that produce prescribed delay differences under\nthe assigned flow conditions. In this way, routing decisions\ndirectly influence whether temporal objectives are satisfied.\nVolumetric control. For metering and ratio synthesis, the\nframework converts desired output volumes into path-level\nconstraints that connect channel geometry, flow distribution,\nand filling times. When users specify relative targets (e.g.,\nratio-based dispensing), 3M-DeSyn enforces proportional re-\nlationships among effective delivered volumes. This is par-\nticularly important for passive reagent preparation, where\nconcentration control depends on maintaining robust volume\nratios without active valves or pumps.\nOptimization objective and solver strategy. The full design\nis cast as a constrained optimization problem. The objective\ncombines compact footprint, feasible routability, and low\nrouting complexity, while satisfying all hard geometric and\nfunctional constraints. In practice, this yields a coordinated\nplacement-and-routing synthesis process in which channel di-\nmensions are not post-hoc tuned manually, but are synthesized\nas part of the optimization itself. The resulting solution is then\nconverted automatically into 3D geometry for fabrication.",
+      "word_count": 317,
+      "claim_ids": [
+        "2608.16267::causal_claim::5",
+        "2608.16267::causal_claim::5",
+        "2608.16267::mechanism_principle::0",
+        "2608.16267::mechanism_principle::1",
+        "2608.16267::constraint::1"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:b210ad462d3ad6a7",
+      "paper_id": "2608.16267",
+      "section": "Methods",
+      "section_index": 1,
+      "passage_index": 9,
+      "text": "as part of the optimization itself. The resulting solution is then\nconverted automatically into 3D geometry for fabrication.\nExperimental outcomes. 3M-DeSyn was evaluated on five\ntest cases spanning different combinations of timing, volumet-\nric, and multi-layer constraints. Compared with a manual base-\nline workflow (schematic analysis, iterative placement/routing,\nand hand-tuned channel dimensions), 3M-DeSyn reduced de-\nsign time from hours to seconds/minutes: baseline estimates\nranged from 5 h 07 m to 20 h 54 m, whereas 3M-DeSyn com-\npleted synthesis in 2 s to 3 m 40 s. The synthesized chips\nwere additionally fabricated on a low-cost hobby SLA setup\n(Anycubic Photon D2 with plant-based clear resin), confirming\nthat the automatically generated geometries are not only com-\nputationally valid but also practically printable. An example\nis shown in Figure 5(left).\nR1 R2 R3 R4 R5 R6 R2 R5\nR1:R2:R3:R4:R5:R6\nR2 R1 R4 R6\n67:38:3:67:14:67\n10mm\nB. Low-Cost Mixing System Design Synthesis\nComplementing 3M-DeSyn, \u00b5-MM [17] focuses on a dif-\nferent but closely related challenge: synthesizing passive 3D-\nprinted mixers that deliver user-defined multi-reagent ratios\nunder a single constant pressure source. The central motivation\nis to avoid external complexity (multiple pumps, controllers,\nor valves) while still achieving ratio-specific mixing that\nis accurate enough for assay and diagnostic workflows. In\ncontrast to many passive mixer designs that primarily optimize\nhomogeneity for symmetric or fixed settings, \u00b5-MM targets\narbitrary ratio specifications and explicitly incorporates man-\nufacturability for low-cost resin printing.\nProblem formulation. Given a target ratio vector T = r1 :\nr2 : \u00b7 \u00b7 \u00b7 : rn, where each ri denotes the required volumetric\ncontribution of reagent i, the goal is to automatically generate\na complete mixer layout (inlets, junction topology, channel\ndimensions, and 3D geometry) such that the outlet mixture\nfollows the requested ratio under one shared pressure input.\nThis framing intentionally shifts complexity from hardware\ncontrol to algorithmic design synthesis.\nRatio decomposition and mix-flow tree construction. The\nfirst stage deterministically decomposes the target ratio into\nadditive sub-ratios and maps them into a hierarchical mix-\nflow tree. In this tree, leaves represent inlet branches, internal",
+      "word_count": 343,
+      "claim_ids": [
+        "2608.16267::problem_motivation::3",
+        "2608.16267::rejected_alternative::0",
+        "2608.16267::hypothesis_statement::1",
+        "2608.16267::evidence_result::0",
+        "2608.16267::evidence_result::1"
+      ],
+      "citation_ids": [
+        "citation:28af9a964a5c7208"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:6bdcb77aed2c75fb",
+      "paper_id": "2608.16267",
+      "section": "Methods",
+      "section_index": 1,
+      "passage_index": 10,
+      "text": "additive sub-ratios and maps them into a hierarchical mix-\nflow tree. In this tree, leaves represent inlet branches, internal\nnodes represent mixing junctions, and the root corresponds\nto the final outlet. Decomposition increases flexibility in flow\nallocation: each reagent contribution can be represented by\nmultiple sub-streams that are later interleaved spatially. This\nstrategy allows the method to preserve exact aggregate ratio\ncontributions while exposing additional degrees of freedom for\nimproving the downstream mixing pattern.\nSpectrum-aware arrangement for passive mixing quality.\nBeyond ratio correctness, \u00b5-MM introduces a spectrum-\noriented arrangement of decomposed sub-flows. Intuitively,\nby distributing and reordering subcomponents in the tree, the\noutlet can exhibit more distinct laminar sub-streams (referred\nto as wider spectrum width), which supports better passive ho-\nmogenization after merging. This is an important design choice\nbecause passive systems cannot rely on active perturbation;\ntherefore, flow ordering and geometric interleaving become\nkey levers for practical mixing performance.\nLayout generation and hydraulic modeling. In the second\nstage, the abstract tree is translated into a compact physical\nlayout using block-based placement and routing constraints.\nThe method further transforms tree levels when beneficial,\nso that selected lower-level nodes are elevated to reduce\nexcessive path growth and improve area efficiency. Channel",
+      "word_count": 200,
+      "claim_ids": [
+        "2608.16267::causal_claim::6",
+        "2608.16267::mechanism_principle::2",
+        "2608.16267::mechanism_principle::2"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:7a1e49248e1d2460",
+      "paper_id": "2608.16267",
+      "section": "Methods",
+      "section_index": 1,
+      "passage_index": 11,
+      "text": "dimensions are then determined via the electronic-hydraulic\nanalogy, where each edge receives a hydraulic resistance\nrealized through channel length assignment. Under a common\npressure boundary, these resistive paths enforce the intended\nrelative flow rates so that outlet composition tracks the original\ntarget ratio.\nConstraint optimization and geometry export. The physical\nrealization is solved as a constrained optimization problem\nthat balances routability and compactness while preserving\nthe synthesized flow structure. The output is not merely a\nlogical network; it is a fabrication-ready geometric design that\ncan be exported in standard 3D format and sent directly to\nslicers/printers.\nExperimental validation. The approach was evaluated on\neight case studies (four real-world-inspired and four syn-\nthetic ratio targets). Generated layouts were fabricated using\na hobby-grade resin printer (Elegoo Mars 5). An example\nis shown in Figure 5(right). To validate ratio accuracy, a\nCOMSOL-based laminar-flow/solute-transport simulation was\nperformed, assigning distinct inlet concentrations to reagents\nso outlet composition errors could be quantified against theo-\nretical targets. Across the four real-world scenarios, simulated\noutlet concentrations deviated by less than 0.01 mol/L from\ntarget values. Over all eight cases, reported deviations re-\nmained small (from \u22120.016 to +0.009 mol/L), while synthesis\nruntime stayed in the millisecond range (108\u2013145 ms). Chip\nfootprints and total channel lengths remained moderate relative\nto a custom baseline, highlighting that \u00b5-MM achieves an\neffective balance: slightly narrower mixing spectrum in some\ncases, but substantially improved compactness and manufac-\nturability with lower channel complexity and hydraulic burden.\nV. DESIGN-FOR-MANUFACTURING FOR 3D-PRINTED\nMICROFLUIDICS\nA. Manual Light-Penetration-Compensation\nA core manufacturability bottleneck in resin-based 3D-\nprinted microfluidics is the unintended curing caused by light\npenetration through previously printed material. This artifact is\nespecially severe for enclosed small channels and multi-layer\nlayouts, where over-exposure can narrow or fully block critical\nflow paths. We introduced practical Design-for-Manufacturing\n(DFM) compensation strategies that is integrated directly into\nthe design-output stage of Flui3d, enabling reliable fabrication",
+      "word_count": 313,
+      "claim_ids": [
+        "2608.16267::problem_motivation::4",
+        "2608.16267::mechanism_principle::1",
+        "2608.16267::evidence_result::2",
+        "2608.16267::evidence_result::3"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:f96536f1c7c9c623",
+      "paper_id": "2608.16267",
+      "section": "Methods",
+      "section_index": 1,
+      "passage_index": 12,
+      "text": "(DFM) compensation strategies that is integrated directly into\nthe design-output stage of Flui3d, enabling reliable fabrication\non hobby-grade SLA/LCD platforms without requiring custom\nresins or printer hardware modifications.\nProblem focus and DFM objective. While layout synthesis\ncan generate functionally correct geometries, printability is\nnot guaranteed when optical side effects distort fine features.\nThe DFM module therefore treats fabrication fidelity as a\nfirst-class design objective: before STL export, the geometry\nis transformed to counter expected light-induced over-curing.\nThe goal is to preserve intended void regions and keep\nmicrochannels open after printing, especially in compact and\nvertically integrated devices.\nTwo complementary compensation strategies. The frame-\nwork introduces two compensation strategies that can be used\nindependently or jointly. Figure 6 illustrates the principle.\nLight Penetration Compensation\nLocal Compensation\nAchieved Size\nGlobal Compensation\n1. Original\n   Design\n2. Compensated\n   Design\n3. Fabrication",
+      "word_count": 137,
+      "claim_ids": [
+        "2608.16267::problem_motivation::4",
+        "2608.16267::hypothesis_statement::2",
+        "2608.16267::hypothesis_statement::2",
+        "2608.16267::hypothesis_statement::2"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:3f725a1892de1428",
+      "paper_id": "2608.16267",
+      "section": "Result",
+      "section_index": 2,
+      "passage_index": 0,
+      "text": "Fig. 6. The principle of our proposed light penetration compensation.\nFirst, local compensation adds feature-specific height offsets\nthat vary with layer depth, reflecting the fact that received\nlight dose differs by position within the print. Second, global\ncompensation inserts a user-defined blank exposure height\nafter feature layers, increasing optical separation and reduc-\ning unintended polymerization in nearby void regions. This\nlocal-plus-global decomposition provides a flexible mecha-\nnism: local compensation addresses depth-dependent exposure\nnonuniformity, while global compensation provides additional\nrobustness for difficult print settings.\nPhysics-guided local compensation. Local compensation is\nderived from a Beer\u2013Lambert-style attenuation assumption in\nwhich light intensity decays exponentially with distance from\nthe source. From this model, cumulative exposure at a given\nheight is mapped to a compensation amount C(z), yielding a\ndynamic layer-wise offset profile rather than a single uniform\nmargin. In practice, this allows deeper or more vulnerable\nregions to receive stronger compensation automatically, which\nis particularly useful for multi-layer channel stacks.\nUser-parameterized calibration workflow. To avoid requir-\ning full optical characterization of each printer-resin com-\nbination, the method uses a practical calibration interface\nbased on four user inputs: minimum and maximum desired\ncompensation values (Cmin, Cmax) and their corresponding\nheight locations (Zmin, Zmax). These anchor points are used\nto approximate model coefficients and generate the full com-\npensation curve applied across layers. A reference calibration\ndesign is provided so users can print, inspect, and iteratively\ntune these settings for their own machine, resin, and exposure\nconditions.\nRole of global compensation in hard regimes. Global com-\npensation is particularly valuable when local compensation\nalone is insufficient, such as low-power printers that require\nlonger exposure times per layer or designs with dense multi-\nlayer interactions. By adding blank height between feature\nlayers, the method increases the optical path and reduces cross-\nlayer curing risk. The work also notes a practical tradeoff:\nexcessive global offset can reduce structural stability, so this\nparameter must be tuned alongside local settings.\nB. ML-Based Light-Penetration-Compensation",
+      "word_count": 323,
+      "claim_ids": [
+        "2608.16267::rejected_alternative::1",
+        "2608.16267::causal_claim::7",
+        "2608.16267::mechanism_principle::3",
+        "2608.16267::mechanism_principle::3",
+        "2608.16267::constraint::2"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:acfa260c2acd02c0",
+      "paper_id": "2608.16267",
+      "section": "Result",
+      "section_index": 2,
+      "passage_index": 1,
+      "text": "parameter must be tuned alongside local settings.\nB. ML-Based Light-Penetration-Compensation\nWe further advanced the design-for-manufacturing direction\nwith LiPCon [12] by introducing a physics-aware, spatially\nresolved light-penetration compensation method. In contrast\nto prior uniform-compensation approaches, LiPCon explicitly\nmodels the fact that over-curing depends not only on feature\ndepth but also on nearby geometry and local optical context.\nThe central goal is therefore to predict location-specific com-",
+      "word_count": 65,
+      "claim_ids": [
+        "2608.16267::prior_approach::3",
+        "2608.16267::rejected_alternative::2"
+      ],
+      "citation_ids": [
+        "citation:497b156e3a4138d4"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:3ec21a18e4e297fe",
+      "paper_id": "2608.16267",
+      "section": "Result",
+      "section_index": 2,
+      "passage_index": 2,
+      "text": "pensation values that preserve intended feature dimensions in\ncomplex multi-layer designs.\nDataset contribution and data pipeline. This work con-\ntributes a dedicated dataset quantifying discrepancies between\ndesign and fabrication in resin-based multi-layer microfluidics.\nThe dataset was constructed from calibration structures with\ncontrolled variations in feature geometry and spatial context,\nfollowed by measurement of fabricated dimensions under fixed\nprint settings. This produced 2,488 data points, providing\nsupervised targets for compensation learning.\nPhysics-aware preprocessing. To improve learnability and\nphysical consistency, LiPCon introduces preprocessing that\nembeds light-propagation principles into the model input\nrepresentation. Specifically, geometric features are weighted\nbased on cumulative light passage and attenuation effects\n(including absorption/scattering-related decay), so the model\nreceives physically meaningful context instead of only raw\ngeometric descriptors. This hybrid strategy combines domain\npriors with machine learning, reducing reliance on purely\nblack-box fitting.\nSpatially resolved machine-learning model. LiPCon then\ntrains a neural predictor to output local compensation values\nfor different regions/features in a design. Unlike uniform com-\npensation, this allows stronger correction where local over-\ncuring risk is high and milder correction where risk is lower.\nIn practice, the learned compensation map is injected into the\nDFM stage before fabrication, producing a compensated 3D\nmodel whose printed dimensions are closer to the original\nCAD targets.\nTraining setup and predictive performance. The dataset\nwas split into training/validation/test subsets (1,727/315/434).\nTraining used Adam with MSE loss, dropout-based regular-\nization, and early stopping. The model converged in fewer\nthan 40 epochs, achieved about 90.01% training accuracy, and\nshowed tight test-error behavior: all reported L1 errors were\nbelow 0.45 with an average around 0.11, indicating stable\ngeneralization for local compensation prediction.\nFabrication validation and benchmarking. For end-to-end\nvalidation, multiple random multi-layer designs were fabri-\ncated and compared against the prior state-of-the-art baseline\nmethod. Across representative microfluidic features (e.g., nar-\nrow channels, serpentine regions, and cavity-like structures),",
+      "word_count": 303,
+      "claim_ids": [
+        "2608.16267::problem_motivation::4",
+        "2608.16267::prior_approach::4",
+        "2608.16267::rejected_alternative::3",
+        "2608.16267::causal_claim::7",
+        "2608.16267::causal_claim::8",
+        "2608.16267::mechanism_principle::4",
+        "2608.16267::evidence_result::4",
+        "2608.16267::evidence_result::5"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:0684a869c58b7e17",
+      "paper_id": "2608.16267",
+      "section": "Result",
+      "section_index": 2,
+      "passage_index": 3,
+      "text": "method. Across representative microfluidic features (e.g., nar-\nrow channels, serpentine regions, and cavity-like structures),\nLiPCon produced fabricated dimensions consistently closer\nto design targets. For six cases printed on the same printer-\nresin setup as training data, dimensional errors were reduced\nby at least 87.64% relative to baseline, with final deviations\nonly 1.25%\u20135.5%. The method was also applied to an addi-\ntional printer-resin pair without retraining, where deviations\nremained within 5.75%\u201317.00% and still outperformed the\nbaseline, demonstrating practical robustness and transfer po-\ntential.\nVI. CONCLUSION\nThis paper presented a unified automation framework for\n3D-printed microfluidics that addresses the full path from\ndesign to fabrication. By combining interactive design support,\nconstraint-driven synthesis for passive fluidic functions, low-\ncost mixer synthesis, and compensation methods for light-\npenetration artifacts, the framework reduces manual effort\nwhile improving print reliability on resin 3D printers. Exper-\nimental results across representative designs show substantial\nreductions in design time and strong agreement between fab-\nricated and target dimensions. Overall, this work helps bridge\nthe gap between the accessibility of low-cost 3D printing\nand the practical requirements of reliable microfluidic device\ndevelopment.",
+      "word_count": 182,
+      "claim_ids": [
+        "2608.16267::problem_motivation::0",
+        "2608.16267::causal_claim::3",
+        "2608.16267::evidence_result::6",
+        "2608.16267::evidence_result::6",
+        "2608.16267::evidence_result::6",
+        "2608.16267::evidence_result::7"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:85e454fa1ffc95b5",
+      "paper_id": "2608.16267",
+      "section": "References",
+      "section_index": 3,
+      "passage_index": 0,
+      "text": "[1] Z. Han, W. Li, Y. Huang, and B. Zheng, \u201cMeasuring rapid enzymatic\nkinetics by electrochemical method in droplet-based microfluidic devices\nwith pneumatic valves,\u201d Analytical chemistry, vol. 81, no. 14, pp. 5840\u2013\n5845, 2009.\n[2] U. Bilitewski, M. Genrich, S. Kadow, and G. Mersal, Biochemical\nanalysis with microfluidic systems.\nSpringer, 2003, vol. 377.\n[3] D. Holmes and S. Gawad, \u201cThe application of microfluidics in biology,\u201d\nMicroengineering in biotechnology, pp. 55\u201380, 2010.\n[4] J. C. Love, D. B. Wolfe, H. O. Jacobs, and G. M. Whitesides, \u201cMicro-\nscope projection photolithography for rapid prototyping of masters with\nmicron-scale features for use in soft lithography,\u201d Langmuir, vol. 17,\nno. 19, pp. 6005\u20136012, 2001.\n[5] S. Qi, Z. Yu, B. Guo, S. Li, Z. Li, H. Ma, T. Ho, K. Chakrabarty,\nand X. Huang, \u201cDesign automation techniques for microfluidic fully\nprogrammable valve array biochips: A systematic survey,\u201d ACM Trans.\nDes. Autom. Electron. Syst., vol. 31, no. 1, Nov. 2025.\n[6] T.-M. Tseng, M. Li, D. N. Freitas, T. McAuley, B. Li, T.-Y. Ho,\nI. E. Araci, and U. Schlichtmann, \u201cColumba 2.0: A co-layout synthesis\ntool for continuous-flow microfluidic biochips,\u201d IEEE Transactions on\nComputer-Aided Design of Integrated Circuits and Systems, vol. 37,\nno. 8, pp. 1588\u20131601, 2017.\n[7] T.-M. Tseng, M. Li, Y. Zhang, T.-Y. Ho, and U. Schlichtmann, \u201cCloud\ncolumba: Accessible design automation platform for production and\ninspiration,\u201d in 2019 IEEE/ACM International Conference on Computer-\nAided Design (ICCAD).\nIEEE, 2019, pp. 1\u20136.\n[8] R. Sanka, J. Lippai, D. Samarasekera, S. Nemsick, and D. Densmore,\n\u201c3D\u00b5f-interactive design environment for continuous flow microfluidic\ndevices,\u201d Scientific reports, vol. 9, no. 1, pp. 1\u201310, 2019.\n[9] A. Gupta, J.-D. Huang, S. Yamashita, and S. Roy, \u201cDesign automation\nfor dilution of a fluid using programmable microfluidic device\u2013based\nbiochips,\u201d ACM Trans. Des. Autom. Electron. Syst., vol. 24, no. 2, Feb.\n2019.\n[10] N. Amin, \u201cComputer-aided design for multilayer microfluidic chips,\u201d\nPh.D. dissertation, Massachusetts Institute of Technology, 2008.\n[11] H. Huang and D. Densmore, \u201cFluigi: Microfluidic device synthesis for\nsynthetic biology,\u201d J. Emerg. Technol. Comput. Syst., vol. 11, no. 3, dec\n2015.\n[12] Y. Zhang, S. Liang, T.-M. Tseng, and U. Schlichtmann, \u201cLipcon: A\nphysics-aware spatially resolved light penetration compensation method",
+      "word_count": 360,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:6369ec50defdba43",
+      "paper_id": "2608.16267",
+      "section": "References",
+      "section_index": 3,
+      "passage_index": 1,
+      "text": "[12] Y. Zhang, S. Liang, T.-M. Tseng, and U. Schlichtmann, \u201cLipcon: A\nphysics-aware spatially resolved light penetration compensation method\nfor low-cost 3d-printed microfluidics,\u201d in Proceedings of the 63rd\nACM/IEEE Design Automation Conference, 2026, pp. 1\u20136.\n[13] H. Song, J. D. Tice, and R. F. Ismagilov, \u201cA microfluidic system for\ncontrolling reaction networks in time,\u201d Angewandte Chemie, vol. 115,\nno. 7, pp. 792\u2013796, 2003.\n[14] S. Waheed, J. M. Cabot, N. P. Macdonald, T. Lewis, R. M. Guijt,\nB. Paull, and M. C. Breadmore, \u201c3d printed microfluidic devices:\nenablers and barriers,\u201d Lab on a Chip, vol. 16, no. 11, pp. 1993\u20132013,\n2016.\n[15] Y. Zhang, M. Li, T.-M. Tseng, and U. Schlichtmann, \u201cOpen-source\ninteractive design platform for 3d-printed microfluidic devices,\u201d Com-\nmunications Engineering, vol. 3, no. 1, p. 71, 2024.\n[16] Y. Zhang, D. Ra\u02c7seta, T.-M. Tseng, and U. Schlichtmann, \u201c3m-desyn:\nDesign synthesis for multi-layer 3d-printed microfluidics with timing\nand volumetric control,\u201d in Proceedings of the 30th Asia and South\nPacific Design Automation Conference, 2025, pp. 1357\u20131363.\n[17] Y. Zhang, D. Kundu, T.-M. Tseng, S. Roy, S. Yamashita, and U. Schlicht-\nmann, \u201cAccessible ratio-specific mixing: Single-pressure-driven multi-\nreagent mixer design and synthesis for 3d-printed microfluidics,\u201d in 2026\n31st Asia and South Pacific Design Automation Conference (ASP-DAC),\n2026, pp. 398\u2013404.",
+      "word_count": 208,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    }
+  ],
+  "references": [
+    {
+      "reference_id": "reference:91ef199153418040",
+      "paper_id": "2608.16267",
+      "reference_number": "1",
+      "raw_text": "Z. Han, W. Li, Y. Huang, and B. Zheng, \u201cMeasuring rapid enzymatic kinetics by electrochemical method in droplet-based microfluidic devices with pneumatic valves,\u201d Analytical chemistry, vol. 81, no. 14, pp. 5840\u2013 5845, 2009.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:112e4b6c76e4e75a",
+      "paper_id": "2608.16267",
+      "reference_number": "2",
+      "raw_text": "U. Bilitewski, M. Genrich, S. Kadow, and G. Mersal, Biochemical analysis with microfluidic systems. Springer, 2003, vol. 377.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:4497387e80c99ae7",
+      "paper_id": "2608.16267",
+      "reference_number": "3",
+      "raw_text": "D. Holmes and S. Gawad, \u201cThe application of microfluidics in biology,\u201d Microengineering in biotechnology, pp. 55\u201380, 2010.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:cfd2f1e7c73f7e50",
+      "paper_id": "2608.16267",
+      "reference_number": "4",
+      "raw_text": "J. C. Love, D. B. Wolfe, H. O. Jacobs, and G. M. Whitesides, \u201cMicro- scope projection photolithography for rapid prototyping of masters with micron-scale features for use in soft lithography,\u201d Langmuir, vol. 17, no. 19, pp. 6005\u20136012, 2001.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:c26ec2a5e4c31394",
+      "paper_id": "2608.16267",
+      "reference_number": "5",
+      "raw_text": "S. Qi, Z. Yu, B. Guo, S. Li, Z. Li, H. Ma, T. Ho, K. Chakrabarty, and X. Huang, \u201cDesign automation techniques for microfluidic fully programmable valve array biochips: A systematic survey,\u201d ACM Trans. Des. Autom. Electron. Syst., vol. 31, no. 1, Nov. 2025.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:9b1380c186b6d6f3",
+      "paper_id": "2608.16267",
+      "reference_number": "6",
+      "raw_text": "T.-M. Tseng, M. Li, D. N. Freitas, T. McAuley, B. Li, T.-Y. Ho, I. E. Araci, and U. Schlichtmann, \u201cColumba 2.0: A co-layout synthesis tool for continuous-flow microfluidic biochips,\u201d IEEE Transactions on Computer-Aided Design of Integrated Circuits and Systems, vol. 37, no. 8, pp. 1588\u20131601, 2017.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:a5b70a3a54993428",
+      "paper_id": "2608.16267",
+      "reference_number": "7",
+      "raw_text": "T.-M. Tseng, M. Li, Y. Zhang, T.-Y. Ho, and U. Schlichtmann, \u201cCloud columba: Accessible design automation platform for production and inspiration,\u201d in 2019 IEEE/ACM International Conference on Computer- Aided Design (ICCAD). IEEE, 2019, pp. 1\u20136.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:0b36aa006c8f1308",
+      "paper_id": "2608.16267",
+      "reference_number": "8",
+      "raw_text": "R. Sanka, J. Lippai, D. Samarasekera, S. Nemsick, and D. Densmore, \u201c3D\u00b5f-interactive design environment for continuous flow microfluidic devices,\u201d Scientific reports, vol. 9, no. 1, pp. 1\u201310, 2019.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:2ac24d786157867a",
+      "paper_id": "2608.16267",
+      "reference_number": "9",
+      "raw_text": "A. Gupta, J.-D. Huang, S. Yamashita, and S. Roy, \u201cDesign automation for dilution of a fluid using programmable microfluidic device\u2013based biochips,\u201d ACM Trans. Des. Autom. Electron. Syst., vol. 24, no. 2, Feb. 2019.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:16478ddd42e89c43",
+      "paper_id": "2608.16267",
+      "reference_number": "10",
+      "raw_text": "N. Amin, \u201cComputer-aided design for multilayer microfluidic chips,\u201d Ph.D. dissertation, Massachusetts Institute of Technology, 2008.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:d3a142583d12b504",
+      "paper_id": "2608.16267",
+      "reference_number": "11",
+      "raw_text": "H. Huang and D. Densmore, \u201cFluigi: Microfluidic device synthesis for synthetic biology,\u201d J. Emerg. Technol. Comput. Syst., vol. 11, no. 3, dec 2015.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:1c5d8cb1d805ec73",
+      "paper_id": "2608.16267",
+      "reference_number": "12",
+      "raw_text": "Y. Zhang, S. Liang, T.-M. Tseng, and U. Schlichtmann, \u201cLipcon: A physics-aware spatially resolved light penetration compensation method for low-cost 3d-printed microfluidics,\u201d in Proceedings of the 63rd ACM/IEEE Design Automation Conference, 2026, pp. 1\u20136.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:2e05cd81d08d0aba",
+      "paper_id": "2608.16267",
+      "reference_number": "13",
+      "raw_text": "H. Song, J. D. Tice, and R. F. Ismagilov, \u201cA microfluidic system for controlling reaction networks in time,\u201d Angewandte Chemie, vol. 115, no. 7, pp. 792\u2013796, 2003.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:d8ac88c21f8e02cb",
+      "paper_id": "2608.16267",
+      "reference_number": "14",
+      "raw_text": "S. Waheed, J. M. Cabot, N. P. Macdonald, T. Lewis, R. M. Guijt, B. Paull, and M. C. Breadmore, \u201c3d printed microfluidic devices: enablers and barriers,\u201d Lab on a Chip, vol. 16, no. 11, pp. 1993\u20132013, 2016.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:0d9db59090f06bdb",
+      "paper_id": "2608.16267",
+      "reference_number": "15",
+      "raw_text": "Y. Zhang, M. Li, T.-M. Tseng, and U. Schlichtmann, \u201cOpen-source interactive design platform for 3d-printed microfluidic devices,\u201d Com- munications Engineering, vol. 3, no. 1, p. 71, 2024.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:8fccfc24535abde8",
+      "paper_id": "2608.16267",
+      "reference_number": "16",
+      "raw_text": "Y. Zhang, D. Ra\u02c7seta, T.-M. Tseng, and U. Schlichtmann, \u201c3m-desyn: Design synthesis for multi-layer 3d-printed microfluidics with timing and volumetric control,\u201d in Proceedings of the 30th Asia and South Pacific Design Automation Conference, 2025, pp. 1357\u20131363.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:e3e3e5089c494207",
+      "paper_id": "2608.16267",
+      "reference_number": "17",
+      "raw_text": "Y. Zhang, D. Kundu, T.-M. Tseng, S. Roy, S. Yamashita, and U. Schlicht- mann, \u201cAccessible ratio-specific mixing: Single-pressure-driven multi- reagent mixer design and synthesis for 3d-printed microfluidics,\u201d in 2026 31st Asia and South Pacific Design Automation Conference (ASP-DAC), 2026, pp. 398\u2013404.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    }
+  ],
+  "citation_mentions": [
+    {
+      "citation_id": "citation:7333c29482f95844",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:f386d1358d224f59",
+      "reference_id": "reference:91ef199153418040",
+      "reference_number": "1",
+      "mention_text": "[1]",
+      "context": "Print-Aware Synthesis and Physical Design\nMethodologies for 3D-Printed Microfluidic Biochips\nYushen Zhang\nTechnical University of Munich\nTsun-Ming Tseng\nTechnical University of Munich\nyushen.zhang@tum.de\ntsun-ming.tseng@tum.de\nAbstract\u2014Microfluidic devices are widely used in diagnostics,\nchemical synthesis, and biological analysis, but their development\noften depends on complex fabrication and design processes.\nResin-based three-dimensional (3D) printing has emerged as a\npromising alternative to conventional microfabrication because it\nenables low-cost, rapid prototyping of complex multi-layer struc-\ntures. However, the practical realization of 3D-printed microflu-\nidic biochips remains challenging due to manual and expertise-\nintensive design workflows, the rigid nature of commonly used\nprinting materials, and fabrication inaccuracies such as over-\ncuring that distort internal features and may block narrow\nchannels. In this paper, we present a cohesive design automation\nframework for 3D-printed microfluidics that addresses these chal-\nlenges across both device design and fabrication. The framework\ncombines interactive design tools, automated synthesis methods\nfor functional 3D microfluidic devices, techniques for developing\nlow-cost 3D-printed mixers, and design-for-manufacturing strate-\ngies to improve print fidelity on low-cost resin printers.\narXiv:2608.16267v1  [cs.ET]  17 Aug 2026\nI. INTRODUCTION\nMicrofluidic biochips have emerged as a powerful tech-\nnology in both research and industry, enabling the precise\nhandling of small fluid volumes for applications including\npoint-of-care diagnostics, drug delivery, chemical synthesis,\nand biological analysis [1]\u2013[3]. Traditionally, microfluidic\nfabrication has relied on processes such as soft lithography\nand polydimethylsiloxane (PDMS)\u2013glass bonding. Although\nthese methods can produce high-quality devices, they are typ-\nically labor-intensive, require specialized facilities, and depend\nheavily on cleanroom infrastructure [4]. These constraints limit\naccessibility and slow down iterative development.\nIn\nrecent\nyears,\nadditive\nmanufacturing,\nor\nthree-\ndimensional\n(3D)\nprinting,\nparticularly\nresin-based"
+    },
+    {
+      "citation_id": "citation:98e6c3d463fca496",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:f386d1358d224f59",
+      "reference_id": "reference:4497387e80c99ae7",
+      "reference_number": "3",
+      "mention_text": "[3]",
+      "context": "Print-Aware Synthesis and Physical Design\nMethodologies for 3D-Printed Microfluidic Biochips\nYushen Zhang\nTechnical University of Munich\nTsun-Ming Tseng\nTechnical University of Munich\nyushen.zhang@tum.de\ntsun-ming.tseng@tum.de\nAbstract\u2014Microfluidic devices are widely used in diagnostics,\nchemical synthesis, and biological analysis, but their development\noften depends on complex fabrication and design processes.\nResin-based three-dimensional (3D) printing has emerged as a\npromising alternative to conventional microfabrication because it\nenables low-cost, rapid prototyping of complex multi-layer struc-\ntures. However, the practical realization of 3D-printed microflu-\nidic biochips remains challenging due to manual and expertise-\nintensive design workflows, the rigid nature of commonly used\nprinting materials, and fabrication inaccuracies such as over-\ncuring that distort internal features and may block narrow\nchannels. In this paper, we present a cohesive design automation\nframework for 3D-printed microfluidics that addresses these chal-\nlenges across both device design and fabrication. The framework\ncombines interactive design tools, automated synthesis methods\nfor functional 3D microfluidic devices, techniques for developing\nlow-cost 3D-printed mixers, and design-for-manufacturing strate-\ngies to improve print fidelity on low-cost resin printers.\narXiv:2608.16267v1  [cs.ET]  17 Aug 2026\nI. INTRODUCTION\nMicrofluidic biochips have emerged as a powerful tech-\nnology in both research and industry, enabling the precise\nhandling of small fluid volumes for applications including\npoint-of-care diagnostics, drug delivery, chemical synthesis,\nand biological analysis [1]\u2013[3]. Traditionally, microfluidic\nfabrication has relied on processes such as soft lithography\nand polydimethylsiloxane (PDMS)\u2013glass bonding. Although\nthese methods can produce high-quality devices, they are typ-\nically labor-intensive, require specialized facilities, and depend\nheavily on cleanroom infrastructure [4]. These constraints limit\naccessibility and slow down iterative development.\nIn\nrecent\nyears,\nadditive\nmanufacturing,\nor\nthree-\ndimensional\n(3D)\nprinting,\nparticularly\nresin-based"
+    },
+    {
+      "citation_id": "citation:fc84c24322042c22",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:f386d1358d224f59",
+      "reference_id": "reference:cfd2f1e7c73f7e50",
+      "reference_number": "4",
+      "mention_text": "[4]",
+      "context": "Print-Aware Synthesis and Physical Design\nMethodologies for 3D-Printed Microfluidic Biochips\nYushen Zhang\nTechnical University of Munich\nTsun-Ming Tseng\nTechnical University of Munich\nyushen.zhang@tum.de\ntsun-ming.tseng@tum.de\nAbstract\u2014Microfluidic devices are widely used in diagnostics,\nchemical synthesis, and biological analysis, but their development\noften depends on complex fabrication and design processes.\nResin-based three-dimensional (3D) printing has emerged as a\npromising alternative to conventional microfabrication because it\nenables low-cost, rapid prototyping of complex multi-layer struc-\ntures. However, the practical realization of 3D-printed microflu-\nidic biochips remains challenging due to manual and expertise-\nintensive design workflows, the rigid nature of commonly used\nprinting materials, and fabrication inaccuracies such as over-\ncuring that distort internal features and may block narrow\nchannels. In this paper, we present a cohesive design automation\nframework for 3D-printed microfluidics that addresses these chal-\nlenges across both device design and fabrication. The framework\ncombines interactive design tools, automated synthesis methods\nfor functional 3D microfluidic devices, techniques for developing\nlow-cost 3D-printed mixers, and design-for-manufacturing strate-\ngies to improve print fidelity on low-cost resin printers.\narXiv:2608.16267v1  [cs.ET]  17 Aug 2026\nI. INTRODUCTION\nMicrofluidic biochips have emerged as a powerful tech-\nnology in both research and industry, enabling the precise\nhandling of small fluid volumes for applications including\npoint-of-care diagnostics, drug delivery, chemical synthesis,\nand biological analysis [1]\u2013[3]. Traditionally, microfluidic\nfabrication has relied on processes such as soft lithography\nand polydimethylsiloxane (PDMS)\u2013glass bonding. Although\nthese methods can produce high-quality devices, they are typ-\nically labor-intensive, require specialized facilities, and depend\nheavily on cleanroom infrastructure [4]. These constraints limit\naccessibility and slow down iterative development.\nIn\nrecent\nyears,\nadditive\nmanufacturing,\nor\nthree-\ndimensional\n(3D)\nprinting,\nparticularly\nresin-based"
+    },
+    {
+      "citation_id": "citation:c568712e59e94bae",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:7f4232401ae5b319",
+      "reference_id": "reference:c26ec2a5e4c31394",
+      "reference_number": "5",
+      "mention_text": "[5]",
+      "context": "such\nas\nstereolithography\n(SLA)\nand\ndigital\nlight processing (DLP), has attracted increasing attention\nas\nan\nalternative\nfabrication\nroute\nfor\nmicrofluidics.\nCompared\nwith\nconventional\napproaches,\n3D\nprinting\noffers several compelling advantages: rapid prototyping,\nreduced infrastructure requirements, lower production costs,\nand the ability to fabricate complex three-dimensional and\nmulti-layered structures that are difficult or even impossible\nto realize using planar manufacturing techniques. An example\nof such a multi-layer 3D-printed microfluidic chip is shown\nin Figure 1. The availability of low-cost SLA printers, many\nof which cost only a few hundred dollars, further strengthens\nthe appeal of this approach, especially for laboratories\nand facilities with limited resources. In this sense, 3D\nprinting has the potential not only to simplify fabrication,\nbut also to democratize access to microfluidic technology.\nHowever, despite these advances in manufacturing, the\nUlf Schlichtmann\nTechnical University of Munich\nulf.schlichtmann@tum.de\ndesign of 3D-printed microfluidic systems remains a major\nchallenge.\nDeveloping\nsuch\ndevices\nrequires\nexpertise\nspanning fluid dynamics, mechanical design, and fabrication-\naware engineering. In practice, the design workflow still\nrelies heavily on manual computer-aided design (CAD),\nwhich is time-consuming, difficult to scale, and increasingly\nerror-prone as device complexity grows. This challenge\nbecomes even more pronounced for multi-layer architectures,\nwhere\nthe\nspatial\narrangement\nof\nchannels,\nchambers,\nand\ninterconnections\nmust\nsatisfy\nboth\nfunctional\nand\nmanufacturing constraints. While earlier design automation\ntools [5]\u2013[11] have improved the design of conventional\nplanar microfluidic chips, they do not adequately address the\ndistinctive requirements of 3D-printed systems.\nA further limitation arises from the material properties of\ncommonly available 3D-printing resins. Off-the-shelf mate-\nrials for resin printing generally produce rigid and inelastic\nstructures, in contrast to PDMS-based devices, which can\nexploit the elasticity of the substrate to implement active\nelements such as pneumatic valves and pumps. As a result, 3D-\nprinted microfluidic devices often cannot rely on deformable\ncomponents for active flow control and must instead achieve\nfunctionality primarily through the careful design of internal"
+    },
+    {
+      "citation_id": "citation:a535f56dd4a18e88",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:7f4232401ae5b319",
+      "reference_id": "reference:d3a142583d12b504",
+      "reference_number": "11",
+      "mention_text": "[11]",
+      "context": "such\nas\nstereolithography\n(SLA)\nand\ndigital\nlight processing (DLP), has attracted increasing attention\nas\nan\nalternative\nfabrication\nroute\nfor\nmicrofluidics.\nCompared\nwith\nconventional\napproaches,\n3D\nprinting\noffers several compelling advantages: rapid prototyping,\nreduced infrastructure requirements, lower production costs,\nand the ability to fabricate complex three-dimensional and\nmulti-layered structures that are difficult or even impossible\nto realize using planar manufacturing techniques. An example\nof such a multi-layer 3D-printed microfluidic chip is shown\nin Figure 1. The availability of low-cost SLA printers, many\nof which cost only a few hundred dollars, further strengthens\nthe appeal of this approach, especially for laboratories\nand facilities with limited resources. In this sense, 3D\nprinting has the potential not only to simplify fabrication,\nbut also to democratize access to microfluidic technology.\nHowever, despite these advances in manufacturing, the\nUlf Schlichtmann\nTechnical University of Munich\nulf.schlichtmann@tum.de\ndesign of 3D-printed microfluidic systems remains a major\nchallenge.\nDeveloping\nsuch\ndevices\nrequires\nexpertise\nspanning fluid dynamics, mechanical design, and fabrication-\naware engineering. In practice, the design workflow still\nrelies heavily on manual computer-aided design (CAD),\nwhich is time-consuming, difficult to scale, and increasingly\nerror-prone as device complexity grows. This challenge\nbecomes even more pronounced for multi-layer architectures,\nwhere\nthe\nspatial\narrangement\nof\nchannels,\nchambers,\nand\ninterconnections\nmust\nsatisfy\nboth\nfunctional\nand\nmanufacturing constraints. While earlier design automation\ntools [5]\u2013[11] have improved the design of conventional\nplanar microfluidic chips, they do not adequately address the\ndistinctive requirements of 3D-printed systems.\nA further limitation arises from the material properties of\ncommonly available 3D-printing resins. Off-the-shelf mate-\nrials for resin printing generally produce rigid and inelastic\nstructures, in contrast to PDMS-based devices, which can\nexploit the elasticity of the substrate to implement active\nelements such as pneumatic valves and pumps. As a result, 3D-\nprinted microfluidic devices often cannot rely on deformable\ncomponents for active flow control and must instead achieve\nfunctionality primarily through the careful design of internal"
+    },
+    {
+      "citation_id": "citation:5b2927b2af1b4d7c",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:821ab4c2f2f87ce5",
+      "reference_id": "reference:2e05cd81d08d0aba",
+      "reference_number": "13",
+      "mention_text": "[13]",
+      "context": "components for active flow control and must instead achieve\nfunctionality primarily through the careful design of internal\ngeometries and fluidic pathways. This strong dependence\non geometry places greater demands on the design process:\nchannel lengths, volumes, resistances, and timing relationships\nmust be coordinated precisely to ensure correct fluid handling,\nsynchronized reactions, and accurate dispensing behavior [13].\nAt the same time, the physical realization of these designs\nis constrained by the fabrication inaccuracies inherent to resin-\nbased printing. During printing, light penetration and scatter-\ning can cause polymerization outside the intended exposure\nregion, a phenomenon commonly referred to as over-curing.\nThis effect introduces geometric deviations from the nominal\ndesign and is especially problematic in narrow channels and\nin fine, complex internal features. In severe cases, over-curing\nMulti-Layer Microfluidic Design\n3D-Printed Device\nLv. 0\nLv. 1\n5mm\n5mm\nLv. 2\nFig. 1. Multi-layer microfluidic chip fabricated by 3D printing [12]."
+    },
+    {
+      "citation_id": "citation:58e96744608ee52e",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:821ab4c2f2f87ce5",
+      "reference_id": "reference:1c5d8cb1d805ec73",
+      "reference_number": "12",
+      "mention_text": "[12]",
+      "context": "components for active flow control and must instead achieve\nfunctionality primarily through the careful design of internal\ngeometries and fluidic pathways. This strong dependence\non geometry places greater demands on the design process:\nchannel lengths, volumes, resistances, and timing relationships\nmust be coordinated precisely to ensure correct fluid handling,\nsynchronized reactions, and accurate dispensing behavior [13].\nAt the same time, the physical realization of these designs\nis constrained by the fabrication inaccuracies inherent to resin-\nbased printing. During printing, light penetration and scatter-\ning can cause polymerization outside the intended exposure\nregion, a phenomenon commonly referred to as over-curing.\nThis effect introduces geometric deviations from the nominal\ndesign and is especially problematic in narrow channels and\nin fine, complex internal features. In severe cases, over-curing\nMulti-Layer Microfluidic Design\n3D-Printed Device\nLv. 0\nLv. 1\n5mm\n5mm\nLv. 2\nFig. 1. Multi-layer microfluidic chip fabricated by 3D printing [12]."
+    },
+    {
+      "citation_id": "citation:caf2a6f29364686b",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:f12d483be615a5d0",
+      "reference_id": "reference:d8ac88c21f8e02cb",
+      "reference_number": "14",
+      "mention_text": "[14]",
+      "context": "A. 3D Printing Technologies for Microfluidics\nThe fabrication of microfluidic devices has historically been\ndominated by soft lithography and PDMS molding, which\nrequire specialized cleanroom environments and extensive\nmanual labor. In response to these limitations, researchers\nhave increasingly turned to diverse 3D printing techniques for\nmicrofluidic fabrication, including stereolithography (SLA),\ndigital light processing (DLP), fused deposition modeling\n(FDM), and two-photon polymerization (2PP) [14]. Among\nthese methods, resin-based printing approaches, particularly\nSLA and DLP, have recently emerged as highly accessible\nalternatives that offer high-resolution features at low cost. In\nLight  Penetration\nLight Penetration Affection\nBuild \nPlatform\nMicrofluidic\nBiochip\nOver-Curing\nIntended\nFabricated\nIntended\nUV Light\nPenetration\nFig. 3.\nUV light penetration cures unintended areas during the printing\nprocess: (left) illustration of how UV penetrates through the printed layers;\n(right) light penetration affects the yield of 3D-printed microfluidic biochips.\nthese processes, a liquid photosensitive resin is selectively\nexposed to a UV light source, curing and solidifying the\nmaterial layer-by-layer to build the desired 3D geometry, as\nillustrated in Figure 2. The 3D printing process can be viewed\nas dragging the object from the resin vat.\nB. Light Penetration and Fabrication Artifacts\nWhile SLA and DLP printing offer high resolution, the\nphysical nature of photopolymerization introduces significant\nfabrication challenges, particularly for internal microfluidic\nvoids. During the layer-by-layer printing process, UV light\ninevitably penetrates through the currently exposed layer and\nscatters into previously solidified layers or adjacent void\nregions, as illustrated in Figure 3(left). This phenomenon,\nknown as light penetration or over-curing, causes unintended\npolymerization of the residual liquid resin trapped inside the\nmicrochannels.\nThe extent of this light penetration depth is governed by the\nBeer-Lambert law, which dictates an exponential decay of light\nintensity as it travels through the resin. Neighboring structural\nfeatures also reflect, refract, and scatter this light, creating\nlocalized variations in the over-curing effect. This cumulative\nUV exposure severely distorts the fabricated dimensions of"
+    },
+    {
+      "citation_id": "citation:37ab013d02dc0677",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:75b853f6277cfab4",
+      "reference_id": "reference:0b36aa006c8f1308",
+      "reference_number": "8",
+      "mention_text": "[8]",
+      "context": "localized variations in the over-curing effect. This cumulative\nUV exposure severely distorts the fabricated dimensions of\nthe features, altering their intended hydraulic resistance and,\nin extreme cases, completely clogging the fluidic pathways, as\nshown in Figure 3 (right).\nC. Microfluidic Design Automation\nAs the complexity of microfluidic networks increases, man-\nual design using standard mechanical CAD software becomes\na significant bottleneck. Designing a functional chip requires\nrouting channels, calculating precise channel lengths to sat-\nisfy hydraulic resistance requirements, and ensuring that no\ncomponents overlap. To address these challenges, Electronic\nDesign Automation (EDA) tools for microfluidics have ad-\nvanced rapidly in recent years, automating many of these\nlabor-intensive tasks. Several state-of-the-art design automa-\ntion tools, such as 3D\u00b5F [8], Cloud Columba [6], [7], Micado\n[10], and Fluigi [11], have significantly facilitated the design of\ncontinuous-flow microfluidic devices. For instance, 3D\u00b5F pro-\nvides an interactive environment for planar chip design, while\nCloud Columba supports synthesis for continuous-flow mLSI\nsystems. These tools can automatically generate 2D layouts,\nvector graphics, or CAD scripts compatible with conventional\nfabrication methods. However, despite their capabilities, most\nexisting microfluidic design automation solutions are funda-\nmentally limited to 2D architectures, often relying on layered"
+    },
+    {
+      "citation_id": "citation:aa69e25c3ac8b01c",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:75b853f6277cfab4",
+      "reference_id": "reference:9b1380c186b6d6f3",
+      "reference_number": "6",
+      "mention_text": "[6]",
+      "context": "localized variations in the over-curing effect. This cumulative\nUV exposure severely distorts the fabricated dimensions of\nthe features, altering their intended hydraulic resistance and,\nin extreme cases, completely clogging the fluidic pathways, as\nshown in Figure 3 (right).\nC. Microfluidic Design Automation\nAs the complexity of microfluidic networks increases, man-\nual design using standard mechanical CAD software becomes\na significant bottleneck. Designing a functional chip requires\nrouting channels, calculating precise channel lengths to sat-\nisfy hydraulic resistance requirements, and ensuring that no\ncomponents overlap. To address these challenges, Electronic\nDesign Automation (EDA) tools for microfluidics have ad-\nvanced rapidly in recent years, automating many of these\nlabor-intensive tasks. Several state-of-the-art design automa-\ntion tools, such as 3D\u00b5F [8], Cloud Columba [6], [7], Micado\n[10], and Fluigi [11], have significantly facilitated the design of\ncontinuous-flow microfluidic devices. For instance, 3D\u00b5F pro-\nvides an interactive environment for planar chip design, while\nCloud Columba supports synthesis for continuous-flow mLSI\nsystems. These tools can automatically generate 2D layouts,\nvector graphics, or CAD scripts compatible with conventional\nfabrication methods. However, despite their capabilities, most\nexisting microfluidic design automation solutions are funda-\nmentally limited to 2D architectures, often relying on layered"
+    },
+    {
+      "citation_id": "citation:40635e83ddbe4ff1",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:75b853f6277cfab4",
+      "reference_id": "reference:a5b70a3a54993428",
+      "reference_number": "7",
+      "mention_text": "[7]",
+      "context": "localized variations in the over-curing effect. This cumulative\nUV exposure severely distorts the fabricated dimensions of\nthe features, altering their intended hydraulic resistance and,\nin extreme cases, completely clogging the fluidic pathways, as\nshown in Figure 3 (right).\nC. Microfluidic Design Automation\nAs the complexity of microfluidic networks increases, man-\nual design using standard mechanical CAD software becomes\na significant bottleneck. Designing a functional chip requires\nrouting channels, calculating precise channel lengths to sat-\nisfy hydraulic resistance requirements, and ensuring that no\ncomponents overlap. To address these challenges, Electronic\nDesign Automation (EDA) tools for microfluidics have ad-\nvanced rapidly in recent years, automating many of these\nlabor-intensive tasks. Several state-of-the-art design automa-\ntion tools, such as 3D\u00b5F [8], Cloud Columba [6], [7], Micado\n[10], and Fluigi [11], have significantly facilitated the design of\ncontinuous-flow microfluidic devices. For instance, 3D\u00b5F pro-\nvides an interactive environment for planar chip design, while\nCloud Columba supports synthesis for continuous-flow mLSI\nsystems. These tools can automatically generate 2D layouts,\nvector graphics, or CAD scripts compatible with conventional\nfabrication methods. However, despite their capabilities, most\nexisting microfluidic design automation solutions are funda-\nmentally limited to 2D architectures, often relying on layered"
+    },
+    {
+      "citation_id": "citation:83edbfb1ac9b8004",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:75b853f6277cfab4",
+      "reference_id": "reference:16478ddd42e89c43",
+      "reference_number": "10",
+      "mention_text": "[10]",
+      "context": "localized variations in the over-curing effect. This cumulative\nUV exposure severely distorts the fabricated dimensions of\nthe features, altering their intended hydraulic resistance and,\nin extreme cases, completely clogging the fluidic pathways, as\nshown in Figure 3 (right).\nC. Microfluidic Design Automation\nAs the complexity of microfluidic networks increases, man-\nual design using standard mechanical CAD software becomes\na significant bottleneck. Designing a functional chip requires\nrouting channels, calculating precise channel lengths to sat-\nisfy hydraulic resistance requirements, and ensuring that no\ncomponents overlap. To address these challenges, Electronic\nDesign Automation (EDA) tools for microfluidics have ad-\nvanced rapidly in recent years, automating many of these\nlabor-intensive tasks. Several state-of-the-art design automa-\ntion tools, such as 3D\u00b5F [8], Cloud Columba [6], [7], Micado\n[10], and Fluigi [11], have significantly facilitated the design of\ncontinuous-flow microfluidic devices. For instance, 3D\u00b5F pro-\nvides an interactive environment for planar chip design, while\nCloud Columba supports synthesis for continuous-flow mLSI\nsystems. These tools can automatically generate 2D layouts,\nvector graphics, or CAD scripts compatible with conventional\nfabrication methods. However, despite their capabilities, most\nexisting microfluidic design automation solutions are funda-\nmentally limited to 2D architectures, often relying on layered"
+    },
+    {
+      "citation_id": "citation:6ee1c14f70fabf42",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:75b853f6277cfab4",
+      "reference_id": "reference:d3a142583d12b504",
+      "reference_number": "11",
+      "mention_text": "[11]",
+      "context": "localized variations in the over-curing effect. This cumulative\nUV exposure severely distorts the fabricated dimensions of\nthe features, altering their intended hydraulic resistance and,\nin extreme cases, completely clogging the fluidic pathways, as\nshown in Figure 3 (right).\nC. Microfluidic Design Automation\nAs the complexity of microfluidic networks increases, man-\nual design using standard mechanical CAD software becomes\na significant bottleneck. Designing a functional chip requires\nrouting channels, calculating precise channel lengths to sat-\nisfy hydraulic resistance requirements, and ensuring that no\ncomponents overlap. To address these challenges, Electronic\nDesign Automation (EDA) tools for microfluidics have ad-\nvanced rapidly in recent years, automating many of these\nlabor-intensive tasks. Several state-of-the-art design automa-\ntion tools, such as 3D\u00b5F [8], Cloud Columba [6], [7], Micado\n[10], and Fluigi [11], have significantly facilitated the design of\ncontinuous-flow microfluidic devices. For instance, 3D\u00b5F pro-\nvides an interactive environment for planar chip design, while\nCloud Columba supports synthesis for continuous-flow mLSI\nsystems. These tools can automatically generate 2D layouts,\nvector graphics, or CAD scripts compatible with conventional\nfabrication methods. However, despite their capabilities, most\nexisting microfluidic design automation solutions are funda-\nmentally limited to 2D architectures, often relying on layered"
+    },
+    {
+      "citation_id": "citation:c49c63f7f8d0bf24",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:dea3ee6b9a8357e1",
+      "reference_id": "reference:0d9db59090f06bdb",
+      "reference_number": "15",
+      "mention_text": "[15]",
+      "context": "Design Interface\nDesign Workflow (Simplified)\nSelect Component\nPlace Component\nDraw Channel\nOutput Options\n3D Model\nFig. 4.\nFlui3d simplifies the design of 3D-printable microfluidic biochips: (left) user interface of the design platform; (right) simplified design workflow\nillustrating the key design steps.\nflow and control designs. As a result, they are not directly\napplicable to the design of microfluidic devices intended for\n3D printing. This limitation highlights the growing need for\ndomain-specific CAD and design automation tools tailored to\nfully leverage the advantages of 3D-printed microfluidics. This\nlack of integrated, 3D-capable design synthesis tools forces\nresearchers into tedious, iterative manual design cycles to\nsatisfy specific timing, volumetric, or mixing constraints.\nIII. INTERACTIVE DESIGN AUTOMATION FOR\nMULTI-LAYER ARCHITECTURES\nAs the field of microfluidics grows from planar, single-\nlayer devices to complex, multi-layer 3D architectures, the\nlimitations of traditional mechanical CAD software become\nincreasingly apparent. Standard CAD tools are not optimized\nfor fluidic routing, requiring manual, tedious adjustments for\nevery channel bend, layer transition, and component place-\nment. To overcome these infrastructural bottlenecks, we de-\nveloped a foundational web-based interactive design automa-\ntion platform\u2014Flui3d\u2014specifically tailored for 3D-printed\nmicrofluidics [15]. Without installing any software, Flui3d can\nbe easily accessed via the web at https://flui3d.org.\nDesign user interface. Flui3d provides a web-based, WYSI-\nWYG (What-You-See-Is-What-You-Get) design environment\nin which users can create microfluidic layouts through a\nfamiliar 2D interaction paradigm, while the tool automatically\ngenerates the corresponding 3D geometry and fabrication-\nready output. Figure 4 shows the user interface and the key\ndesign steps. The platform includes a parameterized compo-\nnent library, support for multi-layer device design, and export\noptions including STL, SVG, and a human-readable JSON\nrepresentation for sharing and reuse.\nParameterized component library. A central element of\nFlui3d is its parametric component library, which abstracts mi-\ncrofluidic design away from low-level geometry construction\ntoward domain-specific building blocks. Instead of manually\ndefining channels and volumes in 3D space, users compose"
+    },
+    {
+      "citation_id": "citation:e920b64991e5fdb4",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:1ed3eafa01ef868e",
+      "reference_id": "reference:8fccfc24535abde8",
+      "reference_number": "16",
+      "mention_text": "[16]",
+      "context": "for simple devices, they become highly iterative and error-\nprone as designs scale to multiple layers and involve tightly\ncoupled timing and volume targets. To address this problem,\nwe introduced 3M-DeSyn [16].\nInput model and specification. 3M-DeSyn begins from\na high-level schematic that specifies functional components\n(e.g., mixers, chambers, sinks), connectivity, and available\ninlets. The user can add optional directives, including preferred\nlayer counts, placement hints for critical modules, target\ninlet flow conditions, synchronization constraints (equal arrival\ntimes), shifted-arrival constraints (prescribed delays between\npaths), and volumetric constraints (absolute target volumes or\ntarget volume ratios at sinks). This representation decouples\nfunctional intent from final geometry and enables automated\nexploration of physical realizations.\nGraph abstraction and physical embedding. The schematic\nis mapped to a graph whose vertices represent components and\nwhose edges represent channels to be synthesized. Physical\nembedding introduces geometric variables for node locations,\nlayer assignments, channel lengths, and routing segments."
+    },
+    {
+      "citation_id": "citation:28af9a964a5c7208",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:b210ad462d3ad6a7",
+      "reference_id": "reference:e3e3e5089c494207",
+      "reference_number": "17",
+      "mention_text": "[17]",
+      "context": "as part of the optimization itself. The resulting solution is then\nconverted automatically into 3D geometry for fabrication.\nExperimental outcomes. 3M-DeSyn was evaluated on five\ntest cases spanning different combinations of timing, volumet-\nric, and multi-layer constraints. Compared with a manual base-\nline workflow (schematic analysis, iterative placement/routing,\nand hand-tuned channel dimensions), 3M-DeSyn reduced de-\nsign time from hours to seconds/minutes: baseline estimates\nranged from 5 h 07 m to 20 h 54 m, whereas 3M-DeSyn com-\npleted synthesis in 2 s to 3 m 40 s. The synthesized chips\nwere additionally fabricated on a low-cost hobby SLA setup\n(Anycubic Photon D2 with plant-based clear resin), confirming\nthat the automatically generated geometries are not only com-\nputationally valid but also practically printable. An example\nis shown in Figure 5(left).\nR1 R2 R3 R4 R5 R6 R2 R5\nR1:R2:R3:R4:R5:R6\nR2 R1 R4 R6\n67:38:3:67:14:67\n10mm\nB. Low-Cost Mixing System Design Synthesis\nComplementing 3M-DeSyn, \u00b5-MM [17] focuses on a dif-\nferent but closely related challenge: synthesizing passive 3D-\nprinted mixers that deliver user-defined multi-reagent ratios\nunder a single constant pressure source. The central motivation\nis to avoid external complexity (multiple pumps, controllers,\nor valves) while still achieving ratio-specific mixing that\nis accurate enough for assay and diagnostic workflows. In\ncontrast to many passive mixer designs that primarily optimize\nhomogeneity for symmetric or fixed settings, \u00b5-MM targets\narbitrary ratio specifications and explicitly incorporates man-\nufacturability for low-cost resin printing.\nProblem formulation. Given a target ratio vector T = r1 :\nr2 : \u00b7 \u00b7 \u00b7 : rn, where each ri denotes the required volumetric\ncontribution of reagent i, the goal is to automatically generate\na complete mixer layout (inlets, junction topology, channel\ndimensions, and 3D geometry) such that the outlet mixture\nfollows the requested ratio under one shared pressure input.\nThis framing intentionally shifts complexity from hardware\ncontrol to algorithmic design synthesis.\nRatio decomposition and mix-flow tree construction. The\nfirst stage deterministically decomposes the target ratio into\nadditive sub-ratios and maps them into a hierarchical mix-\nflow tree. In this tree, leaves represent inlet branches, internal"
+    },
+    {
+      "citation_id": "citation:497b156e3a4138d4",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:acfa260c2acd02c0",
+      "reference_id": "reference:1c5d8cb1d805ec73",
+      "reference_number": "12",
+      "mention_text": "[12]",
+      "context": "parameter must be tuned alongside local settings.\nB. ML-Based Light-Penetration-Compensation\nWe further advanced the design-for-manufacturing direction\nwith LiPCon [12] by introducing a physics-aware, spatially\nresolved light-penetration compensation method. In contrast\nto prior uniform-compensation approaches, LiPCon explicitly\nmodels the fact that over-curing depends not only on feature\ndepth but also on nearby geometry and local optical context.\nThe central goal is therefore to predict location-specific com-"
+    }
+  ],
+  "tables": [],
+  "comparison_contexts": [
+    {
+      "comparison_id": "comparison:91d139976f37c2b6",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:7f4232401ae5b319",
+      "section": "Methods",
+      "text": "such\nas\nstereolithography\n(SLA)\nand\ndigital\nlight processing (DLP), has attracted increasing attention\nas\nan\nalternative\nfabrication\nroute\nfor\nmicrofluidics.\nCompared\nwith\nconventional\napproaches,\n3D\nprinting\noffers several compelling advantages: rapid prototyping,\nreduced infrastructure requirements, lower production costs,\nand the ability to fabricate complex three-dimensional and\nmulti-layered structures that are difficult or even impossible\nto realize using planar manufacturing techniques. An example\nof such a multi-layer 3D-printed microfluidic chip is shown\nin Figure 1. The availability of low-cost SLA printers, many\nof which cost only a few hundred dollars, further strengthens\nthe appeal of this approach, especially for laboratories\nand facilities with limited resources. In this sense, 3D\nprinting has the potential not only to simplify fabrication,\nbut also to democratize access to microfluidic technology.\nHowever, despite these advances in manufacturing, the\nUlf Schlichtmann\nTechnical University of Munich\nulf.schlichtmann@tum.de\ndesign of 3D-printed microfluidic systems remains a major\nchallenge.\nDeveloping\nsuch\ndevices\nrequires\nexpertise\nspanning fluid dynamics, mechanical design, and fabrication-\naware engineering. In practice, the design workflow still\nrelies heavily on manual computer-aided design (CAD),\nwhich is time-consuming, difficult to scale, and increasingly\nerror-prone as device complexity grows. This challenge\nbecomes even more pronounced for multi-layer architectures,\nwhere\nthe\nspatial\narrangement\nof\nchannels,\nchambers,\nand\ninterconnections\nmust\nsatisfy\nboth\nfunctional\nand\nmanufacturing constraints. While earlier design automation\ntools [5]\u2013[11] have improved the design of conventional\nplanar microfluidic chips, they do not adequately address the\ndistinctive requirements of 3D-printed systems.\nA further limitation arises from the material properties of\ncommonly available 3D-printing resins. Off-the-shelf mate-\nrials for resin printing generally produce rigid and inelastic\nstructures, in contrast to PDMS-based devices, which can\nexploit the elasticity of the substrate to implement active\nelements such as pneumatic valves and pumps. As a result, 3D-\nprinted microfluidic devices often cannot rely on deformable\ncomponents for active flow control and must instead achieve\nfunctionality primarily through the careful design of internal",
+      "claim_ids": [
+        "2608.16267::problem_motivation::0",
+        "2608.16267::problem_motivation::1",
+        "2608.16267::prior_approach::0",
+        "2608.16267::prior_limitation::2",
+        "2608.16267::causal_claim::0",
+        "2608.16267::mechanism_principle::0"
+      ],
+      "cited_references": [
+        {
+          "reference_number": "5",
+          "reference_id": "reference:c26ec2a5e4c31394",
+          "raw_text": "S. Qi, Z. Yu, B. Guo, S. Li, Z. Li, H. Ma, T. Ho, K. Chakrabarty, and X. Huang, \u201cDesign automation techniques for microfluidic fully programmable valve array biochips: A systematic survey,\u201d ACM Trans. Des. Autom. Electron. Syst., vol. 31, no. 1, Nov. 2025.",
+          "doi": "",
+          "arxiv_id": "",
+          "resolution_status": "metadata_only"
+        },
+        {
+          "reference_number": "11",
+          "reference_id": "reference:d3a142583d12b504",
+          "raw_text": "H. Huang and D. Densmore, \u201cFluigi: Microfluidic device synthesis for synthetic biology,\u201d J. Emerg. Technol. Comput. Syst., vol. 11, no. 3, dec 2015.",
+          "doi": "",
+          "arxiv_id": "",
+          "resolution_status": "metadata_only"
+        }
+      ],
+      "tables": [],
+      "cross_paper": true,
+      "cited_content_status": "requires_resolution"
+    },
+    {
+      "comparison_id": "comparison:8bb0db8b53ed7f1e",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:b210ad462d3ad6a7",
+      "section": "Methods",
+      "text": "as part of the optimization itself. The resulting solution is then\nconverted automatically into 3D geometry for fabrication.\nExperimental outcomes. 3M-DeSyn was evaluated on five\ntest cases spanning different combinations of timing, volumet-\nric, and multi-layer constraints. Compared with a manual base-\nline workflow (schematic analysis, iterative placement/routing,\nand hand-tuned channel dimensions), 3M-DeSyn reduced de-\nsign time from hours to seconds/minutes: baseline estimates\nranged from 5 h 07 m to 20 h 54 m, whereas 3M-DeSyn com-\npleted synthesis in 2 s to 3 m 40 s. The synthesized chips\nwere additionally fabricated on a low-cost hobby SLA setup\n(Anycubic Photon D2 with plant-based clear resin), confirming\nthat the automatically generated geometries are not only com-\nputationally valid but also practically printable. An example\nis shown in Figure 5(left).\nR1 R2 R3 R4 R5 R6 R2 R5\nR1:R2:R3:R4:R5:R6\nR2 R1 R4 R6\n67:38:3:67:14:67\n10mm\nB. Low-Cost Mixing System Design Synthesis\nComplementing 3M-DeSyn, \u00b5-MM [17] focuses on a dif-\nferent but closely related challenge: synthesizing passive 3D-\nprinted mixers that deliver user-defined multi-reagent ratios\nunder a single constant pressure source. The central motivation\nis to avoid external complexity (multiple pumps, controllers,\nor valves) while still achieving ratio-specific mixing that\nis accurate enough for assay and diagnostic workflows. In\ncontrast to many passive mixer designs that primarily optimize\nhomogeneity for symmetric or fixed settings, \u00b5-MM targets\narbitrary ratio specifications and explicitly incorporates man-\nufacturability for low-cost resin printing.\nProblem formulation. Given a target ratio vector T = r1 :\nr2 : \u00b7 \u00b7 \u00b7 : rn, where each ri denotes the required volumetric\ncontribution of reagent i, the goal is to automatically generate\na complete mixer layout (inlets, junction topology, channel\ndimensions, and 3D geometry) such that the outlet mixture\nfollows the requested ratio under one shared pressure input.\nThis framing intentionally shifts complexity from hardware\ncontrol to algorithmic design synthesis.\nRatio decomposition and mix-flow tree construction. The\nfirst stage deterministically decomposes the target ratio into\nadditive sub-ratios and maps them into a hierarchical mix-\nflow tree. In this tree, leaves represent inlet branches, internal",
+      "claim_ids": [
+        "2608.16267::problem_motivation::3",
+        "2608.16267::rejected_alternative::0",
+        "2608.16267::hypothesis_statement::1",
+        "2608.16267::evidence_result::0",
+        "2608.16267::evidence_result::1"
+      ],
+      "cited_references": [
+        {
+          "reference_number": "17",
+          "reference_id": "reference:e3e3e5089c494207",
+          "raw_text": "Y. Zhang, D. Kundu, T.-M. Tseng, S. Roy, S. Yamashita, and U. Schlicht- mann, \u201cAccessible ratio-specific mixing: Single-pressure-driven multi- reagent mixer design and synthesis for 3d-printed microfluidics,\u201d in 2026 31st Asia and South Pacific Design Automation Conference (ASP-DAC), 2026, pp. 398\u2013404.",
+          "doi": "",
+          "arxiv_id": "",
+          "resolution_status": "metadata_only"
+        }
+      ],
+      "tables": [],
+      "cross_paper": true,
+      "cited_content_status": "requires_resolution"
+    },
+    {
+      "comparison_id": "comparison:410f82d444234a8f",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:7a1e49248e1d2460",
+      "section": "Methods",
+      "text": "dimensions are then determined via the electronic-hydraulic\nanalogy, where each edge receives a hydraulic resistance\nrealized through channel length assignment. Under a common\npressure boundary, these resistive paths enforce the intended\nrelative flow rates so that outlet composition tracks the original\ntarget ratio.\nConstraint optimization and geometry export. The physical\nrealization is solved as a constrained optimization problem\nthat balances routability and compactness while preserving\nthe synthesized flow structure. The output is not merely a\nlogical network; it is a fabrication-ready geometric design that\ncan be exported in standard 3D format and sent directly to\nslicers/printers.\nExperimental validation. The approach was evaluated on\neight case studies (four real-world-inspired and four syn-\nthetic ratio targets). Generated layouts were fabricated using\na hobby-grade resin printer (Elegoo Mars 5). An example\nis shown in Figure 5(right). To validate ratio accuracy, a\nCOMSOL-based laminar-flow/solute-transport simulation was\nperformed, assigning distinct inlet concentrations to reagents\nso outlet composition errors could be quantified against theo-\nretical targets. Across the four real-world scenarios, simulated\noutlet concentrations deviated by less than 0.01 mol/L from\ntarget values. Over all eight cases, reported deviations re-\nmained small (from \u22120.016 to +0.009 mol/L), while synthesis\nruntime stayed in the millisecond range (108\u2013145 ms). Chip\nfootprints and total channel lengths remained moderate relative\nto a custom baseline, highlighting that \u00b5-MM achieves an\neffective balance: slightly narrower mixing spectrum in some\ncases, but substantially improved compactness and manufac-\nturability with lower channel complexity and hydraulic burden.\nV. DESIGN-FOR-MANUFACTURING FOR 3D-PRINTED\nMICROFLUIDICS\nA. Manual Light-Penetration-Compensation\nA core manufacturability bottleneck in resin-based 3D-\nprinted microfluidics is the unintended curing caused by light\npenetration through previously printed material. This artifact is\nespecially severe for enclosed small channels and multi-layer\nlayouts, where over-exposure can narrow or fully block critical\nflow paths. We introduced practical Design-for-Manufacturing\n(DFM) compensation strategies that is integrated directly into\nthe design-output stage of Flui3d, enabling reliable fabrication",
+      "claim_ids": [
+        "2608.16267::problem_motivation::4",
+        "2608.16267::mechanism_principle::1",
+        "2608.16267::evidence_result::2",
+        "2608.16267::evidence_result::3"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:db617390141acce2",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:3ec21a18e4e297fe",
+      "section": "Result",
+      "text": "pensation values that preserve intended feature dimensions in\ncomplex multi-layer designs.\nDataset contribution and data pipeline. This work con-\ntributes a dedicated dataset quantifying discrepancies between\ndesign and fabrication in resin-based multi-layer microfluidics.\nThe dataset was constructed from calibration structures with\ncontrolled variations in feature geometry and spatial context,\nfollowed by measurement of fabricated dimensions under fixed\nprint settings. This produced 2,488 data points, providing\nsupervised targets for compensation learning.\nPhysics-aware preprocessing. To improve learnability and\nphysical consistency, LiPCon introduces preprocessing that\nembeds light-propagation principles into the model input\nrepresentation. Specifically, geometric features are weighted\nbased on cumulative light passage and attenuation effects\n(including absorption/scattering-related decay), so the model\nreceives physically meaningful context instead of only raw\ngeometric descriptors. This hybrid strategy combines domain\npriors with machine learning, reducing reliance on purely\nblack-box fitting.\nSpatially resolved machine-learning model. LiPCon then\ntrains a neural predictor to output local compensation values\nfor different regions/features in a design. Unlike uniform com-\npensation, this allows stronger correction where local over-\ncuring risk is high and milder correction where risk is lower.\nIn practice, the learned compensation map is injected into the\nDFM stage before fabrication, producing a compensated 3D\nmodel whose printed dimensions are closer to the original\nCAD targets.\nTraining setup and predictive performance. The dataset\nwas split into training/validation/test subsets (1,727/315/434).\nTraining used Adam with MSE loss, dropout-based regular-\nization, and early stopping. The model converged in fewer\nthan 40 epochs, achieved about 90.01% training accuracy, and\nshowed tight test-error behavior: all reported L1 errors were\nbelow 0.45 with an average around 0.11, indicating stable\ngeneralization for local compensation prediction.\nFabrication validation and benchmarking. For end-to-end\nvalidation, multiple random multi-layer designs were fabri-\ncated and compared against the prior state-of-the-art baseline\nmethod. Across representative microfluidic features (e.g., nar-\nrow channels, serpentine regions, and cavity-like structures),",
+      "claim_ids": [
+        "2608.16267::problem_motivation::4",
+        "2608.16267::prior_approach::4",
+        "2608.16267::rejected_alternative::3",
+        "2608.16267::causal_claim::7",
+        "2608.16267::causal_claim::8",
+        "2608.16267::mechanism_principle::4",
+        "2608.16267::evidence_result::4",
+        "2608.16267::evidence_result::5"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:c5c7828a6f5aa3f3",
+      "paper_id": "2608.16267",
+      "passage_id": "passage:0684a869c58b7e17",
+      "section": "Result",
+      "text": "method. Across representative microfluidic features (e.g., nar-\nrow channels, serpentine regions, and cavity-like structures),\nLiPCon produced fabricated dimensions consistently closer\nto design targets. For six cases printed on the same printer-\nresin setup as training data, dimensional errors were reduced\nby at least 87.64% relative to baseline, with final deviations\nonly 1.25%\u20135.5%. The method was also applied to an addi-\ntional printer-resin pair without retraining, where deviations\nremained within 5.75%\u201317.00% and still outperformed the\nbaseline, demonstrating practical robustness and transfer po-\ntential.\nVI. CONCLUSION\nThis paper presented a unified automation framework for\n3D-printed microfluidics that addresses the full path from\ndesign to fabrication. By combining interactive design support,\nconstraint-driven synthesis for passive fluidic functions, low-\ncost mixer synthesis, and compensation methods for light-\npenetration artifacts, the framework reduces manual effort\nwhile improving print reliability on resin 3D printers. Exper-\nimental results across representative designs show substantial\nreductions in design time and strong agreement between fab-\nricated and target dimensions. Overall, this work helps bridge\nthe gap between the accessibility of low-cost 3D printing\nand the practical requirements of reliable microfluidic device\ndevelopment.",
+      "claim_ids": [
+        "2608.16267::problem_motivation::0",
+        "2608.16267::causal_claim::3",
+        "2608.16267::evidence_result::6",
+        "2608.16267::evidence_result::6",
+        "2608.16267::evidence_result::6",
+        "2608.16267::evidence_result::7"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    }
+  ],
+  "claim_passage_ids": {
+    "2608.16267::problem_motivation::0": [
+      {
+        "passage_id": "passage:7f4232401ae5b319",
+        "match_score": 1.0,
+        "evidence_span": "However, despite these advances in manufacturing, the design of 3D-printed microfluidic systems remains a major challenge."
+      },
+      {
+        "passage_id": "passage:0e44eca9dad9b8c3",
+        "match_score": 1.0,
+        "evidence_span": "Taken together, these issues reveal a critical gap between the promise of 3D printing for microfluidics and its practical adoption."
+      },
+      {
+        "passage_id": "passage:0e44eca9dad9b8c3",
+        "match_score": 1.0,
+        "evidence_span": "Although 3D printing has made fabrication more accessible, persistent challenges in design complexity, functional synthesis, material limitations, and fabrication fidelity continue to slow the broader dissemination of 3D-printed microfluidics."
+      },
+      {
+        "passage_id": "passage:0684a869c58b7e17",
+        "match_score": 1.0,
+        "evidence_span": "Overall, this work helps bridge the gap between the accessibility of low-cost 3D printing and the practical requirements of reliable microfluidic device development."
+      }
+    ],
+    "2608.16267::problem_motivation::1": [
+      {
+        "passage_id": "passage:7f4232401ae5b319",
+        "match_score": 1.0,
+        "evidence_span": "In practice, the design workflow still relies heavily on manual computer-aided design (CAD), which is time-consuming, difficult to scale, and increasingly error-prone as device complexity grows."
+      },
+      {
+        "passage_id": "passage:75b853f6277cfab4",
+        "match_score": 1.0,
+        "evidence_span": "As the complexity of microfluidic networks increases, manual design using standard mechanical CAD software becomes a significant bottleneck."
+      },
+      {
+        "passage_id": "passage:dea3ee6b9a8357e1",
+        "match_score": 0.9583,
+        "evidence_span": "As the field of microfluidics grows from planar, single-layer devices to complex, multi-layer 3D architectures, the limitations of traditional mechanical CAD software become increasingly apparent."
+      }
+    ],
+    "2608.16267::problem_motivation::2": [
+      {
+        "passage_id": "passage:dea3ee6b9a8357e1",
+        "match_score": 1.0,
+        "evidence_span": "This limitation highlights the growing need for domain-specific CAD and design automation tools tailored to fully leverage the advantages of 3D-printed microfluidics."
+      },
+      {
+        "passage_id": "passage:dea3ee6b9a8357e1",
+        "match_score": 1.0,
+        "evidence_span": "This lack of integrated, 3D-capable design synthesis tools forces researchers into tedious, iterative manual design cycles to satisfy specific timing, volumetric, or mixing constraints."
+      },
+      {
+        "passage_id": "passage:cf323bbcc45f7eb6",
+        "match_score": 1.0,
+        "evidence_span": "A central bottleneck in 3D-printed microfluidics is the lack of synthesis tools that can jointly handle multi-layer physical layout generation and user-defined fluid-delivery behavior."
+      }
+    ],
+    "2608.16267::problem_motivation::3": [
+      {
+        "passage_id": "passage:b210ad462d3ad6a7",
+        "match_score": 1.0,
+        "evidence_span": "The central motivation is to avoid external complexity (multiple pumps, controllers, or valves) while still achieving ratio-specific mixing that is accurate enough for assay and diagnostic workflows."
+      }
+    ],
+    "2608.16267::problem_motivation::4": [
+      {
+        "passage_id": "passage:7a1e49248e1d2460",
+        "match_score": 1.0,
+        "evidence_span": "A core manufacturability bottleneck in resin-based 3D-printed microfluidics is the unintended curing caused by light penetration through previously printed material. This artifact is especially severe for enclosed small channels and multi-layer layouts, where over-exposure can narrow or fully block critical flow paths."
+      },
+      {
+        "passage_id": "passage:f96536f1c7c9c623",
+        "match_score": 1.0,
+        "evidence_span": "While layout synthesis can generate functionally correct geometries, printability is not guaranteed when optical side effects distort fine features."
+      },
+      {
+        "passage_id": "passage:3ec21a18e4e297fe",
+        "match_score": 0.7143,
+        "evidence_span": "The central goal is therefore to predict location-specific compensation values that preserve intended feature dimensions in complex multi-layer designs."
+      }
+    ],
+    "2608.16267::prior_approach::0": [
+      {
+        "passage_id": "passage:7f4232401ae5b319",
+        "match_score": 1.0,
+        "evidence_span": "While earlier design automation tools [5]\u2013[11] have improved the design of conventional planar microfluidic chips"
+      },
+      {
+        "passage_id": "passage:75b853f6277cfab4",
+        "match_score": 1.0,
+        "evidence_span": "Several state-of-the-art design automation tools, such as 3D\u00b5F [8], Cloud Columba [6], [7], Micado [10], and Fluigi [11], have significantly facilitated the design of continuous-flow microfluidic devices."
+      },
+      {
+        "passage_id": "passage:75b853f6277cfab4",
+        "match_score": 1.0,
+        "evidence_span": "For instance, 3D\u00b5F provides an interactive environment for planar chip design, while Cloud Columba supports synthesis for continuous-flow mLSI systems."
+      }
+    ],
+    "2608.16267::prior_approach::1": [
+      {
+        "passage_id": "passage:f12d483be615a5d0",
+        "match_score": 1.0,
+        "evidence_span": "The fabrication of microfluidic devices has historically been dominated by soft lithography and PDMS molding"
+      }
+    ],
+    "2608.16267::prior_approach::2": [
+      {
+        "passage_id": "passage:f12d483be615a5d0",
+        "match_score": 1.0,
+        "evidence_span": "researchers have increasingly turned to diverse 3D printing techniques for microfluidic fabrication, including stereolithography (SLA), digital light processing (DLP), fused deposition modeling (FDM), and two-photon polymerization (2PP) [14]."
+      }
+    ],
+    "2608.16267::prior_approach::3": [
+      {
+        "passage_id": "passage:acfa260c2acd02c0",
+        "match_score": 1.0,
+        "evidence_span": "prior uniform-compensation approaches"
+      }
+    ],
+    "2608.16267::prior_approach::4": [
+      {
+        "passage_id": "passage:3ec21a18e4e297fe",
+        "match_score": 1.0,
+        "evidence_span": "compared against the prior state-of-the-art baseline method"
+      }
+    ],
+    "2608.16267::prior_limitation::0": [
+      {
+        "passage_id": "passage:f12d483be615a5d0",
+        "match_score": 1.0,
+        "evidence_span": "which require specialized cleanroom environments and extensive manual labor."
+      }
+    ],
+    "2608.16267::prior_limitation::1": [
+      {
+        "passage_id": "passage:dea3ee6b9a8357e1",
+        "match_score": 1.0,
+        "evidence_span": "Standard CAD tools are not optimized for fluidic routing, requiring manual, tedious adjustments for every channel bend, layer transition, and component placement."
+      },
+      {
+        "passage_id": "passage:cf323bbcc45f7eb6",
+        "match_score": 0.8667,
+        "evidence_span": "While manual CAD workflows can meet these requirements for simple devices, they become highly iterative and error-prone as designs scale to multiple layers and involve tightly coupled timing and volume targets."
+      }
+    ],
+    "2608.16267::prior_limitation::2": [
+      {
+        "passage_id": "passage:75b853f6277cfab4",
+        "match_score": 0.9167,
+        "evidence_span": "However, despite their capabilities, most existing microfluidic design automation solutions are fundamentally limited to 2D architectures, often relying on layered flow and control designs."
+      },
+      {
+        "passage_id": "passage:7f4232401ae5b319",
+        "match_score": 1.0,
+        "evidence_span": "they do not adequately address the distinctive requirements of 3D-printed systems."
+      },
+      {
+        "passage_id": "passage:dea3ee6b9a8357e1",
+        "match_score": 1.0,
+        "evidence_span": "As a result, they are not directly applicable to the design of microfluidic devices intended for 3D printing."
+      }
+    ],
+    "2608.16267::rejected_alternative::0": [
+      {
+        "passage_id": "passage:b210ad462d3ad6a7",
+        "match_score": 1.0,
+        "evidence_span": "In contrast to many passive mixer designs that primarily optimize homogeneity for symmetric or fixed settings, \u00b5-MM targets arbitrary ratio specifications and explicitly incorporates manufacturability for low-cost resin printing."
+      }
+    ],
+    "2608.16267::rejected_alternative::1": [
+      {
+        "passage_id": "passage:3f725a1892de1428",
+        "match_score": 0.84,
+        "evidence_span": "To avoid requir-ing full optical characterization of each printer-resin com-bination, the method uses a practical calibration interface based on four user inputs"
+      }
+    ],
+    "2608.16267::rejected_alternative::2": [
+      {
+        "passage_id": "passage:acfa260c2acd02c0",
+        "match_score": 1.0,
+        "evidence_span": "In contrast to prior uniform-compensation approaches, LiPCon explicitly models the fact that over-curing depends not only on feature depth but also on nearby geometry and local optical context."
+      }
+    ],
+    "2608.16267::rejected_alternative::3": [
+      {
+        "passage_id": "passage:3ec21a18e4e297fe",
+        "match_score": 1.0,
+        "evidence_span": "This hybrid strategy combines domain priors with machine learning, reducing reliance on purely black-box fitting."
+      }
+    ],
+    "2608.16267::causal_claim::0": [
+      {
+        "passage_id": "passage:7f4232401ae5b319",
+        "match_score": 0.9062,
+        "evidence_span": "As a result, 3D-printed microfluidic devices often cannot rely on deformable components for active flow control and must instead achieve functionality primarily through the careful design of internal geometries and fluidic pathways."
+      },
+      {
+        "passage_id": "passage:821ab4c2f2f87ce5",
+        "match_score": 1.0,
+        "evidence_span": "This strong dependence on geometry places greater demands on the design process: channel lengths, volumes, resistances, and timing relationships must be coordinated precisely to ensure correct fluid handling, synchronized reactions, and accurate dispensing behavior [13]."
+      }
+    ],
+    "2608.16267::causal_claim::1": [
+      {
+        "passage_id": "passage:821ab4c2f2f87ce5",
+        "match_score": 1.0,
+        "evidence_span": "During printing, light penetration and scattering can cause polymerization outside the intended exposure region, a phenomenon commonly referred to as over-curing."
+      },
+      {
+        "passage_id": "passage:821ab4c2f2f87ce5",
+        "match_score": 0.8182,
+        "evidence_span": "This effect introduces geometric deviations from the nominal design and is especially problematic in narrow channels and in fine, complex internal features. In severe cases, over-curing can partially or completely block channels, rendering a device unusable."
+      },
+      {
+        "passage_id": "passage:f12d483be615a5d0",
+        "match_score": 1.0,
+        "evidence_span": "This phenomenon, known as light penetration or over-curing, causes unintended polymerization of the residual liquid resin trapped inside the microchannels."
+      },
+      {
+        "passage_id": "passage:75b853f6277cfab4",
+        "match_score": 1.0,
+        "evidence_span": "This cumulative UV exposure severely distorts the fabricated dimensions of the features, altering their intended hydraulic resistance and, in extreme cases, completely clogging the fluidic pathways"
+      }
+    ],
+    "2608.16267::causal_claim::2": [
+      {
+        "passage_id": "passage:0e44eca9dad9b8c3",
+        "match_score": 1.0,
+        "evidence_span": "High-end printers may alleviate some of these problems, but they do so at the expense of affordability, thereby weakening one of the most compelling motivations for using 3D printing in the first place."
+      }
+    ],
+    "2608.16267::causal_claim::3": [
+      {
+        "passage_id": "passage:0e44eca9dad9b8c3",
+        "match_score": 1.0,
+        "evidence_span": "By integrating interactive design support, constraint-driven functional synthesis, and machine-learning-assisted manufacturing compensation, the presented methodologies lower the barrier to entry for non-expert users and reduce the time and cost required to develop complex microfluidic systems."
+      },
+      {
+        "passage_id": "passage:0684a869c58b7e17",
+        "match_score": 1.0,
+        "evidence_span": "By combining interactive design support,\nconstraint-driven synthesis for passive fluidic functions, low-\ncost mixer synthesis, and compensation methods for light-\npenetration artifacts, the framework reduces manual effort\nwhile improving print reliability on resin 3D printers."
+      }
+    ],
+    "2608.16267::causal_claim::4": [
+      {
+        "passage_id": "passage:cf323bbcc45f7eb6",
+        "match_score": 1.0,
+        "evidence_span": "This approach encapsulates domain knowledge directly into the design representation, enabling rapid iteration and reducing the likelihood of invalid geometries."
+      },
+      {
+        "passage_id": "passage:cf323bbcc45f7eb6",
+        "match_score": 1.0,
+        "evidence_span": "As a result, the platform shifts the design task from geometric modeling to the configuration and composition of microfluidic functionality."
+      }
+    ],
+    "2608.16267::causal_claim::5": [
+      {
+        "passage_id": "passage:375b2e7f30980d4f",
+        "match_score": 0.95,
+        "evidence_span": "shifted-arrival constraints are implemented by introducing calibrated volume offsets that produce prescribed delay differences under the assigned flow conditions."
+      },
+      {
+        "passage_id": "passage:375b2e7f30980d4f",
+        "match_score": 1.0,
+        "evidence_span": "In this way, routing decisions directly influence whether temporal objectives are satisfied."
+      }
+    ],
+    "2608.16267::causal_claim::6": [
+      {
+        "passage_id": "passage:6bdcb77aed2c75fb",
+        "match_score": 1.0,
+        "evidence_span": "Decomposition increases flexibility in flow allocation: each reagent contribution can be represented by multiple sub-streams that are later interleaved spatially. This strategy allows the method to preserve exact aggregate ratio contributions while exposing additional degrees of freedom for improving the downstream mixing pattern."
+      }
+    ],
+    "2608.16267::causal_claim::7": [
+      {
+        "passage_id": "passage:3f725a1892de1428",
+        "match_score": 1.0,
+        "evidence_span": "In practice, this allows deeper or more vulnerable\nregions to receive stronger compensation automatically, which\nis particularly useful for multi-layer channel stacks."
+      },
+      {
+        "passage_id": "passage:3ec21a18e4e297fe",
+        "match_score": 1.0,
+        "evidence_span": "Unlike uniform com-\npensation, this allows stronger correction where local over-\ncuring risk is high and milder correction where risk is lower."
+      }
+    ],
+    "2608.16267::causal_claim::8": [
+      {
+        "passage_id": "passage:3ec21a18e4e297fe",
+        "match_score": 1.0,
+        "evidence_span": "In practice, the learned compensation map is injected into the\nDFM stage before fabrication, producing a compensated 3D\nmodel whose printed dimensions are closer to the original\nCAD targets."
+      }
+    ],
+    "2608.16267::mechanism_principle::0": [
+      {
+        "passage_id": "passage:7f4232401ae5b319",
+        "match_score": 1.0,
+        "evidence_span": "Off-the-shelf materials for resin printing generally produce rigid and inelastic structures, in contrast to PDMS-based devices, which can exploit the elasticity of the substrate to implement active elements such as pneumatic valves and pumps."
+      },
+      {
+        "passage_id": "passage:cf323bbcc45f7eb6",
+        "match_score": 1.0,
+        "evidence_span": "In passive chips, this challenge is particularly acute because functional correctness is encoded directly in geometry."
+      },
+      {
+        "passage_id": "passage:375b2e7f30980d4f",
+        "match_score": 1.0,
+        "evidence_span": "This is particularly important for passive reagent preparation, where concentration control depends on maintaining robust volume ratios without active valves or pumps."
+      }
+    ],
+    "2608.16267::mechanism_principle::1": [
+      {
+        "passage_id": "passage:375b2e7f30980d4f",
+        "match_score": 1.0,
+        "evidence_span": "Under laminar-flow assumptions, 3M-DeSyn couples geometry to behavior using resistance- and flow-based relationships, together with a volume-to-time relation (T = V/Q)."
+      },
+      {
+        "passage_id": "passage:7a1e49248e1d2460",
+        "match_score": 1.0,
+        "evidence_span": "Under a common pressure boundary, these resistive paths enforce the intended relative flow rates so that outlet composition tracks the original target ratio."
+      }
+    ],
+    "2608.16267::mechanism_principle::2": [
+      {
+        "passage_id": "passage:6bdcb77aed2c75fb",
+        "match_score": 1.0,
+        "evidence_span": "This is an important design choice because passive systems cannot rely on active perturbation; therefore, flow ordering and geometric interleaving become key levers for practical mixing performance."
+      },
+      {
+        "passage_id": "passage:6bdcb77aed2c75fb",
+        "match_score": 1.0,
+        "evidence_span": "Intuitively, by distributing and reordering subcomponents in the tree, the outlet can exhibit more distinct laminar sub-streams (referred to as wider spectrum width), which supports better passive homogenization after merging."
+      }
+    ],
+    "2608.16267::mechanism_principle::3": [
+      {
+        "passage_id": "passage:f12d483be615a5d0",
+        "match_score": 1.0,
+        "evidence_span": "The extent of this light penetration depth is governed by the Beer-Lambert law, which dictates an exponential decay of light intensity as it travels through the resin. Neighboring structural features also reflect, refract, and scatter this light, creating localized variations in the over-curing effect."
+      },
+      {
+        "passage_id": "passage:3f725a1892de1428",
+        "match_score": 1.0,
+        "evidence_span": "This local-plus-global decomposition provides a flexible mechanism: local compensation addresses depth-dependent exposure nonuniformity, while global compensation provides additional robustness for difficult print settings."
+      },
+      {
+        "passage_id": "passage:3f725a1892de1428",
+        "match_score": 1.0,
+        "evidence_span": "Local compensation is derived from a Beer\u2013Lambert-style attenuation assumption in which light intensity decays exponentially with distance from the source."
+      }
+    ],
+    "2608.16267::mechanism_principle::4": [
+      {
+        "passage_id": "passage:3ec21a18e4e297fe",
+        "match_score": 1.0,
+        "evidence_span": "Specifically, geometric features are weighted based on cumulative light passage and attenuation effects (including absorption/scattering-related decay), so the model receives physically meaningful context instead of only raw geometric descriptors."
+      }
+    ],
+    "2608.16267::hypothesis_statement::0": [
+      {
+        "passage_id": "passage:0e44eca9dad9b8c3",
+        "match_score": 1.0,
+        "evidence_span": "To address these challenges, this paper presents a cohesive design automation framework for 3D-printed microfluidics that unifies a series of interconnected methods across design and fabrication."
+      },
+      {
+        "passage_id": "passage:dea3ee6b9a8357e1",
+        "match_score": 1.0,
+        "evidence_span": "To overcome these infrastructural bottlenecks, we developed a foundational web-based interactive design automation platform\u2014Flui3d\u2014specifically tailored for 3D-printed microfluidics [15]."
+      }
+    ],
+    "2608.16267::hypothesis_statement::1": [
+      {
+        "passage_id": "passage:1ed3eafa01ef868e",
+        "match_score": 1.0,
+        "evidence_span": "To address this problem, we introduced 3M-DeSyn [16]."
+      },
+      {
+        "passage_id": "passage:b210ad462d3ad6a7",
+        "match_score": 1.0,
+        "evidence_span": "This framing intentionally shifts complexity from hardware control to algorithmic design synthesis."
+      }
+    ],
+    "2608.16267::hypothesis_statement::2": [
+      {
+        "passage_id": "passage:f96536f1c7c9c623",
+        "match_score": 0.8611,
+        "evidence_span": "We introduced practical Design-for-Manufacturing (DFM) compensation strategies that is integrated directly into the design-output stage of Flui3d, enabling reliable fabrication on hobby-grade SLA/LCD platforms without requiring custom resins or printer hardware modifications."
+      },
+      {
+        "passage_id": "passage:f96536f1c7c9c623",
+        "match_score": 1.0,
+        "evidence_span": "The DFM module therefore treats fabrication fidelity as a first-class design objective: before STL export, the geometry is transformed to counter expected light-induced over-curing."
+      },
+      {
+        "passage_id": "passage:f96536f1c7c9c623",
+        "match_score": 1.0,
+        "evidence_span": "The goal is to preserve intended void regions and keep microchannels open after printing, especially in compact and vertically integrated devices."
+      }
+    ],
+    "2608.16267::evidence_result::0": [
+      {
+        "passage_id": "passage:cf323bbcc45f7eb6",
+        "match_score": 1.0,
+        "evidence_span": "For example, the three-layer mixing device from Figure 1 could be taken from initial setup to a print-ready design in less than five minutes, demonstrating the efficiency of this interaction model."
+      },
+      {
+        "passage_id": "passage:b210ad462d3ad6a7",
+        "match_score": 1.0,
+        "evidence_span": "Compared with a manual baseline workflow (schematic analysis, iterative placement/routing, and hand-tuned channel dimensions), 3M-DeSyn reduced design time from hours to seconds/minutes: baseline estimates ranged from 5 h 07 m to 20 h 54 m, whereas 3M-DeSyn completed synthesis in 2 s to 3 m 40 s."
+      }
+    ],
+    "2608.16267::evidence_result::1": [
+      {
+        "passage_id": "passage:b210ad462d3ad6a7",
+        "match_score": 1.0,
+        "evidence_span": "The synthesized chips were additionally fabricated on a low-cost hobby SLA setup (Anycubic Photon D2 with plant-based clear resin), confirming that the automatically generated geometries are not only computationally valid but also practically printable."
+      }
+    ],
+    "2608.16267::evidence_result::2": [
+      {
+        "passage_id": "passage:7a1e49248e1d2460",
+        "match_score": 1.0,
+        "evidence_span": "Across the four real-world scenarios, simulated outlet concentrations deviated by less than 0.01 mol/L from target values. Over all eight cases, reported deviations remained small (from \u22120.016 to +0.009 mol/L), while synthesis runtime stayed in the millisecond range (108\u2013145 ms)."
+      }
+    ],
+    "2608.16267::evidence_result::3": [
+      {
+        "passage_id": "passage:7a1e49248e1d2460",
+        "match_score": 1.0,
+        "evidence_span": "Chip footprints and total channel lengths remained moderate relative to a custom baseline, highlighting that \u00b5-MM achieves an effective balance: slightly narrower mixing spectrum in some cases, but substantially improved compactness and manufacturability with lower channel complexity and hydraulic burden."
+      }
+    ],
+    "2608.16267::evidence_result::4": [
+      {
+        "passage_id": "passage:3ec21a18e4e297fe",
+        "match_score": 1.0,
+        "evidence_span": "This produced 2,488 data points, providing supervised targets for compensation learning."
+      }
+    ],
+    "2608.16267::evidence_result::5": [
+      {
+        "passage_id": "passage:3ec21a18e4e297fe",
+        "match_score": 1.0,
+        "evidence_span": "The model converged in fewer\nthan 40 epochs, achieved about 90.01% training accuracy, and\nshowed tight test-error behavior: all reported L1 errors were\nbelow 0.45 with an average around 0.11, indicating stable\ngeneralization for local compensation prediction."
+      }
+    ],
+    "2608.16267::evidence_result::6": [
+      {
+        "passage_id": "passage:0684a869c58b7e17",
+        "match_score": 1.0,
+        "evidence_span": "Across representative microfluidic features (e.g., nar-\nrow channels, serpentine regions, and cavity-like structures),\nLiPCon produced fabricated dimensions consistently closer\n to design targets."
+      },
+      {
+        "passage_id": "passage:0684a869c58b7e17",
+        "match_score": 1.0,
+        "evidence_span": "For six cases printed on the same printer-\nresin setup as training data, dimensional errors were reduced\nby at least 87.64% relative to baseline, with final deviations\nonly 1.25%\u20135.5%."
+      },
+      {
+        "passage_id": "passage:0684a869c58b7e17",
+        "match_score": 1.0,
+        "evidence_span": "The method was also applied to an addi-\ntional printer-resin pair without retraining, where deviations\nremained within 5.75%\u201317.00% and still outperformed the\nbaseline, demonstrating practical robustness and transfer po-\ntential."
+      }
+    ],
+    "2608.16267::evidence_result::7": [
+      {
+        "passage_id": "passage:0684a869c58b7e17",
+        "match_score": 1.0,
+        "evidence_span": "Exper-\nimental results across representative designs show substantial\nreductions in design time and strong agreement between fab-\nricated and target dimensions."
+      }
+    ],
+    "2608.16267::constraint::0": [
+      {
+        "passage_id": "passage:821ab4c2f2f87ce5",
+        "match_score": 1.0,
+        "evidence_span": "channel lengths, volumes, resistances, and timing relationships must be coordinated precisely to ensure correct fluid handling, synchronized reactions, and accurate dispensing behavior [13]."
+      },
+      {
+        "passage_id": "passage:cf323bbcc45f7eb6",
+        "match_score": 1.0,
+        "evidence_span": "Designers must simultaneously satisfy spatial constraints\u2014such as placement, routing, non-overlap, and layer usage\u2014and hydraulic constraints, including flow, timing, and filling volume."
+      }
+    ],
+    "2608.16267::constraint::1": [
+      {
+        "passage_id": "passage:375b2e7f30980d4f",
+        "match_score": 1.0,
+        "evidence_span": "Additional constraints enforce manufacturable spacing, prevent overlap among components and channels, and guarantee legal inter-layer transitions."
+      }
+    ],
+    "2608.16267::constraint::2": [
+      {
+        "passage_id": "passage:3f725a1892de1428",
+        "match_score": 1.0,
+        "evidence_span": "The work also notes a practical tradeoff:\nexcessive global offset can reduce structural stability, so this\nparameter must be tuned alongside local settings."
+      }
+    ]
+  }
+}

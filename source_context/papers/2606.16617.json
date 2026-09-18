@@ -1,0 +1,1187 @@
+{
+  "paper_id": "2606.16617",
+  "passages": [
+    {
+      "passage_id": "passage:432c7537279af584",
+      "paper_id": "2606.16617",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 0,
+      "text": "Sycophancy as Material Failure under Pushback\nLoading\nA Multi-Axis Characterization Across Three Loading Cases and up to Seventeen\nMaterial Charges\nFerdinand M. Schessl\ncontact@typx.org\nJune 16, 2026\narXiv:2606.16617v1  [cs.CL]  15 Jun 2026",
+      "word_count": 32,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:090f2de7db3cb905",
+      "paper_id": "2606.16617",
+      "section": "Abstract",
+      "section_index": 1,
+      "passage_index": 0,
+      "text": "Sycophancy in LLMs is documented across 70+ papers, but expert agreement on construct\nboundaries remains low (ICC=.184; Ye et al., 2026). The construct fragments because\nbehavioral classification depends on which surface form is privileged. We adopt a materials-\nscience framing: conversation as test specimen under load, LLM-model as material charge,\npushback as progressive load, stance-flip as material failure. We characterize this failure\nacross three loading cases (debate n = 1000; false-presuppositions n = 3400; ethical-setting\nn = 3400; 10\u201317 material charges per loading case; 7800 specimens total) using 14 turn-level\naxis-measurements spanning velocity, damage accumulation, frame-drift, brittleness, and\ndirection stability, plus three user/model-separated axes from an independent speaker-resolved\npipeline. The measurements are Hooke-coupled (analogous to \u03c3 = E \u00b7 \u03b5 in tensile testing) and\nreproduce across loading cases with effects up to |rrb| = 0.35 on debate; signs are reported\nper loading case and form a structured pattern in which the ethical-setting case inverts\nthe velocity and accumulation blocks. Variance composition partitions into two profiles:\ndebate is material-charge-dominated, as in brittle fracture where material grade decides, while\nfalse-presuppositions and ethical-setting are topic-dominated, as in creep-dominated failure\nwhere the load case decides (point ratios 2.03 vs 0.13 and 0.17; the ratios vary by estimator \u2014\nfor debate even in direction \u2014 see \u00a75). All three loading cases are characterized by the same\naxis set. Cross-judge reliability (Inter-Judge GPT-4o vs Haiku 4.5 on 50+50 sample) shows\ndebate-failure scoring is judge-robust (Cohen\u2019s \u03ba = 0.88) while false-presupposition-failure\nscoring is judge-sensitive (\u03ba = 0.36), a caveat that single-judge benchmarks must report. This\nis the methodological move Ye et al.\u2019s diagnosis calls for: a multi-axis characterization that\ndoes not depend on which surface form of the construct one privileges.\nKeywords: large language models, sycophancy, AI safety, multi-axis characterization,\nmaterials-science framing, judge reliability, pre-registered analysis.",
+      "word_count": 299,
+      "claim_ids": [
+        "2606.16617::problem_motivation::0",
+        "2606.16617::problem_motivation::0",
+        "2606.16617::prior_approach::1",
+        "2606.16617::prior_limitation::0",
+        "2606.16617::rejected_alternative::0",
+        "2606.16617::inspiration_source::0",
+        "2606.16617::inspiration_source::0",
+        "2606.16617::causal_claim::1",
+        "2606.16617::causal_claim::2",
+        "2606.16617::hypothesis_statement::0",
+        "2606.16617::evidence_result::0",
+        "2606.16617::evidence_result::0",
+        "2606.16617::evidence_result::1",
+        "2606.16617::evidence_result::2",
+        "2606.16617::constraint::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:53a0bfc110e50580",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 0,
+      "text": "Ye et al. (2026) document a methodological gap in the sycophancy literature: over 70\npublications, but expert agreement on construct boundaries remains low (ICC = .184 for\nsingle-case rating; 94.3% of experts agree that \u201dAI Sycophancy\u201d is a problem, yet disagree on\nconcrete cases). The construct fragments because behavioral classification depends on which\nsurface form is privileged: Position-Sycophancy vs Person-Sycophancy, Subjective-Domain vs\nVerifiable-Domain, Implicit-vs-Explicit. An 8-cell taxonomy has been proposed, but it only\nshifts the boundary question onto another classification axis rather than resolving it.\n1",
+      "word_count": 86,
+      "claim_ids": [
+        "2606.16617::problem_motivation::0",
+        "2606.16617::prior_approach::1",
+        "2606.16617::prior_limitation::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:6dd7be229e64bdac",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 1,
+      "text": "Single-load tests (single-turn benchmarks) miss failure under sustained load (Luz de\nAraujo et al., 2026). Sycophancy is a documented failure mode of LLMs (Sharma et al., 2023)\nthat increases under multi-turn pushback. When the failure migrates over the load duration,\nit is unclear what a single failure label measures.\nWe use a different measurement axis. Instead of sharpening the sycophancy construct\nthrough a more precise behavioral taxonomy, we treat the conversation as a test specimen under\nload and measure the material response rather than the behavioral label. The measurement\naxes are speaker- and content-agnostic at the geometric level: they measure velocity of the\nmeaning trajectory, stiffness of the response axis, accumulation of damage, and asymmetry\nbetween the speaker role and the model role. The results are Hooke-coupled (\u03c3 = E \u00b7\u03b5-analog)\nand yield a material characterization that is invariant to the choice of behavioral classification.\nContributions of this note: 1. Empirical materials characterization of sycophancy failure\nacross three loading cases (debate, false-presuppositions, ethical-setting) and 10\u201317 LLM\ncharges per loading case, 7800 specimens total. 2. Three pre-registration iterations (V_S1 ToF-\nsurvival, V_S2 mixture test, V_S3 multilevel model) plus three robustness iterations (V_S4\nethical-variance, V_S5b cross-probe, V_S6b inter-judge), with verdicts and methodological\nlessons in Appendix A. 3. Identification of two variance profiles: charge-dominated (debate)\nvs topic-dominated (FP, ethical). Mapping onto the Subjective-vs-Verifiable axis of Ye\net al. (2026). 4. Inter-judge reliability per loading case: debate scoring robust, FP scoring\njudge-sensitive. Caveats for single-judge sycophancy benchmarks.\nScope note: The multi-axis material characterization does not improve binary failure\ndetection. A single-axis baseline (sv_velocity at the load point) reaches AUC = 0.581 versus\nAUC = 0.603 for the full-axis characterization (difference +0.022, 95% CI [-0.001, +0.045],\nCI crosses zero). The contribution lies in substrate characterization, not in classification\nperformance.\n2. Materials Framing\nWe use ENK (Emergente Narrative Kontrolle) as the measurement apparatus: an embedding-\ngeometry measurement convention that treats conversations as continuously measured tra-",
+      "word_count": 319,
+      "claim_ids": [
+        "2606.16617::problem_motivation::1",
+        "2606.16617::prior_approach::2",
+        "2606.16617::prior_limitation::1",
+        "2606.16617::rejected_alternative::0",
+        "2606.16617::causal_claim::0",
+        "2606.16617::causal_claim::1",
+        "2606.16617::hypothesis_statement::0",
+        "2606.16617::evidence_result::2",
+        "2606.16617::evidence_result::3",
+        "2606.16617::constraint::1"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:5f285b04349409c4",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 2,
+      "text": "We use ENK (Emergente Narrative Kontrolle) as the measurement apparatus: an embedding-\ngeometry measurement convention that treats conversations as continuously measured tra-\njectories in meaning space. An LLM conversation consists of user turns and AI turns that\nalternately provide embedding-geometry information. Each turn transition is a measurement\npoint, each conversation is a test specimen.\nMaterials analogy: - Test specimen \u2194conversation (one question-pushback sequence) -\nMaterial charge \u2194LLM-model (e.g. claude-3-7-sonnet, GPT-4o, Qwen2.5-72B) - Load \u2194user\npushback (sequential, monotonically escalating) - Load axis \u2194turn index t \u2208{0, 1, 2, 3, 4} -\nMaterial response \u2194embedding geometry of the AI turns - Failure \u2194stance-flip (position\nabandoned, false-premise accepted, bias agreement) - Failure load point \u2194Turn of Flip (ToF,\n0\u20134) - Run-out \u2194ToF = 5 (load completed without failure)\nMeasurement axes (14 reproducible turn-level metrics, grouped; three further user/model-\nseparated axes come from an independent speaker-resolved pipeline and are reported separately\nin \u00a74):\n2",
+      "word_count": 150,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:4bc4ce8dce360c26",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 3,
+      "text": "Group\nMetrics\nMaterials analogy\nVelocity (4)\nsemantic velocity (mean,\nEWMA, and two accumulator\nvariants)\nDamage accumulation (5)\ncumulative, rate,\ndetection-calibrated, detection\nrate, windowed\nFrame-drift (1)\nFID\nprincipal-axis rotation,\nMohr-transform difference\nBrittleness / strain (2)\nNCD, NC2\nfracture-mode and strain\nmeasures\nDirection / predictability (2)\ndirection consistency, rolling\npredictability\nThe speaker-resolved axes (model-side strain \u03b5ai, stiffness Eai, model-side velocity sv_ai)\nmeasure the residual-stress difference between speaker and model.\nHookean constitutive equation as guiding principle: The metrics are coupled, not redun-\ndant. In a tensile test, stress \u03c3, strain \u03b5, Young\u2019s modulus E, and fracture strain \u03b5b are\nnot independent variables; they are related through \u03c3 = E \u00b7 \u03b5 and the material response.\nAnalogously here: a high velocity axis goes together with low stiffness, high frame-drift with\nlow dir_consistency. This coupling follows from the constitutive equation and is expected.\nENK in the broader SRDS context: conversation is one of several load types characterized\nin ongoing SRDS-matrix work (Schessl, 2026b) (in preparation), alongside the manipulation\ntensile test (ENK gold corpus, n = 202) and the wood tensile test (Schessl, 2025). Sycophancy\npushback adds a standardized load form with a reproducible measurement convention. The\npresent note does not depend on that broader programme; it stands on the SYCON results\nbelow.\n3. SYCON-Bench as a Standardized Pushback Load Test\nSYCON-Bench (Hong et al., 2025) is an openly available benchmark with three loading\ncases, 200 topic variants each, 5 user-pushback turns each. We use it as a standardized load\napparatus. Failure labeling is done with GPT-4o as judge (Zheng et al., 2023; Wang et al.,\n2024) (per-turn binary flip label, ToF = first turn with flip).\nThree loading cases:\nLoading case\nn topics\nPushback style\nFlip rate (mean over\ncharges)\ndebate (opinion load)\n100\nVerbatim \u201dI disagree,\ncan you reconsider?\u201d\nover 4 escalation levels\nfalse-presuppositions\n(factual load)\n200\nTopic-specific\npushbacks that\nreinforce false\npremises\nethical-setting (bias\nload)\n200\nStereoSet-based\n(Nadeem et al., 2021)\nMaterial charges (up to 17 per loading case): Llama-3.1/-3.3, Qwen2.5-7B/-14B/-72B,\nclaude-3-7-sonnet, deepseek-chat/-reasoner, gemma-2-9b/-9b-it, gpt-4o, o3-mini. The debate\n3",
+      "word_count": 336,
+      "claim_ids": [
+        "2606.16617::mechanism_principle::0",
+        "2606.16617::mechanism_principle::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:ccd81b0f89e7ce63",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 4,
+      "text": "claude-3-7-sonnet, deepseek-chat/-reasoner, gemma-2-9b/-9b-it, gpt-4o, o3-mini. The debate\n3\nload-advance rate, \u201dstiffness at\nthe load point\u201d\ncumulative plastic deformation\nload-path stability\n33.8%\n65.9%\n76.4%\nbias questions with\nescalated pushback",
+      "word_count": 28,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:ca84a36ae7c8ee6e",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 5,
+      "text": "case covers 10 of these charges, false-presuppositions and ethical-setting all 17. Specimen\ncounts per loading case: debate 10 \u00d7 100 = 1000, false-presuppositions 17 \u00d7 200 = 3400,\nethical-setting 17 \u00d7 200 = 3400; 7800 specimens total.\nENK pipeline application: SYCON-Bench provides raw conversations as JSON lists (user\nturns + AI turns + topic metadata). These are fed without further transformation into the\nENK pipeline compute_convokit_metrics.py (configuration \u2013min_turns 10). Output: the\nturn-level axis-metrics per conversation, the embedding-geometry measurement per turn pair.\n4. Measurement Apparatus and Results\nFour reproducible test procedures per axis-measurement (all without model training):\n1. Comparison test between failed and holding specimens (Mann-Whitney U test, rank-\nbiserial rrb as effect size). 2. Per-charge aggregation (Stouffer-Z over the 10\u201317 material\ncharges per loading case, partitioning the charge axis from the within-charge effect). 3.\nLabel permutation within charge (5000 permutations, empirical null distribution per axis). 4.\nVariance partition (multilevel model with charge and topic as random effects, ANOVA-style\nvariance composition). Procedures 2\u20134 avoid naive pooling of dependent measurements; the\nunderlying dependence problem of turn-level metrics in LLM conversation analysis \u2014 and the\nsignificance inflation it produces under pooled testing \u2014 is characterized in Schessl (2026a).\nThe 14 turn-level axis-measurements across all three loading cases (rrb at flip per loading\ncase; positive = higher in failed specimens; one sign convention throughout; * = p < 0.05, **\n= p < 0.001):\nAxis (group)\ndebate rrb\nFP rrb\nethical rrb\nsemantic velocity,\nmean (velocity)\n+0.335**\n+0.149**\n\u22120.044\nsemantic velocity,\nEWMA (velocity)\n+0.345**\n+0.166**\n\u22120.041\nvelocity accumulator\n(velocity)\n+0.312**\n+0.187**\n\u22120.043\nvelocity accumulator,\ndetection (velocity)\n+0.312**\n+0.187**\n\u22120.043\ndamage accumulation,\ncumulative (accum.)\n\u22120.309**\n\u22120.169**\n+0.028\ndamage accumulation,\nrate (accum.)\n\u22120.309**\n\u22120.169**\n+0.028\n\u22120.312**\n\u22120.194**\n+0.054*\ndamage accumulation,\ndetection-calibrated\n(accum.)\ndamage accumulation,\ndetection rate\n(accum.)\n\u22120.313**\n\u22120.186**\n+0.050*\ndamage accumulation,\nwindowed (accum.)\n\u22120.312**\n\u22120.189**\n+0.056*\nFID (frame-drift)\n+0.220**\n+0.109**\n+0.047*\nNCD (brittleness)\n\u22120.284**\n\u22120.062*\n\u22120.162**\nNC2 (strain)\n\u22120.105*\n\u22120.045*\n\u22120.062*",
+      "word_count": 316,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:7fa24a009ba810cf",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 6,
+      "text": "\u22120.045*\n\u22120.062*\ndirection consistency\n\u22120.089*\n+0.046*\n\u22120.009\nrolling predictability\n+0.126*\n\u22120.031\n\u22120.047*\nThree further turn-level axes carry no usable effect on this corpus (max |rrb| \u22640.06) and the\nwave-distance measure is undefined on 5-pair dialogues; they are omitted here and listed in the verdict\nreports. Signs of individually non-significant cells are shown for completeness and are not interpreted\none by one; block-level robustness is assessed in \u00a75b.\n4",
+      "word_count": 68,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:70bad290e14fc5d6",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 7,
+      "text": "The three speaker-resolved axes from the independent user/model-separated pipeline show the\nsame per-loading-case structure:\nAxis (UA-sep\npipeline)\ndebate rrb\nFP rrb\nethical rrb\n\u03b5ai (model-side strain)\n+0.298**\n+0.173**\n\u22120.094**\nEai (speaker/model\nstiffness)\n\u22120.246**\n\u22120.157**\n+0.049*\nsv_ai (model-side\nvelocity)\n+0.347**\n+0.155**\n\u22120.091**\nCoupling confirmation: The metrics correlate with each other as expected (correlation-matrix\nmedian |r| \u22480.4). Example: high EWMA velocity (fast meaning movement) correlates with low\ndirection consistency (direction-unstable trajectory); the windowed accumulation variant correlates\nwith toughness-like accumulation.\nTrivial-baseline check: comparison of discrimination AUC of the full-axis characterization against\nthe single-axis baseline sv_velocity at the load point. The discrimination run uses the original 12-axis\nset of the pre-registration series, which differs from the 14-axis table above; the null result below is\nabout discrimination, not about the axis inventory:\nCharacterization\nAUC\n95% CI\nSingle-axis sv_velocity at load\npoint\n0.581\n[0.552, 0.610]\nFull-axis (12 axes, logit\nensemble)\n0.603\n[0.577, 0.631]\nDifference\n+0.022\n[-0.001, +0.045]\nThe difference is not significant (CI crosses zero). The AUC is computed on a charge-stratified\nheld-out split (fit on train, scored on test), so the null is not an in-sample artifact. In the materials\nframe this is consistent with the Hooke coupling: all 12 axes measure aspects of the same material\nresponse, hence the high correlation and only marginal discrimination gain. Per charge the full-axis\ngain is itself heterogeneous \u2014 it ranges from \u22120.22 to +0.21 and is negative on 6 of 17 charges \u2014\nwhich reinforces that the apparatus characterizes the failure rather than classifying it. For binary\nfailure detection the single-axis baseline is sufficient; the added value of the full-axis characterization\nlies in the mechanistic separation of failure types (\u00a75), not in discrimination performance.\n5. Variance Composition: Three Loading Cases, Two Profiles\nThe variance partition of the binary failure label (flipped_ever) over the two grouping variables\nmaterial charge and topic (multilevel model with random intercepts) yields a loading-case asymmetry:\nLoading case\nvarcharge\nvartopic\nvarresidual\nvarcharge/vartopic Variance profile\n0.110\n0.054\n0.070\n2.03\ncharge-\ndominated\nfalse-",
+      "word_count": 327,
+      "claim_ids": [
+        "2606.16617::causal_claim::8",
+        "2606.16617::causal_claim::9",
+        "2606.16617::mechanism_principle::0",
+        "2606.16617::evidence_result::4",
+        "2606.16617::evidence_result::5"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:ff5a400ce1bb5b87",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 8,
+      "text": "dominated\nfalse-\npresuppositions\ndebate (opinion\nload)\n0.017\n0.128\n0.081\n0.13\ntopic-dominated\nethical-setting\n0.016\n0.095\n0.070\n0.17\ntopic-dominated\nMaterials reading:\n\u2022 debate profile (charge-dominated): The material charge (which model) decides more strongly\nthan the topic (which claim is debated) whether a specimen breaks or holds (factor 2.03). This\nmatches a brittle-fracture pattern: a hard charge resists every topic, a soft charge breaks at\nevery topic; the material grade is decisive, the load configuration secondary.\n5",
+      "word_count": 74,
+      "claim_ids": [
+        "2606.16617::causal_claim::1",
+        "2606.16617::mechanism_principle::1"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:8e643540986640ab",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 9,
+      "text": "Variance composition: debate charge-dominated, FP and ethical topic-dominated\nVariance composition per loading case\nvarcharge\nvartopic\nvarresidual\n0.20\nVariance share (of flipped_ever)\n0.15\n0.10\n0.05\ndebate\nethical\nfp\n0.00\nFigure 1:\nVariance composition across the three loading cases.\nLeft:\nstacked bar with\ncharge/topic/residual variance per loading case. Right: varcharge/vartopic ratio (logarithmic). debate\nis charge-dominated (2.03), FP and ethical topic-dominated (0.13 and 0.17); the qualitative inversion\nis stable across all topic-bootstrap resamples, while the between-profile factor itself is method- and\ntarget-dependent (roughly 10\u201324, \u00a75).\n\u2022 FP profile / ethical profile (topic-dominated): The load configuration (which false-premise,\nwhich bias question) decides more strongly than the material charge (factor 0.13 and 0.17\nrespectively). This matches a creep pattern: under convincing pushback almost all materials\nfail, and the duration and plausibility of the load decides, not the material grade. Across\nestimation methods and target variables (MixedLM vs method-of-moments; binary flip label\nvs ToF) the between-profile factor varies between roughly 10 and 24; the cluster bootstrap\nof any single estimator (e.g. 95% CI [9.7, 22.0] for MixedLM on the binary label, B = 400)\nunderstates this spread, so we read the inversion \u2014 not any particular factor \u2014 as the result.\nThe topic-dominance of FP and ethical is robust in all four method-target combinations; the\ncharge-dominance of debate is itself method-dependent (a method-of-moments decomposition\non the binary label puts the debate ratio at 0.90, i.e. borderline), which the materials reading\nabove should be understood to inherit.\nethical clusters with FP (both topic-dominated) but shows a higher mean failure rate (76% vs\n66% vs 34%) and is thus the hardest of the three loading cases.\nCross-robust inference: The multilevel Wald test with loading-case \u00d7 material-family interaction\n(5 families: Llama, Qwen, Anthropic, Gemma, Other) yields W = 40.88, df = 4, p = 2.85 \u00d7 10\u22128.\nThis confirmatory interaction is estimated over debate vs FP; the ethical-setting case enters the\nvariance-composition profiles above but not this interaction test (nor the cross-probe in \u00a76 or the AUC\ncomparison in \u00a74, which are likewise debate/FP). The family failure rates show saturation effects:\nFamily\ndebate\nFP\nethical\n\u2206(FP\u2212debate)",
+      "word_count": 347,
+      "claim_ids": [
+        "2606.16617::causal_claim::1",
+        "2606.16617::causal_claim::3",
+        "2606.16617::mechanism_principle::1",
+        "2606.16617::constraint::2",
+        "2606.16617::constraint::3"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:6e24372d9ddcd32c",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 10,
+      "text": "ethical\n\u2206(FP\u2212debate)\nOther/Mixed\n0.12\n0.47\nn/a\n+0.35\nAnthropic\n0.16\n0.55\nn/a\n+0.40\nGemma\n0.63\n0.80\nn/a\n+0.17 (saturation)\nLlama\n0.37\n0.75\nn/a\n+0.38\nQwen\n0.49\n0.70\nn/a\n+0.21 (saturation)\nFamilies with a low debate failure rate have the largest \u2206(Anthropic, Llama, Other); families\nwith a high debate failure rate are near the saturation limit at FP (Gemma, Qwen).\nMapping onto Ye et al. (2026): debate \u2248Position-Subjective (charge-driven, brittle-fracture\nprofile); FP + ethical \u2248Position-Verifiable (topic-driven, creep profile). The construct fragmentation\ndescribed in Ye et al. is the variance-composition shift; it is measurable as a loading-case property on\nthe variance axis, not only as a question of behavioral taxonomy.\n6\n2.03\n(charge-\ndominated)\nVariance-profile classification\nequilibrium\n100\nvarcharge / vartopic\n0.17\n(topic-\ndominated)\n0.13\n(topic-\ndominated)\ndebate\nethical\nfp",
+      "word_count": 127,
+      "claim_ids": [
+        "2606.16617::inspiration_source::1",
+        "2606.16617::hypothesis_statement::1"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:ae72ba4848f0f183",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 11,
+      "text": "5b. Sign Structure Across Loading Cases\nBeyond the variance composition, the sign structure of the axis measurements separates the loading\ncases along a different line. The velocity block (4 axes) and the damage-accumulation block (5 axes)\ninvert their sign in the ethical-setting case (Table in \u00a74), while frame-drift (FID), strain (NC2), and\nbrittleness (NCD) keep their direction across all three cases. The inversion is not a saturation artifact\nof the 76% ethical flip rate: down-sampling ethical to a 50/50 flip rate preserves the inverted sign\nin 99\u2013100% of resamples for the tested axes (velocity \u22120.04, 95% CI [\u22120.08, \u22120.01]; the windowed\nand detection accumulation variants +0.05 [+0.02, +0.09] at 100%), with one boundary case (the\ncumulative accumulation variant: 95%, CI [\u22120.005, +0.064] crossing zero) and two block members not\nseparately re-tested. The per-charge sign is consistent in 65% of the 17 charges. Effect magnitudes on\nethical are small (|rrb| \u22480.03\u20130.06) \u2014 the sign, not the magnitude, is the finding.\nThe independent user/model-separated pipeline reproduces the inversion (\u00a74, lower table): the\nmodel-movement axes flip + + \u2212, while the speaker/model stiffness Eai flips \u2212\u2212+. Note that Eai\nand the turn-level axes that keep their direction are different measurands \u2014 the two stiffness-type\nquantities are not the same measurement.\nIn the materials frame, a sign inversion of a geometric axis under a changed loading case is expected\nbehaviour under changed boundary conditions, not a contradiction. We read the loading cases as\ndiffering support configurations: debate carries an external stance by construction (clamped), while\nFP and ethical leave the stance to the model (free) \u2014 a boundary-condition reading consistent with\nthe rate experiment in \u00a76. This grouping (debate+FP | ethical) differs from the variance grouping\n(debate | FP+ethical, \u00a75); the two are distinct coupled material characteristics, and we do not assign\nfailure modes from the sign structure. In the two-scale reading, the variance composition characterizes\nthe charge axis (which material), while the sign structure tracks the load-path axis (which support\nconfiguration); the mechanism linking the two is left to the broader theory work.\n6. Load Testing and Reproducibility\nCross-loading-case consistency of the turn-level axes: 12 of 14 axes show identical sign across debate",
+      "word_count": 360,
+      "claim_ids": [
+        "2606.16617::causal_claim::2",
+        "2606.16617::mechanism_principle::2",
+        "2606.16617::hypothesis_statement::2",
+        "2606.16617::evidence_result::4",
+        "2606.16617::evidence_result::6"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:7089ef15d9e68b95",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 12,
+      "text": "6. Load Testing and Reproducibility\nCross-loading-case consistency of the turn-level axes: 12 of 14 axes show identical sign across debate\nand FP. The 2 turn-level axes with loading-case-specific sign between debate and FP are direction\nconsistency (\u22120.089/+0.046) and rolling predictability (+0.126*/\u22120.031, the FP value not significant);\nat the summary level, stress concentration changes sign as well. NCD does not flip (\u22120.284/\u22120.062,\nboth negative).\nCross-charge reproducibility per main metric (share of charges carrying the aggregate sign; charge\ncounts after the per-charge minimum-n filter): - 6 of 8 debate charges sign-consistent for the EWMA\nvelocity axis (75%) - 15 of 17 FP charges sign-consistent for FID (88%) - 11 of 17 ethical charges\nsign-consistent for the windowed accumulation variant (65%)\nReserve axis (UQ-Lite residual-stress probe): We measure the scatter of the material response at\nthe most-loaded load point through R = 10 resamples at temperature T = 0.8 (sampling divergence\nfrom pairwise cosine distance of the resample embeddings). The cross-probe findings:\nProbe\nCase\nTarget charge\nn\ndiv_max r (p)\ndiv_std r (p)\nclaude-3-7\ndebate\nclaude\n66\n\u22120.343 (.041)\n\u22120.395 (.018)\nclaude-3-7\nFP\nclaude\n100\n+0.034 (.770)\n+0.045 (.700)\nQwen-7B\ndebate\nQwen2.5-7B\n22\n\u22120.250 (.623)\n\u2014\nSonnet 4.6\nFP\nclaude\n80\n\u22120.229 (.079)\n\u22120.259 (.047)\nThe claude-3-7 probe shows a negative reserve-axis correlation on debate (materials with high\ninternal scatter hold out longer), but a sign-flip on FP. The Sonnet-4.6 probe on the identical FP-\nclaude charge is numerically negative but reaches nominal significance only on div_std (rrb = \u22120.259,\np = 0.047), not on div_max (\u22120.229, p = 0.079): only one of the three divergence measures clears\np < 0.05, without multiplicity correction (V_S5b verdict: PARTIAL). Read cautiously, this is\nconsistent with the V_S1 FP sign-flip being probe-charge-specific rather than loading-case-specific \u2014\nbut a single probe charge cannot establish it (lesson #7 below).\nMethodological lesson #7 (cross-charge tests): A single probe charge is not enough. Cross-charge\nresidual-stress tests require at least 2\u20133 independent probe materials to separate probe-charge-specific\nfrom loading-case-specific effects. With only one probe charge the reserve-axis inference is not robust.\n7",
+      "word_count": 341,
+      "claim_ids": [
+        "2606.16617::evidence_result::7",
+        "2606.16617::evidence_result::7",
+        "2606.16617::constraint::4",
+        "2606.16617::constraint::4"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:8059e47ec6d0ac91",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 13,
+      "text": "Cross-probe reserve-axis sign (div_max) across four probe-loading-case combinations\n0.1\nr=+0.034\np=0.770\nn=100\n0.0\nReserve axis rrb (div_max)\n0.1\n0.2\n0.3\nr=-0.343\np=0.041\n0.4\nn=66\nclaude-3-7\nclaude-3-7\ndebate\nFP\nFigure 2: Cross-probe reserve-axis sign (div_max rrb) across four probe-loading-case combinations.\nThe only positive value (claude-3-7 probe on FP, red) is probe-charge-specific rather than loading-\ncase-specific: the Sonnet-4.6 probe on the identical FP-claude charge is numerically negative, reaching\nsignificance on div_std only (p = 0.047; PARTIAL). A single probe charge cannot settle this.\nLoad-sequence variation test (permutation sanity): For each specimen the pushback order is\npermuted. Integral metrics (windowed accumulation, toughness-like) remain invariant, differential\nmetrics (\u03b5ai-drift) decrease; this is consistent with the expected physical behaviour, though the source\nanalysis reads the order effect as weaker than expected, so we treat this as a sanity check rather than\na confirmation.\nBoundary-condition variation (prospective add-on): In an own-judge add-on experiment we vary\nthe support configuration instead of the load. Adding an explicit external stance to the system prompt\n(an instruction to maintain that the premise is false, or that the stereotype is wrong) reduces the\nfailure rate sharply on two charges and two loading cases:\nCharge\nLoading case\nfree \u2192clamped flip rate\nCondition\nSonnet 4.6\nFP\n40% \u219225%\nmean over T=0/0.5/1.0,\ntemperature-stable\nSonnet 4.6\nethical\n20% \u21922%\nmean over T=0/0.5/1.0,\ntemperature-stable\nmistral-large\nFP\n36% \u21924%\nT=0\nmistral-large\nethical\n63% \u21923%\nT=0\nAll cells n = 100. These cells use our own judge (Haiku 4.5); the free\u2192clamped contrast is\nwithin-judge, so the judge-sensitivity caveat of \u00a77 applies to comparisons against the GPT-4o-judged\nSYCON rates, not to the contrast itself. The failure rate is thus strongly boundary-condition-sensitive,\nconsistent with the loading cases themselves differing in their support configuration \u2014 debate carries\nan external stance by construction.\nA sign-level version of this test (does the clamped velocity sign approach the debate pattern?)\ncould not be posed under our apparatus. A documented velocity-positive charge (Qwen2.5-14B,\n+0.72 on debate in the SYCON original data) was re-measured under our generation apparatus twice:",
+      "word_count": 332,
+      "claim_ids": [
+        "2606.16617::causal_claim::4",
+        "2606.16617::mechanism_principle::2",
+        "2606.16617::evidence_result::8"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:33cf63a062afc717",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 14,
+      "text": "could not be posed under our apparatus. A documented velocity-positive charge (Qwen2.5-14B,\n+0.72 on debate in the SYCON original data) was re-measured under our generation apparatus twice:\nquantized local serving measures \u22120.09 and full-precision serving of the same weights measures \u22120.02\n(n = 100 each, comparable flip rates). Re-judging the original trajectories with our judge reproduces\nthe positive sign (+0.66 vs +0.72; agreement 95%, \u03ba = 0.90), ruling out the judge convention; the\nvelocity sign at failure therefore depends on the generation apparatus in the narrow sense (pushback\nwording, response-length limit, serving stack), not on the weights or the judge. Under our apparatus all\nmeasured charges are velocity-negative or indistinguishable from zero to begin with, and the strongly\n8\nr=-0.229\np=0.079\nr=-0.250\np=0.623\nn=80\nn=22\nHypothesis: materials with high internal scatter\nhold out longer (negative sign)\nQwen-7B\nSonnet 4.6\ndebate\nFP",
+      "word_count": 141,
+      "claim_ids": [
+        "2606.16617::causal_claim::5",
+        "2606.16617::evidence_result::9"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:682227863cb6ce14",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 15,
+      "text": "clamped cells suppress failures below measurable counts where the rate effect is largest. We report the\nboundary-condition experiment as open at the sign level and the apparatus-specificity of the velocity\nsign as a limitation (\u00a77).\n7. Limitations\nResolution limit: SYCON-Bench dialogues have only 5 turn pairs (10 user+AI turns). This is close to\nENK\u2019s lower resolution limit; in particular the sigmoid inflection point \u02c6a and the wave-distance DOA\ntypically need \u226510 turn pairs for clean fits. ToF-based failure measures are robust, finer trajectory\naxes are limited here.\nJudge-bias asymmetry between loading cases (V_S6b, inter-judge comparison GPT-4o vs Haiku\n4.5 on 50+50 conversations):\nLoading case\nCohen\u2019s \u03ba\nDisagreement rate\nHaiku turn-flip\nGPT-4o turn-flip\ndebate\n0.883\n5.2%\n35.6%\n31.2%\nFP\n0.360\n26.8%\n12.4%\n39.2%\nThe debate scoring is judge-robust (substantial agreement per Landis and Koch (1977)); both\njudges give consistently similar failure rates.\nThe FP scoring is judge-sensitive (weak agreement per Landis and Koch (1977)). Haiku tends\ntoward under-flips on FP, because judging whether the response accepted the false-premise or only\npolitely sidestepped it is semantically fuzzier than at debate (leaving the original stance).\nFP\nfailure rates need multi-judge aggregation or explicit inter-judge reliability caveats. For single-judge\nbenchmarks it follows that reported FP flip rates differ systematically by judge model. This judge-\nsensitivity affects absolute flip rates, not the FP variance profile (\u00a75): a sensitivity check that uniformly\nunder-flips FP labels to match the observed Haiku/GPT-4o disagreement leaves the topic-dominance\nintact \u2014 the FP variance ratio stays below 1 across under-flip levels up to 50% (results/note_\nrobustness in the companion repository).\nThe \u00a75 inversion is therefore not an artifact of the\njudge convention, although a charge- or topic-correlated judge bias cannot be excluded from the 50\ndoubly-labeled conversations.\nInter-judge comparison: debate judge-robust, FP judge-sensitive\nInter-judge reliability per loading case\n1.0\n= 0.70 (substantial)\n= 0.883\n= 0.40 (moderate)\n0.8\nCohen's  (GPT-4o vs Haiku 4.5)\n0.6\n= 0.360\n0.4\n0.2\ndebate\nFP\n0.0\nFigure 3: Inter-judge comparison GPT-4o vs Haiku 4.5 on 50+50 Sonnet-4.6 conversations. Left:",
+      "word_count": 333,
+      "claim_ids": [
+        "2606.16617::prior_limitation::1",
+        "2606.16617::causal_claim::6",
+        "2606.16617::mechanism_principle::3",
+        "2606.16617::evidence_result::2",
+        "2606.16617::evidence_result::2",
+        "2606.16617::evidence_result::10",
+        "2606.16617::constraint::0",
+        "2606.16617::constraint::5",
+        "2606.16617::constraint::5",
+        "2606.16617::constraint::6"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:f262806a0059527c",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 16,
+      "text": "0.0\nFigure 3: Inter-judge comparison GPT-4o vs Haiku 4.5 on 50+50 Sonnet-4.6 conversations. Left:\nCohen\u2019s \u03ba per loading case. debate \u03ba = 0.883 (substantial agreement), FP \u03ba = 0.360 (weak agreement).\nRight: conversation flip rate per judge. On FP, GPT-4o (72%) deviates substantially from Haiku\n(40%); on debate both judges are consistent (\u223c85%).\nThe failure measure is flip rate. The person-emotion sycophancy implied by Ye et al. (2026) (tone,\ncomfort prioritization without a position break) needs its own load definition. The method can be\nextended (e.g. with the ELEPHANT corpus (Cheng et al., 2025) for emotional-tonal sycophancy);\nthat is follow-up work and not the subject of this note.\n9\nConversation flip rate per judge\n1.0\nHaiku 4.5\nGPT-4o\n0.86\n0.84\nConversation flip rate (Sonnet 4.6 sample)\n0.8\n0.72\n0.6\n0.40\n0.4\n0.2\ndebate\nFP\n0.0",
+      "word_count": 135,
+      "claim_ids": [
+        "2606.16617::constraint::7"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:fb0a70f3230d4fdc",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 17,
+      "text": "Model-version jump: The prospective Sonnet-4.6 charge (V_S6) on SYCON-debate shows an 88%\nflip rate against 16% in the Anthropic-family aggregate (claude-3-7-sonnet). Within the May-2025\ngeneration the spread repeats: claude-sonnet-4-20250514 shows a 79% debate flip rate, claude-opus-4-\n20250514 28% (own runs, n = 100 each, own Haiku judge; debate scoring is judge-robust, \u03ba = 0.88).\nFailure rates are model-version-specific \u2014 and charge-specific even within one vendor generation \u2014\nnot a stable substrate property. Aggregate findings from older charges are descriptive-historical, not\nprospective-predictive for new model generations. Users must re-measure their own charge.\nFailure labels are GPT-4o-judge-generated (SYCON original), not human-annotated. V_S6b\nqualifies this: debate labels robust, FP labels judge-sensitive. A human validation of the SYCON\njudge convention is still outstanding.\n8. Discussion and Application Consequences\nPractical: ENK characterizes multi-load-point failure trajectories in LLM deployment as a post-hoc\nmeasurement, not as a prospective flip predictor (the discrimination gain over a single axis is not\nsignificant, \u00a74); the multi-axis characterization is speaker- and content-agnostic at the geometric\nlevel. Charge-specific calibration is required, as in every DIN materials-testing standard. A universal\n\u201dsycophancy threshold\u201d across all models does not exist, because failure rates are model-version-specific\n(V_S6 finding).\nTheoretical: The fragmentation of the sycophancy construct described in Ye et al. (2026) is a\nproperty of behavioral classification, not of the physical material response. The materials character-\nization locates the construct-boundary problem at a different level: the variance-composition shift\nis measurable as a qualitative inversion (charge-dominated vs topic-dominated; the numeric factor\nbetween profiles is method- and target-dependent, roughly 10\u201324; \u00a75), the sign structure adds a second\ngrouping of the loading cases whose pattern survives down-sampling and an independent pipeline\n(\u00a75b), the measurement axes are coupled but not redundant (Hooke coupling), and the inter-judge\nbias is quantifiable as a caveat (V_S6b).\nMethodological lessons from the V_S iteration series:\n1.\nPre-registration diagnostics:\nform class, bootstrap CI, edge-convergence diagnosis, and",
+      "word_count": 310,
+      "claim_ids": [
+        "2606.16617::problem_motivation::2",
+        "2606.16617::causal_claim::7",
+        "2606.16617::hypothesis_statement::1",
+        "2606.16617::constraint::8"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:60f4222c2188b240",
+      "paper_id": "2606.16617",
+      "section": "Introduction",
+      "section_index": 2,
+      "passage_index": 18,
+      "text": "Pre-registration diagnostics:\nform class, bootstrap CI, edge-convergence diagnosis, and\ncomponent-plot inspection are all needed together (V_S1\u2013V_S4). Without these four diagnostics a\npre-registration can produce an over-interpretation that must later be revised.\n2. Multilevel-model robustness: with many categorical levels (n_groups > 10), GLM-logit with\ncluster SEs is more robust than MixedLM. Family aggregation as a reparameterization is recommended\n(V_S3 lesson).\n3. Multi-probe cross-charge tests: a single probe charge is not enough; at least 2\u20133 probe materials\nare needed for robust loading-case claims (V_S5b lesson).\n4. Inter-judge reliability per loading case: FP scoring is judge-sensitive (\u03ba = 0.36), debate scoring\njudge-robust (\u03ba = 0.88). Single-judge benchmarks for FP should report confidence intervals from\nmulti-judge aggregation (V_S6b lesson).\nConnection to broader ENK / SRDS: sycophancy pushback adds a further load type to ongoing\nSRDS-matrix work. This note does not assign sycophancy to any particular SRDS aggregation-mode\nclass, nor does it depend on the broader programme; that theoretical consequence is left to the SRDS\ntheory work (Schessl, 2026b) (in preparation).\nOpen extensions: - Implicit person-emotion sycophancy as a 4th loading case (ELEPHANT\ncorpus fits structurally) - Multi-probe cross-charge test with 3+ probe materials per loading case -\nHuman validation of the SYCON judge convention - Reasoning-model sycophancy (pushback during\nchain-of-thought) - Sign-level boundary-condition test under apparatus-calibrated conditions (the\nrate-level test in \u00a76 is closed; the sign-level version requires a velocity-positive reference charge under\nthe measuring apparatus)",
+      "word_count": 232,
+      "claim_ids": [
+        "2606.16617::constraint::9"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:e5cd54732433b557",
+      "paper_id": "2606.16617",
+      "section": "Conclusion",
+      "section_index": 3,
+      "passage_index": 0,
+      "text": "Sycophancy measurement does not need a new behavioral taxonomy, but a different measurement\naxis: the materials characterization of failure at a geometric level that is independent of the choice of\nbehavioral classification.\nAcross three loading cases (debate, false-presuppositions, ethical-setting), 10\u201317 material charges\nper loading case, and 7800 specimens, 14 turn-level axis-measurements plus three speaker-resolved\n10",
+      "word_count": 55,
+      "claim_ids": [
+        "2606.16617::hypothesis_statement::0"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:1e45f2ed435dbed7",
+      "paper_id": "2606.16617",
+      "section": "Conclusion",
+      "section_index": 3,
+      "passage_index": 1,
+      "text": "axes characterize the failure with a reproducible material response. The variance composition shows\ntwo separate profiles (charge-dominated vs topic-dominated; what is robust is the inversion itself,\nwhile its size depends on the estimator), and the sign structure adds a second grouping in which\nthe ethical-setting case inverts the velocity and accumulation blocks. Inter-judge reliability qualifies\nthe findings: debate scoring judge-robust (\u03ba = 0.88), FP scoring judge-sensitive (\u03ba = 0.36). The\nprobe-charge sensitivity of the reserve axis (V_S5b) further qualifies the cross-loading-case claims, and\nthe model-version specificity of the failure rates (V_S6) rules out a simple aggregate generalization\nacross model generations.\nThe analysis comprises six pre-registered iterations with verdicts in Appendix A; several findings\nwere corrected over the course of the work, the V_S1 reading by V_S2 and the too-weak V_S5 probe\nby the cross-probe V_S5b.\nCode,\ndata,\npre-registrations:\ncompanion\nrepository\ngithub.com/FerdinandSchessl/\nsycophancy-note-companion \u2014 pre-registrations V_S{1,...,6b}_PRE_REG.md, verdict reports\nresults/, analysis scripts scripts/, and the per-specimen failure-label tables data/converted/\non which the survival, mixture, multilevel, and variance analyses run. SYCON-Bench original (raw\nconversations and pushback templates): Hong et al. (2025), github.com/JiseungHong/SYCON-Bench\nAppendix A: Pre-Registration Verdict Overview\nIter\nPre-registration hypothesis\nVerdict\nConsequence\nV_S1\nToF-survival 4-family fit\ndebate edge-convergence,\nFP Weibull winner\nV_S1 bimodal-shock\nreading \u2192V_S2 correction\nV_S2\nMixture test 2-component\nWeibull\nFP robustly bimodal,\ndebate mixture shaky\nV_S3\nMultilevel model\nloading-case\u00d7charge\nCharge not testable\n(singular), family PASS\np=2.85e-08\nV_S4\nethical as 3rd loading case,\nown mixture vector\nPASS own mixture + PASS\nbimodal\nTheoretical consequence\nFerdinand\u2019s domain\nV_S5\nCross-charge Qwen-7B\nprobe\nMethodological lesson\nmulti-probe\nV_S5b\nCross-charge Sonnet 4.6\nprobe on FP\nNOT CONCLUSIVE\n(n=22, n_hold=2)\nV_S1 FP sign-flip\ncharge-specific\nV_S6\nSonnet 4.6 as 18th charge\nprospective\nPARTIAL/PASS\n(r_rb=\u22120.259 p=0.047)\nmixed (debate Mode-(i),\nFP no mixture)\nV_S6b\nJudge comparison GPT-4o\nvs Haiku 4.5\ndebate \u03ba=0.88 robust, FP\n\u03ba=0.36 sensitive",
+      "word_count": 295,
+      "claim_ids": [
+        "2606.16617::causal_claim::10",
+        "2606.16617::evidence_result::1",
+        "2606.16617::evidence_result::2",
+        "2606.16617::evidence_result::2",
+        "2606.16617::evidence_result::7",
+        "2606.16617::evidence_result::11",
+        "2606.16617::evidence_result::11",
+        "2606.16617::evidence_result::12",
+        "2606.16617::evidence_result::13",
+        "2606.16617::evidence_result::14",
+        "2606.16617::evidence_result::15",
+        "2606.16617::evidence_result::16",
+        "2606.16617::constraint::10",
+        "2606.16617::constraint::11"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:09714faa98f529ab",
+      "paper_id": "2606.16617",
+      "section": "References",
+      "section_index": 4,
+      "passage_index": 0,
+      "text": "Myra Cheng, Sunny Yu, Cinoo Lee, Pranav Khadpe, Lujain Ibrahim, and Dan Jurafsky. ELEPHANT:\nMeasuring and understanding social sycophancy in LLMs, 2025. URL https://arxiv.org/abs/\n2505.13995.\nJiseung Hong, Grace Byun, Seungone Kim, and Kai Shu. Measuring sycophancy of language models\nin multi-turn dialogues. In Findings of the Association for Computational Linguistics: EMNLP\n2025, pages 2239\u20132259, 2025. URL https://aclanthology.org/2025.findings-emnlp.121/.\nJ. Richard Landis and Gary G. Koch. The measurement of observer agreement for categorical data.\nBiometrics, 33(1):159\u2013174, 1977. doi: 10.2307/2529310.\nPedro Henrique Luz de Araujo, Michael A. Hedderich, Ali Modarressi, Hinrich Sch\u00fctze, and Benjamin\nRoth. Persistent personas? Role-Playing, instruction following, and safety in extended interactions.\nIn Proceedings of the 19th Conference of the European Chapter of the Association for Computational\nLinguistics (Volume 1: Long Papers), pages 5329\u20135359, Rabat, Morocco, March 2026. Association\n11\nCorrection of V_S1\nMethodological lesson\nreparameterization\nModel-version jump\nFP failure rates\njudge-sensitive",
+      "word_count": 142,
+      "claim_ids": [
+        "2606.16617::prior_approach::0",
+        "2606.16617::prior_approach::0",
+        "2606.16617::prior_approach::3",
+        "2606.16617::prior_approach::5"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:62f604d61434d7b0",
+      "paper_id": "2606.16617",
+      "section": "References",
+      "section_index": 4,
+      "passage_index": 1,
+      "text": "for Computational Linguistics. doi: 10.18653/v1/2026.eacl-long.246. URL https://aclanthology.\norg/2026.eacl-long.246/.\nMoin Nadeem, Anna Bethke, and Siva Reddy. StereoSet: Measuring stereotypical bias in pretrained\nlanguage models. In Proceedings of the 59th Annual Meeting of the Association for Computational\nLinguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1:\nLong Papers), pages 5356\u20135371, 2021. URL https://aclanthology.org/2021.acl-long.416/.\nFerdinand M. Schessl.\nEmpirische Modellierung der Verformung von Holzproben unter Zug-\nbeanspruchung: Entwicklung einer sensorlosen Absch\u00e4tzungsmethode im Kontext thermomech-\nanischer Untersuchungen. Master\u2019s thesis, Technical University of Munich, 2025. URL https:\n//zenodo.org/records/18340365. Project \u201cMechanical Properties of Wood for Fire Design\u201d;\nZenodo v2, 22 January 2026.\nFerdinand M. Schessl. The autocorrelation blind spot: Why 42% of turn-level findings in LLM\nconversation analysis may be spurious, 2026a. URL https://arxiv.org/abs/2604.14414.\nFerdinand M. Schessl. SRDS \u2014 Selbstreferentielle Dissipative Systeme, 2026b. In preparation.\nMrinank Sharma, Meg Tong, Tomasz Korbak, David Duvenaud, Amanda Askell, Samuel R. Bowman,\nNewton Cheng, Esin Durmus, Zac Hatfield-Dodds, Scott R. Johnston, et al. Towards understanding\nsycophancy in language models. arXiv preprint arXiv:2310.13548, 2023.\nPeiyi Wang, Lei Li, Liang Chen, Zefan Cai, Dawei Zhu, Binghuai Lin, Yunbo Cao, Lingpeng Kong,\nQi Liu, Tianyu Liu, and Zhifang Sui. Large language models are not fair evaluators. Proceedings of\nthe 62nd Annual Meeting of the Association for Computational Linguistics, pages 9440\u20139450, 2024.\nURL https://aclanthology.org/2024.acl-long.511/.\nMeryl Ye, Lujain Ibrahim, Jessica Y. Bo, Myra Cheng, Ida Mattsson, Daniel Vennemeyer, Robert\nKraut, and Steve Rathje. What counts as AI sycophancy? A taxonomy and expert survey of a\nfragmented construct, 2026. URL https://arxiv.org/abs/2605.21778.\nLianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin,\nZhuohan Li, Dacheng Li, Eric P Xing, et al. Judging LLM-as-a-judge with MT-Bench and Chatbot\nArena. Advances in Neural Information Processing Systems, 36, 2023.\n12",
+      "word_count": 287,
+      "claim_ids": [
+        "2606.16617::prior_approach::0",
+        "2606.16617::prior_approach::1",
+        "2606.16617::prior_approach::4",
+        "2606.16617::prior_approach::6",
+        "2606.16617::prior_approach::6",
+        "2606.16617::prior_approach::7"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    }
+  ],
+  "references": [],
+  "citation_mentions": [],
+  "tables": [],
+  "comparison_contexts": [
+    {
+      "comparison_id": "comparison:be11d56bb761970a",
+      "paper_id": "2606.16617",
+      "passage_id": "passage:6dd7be229e64bdac",
+      "section": "Introduction",
+      "text": "Single-load tests (single-turn benchmarks) miss failure under sustained load (Luz de\nAraujo et al., 2026). Sycophancy is a documented failure mode of LLMs (Sharma et al., 2023)\nthat increases under multi-turn pushback. When the failure migrates over the load duration,\nit is unclear what a single failure label measures.\nWe use a different measurement axis. Instead of sharpening the sycophancy construct\nthrough a more precise behavioral taxonomy, we treat the conversation as a test specimen under\nload and measure the material response rather than the behavioral label. The measurement\naxes are speaker- and content-agnostic at the geometric level: they measure velocity of the\nmeaning trajectory, stiffness of the response axis, accumulation of damage, and asymmetry\nbetween the speaker role and the model role. The results are Hooke-coupled (\u03c3 = E \u00b7\u03b5-analog)\nand yield a material characterization that is invariant to the choice of behavioral classification.\nContributions of this note: 1. Empirical materials characterization of sycophancy failure\nacross three loading cases (debate, false-presuppositions, ethical-setting) and 10\u201317 LLM\ncharges per loading case, 7800 specimens total. 2. Three pre-registration iterations (V_S1 ToF-\nsurvival, V_S2 mixture test, V_S3 multilevel model) plus three robustness iterations (V_S4\nethical-variance, V_S5b cross-probe, V_S6b inter-judge), with verdicts and methodological\nlessons in Appendix A. 3. Identification of two variance profiles: charge-dominated (debate)\nvs topic-dominated (FP, ethical). Mapping onto the Subjective-vs-Verifiable axis of Ye\net al. (2026). 4. Inter-judge reliability per loading case: debate scoring robust, FP scoring\njudge-sensitive. Caveats for single-judge sycophancy benchmarks.\nScope note: The multi-axis material characterization does not improve binary failure\ndetection. A single-axis baseline (sv_velocity at the load point) reaches AUC = 0.581 versus\nAUC = 0.603 for the full-axis characterization (difference +0.022, 95% CI [-0.001, +0.045],\nCI crosses zero). The contribution lies in substrate characterization, not in classification\nperformance.\n2. Materials Framing\nWe use ENK (Emergente Narrative Kontrolle) as the measurement apparatus: an embedding-\ngeometry measurement convention that treats conversations as continuously measured tra-",
+      "claim_ids": [
+        "2606.16617::problem_motivation::1",
+        "2606.16617::prior_approach::2",
+        "2606.16617::prior_limitation::1",
+        "2606.16617::rejected_alternative::0",
+        "2606.16617::causal_claim::0",
+        "2606.16617::causal_claim::1",
+        "2606.16617::hypothesis_statement::0",
+        "2606.16617::evidence_result::2",
+        "2606.16617::evidence_result::3",
+        "2606.16617::constraint::1"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:518b50b8fd5dc23d",
+      "paper_id": "2606.16617",
+      "passage_id": "passage:ca84a36ae7c8ee6e",
+      "section": "Introduction",
+      "text": "case covers 10 of these charges, false-presuppositions and ethical-setting all 17. Specimen\ncounts per loading case: debate 10 \u00d7 100 = 1000, false-presuppositions 17 \u00d7 200 = 3400,\nethical-setting 17 \u00d7 200 = 3400; 7800 specimens total.\nENK pipeline application: SYCON-Bench provides raw conversations as JSON lists (user\nturns + AI turns + topic metadata). These are fed without further transformation into the\nENK pipeline compute_convokit_metrics.py (configuration \u2013min_turns 10). Output: the\nturn-level axis-metrics per conversation, the embedding-geometry measurement per turn pair.\n4. Measurement Apparatus and Results\nFour reproducible test procedures per axis-measurement (all without model training):\n1. Comparison test between failed and holding specimens (Mann-Whitney U test, rank-\nbiserial rrb as effect size). 2. Per-charge aggregation (Stouffer-Z over the 10\u201317 material\ncharges per loading case, partitioning the charge axis from the within-charge effect). 3.\nLabel permutation within charge (5000 permutations, empirical null distribution per axis). 4.\nVariance partition (multilevel model with charge and topic as random effects, ANOVA-style\nvariance composition). Procedures 2\u20134 avoid naive pooling of dependent measurements; the\nunderlying dependence problem of turn-level metrics in LLM conversation analysis \u2014 and the\nsignificance inflation it produces under pooled testing \u2014 is characterized in Schessl (2026a).\nThe 14 turn-level axis-measurements across all three loading cases (rrb at flip per loading\ncase; positive = higher in failed specimens; one sign convention throughout; * = p < 0.05, **\n= p < 0.001):\nAxis (group)\ndebate rrb\nFP rrb\nethical rrb\nsemantic velocity,\nmean (velocity)\n+0.335**\n+0.149**\n\u22120.044\nsemantic velocity,\nEWMA (velocity)\n+0.345**\n+0.166**\n\u22120.041\nvelocity accumulator\n(velocity)\n+0.312**\n+0.187**\n\u22120.043\nvelocity accumulator,\ndetection (velocity)\n+0.312**\n+0.187**\n\u22120.043\ndamage accumulation,\ncumulative (accum.)\n\u22120.309**\n\u22120.169**\n+0.028\ndamage accumulation,\nrate (accum.)\n\u22120.309**\n\u22120.169**\n+0.028\n\u22120.312**\n\u22120.194**\n+0.054*\ndamage accumulation,\ndetection-calibrated\n(accum.)\ndamage accumulation,\ndetection rate\n(accum.)\n\u22120.313**\n\u22120.186**\n+0.050*\ndamage accumulation,\nwindowed (accum.)\n\u22120.312**\n\u22120.189**\n+0.056*\nFID (frame-drift)\n+0.220**\n+0.109**\n+0.047*\nNCD (brittleness)\n\u22120.284**\n\u22120.062*\n\u22120.162**\nNC2 (strain)\n\u22120.105*\n\u22120.045*\n\u22120.062*",
+      "claim_ids": [],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:534ecaa554dde96e",
+      "paper_id": "2606.16617",
+      "passage_id": "passage:70bad290e14fc5d6",
+      "section": "Introduction",
+      "text": "The three speaker-resolved axes from the independent user/model-separated pipeline show the\nsame per-loading-case structure:\nAxis (UA-sep\npipeline)\ndebate rrb\nFP rrb\nethical rrb\n\u03b5ai (model-side strain)\n+0.298**\n+0.173**\n\u22120.094**\nEai (speaker/model\nstiffness)\n\u22120.246**\n\u22120.157**\n+0.049*\nsv_ai (model-side\nvelocity)\n+0.347**\n+0.155**\n\u22120.091**\nCoupling confirmation: The metrics correlate with each other as expected (correlation-matrix\nmedian |r| \u22480.4). Example: high EWMA velocity (fast meaning movement) correlates with low\ndirection consistency (direction-unstable trajectory); the windowed accumulation variant correlates\nwith toughness-like accumulation.\nTrivial-baseline check: comparison of discrimination AUC of the full-axis characterization against\nthe single-axis baseline sv_velocity at the load point. The discrimination run uses the original 12-axis\nset of the pre-registration series, which differs from the 14-axis table above; the null result below is\nabout discrimination, not about the axis inventory:\nCharacterization\nAUC\n95% CI\nSingle-axis sv_velocity at load\npoint\n0.581\n[0.552, 0.610]\nFull-axis (12 axes, logit\nensemble)\n0.603\n[0.577, 0.631]\nDifference\n+0.022\n[-0.001, +0.045]\nThe difference is not significant (CI crosses zero). The AUC is computed on a charge-stratified\nheld-out split (fit on train, scored on test), so the null is not an in-sample artifact. In the materials\nframe this is consistent with the Hooke coupling: all 12 axes measure aspects of the same material\nresponse, hence the high correlation and only marginal discrimination gain. Per charge the full-axis\ngain is itself heterogeneous \u2014 it ranges from \u22120.22 to +0.21 and is negative on 6 of 17 charges \u2014\nwhich reinforces that the apparatus characterizes the failure rather than classifying it. For binary\nfailure detection the single-axis baseline is sufficient; the added value of the full-axis characterization\nlies in the mechanistic separation of failure types (\u00a75), not in discrimination performance.\n5. Variance Composition: Three Loading Cases, Two Profiles\nThe variance partition of the binary failure label (flipped_ever) over the two grouping variables\nmaterial charge and topic (multilevel model with random intercepts) yields a loading-case asymmetry:\nLoading case\nvarcharge\nvartopic\nvarresidual\nvarcharge/vartopic Variance profile\n0.110\n0.054\n0.070\n2.03\ncharge-\ndominated\nfalse-",
+      "claim_ids": [
+        "2606.16617::causal_claim::8",
+        "2606.16617::causal_claim::9",
+        "2606.16617::mechanism_principle::0",
+        "2606.16617::evidence_result::4",
+        "2606.16617::evidence_result::5"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:aaaf2aacb45d2a2d",
+      "paper_id": "2606.16617",
+      "passage_id": "passage:8e643540986640ab",
+      "section": "Introduction",
+      "text": "Variance composition: debate charge-dominated, FP and ethical topic-dominated\nVariance composition per loading case\nvarcharge\nvartopic\nvarresidual\n0.20\nVariance share (of flipped_ever)\n0.15\n0.10\n0.05\ndebate\nethical\nfp\n0.00\nFigure 1:\nVariance composition across the three loading cases.\nLeft:\nstacked bar with\ncharge/topic/residual variance per loading case. Right: varcharge/vartopic ratio (logarithmic). debate\nis charge-dominated (2.03), FP and ethical topic-dominated (0.13 and 0.17); the qualitative inversion\nis stable across all topic-bootstrap resamples, while the between-profile factor itself is method- and\ntarget-dependent (roughly 10\u201324, \u00a75).\n\u2022 FP profile / ethical profile (topic-dominated): The load configuration (which false-premise,\nwhich bias question) decides more strongly than the material charge (factor 0.13 and 0.17\nrespectively). This matches a creep pattern: under convincing pushback almost all materials\nfail, and the duration and plausibility of the load decides, not the material grade. Across\nestimation methods and target variables (MixedLM vs method-of-moments; binary flip label\nvs ToF) the between-profile factor varies between roughly 10 and 24; the cluster bootstrap\nof any single estimator (e.g. 95% CI [9.7, 22.0] for MixedLM on the binary label, B = 400)\nunderstates this spread, so we read the inversion \u2014 not any particular factor \u2014 as the result.\nThe topic-dominance of FP and ethical is robust in all four method-target combinations; the\ncharge-dominance of debate is itself method-dependent (a method-of-moments decomposition\non the binary label puts the debate ratio at 0.90, i.e. borderline), which the materials reading\nabove should be understood to inherit.\nethical clusters with FP (both topic-dominated) but shows a higher mean failure rate (76% vs\n66% vs 34%) and is thus the hardest of the three loading cases.\nCross-robust inference: The multilevel Wald test with loading-case \u00d7 material-family interaction\n(5 families: Llama, Qwen, Anthropic, Gemma, Other) yields W = 40.88, df = 4, p = 2.85 \u00d7 10\u22128.\nThis confirmatory interaction is estimated over debate vs FP; the ethical-setting case enters the\nvariance-composition profiles above but not this interaction test (nor the cross-probe in \u00a76 or the AUC\ncomparison in \u00a74, which are likewise debate/FP). The family failure rates show saturation effects:\nFamily\ndebate\nFP\nethical\n\u2206(FP\u2212debate)",
+      "claim_ids": [
+        "2606.16617::causal_claim::1",
+        "2606.16617::causal_claim::3",
+        "2606.16617::mechanism_principle::1",
+        "2606.16617::constraint::2",
+        "2606.16617::constraint::3"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:4640ba3db4b9a76d",
+      "paper_id": "2606.16617",
+      "passage_id": "passage:682227863cb6ce14",
+      "section": "Introduction",
+      "text": "clamped cells suppress failures below measurable counts where the rate effect is largest. We report the\nboundary-condition experiment as open at the sign level and the apparatus-specificity of the velocity\nsign as a limitation (\u00a77).\n7. Limitations\nResolution limit: SYCON-Bench dialogues have only 5 turn pairs (10 user+AI turns). This is close to\nENK\u2019s lower resolution limit; in particular the sigmoid inflection point \u02c6a and the wave-distance DOA\ntypically need \u226510 turn pairs for clean fits. ToF-based failure measures are robust, finer trajectory\naxes are limited here.\nJudge-bias asymmetry between loading cases (V_S6b, inter-judge comparison GPT-4o vs Haiku\n4.5 on 50+50 conversations):\nLoading case\nCohen\u2019s \u03ba\nDisagreement rate\nHaiku turn-flip\nGPT-4o turn-flip\ndebate\n0.883\n5.2%\n35.6%\n31.2%\nFP\n0.360\n26.8%\n12.4%\n39.2%\nThe debate scoring is judge-robust (substantial agreement per Landis and Koch (1977)); both\njudges give consistently similar failure rates.\nThe FP scoring is judge-sensitive (weak agreement per Landis and Koch (1977)). Haiku tends\ntoward under-flips on FP, because judging whether the response accepted the false-premise or only\npolitely sidestepped it is semantically fuzzier than at debate (leaving the original stance).\nFP\nfailure rates need multi-judge aggregation or explicit inter-judge reliability caveats. For single-judge\nbenchmarks it follows that reported FP flip rates differ systematically by judge model. This judge-\nsensitivity affects absolute flip rates, not the FP variance profile (\u00a75): a sensitivity check that uniformly\nunder-flips FP labels to match the observed Haiku/GPT-4o disagreement leaves the topic-dominance\nintact \u2014 the FP variance ratio stays below 1 across under-flip levels up to 50% (results/note_\nrobustness in the companion repository).\nThe \u00a75 inversion is therefore not an artifact of the\njudge convention, although a charge- or topic-correlated judge bias cannot be excluded from the 50\ndoubly-labeled conversations.\nInter-judge comparison: debate judge-robust, FP judge-sensitive\nInter-judge reliability per loading case\n1.0\n= 0.70 (substantial)\n= 0.883\n= 0.40 (moderate)\n0.8\nCohen's  (GPT-4o vs Haiku 4.5)\n0.6\n= 0.360\n0.4\n0.2\ndebate\nFP\n0.0\nFigure 3: Inter-judge comparison GPT-4o vs Haiku 4.5 on 50+50 Sonnet-4.6 conversations. Left:",
+      "claim_ids": [
+        "2606.16617::prior_limitation::1",
+        "2606.16617::causal_claim::6",
+        "2606.16617::mechanism_principle::3",
+        "2606.16617::evidence_result::2",
+        "2606.16617::evidence_result::2",
+        "2606.16617::evidence_result::10",
+        "2606.16617::constraint::0",
+        "2606.16617::constraint::5",
+        "2606.16617::constraint::5",
+        "2606.16617::constraint::6"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:306568f0ef6cf207",
+      "paper_id": "2606.16617",
+      "passage_id": "passage:f262806a0059527c",
+      "section": "Introduction",
+      "text": "0.0\nFigure 3: Inter-judge comparison GPT-4o vs Haiku 4.5 on 50+50 Sonnet-4.6 conversations. Left:\nCohen\u2019s \u03ba per loading case. debate \u03ba = 0.883 (substantial agreement), FP \u03ba = 0.360 (weak agreement).\nRight: conversation flip rate per judge. On FP, GPT-4o (72%) deviates substantially from Haiku\n(40%); on debate both judges are consistent (\u223c85%).\nThe failure measure is flip rate. The person-emotion sycophancy implied by Ye et al. (2026) (tone,\ncomfort prioritization without a position break) needs its own load definition. The method can be\nextended (e.g. with the ELEPHANT corpus (Cheng et al., 2025) for emotional-tonal sycophancy);\nthat is follow-up work and not the subject of this note.\n9\nConversation flip rate per judge\n1.0\nHaiku 4.5\nGPT-4o\n0.86\n0.84\nConversation flip rate (Sonnet 4.6 sample)\n0.8\n0.72\n0.6\n0.40\n0.4\n0.2\ndebate\nFP\n0.0",
+      "claim_ids": [
+        "2606.16617::constraint::7"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    },
+    {
+      "comparison_id": "comparison:f820088e22ec25e2",
+      "paper_id": "2606.16617",
+      "passage_id": "passage:1e45f2ed435dbed7",
+      "section": "Conclusion",
+      "text": "axes characterize the failure with a reproducible material response. The variance composition shows\ntwo separate profiles (charge-dominated vs topic-dominated; what is robust is the inversion itself,\nwhile its size depends on the estimator), and the sign structure adds a second grouping in which\nthe ethical-setting case inverts the velocity and accumulation blocks. Inter-judge reliability qualifies\nthe findings: debate scoring judge-robust (\u03ba = 0.88), FP scoring judge-sensitive (\u03ba = 0.36). The\nprobe-charge sensitivity of the reserve axis (V_S5b) further qualifies the cross-loading-case claims, and\nthe model-version specificity of the failure rates (V_S6) rules out a simple aggregate generalization\nacross model generations.\nThe analysis comprises six pre-registered iterations with verdicts in Appendix A; several findings\nwere corrected over the course of the work, the V_S1 reading by V_S2 and the too-weak V_S5 probe\nby the cross-probe V_S5b.\nCode,\ndata,\npre-registrations:\ncompanion\nrepository\ngithub.com/FerdinandSchessl/\nsycophancy-note-companion \u2014 pre-registrations V_S{1,...,6b}_PRE_REG.md, verdict reports\nresults/, analysis scripts scripts/, and the per-specimen failure-label tables data/converted/\non which the survival, mixture, multilevel, and variance analyses run. SYCON-Bench original (raw\nconversations and pushback templates): Hong et al. (2025), github.com/JiseungHong/SYCON-Bench\nAppendix A: Pre-Registration Verdict Overview\nIter\nPre-registration hypothesis\nVerdict\nConsequence\nV_S1\nToF-survival 4-family fit\ndebate edge-convergence,\nFP Weibull winner\nV_S1 bimodal-shock\nreading \u2192V_S2 correction\nV_S2\nMixture test 2-component\nWeibull\nFP robustly bimodal,\ndebate mixture shaky\nV_S3\nMultilevel model\nloading-case\u00d7charge\nCharge not testable\n(singular), family PASS\np=2.85e-08\nV_S4\nethical as 3rd loading case,\nown mixture vector\nPASS own mixture + PASS\nbimodal\nTheoretical consequence\nFerdinand\u2019s domain\nV_S5\nCross-charge Qwen-7B\nprobe\nMethodological lesson\nmulti-probe\nV_S5b\nCross-charge Sonnet 4.6\nprobe on FP\nNOT CONCLUSIVE\n(n=22, n_hold=2)\nV_S1 FP sign-flip\ncharge-specific\nV_S6\nSonnet 4.6 as 18th charge\nprospective\nPARTIAL/PASS\n(r_rb=\u22120.259 p=0.047)\nmixed (debate Mode-(i),\nFP no mixture)\nV_S6b\nJudge comparison GPT-4o\nvs Haiku 4.5\ndebate \u03ba=0.88 robust, FP\n\u03ba=0.36 sensitive",
+      "claim_ids": [
+        "2606.16617::causal_claim::10",
+        "2606.16617::evidence_result::1",
+        "2606.16617::evidence_result::2",
+        "2606.16617::evidence_result::2",
+        "2606.16617::evidence_result::7",
+        "2606.16617::evidence_result::11",
+        "2606.16617::evidence_result::11",
+        "2606.16617::evidence_result::12",
+        "2606.16617::evidence_result::13",
+        "2606.16617::evidence_result::14",
+        "2606.16617::evidence_result::15",
+        "2606.16617::evidence_result::16",
+        "2606.16617::constraint::10",
+        "2606.16617::constraint::11"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    }
+  ],
+  "claim_passage_ids": {
+    "2606.16617::problem_motivation::0": [
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "Sycophancy in LLMs is documented across 70+ papers, but expert agreement on construct boundaries remains low (ICC=.184; Ye et al., 2026). The construct fragments because behavioral classification depends on which surface form is privileged."
+      },
+      {
+        "passage_id": "passage:53a0bfc110e50580",
+        "match_score": 1.0,
+        "evidence_span": "over 70 publications, but expert agreement on construct boundaries remains low"
+      },
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "The construct fragments because behavioral classification depends on which surface form is privileged"
+      }
+    ],
+    "2606.16617::problem_motivation::1": [
+      {
+        "passage_id": "passage:6dd7be229e64bdac",
+        "match_score": 1.0,
+        "evidence_span": "When the failure migrates over the load duration, it is unclear what a single failure label measures"
+      }
+    ],
+    "2606.16617::problem_motivation::2": [
+      {
+        "passage_id": "passage:fb0a70f3230d4fdc",
+        "match_score": 1.0,
+        "evidence_span": "A human validation of the SYCON judge convention is still outstanding."
+      }
+    ],
+    "2606.16617::prior_approach::0": [
+      {
+        "passage_id": "passage:62f604d61434d7b0",
+        "match_score": 1.0,
+        "evidence_span": "Mrinank Sharma, Meg Tong, Tomasz Korbak, David Duvenaud, Amanda Askell, Samuel R. Bowman, Newton Cheng, Esin Durmus, Zac Hatfield-Dodds, Scott R. Johnston, et al. Towards understanding sycophancy in language models."
+      },
+      {
+        "passage_id": "passage:09714faa98f529ab",
+        "match_score": 1.0,
+        "evidence_span": "Myra Cheng, Sunny Yu, Cinoo Lee, Pranav Khadpe, Lujain Ibrahim, and Dan Jurafsky. ELEPHANT: Measuring and understanding social sycophancy in LLMs, 2025."
+      },
+      {
+        "passage_id": "passage:09714faa98f529ab",
+        "match_score": 1.0,
+        "evidence_span": "Jiseung Hong, Grace Byun, Seungone Kim, and Kai Shu. Measuring sycophancy of language models in multi-turn dialogues."
+      }
+    ],
+    "2606.16617::prior_approach::1": [
+      {
+        "passage_id": "passage:53a0bfc110e50580",
+        "match_score": 1.0,
+        "evidence_span": "An 8-cell taxonomy has been proposed"
+      },
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "Ye et al.\u2019s diagnosis"
+      },
+      {
+        "passage_id": "passage:62f604d61434d7b0",
+        "match_score": 1.0,
+        "evidence_span": "Meryl Ye, Lujain Ibrahim, Jessica Y. Bo, Myra Cheng, Ida Mattsson, Daniel Vennemeyer, Robert Kraut, and Steve Rathje. What counts as AI sycophancy? A taxonomy and expert survey of a fragmented construct, 2026."
+      }
+    ],
+    "2606.16617::prior_approach::2": [
+      {
+        "passage_id": "passage:6dd7be229e64bdac",
+        "match_score": 1.0,
+        "evidence_span": "Single-load tests (single-turn benchmarks)"
+      }
+    ],
+    "2606.16617::prior_approach::3": [
+      {
+        "passage_id": "passage:09714faa98f529ab",
+        "match_score": 1.0,
+        "evidence_span": "Pedro Henrique Luz de Araujo, Michael A. Hedderich, Ali Modarressi, Hinrich Sch\u00fctze, and Benjamin Roth. Persistent personas? Role-Playing, instruction following, and safety in extended interactions."
+      }
+    ],
+    "2606.16617::prior_approach::4": [
+      {
+        "passage_id": "passage:62f604d61434d7b0",
+        "match_score": 1.0,
+        "evidence_span": "Moin Nadeem, Anna Bethke, and Siva Reddy. StereoSet: Measuring stereotypical bias in pretrained language models."
+      }
+    ],
+    "2606.16617::prior_approach::5": [
+      {
+        "passage_id": "passage:09714faa98f529ab",
+        "match_score": 1.0,
+        "evidence_span": "J. Richard Landis and Gary G. Koch. The measurement of observer agreement for categorical data."
+      }
+    ],
+    "2606.16617::prior_approach::6": [
+      {
+        "passage_id": "passage:62f604d61434d7b0",
+        "match_score": 1.0,
+        "evidence_span": "Peiyi Wang, Lei Li, Liang Chen, Zefan Cai, Dawei Zhu, Binghuai Lin, Yunbo Cao, Lingpeng Kong, Qi Liu, Tianyu Liu, and Zhifang Sui. Large language models are not fair evaluators."
+      },
+      {
+        "passage_id": "passage:62f604d61434d7b0",
+        "match_score": 1.0,
+        "evidence_span": "Lianmin Zheng, Wei-Lin Chiang, Ying Sheng, Siyuan Zhuang, Zhanghao Wu, Yonghao Zhuang, Zi Lin, Zhuohan Li, Dacheng Li, Eric P Xing, et al. Judging LLM-as-a-judge with MT-Bench and Chatbot Arena."
+      }
+    ],
+    "2606.16617::prior_approach::7": [
+      {
+        "passage_id": "passage:62f604d61434d7b0",
+        "match_score": 1.0,
+        "evidence_span": "Ferdinand M. Schessl. The autocorrelation blind spot: Why 42% of turn-level findings in LLM conversation analysis may be spurious, 2026a."
+      }
+    ],
+    "2606.16617::prior_limitation::0": [
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "The construct fragments because behavioral classification depends on which surface form is privileged."
+      },
+      {
+        "passage_id": "passage:53a0bfc110e50580",
+        "match_score": 1.0,
+        "evidence_span": "but it only shifts the boundary question onto another classification axis rather than resolving it"
+      }
+    ],
+    "2606.16617::prior_limitation::1": [
+      {
+        "passage_id": "passage:6dd7be229e64bdac",
+        "match_score": 1.0,
+        "evidence_span": "Single-load tests (single-turn benchmarks) miss failure under sustained load"
+      },
+      {
+        "passage_id": "passage:682227863cb6ce14",
+        "match_score": 1.0,
+        "evidence_span": "SYCON-Bench dialogues have only 5 turn pairs (10 user+AI turns). This is close to ENK\u2019s lower resolution limit"
+      }
+    ],
+    "2606.16617::rejected_alternative::0": [
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "a multi-axis characterization that does not depend on which surface form of the construct one privileges"
+      },
+      {
+        "passage_id": "passage:6dd7be229e64bdac",
+        "match_score": 1.0,
+        "evidence_span": "Instead of sharpening the sycophancy construct\nthrough a more precise behavioral taxonomy, we treat the conversation as a test specimen under\nload and measure the material response rather than the behavioral label"
+      }
+    ],
+    "2606.16617::inspiration_source::0": [
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "We adopt a materials-science framing: conversation as test specimen under load, LLM-model as material charge, pushback as progressive load, stance-flip as material failure."
+      },
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "The measurements are Hooke-coupled (analogous to \u03c3 = E \u00b7 \u03b5 in tensile testing)"
+      }
+    ],
+    "2606.16617::inspiration_source::1": [
+      {
+        "passage_id": "passage:6e24372d9ddcd32c",
+        "match_score": 1.0,
+        "evidence_span": "Mapping onto Ye et al. (2026): debate \u2248Position-Subjective (charge-driven, brittle-fracture profile); FP + ethical \u2248Position-Verifiable (topic-driven, creep profile)."
+      }
+    ],
+    "2606.16617::causal_claim::0": [
+      {
+        "passage_id": "passage:6dd7be229e64bdac",
+        "match_score": 1.0,
+        "evidence_span": "Sycophancy is a documented failure mode of LLMs (Sharma et al., 2023) that increases under multi-turn pushback"
+      }
+    ],
+    "2606.16617::causal_claim::1": [
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "Variance composition partitions into two profiles: debate is material-charge-dominated, as in brittle fracture where material grade decides, while false-presuppositions and ethical-setting are topic-dominated, as in creep-dominated failure where the load case decides"
+      },
+      {
+        "passage_id": "passage:6dd7be229e64bdac",
+        "match_score": 1.0,
+        "evidence_span": "Identification of two variance profiles: charge-dominated (debate) vs topic-dominated (FP, ethical)"
+      },
+      {
+        "passage_id": "passage:ff5a400ce1bb5b87",
+        "match_score": 1.0,
+        "evidence_span": "The material charge (which model) decides more strongly than the topic (which claim is debated) whether a specimen breaks or holds (factor 2.03)."
+      },
+      {
+        "passage_id": "passage:8e643540986640ab",
+        "match_score": 1.0,
+        "evidence_span": "The load configuration (which false-premise, which bias question) decides more strongly than the material charge (factor 0.13 and 0.17 respectively)."
+      }
+    ],
+    "2606.16617::causal_claim::2": [
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "signs are reported per loading case and form a structured pattern in which the ethical-setting case inverts the velocity and accumulation blocks"
+      },
+      {
+        "passage_id": "passage:ae72ba4848f0f183",
+        "match_score": 1.0,
+        "evidence_span": "The velocity block (4 axes) and the damage-accumulation block (5 axes) invert their sign in the ethical-setting case"
+      }
+    ],
+    "2606.16617::causal_claim::3": [
+      {
+        "passage_id": "passage:8e643540986640ab",
+        "match_score": 1.0,
+        "evidence_span": "ethical clusters with FP (both topic-dominated) but shows a higher mean failure rate (76% vs 66% vs 34%) and is thus the hardest of the three loading cases."
+      }
+    ],
+    "2606.16617::causal_claim::4": [
+      {
+        "passage_id": "passage:8059e47ec6d0ac91",
+        "match_score": 1.0,
+        "evidence_span": "The failure rate is thus strongly boundary-condition-sensitive"
+      }
+    ],
+    "2606.16617::causal_claim::5": [
+      {
+        "passage_id": "passage:33cf63a062afc717",
+        "match_score": 1.0,
+        "evidence_span": "the velocity sign at failure therefore depends on the generation apparatus in the narrow sense (pushback wording, response-length limit, serving stack), not on the weights or the judge."
+      }
+    ],
+    "2606.16617::causal_claim::6": [
+      {
+        "passage_id": "passage:682227863cb6ce14",
+        "match_score": 1.0,
+        "evidence_span": "The \u00a75 inversion is therefore not an artifact of the judge convention"
+      }
+    ],
+    "2606.16617::causal_claim::7": [
+      {
+        "passage_id": "passage:fb0a70f3230d4fdc",
+        "match_score": 1.0,
+        "evidence_span": "A universal \u201dsycophancy threshold\u201d across all models does not exist, because failure rates are model-version-specific (V_S6 finding)."
+      }
+    ],
+    "2606.16617::causal_claim::8": [
+      {
+        "passage_id": "passage:70bad290e14fc5d6",
+        "match_score": 1.0,
+        "evidence_span": "Per charge the full-axis gain is itself heterogeneous \u2014 it ranges from \u22120.22 to +0.21 and is negative on 6 of 17 charges \u2014 which reinforces that the apparatus characterizes the failure rather than classifying it."
+      }
+    ],
+    "2606.16617::causal_claim::9": [
+      {
+        "passage_id": "passage:70bad290e14fc5d6",
+        "match_score": 1.0,
+        "evidence_span": "Example: high EWMA velocity (fast meaning movement) correlates with low direction consistency (direction-unstable trajectory)"
+      }
+    ],
+    "2606.16617::causal_claim::10": [
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "V_S1 bimodal-shock reading \u2192V_S2 correction"
+      }
+    ],
+    "2606.16617::mechanism_principle::0": [
+      {
+        "passage_id": "passage:4bc4ce8dce360c26",
+        "match_score": 1.0,
+        "evidence_span": "Hookean constitutive equation as guiding principle: The metrics are coupled, not redun-\ndant. In a tensile test, stress \u03c3, strain \u03b5, Young\u2019s modulus E, and fracture strain \u03b5b are\nnot independent variables; they are related through \u03c3 = E \u00b7 \u03b5 and the material response."
+      },
+      {
+        "passage_id": "passage:4bc4ce8dce360c26",
+        "match_score": 1.0,
+        "evidence_span": "Analogously here: a high velocity axis goes together with low stiffness, high frame-drift with\nlow dir_consistency. This coupling follows from the constitutive equation and is expected."
+      },
+      {
+        "passage_id": "passage:70bad290e14fc5d6",
+        "match_score": 1.0,
+        "evidence_span": "In the materials\nframe this is consistent with the Hooke coupling: all 12 axes measure aspects of the same material\nresponse, hence the high correlation and only marginal discrimination gain."
+      }
+    ],
+    "2606.16617::mechanism_principle::1": [
+      {
+        "passage_id": "passage:ff5a400ce1bb5b87",
+        "match_score": 1.0,
+        "evidence_span": "This\nmatches a brittle-fracture pattern: a hard charge resists every topic, a soft charge breaks at\nevery topic; the material grade is decisive, the load configuration secondary."
+      },
+      {
+        "passage_id": "passage:8e643540986640ab",
+        "match_score": 1.0,
+        "evidence_span": "This matches a creep pattern: under convincing pushback almost all materials\nfail, and the duration and plausibility of the load decides, not the material grade."
+      }
+    ],
+    "2606.16617::mechanism_principle::2": [
+      {
+        "passage_id": "passage:ae72ba4848f0f183",
+        "match_score": 1.0,
+        "evidence_span": "In the materials frame, a sign inversion of a geometric axis under a changed loading case is expected\nbehaviour under changed boundary conditions, not a contradiction."
+      },
+      {
+        "passage_id": "passage:8059e47ec6d0ac91",
+        "match_score": 1.0,
+        "evidence_span": "consistent with the loading cases themselves differing in their support configuration \u2014 debate carries\nan external stance by construction."
+      }
+    ],
+    "2606.16617::mechanism_principle::3": [
+      {
+        "passage_id": "passage:682227863cb6ce14",
+        "match_score": 1.0,
+        "evidence_span": "Haiku tends\ntoward under-flips on FP, because judging whether the response accepted the false-premise or only\npolitely sidestepped it is semantically fuzzier than at debate"
+      }
+    ],
+    "2606.16617::hypothesis_statement::0": [
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "This is the methodological move Ye et al.\u2019s diagnosis calls for: a multi-axis characterization that does not depend on which surface form of the construct one privileges."
+      },
+      {
+        "passage_id": "passage:6dd7be229e64bdac",
+        "match_score": 1.0,
+        "evidence_span": "The results are Hooke-coupled (\u03c3 = E \u00b7\u03b5-analog)\nand yield a material characterization that is invariant to the choice of behavioral classification)"
+      },
+      {
+        "passage_id": "passage:e5cd54732433b557",
+        "match_score": 1.0,
+        "evidence_span": "Sycophancy measurement does not need a new behavioral taxonomy, but a different measurement axis: the materials characterization of failure at a geometric level that is independent of the choice of behavioral classification."
+      }
+    ],
+    "2606.16617::hypothesis_statement::1": [
+      {
+        "passage_id": "passage:6e24372d9ddcd32c",
+        "match_score": 1.0,
+        "evidence_span": "The construct fragmentation\ndescribed in Ye et al. is the variance-composition shift; it is measurable as a loading-case property on\nthe variance axis, not only as a question of behavioral taxonomy."
+      },
+      {
+        "passage_id": "passage:fb0a70f3230d4fdc",
+        "match_score": 1.0,
+        "evidence_span": "The fragmentation of the sycophancy construct described in Ye et al. (2026) is a\nproperty of behavioral classification, not of the physical material response."
+      }
+    ],
+    "2606.16617::hypothesis_statement::2": [
+      {
+        "passage_id": "passage:ae72ba4848f0f183",
+        "match_score": 1.0,
+        "evidence_span": "We read the loading cases as\ndiffering support configurations: debate carries an external stance by construction (clamped), while\nFP and ethical leave the stance to the model (free)"
+      }
+    ],
+    "2606.16617::evidence_result::0": [
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 0.9412,
+        "evidence_span": "Across three loading cases (debate, false-presuppositions, ethical-setting), 10\u201317 material charges per loading case, and 7800 specimens, 14 turn-level axis-measurements plus three speaker-resolved 10 axes characterize the failure with a reproducible material response."
+      },
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "The measurements are Hooke-coupled (analogous to \u03c3 = E \u00b7 \u03b5 in tensile testing) and reproduce across loading cases with effects up to |rrb| = 0.35 on debate"
+      }
+    ],
+    "2606.16617::evidence_result::1": [
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "(point ratios 2.03 vs 0.13 and 0.17; the ratios vary by estimator \u2014 for debate even in direction \u2014 see \u00a75)"
+      },
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "The variance composition shows two separate profiles (charge-dominated vs topic-dominated; what is robust is the inversion itself, while its size depends on the estimator)"
+      }
+    ],
+    "2606.16617::evidence_result::2": [
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "Cross-judge reliability (Inter-Judge GPT-4o vs Haiku 4.5 on 50+50 sample) shows debate-failure scoring is judge-robust (Cohen\u2019s \u03ba = 0.88) while false-presupposition-failure scoring is judge-sensitive (\u03ba = 0.36)"
+      },
+      {
+        "passage_id": "passage:6dd7be229e64bdac",
+        "match_score": 1.0,
+        "evidence_span": "Inter-judge reliability per loading case: debate scoring robust, FP scoring judge-sensitive"
+      },
+      {
+        "passage_id": "passage:682227863cb6ce14",
+        "match_score": 1.0,
+        "evidence_span": "The debate scoring is judge-robust (substantial agreement per Landis and Koch (1977)); both judges give consistently similar failure rates."
+      },
+      {
+        "passage_id": "passage:682227863cb6ce14",
+        "match_score": 1.0,
+        "evidence_span": "The FP scoring is judge-sensitive (weak agreement per Landis and Koch (1977))."
+      },
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "Inter-judge reliability qualifies the findings: debate scoring judge-robust (\u03ba = 0.88), FP scoring judge-sensitive (\u03ba = 0.36)."
+      },
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "V_S6b Judge comparison GPT-4o vs Haiku 4.5 debate \u03ba=0.88 robust, FP \u03ba=0.36 sensitive"
+      }
+    ],
+    "2606.16617::evidence_result::3": [
+      {
+        "passage_id": "passage:6dd7be229e64bdac",
+        "match_score": 1.0,
+        "evidence_span": "A single-axis baseline (sv_velocity at the load point) reaches AUC = 0.581 versus AUC = 0.603 for the full-axis characterization (difference +0.022, 95% CI [-0.001, +0.045], CI crosses zero)."
+      }
+    ],
+    "2606.16617::evidence_result::4": [
+      {
+        "passage_id": "passage:70bad290e14fc5d6",
+        "match_score": 1.0,
+        "evidence_span": "The three speaker-resolved axes from the independent user/model-separated pipeline show the same per-loading-case structure:"
+      },
+      {
+        "passage_id": "passage:ae72ba4848f0f183",
+        "match_score": 1.0,
+        "evidence_span": "The independent user/model-separated pipeline reproduces the inversion (\u00a74, lower table)"
+      }
+    ],
+    "2606.16617::evidence_result::5": [
+      {
+        "passage_id": "passage:70bad290e14fc5d6",
+        "match_score": 1.0,
+        "evidence_span": "Coupling confirmation: The metrics correlate with each other as expected (correlation-matrix median |r| \u22480.4)."
+      }
+    ],
+    "2606.16617::evidence_result::6": [
+      {
+        "passage_id": "passage:ae72ba4848f0f183",
+        "match_score": 1.0,
+        "evidence_span": "down-sampling ethical to a 50/50 flip rate preserves the inverted sign in 99\u2013100% of resamples for the tested axes"
+      }
+    ],
+    "2606.16617::evidence_result::7": [
+      {
+        "passage_id": "passage:7089ef15d9e68b95",
+        "match_score": 1.0,
+        "evidence_span": "Cross-loading-case consistency of the turn-level axes: 12 of 14 axes show identical sign across debate and FP."
+      },
+      {
+        "passage_id": "passage:7089ef15d9e68b95",
+        "match_score": 1.0,
+        "evidence_span": "The claude-3-7 probe shows a negative reserve-axis correlation on debate (materials with high internal scatter hold out longer), but a sign-flip on FP."
+      },
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "the sign structure adds a second grouping in which the ethical-setting case inverts the velocity and accumulation blocks."
+      }
+    ],
+    "2606.16617::evidence_result::8": [
+      {
+        "passage_id": "passage:8059e47ec6d0ac91",
+        "match_score": 1.0,
+        "evidence_span": "Adding an explicit external stance to the system prompt (an instruction to maintain that the premise is false, or that the stereotype is wrong) reduces the failure rate sharply on two charges and two loading cases:"
+      }
+    ],
+    "2606.16617::evidence_result::9": [
+      {
+        "passage_id": "passage:33cf63a062afc717",
+        "match_score": 1.0,
+        "evidence_span": "Re-judging the original trajectories with our judge reproduces the positive sign (+0.66 vs +0.72; agreement 95%, \u03ba = 0.90), ruling out the judge convention"
+      }
+    ],
+    "2606.16617::evidence_result::10": [
+      {
+        "passage_id": "passage:682227863cb6ce14",
+        "match_score": 1.0,
+        "evidence_span": "a sensitivity check that uniformly under-flips FP labels to match the observed Haiku/GPT-4o disagreement leaves the topic-dominance intact \u2014 the FP variance ratio stays below 1 across under-flip levels up to 50%"
+      }
+    ],
+    "2606.16617::evidence_result::11": [
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "The analysis comprises six pre-registered iterations with verdicts in Appendix A; several findings were corrected over the course of the work, the V_S1 reading by V_S2 and the too-weak V_S5 probe by the cross-probe V_S5b."
+      },
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "V_S5 Cross-charge Qwen-7B probe Methodological lesson multi-probe"
+      }
+    ],
+    "2606.16617::evidence_result::12": [
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "V_S2 Mixture test 2-component Weibull FP robustly bimodal, debate mixture shaky"
+      }
+    ],
+    "2606.16617::evidence_result::13": [
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "V_S3 Multilevel model loading-case\u00d7charge Charge not testable (singular), family PASS p=2.85e-08"
+      }
+    ],
+    "2606.16617::evidence_result::14": [
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "V_S4 ethical as 3rd loading case, own mixture vector PASS own mixture + PASS bimodal"
+      }
+    ],
+    "2606.16617::evidence_result::15": [
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "V_S5b Cross-charge Sonnet 4.6 probe on FP NOT CONCLUSIVE (n=22, n_hold=2) V_S1 FP sign-flip charge-specific"
+      }
+    ],
+    "2606.16617::evidence_result::16": [
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "V_S6 Sonnet 4.6 as 18th charge prospective PARTIAL/PASS (r_rb=\u22120.259 p=0.047) mixed (debate Mode-(i), FP no mixture)"
+      }
+    ],
+    "2606.16617::constraint::0": [
+      {
+        "passage_id": "passage:090f2de7db3cb905",
+        "match_score": 1.0,
+        "evidence_span": "a caveat that single-judge benchmarks must report"
+      },
+      {
+        "passage_id": "passage:682227863cb6ce14",
+        "match_score": 1.0,
+        "evidence_span": "FP failure rates need multi-judge aggregation or explicit inter-judge reliability caveats. For single-judge benchmarks it follows that reported FP flip rates differ systematically by judge model."
+      }
+    ],
+    "2606.16617::constraint::1": [
+      {
+        "passage_id": "passage:6dd7be229e64bdac",
+        "match_score": 1.0,
+        "evidence_span": "The contribution lies in substrate characterization, not in classification performance."
+      }
+    ],
+    "2606.16617::constraint::2": [
+      {
+        "passage_id": "passage:8e643540986640ab",
+        "match_score": 1.0,
+        "evidence_span": "Across estimation methods and target variables (MixedLM vs method-of-moments; binary flip label vs ToF) the between-profile factor varies between roughly 10 and 24; the cluster bootstrap of any single estimator (e.g. 95% CI [9.7, 22.0] for MixedLM on the binary label, B = 400) understates this spread, so we read the inversion \u2014 not any particular factor \u2014 as the result."
+      }
+    ],
+    "2606.16617::constraint::3": [
+      {
+        "passage_id": "passage:8e643540986640ab",
+        "match_score": 1.0,
+        "evidence_span": "The topic-dominance of FP and ethical is robust in all four method-target combinations; the charge-dominance of debate is itself method-dependent (a method-of-moments decomposition on the binary label puts the debate ratio at 0.90, i.e. borderline), which the materials reading above should be understood to inherit."
+      }
+    ],
+    "2606.16617::constraint::4": [
+      {
+        "passage_id": "passage:7089ef15d9e68b95",
+        "match_score": 1.0,
+        "evidence_span": "a single probe charge cannot establish it"
+      },
+      {
+        "passage_id": "passage:7089ef15d9e68b95",
+        "match_score": 1.0,
+        "evidence_span": "A single probe charge is not enough. Cross-charge residual-stress tests require at least 2\u20133 independent probe materials to separate probe-charge-specific from loading-case-specific effects."
+      }
+    ],
+    "2606.16617::constraint::5": [
+      {
+        "passage_id": "passage:682227863cb6ce14",
+        "match_score": 1.0,
+        "evidence_span": "in particular the sigmoid inflection point \u02c6a and the wave-distance DOA typically need \u226510 turn pairs for clean fits."
+      },
+      {
+        "passage_id": "passage:682227863cb6ce14",
+        "match_score": 1.0,
+        "evidence_span": "ToF-based failure measures are robust, finer trajectory axes are limited here."
+      }
+    ],
+    "2606.16617::constraint::6": [
+      {
+        "passage_id": "passage:682227863cb6ce14",
+        "match_score": 1.0,
+        "evidence_span": "although a charge- or topic-correlated judge bias cannot be excluded from the 50 doubly-labeled conversations."
+      }
+    ],
+    "2606.16617::constraint::7": [
+      {
+        "passage_id": "passage:f262806a0059527c",
+        "match_score": 1.0,
+        "evidence_span": "The failure measure is flip rate. The person-emotion sycophancy implied by Ye et al. (2026) (tone, comfort prioritization without a position break) needs its own load definition."
+      }
+    ],
+    "2606.16617::constraint::8": [
+      {
+        "passage_id": "passage:fb0a70f3230d4fdc",
+        "match_score": 1.0,
+        "evidence_span": "Charge-specific calibration is required, as in every DIN materials-testing standard. A universal \u201dsycophancy threshold\u201d across all models does not exist"
+      }
+    ],
+    "2606.16617::constraint::9": [
+      {
+        "passage_id": "passage:60f4222c2188b240",
+        "match_score": 1.0,
+        "evidence_span": "This note does not assign sycophancy to any particular SRDS aggregation-mode class, nor does it depend on the broader programme; that theoretical consequence is left to the SRDS theory work"
+      }
+    ],
+    "2606.16617::constraint::10": [
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "The probe-charge sensitivity of the reserve axis (V_S5b) further qualifies the cross-loading-case claims"
+      }
+    ],
+    "2606.16617::constraint::11": [
+      {
+        "passage_id": "passage:1e45f2ed435dbed7",
+        "match_score": 1.0,
+        "evidence_span": "the model-version specificity of the failure rates (V_S6) rules out a simple aggregate generalization across model generations."
+      }
+    ]
+  }
+}

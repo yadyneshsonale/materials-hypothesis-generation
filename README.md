@@ -8,10 +8,12 @@ A materials-science hypothesis generation pipeline that extracts argumentative r
 2. Extract and reconcile typed research roles with `run_extraction.py`.
 3. Normalize each paper into typed entities and evidence-backed relations with
   `build_evidence_graph.py`.
-4. Build a cross-paper claim graph with `graph_build.py`.
-5. Retrieve, compose, refine, merge, and critique hypotheses with `adaptive_agent.py` or
+4. Backfill full source passages, citation mentions, and table contexts with
+  `source_context.py`.
+5. Build a cross-paper claim graph with `graph_build.py`.
+6. Retrieve, compose, refine, merge, and critique hypotheses with `adaptive_agent.py` or
   the simpler `hypothesis_agent.py` baseline.
-6. Evaluate extraction and generation with abstract comparison, audits, and masked-paper recovery.
+7. Evaluate extraction and generation with abstract comparison, audits, and masked-paper recovery.
 
 ## Adaptive Agent Workflow
 
@@ -169,6 +171,13 @@ is intentionally conservative about `OUTPERFORMS` and `UNDERPERFORMS`, but `COMP
 remains lexical and can include general contrastive prose; inspect its evidence span before
 treating it as a quantitative benchmark.
 
+The checked-in source-context backfill augments graph-selected claims with their original
+passages, inline citation mentions, parsed bibliography entries, and raw table contexts. Graph
+edges guide context assembly; they are not used as substitutes for source text. PDF-to-text
+conversion does not reliably preserve merged cells or column geometry, so table records retain
+raw text and an extraction confidence rather than inventing structured rows. External cited-paper
+content is marked `requires_resolution` until full text or an abstract is fetched.
+
 See [`examples/relations.example.jsonl`](examples/relations.example.jsonl) for citation and
 condition-aware comparison records. `OUTPERFORMS` and `UNDERPERFORMS` are never stored as bare
 edges: they carry the metric, compared values, unit, operating conditions, source table or
@@ -215,6 +224,14 @@ MATHG_PROVIDER=trapi .venv/bin/python build_evidence_graph.py \
   --normalizer deterministic --max-passes 0 --retry-delay 120
 ```
 
+Backfill source context without rerunning extraction:
+
+```bash
+.venv/bin/python source_context.py \
+  --source-dir texts_bulk --outputs-dir outputs_bulk \
+  --context-dir source_context
+```
+
 Generate and branch hypotheses:
 
 ```bash
@@ -230,7 +247,8 @@ MATHG_PROVIDER=trapi .venv/bin/python adaptive_agent.py \
   "Improve stability of lithium-metal solid-electrolyte interfaces" \
   outputs_bulk results/adaptive_run.json --max-depth 1 \
   --entities evidence_graph/entities.jsonl \
-  --relations evidence_graph/relations.jsonl
+  --relations evidence_graph/relations.jsonl \
+  --source-context source_context
 ```
 
 The output JSON contains the task graph, evidence returned for each task, sufficiency

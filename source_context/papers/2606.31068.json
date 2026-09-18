@@ -1,0 +1,1182 @@
+{
+  "paper_id": "2606.31068",
+  "passages": [
+    {
+      "passage_id": "passage:c6dd1d66374bcf7d",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 0,
+      "text": "Hybrid Unet-Transformer Model for Generating\nStress and Strain Fields from Composite Geometrics\nShrey Patel\nUniversity of Maryland-College Park\nUnited States of America\nORCID: 0009-0003-0886-4583\nAbstract\u2014Accurate prediction of stress and strain fields in\nhierarchical composite microstructures is critical for physics-\ninformed material design, yet conventional finite element method\n(FEM) simulations are computationally prohibitive at scale,\nrequiring minutes to days per evaluation. In this work, we\npropose a hybrid UNet-Transformer architecture that predicts\ncomplex mechanical field distributions directly from composite\nmicrostructure geometry images, serving as an efficient surrogate\nfor FEM across ten distinct stress and strain field types spanning\ndiverse two-phase composite configurations including square,\nhexagonal, and triangular tessellations, multiple boundary con-\nditions, and high-resolution geometries. Results demonstrate that\nthe proposed architecture achieves strong predictive performance\nacross the majority of subdatasets, with peak accuracy on\nperiodic tessellation geometries reaching R\u00b2 = 0.9991, SSIM =\n0.9936, and MAE = 0.0050 on the boundary condition subdataset\nand the triangular tessellation subdataset respectively. Across\nsix of the eight evaluated subdatasets, MAE remains below\n0.05 on the normalized [0, 1] pixel scale. Encoder attention\nanalysis via Grad-CAM and Grad-CAM++ confirms that the\nmodel develops physically meaningful internal representations,\nlocalizing attention at mechanically critical regions including\nphase boundaries, ligament junctions, and indenter contact zones\nwithout explicit structural supervision. Performance degrades on\nirregular square-grid geometries with sparse soft-phase inclu-\nsions, with the S11 normal stress subdataset yielding R\u00b2 = 0.7735\nand SSIM = 0.7126, consistent with the known limitation of\nsmooth-loss image translation models in reproducing sharp stress\ndiscontinuities. These results establish hybrid UNet-Transformer\nmodels as a viable deep learning surrogate for mechanical field\nprediction in composite materials, with inference time reduced\nfrom minutes-to-days per FEM simulation to under one second\nper prediction.\narXiv:2606.31068v1  [cs.CV]  30 Jun 2026\nIndex Terms\u2014Generative AI, Transformer, FEM simulations,\nstress/strain fields\nI. INTRODUCTION",
+      "word_count": 300,
+      "claim_ids": [],
+      "citation_ids": [
+        "citation:68030e38b810dbe3"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:bb84d5138348f573",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 1,
+      "text": "stress/strain fields\nI. INTRODUCTION\nComposite materials are non-homogeneous mixtures of met-\nals, ceramics or polymers. The combination of any constituent\nmaterials into a single composite material can significantly\nenhance mechanical performance. By spatially distributing soft\nand brittle constituent phases, composites can be engineered to\nachieve properties such as high stiffness, recoverability under\ncompressive loading and crack resistance. Various material\ndesigns, such as modern ceramics, fiber-reinforced polymers\nand biologically evolved materials, are driven by this tun-\nability. The advent of additive manufacturing has further\nexpanded the accessible design space by enabling fabrication\nof composites with complex, hierarchical microstructures that\nwere previously unattainable through conventional manufac-\nturing techniques. However, as the design space grows in\ncomplexity and dimensionality, the challenge of identifying\noptimal microstructural configurations becomes increasingly\ndifficult without efficient computational tools.\nRealizing the full potential of composite design requires\naccurate knowledge of how stress and strain distribute spa-\ntially across a heterogeneous microstructure under mechani-\ncal loading. Failure initiation, recoverability and local stress\nconcentration are all governed by physical field distributions,\nand thus require a physics-informed design process. Finite\nElement Method (FEM) simulations are the standard tool for\ncomputing these fields, providing high-fidelity ground truth\nfor arbitrary geometries and loading conditions. However, a\nsingle FEM simulation for one composite geometry is already\ncomputationally expensive, and design optimization or uncer-\ntainty quantification typically requires evaluating thousands\nof candidate configurations. The resulting computational cost\nis combinatorially large, making exhaustive FEM evaluation\nof candidate designs computationally intractable. These chal-\nlenges have strongly motivated the development of deep learn-\ning architectures as efficient surrogates for FEM simulations,\ncapable of predicting physical field distributions at a fraction\nof the computational cost once trained.\nRecent advances in deep learning have fundamentally trans-\nformed surrogate modeling across computational science and\nengineering. Deep learning models have demonstrated re-",
+      "word_count": 299,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:771218db1cdb108d",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 2,
+      "text": "formed surrogate modeling across computational science and\nengineering. Deep learning models have demonstrated re-\nmarkable success in approximating complex physical phe-\nnomena across domains including fluid dynamics, molec-\nular dynamics, structural mechanics and materials science,\nconsistently achieving accuracy comparable to high-fidelity\nnumerical solvers at a fraction of the computational cost.\nThe ability of deep neural networks to learn highly nonlin-\near mappings from large datasets of simulation outputs has\nestablished them as powerful tools for accelerating physics-\nbased design workflows. Image-to-image translation architec-\ntures in particular have proven effective at learning spatial\nmappings between input configurations and output physical\nfields, enabling direct prediction of distributed quantities such\nas temperature, pressure, velocity and stress from geometric or\nboundary condition inputs. These capabilities have made deep\nlearning an attractive framework for replacing or augmenting\ncomputationally expensive numerical simulations across a\nbroad range of engineering applications.",
+      "word_count": 143,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:43a8b85c5c4c4359",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 3,
+      "text": "Vision Transformers and hybrid Unet-Transformer architec-\ntures, which apply self-attention mechanisms across spatial\npatch sequences, have demonstrated strong performance in\ndense prediction tasks in computer vision such as semantic\nsegmentation and depth estimation. However, their applica-\ntion to mechanical field prediction in composite materials\nremains largely unexplored. In this work, a hybrid Unet-\nTransformer is applied to the problem of stress and strain\nfield prediction in hierarchical composites. The encoder uses\nresidual convolutional blocks to extract multi-scale spatial\nfeatures, a bottleneck transformer module with sinusoidal 2D\npositional embeddings captures global spatial relationships,\nand a convolutional decoder with skip connections and multi-\nscale supervision reconstructs the output field at full resolution.\nThe dataset has been obtained from Yang et al.[1] where a\nconditional GAN model was trained for predicting stress and\nstrain fields across a range of two-phase composite geometries.\nThe primary contribution of this work is an empirical demon-\nstration that a hybrid Unet-Transformer achieves competitive\nfield prediction accuracy on this benchmark, while offering a\nsimpler, single-network training procedure.\nII. LITERATURE REVIEW\nThe prediction of stress and strain fields in composite\nmaterials from microstructural geometry has emerged as a\nkey research direction in data-driven mechanics, driven by\nthe prohibitive computational cost of repeated finite element\nmethod (FEM) simulations [7] across large composite design\nspaces. Early work demonstrated that convolutional neural\nnetworks could serve as efficient surrogates for FEM at\nhigh accuracy. A foundational benchmark was established in\n[6], proposing SCSNet and StressNet two CNN architectures\nfor predicting von Mises stress fields in 2D linear elastic\ncantilevered structures from geometry, loading, and boundary\ncondition inputs with a mean relative error of 2.04% on the\ntest set, demonstrating that image-based deep learning could\napproximate FEM outputs for structured geometries without\niterative numerical solving.\nSubsequent work extended this capability to composite\nmicrostructures, where the heterogeneous spatial arrangement\nof constituent phases introduces substantially greater field\ncomplexity. A U-Net encoder-decoder architecture was pro-",
+      "word_count": 318,
+      "claim_ids": [
+        "2606.31068::problem_motivation::0",
+        "2606.31068::prior_approach::0",
+        "2606.31068::prior_approach::1",
+        "2606.31068::prior_approach::2",
+        "2606.31068::causal_claim::0",
+        "2606.31068::hypothesis_statement::0",
+        "2606.31068::evidence_result::0"
+      ],
+      "citation_ids": [
+        "citation:75c80153a3d17caa",
+        "citation:6990309a040a9e6d",
+        "citation:4c9f25aed16dbd5c"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:c9088b99c2bed6b0",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 4,
+      "text": "of constituent phases introduces substantially greater field\ncomplexity. A U-Net encoder-decoder architecture was pro-\nposed in [5, 15] for von Mises stress field prediction in fiber-\nreinforced composites, demonstrating cross-complexity gener-\nalization to higher fiber-count configurations unseen during\ntraining. Critically, this work established that data augmenta-\ntion in mechanics field prediction must be restricted to physics-\nconsistent transformations: axis-aligned flipping operations\nthat preserve mechanical boundary conditions are permissible,\nwhereas arbitrary rotation decouples the geometry image from\nits physically valid field output and constitutes a physics-\nviolating transformation [15].\nThe image-to-image translation paradigm for composite\nfield prediction was advanced in [1], where a conditional GAN\ncomprising a U-Net generator and PatchGAN discriminator\nwas trained to predict von Mises stress and plastic strain\nfields in two-phase hierarchical composites directly from 2D\ngeometry images, using FEM simulations in Abaqus as ground\ntruth across 2,000 randomly generated composite geometries.\nGeneralization was demonstrated to unseen geometries, mul-\ntiple loading conditions, and non-square tessellations includ-\ning hexagonal and triangular unit arrangements. A follow-up\nstudy [2] extended this to predict complete stress and strain\ntensor components across all field directions, incorporating\ndata statistics tuning to improve generalization across varying\nconstituent ratios under limited training data.\nAlternative architectural paradigms for the same geometry-\nto-field mapping task were explored in parallel. A Fourier\nNeural Operator framework was proposed in [3] that oper-\nates in the frequency domain rather than the pixel domain,\nachieving high-fidelity predictions of complete stress and\nstrain fields with very few training samples and demonstrating\nzero-shot generalization to unseen geometries and zero-shot\nsuper-resolution capabilities not accessible to pixel-domain\nconvolutional surrogates. A graph neural network framework\nwas proposed in [4] that exploits the natural correspondence\nbetween FEM meshes and graphs, predicting deformation,\nstress and strain fields across fiber composites, stratified\ncomposites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability.",
+      "word_count": 306,
+      "claim_ids": [
+        "2606.31068::prior_approach::3",
+        "2606.31068::prior_approach::4",
+        "2606.31068::prior_approach::5",
+        "2606.31068::prior_approach::6",
+        "2606.31068::prior_approach::7",
+        "2606.31068::causal_claim::1",
+        "2606.31068::evidence_result::1",
+        "2606.31068::evidence_result::2",
+        "2606.31068::evidence_result::3",
+        "2606.31068::evidence_result::4",
+        "2606.31068::constraint::0"
+      ],
+      "citation_ids": [
+        "citation:1475508974a1a4d3",
+        "citation:12734c6d4b9bc5b6",
+        "citation:918b4fa1f647661f",
+        "citation:add5995bc021208d",
+        "citation:5da4a8944511af50",
+        "citation:0c8c7d10270652a2",
+        "citation:9c74152434268b2a"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:04d986f39e1b0042",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 5,
+      "text": "composites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability.\nDespite this progression, a common limitation across the\nabove architectures is their reliance on convolutional inductive\nbiases local receptive fields and translational equivariance\nwhich constrain the model\u2019s capacity to capture long-range\nspatial dependencies in stress and strain fields, particularly\nfor geometries with non-local load transfer paths. Vision\nTransformers address this through global self-attention mech-\nanisms with no locality constraint, making them in principle\nbetter suited to capturing long-range mechanical interactions.\nHowever, standard Vision Transformers require large training\ndatasets to converge effectively, which is incompatible with\nthe small FEM-generated datasets typical of computational\nmechanics. A hybrid CNN-Transformer architecture for small\ndata paradigms was proposed in [10], incorporating progres-\nsive tokenization with feature supplementation and a convolu-\ntional prediction module shortcut, enabling effective training\nwithout large-scale pre-training.\nThe present work builds directly on this progression. The\ndataset from [1] gives 22,000 FEM-generated composite ge-\nometry and field image pairs across ten subdatasets is adopted,\nand the cGAN image-to-image architecture is replaced with\na hybrid UNet-Transformer, providing the first direct archi-\ntectural comparison between convolutional image translation\nand global-attention-based field prediction on this benchmark.\nPrediction quality is evaluated using MAE, SSIM [8], and\nR2, and encoder attention is interpreted using Grad-CAM\n[9] and Grad-CAM++ [11] to assess whether global attention\nproduces physically meaningful spatial localization without\nexplicit structural supervision.",
+      "word_count": 229,
+      "claim_ids": [
+        "2606.31068::prior_approach::8",
+        "2606.31068::prior_limitation::0",
+        "2606.31068::prior_limitation::1",
+        "2606.31068::rejected_alternative::0",
+        "2606.31068::mechanism_principle::0"
+      ],
+      "citation_ids": [
+        "citation:92d58024748102b8",
+        "citation:56e5f0aaf66ed386",
+        "citation:b8f2a4300b1c0460",
+        "citation:c3a98f105cd74e90",
+        "citation:45fb9a9d5860fa0c"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:a029dbeca306a9df",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 6,
+      "text": "III. PROPOSED METHODOLOGY\nThe proposed model, the hybrid Unet-Transformer, takes\na 128\u00d7128 RGB composite geometry image as input and\nproduces a 128\u00d7128 RGB stress or strain field image as\noutput, framing mechanical field prediction as an image-\nto-image translation problem. The training ran for around\n4 hours 25 minutes on Google Colab\u2019s T4 GPU. Code\navailability : \u201dhttps://anonymous.4open.science/r/hybrid-Unet-\nTransformer-Stress-Field-Prediction-C112/\u201d. Data is uploaded\non huggingface as well which the notebook in the paper\ndirectly accesses it.\nA. Data Collection and Preprocessing\nThe dataset used in this work is sourced from Yang et al.\n[1], where it was generated through finite element method\n(FEM) simulations using the commercial Abaqus software.\nThe composite geometries consist of two constituent phases\nbrittle units and soft units arranged on a two-dimensional grid\nin the x-y plane. The brittle units are represented in white and\nthe soft units in red against a black background, providing\nunambiguous encoding of the microstructural geometry as\nan RGB image. Out of 2\u00b3\u00b2 possible geometric combinations\narising from the binary arrangement of soft and brittle units\non the grid, 2,000 geometries were randomly selected to form\nthe dataset. The ratio of soft units across the dataset follows\nan approximately Gaussian distribution, centered around 0.5,\nensuring a balanced representation of microstructural config-\nurations across the design space.\nThe dataset covers eight distinct field types, each con-\nstituting a separate subdataset.The PE11 subdataset captures\nthe plastic strain component in the x-direction, encoding\ndirectional deformation along the horizontal loading axis.\nPE12 provides the shear strain component, reflecting off-axis\ndeformation between the x and y directions. S11 contains the\nnormal stress in the x-direction, representing the direct stress\ncomponent along the compressive loading axis, while S12\ncaptures the corresponding shear stress between the x and y di-\nrections. Beyond these field-type variants, the dataset includes\nthree geometry-variant subdatasets. The hexagonal subdataset\ncontains composites built from hexagonal tessellations in place\nof square units, testing the model\u2019s generalization to non-\nsquare elementary shapes. The triangular subdataset similarly\nreplaces square units with triangular tessellations. The bound-",
+      "word_count": 337,
+      "claim_ids": [
+        "2606.31068::prior_approach::9",
+        "2606.31068::prior_approach::10"
+      ],
+      "citation_ids": [
+        "citation:67ee787596588e82"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:6bc549dc026bceb6",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 7,
+      "text": "square elementary shapes. The triangular subdataset similarly\nreplaces square units with triangular tessellations. The bound-\nary condition subdataset encodes multiple loading scenarios\nspecifically compression and nanoindentation directly within\nthe geometry image using green lines as rigid body indicators,\nenabling a single model to distinguish and respond to distinct\nmechanical boundary conditions. The von Mises subdataset\nuses a higher-resolution 32\u00d732 grid representation in place of\nthe base 8\u00d78 grid, allowing the model to capture more complex\nmicrostructural patterns. All subdatasets share a common\nstorage format: each image is stored as a side-by-side PNG,\nwhere the left half encodes the input composite geometry and\nthe right half encodes the corresponding FEM-computed stress\nor strain field, as shown in Figure 1.\nNo physics-altering preprocessing or artificial augmentation\ntechniques such as rotation, colour jitter or noise injection are\napplied, as such transformations would decouple the geometry\nimage from its physically consistent field output and cause\nthe model to learn spurious mappings inconsistent with the\nunderlying mechanics [15].\nFig. 1. (a) Geometry on the left half (b) FEM Field on right half\nB. Model Architecture and Training\nA hybrid Unet-Transformer architecture is proposed, de-\nsigned specifically for image-to-image translation from FEM\ngeometry inputs to stress/strain field outputs[13]. The model\naccepts a 3-channel 128\u00d7128 geometry image and produces\na corresponding 3-channel 128\u00d7128 field prediction. The\narchitecture consists of three components: a convolutional\nencoder, a Transformer bottleneck, and a multi-scale convo-\nlutional decoder with skip connections. Due to limited data\nof only 22,000 images in total, a hybrid architecture likes\nthis provides better performance over Vision transformer [10].\nHere, the Unet[12] encoders will capture the local features,\nwhereas transformer block will attend to global context of\nFEM geometric images.\n1) Encoder: The encoder progressively downsamples the\ninput from 128\u00d7128 to an 8\u00d78 spatial bottleneck through\nfour stages, producing skip features at each intermediate\nresolution as shown in Figure 2. Each residual blocks consists\nof two convolution layers interleaved with GroupNorm and\nSilU activations, with a residual shortcut connections. Each\nResBlock computes:",
+      "word_count": 334,
+      "claim_ids": [
+        "2606.31068::causal_claim::2",
+        "2606.31068::mechanism_principle::1",
+        "2606.31068::mechanism_principle::2",
+        "2606.31068::hypothesis_statement::1",
+        "2606.31068::constraint::0"
+      ],
+      "citation_ids": [
+        "citation:1a92aabc66cfd04f",
+        "citation:730b0dc659efd13a",
+        "citation:0b43b0a3ea500d1e",
+        "citation:703c7156939087c0"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:68b3a7c1f4f1ff3b",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 8,
+      "text": "SilU activations, with a residual shortcut connections. Each\nResBlock computes:\nx\u2032 = x + GN2(Conv3\u00d73(SiLU(GN1(Conv3\u00d73(x)))))\n(1)\nwhere GN(\u00b7) denotes Group Normalization with 8 groups,\nSiLU(\u00b7) = x \u00b7 \u03c3(x) is the Sigmoid Linear Unit activation,\nand x is the identity shortcut.\n2) Transformer Bottleneck: The 8\u00d78 feature map from the\nencoder is flattened into a sequence of 64 tokens of dimension\n256 and augmented with fixed 2D sinusoidal positional embed-\ndings. The positional encoding follows the standard formula-\ntion using sine and cosine functions of frequencies spaced log-",
+      "word_count": 88,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:37d08d5f7f45c958",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 9,
+      "text": "Fig. 2. Model Architecture\narithmically between 1 and 10,000, computed independently\nfor both spatial dimensions (y and x) and concatenated.\nSix TransformerBlock modules are applied sequentially.\nEach block uses pre-norm LayerNorm, multi-head self-\nattention, and a two-layer MLP with GELU activation (hidden\ndimension 512). Residual connections are applied around\nboth the attention and MLP sub-layers. A learnable linear\nprojection is additionally applied to the positional-embedded\ntokens before the Transformer layers.\nGiven a sequence of tokens Z \u2208RN\u00d7d where N = H\u00b7W =\n64 and d = 256, each TransformerBlock computes:\nZ\u2032 = Z + MHSA(LN(Z))\n(2)\nZ\u2032\u2032 = Z\u2032 + MLP(LN(Z\u2032))\n(3)\nwhere\nLN(\u00b7)\nis\nLayer\nNormalization\n(pre-norm),\nand\nMHSA(\u00b7) is Multi-Head Self-Attention with h = 8 heads\ndefined as:\nMHSA(Z) = Concat(head1, . . . , headh) WO\n(4)\n\u0012QiK\u22a4\n\u0013\ni\n\u221adk\nheadi = softmax\nVi\n(5)\nwhere dk = d/h = 32 is the per-head dimension, and WO \u2208\nRd\u00d7d are learned projection matrices.\nThe MLP sub-layer is a two-layer feed-forward network:\nMLP(z) = W2 GELU(W1z + b1) + b2\n(6)\nwith hidden dimension dmlp = 512 (i.e., W1 \u2208R512\u00d7256,\nW2 \u2208R256\u00d7512).\n3) Decoder: The decoder reconstructs the full-resolution\nfield prediction through bilinear upsampling and skip connec-\ntion fusion. At each scale, an UpSample block applies bilinear\n2\u00d7 upsampling followed by a 3\u00d73 convolution and SiLU, then\nconcatenates the corresponding encoder skip feature along\nthe channel dimension, and processes the result through a\nFuseBlock consisting of a 3\u00d73 projection convolution and a\nsequence of ResBlocks.\nSigmoid activations at all output heads bound predictions to\n[0, 1], which is required for numerical stability of the SSIM\nloss.\nC. Loss Function\nTraining uses a multi-scale composite loss combining Struc-\ntural Similarity Index Measure (SSIM) [8] and L1 losses at all\nthree decoder output scales. For the full-resolution (128\u00d7128)\noutput:\n\u0000\n1 \u2212SSIM(\u02c6y128, y)\n\u0001\n+ LL1(\u02c6y128, y)\n(7)\nL128 =\nFor the auxiliary lower-resolution outputs, ground-truth\nfields are downsampled via average pooling (factor 2 for\n64 \u00d7 64, factor 4 for 32 \u00d7 32):\nh\u0000\ni\n1 \u2212SSIM(\u02c6y64, y64)\n\u0001\n+ LL1(\u02c6y64, y64)\nLms = 0.5 \u00b7\nh\u0000\ni\n1 \u2212SSIM(\u02c6y32, y32)\n\u0001\n+ LL1(\u02c6y32, y32)\n+ 0.25 \u00b7\n(8)\nThe total loss is:\nLtotal = L128 + Lms\n(9)\nIV. RESULTS AND DISCUSSIONS\nFigure\n3 presents the training and validation loss curves\nalongside the validation SSIM trajectory. Validation SSIM",
+      "word_count": 391,
+      "claim_ids": [
+        "2606.31068::constraint::1"
+      ],
+      "citation_ids": [
+        "citation:48a6a44e03fb9d57",
+        "citation:f4fc3a4b5ae34c14"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:1aaa48272fe23cee",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 10,
+      "text": "3 presents the training and validation loss curves\nalongside the validation SSIM trajectory. Validation SSIM\nimproves steadily from 0.8697 to 0.9070.\nFig. 3. (a) Training Logs (b) Validation SSIM over training\nA. Quantitative Performance\nTable I summarizes the per-sample prediction metrics across\nall eight subdatasets evaluated on the held-out test split. The\nmodel is assessed using Mean Absolute Error (MAE), Struc-\ntural Similarity Index Measure (SSIM), and the coefficient of\ndetermination R2, computed between the predicted field and\nthe corresponding FEM ground truth.\nThe results reveal a consistent performance stratification\nacross subdatasets that correlates with the geometric regularity\nand field complexity of each case. The boundary condi-\ntion subdataset (BC scale) and the TRIANGLE tessellation\nachieve the highest accuracy of all evaluated cases, with R2\nvalues of 0.9991 and 0.9980 and MAE below 0.006 in both",
+      "word_count": 136,
+      "claim_ids": [
+        "2606.31068::causal_claim::3",
+        "2606.31068::evidence_result::5",
+        "2606.31068::evidence_result::6"
+      ],
+      "citation_ids": [],
+      "table_ids": [
+        "table:6067694785cec41f",
+        "table:f7d208657b2fe447"
+      ]
+    },
+    {
+      "passage_id": "passage:71ebfdddda578aaf",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 11,
+      "text": "TABLE I\nPER-SAMPLE PREDICTION METRICS ON THE TEST SPLIT ACROSS ALL\nSUBDATASETS.\nSubdataset\nMAE\nSSIM\nR2\nBC scale\n0.0050\n0.9845\n0.9991\nTRIANGLE\n0.0052\n0.9936\n0.9980\nHEXAGON\n0.0129\n0.9779\n0.9935\nSTITCH (GEO MISES)\n0.0109\n0.9730\n0.9929\nPE12\n0.0266\n0.8995\n0.9617\nS12\n0.0445\n0.8197\n0.9240\nPE11 0.2\n0.0512\n0.8543\n0.8258\nS11\n0.0770\n0.7126\n0.7735\ninstances, indicating near-perfect spatial and intensity agree-\nment with the FEM reference. The HEXAGON and STITCH\nsubdatasets follow closely, with R2 above 0.99 and SSIM\nabove 0.97, confirming that the model generalizes effectively\nto both periodic non-square tessellations and high-resolution\n32\u00d732 microstructural geometries.\nPE12 and S12 remain quantitatively strong, with R2 values\nof 0.9617 and 0.9240 respectively, though SSIM drops below\n0.90 in both cases, reflecting the model\u2019s tendency to apply\nspatial smoothing at sharp phase-boundary stress concentra-\ntions under irregular block arrangements. PE11 0.2 exhibits\na further reduction to R2 = 0.8258 and SSIM = 0.8543,\nattributable to the sparse geometry and extended low-stress\nbrittle regions that reduce the density of learnable structural\ncues available to the encoder.\n1) Qualitative Analysis: Figure 4 presents qualitative pre-\ndictions alongside Gradient-weighted Class Activation Maps\n(GradCAM)[9] and GradCAM++[11] computed at the final\nencoder convolutional layer, for each of the three subdatasets.\nBoundary Condition Scale The model achieves near-\nperfect performance (MAE 0.0050, SSIM 0.9845, R\u00b2 0.9991),\naccurately reproducing the arch-shaped stress diffusion be-\nneath the spherical indenter. GradCAM shows broad acti-\nvations originating at the indenter contact zone spreading\ndownward, while GradCAM++ tightly concentrates at the\ntop-center contact point confirming the encoder has correctly\nparsed the green boundary condition marker as a mechanically\nmeaningful spatial cue.\nPE12 The shear strain field is recovered with strong ac-\ncuracy (MAE 0.0266, SSIM 0.8995, R\u00b2 0.9617). GradCAM\nexhibits a dominant activation band in the upper-left re-\ngion extending diagonally toward center, consistent with the\nshear-dominant load path through this geometry. GradCAM++\nsharpens this to a single hotspot at the primary block junction.\nMinor underestimation of peak shear concentrations at sharp\ncorners accounts for the slight SSIM reduction.",
+      "word_count": 334,
+      "claim_ids": [
+        "2606.31068::causal_claim::4",
+        "2606.31068::causal_claim::5",
+        "2606.31068::causal_claim::6",
+        "2606.31068::causal_claim::7",
+        "2606.31068::mechanism_principle::3",
+        "2606.31068::mechanism_principle::4",
+        "2606.31068::evidence_result::7",
+        "2606.31068::evidence_result::8",
+        "2606.31068::evidence_result::9",
+        "2606.31068::evidence_result::10",
+        "2606.31068::evidence_result::11",
+        "2606.31068::evidence_result::12",
+        "2606.31068::evidence_result::13"
+      ],
+      "citation_ids": [
+        "citation:7166d064cee9a16a",
+        "citation:b77f6dbf14c01659"
+      ],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:1827a04ce7a1572c",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 12,
+      "text": "Minor underestimation of peak shear concentrations at sharp\ncorners accounts for the slight SSIM reduction.\nS12 Performance remains acceptable (MAE 0.0445, SSIM\n0.8197, R\u00b2 0.9240) though SSIM drops relative to PE12,\nreflecting the more irregular block arrangement and sharper\nstress discontinuities. GradCAM activations are spatially scat-\ntered across the central region, while GradCAM++ identifies\ntwo discrete hotspots in the lower half corresponding to the\nmost geometrically irregular phase junctions. The predicted\nfield captures global topology but applies smoothing at the\nFig. 4. (a) Composite Input (b) GradCAM Results (c) GradCAM++ Results\n(d) Predicted Strain Fields (e) Ground Truth\nsharpest concentration sites.\nS11 This subdataset gave these results (MAE 0.0770, SSIM\n0.7126, R\u00b2 0.7735). The FEM ground truth contains sharp,\nhigh-contrast stress discontinuities at phase boundaries that\nthe model fails to reproduce at full intensity, producing an\nover-smoothed prediction. GradCAM shows diffuse, poorly lo-\ncalized activations with no dominant load path identified, and\nGradCAM++ provides only marginal improvement in spatial\nspecificity both indicating the encoder has not developed a\ngeometrically precise internal representation for this field type.\nPE11-0.2 Performance is moderate (MAE 0.0512, SSIM\n0.8543, R\u00b2 0.8258). The sparse geometry, dominated by large\nbrittle regions with isolated soft inclusions, creates an irregular\nstress topology that the model partially recovers. GradCAM\nactivations concentrate in the upper-center region while Grad-",
+      "word_count": 217,
+      "claim_ids": [
+        "2606.31068::causal_claim::8",
+        "2606.31068::causal_claim::9",
+        "2606.31068::causal_claim::10",
+        "2606.31068::mechanism_principle::5",
+        "2606.31068::evidence_result::14",
+        "2606.31068::evidence_result::15",
+        "2606.31068::evidence_result::16"
+      ],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:bc2ab71c4c49129a",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 13,
+      "text": "CAM++ identifies two hotspots in the lower-right quadrant a\nspatial mismatch with the actual stress maxima location that\ndirectly explains the residual prediction error.\nHEXAGON Strong performance (MAE 0.0129, SSIM\n0.9779, R\u00b2 0.9935) reflects the model\u2019s effective exploitation of\nthe periodic hexagonal geometry. GradCAM shows broad lat-\neral activations along hexagonal boundary columns consistent\nwith distributed load-sharing under compression. GradCAM++\nlocalizes two symmetric hotspots at dominant ligament junc-\ntions, spatially aligned with FEM-computed stress maxima\nconfirming physically meaningful encoder representations for\nregular tessellation geometries.\nTRIANGLE The highest combined accuracy in the figure\n(MAE 0.0052, SSIM 0.9936, R\u00b2 0.9980). GradCAM shows\nbroad distributed activations across the full triangular lattice\nreflecting global load-sharing, while GradCAM++ sharpens to\na single concentrated hotspot at the most mechanically loaded\ntriangular junction in the upper-center. The tight spatial cor-\nrespondence between GradCAM++ attention and FEM stress\nmaxima confirms the encoder captures angular load-transfer\ngeometry rather than superficial color patterns.\nGEO-MISES The high-resolution 32\u00d732 microstructure\npresents the greatest geometric complexity in the figure.\nDespite this, the model achieves strong performance (MAE\n0.0109, SSIM 0.9730, R\u00b2 0.9929), recovering the branched\nstress propagation patterns visible in the FEM ground truth.\nGradCAM activations are broadly distributed reflecting the\nhigh information density of the fine-grained geometry, while\nGradCAM++ identifies a concentrated central vertical band\ncorresponding to the dominant vertical stress transmission path\nthrough the connected phase. The slight MAE increase relative\nto simpler geometries reflects the higher spatial complexity\nrather than a model generalization failure.\nAcross all subdatasets, GradCAM consistently highlights\nmechanically meaningful regions structural junctions, load-\nbearing ligaments, and material boundaries rather than geo-\nmetrically trivial areas such as void interiors or uniform-field\nzones. On the other side, GradCAM++, highlights the concen-\ntrated regions which have dominant stress or strain fields. This\nconfirms that the Transformer bottleneck and Unet layers can\ntogether learn spatially coherent, physically grounded feature",
+      "word_count": 308,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:3da96896eeebd074",
+      "paper_id": "2606.31068",
+      "section": "Front matter",
+      "section_index": 0,
+      "passage_index": 14,
+      "text": "confirms that the Transformer bottleneck and Unet layers can\ntogether learn spatially coherent, physically grounded feature\nrepresentations directly from image supervision.\nV. CONCLUSION AND FUTURE WORKS\nThis paper presented, a hybrid Unet-Transformer surrogate\nmodel for direct prediction of FEA stress and strain fields from\ngeometry images. The proposed architecture combines a four-\nstage residual convolutional encoder, a six-layer Transformer\nbottleneck with 2D sinusoidal positional embeddings, and a\nmulti-scale decoder with skip connections, trained end-to-\nend using a composite SSIM and L1 loss across ten FEA\nsubdatasets simultaneously. Experimental evaluation on the\nHEXAGON, PE12, and S12 subdatasets demonstrates that the\nmodel achieves strong quantitative accuracy with R2 values\nabove 0.96 and MAE below 0.03 across all subdatasets while\nGradCAM analysis confirms that the learned representations\nalign with physically meaningful stress-concentrating regions,\nwithout any explicit mechanical supervision. The results es-\ntablish that a single unified model can generalize across\nstructurally diverse geometry types and field quantities within\nthe same training framework.\nThese findings suggest that hybrid Unet-Transformer ar-\nchitectures are a viable and efficient alternative to iterative\nFEM solvers for engineering design exploration, offering near-\ninstant field predictions at inference time once trained. For the\nfuture works, the architecture can be evolved to for 3D Unet\nwith transformer as bottleneck for predicting 3D stress and\nstrain directions in composite material.",
+      "word_count": 218,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:8b7bd38a2d768b1f",
+      "paper_id": "2606.31068",
+      "section": "References",
+      "section_index": 1,
+      "passage_index": 0,
+      "text": "[1] Z. Yang, C.-H. Yu, and M. J. Buehler, \u201cDeep learning model to predict\ncomplex stress and strain fields in hierarchical composites,\u201d Science\nAdvances, vol. 7, no. 15, eabd7416, 2021.\n[2] Z. Yang, C.-H. Yu, K. Guo, and M. J. Buehler, \u201cEnd-to-end deep\nlearning method to predict complete strain and stress tensors for complex\nhierarchical composite microstructures,\u201d Journal of the Mechanics and\nPhysics of Solids, vol. 154, p. 104506, 2021.\n[3] M. M. Rashid, T. Pittie, S. Chakraborty, and N. M. A. Krishnan,\n\u201cLearning the stress-strain fields in digital composites using Fourier\nneural operator,\u201d iScience, vol. 25, no. 11, p. 105452, 2022.\n[4] M. Maurizi, C. Gao, and F. Berto, \u201cPredicting stress, strain and defor-\nmation fields in materials and structures with graph neural networks,\u201d\nScientific Reports, vol. 12, p. 21834, 2022.\n[5] A. Bhaduri, A. Gupta, and L. Graham-Brady, \u201cStress field prediction\nin fiber-reinforced composite materials using a deep learning approach,\u201d\nComposites Part B: Engineering, vol. 238, p. 109879, 2022.\n[6] Z. Nie, H. Jiang, and L. B. Kara, \u201cStress field prediction in cantilevered\nstructures using convolutional neural networks,\u201d Journal of Computing\nand Information Science in Engineering, vol. 20, no. 1, p. 011002, 2020.\n[7] O. C. Zienkiewicz, R. L. Taylor, and J. Z. Zhu, The Finite Element\nMethod: Its Basis and Fundamentals, 6th ed. Oxford: Elsevier, 2005.\n[8] Z. Wang, A. C. Bovik, H. R. Sheikh, and E. P. Simoncelli, \u201cImage\nquality assessment: From error visibility to structural similarity,\u201d IEEE\nTransactions on Image Processing, vol. 13, no. 4, pp. 600\u2013612, 2004.\n[9] R. R. Selvaraju, M. Cogswell, A. Das, R. Vedantam, D. Parikh, and\nD. Batra, \u201cGrad-CAM: Visual explanations from deep networks via\ngradient-based localization,\u201d in Proc. IEEE International Conference on\nComputer Vision (ICCV), Venice, Italy, 2017, pp. 618\u2013626.\n[10] J. Chen, P. Wu, X. Zhang et al., \u201cAdd-Vit: CNN-Transformer hybrid\narchitecture for small data paradigm processing,\u201d Neural Processing\nLetters, vol. 56, p. 198, 2024.\n[11] A. B. George, S. Bathini and G. A, \u201cGrad-CAM & Grad-CAM++\nfor Explainable Oral Squamous Cell Carcinoma Detection using Deep\nLearning on Orthopantomograms,\u201d International Conference on Sen-\nsors and Related Networks (SENNET) Special Focus on Digital\nhealthcare(64220), Vellore, India, 2025, pp. 1-6, doi: 10.1109/SEN-\nNET64220.2025.11136014",
+      "word_count": 363,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    },
+    {
+      "passage_id": "passage:188372a404dee51b",
+      "paper_id": "2606.31068",
+      "section": "References",
+      "section_index": 1,
+      "passage_index": 1,
+      "text": "healthcare(64220), Vellore, India, 2025, pp. 1-6, doi: 10.1109/SEN-\nNET64220.2025.11136014\n[12] Govind, A., D. Lekshmi, and S. G. Devika. \u201dFrom Chaos to Clarity:\nLeveraging Satellite Imagery and Deep Learning for Emergency Re-\nsponse in War Torn & Disaster-Stricken Areas.\u201d Authorea Preprints.\n[13] George, Ajo Babu, et al. \u201dSemi-supervised CBCT\u2013IOS Registration\nUsing PointNetLK.\u201d International Workshop on Oral and Dental Image\nAnalysis. Cham: Springer Nature Switzerland, 2025.\n[14] Arun,\nGovind,\nRohith\nSyam,\nand\nAhmed\nElgammal.\n\u201dAnchor-\nConditioned Compositional Control for Landscape Image Generation.\u201d\narXiv preprint arXiv:2606.07638 (2026).\n[15] Bhaduri, A., Gupta, A., and Graham-Brady, L. Stress field prediction\nin fiber-reinforced composite materials using a deep learning approach.\nComposites Part B: Engineering, 238, 109879 (2022)\n[16] Selvaraju, Ramprasaath R., et al. \u201dChoose your neuron: Incorporating\ndomain knowledge through neuron-importance.\u201d Proceedings of the\nEuropean conference on computer vision (ECCV). 2018.",
+      "word_count": 135,
+      "claim_ids": [],
+      "citation_ids": [],
+      "table_ids": []
+    }
+  ],
+  "references": [
+    {
+      "reference_id": "reference:8553e399a8945970",
+      "paper_id": "2606.31068",
+      "reference_number": "9",
+      "raw_text": "and Grad-CAM++ [11] to assess whether global attention produces physically meaningful spatial localization without explicit structural supervision.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:57e31ef4ac1fbf96",
+      "paper_id": "2606.31068",
+      "reference_number": "1",
+      "raw_text": "Z. Yang, C.-H. Yu, and M. J. Buehler, \u201cDeep learning model to predict complex stress and strain fields in hierarchical composites,\u201d Science Advances, vol. 7, no. 15, eabd7416, 2021.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:64d212fafcd613ef",
+      "paper_id": "2606.31068",
+      "reference_number": "2",
+      "raw_text": "Z. Yang, C.-H. Yu, K. Guo, and M. J. Buehler, \u201cEnd-to-end deep learning method to predict complete strain and stress tensors for complex hierarchical composite microstructures,\u201d Journal of the Mechanics and Physics of Solids, vol. 154, p. 104506, 2021.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:c0db4c6840bdef23",
+      "paper_id": "2606.31068",
+      "reference_number": "3",
+      "raw_text": "M. M. Rashid, T. Pittie, S. Chakraborty, and N. M. A. Krishnan, \u201cLearning the stress-strain fields in digital composites using Fourier neural operator,\u201d iScience, vol. 25, no. 11, p. 105452, 2022.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:f39f0d51fb7cf3aa",
+      "paper_id": "2606.31068",
+      "reference_number": "4",
+      "raw_text": "M. Maurizi, C. Gao, and F. Berto, \u201cPredicting stress, strain and defor- mation fields in materials and structures with graph neural networks,\u201d Scientific Reports, vol. 12, p. 21834, 2022.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:dc8c3dc5146f6269",
+      "paper_id": "2606.31068",
+      "reference_number": "5",
+      "raw_text": "A. Bhaduri, A. Gupta, and L. Graham-Brady, \u201cStress field prediction in fiber-reinforced composite materials using a deep learning approach,\u201d Composites Part B: Engineering, vol. 238, p. 109879, 2022.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:42ae0312087ffe81",
+      "paper_id": "2606.31068",
+      "reference_number": "6",
+      "raw_text": "Z. Nie, H. Jiang, and L. B. Kara, \u201cStress field prediction in cantilevered structures using convolutional neural networks,\u201d Journal of Computing and Information Science in Engineering, vol. 20, no. 1, p. 011002, 2020.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:0da4914852ee53f3",
+      "paper_id": "2606.31068",
+      "reference_number": "7",
+      "raw_text": "O. C. Zienkiewicz, R. L. Taylor, and J. Z. Zhu, The Finite Element Method: Its Basis and Fundamentals, 6th ed. Oxford: Elsevier, 2005.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:acf3541256f64c06",
+      "paper_id": "2606.31068",
+      "reference_number": "8",
+      "raw_text": "Z. Wang, A. C. Bovik, H. R. Sheikh, and E. P. Simoncelli, \u201cImage quality assessment: From error visibility to structural similarity,\u201d IEEE Transactions on Image Processing, vol. 13, no. 4, pp. 600\u2013612, 2004.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:edd1f63548eb41f9",
+      "paper_id": "2606.31068",
+      "reference_number": "10",
+      "raw_text": "J. Chen, P. Wu, X. Zhang et al., \u201cAdd-Vit: CNN-Transformer hybrid architecture for small data paradigm processing,\u201d Neural Processing Letters, vol. 56, p. 198, 2024.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:1bad2131406ba207",
+      "paper_id": "2606.31068",
+      "reference_number": "11",
+      "raw_text": "A. B. George, S. Bathini and G. A, \u201cGrad-CAM & Grad-CAM++ for Explainable Oral Squamous Cell Carcinoma Detection using Deep Learning on Orthopantomograms,\u201d International Conference on Sen- sors and Related Networks (SENNET) Special Focus on Digital healthcare(64220), Vellore, India, 2025, pp. 1-6, doi: 10.1109/SEN- NET64220.2025.11136014",
+      "doi": "10.1109/SEN-",
+      "arxiv_id": "",
+      "resolution_status": "identifier_available"
+    },
+    {
+      "reference_id": "reference:aa13189ae8b22021",
+      "paper_id": "2606.31068",
+      "reference_number": "12",
+      "raw_text": "Govind, A., D. Lekshmi, and S. G. Devika. \u201dFrom Chaos to Clarity: Leveraging Satellite Imagery and Deep Learning for Emergency Re- sponse in War Torn & Disaster-Stricken Areas.\u201d Authorea Preprints.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:d2db069c87314a15",
+      "paper_id": "2606.31068",
+      "reference_number": "13",
+      "raw_text": "George, Ajo Babu, et al. \u201dSemi-supervised CBCT\u2013IOS Registration Using PointNetLK.\u201d International Workshop on Oral and Dental Image Analysis. Cham: Springer Nature Switzerland, 2025.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:5583e083452878ff",
+      "paper_id": "2606.31068",
+      "reference_number": "14",
+      "raw_text": "Arun, Govind, Rohith Syam, and Ahmed Elgammal. \u201dAnchor- Conditioned Compositional Control for Landscape Image Generation.\u201d arXiv preprint arXiv:2606.07638 (2026).",
+      "doi": "",
+      "arxiv_id": "2606.07638",
+      "resolution_status": "identifier_available"
+    },
+    {
+      "reference_id": "reference:6073382800ee1547",
+      "paper_id": "2606.31068",
+      "reference_number": "15",
+      "raw_text": "Bhaduri, A., Gupta, A., and Graham-Brady, L. Stress field prediction in fiber-reinforced composite materials using a deep learning approach. Composites Part B: Engineering, 238, 109879 (2022)",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    },
+    {
+      "reference_id": "reference:2231f4e60d30c829",
+      "paper_id": "2606.31068",
+      "reference_number": "16",
+      "raw_text": "Selvaraju, Ramprasaath R., et al. \u201dChoose your neuron: Incorporating domain knowledge through neuron-importance.\u201d Proceedings of the European conference on computer vision (ECCV). 2018.",
+      "doi": "",
+      "arxiv_id": "",
+      "resolution_status": "metadata_only"
+    }
+  ],
+  "citation_mentions": [
+    {
+      "citation_id": "citation:68030e38b810dbe3",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:c6dd1d66374bcf7d",
+      "reference_id": "reference:57e31ef4ac1fbf96",
+      "reference_number": "1",
+      "mention_text": "[0, 1]",
+      "context": "Hybrid Unet-Transformer Model for Generating\nStress and Strain Fields from Composite Geometrics\nShrey Patel\nUniversity of Maryland-College Park\nUnited States of America\nORCID: 0009-0003-0886-4583\nAbstract\u2014Accurate prediction of stress and strain fields in\nhierarchical composite microstructures is critical for physics-\ninformed material design, yet conventional finite element method\n(FEM) simulations are computationally prohibitive at scale,\nrequiring minutes to days per evaluation. In this work, we\npropose a hybrid UNet-Transformer architecture that predicts\ncomplex mechanical field distributions directly from composite\nmicrostructure geometry images, serving as an efficient surrogate\nfor FEM across ten distinct stress and strain field types spanning\ndiverse two-phase composite configurations including square,\nhexagonal, and triangular tessellations, multiple boundary con-\nditions, and high-resolution geometries. Results demonstrate that\nthe proposed architecture achieves strong predictive performance\nacross the majority of subdatasets, with peak accuracy on\nperiodic tessellation geometries reaching R\u00b2 = 0.9991, SSIM =\n0.9936, and MAE = 0.0050 on the boundary condition subdataset\nand the triangular tessellation subdataset respectively. Across\nsix of the eight evaluated subdatasets, MAE remains below\n0.05 on the normalized [0, 1] pixel scale. Encoder attention\nanalysis via Grad-CAM and Grad-CAM++ confirms that the\nmodel develops physically meaningful internal representations,\nlocalizing attention at mechanically critical regions including\nphase boundaries, ligament junctions, and indenter contact zones\nwithout explicit structural supervision. Performance degrades on\nirregular square-grid geometries with sparse soft-phase inclu-\nsions, with the S11 normal stress subdataset yielding R\u00b2 = 0.7735\nand SSIM = 0.7126, consistent with the known limitation of\nsmooth-loss image translation models in reproducing sharp stress\ndiscontinuities. These results establish hybrid UNet-Transformer\nmodels as a viable deep learning surrogate for mechanical field\nprediction in composite materials, with inference time reduced\nfrom minutes-to-days per FEM simulation to under one second\nper prediction.\narXiv:2606.31068v1  [cs.CV]  30 Jun 2026\nIndex Terms\u2014Generative AI, Transformer, FEM simulations,\nstress/strain fields\nI. INTRODUCTION"
+    },
+    {
+      "citation_id": "citation:75c80153a3d17caa",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:43a8b85c5c4c4359",
+      "reference_id": "reference:57e31ef4ac1fbf96",
+      "reference_number": "1",
+      "mention_text": "[1]",
+      "context": "Vision Transformers and hybrid Unet-Transformer architec-\ntures, which apply self-attention mechanisms across spatial\npatch sequences, have demonstrated strong performance in\ndense prediction tasks in computer vision such as semantic\nsegmentation and depth estimation. However, their applica-\ntion to mechanical field prediction in composite materials\nremains largely unexplored. In this work, a hybrid Unet-\nTransformer is applied to the problem of stress and strain\nfield prediction in hierarchical composites. The encoder uses\nresidual convolutional blocks to extract multi-scale spatial\nfeatures, a bottleneck transformer module with sinusoidal 2D\npositional embeddings captures global spatial relationships,\nand a convolutional decoder with skip connections and multi-\nscale supervision reconstructs the output field at full resolution.\nThe dataset has been obtained from Yang et al.[1] where a\nconditional GAN model was trained for predicting stress and\nstrain fields across a range of two-phase composite geometries.\nThe primary contribution of this work is an empirical demon-\nstration that a hybrid Unet-Transformer achieves competitive\nfield prediction accuracy on this benchmark, while offering a\nsimpler, single-network training procedure.\nII. LITERATURE REVIEW\nThe prediction of stress and strain fields in composite\nmaterials from microstructural geometry has emerged as a\nkey research direction in data-driven mechanics, driven by\nthe prohibitive computational cost of repeated finite element\nmethod (FEM) simulations [7] across large composite design\nspaces. Early work demonstrated that convolutional neural\nnetworks could serve as efficient surrogates for FEM at\nhigh accuracy. A foundational benchmark was established in\n[6], proposing SCSNet and StressNet two CNN architectures\nfor predicting von Mises stress fields in 2D linear elastic\ncantilevered structures from geometry, loading, and boundary\ncondition inputs with a mean relative error of 2.04% on the\ntest set, demonstrating that image-based deep learning could\napproximate FEM outputs for structured geometries without\niterative numerical solving.\nSubsequent work extended this capability to composite\nmicrostructures, where the heterogeneous spatial arrangement\nof constituent phases introduces substantially greater field\ncomplexity. A U-Net encoder-decoder architecture was pro-"
+    },
+    {
+      "citation_id": "citation:6990309a040a9e6d",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:43a8b85c5c4c4359",
+      "reference_id": "reference:0da4914852ee53f3",
+      "reference_number": "7",
+      "mention_text": "[7]",
+      "context": "Vision Transformers and hybrid Unet-Transformer architec-\ntures, which apply self-attention mechanisms across spatial\npatch sequences, have demonstrated strong performance in\ndense prediction tasks in computer vision such as semantic\nsegmentation and depth estimation. However, their applica-\ntion to mechanical field prediction in composite materials\nremains largely unexplored. In this work, a hybrid Unet-\nTransformer is applied to the problem of stress and strain\nfield prediction in hierarchical composites. The encoder uses\nresidual convolutional blocks to extract multi-scale spatial\nfeatures, a bottleneck transformer module with sinusoidal 2D\npositional embeddings captures global spatial relationships,\nand a convolutional decoder with skip connections and multi-\nscale supervision reconstructs the output field at full resolution.\nThe dataset has been obtained from Yang et al.[1] where a\nconditional GAN model was trained for predicting stress and\nstrain fields across a range of two-phase composite geometries.\nThe primary contribution of this work is an empirical demon-\nstration that a hybrid Unet-Transformer achieves competitive\nfield prediction accuracy on this benchmark, while offering a\nsimpler, single-network training procedure.\nII. LITERATURE REVIEW\nThe prediction of stress and strain fields in composite\nmaterials from microstructural geometry has emerged as a\nkey research direction in data-driven mechanics, driven by\nthe prohibitive computational cost of repeated finite element\nmethod (FEM) simulations [7] across large composite design\nspaces. Early work demonstrated that convolutional neural\nnetworks could serve as efficient surrogates for FEM at\nhigh accuracy. A foundational benchmark was established in\n[6], proposing SCSNet and StressNet two CNN architectures\nfor predicting von Mises stress fields in 2D linear elastic\ncantilevered structures from geometry, loading, and boundary\ncondition inputs with a mean relative error of 2.04% on the\ntest set, demonstrating that image-based deep learning could\napproximate FEM outputs for structured geometries without\niterative numerical solving.\nSubsequent work extended this capability to composite\nmicrostructures, where the heterogeneous spatial arrangement\nof constituent phases introduces substantially greater field\ncomplexity. A U-Net encoder-decoder architecture was pro-"
+    },
+    {
+      "citation_id": "citation:4c9f25aed16dbd5c",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:43a8b85c5c4c4359",
+      "reference_id": "reference:42ae0312087ffe81",
+      "reference_number": "6",
+      "mention_text": "[6]",
+      "context": "Vision Transformers and hybrid Unet-Transformer architec-\ntures, which apply self-attention mechanisms across spatial\npatch sequences, have demonstrated strong performance in\ndense prediction tasks in computer vision such as semantic\nsegmentation and depth estimation. However, their applica-\ntion to mechanical field prediction in composite materials\nremains largely unexplored. In this work, a hybrid Unet-\nTransformer is applied to the problem of stress and strain\nfield prediction in hierarchical composites. The encoder uses\nresidual convolutional blocks to extract multi-scale spatial\nfeatures, a bottleneck transformer module with sinusoidal 2D\npositional embeddings captures global spatial relationships,\nand a convolutional decoder with skip connections and multi-\nscale supervision reconstructs the output field at full resolution.\nThe dataset has been obtained from Yang et al.[1] where a\nconditional GAN model was trained for predicting stress and\nstrain fields across a range of two-phase composite geometries.\nThe primary contribution of this work is an empirical demon-\nstration that a hybrid Unet-Transformer achieves competitive\nfield prediction accuracy on this benchmark, while offering a\nsimpler, single-network training procedure.\nII. LITERATURE REVIEW\nThe prediction of stress and strain fields in composite\nmaterials from microstructural geometry has emerged as a\nkey research direction in data-driven mechanics, driven by\nthe prohibitive computational cost of repeated finite element\nmethod (FEM) simulations [7] across large composite design\nspaces. Early work demonstrated that convolutional neural\nnetworks could serve as efficient surrogates for FEM at\nhigh accuracy. A foundational benchmark was established in\n[6], proposing SCSNet and StressNet two CNN architectures\nfor predicting von Mises stress fields in 2D linear elastic\ncantilevered structures from geometry, loading, and boundary\ncondition inputs with a mean relative error of 2.04% on the\ntest set, demonstrating that image-based deep learning could\napproximate FEM outputs for structured geometries without\niterative numerical solving.\nSubsequent work extended this capability to composite\nmicrostructures, where the heterogeneous spatial arrangement\nof constituent phases introduces substantially greater field\ncomplexity. A U-Net encoder-decoder architecture was pro-"
+    },
+    {
+      "citation_id": "citation:1475508974a1a4d3",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:c9088b99c2bed6b0",
+      "reference_id": "reference:dc8c3dc5146f6269",
+      "reference_number": "5",
+      "mention_text": "[5, 15]",
+      "context": "of constituent phases introduces substantially greater field\ncomplexity. A U-Net encoder-decoder architecture was pro-\nposed in [5, 15] for von Mises stress field prediction in fiber-\nreinforced composites, demonstrating cross-complexity gener-\nalization to higher fiber-count configurations unseen during\ntraining. Critically, this work established that data augmenta-\ntion in mechanics field prediction must be restricted to physics-\nconsistent transformations: axis-aligned flipping operations\nthat preserve mechanical boundary conditions are permissible,\nwhereas arbitrary rotation decouples the geometry image from\nits physically valid field output and constitutes a physics-\nviolating transformation [15].\nThe image-to-image translation paradigm for composite\nfield prediction was advanced in [1], where a conditional GAN\ncomprising a U-Net generator and PatchGAN discriminator\nwas trained to predict von Mises stress and plastic strain\nfields in two-phase hierarchical composites directly from 2D\ngeometry images, using FEM simulations in Abaqus as ground\ntruth across 2,000 randomly generated composite geometries.\nGeneralization was demonstrated to unseen geometries, mul-\ntiple loading conditions, and non-square tessellations includ-\ning hexagonal and triangular unit arrangements. A follow-up\nstudy [2] extended this to predict complete stress and strain\ntensor components across all field directions, incorporating\ndata statistics tuning to improve generalization across varying\nconstituent ratios under limited training data.\nAlternative architectural paradigms for the same geometry-\nto-field mapping task were explored in parallel. A Fourier\nNeural Operator framework was proposed in [3] that oper-\nates in the frequency domain rather than the pixel domain,\nachieving high-fidelity predictions of complete stress and\nstrain fields with very few training samples and demonstrating\nzero-shot generalization to unseen geometries and zero-shot\nsuper-resolution capabilities not accessible to pixel-domain\nconvolutional surrogates. A graph neural network framework\nwas proposed in [4] that exploits the natural correspondence\nbetween FEM meshes and graphs, predicting deformation,\nstress and strain fields across fiber composites, stratified\ncomposites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability."
+    },
+    {
+      "citation_id": "citation:12734c6d4b9bc5b6",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:c9088b99c2bed6b0",
+      "reference_id": "reference:6073382800ee1547",
+      "reference_number": "15",
+      "mention_text": "[5, 15]",
+      "context": "of constituent phases introduces substantially greater field\ncomplexity. A U-Net encoder-decoder architecture was pro-\nposed in [5, 15] for von Mises stress field prediction in fiber-\nreinforced composites, demonstrating cross-complexity gener-\nalization to higher fiber-count configurations unseen during\ntraining. Critically, this work established that data augmenta-\ntion in mechanics field prediction must be restricted to physics-\nconsistent transformations: axis-aligned flipping operations\nthat preserve mechanical boundary conditions are permissible,\nwhereas arbitrary rotation decouples the geometry image from\nits physically valid field output and constitutes a physics-\nviolating transformation [15].\nThe image-to-image translation paradigm for composite\nfield prediction was advanced in [1], where a conditional GAN\ncomprising a U-Net generator and PatchGAN discriminator\nwas trained to predict von Mises stress and plastic strain\nfields in two-phase hierarchical composites directly from 2D\ngeometry images, using FEM simulations in Abaqus as ground\ntruth across 2,000 randomly generated composite geometries.\nGeneralization was demonstrated to unseen geometries, mul-\ntiple loading conditions, and non-square tessellations includ-\ning hexagonal and triangular unit arrangements. A follow-up\nstudy [2] extended this to predict complete stress and strain\ntensor components across all field directions, incorporating\ndata statistics tuning to improve generalization across varying\nconstituent ratios under limited training data.\nAlternative architectural paradigms for the same geometry-\nto-field mapping task were explored in parallel. A Fourier\nNeural Operator framework was proposed in [3] that oper-\nates in the frequency domain rather than the pixel domain,\nachieving high-fidelity predictions of complete stress and\nstrain fields with very few training samples and demonstrating\nzero-shot generalization to unseen geometries and zero-shot\nsuper-resolution capabilities not accessible to pixel-domain\nconvolutional surrogates. A graph neural network framework\nwas proposed in [4] that exploits the natural correspondence\nbetween FEM meshes and graphs, predicting deformation,\nstress and strain fields across fiber composites, stratified\ncomposites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability."
+    },
+    {
+      "citation_id": "citation:918b4fa1f647661f",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:c9088b99c2bed6b0",
+      "reference_id": "reference:6073382800ee1547",
+      "reference_number": "15",
+      "mention_text": "[15]",
+      "context": "of constituent phases introduces substantially greater field\ncomplexity. A U-Net encoder-decoder architecture was pro-\nposed in [5, 15] for von Mises stress field prediction in fiber-\nreinforced composites, demonstrating cross-complexity gener-\nalization to higher fiber-count configurations unseen during\ntraining. Critically, this work established that data augmenta-\ntion in mechanics field prediction must be restricted to physics-\nconsistent transformations: axis-aligned flipping operations\nthat preserve mechanical boundary conditions are permissible,\nwhereas arbitrary rotation decouples the geometry image from\nits physically valid field output and constitutes a physics-\nviolating transformation [15].\nThe image-to-image translation paradigm for composite\nfield prediction was advanced in [1], where a conditional GAN\ncomprising a U-Net generator and PatchGAN discriminator\nwas trained to predict von Mises stress and plastic strain\nfields in two-phase hierarchical composites directly from 2D\ngeometry images, using FEM simulations in Abaqus as ground\ntruth across 2,000 randomly generated composite geometries.\nGeneralization was demonstrated to unseen geometries, mul-\ntiple loading conditions, and non-square tessellations includ-\ning hexagonal and triangular unit arrangements. A follow-up\nstudy [2] extended this to predict complete stress and strain\ntensor components across all field directions, incorporating\ndata statistics tuning to improve generalization across varying\nconstituent ratios under limited training data.\nAlternative architectural paradigms for the same geometry-\nto-field mapping task were explored in parallel. A Fourier\nNeural Operator framework was proposed in [3] that oper-\nates in the frequency domain rather than the pixel domain,\nachieving high-fidelity predictions of complete stress and\nstrain fields with very few training samples and demonstrating\nzero-shot generalization to unseen geometries and zero-shot\nsuper-resolution capabilities not accessible to pixel-domain\nconvolutional surrogates. A graph neural network framework\nwas proposed in [4] that exploits the natural correspondence\nbetween FEM meshes and graphs, predicting deformation,\nstress and strain fields across fiber composites, stratified\ncomposites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability."
+    },
+    {
+      "citation_id": "citation:add5995bc021208d",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:c9088b99c2bed6b0",
+      "reference_id": "reference:57e31ef4ac1fbf96",
+      "reference_number": "1",
+      "mention_text": "[1]",
+      "context": "of constituent phases introduces substantially greater field\ncomplexity. A U-Net encoder-decoder architecture was pro-\nposed in [5, 15] for von Mises stress field prediction in fiber-\nreinforced composites, demonstrating cross-complexity gener-\nalization to higher fiber-count configurations unseen during\ntraining. Critically, this work established that data augmenta-\ntion in mechanics field prediction must be restricted to physics-\nconsistent transformations: axis-aligned flipping operations\nthat preserve mechanical boundary conditions are permissible,\nwhereas arbitrary rotation decouples the geometry image from\nits physically valid field output and constitutes a physics-\nviolating transformation [15].\nThe image-to-image translation paradigm for composite\nfield prediction was advanced in [1], where a conditional GAN\ncomprising a U-Net generator and PatchGAN discriminator\nwas trained to predict von Mises stress and plastic strain\nfields in two-phase hierarchical composites directly from 2D\ngeometry images, using FEM simulations in Abaqus as ground\ntruth across 2,000 randomly generated composite geometries.\nGeneralization was demonstrated to unseen geometries, mul-\ntiple loading conditions, and non-square tessellations includ-\ning hexagonal and triangular unit arrangements. A follow-up\nstudy [2] extended this to predict complete stress and strain\ntensor components across all field directions, incorporating\ndata statistics tuning to improve generalization across varying\nconstituent ratios under limited training data.\nAlternative architectural paradigms for the same geometry-\nto-field mapping task were explored in parallel. A Fourier\nNeural Operator framework was proposed in [3] that oper-\nates in the frequency domain rather than the pixel domain,\nachieving high-fidelity predictions of complete stress and\nstrain fields with very few training samples and demonstrating\nzero-shot generalization to unseen geometries and zero-shot\nsuper-resolution capabilities not accessible to pixel-domain\nconvolutional surrogates. A graph neural network framework\nwas proposed in [4] that exploits the natural correspondence\nbetween FEM meshes and graphs, predicting deformation,\nstress and strain fields across fiber composites, stratified\ncomposites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability."
+    },
+    {
+      "citation_id": "citation:5da4a8944511af50",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:c9088b99c2bed6b0",
+      "reference_id": "reference:64d212fafcd613ef",
+      "reference_number": "2",
+      "mention_text": "[2]",
+      "context": "of constituent phases introduces substantially greater field\ncomplexity. A U-Net encoder-decoder architecture was pro-\nposed in [5, 15] for von Mises stress field prediction in fiber-\nreinforced composites, demonstrating cross-complexity gener-\nalization to higher fiber-count configurations unseen during\ntraining. Critically, this work established that data augmenta-\ntion in mechanics field prediction must be restricted to physics-\nconsistent transformations: axis-aligned flipping operations\nthat preserve mechanical boundary conditions are permissible,\nwhereas arbitrary rotation decouples the geometry image from\nits physically valid field output and constitutes a physics-\nviolating transformation [15].\nThe image-to-image translation paradigm for composite\nfield prediction was advanced in [1], where a conditional GAN\ncomprising a U-Net generator and PatchGAN discriminator\nwas trained to predict von Mises stress and plastic strain\nfields in two-phase hierarchical composites directly from 2D\ngeometry images, using FEM simulations in Abaqus as ground\ntruth across 2,000 randomly generated composite geometries.\nGeneralization was demonstrated to unseen geometries, mul-\ntiple loading conditions, and non-square tessellations includ-\ning hexagonal and triangular unit arrangements. A follow-up\nstudy [2] extended this to predict complete stress and strain\ntensor components across all field directions, incorporating\ndata statistics tuning to improve generalization across varying\nconstituent ratios under limited training data.\nAlternative architectural paradigms for the same geometry-\nto-field mapping task were explored in parallel. A Fourier\nNeural Operator framework was proposed in [3] that oper-\nates in the frequency domain rather than the pixel domain,\nachieving high-fidelity predictions of complete stress and\nstrain fields with very few training samples and demonstrating\nzero-shot generalization to unseen geometries and zero-shot\nsuper-resolution capabilities not accessible to pixel-domain\nconvolutional surrogates. A graph neural network framework\nwas proposed in [4] that exploits the natural correspondence\nbetween FEM meshes and graphs, predicting deformation,\nstress and strain fields across fiber composites, stratified\ncomposites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability."
+    },
+    {
+      "citation_id": "citation:0c8c7d10270652a2",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:c9088b99c2bed6b0",
+      "reference_id": "reference:c0db4c6840bdef23",
+      "reference_number": "3",
+      "mention_text": "[3]",
+      "context": "of constituent phases introduces substantially greater field\ncomplexity. A U-Net encoder-decoder architecture was pro-\nposed in [5, 15] for von Mises stress field prediction in fiber-\nreinforced composites, demonstrating cross-complexity gener-\nalization to higher fiber-count configurations unseen during\ntraining. Critically, this work established that data augmenta-\ntion in mechanics field prediction must be restricted to physics-\nconsistent transformations: axis-aligned flipping operations\nthat preserve mechanical boundary conditions are permissible,\nwhereas arbitrary rotation decouples the geometry image from\nits physically valid field output and constitutes a physics-\nviolating transformation [15].\nThe image-to-image translation paradigm for composite\nfield prediction was advanced in [1], where a conditional GAN\ncomprising a U-Net generator and PatchGAN discriminator\nwas trained to predict von Mises stress and plastic strain\nfields in two-phase hierarchical composites directly from 2D\ngeometry images, using FEM simulations in Abaqus as ground\ntruth across 2,000 randomly generated composite geometries.\nGeneralization was demonstrated to unseen geometries, mul-\ntiple loading conditions, and non-square tessellations includ-\ning hexagonal and triangular unit arrangements. A follow-up\nstudy [2] extended this to predict complete stress and strain\ntensor components across all field directions, incorporating\ndata statistics tuning to improve generalization across varying\nconstituent ratios under limited training data.\nAlternative architectural paradigms for the same geometry-\nto-field mapping task were explored in parallel. A Fourier\nNeural Operator framework was proposed in [3] that oper-\nates in the frequency domain rather than the pixel domain,\nachieving high-fidelity predictions of complete stress and\nstrain fields with very few training samples and demonstrating\nzero-shot generalization to unseen geometries and zero-shot\nsuper-resolution capabilities not accessible to pixel-domain\nconvolutional surrogates. A graph neural network framework\nwas proposed in [4] that exploits the natural correspondence\nbetween FEM meshes and graphs, predicting deformation,\nstress and strain fields across fiber composites, stratified\ncomposites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability."
+    },
+    {
+      "citation_id": "citation:9c74152434268b2a",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:c9088b99c2bed6b0",
+      "reference_id": "reference:f39f0d51fb7cf3aa",
+      "reference_number": "4",
+      "mention_text": "[4]",
+      "context": "of constituent phases introduces substantially greater field\ncomplexity. A U-Net encoder-decoder architecture was pro-\nposed in [5, 15] for von Mises stress field prediction in fiber-\nreinforced composites, demonstrating cross-complexity gener-\nalization to higher fiber-count configurations unseen during\ntraining. Critically, this work established that data augmenta-\ntion in mechanics field prediction must be restricted to physics-\nconsistent transformations: axis-aligned flipping operations\nthat preserve mechanical boundary conditions are permissible,\nwhereas arbitrary rotation decouples the geometry image from\nits physically valid field output and constitutes a physics-\nviolating transformation [15].\nThe image-to-image translation paradigm for composite\nfield prediction was advanced in [1], where a conditional GAN\ncomprising a U-Net generator and PatchGAN discriminator\nwas trained to predict von Mises stress and plastic strain\nfields in two-phase hierarchical composites directly from 2D\ngeometry images, using FEM simulations in Abaqus as ground\ntruth across 2,000 randomly generated composite geometries.\nGeneralization was demonstrated to unseen geometries, mul-\ntiple loading conditions, and non-square tessellations includ-\ning hexagonal and triangular unit arrangements. A follow-up\nstudy [2] extended this to predict complete stress and strain\ntensor components across all field directions, incorporating\ndata statistics tuning to improve generalization across varying\nconstituent ratios under limited training data.\nAlternative architectural paradigms for the same geometry-\nto-field mapping task were explored in parallel. A Fourier\nNeural Operator framework was proposed in [3] that oper-\nates in the frequency domain rather than the pixel domain,\nachieving high-fidelity predictions of complete stress and\nstrain fields with very few training samples and demonstrating\nzero-shot generalization to unseen geometries and zero-shot\nsuper-resolution capabilities not accessible to pixel-domain\nconvolutional surrogates. A graph neural network framework\nwas proposed in [4] that exploits the natural correspondence\nbetween FEM meshes and graphs, predicting deformation,\nstress and strain fields across fiber composites, stratified\ncomposites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability."
+    },
+    {
+      "citation_id": "citation:92d58024748102b8",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:04d986f39e1b0042",
+      "reference_id": "reference:edd1f63548eb41f9",
+      "reference_number": "10",
+      "mention_text": "[10]",
+      "context": "composites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability.\nDespite this progression, a common limitation across the\nabove architectures is their reliance on convolutional inductive\nbiases local receptive fields and translational equivariance\nwhich constrain the model\u2019s capacity to capture long-range\nspatial dependencies in stress and strain fields, particularly\nfor geometries with non-local load transfer paths. Vision\nTransformers address this through global self-attention mech-\nanisms with no locality constraint, making them in principle\nbetter suited to capturing long-range mechanical interactions.\nHowever, standard Vision Transformers require large training\ndatasets to converge effectively, which is incompatible with\nthe small FEM-generated datasets typical of computational\nmechanics. A hybrid CNN-Transformer architecture for small\ndata paradigms was proposed in [10], incorporating progres-\nsive tokenization with feature supplementation and a convolu-\ntional prediction module shortcut, enabling effective training\nwithout large-scale pre-training.\nThe present work builds directly on this progression. The\ndataset from [1] gives 22,000 FEM-generated composite ge-\nometry and field image pairs across ten subdatasets is adopted,\nand the cGAN image-to-image architecture is replaced with\na hybrid UNet-Transformer, providing the first direct archi-\ntectural comparison between convolutional image translation\nand global-attention-based field prediction on this benchmark.\nPrediction quality is evaluated using MAE, SSIM [8], and\nR2, and encoder attention is interpreted using Grad-CAM\n[9] and Grad-CAM++ [11] to assess whether global attention\nproduces physically meaningful spatial localization without\nexplicit structural supervision."
+    },
+    {
+      "citation_id": "citation:56e5f0aaf66ed386",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:04d986f39e1b0042",
+      "reference_id": "reference:57e31ef4ac1fbf96",
+      "reference_number": "1",
+      "mention_text": "[1]",
+      "context": "composites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability.\nDespite this progression, a common limitation across the\nabove architectures is their reliance on convolutional inductive\nbiases local receptive fields and translational equivariance\nwhich constrain the model\u2019s capacity to capture long-range\nspatial dependencies in stress and strain fields, particularly\nfor geometries with non-local load transfer paths. Vision\nTransformers address this through global self-attention mech-\nanisms with no locality constraint, making them in principle\nbetter suited to capturing long-range mechanical interactions.\nHowever, standard Vision Transformers require large training\ndatasets to converge effectively, which is incompatible with\nthe small FEM-generated datasets typical of computational\nmechanics. A hybrid CNN-Transformer architecture for small\ndata paradigms was proposed in [10], incorporating progres-\nsive tokenization with feature supplementation and a convolu-\ntional prediction module shortcut, enabling effective training\nwithout large-scale pre-training.\nThe present work builds directly on this progression. The\ndataset from [1] gives 22,000 FEM-generated composite ge-\nometry and field image pairs across ten subdatasets is adopted,\nand the cGAN image-to-image architecture is replaced with\na hybrid UNet-Transformer, providing the first direct archi-\ntectural comparison between convolutional image translation\nand global-attention-based field prediction on this benchmark.\nPrediction quality is evaluated using MAE, SSIM [8], and\nR2, and encoder attention is interpreted using Grad-CAM\n[9] and Grad-CAM++ [11] to assess whether global attention\nproduces physically meaningful spatial localization without\nexplicit structural supervision."
+    },
+    {
+      "citation_id": "citation:b8f2a4300b1c0460",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:04d986f39e1b0042",
+      "reference_id": "reference:acf3541256f64c06",
+      "reference_number": "8",
+      "mention_text": "[8]",
+      "context": "composites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability.\nDespite this progression, a common limitation across the\nabove architectures is their reliance on convolutional inductive\nbiases local receptive fields and translational equivariance\nwhich constrain the model\u2019s capacity to capture long-range\nspatial dependencies in stress and strain fields, particularly\nfor geometries with non-local load transfer paths. Vision\nTransformers address this through global self-attention mech-\nanisms with no locality constraint, making them in principle\nbetter suited to capturing long-range mechanical interactions.\nHowever, standard Vision Transformers require large training\ndatasets to converge effectively, which is incompatible with\nthe small FEM-generated datasets typical of computational\nmechanics. A hybrid CNN-Transformer architecture for small\ndata paradigms was proposed in [10], incorporating progres-\nsive tokenization with feature supplementation and a convolu-\ntional prediction module shortcut, enabling effective training\nwithout large-scale pre-training.\nThe present work builds directly on this progression. The\ndataset from [1] gives 22,000 FEM-generated composite ge-\nometry and field image pairs across ten subdatasets is adopted,\nand the cGAN image-to-image architecture is replaced with\na hybrid UNet-Transformer, providing the first direct archi-\ntectural comparison between convolutional image translation\nand global-attention-based field prediction on this benchmark.\nPrediction quality is evaluated using MAE, SSIM [8], and\nR2, and encoder attention is interpreted using Grad-CAM\n[9] and Grad-CAM++ [11] to assess whether global attention\nproduces physically meaningful spatial localization without\nexplicit structural supervision."
+    },
+    {
+      "citation_id": "citation:c3a98f105cd74e90",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:04d986f39e1b0042",
+      "reference_id": "reference:8553e399a8945970",
+      "reference_number": "9",
+      "mention_text": "[9]",
+      "context": "composites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability.\nDespite this progression, a common limitation across the\nabove architectures is their reliance on convolutional inductive\nbiases local receptive fields and translational equivariance\nwhich constrain the model\u2019s capacity to capture long-range\nspatial dependencies in stress and strain fields, particularly\nfor geometries with non-local load transfer paths. Vision\nTransformers address this through global self-attention mech-\nanisms with no locality constraint, making them in principle\nbetter suited to capturing long-range mechanical interactions.\nHowever, standard Vision Transformers require large training\ndatasets to converge effectively, which is incompatible with\nthe small FEM-generated datasets typical of computational\nmechanics. A hybrid CNN-Transformer architecture for small\ndata paradigms was proposed in [10], incorporating progres-\nsive tokenization with feature supplementation and a convolu-\ntional prediction module shortcut, enabling effective training\nwithout large-scale pre-training.\nThe present work builds directly on this progression. The\ndataset from [1] gives 22,000 FEM-generated composite ge-\nometry and field image pairs across ten subdatasets is adopted,\nand the cGAN image-to-image architecture is replaced with\na hybrid UNet-Transformer, providing the first direct archi-\ntectural comparison between convolutional image translation\nand global-attention-based field prediction on this benchmark.\nPrediction quality is evaluated using MAE, SSIM [8], and\nR2, and encoder attention is interpreted using Grad-CAM\n[9] and Grad-CAM++ [11] to assess whether global attention\nproduces physically meaningful spatial localization without\nexplicit structural supervision."
+    },
+    {
+      "citation_id": "citation:45fb9a9d5860fa0c",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:04d986f39e1b0042",
+      "reference_id": "reference:1bad2131406ba207",
+      "reference_number": "11",
+      "mention_text": "[11]",
+      "context": "composites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability.\nDespite this progression, a common limitation across the\nabove architectures is their reliance on convolutional inductive\nbiases local receptive fields and translational equivariance\nwhich constrain the model\u2019s capacity to capture long-range\nspatial dependencies in stress and strain fields, particularly\nfor geometries with non-local load transfer paths. Vision\nTransformers address this through global self-attention mech-\nanisms with no locality constraint, making them in principle\nbetter suited to capturing long-range mechanical interactions.\nHowever, standard Vision Transformers require large training\ndatasets to converge effectively, which is incompatible with\nthe small FEM-generated datasets typical of computational\nmechanics. A hybrid CNN-Transformer architecture for small\ndata paradigms was proposed in [10], incorporating progres-\nsive tokenization with feature supplementation and a convolu-\ntional prediction module shortcut, enabling effective training\nwithout large-scale pre-training.\nThe present work builds directly on this progression. The\ndataset from [1] gives 22,000 FEM-generated composite ge-\nometry and field image pairs across ten subdatasets is adopted,\nand the cGAN image-to-image architecture is replaced with\na hybrid UNet-Transformer, providing the first direct archi-\ntectural comparison between convolutional image translation\nand global-attention-based field prediction on this benchmark.\nPrediction quality is evaluated using MAE, SSIM [8], and\nR2, and encoder attention is interpreted using Grad-CAM\n[9] and Grad-CAM++ [11] to assess whether global attention\nproduces physically meaningful spatial localization without\nexplicit structural supervision."
+    },
+    {
+      "citation_id": "citation:67ee787596588e82",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:a029dbeca306a9df",
+      "reference_id": "reference:57e31ef4ac1fbf96",
+      "reference_number": "1",
+      "mention_text": "[1]",
+      "context": "III. PROPOSED METHODOLOGY\nThe proposed model, the hybrid Unet-Transformer, takes\na 128\u00d7128 RGB composite geometry image as input and\nproduces a 128\u00d7128 RGB stress or strain field image as\noutput, framing mechanical field prediction as an image-\nto-image translation problem. The training ran for around\n4 hours 25 minutes on Google Colab\u2019s T4 GPU. Code\navailability : \u201dhttps://anonymous.4open.science/r/hybrid-Unet-\nTransformer-Stress-Field-Prediction-C112/\u201d. Data is uploaded\non huggingface as well which the notebook in the paper\ndirectly accesses it.\nA. Data Collection and Preprocessing\nThe dataset used in this work is sourced from Yang et al.\n[1], where it was generated through finite element method\n(FEM) simulations using the commercial Abaqus software.\nThe composite geometries consist of two constituent phases\nbrittle units and soft units arranged on a two-dimensional grid\nin the x-y plane. The brittle units are represented in white and\nthe soft units in red against a black background, providing\nunambiguous encoding of the microstructural geometry as\nan RGB image. Out of 2\u00b3\u00b2 possible geometric combinations\narising from the binary arrangement of soft and brittle units\non the grid, 2,000 geometries were randomly selected to form\nthe dataset. The ratio of soft units across the dataset follows\nan approximately Gaussian distribution, centered around 0.5,\nensuring a balanced representation of microstructural config-\nurations across the design space.\nThe dataset covers eight distinct field types, each con-\nstituting a separate subdataset.The PE11 subdataset captures\nthe plastic strain component in the x-direction, encoding\ndirectional deformation along the horizontal loading axis.\nPE12 provides the shear strain component, reflecting off-axis\ndeformation between the x and y directions. S11 contains the\nnormal stress in the x-direction, representing the direct stress\ncomponent along the compressive loading axis, while S12\ncaptures the corresponding shear stress between the x and y di-\nrections. Beyond these field-type variants, the dataset includes\nthree geometry-variant subdatasets. The hexagonal subdataset\ncontains composites built from hexagonal tessellations in place\nof square units, testing the model\u2019s generalization to non-\nsquare elementary shapes. The triangular subdataset similarly\nreplaces square units with triangular tessellations. The bound-"
+    },
+    {
+      "citation_id": "citation:1a92aabc66cfd04f",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:6bc549dc026bceb6",
+      "reference_id": "reference:6073382800ee1547",
+      "reference_number": "15",
+      "mention_text": "[15]",
+      "context": "square elementary shapes. The triangular subdataset similarly\nreplaces square units with triangular tessellations. The bound-\nary condition subdataset encodes multiple loading scenarios\nspecifically compression and nanoindentation directly within\nthe geometry image using green lines as rigid body indicators,\nenabling a single model to distinguish and respond to distinct\nmechanical boundary conditions. The von Mises subdataset\nuses a higher-resolution 32\u00d732 grid representation in place of\nthe base 8\u00d78 grid, allowing the model to capture more complex\nmicrostructural patterns. All subdatasets share a common\nstorage format: each image is stored as a side-by-side PNG,\nwhere the left half encodes the input composite geometry and\nthe right half encodes the corresponding FEM-computed stress\nor strain field, as shown in Figure 1.\nNo physics-altering preprocessing or artificial augmentation\ntechniques such as rotation, colour jitter or noise injection are\napplied, as such transformations would decouple the geometry\nimage from its physically consistent field output and cause\nthe model to learn spurious mappings inconsistent with the\nunderlying mechanics [15].\nFig. 1. (a) Geometry on the left half (b) FEM Field on right half\nB. Model Architecture and Training\nA hybrid Unet-Transformer architecture is proposed, de-\nsigned specifically for image-to-image translation from FEM\ngeometry inputs to stress/strain field outputs[13]. The model\naccepts a 3-channel 128\u00d7128 geometry image and produces\na corresponding 3-channel 128\u00d7128 field prediction. The\narchitecture consists of three components: a convolutional\nencoder, a Transformer bottleneck, and a multi-scale convo-\nlutional decoder with skip connections. Due to limited data\nof only 22,000 images in total, a hybrid architecture likes\nthis provides better performance over Vision transformer [10].\nHere, the Unet[12] encoders will capture the local features,\nwhereas transformer block will attend to global context of\nFEM geometric images.\n1) Encoder: The encoder progressively downsamples the\ninput from 128\u00d7128 to an 8\u00d78 spatial bottleneck through\nfour stages, producing skip features at each intermediate\nresolution as shown in Figure 2. Each residual blocks consists\nof two convolution layers interleaved with GroupNorm and\nSilU activations, with a residual shortcut connections. Each\nResBlock computes:"
+    },
+    {
+      "citation_id": "citation:730b0dc659efd13a",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:6bc549dc026bceb6",
+      "reference_id": "reference:d2db069c87314a15",
+      "reference_number": "13",
+      "mention_text": "[13]",
+      "context": "square elementary shapes. The triangular subdataset similarly\nreplaces square units with triangular tessellations. The bound-\nary condition subdataset encodes multiple loading scenarios\nspecifically compression and nanoindentation directly within\nthe geometry image using green lines as rigid body indicators,\nenabling a single model to distinguish and respond to distinct\nmechanical boundary conditions. The von Mises subdataset\nuses a higher-resolution 32\u00d732 grid representation in place of\nthe base 8\u00d78 grid, allowing the model to capture more complex\nmicrostructural patterns. All subdatasets share a common\nstorage format: each image is stored as a side-by-side PNG,\nwhere the left half encodes the input composite geometry and\nthe right half encodes the corresponding FEM-computed stress\nor strain field, as shown in Figure 1.\nNo physics-altering preprocessing or artificial augmentation\ntechniques such as rotation, colour jitter or noise injection are\napplied, as such transformations would decouple the geometry\nimage from its physically consistent field output and cause\nthe model to learn spurious mappings inconsistent with the\nunderlying mechanics [15].\nFig. 1. (a) Geometry on the left half (b) FEM Field on right half\nB. Model Architecture and Training\nA hybrid Unet-Transformer architecture is proposed, de-\nsigned specifically for image-to-image translation from FEM\ngeometry inputs to stress/strain field outputs[13]. The model\naccepts a 3-channel 128\u00d7128 geometry image and produces\na corresponding 3-channel 128\u00d7128 field prediction. The\narchitecture consists of three components: a convolutional\nencoder, a Transformer bottleneck, and a multi-scale convo-\nlutional decoder with skip connections. Due to limited data\nof only 22,000 images in total, a hybrid architecture likes\nthis provides better performance over Vision transformer [10].\nHere, the Unet[12] encoders will capture the local features,\nwhereas transformer block will attend to global context of\nFEM geometric images.\n1) Encoder: The encoder progressively downsamples the\ninput from 128\u00d7128 to an 8\u00d78 spatial bottleneck through\nfour stages, producing skip features at each intermediate\nresolution as shown in Figure 2. Each residual blocks consists\nof two convolution layers interleaved with GroupNorm and\nSilU activations, with a residual shortcut connections. Each\nResBlock computes:"
+    },
+    {
+      "citation_id": "citation:0b43b0a3ea500d1e",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:6bc549dc026bceb6",
+      "reference_id": "reference:edd1f63548eb41f9",
+      "reference_number": "10",
+      "mention_text": "[10]",
+      "context": "square elementary shapes. The triangular subdataset similarly\nreplaces square units with triangular tessellations. The bound-\nary condition subdataset encodes multiple loading scenarios\nspecifically compression and nanoindentation directly within\nthe geometry image using green lines as rigid body indicators,\nenabling a single model to distinguish and respond to distinct\nmechanical boundary conditions. The von Mises subdataset\nuses a higher-resolution 32\u00d732 grid representation in place of\nthe base 8\u00d78 grid, allowing the model to capture more complex\nmicrostructural patterns. All subdatasets share a common\nstorage format: each image is stored as a side-by-side PNG,\nwhere the left half encodes the input composite geometry and\nthe right half encodes the corresponding FEM-computed stress\nor strain field, as shown in Figure 1.\nNo physics-altering preprocessing or artificial augmentation\ntechniques such as rotation, colour jitter or noise injection are\napplied, as such transformations would decouple the geometry\nimage from its physically consistent field output and cause\nthe model to learn spurious mappings inconsistent with the\nunderlying mechanics [15].\nFig. 1. (a) Geometry on the left half (b) FEM Field on right half\nB. Model Architecture and Training\nA hybrid Unet-Transformer architecture is proposed, de-\nsigned specifically for image-to-image translation from FEM\ngeometry inputs to stress/strain field outputs[13]. The model\naccepts a 3-channel 128\u00d7128 geometry image and produces\na corresponding 3-channel 128\u00d7128 field prediction. The\narchitecture consists of three components: a convolutional\nencoder, a Transformer bottleneck, and a multi-scale convo-\nlutional decoder with skip connections. Due to limited data\nof only 22,000 images in total, a hybrid architecture likes\nthis provides better performance over Vision transformer [10].\nHere, the Unet[12] encoders will capture the local features,\nwhereas transformer block will attend to global context of\nFEM geometric images.\n1) Encoder: The encoder progressively downsamples the\ninput from 128\u00d7128 to an 8\u00d78 spatial bottleneck through\nfour stages, producing skip features at each intermediate\nresolution as shown in Figure 2. Each residual blocks consists\nof two convolution layers interleaved with GroupNorm and\nSilU activations, with a residual shortcut connections. Each\nResBlock computes:"
+    },
+    {
+      "citation_id": "citation:703c7156939087c0",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:6bc549dc026bceb6",
+      "reference_id": "reference:aa13189ae8b22021",
+      "reference_number": "12",
+      "mention_text": "[12]",
+      "context": "square elementary shapes. The triangular subdataset similarly\nreplaces square units with triangular tessellations. The bound-\nary condition subdataset encodes multiple loading scenarios\nspecifically compression and nanoindentation directly within\nthe geometry image using green lines as rigid body indicators,\nenabling a single model to distinguish and respond to distinct\nmechanical boundary conditions. The von Mises subdataset\nuses a higher-resolution 32\u00d732 grid representation in place of\nthe base 8\u00d78 grid, allowing the model to capture more complex\nmicrostructural patterns. All subdatasets share a common\nstorage format: each image is stored as a side-by-side PNG,\nwhere the left half encodes the input composite geometry and\nthe right half encodes the corresponding FEM-computed stress\nor strain field, as shown in Figure 1.\nNo physics-altering preprocessing or artificial augmentation\ntechniques such as rotation, colour jitter or noise injection are\napplied, as such transformations would decouple the geometry\nimage from its physically consistent field output and cause\nthe model to learn spurious mappings inconsistent with the\nunderlying mechanics [15].\nFig. 1. (a) Geometry on the left half (b) FEM Field on right half\nB. Model Architecture and Training\nA hybrid Unet-Transformer architecture is proposed, de-\nsigned specifically for image-to-image translation from FEM\ngeometry inputs to stress/strain field outputs[13]. The model\naccepts a 3-channel 128\u00d7128 geometry image and produces\na corresponding 3-channel 128\u00d7128 field prediction. The\narchitecture consists of three components: a convolutional\nencoder, a Transformer bottleneck, and a multi-scale convo-\nlutional decoder with skip connections. Due to limited data\nof only 22,000 images in total, a hybrid architecture likes\nthis provides better performance over Vision transformer [10].\nHere, the Unet[12] encoders will capture the local features,\nwhereas transformer block will attend to global context of\nFEM geometric images.\n1) Encoder: The encoder progressively downsamples the\ninput from 128\u00d7128 to an 8\u00d78 spatial bottleneck through\nfour stages, producing skip features at each intermediate\nresolution as shown in Figure 2. Each residual blocks consists\nof two convolution layers interleaved with GroupNorm and\nSilU activations, with a residual shortcut connections. Each\nResBlock computes:"
+    },
+    {
+      "citation_id": "citation:48a6a44e03fb9d57",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:37d08d5f7f45c958",
+      "reference_id": "reference:57e31ef4ac1fbf96",
+      "reference_number": "1",
+      "mention_text": "[0, 1]",
+      "context": "Fig. 2. Model Architecture\narithmically between 1 and 10,000, computed independently\nfor both spatial dimensions (y and x) and concatenated.\nSix TransformerBlock modules are applied sequentially.\nEach block uses pre-norm LayerNorm, multi-head self-\nattention, and a two-layer MLP with GELU activation (hidden\ndimension 512). Residual connections are applied around\nboth the attention and MLP sub-layers. A learnable linear\nprojection is additionally applied to the positional-embedded\ntokens before the Transformer layers.\nGiven a sequence of tokens Z \u2208RN\u00d7d where N = H\u00b7W =\n64 and d = 256, each TransformerBlock computes:\nZ\u2032 = Z + MHSA(LN(Z))\n(2)\nZ\u2032\u2032 = Z\u2032 + MLP(LN(Z\u2032))\n(3)\nwhere\nLN(\u00b7)\nis\nLayer\nNormalization\n(pre-norm),\nand\nMHSA(\u00b7) is Multi-Head Self-Attention with h = 8 heads\ndefined as:\nMHSA(Z) = Concat(head1, . . . , headh) WO\n(4)\n\u0012QiK\u22a4\n\u0013\ni\n\u221adk\nheadi = softmax\nVi\n(5)\nwhere dk = d/h = 32 is the per-head dimension, and WO \u2208\nRd\u00d7d are learned projection matrices.\nThe MLP sub-layer is a two-layer feed-forward network:\nMLP(z) = W2 GELU(W1z + b1) + b2\n(6)\nwith hidden dimension dmlp = 512 (i.e., W1 \u2208R512\u00d7256,\nW2 \u2208R256\u00d7512).\n3) Decoder: The decoder reconstructs the full-resolution\nfield prediction through bilinear upsampling and skip connec-\ntion fusion. At each scale, an UpSample block applies bilinear\n2\u00d7 upsampling followed by a 3\u00d73 convolution and SiLU, then\nconcatenates the corresponding encoder skip feature along\nthe channel dimension, and processes the result through a\nFuseBlock consisting of a 3\u00d73 projection convolution and a\nsequence of ResBlocks.\nSigmoid activations at all output heads bound predictions to\n[0, 1], which is required for numerical stability of the SSIM\nloss.\nC. Loss Function\nTraining uses a multi-scale composite loss combining Struc-\ntural Similarity Index Measure (SSIM) [8] and L1 losses at all\nthree decoder output scales. For the full-resolution (128\u00d7128)\noutput:\n\u0000\n1 \u2212SSIM(\u02c6y128, y)\n\u0001\n+ LL1(\u02c6y128, y)\n(7)\nL128 =\nFor the auxiliary lower-resolution outputs, ground-truth\nfields are downsampled via average pooling (factor 2 for\n64 \u00d7 64, factor 4 for 32 \u00d7 32):\nh\u0000\ni\n1 \u2212SSIM(\u02c6y64, y64)\n\u0001\n+ LL1(\u02c6y64, y64)\nLms = 0.5 \u00b7\nh\u0000\ni\n1 \u2212SSIM(\u02c6y32, y32)\n\u0001\n+ LL1(\u02c6y32, y32)\n+ 0.25 \u00b7\n(8)\nThe total loss is:\nLtotal = L128 + Lms\n(9)\nIV. RESULTS AND DISCUSSIONS\nFigure\n3 presents the training and validation loss curves\nalongside the validation SSIM trajectory. Validation SSIM"
+    },
+    {
+      "citation_id": "citation:f4fc3a4b5ae34c14",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:37d08d5f7f45c958",
+      "reference_id": "reference:acf3541256f64c06",
+      "reference_number": "8",
+      "mention_text": "[8]",
+      "context": "Fig. 2. Model Architecture\narithmically between 1 and 10,000, computed independently\nfor both spatial dimensions (y and x) and concatenated.\nSix TransformerBlock modules are applied sequentially.\nEach block uses pre-norm LayerNorm, multi-head self-\nattention, and a two-layer MLP with GELU activation (hidden\ndimension 512). Residual connections are applied around\nboth the attention and MLP sub-layers. A learnable linear\nprojection is additionally applied to the positional-embedded\ntokens before the Transformer layers.\nGiven a sequence of tokens Z \u2208RN\u00d7d where N = H\u00b7W =\n64 and d = 256, each TransformerBlock computes:\nZ\u2032 = Z + MHSA(LN(Z))\n(2)\nZ\u2032\u2032 = Z\u2032 + MLP(LN(Z\u2032))\n(3)\nwhere\nLN(\u00b7)\nis\nLayer\nNormalization\n(pre-norm),\nand\nMHSA(\u00b7) is Multi-Head Self-Attention with h = 8 heads\ndefined as:\nMHSA(Z) = Concat(head1, . . . , headh) WO\n(4)\n\u0012QiK\u22a4\n\u0013\ni\n\u221adk\nheadi = softmax\nVi\n(5)\nwhere dk = d/h = 32 is the per-head dimension, and WO \u2208\nRd\u00d7d are learned projection matrices.\nThe MLP sub-layer is a two-layer feed-forward network:\nMLP(z) = W2 GELU(W1z + b1) + b2\n(6)\nwith hidden dimension dmlp = 512 (i.e., W1 \u2208R512\u00d7256,\nW2 \u2208R256\u00d7512).\n3) Decoder: The decoder reconstructs the full-resolution\nfield prediction through bilinear upsampling and skip connec-\ntion fusion. At each scale, an UpSample block applies bilinear\n2\u00d7 upsampling followed by a 3\u00d73 convolution and SiLU, then\nconcatenates the corresponding encoder skip feature along\nthe channel dimension, and processes the result through a\nFuseBlock consisting of a 3\u00d73 projection convolution and a\nsequence of ResBlocks.\nSigmoid activations at all output heads bound predictions to\n[0, 1], which is required for numerical stability of the SSIM\nloss.\nC. Loss Function\nTraining uses a multi-scale composite loss combining Struc-\ntural Similarity Index Measure (SSIM) [8] and L1 losses at all\nthree decoder output scales. For the full-resolution (128\u00d7128)\noutput:\n\u0000\n1 \u2212SSIM(\u02c6y128, y)\n\u0001\n+ LL1(\u02c6y128, y)\n(7)\nL128 =\nFor the auxiliary lower-resolution outputs, ground-truth\nfields are downsampled via average pooling (factor 2 for\n64 \u00d7 64, factor 4 for 32 \u00d7 32):\nh\u0000\ni\n1 \u2212SSIM(\u02c6y64, y64)\n\u0001\n+ LL1(\u02c6y64, y64)\nLms = 0.5 \u00b7\nh\u0000\ni\n1 \u2212SSIM(\u02c6y32, y32)\n\u0001\n+ LL1(\u02c6y32, y32)\n+ 0.25 \u00b7\n(8)\nThe total loss is:\nLtotal = L128 + Lms\n(9)\nIV. RESULTS AND DISCUSSIONS\nFigure\n3 presents the training and validation loss curves\nalongside the validation SSIM trajectory. Validation SSIM"
+    },
+    {
+      "citation_id": "citation:7166d064cee9a16a",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:71ebfdddda578aaf",
+      "reference_id": "reference:8553e399a8945970",
+      "reference_number": "9",
+      "mention_text": "[9]",
+      "context": "TABLE I\nPER-SAMPLE PREDICTION METRICS ON THE TEST SPLIT ACROSS ALL\nSUBDATASETS.\nSubdataset\nMAE\nSSIM\nR2\nBC scale\n0.0050\n0.9845\n0.9991\nTRIANGLE\n0.0052\n0.9936\n0.9980\nHEXAGON\n0.0129\n0.9779\n0.9935\nSTITCH (GEO MISES)\n0.0109\n0.9730\n0.9929\nPE12\n0.0266\n0.8995\n0.9617\nS12\n0.0445\n0.8197\n0.9240\nPE11 0.2\n0.0512\n0.8543\n0.8258\nS11\n0.0770\n0.7126\n0.7735\ninstances, indicating near-perfect spatial and intensity agree-\nment with the FEM reference. The HEXAGON and STITCH\nsubdatasets follow closely, with R2 above 0.99 and SSIM\nabove 0.97, confirming that the model generalizes effectively\nto both periodic non-square tessellations and high-resolution\n32\u00d732 microstructural geometries.\nPE12 and S12 remain quantitatively strong, with R2 values\nof 0.9617 and 0.9240 respectively, though SSIM drops below\n0.90 in both cases, reflecting the model\u2019s tendency to apply\nspatial smoothing at sharp phase-boundary stress concentra-\ntions under irregular block arrangements. PE11 0.2 exhibits\na further reduction to R2 = 0.8258 and SSIM = 0.8543,\nattributable to the sparse geometry and extended low-stress\nbrittle regions that reduce the density of learnable structural\ncues available to the encoder.\n1) Qualitative Analysis: Figure 4 presents qualitative pre-\ndictions alongside Gradient-weighted Class Activation Maps\n(GradCAM)[9] and GradCAM++[11] computed at the final\nencoder convolutional layer, for each of the three subdatasets.\nBoundary Condition Scale The model achieves near-\nperfect performance (MAE 0.0050, SSIM 0.9845, R\u00b2 0.9991),\naccurately reproducing the arch-shaped stress diffusion be-\nneath the spherical indenter. GradCAM shows broad acti-\nvations originating at the indenter contact zone spreading\ndownward, while GradCAM++ tightly concentrates at the\ntop-center contact point confirming the encoder has correctly\nparsed the green boundary condition marker as a mechanically\nmeaningful spatial cue.\nPE12 The shear strain field is recovered with strong ac-\ncuracy (MAE 0.0266, SSIM 0.8995, R\u00b2 0.9617). GradCAM\nexhibits a dominant activation band in the upper-left re-\ngion extending diagonally toward center, consistent with the\nshear-dominant load path through this geometry. GradCAM++\nsharpens this to a single hotspot at the primary block junction.\nMinor underestimation of peak shear concentrations at sharp\ncorners accounts for the slight SSIM reduction."
+    },
+    {
+      "citation_id": "citation:b77f6dbf14c01659",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:71ebfdddda578aaf",
+      "reference_id": "reference:1bad2131406ba207",
+      "reference_number": "11",
+      "mention_text": "[11]",
+      "context": "TABLE I\nPER-SAMPLE PREDICTION METRICS ON THE TEST SPLIT ACROSS ALL\nSUBDATASETS.\nSubdataset\nMAE\nSSIM\nR2\nBC scale\n0.0050\n0.9845\n0.9991\nTRIANGLE\n0.0052\n0.9936\n0.9980\nHEXAGON\n0.0129\n0.9779\n0.9935\nSTITCH (GEO MISES)\n0.0109\n0.9730\n0.9929\nPE12\n0.0266\n0.8995\n0.9617\nS12\n0.0445\n0.8197\n0.9240\nPE11 0.2\n0.0512\n0.8543\n0.8258\nS11\n0.0770\n0.7126\n0.7735\ninstances, indicating near-perfect spatial and intensity agree-\nment with the FEM reference. The HEXAGON and STITCH\nsubdatasets follow closely, with R2 above 0.99 and SSIM\nabove 0.97, confirming that the model generalizes effectively\nto both periodic non-square tessellations and high-resolution\n32\u00d732 microstructural geometries.\nPE12 and S12 remain quantitatively strong, with R2 values\nof 0.9617 and 0.9240 respectively, though SSIM drops below\n0.90 in both cases, reflecting the model\u2019s tendency to apply\nspatial smoothing at sharp phase-boundary stress concentra-\ntions under irregular block arrangements. PE11 0.2 exhibits\na further reduction to R2 = 0.8258 and SSIM = 0.8543,\nattributable to the sparse geometry and extended low-stress\nbrittle regions that reduce the density of learnable structural\ncues available to the encoder.\n1) Qualitative Analysis: Figure 4 presents qualitative pre-\ndictions alongside Gradient-weighted Class Activation Maps\n(GradCAM)[9] and GradCAM++[11] computed at the final\nencoder convolutional layer, for each of the three subdatasets.\nBoundary Condition Scale The model achieves near-\nperfect performance (MAE 0.0050, SSIM 0.9845, R\u00b2 0.9991),\naccurately reproducing the arch-shaped stress diffusion be-\nneath the spherical indenter. GradCAM shows broad acti-\nvations originating at the indenter contact zone spreading\ndownward, while GradCAM++ tightly concentrates at the\ntop-center contact point confirming the encoder has correctly\nparsed the green boundary condition marker as a mechanically\nmeaningful spatial cue.\nPE12 The shear strain field is recovered with strong ac-\ncuracy (MAE 0.0266, SSIM 0.8995, R\u00b2 0.9617). GradCAM\nexhibits a dominant activation band in the upper-left re-\ngion extending diagonally toward center, consistent with the\nshear-dominant load path through this geometry. GradCAM++\nsharpens this to a single hotspot at the primary block junction.\nMinor underestimation of peak shear concentrations at sharp\ncorners accounts for the slight SSIM reduction."
+    }
+  ],
+  "tables": [
+    {
+      "table_id": "table:6067694785cec41f",
+      "paper_id": "2606.31068",
+      "label": "I",
+      "caption": "summarizes the per-sample prediction metrics across",
+      "raw_text": "Table I summarizes the per-sample prediction metrics across\nall eight subdatasets evaluated on the held-out test split. The\nmodel is assessed using Mean Absolute Error (MAE), Struc-\ntural Similarity Index Measure (SSIM), and the coefficient of\ndetermination R2, computed between the predicted field and\nthe corresponding FEM ground truth.\nThe results reveal a consistent performance stratification\nacross subdatasets that correlates with the geometric regularity\nand field complexity of each case. The boundary condi-\ntion subdataset (BC scale) and the TRIANGLE tessellation\nachieve the highest accuracy of all evaluated cases, with R2\nvalues of 0.9991 and 0.9980 and MAE below 0.006 in both",
+      "numeric_lines": [
+        "values of 0.9991 and 0.9980 and MAE below 0.006 in both"
+      ],
+      "structured_rows": [],
+      "extraction_level": "raw_numeric_lines",
+      "confidence": 0.6,
+      "passage_id": "passage:1aaa48272fe23cee"
+    },
+    {
+      "table_id": "table:f7d208657b2fe447",
+      "paper_id": "2606.31068",
+      "label": "I",
+      "caption": "",
+      "raw_text": "TABLE I\nPER-SAMPLE PREDICTION METRICS ON THE TEST SPLIT ACROSS ALL\nSUBDATASETS.\nSubdataset\nMAE\nSSIM\nR2\nBC scale\n0.0050\n0.9845\n0.9991\nTRIANGLE\n0.0052\n0.9936\n0.9980\nHEXAGON\n0.0129\n0.9779\n0.9935\nSTITCH (GEO MISES)\n0.0109\n0.9730\n0.9929\nPE12\n0.0266\n0.8995\n0.9617\nS12\n0.0445\n0.8197\n0.9240\nPE11 0.2\n0.0512\n0.8543\n0.8258\nS11\n0.0770\n0.7126\n0.7735\ninstances, indicating near-perfect spatial and intensity agree-\nment with the FEM reference. The HEXAGON and STITCH\nsubdatasets follow closely, with R2 above 0.99 and SSIM\nabove 0.97, confirming that the model generalizes effectively\nto both periodic non-square tessellations and high-resolution\n32\u00d732 microstructural geometries.\nPE12 and S12 remain quantitatively strong, with R2 values\nof 0.9617 and 0.9240 respectively, though SSIM drops below\n0.90 in both cases, reflecting the model\u2019s tendency to apply\nspatial smoothing at sharp phase-boundary stress concentra-\ntions under irregular block arrangements. PE11 0.2 exhibits\na further reduction to R2 = 0.8258 and SSIM = 0.8543,\nattributable to the sparse geometry and extended low-stress\nbrittle regions that reduce the density of learnable structural\ncues available to the encoder.\n1) Qualitative Analysis: Figure 4 presents qualitative pre-\ndictions alongside Gradient-weighted Class Activation Maps\n(GradCAM)[9] and GradCAM++[11] computed at the final\nencoder convolutional layer, for each of the three subdatasets.\nBoundary Condition Scale The model achieves near-\nperfect performance (MAE 0.0050, SSIM 0.9845, R\u00b2 0.9991),\naccurately reproducing the arch-shaped stress diffusion be-\nneath the spherical indenter. GradCAM shows broad acti-\nvations originating at the indenter contact zone spreading\ndownward, while GradCAM++ tightly concentrates at the\ntop-center contact point confirming the encoder has correctly\nparsed the green boundary condition marker as a mechanically\nmeaningful spatial cue.\nPE12 The shear strain field is recovered with strong ac-\ncuracy (MAE 0.0266, SSIM 0.8995, R\u00b2 0.9617). GradCAM\nexhibits a dominant activation band in the upper-left re-\ngion extending diagonally toward center, consistent with the\nshear-dominant load path through this geometry. GradCAM++\nsharpens this to a single hotspot at the primary block junction.\nMinor underestimation of peak shear concentrations at sharp\ncorners accounts for the slight SSIM reduction.\nS12 Performance remains acceptable (MAE 0.0445, SSIM\n0.8197, R\u00b2 0.9240) though SSIM drops relative to PE12,\nreflecting the more irregular block arrangement and sharper\nstress discontinuities. GradCAM activations are spatially scat-\ntered across the central region, while GradCAM++ identifies",
+      "numeric_lines": [
+        "PE11 0.2",
+        "subdatasets follow closely, with R2 above 0.99 and SSIM",
+        "32\u00d732 microstructural geometries.",
+        "PE12 and S12 remain quantitatively strong, with R2 values",
+        "of 0.9617 and 0.9240 respectively, though SSIM drops below",
+        "tions under irregular block arrangements. PE11 0.2 exhibits",
+        "a further reduction to R2 = 0.8258 and SSIM = 0.8543,",
+        "1) Qualitative Analysis: Figure 4 presents qualitative pre-",
+        "(GradCAM)[9] and GradCAM++[11] computed at the final",
+        "perfect performance (MAE 0.0050, SSIM 0.9845, R\u00b2 0.9991),",
+        "curacy (MAE 0.0266, SSIM 0.8995, R\u00b2 0.9617). GradCAM",
+        "S12 Performance remains acceptable (MAE 0.0445, SSIM",
+        "0.8197, R\u00b2 0.9240) though SSIM drops relative to PE12,"
+      ],
+      "structured_rows": [],
+      "extraction_level": "raw_numeric_lines",
+      "confidence": 0.6,
+      "passage_id": "passage:1aaa48272fe23cee"
+    }
+  ],
+  "comparison_contexts": [
+    {
+      "comparison_id": "comparison:c36eead85eca9314",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:04d986f39e1b0042",
+      "section": "Front matter",
+      "text": "composites and lattice metamaterials, and capturing nonlinear\nphenomena including plasticity and buckling instability.\nDespite this progression, a common limitation across the\nabove architectures is their reliance on convolutional inductive\nbiases local receptive fields and translational equivariance\nwhich constrain the model\u2019s capacity to capture long-range\nspatial dependencies in stress and strain fields, particularly\nfor geometries with non-local load transfer paths. Vision\nTransformers address this through global self-attention mech-\nanisms with no locality constraint, making them in principle\nbetter suited to capturing long-range mechanical interactions.\nHowever, standard Vision Transformers require large training\ndatasets to converge effectively, which is incompatible with\nthe small FEM-generated datasets typical of computational\nmechanics. A hybrid CNN-Transformer architecture for small\ndata paradigms was proposed in [10], incorporating progres-\nsive tokenization with feature supplementation and a convolu-\ntional prediction module shortcut, enabling effective training\nwithout large-scale pre-training.\nThe present work builds directly on this progression. The\ndataset from [1] gives 22,000 FEM-generated composite ge-\nometry and field image pairs across ten subdatasets is adopted,\nand the cGAN image-to-image architecture is replaced with\na hybrid UNet-Transformer, providing the first direct archi-\ntectural comparison between convolutional image translation\nand global-attention-based field prediction on this benchmark.\nPrediction quality is evaluated using MAE, SSIM [8], and\nR2, and encoder attention is interpreted using Grad-CAM\n[9] and Grad-CAM++ [11] to assess whether global attention\nproduces physically meaningful spatial localization without\nexplicit structural supervision.",
+      "claim_ids": [
+        "2606.31068::prior_approach::8",
+        "2606.31068::prior_limitation::0",
+        "2606.31068::prior_limitation::1",
+        "2606.31068::rejected_alternative::0",
+        "2606.31068::mechanism_principle::0"
+      ],
+      "cited_references": [
+        {
+          "reference_number": "10",
+          "reference_id": "reference:edd1f63548eb41f9",
+          "raw_text": "J. Chen, P. Wu, X. Zhang et al., \u201cAdd-Vit: CNN-Transformer hybrid architecture for small data paradigm processing,\u201d Neural Processing Letters, vol. 56, p. 198, 2024.",
+          "doi": "",
+          "arxiv_id": "",
+          "resolution_status": "metadata_only"
+        },
+        {
+          "reference_number": "1",
+          "reference_id": "reference:57e31ef4ac1fbf96",
+          "raw_text": "Z. Yang, C.-H. Yu, and M. J. Buehler, \u201cDeep learning model to predict complex stress and strain fields in hierarchical composites,\u201d Science Advances, vol. 7, no. 15, eabd7416, 2021.",
+          "doi": "",
+          "arxiv_id": "",
+          "resolution_status": "metadata_only"
+        },
+        {
+          "reference_number": "8",
+          "reference_id": "reference:acf3541256f64c06",
+          "raw_text": "Z. Wang, A. C. Bovik, H. R. Sheikh, and E. P. Simoncelli, \u201cImage quality assessment: From error visibility to structural similarity,\u201d IEEE Transactions on Image Processing, vol. 13, no. 4, pp. 600\u2013612, 2004.",
+          "doi": "",
+          "arxiv_id": "",
+          "resolution_status": "metadata_only"
+        },
+        {
+          "reference_number": "9",
+          "reference_id": "reference:8553e399a8945970",
+          "raw_text": "and Grad-CAM++ [11] to assess whether global attention produces physically meaningful spatial localization without explicit structural supervision.",
+          "doi": "",
+          "arxiv_id": "",
+          "resolution_status": "metadata_only"
+        },
+        {
+          "reference_number": "11",
+          "reference_id": "reference:1bad2131406ba207",
+          "raw_text": "A. B. George, S. Bathini and G. A, \u201cGrad-CAM & Grad-CAM++ for Explainable Oral Squamous Cell Carcinoma Detection using Deep Learning on Orthopantomograms,\u201d International Conference on Sen- sors and Related Networks (SENNET) Special Focus on Digital healthcare(64220), Vellore, India, 2025, pp. 1-6, doi: 10.1109/SEN- NET64220.2025.11136014",
+          "doi": "10.1109/SEN-",
+          "arxiv_id": "",
+          "resolution_status": "identifier_available"
+        }
+      ],
+      "tables": [],
+      "cross_paper": true,
+      "cited_content_status": "requires_resolution"
+    },
+    {
+      "comparison_id": "comparison:887bcba3226be956",
+      "paper_id": "2606.31068",
+      "passage_id": "passage:1827a04ce7a1572c",
+      "section": "Front matter",
+      "text": "Minor underestimation of peak shear concentrations at sharp\ncorners accounts for the slight SSIM reduction.\nS12 Performance remains acceptable (MAE 0.0445, SSIM\n0.8197, R\u00b2 0.9240) though SSIM drops relative to PE12,\nreflecting the more irregular block arrangement and sharper\nstress discontinuities. GradCAM activations are spatially scat-\ntered across the central region, while GradCAM++ identifies\ntwo discrete hotspots in the lower half corresponding to the\nmost geometrically irregular phase junctions. The predicted\nfield captures global topology but applies smoothing at the\nFig. 4. (a) Composite Input (b) GradCAM Results (c) GradCAM++ Results\n(d) Predicted Strain Fields (e) Ground Truth\nsharpest concentration sites.\nS11 This subdataset gave these results (MAE 0.0770, SSIM\n0.7126, R\u00b2 0.7735). The FEM ground truth contains sharp,\nhigh-contrast stress discontinuities at phase boundaries that\nthe model fails to reproduce at full intensity, producing an\nover-smoothed prediction. GradCAM shows diffuse, poorly lo-\ncalized activations with no dominant load path identified, and\nGradCAM++ provides only marginal improvement in spatial\nspecificity both indicating the encoder has not developed a\ngeometrically precise internal representation for this field type.\nPE11-0.2 Performance is moderate (MAE 0.0512, SSIM\n0.8543, R\u00b2 0.8258). The sparse geometry, dominated by large\nbrittle regions with isolated soft inclusions, creates an irregular\nstress topology that the model partially recovers. GradCAM\nactivations concentrate in the upper-center region while Grad-",
+      "claim_ids": [
+        "2606.31068::causal_claim::8",
+        "2606.31068::causal_claim::9",
+        "2606.31068::causal_claim::10",
+        "2606.31068::mechanism_principle::5",
+        "2606.31068::evidence_result::14",
+        "2606.31068::evidence_result::15",
+        "2606.31068::evidence_result::16"
+      ],
+      "cited_references": [],
+      "tables": [],
+      "cross_paper": false,
+      "cited_content_status": "not_applicable"
+    }
+  ],
+  "claim_passage_ids": {
+    "2606.31068::problem_motivation::0": [
+      {
+        "passage_id": "passage:43a8b85c5c4c4359",
+        "match_score": 1.0,
+        "evidence_span": "The prediction of stress and strain fields in composite materials from microstructural geometry has emerged as a key research direction in data-driven mechanics, driven by the prohibitive computational cost of repeated finite element method (FEM) simulations [7] across large composite design spaces."
+      }
+    ],
+    "2606.31068::prior_approach::0": [
+      {
+        "passage_id": "passage:43a8b85c5c4c4359",
+        "match_score": 1.0,
+        "evidence_span": "The dataset has been obtained from Yang et al.[1] where a conditional GAN model was trained for predicting stress and strain fields across a range of two-phase composite geometries."
+      }
+    ],
+    "2606.31068::prior_approach::1": [
+      {
+        "passage_id": "passage:43a8b85c5c4c4359",
+        "match_score": 1.0,
+        "evidence_span": "Early work demonstrated that convolutional neural networks could serve as efficient surrogates for FEM at high accuracy."
+      }
+    ],
+    "2606.31068::prior_approach::2": [
+      {
+        "passage_id": "passage:43a8b85c5c4c4359",
+        "match_score": 1.0,
+        "evidence_span": "A foundational benchmark was established in [6], proposing SCSNet and StressNet two CNN architectures for predicting von Mises stress fields in 2D linear elastic cantilevered structures from geometry, loading, and boundary condition inputs"
+      }
+    ],
+    "2606.31068::prior_approach::3": [
+      {
+        "passage_id": "passage:c9088b99c2bed6b0",
+        "match_score": 1.0,
+        "evidence_span": "A U-Net encoder-decoder architecture was pro- posed in [5, 15] for von Mises stress field prediction in fiber- reinforced composites"
+      }
+    ],
+    "2606.31068::prior_approach::4": [
+      {
+        "passage_id": "passage:c9088b99c2bed6b0",
+        "match_score": 1.0,
+        "evidence_span": "The image-to-image translation paradigm for composite field prediction was advanced in [1], where a conditional GAN comprising a U-Net generator and PatchGAN discriminator was trained to predict von Mises stress and plastic strain fields in two-phase hierarchical composites directly from 2D geometry images, using FEM simulations in Abaqus as ground truth across 2,000 randomly generated composite geometries."
+      }
+    ],
+    "2606.31068::prior_approach::5": [
+      {
+        "passage_id": "passage:c9088b99c2bed6b0",
+        "match_score": 1.0,
+        "evidence_span": "A follow-up study [2] extended this to predict complete stress and strain tensor components across all field directions, incorporating data statistics tuning to improve generalization across varying constituent ratios under limited training data."
+      }
+    ],
+    "2606.31068::prior_approach::6": [
+      {
+        "passage_id": "passage:c9088b99c2bed6b0",
+        "match_score": 1.0,
+        "evidence_span": "A Fourier Neural Operator framework was proposed in [3] that oper- ates in the frequency domain rather than the pixel domain"
+      }
+    ],
+    "2606.31068::prior_approach::7": [
+      {
+        "passage_id": "passage:c9088b99c2bed6b0",
+        "match_score": 1.0,
+        "evidence_span": "A graph neural network framework was proposed in [4] that exploits the natural correspondence between FEM meshes and graphs, predicting deformation, stress and strain fields across fiber composites, stratified composites and lattice metamaterials"
+      }
+    ],
+    "2606.31068::prior_approach::8": [
+      {
+        "passage_id": "passage:04d986f39e1b0042",
+        "match_score": 1.0,
+        "evidence_span": "A hybrid CNN-Transformer architecture for small data paradigms was proposed in [10], incorporating progres- sive tokenization with feature supplementation and a convolu- tional prediction module shortcut, enabling effective training without large-scale pre-training."
+      }
+    ],
+    "2606.31068::prior_approach::9": [
+      {
+        "passage_id": "passage:a029dbeca306a9df",
+        "match_score": 1.0,
+        "evidence_span": "The dataset used in this work is sourced from Yang et al. [1], where it was generated through finite element method (FEM) simulations using the commercial Abaqus software."
+      }
+    ],
+    "2606.31068::prior_approach::10": [
+      {
+        "passage_id": "passage:a029dbeca306a9df",
+        "match_score": 1.0,
+        "evidence_span": "The dataset used in this work is sourced from Yang et al. [1], where it was generated through finite element method (FEM) simulations using the commercial Abaqus software."
+      }
+    ],
+    "2606.31068::prior_limitation::0": [
+      {
+        "passage_id": "passage:04d986f39e1b0042",
+        "match_score": 1.0,
+        "evidence_span": "Despite this progression, a common limitation across the above architectures is their reliance on convolutional inductive biases local receptive fields and translational equivariance which constrain the model\u2019s capacity to capture long-range spatial dependencies in stress and strain fields, particularly for geometries with non-local load transfer paths."
+      }
+    ],
+    "2606.31068::prior_limitation::1": [
+      {
+        "passage_id": "passage:04d986f39e1b0042",
+        "match_score": 1.0,
+        "evidence_span": "However, standard Vision Transformers require large training datasets to converge effectively, which is incompatible with the small FEM-generated datasets typical of computational mechanics."
+      }
+    ],
+    "2606.31068::rejected_alternative::0": [
+      {
+        "passage_id": "passage:04d986f39e1b0042",
+        "match_score": 1.0,
+        "evidence_span": "The dataset from [1] gives 22,000 FEM-generated composite ge- ometry and field image pairs across ten subdatasets is adopted, and the cGAN image-to-image architecture is replaced with a hybrid UNet-Transformer, providing the first direct archi- tectural comparison between convolutional image translation and global-attention-based field prediction on this benchmark."
+      }
+    ],
+    "2606.31068::causal_claim::0": [
+      {
+        "passage_id": "passage:43a8b85c5c4c4359",
+        "match_score": 1.0,
+        "evidence_span": "demonstrating that image-based deep learning could approximate FEM outputs for structured geometries without iterative numerical solving."
+      }
+    ],
+    "2606.31068::causal_claim::1": [
+      {
+        "passage_id": "passage:c9088b99c2bed6b0",
+        "match_score": 1.0,
+        "evidence_span": "axis-aligned flipping operations that preserve mechanical boundary conditions are permissible, whereas arbitrary rotation decouples the geometry image from its physically valid field output and constitutes a physics- violating transformation [15]."
+      }
+    ],
+    "2606.31068::causal_claim::2": [
+      {
+        "passage_id": "passage:6bc549dc026bceb6",
+        "match_score": 1.0,
+        "evidence_span": "Due to limited data of only 22,000 images in total, a hybrid architecture likes this provides better performance over Vision transformer [10]."
+      }
+    ],
+    "2606.31068::causal_claim::3": [
+      {
+        "passage_id": "passage:1aaa48272fe23cee",
+        "match_score": 1.0,
+        "evidence_span": "The results reveal a consistent performance stratification across subdatasets that correlates with the geometric regularity and field complexity of each case."
+      }
+    ],
+    "2606.31068::causal_claim::4": [
+      {
+        "passage_id": "passage:71ebfdddda578aaf",
+        "match_score": 1.0,
+        "evidence_span": "though SSIM drops below 0.90 in both cases, reflecting the model\u2019s tendency to apply spatial smoothing at sharp phase-boundary stress concentra- tions under irregular block arrangements."
+      }
+    ],
+    "2606.31068::causal_claim::5": [
+      {
+        "passage_id": "passage:71ebfdddda578aaf",
+        "match_score": 1.0,
+        "evidence_span": "attributable to the sparse geometry and extended low-stress brittle regions that reduce the density of learnable structural cues available to the encoder."
+      }
+    ],
+    "2606.31068::causal_claim::6": [
+      {
+        "passage_id": "passage:71ebfdddda578aaf",
+        "match_score": 1.0,
+        "evidence_span": "confirming the encoder has correctly parsed the green boundary condition marker as a mechanically meaningful spatial cue."
+      }
+    ],
+    "2606.31068::causal_claim::7": [
+      {
+        "passage_id": "passage:71ebfdddda578aaf",
+        "match_score": 1.0,
+        "evidence_span": "Minor underestimation of peak shear concentrations at sharp corners accounts for the slight SSIM reduction."
+      }
+    ],
+    "2606.31068::causal_claim::8": [
+      {
+        "passage_id": "passage:1827a04ce7a1572c",
+        "match_score": 1.0,
+        "evidence_span": "though SSIM drops relative to PE12, reflecting the more irregular block arrangement and sharper stress discontinuities."
+      }
+    ],
+    "2606.31068::causal_claim::9": [
+      {
+        "passage_id": "passage:1827a04ce7a1572c",
+        "match_score": 1.0,
+        "evidence_span": "The FEM ground truth contains sharp, high-contrast stress discontinuities at phase boundaries that the model fails to reproduce at full intensity, producing an over-smoothed prediction."
+      }
+    ],
+    "2606.31068::causal_claim::10": [
+      {
+        "passage_id": "passage:1827a04ce7a1572c",
+        "match_score": 1.0,
+        "evidence_span": "both indicating the encoder has not developed a geometrically precise internal representation for this field type."
+      }
+    ],
+    "2606.31068::mechanism_principle::0": [
+      {
+        "passage_id": "passage:04d986f39e1b0042",
+        "match_score": 1.0,
+        "evidence_span": "Vision Transformers address this through global self-attention mech- anisms with no locality constraint, making them in principle better suited to capturing long-range mechanical interactions."
+      }
+    ],
+    "2606.31068::mechanism_principle::1": [
+      {
+        "passage_id": "passage:6bc549dc026bceb6",
+        "match_score": 1.0,
+        "evidence_span": "as such transformations would decouple the geometry image from its physically consistent field output and cause the model to learn spurious mappings inconsistent with the underlying mechanics [15]."
+      }
+    ],
+    "2606.31068::mechanism_principle::2": [
+      {
+        "passage_id": "passage:6bc549dc026bceb6",
+        "match_score": 1.0,
+        "evidence_span": "Here, the Unet[12] encoders will capture the local features, whereas transformer block will attend to global context of FEM geometric images."
+      }
+    ],
+    "2606.31068::mechanism_principle::3": [
+      {
+        "passage_id": "passage:71ebfdddda578aaf",
+        "match_score": 1.0,
+        "evidence_span": "reflecting the model\u2019s tendency to apply spatial smoothing at sharp phase-boundary stress concentra- tions under irregular block arrangements."
+      }
+    ],
+    "2606.31068::mechanism_principle::4": [
+      {
+        "passage_id": "passage:71ebfdddda578aaf",
+        "match_score": 1.0,
+        "evidence_span": "attributable to the sparse geometry and extended low-stress brittle regions that reduce the density of learnable structural cues available to the encoder."
+      }
+    ],
+    "2606.31068::mechanism_principle::5": [
+      {
+        "passage_id": "passage:1827a04ce7a1572c",
+        "match_score": 1.0,
+        "evidence_span": "reflecting the more irregular block arrangement and sharper stress discontinuities."
+      }
+    ],
+    "2606.31068::hypothesis_statement::0": [
+      {
+        "passage_id": "passage:43a8b85c5c4c4359",
+        "match_score": 1.0,
+        "evidence_span": "The primary contribution of this work is an empirical demon- stration that a hybrid Unet-Transformer achieves competitive field prediction accuracy on this benchmark, while offering a simpler, single-network training procedure."
+      }
+    ],
+    "2606.31068::hypothesis_statement::1": [
+      {
+        "passage_id": "passage:6bc549dc026bceb6",
+        "match_score": 1.0,
+        "evidence_span": "A hybrid Unet-Transformer architecture is proposed, de- signed specifically for image-to-image translation from FEM geometry inputs to stress/strain field outputs[13]."
+      }
+    ],
+    "2606.31068::evidence_result::0": [
+      {
+        "passage_id": "passage:43a8b85c5c4c4359",
+        "match_score": 1.0,
+        "evidence_span": "with a mean relative error of 2.04% on the test set"
+      }
+    ],
+    "2606.31068::evidence_result::1": [
+      {
+        "passage_id": "passage:c9088b99c2bed6b0",
+        "match_score": 1.0,
+        "evidence_span": "demonstrating cross-complexity gener- alization to higher fiber-count configurations unseen during training."
+      }
+    ],
+    "2606.31068::evidence_result::2": [
+      {
+        "passage_id": "passage:c9088b99c2bed6b0",
+        "match_score": 1.0,
+        "evidence_span": "Generalization was demonstrated to unseen geometries, mul- tiple loading conditions, and non-square tessellations includ- ing hexagonal and triangular unit arrangements."
+      }
+    ],
+    "2606.31068::evidence_result::3": [
+      {
+        "passage_id": "passage:c9088b99c2bed6b0",
+        "match_score": 1.0,
+        "evidence_span": "achieving high-fidelity predictions of complete stress and strain fields with very few training samples and demonstrating zero-shot generalization to unseen geometries and zero-shot super-resolution capabilities not accessible to pixel-domain convolutional surrogates."
+      }
+    ],
+    "2606.31068::evidence_result::4": [
+      {
+        "passage_id": "passage:c9088b99c2bed6b0",
+        "match_score": 1.0,
+        "evidence_span": "and capturing nonlinear phenomena including plasticity and buckling instability."
+      }
+    ],
+    "2606.31068::evidence_result::5": [
+      {
+        "passage_id": "passage:1aaa48272fe23cee",
+        "match_score": 1.0,
+        "evidence_span": "Validation SSIM improves steadily from 0.8697 to 0.9070."
+      }
+    ],
+    "2606.31068::evidence_result::6": [
+      {
+        "passage_id": "passage:1aaa48272fe23cee",
+        "match_score": 1.0,
+        "evidence_span": "The boundary condi- tion subdataset (BC scale) and the TRIANGLE tessellation achieve the highest accuracy of all evaluated cases, with R2 values of 0.9991 and 0.9980 and MAE below 0.006 in both"
+      }
+    ],
+    "2606.31068::evidence_result::7": [
+      {
+        "passage_id": "passage:71ebfdddda578aaf",
+        "match_score": 1.0,
+        "evidence_span": "The HEXAGON and STITCH subdatasets follow closely, with R2 above 0.99 and SSIM above 0.97, confirming that the model generalizes effectively to both periodic non-square tessellations and high-resolution 32\u00d732 microstructural geometries."
+      }
+    ],
+    "2606.31068::evidence_result::8": [
+      {
+        "passage_id": "passage:71ebfdddda578aaf",
+        "match_score": 1.0,
+        "evidence_span": "PE12 and S12 remain quantitatively strong, with R2 values of 0.9617 and 0.9240 respectively, though SSIM drops below 0.90 in both cases"
+      }
+    ],
+    "2606.31068::evidence_result::9": [
+      {
+        "passage_id": "passage:71ebfdddda578aaf",
+        "match_score": 1.0,
+        "evidence_span": "PE11 0.2 exhibits a further reduction to R2 = 0.8258 and SSIM = 0.8543"
+      }
+    ],
+    "2606.31068::evidence_result::10": [
+      {
+        "passage_id": "passage:71ebfdddda578aaf",
+        "match_score": 1.0,
+        "evidence_span": "The model achieves near- perfect performance (MAE 0.0050, SSIM 0.9845, R\u00b2 0.9991), accurately reproducing the arch-shaped stress diffusion be- neath the spherical indenter."
+      }
+    ],
+    "2606.31068::evidence_result::11": [
+      {
+        "passage_id": "passage:71ebfdddda578aaf",
+        "match_score": 1.0,
+        "evidence_span": "GradCAM shows broad acti- vations originating at the indenter contact zone spreading downward, while GradCAM++ tightly concentrates at the top-center contact point"
+      }
+    ],
+    "2606.31068::evidence_result::12": [
+      {
+        "passage_id": "passage:71ebfdddda578aaf",
+        "match_score": 1.0,
+        "evidence_span": "The shear strain field is recovered with strong ac- curacy (MAE 0.0266, SSIM 0.8995, R\u00b2 0.9617)."
+      }
+    ],
+    "2606.31068::evidence_result::13": [
+      {
+        "passage_id": "passage:71ebfdddda578aaf",
+        "match_score": 1.0,
+        "evidence_span": "GradCAM exhibits a dominant activation band in the upper-left re- gion extending diagonally toward center, consistent with the shear-dominant load path through this geometry. GradCAM++ sharpens this to a single hotspot at the primary block junction."
+      }
+    ],
+    "2606.31068::evidence_result::14": [
+      {
+        "passage_id": "passage:1827a04ce7a1572c",
+        "match_score": 1.0,
+        "evidence_span": "Performance remains acceptable (MAE 0.0445, SSIM 0.8197, R\u00b2 0.9240)"
+      }
+    ],
+    "2606.31068::evidence_result::15": [
+      {
+        "passage_id": "passage:1827a04ce7a1572c",
+        "match_score": 1.0,
+        "evidence_span": "S11 This subdataset gave these results (MAE 0.0770, SSIM 0.7126, R\u00b2 0.7735)."
+      }
+    ],
+    "2606.31068::evidence_result::16": [
+      {
+        "passage_id": "passage:1827a04ce7a1572c",
+        "match_score": 1.0,
+        "evidence_span": "GradCAM shows diffuse, poorly lo- calized activations with no dominant load path identified, and GradCAM++ provides only marginal improvement in spatial specificity"
+      }
+    ],
+    "2606.31068::constraint::0": [
+      {
+        "passage_id": "passage:c9088b99c2bed6b0",
+        "match_score": 1.0,
+        "evidence_span": "Critically, this work established that data augmenta- tion in mechanics field prediction must be restricted to physics- consistent transformations"
+      },
+      {
+        "passage_id": "passage:6bc549dc026bceb6",
+        "match_score": 1.0,
+        "evidence_span": "No physics-altering preprocessing or artificial augmentation techniques such as rotation, colour jitter or noise injection are applied"
+      }
+    ],
+    "2606.31068::constraint::1": [
+      {
+        "passage_id": "passage:37d08d5f7f45c958",
+        "match_score": 1.0,
+        "evidence_span": "Sigmoid activations at all output heads bound predictions to [0, 1], which is required for numerical stability of the SSIM loss."
+      }
+    ]
+  }
+}
