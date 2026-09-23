@@ -22,17 +22,14 @@ ROLES = [
     {
         "key": "rejected_alternative",
         "definition": (
-            "An approach explicitly considered but NOT used, plus the reason. Includes both explicit "
-            "method-level rejections ('we did not use X because Y') AND broader contrastive-motivation "
-            "statements that position the paper against prior work ('unlike previous reports, we...', "
-            "'rather than X, we...') - the latter is just as valid an instance of this role even when no "
-            "single sentence names the rejected alternative as bluntly as a methods-section rejection would."
+            "An approach the authors explicitly considered but did not use, together with the reason. "
+            "A comparison, an observed performance difference, or a general weakness of prior work is not "
+            "a rejected alternative unless the text establishes the authors' decision not to use it."
         ),
-        "triggers": ["unlike X, we did not use", "we avoided Y since", "rather than", "unlike previous reports"],
+        "triggers": ["we did not use", "we avoided", "was rejected because"],
         "example": (
-            "\"Unlike previous reports, this study systematically examines the coupled influence of absorber, "
-            "ETL, and HTL properties together with bulk and interface defects.\" -> rejected_alternative "
-            "(prior work studied these factors in isolation; this is rejected as insufficient)"
+            "\"We did not use the Voigt approximation because it cannot represent grain-level stress variation.\" "
+            "-> rejected_alternative"
         ),
     },
     {
@@ -55,7 +52,10 @@ ROLES = [
     },
     {
         "key": "hypothesis_statement",
-        "definition": "An explicit or implicit statement of the paper's core proposal or expectation.",
+        "definition": (
+            "A testable proposal or expectation about what should happen and why. A statement of study purpose, "
+            "a method that was used, or a result already observed is not a hypothesis."
+        ),
         "triggers": ["we hypothesize", "we propose that", "our approach should"],
         "example": "\"Oxo-G retains sufficient lattice periodicity to serve as a robust template for van der Waals epitaxy.\" -> hypothesis_statement",
     },
@@ -67,13 +67,21 @@ ROLES = [
     },
     {
         "key": "constraint",
-        "definition": "A stated limitation or boundary condition the solution must satisfy.",
+        "definition": (
+            "A stated design requirement, validity boundary, experimental limitation, or operating condition. "
+            "An observed value, performance tradeoff, or stability result is not a constraint unless the paper "
+            "states it as a requirement or limit."
+        ),
         "triggers": ["must remain below", "constrained to", "under ambient conditions"],
         "example": "\"These trajectories cannot access dynamics on time scales longer than the ~1.5 ps restart segments.\" -> constraint",
     },
     {
         "key": "contradiction",
-        "definition": "The paper's own result conflicts with a prior claim in the literature.",
+        "definition": (
+            "The paper's own result explicitly conflicts with a specific prior claim or accepted expectation. "
+            "An unusual observation, a comparison between materials, or the absence of a feature is not enough "
+            "without identifying the conflicting expectation."
+        ),
         "triggers": ["in contrast to prior reports", "unexpectedly, we found"],
         "example": "\"Contrary to what analytical potential molecular dynamics simulations predicted, we predominantly observe boron single vacancies.\" -> contradiction",
     },

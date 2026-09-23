@@ -21,6 +21,7 @@ The ranked selection and provenance are in `manifest.json`. Citation counts are 
 - `xml/`: downloaded Europe PMC JATS source.
 - `text/`: structure-preserving extraction text with normalized numeric citations.
 - `agent_claims/`: compact claims selected by Copilot subagents or the main agent.
+- `agent_reviews/`: reproducible removals, corrections, and additions from the quality review.
 - `outputs/`: validated 11-role `PaperRecord` outputs.
 - `evidence_graph/`: deterministic typed entities and relations.
 - `source_context/`: passages, references, citation mentions, tables, and claim anchors.
@@ -38,6 +39,10 @@ Nine papers are distributed under CC BY. `PMC11206460` is CC BY-NC. Per-paper li
 python import_jats_corpus.py --corpus-dir corpus_high_temperature_alloys \
   PMC11206460 PMC10154406 PMC5995863 PMC5627260 PMC7532182 \
   PMC6427779 PMC5458593 PMC10213035 PMC5978046 PMC6265909
+
+python apply_agent_review.py \
+  --claims-dir corpus_high_temperature_alloys/agent_claims \
+  --review-dir corpus_high_temperature_alloys/agent_reviews
 
 python assemble_agent_extraction.py \
   --text-dir corpus_high_temperature_alloys/text \

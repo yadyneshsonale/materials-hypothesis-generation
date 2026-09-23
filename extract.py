@@ -24,6 +24,14 @@ Return a JSON object: {{"items": [{{"role": "<role_key>", "content": "<concise p
 "evidence_span": "<verbatim quote from the text>"}}, ...]}}. Only use role_key values from the
 list above. If nothing matches, return {{"items": []}}."""
 
+_SECTION_GUIDANCE = """Apply section-aware emphasis without imposing quotas:
+- Introduction/background: problem_motivation, prior_approach, prior_limitation, inspiration_source.
+- Methods: rejected_alternative and genuine experimental/design constraints.
+- Results: measured evidence_result and directly supported causal_claim.
+- Discussion/conclusion: mechanism_principle, hypothesis_statement, and explicit contradiction.
+Extract every high-signal match. Do not fill a role merely to make it non-empty. Keep observations,
+mechanisms, hypotheses, constraints, and contradictions distinct according to their definitions."""
+
 _RECONCILE_SYSTEM = """You reconcile candidate extractions for ONE role, gathered independently
 from every section of a paper. Merge near-duplicate mentions, and where two items are clearly
 two halves of the same underlying claim split across sections (e.g. a cause stated in one
@@ -51,6 +59,7 @@ def _extract_text(section: str, text: str, digest: list[str], depth: int = 0) ->
     user = (
         f"Context extracted so far (for resolving references like 'the method described above'):\n"
         f"{digest_block}\n\n"
+        f"{_SECTION_GUIDANCE}\n\n"
         f"--- SECTION: {section} ---\n{text}"
     )
     try:

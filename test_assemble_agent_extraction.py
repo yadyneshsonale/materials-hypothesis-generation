@@ -24,6 +24,29 @@ class AssembleAgentExtractionTests(unittest.TestCase):
                 "role": "evidence_result", "content": "claim", "evidence_span": "missing"
             }])
 
+    def test_reconciles_agent_grouped_claims(self) -> None:
+        claims = [{
+            "role": "problem_motivation",
+            "content": "General gap.",
+            "evidence_span": "Strength remains difficult.",
+            "reconcile_group": "strength-gap",
+            "reconciled_content": "High strength with ductility remains difficult.",
+        }, {
+            "role": "problem_motivation",
+            "content": "Quantified gap.",
+            "evidence_span": "The target is 2 GPa and 10% ductility.",
+            "reconcile_group": "strength-gap",
+            "reconciled_content": "High strength with ductility remains difficult.",
+        }]
+
+        record = assemble(
+            "paper", "Strength remains difficult. The target is 2 GPa and 10% ductility.", claims
+        )
+
+        self.assertEqual(len(record["raw_by_role"]["problem_motivation"]), 2)
+        self.assertEqual(len(record["reconciled_by_role"]["problem_motivation"]), 1)
+        self.assertEqual(len(record["reconciled_by_role"]["problem_motivation"][0]["evidence_spans"]), 2)
+
 
 if __name__ == "__main__":
     unittest.main()
