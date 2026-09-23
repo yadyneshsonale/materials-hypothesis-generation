@@ -19,6 +19,7 @@ from source_context import load_context_index
 MAX_DIRECT_HITS = 8
 MAX_GRAPH_HITS = 8
 MAX_PER_PAPER = 2
+MAX_CITATION_HITS = 8
 SUFFICIENCY_DECISIONS = {"sufficient", "reason_with_caveat", "decompose_further", "unresolved"}
 
 
@@ -45,8 +46,8 @@ _SUFFICIENCY_SYSTEM = """You assess whether retrieved literature claims answer o
 Keep retrieved facts separate from your inference. Return JSON with decision equal to one of:
 sufficient, reason_with_caveat, decompose_further, unresolved. Include a concise finding grounded
 in cited entity IDs, a reason, missing_questions, and assumptions. Use decompose_further only when
-narrower literature questions can close the gap. Never ask the user: when a preference or constraint
-is absent, choose a conservative default, record it in assumptions, and use reason_with_caveat.
+narrower literature questions can close the gap. When a preference or constraint is absent, choose
+a conservative default, record it in assumptions, and continue with reason_with_caveat.
 Bibliography metadata and citations marked METADATA_ONLY or REQUIRES_RESOLUTION are routing
 information, not substantive evidence from the cited paper. Do not infer the cited paper's methods,
 conditions, or results from its title. Treat low-confidence raw table text as provisional.
@@ -289,16 +290,63 @@ def retrieve_evidence(
     return evidence
 
 
+def retrieve_cited_role_evidence(task: Task, evidence: list[EvidenceItem]) -> list[EvidenceItem]:
+    candidates: dict[str, tuple[float, dict[str, Any], dict[str, Any], EvidenceItem]] = {}
+    for source_item in evidence:
+        for context in source_item.source_contexts:
+            for citation in context.get("citations", []):
+                cited_paper_id = str(citation.get("resolved_paper_id", ""))
+                for claim in citation.get("cited_role_context", []):
+                    claim_id = str(claim.get("claim_id", ""))
+                    if not claim_id or not cited_paper_id:
+                        continue
+                    role = str(claim.get("role", ""))
+                    relevance = float(claim.get("relevance_score", 0))
+                    role_bonus = 1.5 if role in task.required_roles else 0.0
+                    score = source_item.score + relevance + role_bonus
+                    current = candidates.get(claim_id)
+                    if current is None or score > current[0]:
+                        candidates[claim_id] = (score, claim, citation, source_item)
+
+    ranked = sorted(candidates.values(), key=lambda value: (-value[0], str(value[1]["claim_id"])))
+    return [EvidenceItem(
+        node_id=str(claim["claim_id"]),
+        paper_id=str(citation["resolved_paper_id"]),
+        role=str(claim.get("role", "")),
+        content=str(claim.get("content", "")),
+        evidence_spans=[str(value) for value in claim.get("evidence_spans", []) if value],
+        score=round(score, 4),
+        retrieval_reason=f"cited_role:{source_item.node_id}:{citation.get('reference_id', '')}",
+        relation_context={
+            "relation_type": "cites",
+            "source_entity_id": source_item.node_id,
+            "resolved_paper_id": citation["resolved_paper_id"],
+            "reference_id": citation.get("reference_id", ""),
+            "reference_number": citation.get("reference_number", ""),
+            "resolution_method": citation.get("resolution_method", ""),
+            "confidence": 1.0,
+        },
+    ) for score, claim, citation, source_item in ranked[:MAX_CITATION_HITS]]
+
+
 def _evidence_text(item: EvidenceItem) -> str:
     blocks = [f"id={item.node_id} paper={item.paper_id} role={item.role}: {item.content}"]
     if item.relation_context:
         relation = item.relation_context
-        blocks.append(
-            f"RELATION {relation.get('relation_type', '')}: metric={relation.get('metric') or 'unspecified'}; "
-            f"subject={relation.get('subject_value')}; reference={relation.get('reference_value')}; "
-            f"unit={relation.get('unit') or 'unspecified'}; conditions={relation.get('conditions') or {}}; "
-            f"confidence={relation.get('confidence')}"
-        )
+        if relation.get("relation_type") == "cites":
+            blocks.append(
+                f"CITATION PROVENANCE: source={relation.get('source_entity_id', '')}; "
+                f"reference={relation.get('reference_number', '')}; "
+                f"resolved_paper={relation.get('resolved_paper_id', '')}; "
+                f"resolution={relation.get('resolution_method', '')}"
+            )
+        else:
+            blocks.append(
+                f"RELATION {relation.get('relation_type', '')}: metric={relation.get('metric') or 'unspecified'}; "
+                f"subject={relation.get('subject_value')}; reference={relation.get('reference_value')}; "
+                f"unit={relation.get('unit') or 'unspecified'}; conditions={relation.get('conditions') or {}}; "
+                f"confidence={relation.get('confidence')}"
+            )
     for context in item.source_contexts[:2]:
         blocks.append(
             f"SOURCE passage={context['passage_id']} section={context['section']} "
@@ -313,10 +361,22 @@ def _evidence_text(item: EvidenceItem) -> str:
             citations = []
             for citation in context["citations"]:
                 status = citation.get("resolution_status", "unresolved").upper()
-                citations.append(
-                    f"{citation.get('mention_text', '')} [{status}; ROUTING_METADATA_ONLY]: "
-                    f"{citation.get('reference_text', '')}"
-                )
+                cited_roles = citation.get("cited_role_context", [])
+                if cited_roles:
+                    role_evidence = "\n".join(
+                        f"  - id={claim['claim_id']} role={claim['role']}: {claim['content']} "
+                        f"(evidence: {' | '.join(value for value in claim.get('evidence_spans', []) if value)})"
+                        for claim in cited_roles
+                    )
+                    citations.append(
+                        f"{citation.get('mention_text') or '[' + citation.get('reference_number', '') + ']'} "
+                        f"[LOCAL_EXTRACTION paper={citation.get('resolved_paper_id', '')}]:\n{role_evidence}"
+                    )
+                else:
+                    citations.append(
+                        f"{citation.get('mention_text', '')} [{status}; ROUTING_METADATA_ONLY]: "
+                        f"{citation.get('reference_text', '')}"
+                    )
             blocks.append("CITED REFERENCES:\n" + "\n".join(citations))
         if context.get("cited_content_status") == "requires_resolution":
             blocks.append("CITED CONTENT: REQUIRES_RESOLUTION; no cited-paper passage is available.")
@@ -327,10 +387,6 @@ def assess_sufficiency(task: Task, evidence: list[EvidenceItem]) -> dict[str, An
     evidence_block = "\n\n".join(f"- {_evidence_text(item)}" for item in evidence) or "(no evidence retrieved)"
     user = f"TASK:\n{task.question}\n\nEVIDENCE:\n{evidence_block}"
     result = resilient_chat_json(_SUFFICIENCY_SYSTEM, user, max_tokens=1200)
-    if isinstance(result, dict) and result.get("decision") == "ask_user":
-        question = str(result.get("user_question", "")).strip()
-        result["decision"] = "reason_with_caveat"
-        result["assumptions"] = [question] if question else ["A missing constraint was conservatively assumed."]
     if isinstance(result, dict) and result.get("decision") in SUFFICIENCY_DECISIONS:
         result.setdefault("assumptions", [])
         return result
@@ -393,8 +449,8 @@ def run_workflow(
         "provider": provider_info(),
         "goal": goal,
         "subagents": [
-            "planner", "retriever", "context_assembler", "sufficiency_assessor",
-            "gap_resolver", "conflict_adjudicator", "hypothesis_synthesizer", "critic",
+            "planner_orchestrator", "evidence_researcher", "evidence_adjudicator",
+            "hypothesis_synthesizer", "critic",
         ],
         "graph": {
             "nodes": len(graph.nodes),
@@ -403,7 +459,11 @@ def run_workflow(
             "typed_entities": len(entities),
             "contextualized_claims": len(context_index),
         },
-        "events": [{"stage": "decompose", "agent": "planner", "tasks": [asdict(task) for task in tasks]}],
+        "events": [{
+            "stage": "decompose",
+            "agent": "planner_orchestrator",
+            "tasks": [asdict(task) for task in tasks],
+        }],
     }
     evidence_by_id: dict[str, EvidenceItem] = {}
 
@@ -421,17 +481,19 @@ def run_workflow(
             break
 
         for task in ready:
-            evidence = retrieve_evidence(task, graph, relation_index, entity_index, context_index)
+            direct_evidence = retrieve_evidence(task, graph, relation_index, entity_index, context_index)
+            citation_evidence = retrieve_cited_role_evidence(task, direct_evidence)
+            direct_ids = {item.node_id for item in direct_evidence}
+            evidence = direct_evidence + [item for item in citation_evidence if item.node_id not in direct_ids]
             for item in evidence:
                 evidence_by_id[item.node_id] = item
+            trace["events"].append({
+                "stage": "citation_augmentation",
+                "agent": "evidence_researcher",
+                "task_id": task.task_id,
+                "resolved_claims": [asdict(item) for item in citation_evidence],
+            })
             assessment = assess_sufficiency(task, evidence)
-            if assessment.get("decision") == "ask_user":
-                assessment = dict(assessment)
-                question = str(assessment.get("user_question", "")).strip()
-                assessment["decision"] = "reason_with_caveat"
-                assessment["assumptions"] = [
-                    question or "A missing constraint was conservatively assumed."
-                ]
             task.decision = str(assessment.get("decision", "unresolved"))
             task.finding = str(assessment.get("finding", ""))
             task.cited_ids = [str(value) for value in assessment.get("cited_ids", []) if str(value) in evidence_by_id]
@@ -448,7 +510,7 @@ def run_workflow(
 
             trace["events"].append({
                 "stage": "subtask",
-                "agents": ["retriever", "context_assembler", "sufficiency_assessor"],
+                "agent": "evidence_researcher",
                 "task_id": task.task_id,
                 "question": task.question,
                 "retrieved": [asdict(item) for item in evidence],
@@ -458,7 +520,7 @@ def run_workflow(
 
     all_evidence = list(evidence_by_id.values())
     conflicts = adjudicate_conflicts(goal, all_evidence)
-    trace["events"].append({"stage": "adjudication", "agent": "conflict_adjudicator", "conflicts": conflicts})
+    trace["events"].append({"stage": "adjudication", "agent": "evidence_adjudicator", "conflicts": conflicts})
     candidates = synthesize(goal, tasks, all_evidence, conflicts)
     valid_ids = set(evidence_by_id)
     candidate_records = []

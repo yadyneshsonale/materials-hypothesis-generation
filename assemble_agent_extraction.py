@@ -1,0 +1,62 @@
+"""Validate agent-curated claims and assemble Stage-1 extraction records."""
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+from typing import Any
+
+from chunking import split_into_chunks
+from roles import ROLE_KEYS
+
+
+def assemble(paper_id: str, text: str, claims: list[dict[str, Any]]) -> dict[str, Any]:
+    raw = {role: [] for role in ROLE_KEYS}
+    reconciled = {role: [] for role in ROLE_KEYS}
+    seen: set[tuple[str, str]] = set()
+    for claim in claims:
+        role = claim.get("role")
+        content = str(claim.get("content", "")).strip()
+        evidence = str(claim.get("evidence_span", "")).strip()
+        if role not in raw:
+            raise ValueError(f"unknown role: {role}")
+        if not content or not evidence:
+            raise ValueError(f"empty content or evidence for {paper_id}/{role}")
+        if evidence not in text:
+            raise ValueError(f"non-verbatim evidence for {paper_id}/{role}: {evidence[:100]!r}")
+        key = (role, evidence)
+        if key in seen:
+            continue
+        seen.add(key)
+        raw[role].append({"role": role, "content": content, "evidence_span": evidence})
+        reconciled[role].append({
+            "content": content,
+            "evidence_spans": [evidence],
+            "conflicting": False,
+        })
+    return {
+        "paper_id": paper_id,
+        "chunks_processed": len(split_into_chunks(text)),
+        "raw_by_role": raw,
+        "reconciled_by_role": reconciled,
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--text-dir", required=True, type=Path)
+    parser.add_argument("--claims-dir", required=True, type=Path)
+    parser.add_argument("--out-dir", required=True, type=Path)
+    args = parser.parse_args()
+    args.out_dir.mkdir(parents=True, exist_ok=True)
+    for claims_path in sorted(args.claims_dir.glob("*.json")):
+        payload = json.loads(claims_path.read_text())
+        paper_id = payload["paper_id"]
+        text = (args.text_dir / f"{paper_id}.txt").read_text()
+        record = assemble(paper_id, text, payload["claims"])
+        (args.out_dir / f"{paper_id}.json").write_text(json.dumps(record, indent=2))
+        print(f"[assemble] {paper_id}: {sum(map(len, record['raw_by_role'].values()))} claims")
+
+
+if __name__ == "__main__":
+    main()

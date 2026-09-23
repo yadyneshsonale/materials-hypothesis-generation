@@ -14,6 +14,7 @@ from chunking import _HEADER_RE
 
 MAX_PASSAGE_CHARS = 2400
 TABLE_CONTEXT_LINES = 80
+MAX_CITED_ROLE_CLAIMS = 6
 _REFERENCE_START_RE = re.compile(r"^\s*\[(\d+)\]\s+(.+)")
 _CITATION_RE = re.compile(r"\[((?:\d+\s*[-,;]?\s*)+)\]")
 _TABLE_CAPTION_RE = re.compile(r"^\s*((?:supplementary\s+)?table)\s+([A-Z0-9IVX.-]+)[.:]?\s*(.*)$", re.I)
@@ -32,6 +33,81 @@ def _stable_id(prefix: str, *parts: str) -> str:
 def _normalized(text: str) -> str:
     text = re.sub(r"(?<=\w)-\s+(?=\w)", "", text)
     return " ".join(re.findall(r"[a-z0-9]+", text.lower()))
+
+
+def _citation_numbers(text: str) -> list[str]:
+    numbers: list[str] = []
+    for match in _CITATION_RE.finditer(text):
+        for part in re.split(r"\s*[,;]\s*", match.group(1)):
+            bounds = re.fullmatch(r"(\d+)\s*-\s*(\d+)", part)
+            if bounds:
+                start, end = map(int, bounds.groups())
+                if start <= end and end - start <= 100:
+                    numbers.extend(str(value) for value in range(start, end + 1))
+            elif part.strip().isdigit():
+                numbers.append(part.strip())
+    return list(dict.fromkeys(numbers))
+
+
+def _resolve_reference(reference: dict[str, Any], metadata: dict[str, Any]) -> dict[str, str]:
+    arxiv_id = reference.get("arxiv_id", "")
+    if arxiv_id in metadata:
+        return {"paper_id": arxiv_id, "match_method": "arxiv_id"}
+    reference_doi = reference.get("doi", "").lower()
+    reference_text = _normalized(reference.get("raw_text", ""))
+    for paper_id, row in metadata.items():
+        if not isinstance(row, dict):
+            continue
+        metadata_doi = str(row.get("doi", "")).strip().lower()
+        if not metadata_doi:
+            match = re.search(r"10\.\d{4,9}/[-._;()/:A-Z0-9]+", str(row.get("pdf_url", "")), re.I)
+            metadata_doi = match.group(0).rstrip(".,;)").lower() if match else ""
+        if reference_doi and metadata_doi and reference_doi == metadata_doi:
+            return {"paper_id": paper_id, "match_method": "doi"}
+        title = _normalized(str(row.get("title", "")))
+        if len(title.split()) >= 5 and title in reference_text:
+            return {"paper_id": paper_id, "match_method": "title"}
+    return {"paper_id": "", "match_method": "unresolved"}
+
+
+def _cited_role_context(
+    paper_id: str,
+    context: str,
+    records: dict[str, dict[str, Any]],
+) -> list[dict[str, Any]]:
+    record = records.get(paper_id)
+    if not record:
+        return []
+    context_terms = set(_normalized(context).split())
+    role_priority = {
+        "evidence_result": 6,
+        "mechanism_principle": 5,
+        "causal_claim": 5,
+        "constraint": 4,
+        "contradiction": 4,
+        "prior_approach": 3,
+        "prior_limitation": 3,
+        "hypothesis_statement": 2,
+    }
+    candidates: list[tuple[int, int, str, int, dict[str, Any]]] = []
+    for role, claims in record.get("reconciled_by_role", {}).items():
+        if role not in role_priority:
+            continue
+        for index, claim in enumerate(claims):
+            content = str(claim.get("content", ""))
+            overlap = len(context_terms & set(_normalized(content).split()))
+            candidates.append((overlap, role_priority[role], role, index, claim))
+    candidates.sort(key=lambda value: (-value[0], -value[1], value[2], value[3]))
+    selected = [row for row in candidates if row[0] > 0][:MAX_CITED_ROLE_CLAIMS]
+    if not selected:
+        selected = candidates[:MAX_CITED_ROLE_CLAIMS]
+    return [{
+        "claim_id": f"{paper_id}::{role}::{index}",
+        "role": role,
+        "content": claim.get("content", ""),
+        "evidence_spans": claim.get("evidence_spans") or [claim.get("evidence_span", "")],
+        "relevance_score": overlap,
+    } for overlap, _, role, index, claim in selected]
 
 
 def _sections(text: str) -> list[tuple[str, list[str]]]:
@@ -201,10 +277,27 @@ def _anchor_claims(passages: list[dict[str, Any]], record: dict[str, Any]) -> di
     return anchors
 
 
-def build_source_bundle(paper_id: str, text: str, record: dict[str, Any]) -> dict[str, Any]:
+def build_source_bundle(
+    paper_id: str,
+    text: str,
+    record: dict[str, Any],
+    corpus_records: dict[str, dict[str, Any]] | None = None,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    corpus_records = corpus_records or {}
+    metadata = metadata or {}
     passages = extract_passages(paper_id, text)
     references = extract_references(paper_id, text)
     tables = extract_tables(paper_id, text)
+    for reference in references:
+        resolution = _resolve_reference(reference, metadata)
+        reference["resolved_paper_id"] = resolution["paper_id"]
+        reference["resolution_method"] = resolution["match_method"]
+        reference["cited_role_context"] = _cited_role_context(
+            resolution["paper_id"], reference["raw_text"], corpus_records
+        )
+        if reference["cited_role_context"]:
+            reference["resolution_status"] = "local_extraction_available"
     reference_by_number = {row["reference_number"]: row for row in references}
     mentions: list[dict[str, Any]] = []
     for passage in passages:
@@ -225,9 +318,28 @@ def build_source_bundle(paper_id: str, text: str, record: dict[str, Any]) -> dic
                     "reference_number": number,
                     "mention_text": match.group(0),
                     "context": passage["text"],
+                    "resolved_paper_id": reference["resolved_paper_id"],
+                    "resolution_method": reference["resolution_method"],
+                    "cited_role_context": _cited_role_context(
+                        reference["resolved_paper_id"], passage["text"], corpus_records
+                    ),
                 })
                 passage["citation_ids"].append(citation_id)
     for table in tables:
+        table["citation_numbers"] = _citation_numbers(table["raw_text"])
+        table["citations"] = [{
+            "reference_number": number,
+            "reference_id": reference_by_number[number]["reference_id"],
+            "reference_text": reference_by_number[number]["raw_text"],
+            "doi": reference_by_number[number]["doi"],
+            "arxiv_id": reference_by_number[number]["arxiv_id"],
+            "resolution_status": reference_by_number[number]["resolution_status"],
+            "resolved_paper_id": reference_by_number[number]["resolved_paper_id"],
+            "resolution_method": reference_by_number[number]["resolution_method"],
+            "cited_role_context": _cited_role_context(
+                reference_by_number[number]["resolved_paper_id"], table["raw_text"], corpus_records
+            ),
+        } for number in table["citation_numbers"] if number in reference_by_number]
         caption_terms = set(_normalized(f"table {table['label']} {table['caption']}").split())
         candidates = []
         for passage in passages:
@@ -259,9 +371,23 @@ def build_source_bundle(paper_id: str, text: str, record: dict[str, Any]) -> dic
                 "doi": reference["doi"],
                 "arxiv_id": reference["arxiv_id"],
                 "resolution_status": reference["resolution_status"],
+                "resolved_paper_id": reference["resolved_paper_id"],
+                "resolution_method": reference["resolution_method"],
+                "cited_role_context": _cited_role_context(
+                    reference["resolved_paper_id"], passage["text"], corpus_records
+                ),
             })
         cited_references = list(cited_references_by_id.values())
         linked_tables = [table_by_id[table_id] for table_id in passage["table_ids"]]
+        resolved_count = sum(bool(reference["cited_role_context"]) for reference in cited_references)
+        if not cited_references:
+            cited_content_status = "not_applicable"
+        elif resolved_count == len(cited_references):
+            cited_content_status = "local_extraction_available"
+        elif resolved_count:
+            cited_content_status = "partially_resolved"
+        else:
+            cited_content_status = "requires_resolution"
         comparison_contexts.append({
             "comparison_id": _stable_id("comparison", passage["passage_id"]),
             "paper_id": paper_id,
@@ -272,7 +398,7 @@ def build_source_bundle(paper_id: str, text: str, record: dict[str, Any]) -> dic
             "cited_references": cited_references,
             "tables": linked_tables,
             "cross_paper": bool(cited_references),
-            "cited_content_status": "requires_resolution" if cited_references else "not_applicable",
+            "cited_content_status": cited_content_status,
         })
     return {
         "paper_id": paper_id,
@@ -301,6 +427,14 @@ def aggregate_source_context(output_dir: Path) -> dict[str, Any]:
         "reference_resolution_status": dict(Counter(
             reference["resolution_status"] for bundle in bundles for reference in bundle["references"]
         )),
+        "resolved_local_references": sum(
+            bool(reference.get("cited_role_context"))
+            for bundle in bundles for reference in bundle["references"]
+        ),
+        "resolved_local_table_citations": sum(
+            bool(citation.get("cited_role_context"))
+            for bundle in bundles for table in bundle["tables"] for citation in table.get("citations", [])
+        ),
     }
     (output_dir / "summary.json").write_text(json.dumps(summary, indent=2))
     return summary
@@ -328,6 +462,9 @@ def load_context_index(context_dir: Path | None) -> dict[str, list[dict[str, Any
                 "doi": reference.get("doi", ""),
                 "arxiv_id": reference.get("arxiv_id", ""),
                 "resolution_status": reference.get("resolution_status", "unresolved"),
+                "resolved_paper_id": mention.get("resolved_paper_id", reference.get("resolved_paper_id", "")),
+                "resolution_method": mention.get("resolution_method", reference.get("resolution_method", "unresolved")),
+                "cited_role_context": mention.get("cited_role_context", reference.get("cited_role_context", [])),
             })
         tables_by_passage: dict[str, list[dict[str, Any]]] = {}
         for table in bundle["tables"]:
@@ -337,7 +474,7 @@ def load_context_index(context_dir: Path | None) -> dict[str, list[dict[str, Any
                 "text": table["raw_text"],
                 "match_score": table["confidence"],
                 "evidence_span": table["caption"],
-                "citations": [],
+                "citations": table.get("citations", []),
                 "tables": [{
                     "table_id": table["table_id"],
                     "label": table["label"],
@@ -377,6 +514,9 @@ def load_context_index(context_dir: Path | None) -> dict[str, list[dict[str, Any
                 "doi": reference["doi"],
                 "arxiv_id": reference["arxiv_id"],
                 "resolution_status": reference["resolution_status"],
+                "resolved_paper_id": reference.get("resolved_paper_id", ""),
+                "resolution_method": reference.get("resolution_method", "unresolved"),
+                "cited_role_context": reference.get("cited_role_context", []),
             } for reference in comparison["cited_references"]]
             index.setdefault(comparison["comparison_id"], []).append({
                 "passage_id": comparison["passage_id"],
@@ -400,6 +540,7 @@ def main() -> None:
     parser.add_argument("--source-dir", required=True, type=Path)
     parser.add_argument("--outputs-dir", required=True, type=Path)
     parser.add_argument("--context-dir", required=True, type=Path)
+    parser.add_argument("--metadata", type=Path, help="paper metadata used to resolve references to locally extracted papers")
     parser.add_argument("--limit", type=int)
     args = parser.parse_args()
     records = sorted(args.outputs_dir.glob("*.json"))
@@ -407,12 +548,20 @@ def main() -> None:
         records = records[:args.limit]
     paper_dir = args.context_dir / "papers"
     paper_dir.mkdir(parents=True, exist_ok=True)
+    corpus_records = {path.stem: json.loads(path.read_text()) for path in records}
+    metadata = json.loads(args.metadata.read_text()) if args.metadata else {}
     for record_path in records:
         source_path = args.source_dir / f"{record_path.stem}.txt"
         if not source_path.exists():
             raise FileNotFoundError(source_path)
-        record = json.loads(record_path.read_text())
-        bundle = build_source_bundle(record_path.stem, source_path.read_text(errors="ignore"), record)
+        record = corpus_records[record_path.stem]
+        bundle = build_source_bundle(
+            record_path.stem,
+            source_path.read_text(errors="ignore"),
+            record,
+            corpus_records,
+            metadata,
+        )
         (paper_dir / record_path.name).write_text(json.dumps(bundle, indent=2))
         print(
             f"[context] {record_path.stem}: passages={len(bundle['passages'])} "
