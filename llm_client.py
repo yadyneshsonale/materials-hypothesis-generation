@@ -103,7 +103,8 @@ def chat_json(system: str, user: str, max_tokens: int = 4000, retries: int = 3) 
     last_err: Exception | None = None
     for attempt in range(retries):
         try:
-            resp = requests.post(url, headers=headers, json=payload, timeout=120)
+            timeout = float(os.environ.get("MATHG_REQUEST_TIMEOUT", "120"))
+            resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
             resp.raise_for_status()
             choice = resp.json()["choices"][0]
             content = choice["message"]["content"]

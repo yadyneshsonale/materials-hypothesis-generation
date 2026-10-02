@@ -38,6 +38,31 @@ Cr2O3-dominant protective scale in a W-rich alloy above 1000 C may be chemically
 volatile chromium oxides can form. The generated candidate is therefore a testable research lead,
 not a validated recommendation; an alumina-forming alternative should be evaluated.
 
+### Eleven-role and question extraction
+
+A second pass retained the original 11-role representation while applying stricter role semantics,
+exact source grounding, and a new definition of a useful question.
+
+| Metric | Result |
+| --- | ---: |
+| Papers with role/question output | 50/50 |
+| Reconciled role claims | 1,271 |
+| Valid decision questions | 81 |
+| Invalid persisted items | 0 |
+| Mean questions per paper | 1.62 |
+| Mean question confidence | 0.8074 |
+| Papers with no sufficiently grounded question | 10 |
+| Rejected model candidates | 191 |
+
+A **decision question** is a specific, answerable, and falsifiable information need whose answer
+changes a materials-design choice, causal-mechanism choice, boundary condition, or experiment.
+Every accepted question records its rationale, decision use, required measurements, grounded role
+references, exact source passages, and confidence.
+
+The 81 questions comprise 26 boundary, 19 discrimination, 18 causal, 16 intervention, and two
+baseline questions. The pipeline emits zero questions rather than manufacture one when the paper's
+role evidence does not support a decision-useful uncertainty.
+
 ## Folder contents
 
 ```text
@@ -54,10 +79,14 @@ high_temperature_hea_qwen35b/
 │       ├── text/                 # 50 structure-preserving text files
 │       └── xml/                  # 50 open-access JATS XML articles
 ├── outputs/
-│   └── materials_evidence/       # one JSON extraction record per paper
+│   ├── materials_evidence/       # linked evidence, one JSON record per paper
+│   └── role_questions/           # 11 roles and decision questions per paper
 ├── results/
 │   ├── corpus_evaluation.json
-│   └── adaptive_trace.json
+│   ├── adaptive_trace.json
+│   ├── role_question_evaluation.json
+│   ├── roles.jsonl               # 1,271 consolidated grounded role claims
+│   └── questions.jsonl           # 81 consolidated decision questions
 └── pilot/
     ├── materials_evidence/       # six manually curated grounded units
     ├── evaluation.json
@@ -97,6 +126,26 @@ Evaluate the persisted outputs:
   --evidence-dir experiments/high_temperature_hea_qwen35b/outputs/materials_evidence \
   --source-dir experiments/high_temperature_hea_qwen35b/data/corpus/text \
   --output experiments/high_temperature_hea_qwen35b/results/corpus_evaluation.json
+```
+
+Extract the 11 roles and decision questions:
+
+```bash
+.venv/bin/python role_question_extract.py \
+  --input-dir experiments/high_temperature_hea_qwen35b/data/corpus/text \
+  --out-dir experiments/high_temperature_hea_qwen35b/outputs/role_questions \
+  --workers 4 --resume
+```
+
+Validate and consolidate the role/question outputs:
+
+```bash
+.venv/bin/python evaluate_role_questions.py \
+  --evidence-dir experiments/high_temperature_hea_qwen35b/outputs/role_questions \
+  --source-dir experiments/high_temperature_hea_qwen35b/data/corpus/text \
+  --output experiments/high_temperature_hea_qwen35b/results/role_question_evaluation.json \
+  --roles-jsonl experiments/high_temperature_hea_qwen35b/results/roles.jsonl \
+  --questions-jsonl experiments/high_temperature_hea_qwen35b/results/questions.jsonl
 ```
 
 Run the deterministic five-task agent:

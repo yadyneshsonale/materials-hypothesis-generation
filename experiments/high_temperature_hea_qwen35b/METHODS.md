@@ -151,3 +151,36 @@ the evidence gap as resolved.
   1000 C because volatile chromium oxides can form. The candidate must not be treated as a
   validated alloy prescription.
 - No independent materials expert has yet scored the 493 extracted units or final candidate.
+
+## 10. Eleven-role and decision-question extraction
+
+The corpus was also processed with the original 11-role taxonomy: problem motivation, prior
+approach, prior limitation, rejected alternative, inspiration source, causal claim,
+mechanism/principle, hypothesis statement, evidence/result, constraint, and contradiction.
+
+Role definitions were tightened to prevent common category errors. A hypothesis must predict
+material behavior or an intervention-to-outcome relationship; method utility and study objectives
+do not qualify. A contradiction must identify both the current result and the conflicting prior
+claim or expectation. A rejected alternative requires an explicit decision not to use an option
+and a reason. An inspiration source requires a borrowed method, analogy, or prior finding that
+shaped the approach.
+
+After section-level extraction, all roles were reconciled in one paper-level call. Claims from
+different material systems or operating regimes were prohibited from merging. Exact source
+grounding was validated both before and after reconciliation.
+
+The same paper-level stage generated zero to five decision questions. A decision question was
+defined as a specific, answerable, falsifiable information need that changes a material-design,
+mechanism, boundary, or experiment decision. Accepted questions had to:
+
+- ask one primary uncertainty in at most 50 words;
+- use one of five types: baseline, causal, intervention, boundary, or discrimination;
+- cite at least one valid reconciled role;
+- state rationale and decision use;
+- name the measurements or comparisons required to answer it; and
+- retain exact source evidence.
+
+The run produced 1,271 role claims and 81 questions. Ten papers produced no accepted question;
+this is an intentional no-quota behavior. Across the corpus, 191 model candidates were rejected
+for non-verbatim spans, invalid role references, malformed question syntax, or other schema
+violations. All persisted items passed deterministic revalidation.

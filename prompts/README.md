@@ -6,6 +6,7 @@ This directory documents the prompts used by the pipeline. Braced fields such as
 | --- | --- | --- |
 | `extraction.md` | Extract typed argumentative items from paper sections | `extract.py` |
 | `materials-evidence-extraction.md` | Extract linked processing-structure-property evidence units | `materials_extract.py` |
+| `role-question-extraction.md` | Reconcile 11 roles and define grounded decision questions | `role_question_extract.py` |
 | `reconciliation.md` | Reconcile role items across a paper | `extract.py` |
 | `role-taxonomy.md` | Define extraction roles, triggers, and examples | `roles.py` |
 | `hypothesis-composition.md` | Compose cross-paper hypotheses | `hypothesis_agent.py` |

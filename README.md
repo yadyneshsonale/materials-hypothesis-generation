@@ -218,6 +218,12 @@ graph covering quantitative baselines, intact causal chains, actionable interven
 boundaries, and evidence that discriminates competing mechanisms. Every task states how its answer
 will affect the final hypothesis.
 
+For workflows that require the original 11 argumentative roles, `role_question_extract.py`
+extracts and reconciles all roles while also producing grounded **decision questions**. A decision
+question is a specific, answerable, falsifiable information need whose answer changes a
+materials-design, mechanism, boundary-condition, or experiment decision. It is not a topic label,
+summary request, or generic future-work prompt.
+
 ## Setup
 
 ```bash
@@ -247,6 +253,23 @@ Extract linked materials evidence:
 ```bash
 MATHG_PROVIDER=trapi .venv/bin/python materials_extract.py \
   --input-dir texts --out-dir materials_evidence
+```
+
+Extract the 11 roles and grounded decision questions:
+
+```bash
+MATHG_PROVIDER=trapi .venv/bin/python role_question_extract.py \
+  --input-dir texts --out-dir role_questions --workers 4 --resume
+```
+
+Evaluate and consolidate role/question outputs:
+
+```bash
+.venv/bin/python evaluate_role_questions.py \
+  --evidence-dir role_questions --source-dir texts \
+  --output results/role_question_evaluation.json \
+  --roles-jsonl results/roles.jsonl \
+  --questions-jsonl results/questions.jsonl
 ```
 
 Extract and immediately build typed evidence for each completed paper:
