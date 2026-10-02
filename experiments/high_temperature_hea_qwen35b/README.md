@@ -152,6 +152,23 @@ Arrange the output, retrieve checksum-verified PMC OA PDFs, and split roles from
 The PDF in each paper's `input/` directory is **only for visual inspection**. The pipeline does
 not parse or use it. The JATS XML is the machine-readable source.
 
+Review the PDF and generated evidence side by side:
+
+```bash
+.venv/bin/python review_interface_server.py
+```
+
+Then open `http://127.0.0.1:8765`. The interface provides:
+
+- a ranked 50-paper selector;
+- a visual-only PDF pane;
+- filterable role claims and decision-question cards;
+- exact XML-derived evidence chunks with the selected span highlighted; and
+- best-effort navigation to the corresponding PDF page.
+
+Chunk highlighting is exact because it uses the XML-derived pipeline source. PDF page matching is
+best-effort because publisher PDF text layers can differ in spacing, formulas, and reading order.
+
 Validate and consolidate the organized role/question outputs:
 
 ```bash

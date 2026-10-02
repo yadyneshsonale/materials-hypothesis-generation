@@ -276,6 +276,15 @@ For a per-paper archival layout, run `arrange_paper_outputs.py`. It creates an `
 containing JATS XML and a checksum-verified PMC OA PDF, plus separate role and question output
 files. The PDF is **only for visual inspection** and is never parsed or used as pipeline evidence.
 
+Review PDFs beside their grounded roles and questions:
+
+```bash
+.venv/bin/python review_interface_server.py
+```
+
+Open `http://127.0.0.1:8765`. Selecting a role or question highlights its exact XML-derived
+evidence chunk and navigates the visual-only PDF to the best-matched page.
+
 Extract and immediately build typed evidence for each completed paper:
 
 ```bash
