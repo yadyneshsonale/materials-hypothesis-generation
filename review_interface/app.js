@@ -1,7 +1,7 @@
 const state = {
   papers: [],
   paper: null,
-  activeRole: "all",
+  activeRoles: null,
   selectedItem: null,
   pdfPage: 1,
   pdfZoom: 1,
@@ -104,12 +104,37 @@ function showEvidence(item, title) {
 function renderRoleFilters() {
   const container = $("roleFilters");
   container.replaceChildren();
-  const roles = [...new Set(state.paper.roles.map((item) => item.role))].sort();
-  ["all", ...roles].forEach((role) => {
-    const label = role === "all" ? "All roles" : role.replaceAll("_", " ");
-    const button = make("button", `filter${state.activeRole === role ? " active" : ""}`, label);
+  container.append(make("span", "filter-label", "Filter roles"));
+  const counts = state.paper.roles.reduce((result, item) => {
+    result.set(item.role, (result.get(item.role) || 0) + 1);
+    return result;
+  }, new Map());
+  const roles = [...counts.keys()].sort();
+  const allButton = make(
+    "button",
+    `filter${state.activeRoles === null ? " active" : ""}`,
+    `All roles (${state.paper.roles.length})`,
+  );
+  allButton.setAttribute("aria-pressed", String(state.activeRoles === null));
+  allButton.addEventListener("click", () => {
+    state.activeRoles = null;
+    renderRoles();
+    renderRoleFilters();
+  });
+  container.append(allButton);
+  roles.forEach((role) => {
+    const selected = state.activeRoles?.has(role) || false;
+    const label = `${role.replaceAll("_", " ")} (${counts.get(role)})`;
+    const button = make("button", `filter${selected ? " active" : ""}`, label);
+    button.setAttribute("aria-pressed", String(selected));
     button.addEventListener("click", () => {
-      state.activeRole = role;
+      if (state.activeRoles === null) {
+        state.activeRoles = new Set([role]);
+      } else if (state.activeRoles.has(role)) {
+        state.activeRoles.delete(role);
+      } else {
+        state.activeRoles.add(role);
+      }
       renderRoles();
       renderRoleFilters();
     });
@@ -121,7 +146,7 @@ function renderRoles() {
   const container = $("rolesPanel");
   container.replaceChildren();
   const roles = state.paper.roles.filter(
-    (item) => state.activeRole === "all" || item.role === state.activeRole,
+    (item) => state.activeRoles === null || state.activeRoles.has(item.role),
   );
   if (!roles.length) {
     container.append(make("div", "empty", "No role claims match this filter."));
@@ -181,7 +206,7 @@ function renderPaper() {
   state.pdfPage = 1;
   state.pdfZoom = 1;
   renderPdfPage(1);
-  state.activeRole = "all";
+  state.activeRoles = null;
   renderRoleFilters();
   renderRoles();
   renderQuestions();

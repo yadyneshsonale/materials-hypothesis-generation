@@ -163,7 +163,7 @@ Then open `http://127.0.0.1:8765` in a local browser. For the VS Code integrated
 
 - a ranked 50-paper selector;
 - a visual-only rendered PDF pane with page and zoom controls;
-- filterable role claims and decision-question cards;
+- count-labelled multi-select role filters and decision-question cards;
 - exact XML-derived evidence chunks with the selected span highlighted; and
 - navigation to the corresponding PDF page with coordinate-level passage highlights.
 
