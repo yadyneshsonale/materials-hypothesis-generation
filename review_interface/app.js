@@ -2,6 +2,9 @@ const state = {
   papers: [],
   paper: null,
   activeRole: "all",
+  selectedItem: null,
+  pdfPage: 1,
+  pdfZoom: 1,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -13,10 +16,58 @@ function make(tag, className, text) {
   return node;
 }
 
-function pdfUrl(item) {
-  const base = state.paper.pdf_url;
-  if (!item || !item.pdf_page) return base;
-  return `${base}#page=${item.pdf_page}`;
+function pdfUrl(page = state.pdfPage) {
+  return `${state.paper.pdf_url}#page=${page}`;
+}
+
+function matchForPage(item, page) {
+  return item?.pdf_matches?.find((match) => match.page === page);
+}
+
+function renderPdfHighlights() {
+  const layer = $("pdfHighlights");
+  layer.replaceChildren();
+  const match = matchForPage(state.selectedItem, state.pdfPage);
+  if (!match) return;
+  match.highlights.forEach((rectangle) => {
+    const highlight = make("div", "pdf-highlight");
+    highlight.style.left = `${(rectangle.x / match.page_width) * 100}%`;
+    highlight.style.top = `${(rectangle.y / match.page_height) * 100}%`;
+    highlight.style.width = `${(rectangle.width / match.page_width) * 100}%`;
+    highlight.style.height = `${(rectangle.height / match.page_height) * 100}%`;
+    highlight.title = `Evidence span ${rectangle.span_index + 1}`;
+    layer.append(highlight);
+  });
+}
+
+function renderPdfPage(page) {
+  state.pdfPage = Math.min(Math.max(page, 1), state.paper.pdf_page_count);
+  const evidencePages = state.selectedItem?.pdf_matches?.map((match) => match.page) || [];
+  const currentMatch = matchForPage(state.selectedItem, state.pdfPage);
+  $("pdfImage").src = `/api/papers/${state.paper.paper_id}/pdf/pages/${state.pdfPage}.png`;
+  $("pdfImage").onload = renderPdfHighlights;
+  $("pdfPage").style.width = `${state.pdfZoom * 100}%`;
+  $("pagePosition").textContent = `${state.pdfPage} / ${state.paper.pdf_page_count}`;
+  $("zoomLevel").textContent = `${Math.round(state.pdfZoom * 100)}%`;
+  $("previousPage").disabled = state.pdfPage === 1;
+  $("nextPage").disabled = state.pdfPage === state.paper.pdf_page_count;
+  $("openPdf").href = pdfUrl();
+  if (currentMatch) {
+    const otherPages = evidencePages.length > 1 ? ` · evidence pages ${evidencePages.join(", ")}` : "";
+    $("pdfPageLabel").textContent = `PDF · highlighted evidence on page ${state.pdfPage}${otherPages}`;
+  } else if (state.selectedItem?.pdf_page === state.pdfPage) {
+    $("pdfPageLabel").textContent = `PDF · approximate page ${state.pdfPage}; exact PDF text not found`;
+  } else {
+    const evidenceLabel = evidencePages.length ? ` · evidence pages ${evidencePages.join(", ")}` : "";
+    $("pdfPageLabel").textContent = `PDF · page ${state.pdfPage}${evidenceLabel}`;
+  }
+  renderPdfHighlights();
+}
+
+function setPdfZoom(zoom) {
+  state.pdfZoom = Math.min(Math.max(zoom, 0.6), 2);
+  $("pdfPage").style.width = `${state.pdfZoom * 100}%`;
+  $("zoomLevel").textContent = `${Math.round(state.pdfZoom * 100)}%`;
 }
 
 function showEvidence(item, title) {
@@ -41,9 +92,13 @@ function showEvidence(item, title) {
     body.append(chunk);
   });
   $("evidenceDrawer").classList.add("open");
-  $("pdfViewer").src = pdfUrl(item);
-  $("openPdf").href = pdfUrl(item);
-  $("pdfPageLabel").textContent = item.pdf_page ? `PDF · matched page ${item.pdf_page}` : "PDF · page match unavailable";
+  state.selectedItem = item;
+  if (item.pdf_page) {
+    renderPdfPage(item.pdf_page);
+  } else {
+    renderPdfPage(state.pdfPage);
+    $("pdfPageLabel").textContent = "PDF · page match unavailable";
+  }
 }
 
 function renderRoleFilters() {
@@ -120,10 +175,12 @@ function renderPaper() {
   $("pdfNotice").textContent = state.paper.pdf_notice;
   $("roleCount").textContent = `(${state.paper.roles.length})`;
   $("questionCount").textContent = `(${state.paper.questions.length})`;
-  $("pdfViewer").src = state.paper.pdf_url;
-  $("openPdf").href = state.paper.pdf_url;
   $("pdfPageLabel").textContent = "PDF";
   $("evidenceDrawer").classList.remove("open");
+  state.selectedItem = null;
+  state.pdfPage = 1;
+  state.pdfZoom = 1;
+  renderPdfPage(1);
   state.activeRole = "all";
   renderRoleFilters();
   renderRoles();
@@ -153,6 +210,10 @@ function configureTabs() {
 async function initialize() {
   configureTabs();
   $("closeEvidence").addEventListener("click", () => $("evidenceDrawer").classList.remove("open"));
+  $("previousPage").addEventListener("click", () => renderPdfPage(state.pdfPage - 1));
+  $("nextPage").addEventListener("click", () => renderPdfPage(state.pdfPage + 1));
+  $("zoomOut").addEventListener("click", () => setPdfZoom(state.pdfZoom - 0.2));
+  $("zoomIn").addEventListener("click", () => setPdfZoom(state.pdfZoom + 0.2));
   const response = await fetch("/api/papers");
   if (!response.ok) throw new Error("Failed to load papers");
   state.papers = await response.json();

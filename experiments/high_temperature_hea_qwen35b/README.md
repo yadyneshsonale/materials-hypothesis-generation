@@ -162,13 +162,15 @@ Then open `http://127.0.0.1:8765` in a local browser. For the VS Code integrated
 `http://<machine-ip>:8765` because its loopback interface is isolated. The interface provides:
 
 - a ranked 50-paper selector;
-- a visual-only PDF pane;
+- a visual-only rendered PDF pane with page and zoom controls;
 - filterable role claims and decision-question cards;
 - exact XML-derived evidence chunks with the selected span highlighted; and
-- best-effort navigation to the corresponding PDF page.
+- navigation to the corresponding PDF page with coordinate-level passage highlights.
 
-Chunk highlighting is exact because it uses the XML-derived pipeline source. PDF page matching is
-best-effort because publisher PDF text layers can differ in spacing, formulas, and reading order.
+Chunk highlighting is exact because it uses the XML-derived pipeline source. The review server
+reads the PDF text layer only to align visual highlight rectangles; pipeline extraction and exact
+grounding continue to use JATS XML-derived text exclusively. PDF matching remains best-effort
+because publisher text layers can differ in spacing, formulas, and reading order.
 
 Validate and consolidate the organized role/question outputs:
 

@@ -7,6 +7,7 @@ from review_interface_server import (
     _compact_normalized,
     _evidence_context,
     _find_pdf_page,
+    _find_pdf_matches,
 )
 
 
@@ -32,6 +33,20 @@ class ReviewInterfaceTests(unittest.TestCase):
         page = _find_pdf_page(pdf, ["Mn is the major oxide-forming element"])
 
         self.assertIsNotNone(page)
+
+    def test_finds_highlight_rectangles_in_real_pdf(self) -> None:
+        root = Path(__file__).parent / "experiments" / "high_temperature_hea_qwen35b"
+        pdf = root / "outputs" / "papers" / "PMC10384371" / "input" / "article.pdf"
+
+        matches = _find_pdf_matches(
+            pdf,
+            ["oxygen abundance promotes the formation of Mn2O3 instead of MnO"],
+        )
+
+        self.assertTrue(matches)
+        self.assertGreater(len(matches[0]["highlights"]), 0)
+        self.assertGreater(matches[0]["page_width"], 0)
+        self.assertGreater(matches[0]["page_height"], 0)
 
 
 if __name__ == "__main__":

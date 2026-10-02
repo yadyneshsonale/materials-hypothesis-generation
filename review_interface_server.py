@@ -32,6 +32,101 @@ def _compact_normalized(text: str) -> str:
     return _normalized(text).replace(" ", "")
 
 
+def _pdf_pages(pdf_path: Path) -> list[dict]:
+    pages = []
+    with pymupdf.open(pdf_path) as document:
+        for page in document:
+            words = []
+            compact_parts = []
+            offset = 0
+            for raw_word in page.get_text("words", sort=True):
+                token = _compact_normalized(str(raw_word[4]))
+                if not token:
+                    continue
+                words.append({
+                    "rect": tuple(float(value) for value in raw_word[:4]),
+                    "block": int(raw_word[5]),
+                    "line": int(raw_word[6]),
+                    "start": offset,
+                    "end": offset + len(token),
+                })
+                compact_parts.append(token)
+                offset += len(token)
+            pages.append({
+                "width": float(page.rect.width),
+                "height": float(page.rect.height),
+                "compact": "".join(compact_parts),
+                "normalized": _normalized(page.get_text("text")),
+                "words": words,
+            })
+    return pages
+
+
+def _rectangles_for_span(page: dict, span: str) -> list[dict[str, float]]:
+    compact_span = _compact_normalized(span)
+    start = page["compact"].find(compact_span)
+    if start < 0 or not compact_span:
+        return []
+    end = start + len(compact_span)
+    matched = [
+        word for word in page["words"]
+        if word["end"] > start and word["start"] < end
+    ]
+    rectangles = []
+    current = None
+    for word in matched:
+        x0, y0, x1, y1 = word["rect"]
+        line_key = (word["block"], word["line"])
+        if current and current["line_key"] == line_key:
+            current["x1"] = max(current["x1"], x1)
+            current["y0"] = min(current["y0"], y0)
+            current["y1"] = max(current["y1"], y1)
+            continue
+        current = {
+            "line_key": line_key,
+            "x0": x0,
+            "y0": y0,
+            "x1": x1,
+            "y1": y1,
+        }
+        rectangles.append(current)
+    return [
+        {
+            "x": rectangle["x0"],
+            "y": rectangle["y0"],
+            "width": rectangle["x1"] - rectangle["x0"],
+            "height": rectangle["y1"] - rectangle["y0"],
+        }
+        for rectangle in rectangles
+    ]
+
+
+def _pdf_matches_from_pages(pages: list[dict], spans: list[str]) -> list[dict]:
+    matches_by_page: dict[int, dict] = {}
+    for span_index, span in enumerate(spans):
+        for page_index, page in enumerate(pages):
+            rectangles = _rectangles_for_span(page, span)
+            if not rectangles:
+                continue
+            match = matches_by_page.setdefault(page_index + 1, {
+                "page": page_index + 1,
+                "page_width": page["width"],
+                "page_height": page["height"],
+                "highlights": [],
+            })
+            for rectangle in rectangles:
+                match["highlights"].append({
+                    **rectangle,
+                    "span_index": span_index,
+                })
+            break
+    return list(matches_by_page.values())
+
+
+def _find_pdf_matches(pdf_path: Path, spans: list[str]) -> list[dict]:
+    return _pdf_matches_from_pages(_pdf_pages(pdf_path), spans)
+
+
 def _evidence_context(source_text: str, span: str, padding: int = 420) -> dict[str, str]:
     start = source_text.find(span)
     if start < 0:
@@ -78,7 +173,7 @@ class ReviewData:
         self.text_dir = self.experiment_dir / "data" / "corpus" / "text"
         if not self.papers_dir.is_dir():
             raise FileNotFoundError(f"paper outputs directory not found: {self.papers_dir}")
-        self._page_cache: dict[tuple[str, tuple[str, ...]], int | None] = {}
+        self._pdf_pages_cache: dict[str, list[dict]] = {}
 
     def paper_ids(self) -> list[str]:
         return sorted(path.name for path in self.papers_dir.iterdir() if path.is_dir())
@@ -110,12 +205,37 @@ class ReviewData:
         papers.sort(key=lambda item: (item["rank"] or 10**9, item["paper_id"]))
         return papers
 
-    def _page_for(self, paper_id: str, spans: list[str]) -> int | None:
-        key = (paper_id, tuple(spans))
-        if key not in self._page_cache:
+    def _pages_for(self, paper_id: str) -> list[dict]:
+        if paper_id not in self._pdf_pages_cache:
             pdf_path = self.paper_dir(paper_id) / "input" / "article.pdf"
-            self._page_cache[key] = _find_pdf_page(pdf_path, spans)
-        return self._page_cache[key]
+            self._pdf_pages_cache[paper_id] = _pdf_pages(pdf_path)
+        return self._pdf_pages_cache[paper_id]
+
+    def _pdf_evidence(self, paper_id: str, spans: list[str]) -> tuple[int | None, list[dict]]:
+        pages = self._pages_for(paper_id)
+        matches = _pdf_matches_from_pages(pages, spans)
+        if matches:
+            return matches[0]["page"], matches
+        normalized_spans = [_normalized(span) for span in spans if _normalized(span)]
+        best_page = None
+        best_score = 0.0
+        for page_index, page in enumerate(pages):
+            page_tokens = set(page["normalized"].split())
+            for span in normalized_spans:
+                tokens = set(span.split())
+                score = len(tokens & page_tokens) / max(len(tokens), 1)
+                if score > best_score:
+                    best_score = score
+                    best_page = page_index + 1
+        return (best_page if best_score >= 0.6 else None), []
+
+    def render_pdf_page(self, paper_id: str, page_number: int) -> bytes:
+        pdf_path = self.paper_dir(paper_id) / "input" / "article.pdf"
+        with pymupdf.open(pdf_path) as document:
+            if page_number < 1 or page_number > document.page_count:
+                raise KeyError(page_number)
+            page = document[page_number - 1]
+            return page.get_pixmap(matrix=pymupdf.Matrix(2, 2), alpha=False).tobytes("png")
 
     def paper_details(self, paper_id: str) -> dict:
         root = self.paper_dir(paper_id)
@@ -131,6 +251,7 @@ class ReviewData:
         for role, items in roles_payload.get("reconciled_by_role", {}).items():
             for index, item in enumerate(items):
                 spans = [str(span) for span in item.get("evidence_spans", [])]
+                pdf_page, pdf_matches = self._pdf_evidence(paper_id, spans)
                 roles.append({
                     "id": f"{role}:{index}",
                     "role": role,
@@ -138,23 +259,28 @@ class ReviewData:
                     "conflicting": bool(item.get("conflicting", False)),
                     "evidence_spans": spans,
                     "contexts": [_evidence_context(source_text, span) for span in spans],
-                    "pdf_page": self._page_for(paper_id, spans),
+                    "pdf_page": pdf_page,
+                    "pdf_matches": pdf_matches,
                 })
 
         questions = []
         for item in questions_payload.get("questions", []):
             spans = [str(span) for span in item.get("evidence_spans", [])]
+            pdf_page, pdf_matches = self._pdf_evidence(paper_id, spans)
             questions.append({
                 **item,
                 "contexts": [_evidence_context(source_text, span) for span in spans],
-                "pdf_page": self._page_for(paper_id, spans),
+                "pdf_page": pdf_page,
+                "pdf_matches": pdf_matches,
             })
 
+        pdf_pages = self._pages_for(paper_id)
         return {
             "paper_id": paper_id,
             "metadata": metadata,
             "roles": roles,
             "questions": questions,
+            "pdf_page_count": len(pdf_pages),
             "pdf_url": f"/api/papers/{paper_id}/pdf",
             "pdf_notice": (
                 "The PDF is displayed only for visual review. Pipeline extraction and exact "
@@ -176,6 +302,14 @@ class ReviewHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _send_bytes(self, body: bytes, content_type: str) -> None:
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "private, max-age=3600")
         self.end_headers()
         self.wfile.write(body)
 
@@ -238,6 +372,11 @@ class ReviewHandler(BaseHTTPRequestHandler):
             if match:
                 pdf = self.data.paper_dir(match.group(1)) / "input" / "article.pdf"
                 self._send_file(pdf, "application/pdf")
+                return
+            match = re.fullmatch(r"/api/papers/(PMC\d+)/pdf/pages/(\d+)\.png", path)
+            if match:
+                image = self.data.render_pdf_page(match.group(1), int(match.group(2)))
+                self._send_bytes(image, "image/png")
                 return
             static_name = "index.html" if path == "/" else path.lstrip("/")
             static_path = (STATIC_DIR / static_name).resolve()

@@ -284,8 +284,9 @@ Review PDFs beside their grounded roles and questions:
 
 In a local browser, open `http://127.0.0.1:8765`. In the VS Code integrated browser, open
 `http://<machine-ip>:8765` because its loopback network is isolated. Selecting a role or question
-highlights its exact XML-derived evidence chunk and navigates the visual-only PDF to the
-best-matched page.
+highlights its exact XML-derived evidence chunk, navigates to the matched PDF page, and overlays
+the corresponding passage in the rendered PDF. PDF text coordinates are read only at review time
+to position this visual overlay; the PDF is not an extraction or grounding source.
 
 Extract and immediately build typed evidence for each completed paper:
 
