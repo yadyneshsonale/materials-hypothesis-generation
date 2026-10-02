@@ -76,11 +76,13 @@ high_temperature_hea_qwen35b/
 │       ├── manifest.json
 │       ├── metadata.json
 │       ├── screening_audit.json
-│       ├── text/                 # 50 structure-preserving text files
-│       └── xml/                  # 50 open-access JATS XML articles
+│       └── text/                 # 50 structure-preserving pipeline inputs
 ├── outputs/
 │   ├── materials_evidence/       # linked evidence, one JSON record per paper
-│   └── role_questions/           # 11 roles and decision questions per paper
+│   └── papers/                   # one organized folder per research paper
+│       └── <PMCID>/
+│           ├── input/            # JATS XML and visual-only PDF
+│           └── output/           # roles, questions, and rejected candidates
 ├── results/
 │   ├── corpus_evaluation.json
 │   ├── adaptive_trace.json
@@ -133,15 +135,28 @@ Extract the 11 roles and decision questions:
 ```bash
 .venv/bin/python role_question_extract.py \
   --input-dir experiments/high_temperature_hea_qwen35b/data/corpus/text \
-  --out-dir experiments/high_temperature_hea_qwen35b/outputs/role_questions \
+  --out-dir /tmp/role_questions \
   --workers 4 --resume
 ```
 
-Validate and consolidate the role/question outputs:
+Arrange the output, retrieve checksum-verified PMC OA PDFs, and split roles from questions:
+
+```bash
+.venv/bin/python arrange_paper_outputs.py \
+  --corpus-dir experiments/high_temperature_hea_qwen35b/data/corpus \
+  --role-dir /tmp/role_questions \
+  --papers-dir experiments/high_temperature_hea_qwen35b/outputs/papers \
+  --workers 6
+```
+
+The PDF in each paper's `input/` directory is **only for visual inspection**. The pipeline does
+not parse or use it. The JATS XML is the machine-readable source.
+
+Validate and consolidate the organized role/question outputs:
 
 ```bash
 .venv/bin/python evaluate_role_questions.py \
-  --evidence-dir experiments/high_temperature_hea_qwen35b/outputs/role_questions \
+  --evidence-dir experiments/high_temperature_hea_qwen35b/outputs/papers \
   --source-dir experiments/high_temperature_hea_qwen35b/data/corpus/text \
   --output experiments/high_temperature_hea_qwen35b/results/role_question_evaluation.json \
   --roles-jsonl experiments/high_temperature_hea_qwen35b/results/roles.jsonl \

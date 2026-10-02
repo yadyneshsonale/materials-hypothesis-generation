@@ -12,6 +12,27 @@ from role_question_extract import QUESTION_TYPES, _validate_questions, _validate
 from roles import ROLE_KEYS
 
 
+def _load_output_payloads(evidence_dir: Path) -> list[tuple[Path, dict[str, Any]]]:
+    flat_paths = sorted(evidence_dir.glob("*.json"))
+    if flat_paths:
+        return [(path, json.loads(path.read_text())) for path in flat_paths]
+
+    payloads: list[tuple[Path, dict[str, Any]]] = []
+    for roles_path in sorted(evidence_dir.glob("*/output/roles.json")):
+        paper_dir = roles_path.parent.parent
+        roles_payload = json.loads(roles_path.read_text())
+        questions_path = paper_dir / "output" / "questions.json"
+        rejected_path = paper_dir / "output" / "rejected_items.json"
+        questions_payload = json.loads(questions_path.read_text())
+        rejected_payload = json.loads(rejected_path.read_text())
+        payloads.append((roles_path, {
+            **roles_payload,
+            "questions": questions_payload.get("questions", []),
+            "rejected_items": rejected_payload.get("rejected_items", []),
+        }))
+    return payloads
+
+
 def _rejection_category(reason: str) -> str:
     for prefix in (
         "non-verbatim role evidence_span",
@@ -29,9 +50,9 @@ def evaluate(
     roles_output: Path | None = None,
     questions_output: Path | None = None,
 ) -> dict[str, Any]:
-    output_paths = sorted(evidence_dir.glob("*.json"))
+    output_payloads = _load_output_payloads(evidence_dir)
     source_ids = {path.stem for path in source_dir.glob("*.txt")}
-    output_ids = {path.stem for path in output_paths}
+    output_ids: set[str] = set()
     role_counts: Counter[str] = Counter()
     role_papers: Counter[str] = Counter()
     question_types: Counter[str] = Counter()
@@ -45,9 +66,9 @@ def evaluate(
     question_confidences: list[float] = []
     total_rejected = 0
 
-    for path in output_paths:
-        payload = json.loads(path.read_text())
+    for path, payload in output_payloads:
         paper_id = str(payload.get("paper_id") or path.stem)
+        output_ids.add(paper_id)
         source_path = source_dir / f"{paper_id}.txt"
         if not source_path.exists():
             invalid_items.append({"paper_id": paper_id, "reason": "source text is missing"})
@@ -111,7 +132,10 @@ def evaluate(
         "role_paper_coverage": {
             role: {
                 "papers": role_papers[role],
-                "rate": round(role_papers[role] / len(output_paths), 4) if output_paths else 0,
+                "rate": (
+                    round(role_papers[role] / len(output_payloads), 4)
+                    if output_payloads else 0
+                ),
             }
             for role in ROLE_KEYS
         },

@@ -1,0 +1,102 @@
+{
+  "schema_version": "role-question-1.0",
+  "paper_id": "PMC11375712",
+  "rejected_items": [
+    {
+      "stage": "chunk_extraction",
+      "section": "Results And Discussion",
+      "model_item_index": 2,
+      "reason": "non-verbatim role evidence_span: 'The local minima of d χ dc / dT define the T c values... The thus-obtained T c values are 1084, 214, and 168 K.'",
+      "candidate": {
+        "role": "evidence_result",
+        "content": "Curie temperatures were determined as 1084, 214, and 168 K based on local minima of the temperature derivative of magnetic susceptibility.",
+        "evidence_span": "The local minima of d χ dc / dT define the T c values... The thus-obtained T c values are 1084, 214, and 168 K."
+      }
+    },
+    {
+      "stage": "chunk_extraction",
+      "section": "Results And Discussion",
+      "model_item_index": 5,
+      "reason": "non-verbatim role evidence_span: 'Following the claim of a simple magnetic anisotropy model, H c is described as 2 K /μ 0 M s ... Consequently, we expect '",
+      "candidate": {
+        "role": "hypothesis_statement",
+        "content": "It is expected that magnetocrystalline anisotropy predominantly governs the coercivity (H c) within the fcc phase based on the simple magnetic anisotropy model.",
+        "evidence_span": "Following the claim of a simple magnetic anisotropy model, H c is described as 2 K /μ 0 M s ... Consequently, we expect that the magnetocrystalline anisotropy predominantly governs H c within the fcc phase."
+      }
+    },
+    {
+      "stage": "reconciliation",
+      "role": "rejected_alternative",
+      "model_item_index": 0,
+      "reason": "non-verbatim reconciled span: \"Based on Green's function and multiple scattering principles, this program obviates the need for a supercell structure i\"",
+      "candidate": {
+        "content": "The authors avoided using a supercell structure for handling chemically disordered materials, relying instead on the coherent potential approximation.",
+        "evidence_spans": [
+          "Based on Green's function and multiple scattering principles, this program obviates the need for a supercell structure in handling chemically disordered materials."
+        ],
+        "conflicting": false
+      }
+    },
+    {
+      "stage": "reconciliation",
+      "role": "mechanism_principle",
+      "model_item_index": 0,
+      "reason": "non-verbatim reconciled span: 'The emergence of 214 K transition is attributed to the influence of the C14 phase.'",
+      "candidate": {
+        "content": "The emergence of the 214 K transition is caused by the influence of the C14 phase.",
+        "evidence_spans": [
+          "The emergence of 214 K transition is attributed to the influence of the C14 phase."
+        ],
+        "conflicting": false
+      }
+    },
+    {
+      "stage": "question_generation",
+      "model_item_index": 1,
+      "reason": "question contains an invalid grounded_role_ref",
+      "candidate": {
+        "question": "Is the spin-canted component in the fcc phase the dominant mechanism limiting Hc, or does the orbital moment magnitude dictate the limit?",
+        "question_type": "causal",
+        "rationale": "The paper attributes reduced Ms to spin-canting and low Hc in prior single-phase fcc to low orbital moments. Distinguishing these causes is necessary to decide whether to target spin-canting suppression (e.g., via strain) or orbital moment enhancement (e.g., via heavy elements).",
+        "decision_use": "Selects between structural engineering (strain) vs. chemical engineering (heavy doping) strategies to boost coercivity.",
+        "grounded_role_refs": [
+          "mechanism_principle:2",
+          "prior_limitation:1"
+        ],
+        "answer_requirements": [
+          "Compare spin-canting angles via neutron diffraction across samples with varying orbital moments",
+          "Correlate Hc with calculated orbital moment magnitudes"
+        ],
+        "evidence_spans": [
+          "The diminished experimental M s in each phase signifies the presence of a spin-canted component within the actual magnetic structure.",
+          "In each elemental component, both spin and orbital moments are greater for FeCoNi, signifying that the orbital moment in the fcc phase does not yield an augmented H c ."
+        ],
+        "confidence": 0.6
+      }
+    },
+    {
+      "stage": "question_generation",
+      "model_item_index": 2,
+      "reason": "question contains a non-verbatim evidence span",
+      "candidate": {
+        "question": "Does the dual-phase microstructure (fcc + C14) in FeCoNiTi fundamentally alter the 214 K ordering transition compared to the single-phase fcc limit?",
+        "question_type": "discrimination",
+        "rationale": "The 214 K transition is attributed to the C14 phase, while single-phase fcc is the target for high Hc. Understanding if the C14 phase suppresses or enhances the magnetic ordering temperature in the fcc matrix is vital for phase control strategies.",
+        "decision_use": "Determines if phase separation must be avoided to maintain high-temperature magnetic stability.",
+        "grounded_role_refs": [
+          "mechanism_principle:0",
+          "prior_approach:2"
+        ],
+        "answer_requirements": [
+          "Measure magnetic susceptibility of single-phase fcc samples near 214 K",
+          "Perform TEM to isolate C14 fraction effects on ordering temperature"
+        ],
+        "evidence_spans": [
+          "The emergence of 214 K transition is attributed to the influence of the C14 phase.",
+          "According to their findings, the as-cast FeCoNiTi manifests a dual-phase microstructure comprising fcc and hexagonal C14 Laves phases"
+        ],
+        "confidence": 0.5
+      }
+    }
+  ]
+}

@@ -272,6 +272,10 @@ Evaluate and consolidate role/question outputs:
   --questions-jsonl results/questions.jsonl
 ```
 
+For a per-paper archival layout, run `arrange_paper_outputs.py`. It creates an `input/` directory
+containing JATS XML and a checksum-verified PMC OA PDF, plus separate role and question output
+files. The PDF is **only for visual inspection** and is never parsed or used as pipeline evidence.
+
 Extract and immediately build typed evidence for each completed paper:
 
 ```bash

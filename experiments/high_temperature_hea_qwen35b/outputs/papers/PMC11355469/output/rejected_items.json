@@ -1,0 +1,96 @@
+{
+  "schema_version": "role-question-1.0",
+  "paper_id": "PMC11355469",
+  "rejected_items": [
+    {
+      "stage": "chunk_extraction",
+      "section": "Results",
+      "model_item_index": 3,
+      "reason": "non-verbatim role evidence_span: 'The FeNiCrCoCu high entropy alloy has excellent high temperature resistance at 300–900 K.'",
+      "candidate": {
+        "role": "evidence_result",
+        "content": "The material exhibits excellent high-temperature resistance between 300 K and 900 K.",
+        "evidence_span": "The FeNiCrCoCu high entropy alloy has excellent high temperature resistance at 300–900 K."
+      }
+    },
+    {
+      "stage": "question_generation",
+      "model_item_index": 1,
+      "reason": "question contains an invalid grounded_role_ref",
+      "candidate": {
+        "question": "For FeNiCrCoCu coatings, what is the precise temperature threshold where the dislocation-density-driven elastic modulus increase (at 600 K) reverses to a dislocation-loss-driven softening, and how can this be measured via in-situ nanoindentation?",
+        "question_type": "boundary",
+        "rationale": "The paper reports a unique non-monotonic elastic modulus (increase 300-600 K, decrease >600 K). Identifying the exact crossover temperature is essential for defining the safe operating window for high-temperature structural applications.",
+        "decision_use": "Defines the maximum operating temperature before mechanical softening outweighs dislocation recovery benefits, preventing design for temperatures where modulus drops.",
+        "grounded_role_refs": [
+          "causal_claim:1",
+          "causal_claim:2",
+          "mechanism_principle:2",
+          "evidence_result:10"
+        ],
+        "answer_requirements": [
+          "In-situ nanoindentation across the 500-800 K range with 10 K increments to map elastic modulus vs. temperature",
+          "Concurrent EBSD or TEM mapping of dislocation density to pinpoint the exact temperature of peak dislocation recovery before rapid dissolution"
+        ],
+        "evidence_spans": [
+          "However, the dislocation density at 600 K is significantly reduced compared with that at 300 K, resulting in an increase of the elastic modulus of the material from 173 GPa to 219 GPa",
+          "lattice disorder takes place rapidly, and dislocation density also decreases significantly, resulting in a significant decrease in the hardness and elastic modulus of the material",
+          "When the temperature increased from 300 K to 600 K, the elastic modulus increased significantly, from 173 GPa to 219 GPa. As the temperature continued to rise, the elastic modulus began to decline rapidly"
+        ],
+        "confidence": 0.9
+      }
+    },
+    {
+      "stage": "question_generation",
+      "model_item_index": 3,
+      "reason": "question contains a non-verbatim evidence span",
+      "candidate": {
+        "question": "At 900 K, is the wear resistance drop in FeNiCrCoCu coatings caused by permanent property changes (loading/unloading slope divergence) or reversible lattice disorder, and how can cyclic loading tests distinguish them?",
+        "question_type": "discrimination",
+        "rationale": "The paper notes permanent changes at 900 K via slope analysis but also discusses lattice disorder. Determining if the damage is cumulative/permanent or reversible is vital for designing coatings that might undergo thermal cycling.",
+        "decision_use": "Informs whether the coating can be designed for cyclic thermal loading (reversible) or requires replacement after a single high-temp event (permanent damage).",
+        "grounded_role_refs": [
+          "evidence_result:4",
+          "causal_claim:4",
+          "problem_motivation:0"
+        ],
+        "answer_requirements": [
+          "Conduct cyclic nanoindentation (loading/unloading) at 900 K for 10, 50, and 100 cycles",
+          "Measure the shift in the loading slope and permanent indentation depth after each cycle to quantify cumulative vs. permanent damage"
+        ],
+        "evidence_spans": [
+          "At 900 K and 1200 K, the slope of the curve in the loading stage is higher than that in the unloading stage, indicating that the friction properties of the material have changed permanently in the friction process.",
+          "Due to the softening of the lattice with increasing temperature, the deformation mechanism transformed from stacking faults to lattice disorder.",
+          "Identifies the need to systematically analyze the wear resistance of FeNiCrCoCu high entropy alloy coatings, particularly regarding their performance under varying temperatures."
+        ],
+        "confidence": 0.8
+      }
+    },
+    {
+      "stage": "question_generation",
+      "model_item_index": 4,
+      "reason": "question contains an invalid grounded_role_ref",
+      "candidate": {
+        "question": "What is the baseline friction coefficient of FeNiCrCoCu coatings on Cu at 600 K where dislocation density is minimal, and how does it compare to the 300 K baseline to isolate the effect of dislocation recovery?",
+        "question_type": "baseline",
+        "rationale": "The paper reports a unique elastic modulus increase and enhanced recovery at 600 K. Establishing the specific baseline friction coefficient at this anomaly point allows for quantifying the 'benefit' of dislocation recovery versus the 'penalty' of increased lattice disorder.",
+        "decision_use": "Determines if the 600 K regime offers a unique operational window of reduced friction despite high disorder, justifying operation in this specific thermal zone.",
+        "grounded_role_refs": [
+          "evidence_result:9",
+          "evidence_result:10",
+          "mechanism_principle:2"
+        ],
+        "answer_requirements": [
+          "Measure friction coefficient at 600 K and 300 K under identical load/speed conditions",
+          "Calculate the difference in friction coefficient and correlate with the reported dislocation density values (min at 600 K)"
+        ],
+        "evidence_spans": [
+          "With the increase of temperature, the friction coefficients gradually increased, and the fluctuation range also continued to increase.",
+          "When the temperature increased from 300 K to 600 K, the elastic modulus increased significantly, from 173 GPa to 219 GPa. As the temperature continued to rise, the elastic modulus began to decline rapidly",
+          "The length of the dislocation line was the smallest, and the deformation recovery ability of the material was enhanced at a temperature of 600 K."
+        ],
+        "confidence": 0.95
+      }
+    }
+  ]
+}

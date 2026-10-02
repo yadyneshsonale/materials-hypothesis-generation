@@ -31,6 +31,12 @@ are retained:
 Titles, DOI values, venues, years, citation counts, licenses, and source URLs are recorded in the
 manifest. Article-level reuse remains subject to each recorded license.
 
+For human review, the publisher-deposited PDF for each paper was downloaded from the official PMC
+Open Access S3 dataset. Every download was required to begin with a PDF signature and match the MD5
+checksum supplied in PMC's article-version metadata. The PDFs are **only for visual inspection**:
+they are not parsed, extracted, scored, or used as evidence. The XML-derived text remains the
+pipeline input and exact-grounding source.
+
 ## 3. Model and inference runtime
 
 | Setting | Value |

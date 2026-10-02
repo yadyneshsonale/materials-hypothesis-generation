@@ -63,6 +63,40 @@ class EvaluateRoleQuestionsTests(unittest.TestCase):
         self.assertEqual(exported_question["paper_id"], "paper-1")
         self.assertTrue(exported_question["question_id"].startswith("paper-1::decision_question::"))
 
+    def test_reads_split_per_paper_output_layout(self) -> None:
+        span = "Cr reduced mass gain at 800 C."
+        roles = {role: [] for role in ROLE_KEYS}
+        roles["evidence_result"] = [{
+            "content": "Cr reduced mass gain.",
+            "evidence_spans": [span],
+            "conflicting": False,
+        }]
+        with TemporaryDirectory() as directory:
+            root = Path(directory)
+            source_dir = root / "source"
+            evidence_dir = root / "papers"
+            output_dir = evidence_dir / "paper-1" / "output"
+            source_dir.mkdir()
+            output_dir.mkdir(parents=True)
+            (source_dir / "paper-1.txt").write_text(span)
+            (output_dir / "roles.json").write_text(json.dumps({
+                "paper_id": "paper-1",
+                "reconciled_by_role": roles,
+            }))
+            (output_dir / "questions.json").write_text(json.dumps({
+                "paper_id": "paper-1",
+                "questions": [],
+            }))
+            (output_dir / "rejected_items.json").write_text(json.dumps({
+                "paper_id": "paper-1",
+                "rejected_items": [],
+            }))
+
+            result = evaluate(evidence_dir, source_dir)
+
+        self.assertEqual(result["output_papers"], 1)
+        self.assertEqual(result["total_role_items"], 1)
+
 
 if __name__ == "__main__":
     unittest.main()

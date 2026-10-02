@@ -34,12 +34,15 @@ full-text JATS XML availability before the selection cutoff.
 
 ## Contents
 
-- `xml/`: the 50 downloaded Europe PMC JATS XML articles.
 - `text/`: structure-preserving text generated from the JATS files for this repository's
   extraction pipeline.
 - `manifest.json`: rank, citation count, DOI, venue, license, source URL, and screening evidence.
 - `metadata.json`: compact title, DOI, license, venue, and publication-year lookup.
 - `screening_audit.json`: query, selection rules, cutoff, and higher-ranked exclusions.
+
+The canonical XML for each paper is stored with its paper-specific outputs under
+`../../outputs/papers/<PMCID>/input/article.xml`. The adjacent PDF is for visual inspection only
+and is not used by the pipeline.
 
 Licenses vary by article and are retained in `manifest.json` and `metadata.json`. Reuse must
 follow each article's license.

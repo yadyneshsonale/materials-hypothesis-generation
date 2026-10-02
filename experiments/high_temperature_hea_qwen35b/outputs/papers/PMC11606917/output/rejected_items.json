@@ -1,0 +1,65 @@
+{
+  "schema_version": "role-question-1.0",
+  "paper_id": "PMC11606917",
+  "rejected_items": [
+    {
+      "stage": "chunk_extraction",
+      "section": "Abstract",
+      "model_item_index": 0,
+      "reason": "non-verbatim role evidence_span: 'Experimental measurements of these properties are extremely challenging due to their high melting temperatures. ... The '",
+      "candidate": {
+        "role": "problem_motivation",
+        "content": "Experimental measurements of melting properties are extremely challenging due to high temperatures, and existing theoretical methods are too computationally expensive for high-throughput calculations.",
+        "evidence_span": "Experimental measurements of these properties are extremely challenging due to their high melting temperatures. ... The high computational cost makes high-throughput calculations infeasible."
+      }
+    },
+    {
+      "stage": "question_generation",
+      "model_item_index": 0,
+      "reason": "decision question must end with a question mark",
+      "candidate": {
+        "question": "For TaVCrW and similar refractory HEAs, does replacing electronic Gibbs energy corrections with explicit magnetic treatments alter the predicted melting temperature by >20 K outside the 2000–2400 K range? Answering this determines if the current non-magnetic model is sufficient for design or if magnetic potentials are required for accurate predictions in this regime.",
+        "question_type": "causal",
+        "rationale": "The paper explicitly states that elaborate magnetic treatments are necessary but out of scope, yet electronic excitations already cause a 48 K shift. The magnitude of magnetic effects is unknown in the disordered liquid state.",
+        "decision_use": "Decides whether to implement magnetic MTPs for TaVCrW or abandon the current non-magnetic approach for melting point prediction.",
+        "grounded_role_refs": [
+          "prior_limitation:3",
+          "constraint:0",
+          "mechanism_principle:0"
+        ],
+        "answer_requirements": [
+          "Compare melting temperatures calculated with and without magnetic degrees of freedom in MTP for TaVCrW at T > 2400 K."
+        ],
+        "evidence_spans": [
+          "More elaborate treatment of magnetism may resolve this issue, which is, however, beyond the scope of the present work.",
+          "The disparity in electronic Gibbs energy between solid and liquid phases, arising from a gap in the DOS at the Fermi level, causes a shift in the melting point."
+        ],
+        "confidence": 0.95
+      }
+    },
+    {
+      "stage": "question_generation",
+      "model_item_index": 1,
+      "reason": "question contains a non-verbatim evidence span",
+      "candidate": {
+        "question": "In multi-component HEAs like TaVCrW, does the underbinding/overbinding trend of GGA-PBE/LDA reverse the typical melting boundary ordering (PBE lower, LDA higher) due to the specific electronic structure of V and Cr?",
+        "question_type": "discrimination",
+        "rationale": "The paper reports a contradiction where the standard functional trend fails for this alloy because V and Cr exhibit anomalous lattice constants. Understanding if this anomaly is general or specific to V/Cr dictates functional choice for screening.",
+        "decision_use": "Determines whether to rely on GGA-PBE or LDA for high-throughput melting point screening of alloys containing V and Cr.",
+        "grounded_role_refs": [
+          "contradiction:0",
+          "mechanism_principle:1",
+          "mechanism_principle:2"
+        ],
+        "answer_requirements": [
+          "Calculate lattice constants and melting points for pure V, pure Cr, and V/Cr-containing HEAs using both functionals to check if the PBE<LDA melting order holds."
+        ],
+        "evidence_spans": [
+          "For TaVCrW, using the CALPHAD value as a proxy for the experiment, this empirical rule seems to not hold anymore.",
+          "Already for the pure elements, the underbinding / overbinding tendency of GGA-PBE / LDA, which generally predicts larger / smaller equilibrium lattice constants compared to experimental values for most unaries, does not hold for unary V and Cr anymore."
+        ],
+        "confidence": 0.9
+      }
+    }
+  ]
+}

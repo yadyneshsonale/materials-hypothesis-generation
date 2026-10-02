@@ -1,0 +1,129 @@
+{
+  "schema_version": "role-question-1.0",
+  "paper_id": "PMC6926650",
+  "rejected_items": [
+    {
+      "stage": "chunk_extraction",
+      "section": "Results",
+      "model_item_index": 1,
+      "reason": "non-verbatim role evidence_span: 'The cracking of specimens during hot swaging was at first attributed to a decrease of temperature during contact of the '",
+      "candidate": {
+        "role": "causal_claim",
+        "content": "Hot swaging caused specimen cracking, potentially due to high oxygen content or inappropriate deformation temperature/strain rate.",
+        "evidence_span": "The cracking of specimens during hot swaging was at first attributed to a decrease of temperature during contact of the die with the specimen... It should be pointed out that this specimen contained relatively high amount of oxygen (~0.75 wt %), which may have caused the brittleness of this alloy at the given deformation conditions (i.e., temperature and strain rate). It is also possible that the deformation temperature was too low and the strain rate was too high for the given specimens."
+      }
+    },
+    {
+      "stage": "question_generation",
+      "model_item_index": 0,
+      "reason": "decision question must end with a question mark",
+      "candidate": {
+        "question": "For HfNbTaTiZr HEA processed by hot swaging, what is the specific oxygen threshold (in wt%) where cracking occurs instead of dislocation strengthening, and how can this be measured to validate the swaging process? (Baseline: Low hardness in HIP samples; Causal: Oxide-induced brittleness vs. dislocation strengthening)",
+        "question_type": "boundary",
+        "rationale": "Determining the oxygen limit for swaging is critical because swaging failed due to cracking in this study, yet the material is expected to strengthen via dislocations. Without this boundary, swaging cannot be reliably used.",
+        "decision_use": "Define oxygen purity limits for swaging vs. HIP to prevent cracking and achieve density.",
+        "grounded_role_refs": [
+          "prior_limitation:1",
+          "causal_claim:4",
+          "contradiction:0",
+          "constraint:0"
+        ],
+        "answer_requirements": [
+          "Measure oxygen content (wt%) in swaged samples prior to cracking and compare with hardness values.",
+          "Conduct incremental swaging tests on samples with controlled oxygen levels (e.g., 0.1, 0.2, 0.3 wt%) to find the failure threshold."
+        ],
+        "evidence_spans": [
+          "This method does not result in a full density alloy due to cracking during swaging.",
+          "Oxygen incorporated into the HfNbTaTiZr samples caused deterioration of mechanical properties (embrittlement) and prevented formation of a single phase random solid solution.",
+          "It has to be mentioned that HEAP-HIP and HEAP-HIP-S samples were characterized by surprisingly low hardness.",
+          "Porosity was not measured in the HEAP-S-SW specimen because the swaging process was interrupted due to specimen cracking"
+        ],
+        "confidence": 0.85
+      }
+    },
+    {
+      "stage": "question_generation",
+      "model_item_index": 1,
+      "reason": "decision question must end with a question mark",
+      "candidate": {
+        "question": "Does increasing the SPS sintering temperature above 1300°C or altering the cooling rate mitigate the brittleness caused by oxygen-induced phase separation in mechanically alloyed HfNbTaTiZr, and how can this be verified microstructurally? (Causal: Sintering/cooling mechanism; Mechanism: Oxygen/phase separation)",
+        "question_type": "intervention",
+        "rationale": "Current SPS processing yields brittle specimens. Understanding if process parameter changes (T, cooling rate) can overcome oxygen-induced phase separation is necessary to improve ductility.",
+        "decision_use": "Select optimal sintering temperature and cooling protocol to minimize brittle phases in MA-SPS routes.",
+        "grounded_role_refs": [
+          "causal_claim:1",
+          "mechanism_principle:4",
+          "mechanism_principle:3",
+          "prior_limitation:2"
+        ],
+        "answer_requirements": [
+          "Perform SPS at varying temperatures (>1300°C) and cooling rates.",
+          "Analyze microstructure via XRD for phase separation and SEM/EDS for chemical homogeneity to correlate with hardness."
+        ],
+        "evidence_spans": [
+          "The sintering caused narrowing of XRD profiles, which indicated grain growth occurring during sintering.",
+          "Single phase random solid solution is caused by relatively high cooling rate after SPS processing at high temperature of 1300 °C, where all secondary phases are supposed to be dissolved",
+          "Spark plasma sintering (SPS) of mechanically alloyed powders resulted in a fully dense but brittle specimen.",
+          "The dendritic microstructure may lead to phase separation (a mixture of two phases with slightly different chemical composition)"
+        ],
+        "confidence": 0.8
+      }
+    },
+    {
+      "stage": "question_generation",
+      "model_item_index": 2,
+      "reason": "decision question must end with a question mark",
+      "candidate": {
+        "question": "What is the minimum cooling rate required to retain a single-phase structure in HfNbTaTiZr when using the SPS method, and how does this compare to the 15°C/min threshold reported for arc melting? (Baseline: Cooling rate threshold; Mechanism: Single-phase formation)",
+        "question_type": "baseline",
+        "rationale": "The paper cites a 15°C/min threshold for arc melting but uses SPS. Establishing the SPS-specific threshold is essential for process design to avoid the brittleness of multiphase structures.",
+        "decision_use": "Set SPS cooling parameters to ensure single-phase retention and prevent phase separation.",
+        "grounded_role_refs": [
+          "prior_approach:2",
+          "mechanism_principle:3",
+          "prior_limitation:2",
+          "contradiction:0"
+        ],
+        "answer_requirements": [
+          "Measure cooling rates in SPS furnaces for different cooling profiles.",
+          "Correlate cooling rate with XRD results to identify the rate at which single-phase formation is lost."
+        ],
+        "evidence_spans": [
+          "It was reported by Senkov et al. [ [22] ] that cooling rate higher than 15 °C/min is sufficient for retaining single phase random solid solution at this alloy.",
+          "Single phase random solid solution is caused by relatively high cooling rate after SPS processing at high temperature of 1300 °C, where all secondary phases are supposed to be dissolved",
+          "The dendritic microstructure may lead to phase separation (a mixture of two phases with slightly different chemical composition) due to variation of chemical composition in dendrite and interdendritic regions",
+          "It has to be mentioned that HEAP-HIP and HEAP-HIP-S samples were characterized by surprisingly low hardness."
+        ],
+        "confidence": 0.75
+      }
+    },
+    {
+      "stage": "question_generation",
+      "model_item_index": 3,
+      "reason": "decision question must end with a question mark",
+      "candidate": {
+        "question": "Is the observed low hardness in HIP-processed HfNbTaTiZr caused by residual porosity or by oxygen-induced phase separation, and how can this be distinguished using positron annihilation spectroscopy? (Discrimination: HIP contradiction; Causal: Oxygen mechanism)",
+        "question_type": "discrimination",
+        "rationale": "HIP samples showed surprisingly low hardness, contradicting expectations. Distinguishing whether porosity or oxygen-driven phase separation is the culprit determines the next optimization step (pressure vs. atmosphere control).",
+        "decision_use": "Determine if HIP requires better oxygen control or higher pressure to achieve expected hardness.",
+        "grounded_role_refs": [
+          "contradiction:0",
+          "causal_claim:4",
+          "mechanism_principle:1",
+          "prior_limitation:3"
+        ],
+        "answer_requirements": [
+          "Measure porosity volume fraction using Archimedes or CT scan.",
+          "Compare positron lifetime (τ2) and S-parameter values between low-hardness HIP samples and known single-phase vs. multiphase standards."
+        ],
+        "evidence_spans": [
+          "It has to be mentioned that HEAP-HIP and HEAP-HIP-S samples were characterized by surprisingly low hardness.",
+          "Oxygen incorporated into the HfNbTaTiZr samples caused deterioration of mechanical properties (embrittlement) and prevented formation of a single phase random solid solution.",
+          "Since bcc1 and bcc2 phases had slightly different lattice parameters, the discontinuity of lattice planes resulted in the formation of misfit defects at interfaces between these two phases",
+          "On the other hand, residual porosity present after sintering deteriorates the mechanical properties of HEAs significantly"
+        ],
+        "confidence": 0.9
+      }
+    }
+  ]
+}
