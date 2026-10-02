@@ -155,10 +155,11 @@ not parse or use it. The JATS XML is the machine-readable source.
 Review the PDF and generated evidence side by side:
 
 ```bash
-.venv/bin/python review_interface_server.py
+.venv/bin/python review_interface_server.py --host 0.0.0.0
 ```
 
-Then open `http://127.0.0.1:8765`. The interface provides:
+Then open `http://127.0.0.1:8765` in a local browser. For the VS Code integrated browser, use
+`http://<machine-ip>:8765` because its loopback interface is isolated. The interface provides:
 
 - a ranked 50-paper selector;
 - a visual-only PDF pane;

@@ -279,11 +279,13 @@ files. The PDF is **only for visual inspection** and is never parsed or used as 
 Review PDFs beside their grounded roles and questions:
 
 ```bash
-.venv/bin/python review_interface_server.py
+.venv/bin/python review_interface_server.py --host 0.0.0.0
 ```
 
-Open `http://127.0.0.1:8765`. Selecting a role or question highlights its exact XML-derived
-evidence chunk and navigates the visual-only PDF to the best-matched page.
+In a local browser, open `http://127.0.0.1:8765`. In the VS Code integrated browser, open
+`http://<machine-ip>:8765` because its loopback network is isolated. Selecting a role or question
+highlights its exact XML-derived evidence chunk and navigates the visual-only PDF to the
+best-matched page.
 
 Extract and immediately build typed evidence for each completed paper:
 

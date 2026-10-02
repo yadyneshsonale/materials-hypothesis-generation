@@ -16,8 +16,7 @@ function make(tag, className, text) {
 function pdfUrl(item) {
   const base = state.paper.pdf_url;
   if (!item || !item.pdf_page) return base;
-  const search = item.evidence_spans?.[0]?.slice(0, 100) || "";
-  return `${base}#page=${item.pdf_page}&search=${encodeURIComponent(search)}`;
+  return `${base}#page=${item.pdf_page}`;
 }
 
 function showEvidence(item, title) {
