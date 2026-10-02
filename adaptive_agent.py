@@ -14,12 +14,14 @@ from evidence_model import EvidenceEntity, EvidenceRelation, index_relations, lo
 from graph_build import Graph, Node, _keywords, build_graph
 from hypothesis_agent import critique
 from llm_client import provider_info, resilient_chat_json
+from materials_evidence import MaterialsEvidenceUnit, load_materials_evidence
 from source_context import load_context_index
 
 MAX_DIRECT_HITS = 8
 MAX_GRAPH_HITS = 8
 MAX_PER_PAPER = 2
 MAX_CITATION_HITS = 8
+MAX_SYNTHESIS_EVIDENCE = 20
 SUFFICIENCY_DECISIONS = {"sufficient", "reason_with_caveat", "decompose_further", "unresolved"}
 
 
@@ -33,17 +35,11 @@ def _context_keywords(text: str) -> set[str]:
         terms.add(term)
     return terms
 
-_DECOMPOSE_SYSTEM = """You plan evidence gathering for materials hypothesis generation.
-Convert the user's goal into a small directed acyclic graph of retrieval questions. Tasks must
-cover mechanisms, interventions or transferable analogies, boundary conditions and failure modes,
-and contradictory or comparative evidence. These are literature questions, not experiments to run.
-Return JSON: {"tasks": [{"id": "T1", "question": "...", "intent": "...",
-"depends_on": [], "required_roles": ["mechanism_principle"]}]}. Use only these role names:
-problem_motivation, prior_approach, prior_limitation, rejected_alternative, inspiration_source,
-causal_claim, mechanism_principle, hypothesis_statement, evidence_result, constraint, contradiction."""
-
 _SUFFICIENCY_SYSTEM = """You assess whether retrieved literature claims answer one evidence task.
-Keep retrieved facts separate from your inference. Return JSON with decision equal to one of:
+Prefer complete linked materials evidence that retains composition, processing, structure,
+mechanism, property outcome, conditions, comparison, and provenance. Do not join fields from
+different material states or operating regimes. Keep retrieved facts separate from your inference.
+Return JSON with decision equal to one of:
 sufficient, reason_with_caveat, decompose_further, unresolved. Include a concise finding grounded
 in cited entity IDs, a reason, missing_questions, and assumptions. Use decompose_further only when
 narrower literature questions can close the gap. When a preference or constraint is absent, choose
@@ -67,6 +63,10 @@ _SYNTHESIZE_SYSTEM = """You generate auditable materials-science hypotheses from
 tasks. Propose mechanism-specific candidates that combine claims from at least two papers. Every
 literature-backed statement must cite a supplied entity ID; label any new connection as a proposed
 inference. Include boundary conditions, predicted outcome, uncertainty, and a falsifying experiment.
+Prefer evidence units that contain an intact processing/composition -> structure -> mechanism ->
+property chain. Never transfer an outcome across compositions, temperatures, environments, or
+loading regimes without labeling that transfer as a proposed inference. State the controllable
+intervention, expected structural change, mechanism, property direction, and applicable conditions.
 Never treat METADATA_ONLY or REQUIRES_RESOLUTION citations as evidence from the cited paper, and
 treat low-confidence raw table extraction as provisional.
 Return JSON: {"candidates": [{"hypothesis": "...", "mechanism": "...", "predicted_outcome":
@@ -81,6 +81,9 @@ class Task:
     intent: str
     depends_on: list[str] = field(default_factory=list)
     required_roles: list[str] = field(default_factory=list)
+    decision_use: str = ""
+    required_facets: list[str] = field(default_factory=list)
+    minimum_distinct_materials: int = 1
     depth: int = 0
     status: str = "pending"
     finding: str = ""
@@ -100,32 +103,66 @@ class EvidenceItem:
     retrieval_reason: str
     source_contexts: list[dict[str, Any]] = field(default_factory=list)
     relation_context: dict[str, Any] = field(default_factory=dict)
+    structured_context: dict[str, Any] = field(default_factory=dict)
 
 
 def _default_tasks(goal: str) -> list[Task]:
     return [
-        Task("T1", f"Which mechanisms govern the target behavior in: {goal}?", "mechanisms", [], ["mechanism_principle", "causal_claim"]),
-        Task("T2", f"Which interventions or cross-domain analogies could improve: {goal}?", "interventions", ["T1"], ["hypothesis_statement", "inspiration_source", "causal_claim"]),
-        Task("T3", f"Under which conditions and failure modes do relevant approaches fail for: {goal}?", "boundaries", ["T1"], ["constraint", "prior_limitation", "rejected_alternative"]),
-        Task("T4", f"Which findings compare or contradict candidate approaches for: {goal}?", "conflicts", ["T2", "T3"], ["contradiction", "evidence_result", "prior_approach"]),
+        Task(
+            "T1",
+            f"What quantitative baseline property values are reported for materials relevant to '{goal}', and under exactly which temperature, environment, and loading conditions?",
+            "baseline",
+            [],
+            ["evidence_result", "prior_approach"],
+            "Establish the target metric, baseline range, and comparable operating regime.",
+            ["material", "outcome", "conditions", "comparison", "provenance"],
+            2,
+        ),
+        Task(
+            "T2",
+            f"Which intact processing or composition -> structure -> mechanism -> property chains explain the behavior targeted by '{goal}'?",
+            "causal_chain",
+            ["T1"],
+            ["mechanism_principle", "causal_claim", "evidence_result"],
+            "Identify causal levers without combining disconnected claims.",
+            ["material", "intervention", "structure", "mechanism", "outcome", "conditions"],
+            2,
+        ),
+        Task(
+            "T3",
+            f"Which controllable composition or processing changes improve the target property in '{goal}' relative to a stated baseline, by how much, and through which structural mechanism?",
+            "intervention",
+            ["T1", "T2"],
+            ["causal_claim", "evidence_result", "hypothesis_statement"],
+            "Select an actionable intervention and estimate its expected effect.",
+            ["material", "intervention", "structure", "mechanism", "outcome", "comparison"],
+            2,
+        ),
+        Task(
+            "T4",
+            f"At which temperatures, environments, times, or loading regimes do the candidate mechanisms for '{goal}' weaken, reverse, or fail?",
+            "boundary",
+            ["T2"],
+            ["constraint", "contradiction", "prior_limitation"],
+            "Define boundary conditions and reject unsafe extrapolation.",
+            ["material", "mechanism", "outcome", "conditions", "limitations"],
+            1,
+        ),
+        Task(
+            "T5",
+            f"Which competing mechanisms remain plausible for '{goal}', and which reported measurement or comparison can distinguish between them?",
+            "discrimination",
+            ["T3", "T4"],
+            ["contradiction", "evidence_result", "mechanism_principle"],
+            "Choose a falsifiable discriminator for the final hypothesis.",
+            ["material", "mechanism", "outcome", "comparison", "provenance"],
+            2,
+        ),
     ]
 
 
 def decompose_goal(goal: str) -> list[Task]:
-    result = resilient_chat_json(_DECOMPOSE_SYSTEM, f"USER GOAL:\n{goal}", max_tokens=1800)
-    rows = result.get("tasks", []) if isinstance(result, dict) else []
-    tasks = []
-    for index, row in enumerate(rows):
-        if not isinstance(row, dict) or not row.get("question"):
-            continue
-        tasks.append(Task(
-            task_id=str(row.get("id") or f"T{index + 1}"),
-            question=str(row["question"]),
-            intent=str(row.get("intent") or "evidence"),
-            depends_on=[str(value) for value in row.get("depends_on", [])],
-            required_roles=[str(value) for value in row.get("required_roles", [])],
-        ))
-    return tasks or _default_tasks(goal)
+    return _default_tasks(goal)
 
 
 def retrieve_evidence(
@@ -290,6 +327,43 @@ def retrieve_evidence(
     return evidence
 
 
+def retrieve_materials_evidence(
+    task: Task,
+    units: list[MaterialsEvidenceUnit],
+) -> list[EvidenceItem]:
+    query_terms = _keywords(task.question)
+    scored: list[tuple[float, MaterialsEvidenceUnit]] = []
+    for unit in units:
+        overlap = len(query_terms & _keywords(unit.summary()))
+        matched_facets = len(set(task.required_facets) & unit.facets())
+        if not overlap and not matched_facets:
+            continue
+        completeness = matched_facets / max(len(task.required_facets), 1)
+        score = overlap + (3.0 * completeness) + unit.confidence
+        scored.append((score, unit))
+    scored.sort(key=lambda value: (-value[0], value[1].unit_id))
+
+    selected: list[EvidenceItem] = []
+    paper_counts: dict[str, int] = {}
+    for score, unit in scored:
+        if paper_counts.get(unit.paper_id, 0) >= MAX_PER_PAPER:
+            continue
+        selected.append(EvidenceItem(
+            node_id=unit.unit_id,
+            paper_id=unit.paper_id,
+            role="materials_evidence_unit",
+            content=unit.summary(),
+            evidence_spans=unit.evidence_spans,
+            score=round(score, 4),
+            retrieval_reason="linked_materials_evidence",
+            structured_context=unit.to_dict(),
+        ))
+        paper_counts[unit.paper_id] = paper_counts.get(unit.paper_id, 0) + 1
+        if len(selected) >= MAX_DIRECT_HITS:
+            break
+    return selected
+
+
 def retrieve_cited_role_evidence(task: Task, evidence: list[EvidenceItem]) -> list[EvidenceItem]:
     candidates: dict[str, tuple[float, dict[str, Any], dict[str, Any], EvidenceItem]] = {}
     for source_item in evidence:
@@ -331,6 +405,11 @@ def retrieve_cited_role_evidence(task: Task, evidence: list[EvidenceItem]) -> li
 
 def _evidence_text(item: EvidenceItem) -> str:
     blocks = [f"id={item.node_id} paper={item.paper_id} role={item.role}: {item.content}"]
+    if item.structured_context:
+        blocks.append(
+            "LINKED MATERIALS EVIDENCE (fields belong to one material state and regime):\n"
+            f"{json.dumps(item.structured_context, ensure_ascii=False)}"
+        )
     if item.relation_context:
         relation = item.relation_context
         if relation.get("relation_type") == "cites":
@@ -385,7 +464,12 @@ def _evidence_text(item: EvidenceItem) -> str:
 
 def assess_sufficiency(task: Task, evidence: list[EvidenceItem]) -> dict[str, Any]:
     evidence_block = "\n\n".join(f"- {_evidence_text(item)}" for item in evidence) or "(no evidence retrieved)"
-    user = f"TASK:\n{task.question}\n\nEVIDENCE:\n{evidence_block}"
+    user = (
+        f"TASK:\n{task.question}\n\nDECISION USE:\n{task.decision_use or '(not specified)'}\n\n"
+        f"REQUIRED FACETS:\n{', '.join(task.required_facets) or '(legacy claim evidence)'}\n\n"
+        f"MINIMUM DISTINCT MATERIALS OR BASELINES:\n{task.minimum_distinct_materials}\n\n"
+        f"EVIDENCE:\n{evidence_block}"
+    )
     result = resilient_chat_json(_SUFFICIENCY_SYSTEM, user, max_tokens=1200)
     if isinstance(result, dict) and result.get("decision") in SUFFICIENCY_DECISIONS:
         result.setdefault("assumptions", [])
@@ -412,6 +496,30 @@ def adjudicate_conflicts(goal: str, evidence: list[EvidenceItem]) -> dict[str, A
     return result if isinstance(result, dict) and isinstance(result.get("conflicts"), list) else {"conflicts": []}
 
 
+def select_synthesis_evidence(
+    tasks: list[Task],
+    evidence: list[EvidenceItem],
+    limit: int = MAX_SYNTHESIS_EVIDENCE,
+) -> list[EvidenceItem]:
+    by_id = {item.node_id: item for item in evidence}
+    selected: list[EvidenceItem] = []
+    seen: set[str] = set()
+    for task in tasks:
+        for node_id in task.cited_ids:
+            if node_id in by_id and node_id not in seen:
+                selected.append(by_id[node_id])
+                seen.add(node_id)
+                if len(selected) >= limit:
+                    return selected
+    for item in sorted(evidence, key=lambda value: (-value.score, value.node_id)):
+        if item.node_id not in seen:
+            selected.append(item)
+            seen.add(item.node_id)
+            if len(selected) >= limit:
+                break
+    return selected
+
+
 def synthesize(goal: str, tasks: list[Task], evidence: list[EvidenceItem], conflicts: dict[str, Any]) -> list[dict[str, Any]]:
     findings = "\n".join(
         f"- {task.task_id} [{task.decision}]: {task.finding} (citations: {', '.join(task.cited_ids)})"
@@ -435,6 +543,7 @@ def run_workflow(
     relations_path: Path | None = None,
     entities_path: Path | None = None,
     source_context_dir: Path | None = None,
+    materials_evidence_path: Path | None = None,
 ) -> dict[str, Any]:
     graph = build_graph(outputs_dir)
     relations = load_relations(relations_path)
@@ -442,6 +551,7 @@ def run_workflow(
     entities = load_entities(entities_path) if entities_path else []
     entity_index = {entity.entity_id: entity for entity in entities}
     context_index = load_context_index(source_context_dir)
+    materials_units = load_materials_evidence(materials_evidence_path)
     tasks = decompose_goal(goal)
     trace: dict[str, Any] = {
         "run_id": str(uuid.uuid4()),
@@ -458,6 +568,7 @@ def run_workflow(
             "typed_relations": len(relations),
             "typed_entities": len(entities),
             "contextualized_claims": len(context_index),
+            "linked_materials_evidence_units": len(materials_units),
         },
         "events": [{
             "stage": "decompose",
@@ -481,7 +592,12 @@ def run_workflow(
             break
 
         for task in ready:
-            direct_evidence = retrieve_evidence(task, graph, relation_index, entity_index, context_index)
+            linked_evidence = retrieve_materials_evidence(task, materials_units)
+            legacy_evidence = retrieve_evidence(task, graph, relation_index, entity_index, context_index)
+            linked_ids = {item.node_id for item in linked_evidence}
+            direct_evidence = linked_evidence + [
+                item for item in legacy_evidence if item.node_id not in linked_ids
+            ]
             citation_evidence = retrieve_cited_role_evidence(task, direct_evidence)
             direct_ids = {item.node_id for item in direct_evidence}
             evidence = direct_evidence + [item for item in citation_evidence if item.node_id not in direct_ids]
@@ -504,7 +620,17 @@ def run_workflow(
             if task.decision == "decompose_further" and task.depth < max_depth:
                 for index, question in enumerate(assessment.get("missing_questions", []), start=1):
                     child_id = f"{task.task_id}.{index}"
-                    children.append(Task(child_id, str(question), "gap_closure", task.depends_on.copy(), task.required_roles.copy(), task.depth + 1))
+                    children.append(Task(
+                        task_id=child_id,
+                        question=str(question),
+                        intent="gap_closure",
+                        depends_on=task.depends_on.copy(),
+                        required_roles=task.required_roles.copy(),
+                        decision_use=task.decision_use,
+                        required_facets=task.required_facets.copy(),
+                        minimum_distinct_materials=task.minimum_distinct_materials,
+                        depth=task.depth + 1,
+                    ))
                 tasks.extend(children)
                 task.status = "decomposed"
 
@@ -521,7 +647,15 @@ def run_workflow(
     all_evidence = list(evidence_by_id.values())
     conflicts = adjudicate_conflicts(goal, all_evidence)
     trace["events"].append({"stage": "adjudication", "agent": "evidence_adjudicator", "conflicts": conflicts})
-    candidates = synthesize(goal, tasks, all_evidence, conflicts)
+    synthesis_evidence = select_synthesis_evidence(tasks, all_evidence)
+    trace["events"].append({
+        "stage": "synthesis_evidence_selection",
+        "agent": "hypothesis_synthesizer",
+        "available_count": len(all_evidence),
+        "selected_count": len(synthesis_evidence),
+        "selected_ids": [item.node_id for item in synthesis_evidence],
+    })
+    candidates = synthesize(goal, tasks, synthesis_evidence, conflicts)
     valid_ids = set(evidence_by_id)
     candidate_records = []
     for candidate in candidates:
@@ -561,6 +695,11 @@ def main() -> None:
     parser.add_argument("--relations", type=Path, help="optional JSONL file of typed evidence relations")
     parser.add_argument("--entities", type=Path, help="optional JSONL file of typed evidence entities")
     parser.add_argument("--source-context", type=Path, help="optional directory of passage, citation, and table context bundles")
+    parser.add_argument(
+        "--materials-evidence",
+        type=Path,
+        help="optional linked materials evidence JSON file or directory",
+    )
     args = parser.parse_args()
     result = run_workflow(
         args.goal,
@@ -570,6 +709,7 @@ def main() -> None:
         args.relations,
         args.entities,
         args.source_context,
+        args.materials_evidence,
     )
     print(f"[adaptive] status={result['status']} tasks={len(result['tasks'])} candidates={len(result['candidates'])}")
     print(f"[adaptive] trace={args.trace_path}")

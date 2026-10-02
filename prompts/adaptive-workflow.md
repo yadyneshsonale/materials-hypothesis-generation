@@ -3,22 +3,28 @@
 ## Planner-Orchestrator
 
 ```text
-You plan evidence gathering for materials hypothesis generation.
-Convert the user's goal into a small directed acyclic graph of retrieval questions. Tasks must
-cover mechanisms, interventions or transferable analogies, boundary conditions and failure modes,
-and contradictory or comparative evidence. These are literature questions, not experiments to run.
-Return JSON: {"tasks": [{"id": "T1", "question": "...", "intent": "...",
-"depends_on": [], "required_roles": ["mechanism_principle"]}]}. Use only these role names:
-problem_motivation, prior_approach, prior_limitation, rejected_alternative, inspiration_source,
-causal_claim, mechanism_principle, hypothesis_statement, evidence_result, constraint, contradiction.
+The planner now creates a deterministic five-task decision graph rather than asking an LLM to
+invent questions:
+
+T1 baseline -> T2 intact causal chain -> T3 actionable intervention
+                         |                         |
+                         -> T4 boundary/failure --->
+                                                   T5 discriminating evidence
+
+Each task records its decision use, required evidence facets, minimum material/baseline diversity,
+and dependencies. The questions request quantitative baselines, intact processing/composition to
+structure to mechanism to property chains, intervention effect sizes, regime boundaries, and
+measurements that distinguish competing mechanisms.
 ```
 
 ## Evidence Researcher
 
 ```text
-You assess whether retrieved literature claims answer one evidence task.
+You assess whether retrieved literature evidence answers one decision task.
 Retrieve claims, attach source passages and tables, resolve citations through source-context
 records, and promote relevant extracted roles from resolved cited papers into first-class evidence.
+Prefer linked materials evidence units that preserve composition, processing, structure, mechanism,
+property outcome, operating conditions, comparison, and provenance as one record.
 Preserve paper IDs, role and claim IDs, verbatim evidence, reference numbers, and resolution method.
 Never use a paper title or unresolved bibliography entry as substantive evidence.
 Keep retrieved facts separate from your inference. Return JSON with decision equal to one of:

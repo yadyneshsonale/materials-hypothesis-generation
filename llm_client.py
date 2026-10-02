@@ -79,6 +79,15 @@ def chat_json(system: str, user: str, max_tokens: int = 4000, retries: int = 3) 
             "max_tokens": max_tokens,
             "response_format": {"type": "json_object"},
         }
+        chat_template_kwargs = os.environ.get("OPENAI_CHAT_TEMPLATE_KWARGS")
+        if chat_template_kwargs:
+            try:
+                parsed_kwargs = json.loads(chat_template_kwargs)
+            except json.JSONDecodeError as error:
+                raise LLMError(f"OPENAI_CHAT_TEMPLATE_KWARGS is not valid JSON: {error}") from error
+            if not isinstance(parsed_kwargs, dict):
+                raise LLMError("OPENAI_CHAT_TEMPLATE_KWARGS must be a JSON object")
+            payload["chat_template_kwargs"] = parsed_kwargs
     elif provider == "trapi":
         token = _trapi_token()
         url = f"{TRAPI_ENDPOINT}/openai/deployments/{TRAPI_DEPLOYMENT}/chat/completions?api-version={TRAPI_API_VERSION}"

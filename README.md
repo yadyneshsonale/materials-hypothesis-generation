@@ -5,7 +5,8 @@ A materials-science hypothesis generation pipeline that extracts argumentative r
 ## Pipeline
 
 1. Convert scientific PDFs to column-aware text with `pdf_convert.py`.
-2. Extract and reconcile typed research roles with `run_extraction.py`.
+2. Extract condition-specific, linked materials evidence with `materials_extract.py`. The legacy
+  argumentative-role extractor remains available through `run_extraction.py`.
 3. Normalize each paper into typed entities and evidence-backed relations with
   `build_evidence_graph.py`.
 4. Backfill full source passages, citation mentions, and table contexts with
@@ -192,6 +193,31 @@ condition-aware comparison records. `OUTPERFORMS` and `UNDERPERFORMS` are never 
 edges: they carry the metric, compared values, unit, operating conditions, source table or
 figure, evidence span, and extraction confidence.
 
+## Hypothesis-oriented evidence units
+
+The original 11-role extraction describes argumentative function, but a flat role list can separate
+a processing step from its material, structure, operating conditions, mechanism, and measured
+outcome. Those fragments are difficult to compare and unsafe to recombine during hypothesis
+generation.
+
+`materials_extract.py` is the preferred extraction path for generation. It emits one linked record
+per material state and operating regime:
+
+```text
+material/composition + intervention -> structure -> mechanism -> property outcome
+                                      + conditions + baseline + provenance
+```
+
+The validator rejects disconnected records and non-verbatim evidence. Missing fields remain empty
+instead of being inferred. The legacy 11-role outputs remain supported for evaluation and backward
+compatibility, but the adaptive agent ranks linked evidence first when `--materials-evidence` is
+provided.
+
+The planner no longer asks an LLM to invent open-ended questions. It creates a deterministic task
+graph covering quantitative baselines, intact causal chains, actionable interventions, regime
+boundaries, and evidence that discriminates competing mechanisms. Every task states how its answer
+will affect the final hypothesis.
+
 ## Setup
 
 ```bash
@@ -214,6 +240,13 @@ Extract research roles:
 ```bash
 MATHG_PROVIDER=trapi .venv/bin/python run_extraction.py \
   --input_dir texts --out_dir outputs --max_passes 0 --retry_delay 120
+```
+
+Extract linked materials evidence:
+
+```bash
+MATHG_PROVIDER=trapi .venv/bin/python materials_extract.py \
+  --input-dir texts --out-dir materials_evidence
 ```
 
 Extract and immediately build typed evidence for each completed paper:
@@ -263,12 +296,21 @@ MATHG_PROVIDER=trapi .venv/bin/python adaptive_agent.py \
   outputs_bulk results/adaptive_run.json --max-depth 1 \
   --entities evidence_graph/entities.jsonl \
   --relations evidence_graph/relations.jsonl \
-  --source-context source_context
+  --source-context source_context \
+  --materials-evidence materials_evidence
 ```
 
 The output JSON contains the task graph, evidence returned for each task, sufficiency
 decisions, child questions, unresolved gaps, conflict assessments, ranked candidates, critic
 results, and cited entity IDs.
+
+## High-temperature HEA Qwen experiment
+
+The complete 50-paper high-temperature HEA study is archived in
+[`experiments/high_temperature_hea_qwen35b/`](experiments/high_temperature_hea_qwen35b/). It
+includes the screened open-access JATS corpus, Qwen3.5-35B-A3B linked-evidence outputs, rejected
+candidate records, aggregate evaluation, adaptive-agent trace, machine-readable configuration,
+methods, limitations, and exact rerun commands.
 
 Run masked-paper recovery:
 
@@ -370,4 +412,3 @@ These roles are defined in [`roles.py`](roles.py). Each extracted item also cont
 
 * **Concise paraphrase** of the extracted information.
 * **Verbatim evidence span** from the source text supporting the extraction.
-
