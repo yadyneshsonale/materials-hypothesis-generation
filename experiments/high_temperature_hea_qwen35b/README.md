@@ -170,7 +170,17 @@ Then open `http://127.0.0.1:8765` in a local browser. For the VS Code integrated
 Chunk highlighting is exact because it uses the XML-derived pipeline source. The review server
 reads the PDF text layer only to align visual highlight rectangles; pipeline extraction and exact
 grounding continue to use JATS XML-derived text exclusively. PDF matching remains best-effort
-because publisher text layers can differ in spacing, formulas, and reading order.
+because publisher text layers can differ in spacing, formulas, and reading order. Guarded
+ordered-token alignment handles citation-format differences and evidence spanning two PDF pages.
+
+For temporary international sharing, expose the running server through an HTTPS Quick Tunnel:
+
+```bash
+cloudflared tunnel --url http://127.0.0.1:8765 --no-autoupdate
+```
+
+The generated `https://*.trycloudflare.com` URL works while both processes remain running and has
+no uptime guarantee. A permanent deployment requires a named tunnel or another managed host.
 
 Validate and consolidate the organized role/question outputs:
 

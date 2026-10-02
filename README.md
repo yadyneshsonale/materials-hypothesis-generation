@@ -289,6 +289,19 @@ the corresponding passage in the rendered PDF. PDF text coordinates are read onl
 to position this visual overlay; the PDF is not an extraction or grounding source. The Roles tab
 has a count-labelled multi-select filter for isolating or combining role types.
 
+Publisher citation formatting and page breaks can differ from the XML. The review matcher uses
+guarded ordered-token alignment for those cases, including passages that continue onto the next
+PDF page; every matched page is listed in the viewer header.
+
+To share a running interface temporarily over HTTPS, use a Cloudflare Quick Tunnel:
+
+```bash
+cloudflared tunnel --url http://127.0.0.1:8765 --no-autoupdate
+```
+
+Share the generated `https://*.trycloudflare.com` URL. Quick Tunnel URLs have no uptime guarantee
+and remain available only while both the review server and tunnel process are running.
+
 Extract and immediately build typed evidence for each completed paper:
 
 ```bash

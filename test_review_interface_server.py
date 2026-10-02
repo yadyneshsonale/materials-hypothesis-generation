@@ -48,6 +48,27 @@ class ReviewInterfaceTests(unittest.TestCase):
         self.assertGreater(matches[0]["page_width"], 0)
         self.assertGreater(matches[0]["page_height"], 0)
 
+    def test_aligns_citation_variant_across_pdf_pages(self) -> None:
+        root = Path(__file__).parent / "experiments" / "high_temperature_hea_qwen35b"
+        pdf = root / "outputs" / "papers" / "PMC10384371" / "input" / "article.pdf"
+        span = (
+            "To summarize, the mechanisms of high-temperature oxidation in CrMnFeCoNi system "
+            "reported in references [ [13] , [27] , [28] , [29] ] were mainly based upon "
+            "surface analysis of the reaction products retained after tests, which is "
+            "insufficient because great emphasis has been placed on post-mortem analyses of "
+            "reaction products analysed at ambient temperature, or else assumptions made via "
+            "the analysis of the temperature dependence of phases at different temperatures. "
+            "Clearly, this introduces a degree of uncertainty, since one cannot be completely "
+            "sure of the underlying physical mechanisms which are imperative on the critical "
+            "scales: that of the activity of elements, transformation temperatures, and vapour "
+            "pressure at the same time."
+        )
+
+        matches = _find_pdf_matches(pdf, [span])
+
+        self.assertEqual([match["page"] for match in matches], [2, 3])
+        self.assertTrue(all(match["highlights"] for match in matches))
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import difflib
 import json
 import mimetypes
 import re
@@ -37,6 +38,7 @@ def _pdf_pages(pdf_path: Path) -> list[dict]:
     with pymupdf.open(pdf_path) as document:
         for page in document:
             words = []
+            token_words = []
             compact_parts = []
             offset = 0
             for raw_word in page.get_text("words", sort=True):
@@ -52,26 +54,25 @@ def _pdf_pages(pdf_path: Path) -> list[dict]:
                 })
                 compact_parts.append(token)
                 offset += len(token)
+                for normalized_token in _normalized(str(raw_word[4])).split():
+                    token_words.append({
+                        "text": normalized_token,
+                        "rect": tuple(float(value) for value in raw_word[:4]),
+                        "block": int(raw_word[5]),
+                        "line": int(raw_word[6]),
+                    })
             pages.append({
                 "width": float(page.rect.width),
                 "height": float(page.rect.height),
                 "compact": "".join(compact_parts),
                 "normalized": _normalized(page.get_text("text")),
                 "words": words,
+                "token_words": token_words,
             })
     return pages
 
 
-def _rectangles_for_span(page: dict, span: str) -> list[dict[str, float]]:
-    compact_span = _compact_normalized(span)
-    start = page["compact"].find(compact_span)
-    if start < 0 or not compact_span:
-        return []
-    end = start + len(compact_span)
-    matched = [
-        word for word in page["words"]
-        if word["end"] > start and word["start"] < end
-    ]
+def _rectangles_for_words(matched: list[dict]) -> list[dict[str, float]]:
     rectangles = []
     current = None
     for word in matched:
@@ -101,6 +102,70 @@ def _rectangles_for_span(page: dict, span: str) -> list[dict[str, float]]:
     ]
 
 
+def _rectangles_for_span(page: dict, span: str) -> list[dict[str, float]]:
+    compact_span = _compact_normalized(span)
+    start = page["compact"].find(compact_span)
+    if start < 0 or not compact_span:
+        return []
+    end = start + len(compact_span)
+    matched = [
+        word for word in page["words"]
+        if word["end"] > start and word["start"] < end
+    ]
+    return _rectangles_for_words(matched)
+
+
+def _fuzzy_span_matches(
+    pages: list[dict],
+    span: str,
+    span_index: int,
+) -> list[dict]:
+    span_tokens = _normalized(span).split()
+    if len(span_tokens) < 5:
+        return []
+    best = None
+    for start_page in range(len(pages)):
+        window = []
+        for page_index in range(start_page, min(start_page + 2, len(pages))):
+            for word in pages[page_index]["token_words"]:
+                window.append({**word, "page_index": page_index})
+        matcher = difflib.SequenceMatcher(
+            None,
+            span_tokens,
+            [word["text"] for word in window],
+            autojunk=False,
+        )
+        blocks = [block for block in matcher.get_matching_blocks() if block.size >= 3]
+        coverage = sum(block.size for block in blocks) / len(span_tokens)
+        longest = max((block.size for block in blocks), default=0)
+        candidate = (coverage, longest, -start_page, window, blocks)
+        if best is None or candidate[:3] > best[:3]:
+            best = candidate
+    if best is None or best[0] < 0.6 or best[1] < 5:
+        return []
+
+    matches_by_page = {}
+    window = best[3]
+    for block in best[4]:
+        for word in window[block.b:block.b + block.size]:
+            matches_by_page.setdefault(word["page_index"], []).append(word)
+
+    matches = []
+    for page_index, words in sorted(matches_by_page.items()):
+        rectangles = _rectangles_for_words(words)
+        matches.append({
+            "page": page_index + 1,
+            "page_width": pages[page_index]["width"],
+            "page_height": pages[page_index]["height"],
+            "highlights": [
+                {**rectangle, "span_index": span_index}
+                for rectangle in rectangles
+            ],
+            "match_type": "aligned",
+        })
+    return matches
+
+
 def _pdf_matches_from_pages(pages: list[dict], spans: list[str]) -> list[dict]:
     matches_by_page: dict[int, dict] = {}
     for span_index, span in enumerate(spans):
@@ -120,6 +185,17 @@ def _pdf_matches_from_pages(pages: list[dict], spans: list[str]) -> list[dict]:
                     "span_index": span_index,
                 })
             break
+        else:
+            for fuzzy_match in _fuzzy_span_matches(pages, span, span_index):
+                page_number = fuzzy_match["page"]
+                match = matches_by_page.setdefault(page_number, {
+                    "page": page_number,
+                    "page_width": fuzzy_match["page_width"],
+                    "page_height": fuzzy_match["page_height"],
+                    "highlights": [],
+                    "match_type": "aligned",
+                })
+                match["highlights"].extend(fuzzy_match["highlights"])
     return list(matches_by_page.values())
 
 
