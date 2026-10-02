@@ -1,47 +1,2154 @@
 {
-  "schema_version": "role-question-1.0",
+  "schema_version": "reader-question-3.0",
   "paper_id": "PMC6093928",
+  "generation_mode": "high_recall_reader_questions",
+  "steps": [
+    "read overlapping paper passage",
+    "carry recent paper-reading state",
+    "generate many passage-triggered questions",
+    "validate exact source grounding and schema",
+    "remove exact duplicates only",
+    "link questions to overlapping reconciled roles"
+  ],
+  "chunks_processed": 11,
+  "model_calls": 11,
+  "resumed_chunks": 0,
   "questions": [
     {
-      "question_id": "PMC6093928::decision_question::dedb70802bccff33",
-      "question": "In PM CoCrFeMnNi, does the negative stacking fault energy at cryogenic temperatures (<260 K) persist if structural relaxation in the faulted supercell is included, given the current model assumes a fixed c/a ratio and no relaxation?",
-      "question_type": "intervention",
-      "rationale": "The paper attributes negative SFE to hcp stability but omits structural relaxation and assumes an ideal c/a ratio; including these could reverse the predicted negative SFE, fundamentally altering the expected deformation mechanism (nano-twinning vs. slip).",
-      "decision_use": "Determine whether the predicted negative SFE and associated twin-dominated deformation at cryogenic temperatures is an artifact of the rigid supercell approximation or a robust physical feature of the alloy.",
-      "grounded_role_refs": [
-        "evidence_result:3",
-        "constraint:2",
-        "mechanism_principle:1"
+      "question_id": "PMC6093928::reader_question::7a6843c8bae1cb46",
+      "question": "What specific 'first-principles alloy theory' framework and functional form for Longitudinal Spin Fluctuations (LSFs) were implemented?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "To assess replicability, I need to know the specific theoretical model used to treat LSFs, as this is the core novelty.",
+      "source_section": "Abstract",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Here we use first-principles alloy theory to investigate the magnetic structure of polymorphic CoCrFeMnNi"
       ],
-      "answer_requirements": [
-        "Compute stacking fault energy (γ_isf) for the hcp-fcc fault interface in PM CoCrFeMnNi at 50 K allowing full ionic relaxation of the supercell atoms and using a non-ideal c/a ratio derived from the relaxed structure."
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::e5c04468a172b717",
+      "question": "What exact temperature range defines 'cryogenic temperatures' where the hcp phase becomes energetically preferable?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The term 'cryogenic' is vague; precise temperature bounds are essential for applying these findings to specific service conditions.",
+      "source_section": "Abstract",
+      "chunk_index": 0,
+      "grounded_role_refs": [
+        "causal_claim:0"
       ],
       "evidence_spans": [
-        "the γ isf of PM CoCrFeMnNi is predicted from the LSF calculations to increase from −17 mJ m −2 at 50 K, reach zero at ~260 K and keep rising to 31 mJ m −2 at 1000 K",
-        "The structural relaxation in the faulted supercell was omitted.",
-        "an ideal c / a ratio of 8/3 was employed for the hcp structure"
+        "The hcp phase is energetically preferable to the fcc one at cryogenic temperatures"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::e71074aa62a244e2",
+      "question": "Why do LSFs induce sizable magnetic moments specifically in Co, Cr, and Ni but not Mn in the paramagnetic state?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The abstract highlights specific elements, implying a differential response to LSFs that needs mechanistic explanation.",
+      "source_section": "Abstract",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "In both face-centered cubic (fcc) and hexagonal close-packed (hcp) structures, the LSFs induce sizable magnetic moments for Co, Cr and Ni."
       ],
       "confidence": 0.85
     },
     {
-      "question_id": "PMC6093928::decision_question::2bb91c7b74677877",
-      "question": "Does the magneto-volume coupling mechanism alone explain the SFE increase in PM CoCrFeMnNi between 260 K and 1000 K, or do non-magnetic thermal contributions (phonons) play a significant role in the SFE trend observed in this regime?",
-      "question_type": "causal",
-      "rationale": "The paper attributes the positive SFE dependence to magneto-volume coupling, but phonon contributions to the free energy difference between fcc and hcp phases are unknown; determining the phonon contribution is necessary to isolate the magnetic mechanism for alloy design.",
-      "decision_use": "Decide whether to focus computational resources on refining magnetic models (LSF/DLM) or to incorporate full phonon calculations (e.g., quasiharmonic approximation) to accurately predict SFE at elevated temperatures.",
+      "question_id": "PMC6093928::reader_question::87d7de087f439a08",
+      "question": "What are the quantitative values of the stacking fault energy as it transitions from negative to positive with increasing temperature?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The claim of SFE increasing and suppressing twins relies on specific numerical data that is missing from the abstract.",
+      "source_section": "Abstract",
+      "chunk_index": 0,
       "grounded_role_refs": [
-        "mechanism_principle:0",
-        "prior_limitation:0",
-        "evidence_result:3"
-      ],
-      "answer_requirements": [
-        "Compare the calculated SFE trend with and without explicit phonon contributions to the Gibbs free energy difference between fcc and hcp phases in PM CoCrFeMnNi over the 260 K–1000 K range."
+        "causal_claim:1"
       ],
       "evidence_spans": [
-        "The positive temperature dependence of γ isf is ultimately dominated by the magneto-volume coupling at thermal excitations.",
-        "However, at finite temperature, a proper account of magnetic excitations, both transversal and longitudinal spin fluctuations (LSFs), is of particular challenge for magnetic transition metals and alloys like the Cantor alloy, owing to the lack of a complete theory for itinerant electron magnetism [24] , [25] ."
+        "With increasing temperature, the stacking fault energy increases, suppressing the formation of stacking faults and nano-twins."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::cf2efb3500b7b0c9",
+      "question": "How does the predicted negative stacking fault energy at cryogenic temperatures compare with existing experimental measurements for this alloy?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The paper claims consistency with experiments; I need to know the magnitude and source of this comparison.",
+      "source_section": "Abstract",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Our predictions are consistent with recent experimental findings."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::f0b1708babd2d6e5",
+      "question": "What specific experimental data on 'single-phase alloys' is cited as being incomplete, and which alloys were excluded?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The motivation relies on a gap in data; identifying this gap clarifies the specific contribution of this study.",
+      "source_section": "Abstract",
+      "chunk_index": 0,
+      "grounded_role_refs": [
+        "problem_motivation:0"
+      ],
+      "evidence_spans": [
+        "Understanding their behavior at finite temperature is, however, limited by the incomplete experimental data for single-phase alloys."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::b3353821f897469b",
+      "question": "If the alloy composition were slightly altered (e.g., changing CoCrFeMnNi ratios), would the LSF-induced negative SFE at cryogenic temperatures persist?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "extend",
+      "relevance": "adjacent",
+      "rationale": "This tests the transferability of the mechanism to other high entropy alloy compositions.",
+      "source_section": "Abstract",
+      "chunk_index": 0,
+      "grounded_role_refs": [
+        "problem_motivation:0"
+      ],
+      "evidence_spans": [
+        "Understanding their behavior at finite temperature is, however, limited by the incomplete experimental data for single-phase alloys."
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC6093928::reader_question::cf668b1019fbc847",
+      "question": "What specific definition of 'multiple principle elements' and 'equal or near-equal atomic proportions' is used to classify these materials as HEAs in this context?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The paper introduces HEAs with general criteria; knowing the precise compositional bounds used here is essential for context.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "High entropy alloys (HEAs) are a new class of metallic materials composed of multiple principle elements in equal or near-equal atomic proportions [1] , [2] ."
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::94d4b92e0cad92f0",
+      "question": "Why is the equiatomic CoCrFeMnNi alloy specifically singled out as the 'popular and important prototype' compared to other reported HEAs?",
+      "question_type": "rationale",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Understanding the selection of the Cantor alloy as the primary subject helps identify the research gap and significance.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Among various reported HEAs, the equiatomic CoCrFeMnNi (Cantor alloy) [6] is a popular and important prototype of HEAs based on 3d transition metals."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::a6cb7827bf128466",
+      "question": "What is the solidus temperature of the Cantor alloy that defines the 'wide range of temperature' below which the fcc structure forms?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The range 'below its solidus' is vague without the specific temperature value to constrain the study.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Within a wide range of temperature below its solidus, it usually forms a chemically disordered solid solution in face-centered cubic (fcc) structure at ambient pressure [6] – [9] ."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::e080138dc8f3707d",
+      "question": "Which specific mechanical properties or metrics quantify the 'enhanced strength-ductility combination' mentioned for the Cantor alloy?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The claim of enhanced properties is central to the alloy's utility, but the metrics are not detailed here.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "A unique mechanical characteristic of the Cantor alloy is an enhanced strength-ductility combination with decreasing temperature, while maintaining outstanding fracture toughness at cryogenic temperatures"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::de44f31e9323124b",
+      "question": "What is the physical mechanism linking 'formation of nano-twins and stacking faults' directly to the observed strength-ductility combination?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The paper asserts a correlation but does not explain the dislocation-twin interaction mechanism in this passage.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "which was demonstrated to be closely related to the formation of nano-twins and stacking faults in deformation [7] , [10] – [15] ."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::495e963e7dcda649",
+      "question": "How is the 'irreversible pressure-induced phase transition' from fcc to hcp triggered, and what pressure magnitude was required in the cited experiments?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The transition is described as 'pressure-induced', but the specific pressure values and experimental conditions are missing.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Furthermore, due to the irreversible pressure-induced phase transition from the fcc to the hexagonal close-packed (hcp) lattice, the presence of the hcp structure was recently observed at ambient conditions [16] – [18] ."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::7a4c92dd409054e2",
+      "question": "Why does the Cantor alloy form hcp lamellae at ambient conditions after pressure transition, whereas the CoCrFeNi alloy requires deformation below 77 K?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "The passage contrasts two similar alloys with different conditions for hcp formation, suggesting a compositional or mechanical difference.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "In the CoCrFeNi HEA belonging to the same family as the Cantor alloy, lamellae with hcp structure were also reported at ambient conditions when deforming at cryogenic temperatures below 77 K [19] ."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::928aaf32c61fc38f",
+      "question": "What theoretical model or calculation specifically predicted the 'stability of hcp phase at low temperatures' that agrees with the CoCrFeNi observations?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The paper cites a prediction [20] but does not state which theoretical framework was used in this introduction.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "These experimental findings are in agreement with the recent theoretical prediction regarding the stability of hcp phase at low temperatures [20] ."
       ],
       "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6093928::reader_question::a90c4a21b8a392bb",
+      "question": "What specific experimental techniques were used to identify the two magnetic transitions at 93 K and 38 K in the fcc CoCrFeMnNi alloy?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Understanding the methodology behind the magnetic transition data is crucial for assessing the reliability of the cited temperatures.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Among the limited number of works, two magnetic transitions from the disordered paramagnetic (PM) to spin glass, and eventually to the ordered ferromagnetic state were experimentally revealed at 93 and 38 K, respectively, in fcc CoCrFeMnNi [21] ."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::d0bc18831ed15288",
+      "question": "How does the experimental Curie temperature range (20~27 K) compare with the transition to the ferromagnetic state at 38 K mentioned earlier?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "There is a potential confusion between the 38 K ferromagnetic transition and the 20-27 K Curie temperature prediction.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The latter is comparable with the Curie temperature of the alloy predicted from ab initio calculations [22] , [23] , i.e., 20~27 K."
+      ],
+      "confidence": 0.6
+    },
+    {
+      "question_id": "PMC6093928::reader_question::86a711bef980ac86",
+      "question": "Why are 'thermally induced magnetic excitations' considered necessary to explain the evolution of mechanical properties at low temperatures?",
+      "question_type": "rationale",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The paper connects magnetic excitations to mechanical behavior, implying a coupling mechanism that needs justification.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "These low magnetic transition temperatures indicate that the evolution of its mechanical and functional properties with temperature needs to be considered along with the thermally induced magnetic excitations in the PM state."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::fabffd1199e0c4f9",
+      "question": "What is the specific 'lack of a complete theory for itinerant electron magnetism' that prevents standard DFT from accounting for longitudinal spin fluctuations?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The limitation of DFT is stated as a 'lack of complete theory', but the specific theoretical gap is not detailed here.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [
+        "prior_limitation:0"
+      ],
+      "evidence_spans": [
+        "However, at finite temperature, a proper account of magnetic excitations, both transversal and longitudinal spin fluctuations (LSFs), is of particular challenge for magnetic transition metals and alloys like the Cantor alloy, owing to the lack of a complete theory for itinerant electron magnetism [24] , [25] ."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::b565a3b03cbcd08e",
+      "question": "How does the Disordered Local Moment (DLM) theory approximate the paramagnetic state, and does it inherently account for thermal fluctuations or only static disorder?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The passage introduces DLM as a starting point, but the distinction between static disorder and dynamic thermal fluctuations is critical.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Starting from the disordered local moment (DLM) theory [26] – [28] , which approximates a PM state with randomly oriented local magnetic moments within the mean-field"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::fb514c313133d3bb",
+      "question": "Which specific ab initio methodologies cited in references [29]–[33] are actually implemented to go beyond the DLM mean-field approximation?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The passage mentions 'several' new methodologies exist but does not name them, which is critical for replication.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Starting from the disordered local moment (DLM) theory [26] – [28] , which approximates a PM state with randomly oriented local magnetic moments within the mean-field approximation, several ab initio methodologies have been recently proposed to properly describe the LSFs in the PM state [29] – [33] ."
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::ae206c656ed6bde1",
+      "question": "Why were PM bcc and fcc Fe, fcc Ni, and fcc Co chosen as the specific demonstration cases for the crucial role of LSFs?",
+      "question_type": "rationale",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "Understanding why these specific metals were selected helps assess the transferability of the LSF effects to the CoCrFeMnNi alloy.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [
+        "prior_approach:0"
+      ],
+      "evidence_spans": [
+        "The crucial role of LSFs in the accurate description of finite-temperature magnetic properties has been demonstrated in a few magnetic metals including PM bcc (body-centered cubic) and fcc Fe, fcc Ni and fcc Co [30] – [34] , and in alloys such as PM fcc/hcp Fe-Mn and Fe-Cr-Ni systems [29] , [35] – [38] ."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::5c30889988a9a031",
+      "question": "What specific 'intrinsic energy barriers associated with fundamental plasticity mechanisms' are impacted by LSFs in the cited literature?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The passage lists this as a key impact of LSFs, but the specific barriers (e.g., dislocation glide, cross-slip) are not named.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "It was reported that LSFs usually lead to sizable impacts on the temperature-dependent mechanical and physical properties of the metals and alloys, such as single-crystal elastic constants [29] , [30] , [35] , lattice expansion [34] and intrinsic energy barriers associated with fundamental plasticity mechanisms [36] – [39] ."
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::cd9e1a7227ca608a",
+      "question": "Is the gap in literature regarding 'PM CoCrFeMnNi HEA' due to computational cost or the specific complexity of the fcc-hcp interfacial energy calculation?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The authors state no attempt has been made; determining the root cause helps assess the novelty and difficulty of their work.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [
+        "problem_motivation:2",
+        "prior_limitation:1"
+      ],
+      "evidence_spans": [
+        "However, to our best knowledge, there has been no attempt yet to explore the role of thermal LSFs in PM CoCrFeMnNi HEA for neither the fcc nor hcp phase, in spite of its high fundamental and practical interest."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::8b44fc59b97a3a44",
+      "question": "What specific definition of 'phase stability' is used to quantify the influence of LSFs on the fcc and hcp phases?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Phase stability can refer to formation energy, free energy, or phase diagram positions; the exact metric is missing here.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "In this report, we put forward the first comprehensive description of the magnetic state of PM CoCrFeMnNi HEA in both the fcc and hcp phases by accounting for the LSFs as a function of temperature. The influence of LSFs on the phase stability, stacking fault energy and the fcc-hcp interfacial energy of the alloy are elaborated at finite temperature."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::76694e6849e10a5a",
+      "question": "Does the 'comprehensive description' of the magnetic state include both longitudinal and transversal spin fluctuations, or just LSFs as stated?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The introduction distinguishes between transversal and longitudinal fluctuations earlier; it is vital to know if the new method captures both.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "In this report, we put forward the first comprehensive description of the magnetic state of PM CoCrFeMnNi HEA in both the fcc and hcp phases by accounting for the LSFs as a function of temperature."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::767635a3fd6373b5",
+      "question": "What specific magnitude of 'lattice expansion' is attributed to LSFs in the cited fcc Ni or fcc Co studies?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "apply",
+      "relevance": "adjacent",
+      "rationale": "Quantitative data from the cited literature would serve as a baseline to evaluate the expected lattice expansion in the HEA.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "It was reported that LSFs usually lead to sizable impacts on the temperature-dependent mechanical and physical properties of the metals and alloys, such as single-crystal elastic constants [29] , [30] , [35] , lattice expansion [34] and intrinsic energy barriers associated with fundamental plasticity mechanisms [36] – [39] ."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::3165e1195f38f7e7",
+      "question": "Does the 'mean-field approximation' in the DLM theory fail specifically for the high configurational entropy of CoCrFeMnNi, or is it a general failure for itinerant magnets?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Determining if the failure is unique to HEAs or general is important for understanding the novelty of the proposed ab initio methodologies.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Starting from the disordered local moment (DLM) theory [26] – [28] , which approximates a PM state with randomly oriented local magnetic moments within the mean-field approximation, several ab initio methodologies have been recently proposed to properly describe the LSFs in the PM state [29] – [33] ."
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6093928::reader_question::9d866fd3257dbaa8",
+      "question": "Will the 'first comprehensive description' account for the coupling between LSFs and the specific chemical disorder of the CoCrFeMnNi HEA beyond the random local moment assumption?",
+      "question_type": "follow_up",
+      "reading_step": "plan_follow_up",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The DLM theory assumes random moments; the HEA has chemical complexity that might require more sophisticated disorder modeling.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "In this report, we put forward the first comprehensive description of the magnetic state of PM CoCrFeMnNi HEA in both the fcc and hcp phases by accounting for the LSFs as a function of temperature."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::b8645589e9f258b0",
+      "question": "What specific numerical values are assigned to the 'mean magnetic moments' for Cr, Ni, and Co at 50 K, and how do they compare to the zero value in FS calculations?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text states finite moments are induced where FS gave zero; quantifying this induction is critical to understanding the LSF magnitude.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "finite magnetic moments have been thermally induced for Cr, Ni and Co at all volumes even at the lowest temperature considered here (50 K)"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::bc578ac08e88d1b7",
+      "question": "How is the Wigner-Seitz radius 'w' mathematically related to the volume in the contour plots, and does a linear scaling apply across the fcc and hcp phases?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "adjacent",
+      "rationale": "The x-axis is defined as volume via 'w'; knowing the exact conversion or scaling is necessary to interpret the ab initio results correctly.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "function of volume (represented by the Wigner-Seitz radius w )"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::32eab8941a961545",
+      "question": "What specific magnitude of the 'maximum difference' (~0.32, 0.64, 0.28 μB) is attributed solely to the phase difference (fcc vs hcp) for Fe, Mn, and Co?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text lists specific differences but does not explicitly link each number to the specific element without ambiguity; verification is needed.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The maximum difference amounts to ~0.32, 0.64 and 0.28 μ B for Fe, Mn and Co"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::7423a6db89896808",
+      "question": "How does the 'magneto-volume coupling' observed in FS calculations for Cr and Ni differ from the LSF-induced moments, given that Cr/Ni are non-magnetic in FS at equilibrium volumes?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Cr and Ni have zero moments in FS at normal volumes but gain moments via LSF; distinguishing the physical mechanisms (volume expansion vs thermal fluctuation) is vital.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "those of Cr and Ni are always zero and a finite magnetic moment arises only at large volumes for Co"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::ecca34d91013be01",
+      "question": "What experimental procedure was used to determine the 'experimental volumes' indicated by stars in Fig. 1, and at what specific crystallographic conditions were they measured?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "adjacent",
+      "rationale": "The text references experimental volumes [40] for validation; the source and measurement conditions (e.g., X-ray diffraction parameters) are necessary for replication.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The experimental volumes [40] at 100, 300 and 900 K are indicated by stars"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::6051f3cfbc867988",
+      "question": "Does the 'prevailing contribution' of LSFs to Co, Cr, and Ni imply that their total magnetic moment is entirely absent in the absence of thermal fluctuations?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The term 'prevailing contribution' suggests LSFs dominate, but the exact baseline (static vs dynamic) needs clarification to assess the magnetic ground state.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "LSFs give the prevailing contribution to the m I of Co, Cr and Ni in both the fcc and hcp phases"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::8d59d7810d3d89c3",
+      "question": "Why does the impact of LSFs on mean magnetic moment weaken as volume increases, and is this trend consistent with the Stoner criterion or other electronic structure theories?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text states a specific trend (weakening impact with volume) that contradicts simple volume-dependent magnetism expectations; the physical reason is required.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "As the volume increases, the impact of LSFs on m I weakens for all alloy components"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::bc6f65bfb01d8c8c",
+      "question": "What specific temperature range was simulated for the 'contour plots' in Fig. 1, and does the simulation cover the full paramagnetic range up to the Curie temperature if applicable?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The text mentions 50 K as the lowest, but the upper limit and step size are not provided, which are essential for replicating the thermal evolution study.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "even at the lowest temperature considered here (50 K)"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::760bf56870dd94a7",
+      "question": "How does the 'floating spin (FS)' method specifically constrain the magnetic moments compared to the 'DLM' approach used for LSFs, and what are the specific DFT functionals employed?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "adjacent",
+      "rationale": "The comparison relies on two distinct magnetic models (FS vs LSF); knowing the underlying functional and constraints is critical for reproducibility.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "derived from the conventional floating spin (FS) calculations"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::793ae12e27f8d186",
+      "question": "Is the 'large spontaneous magnetic moment' for Fe and Mn in the hcp phase stable or metastable, and does the LSF mechanism alter the phase stability ordering predicted by FS?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "extend",
+      "relevance": "direct",
+      "rationale": "The text notes large moments for Fe/Mn in both phases but also discusses phase stability later; checking if LSFs flip stability predictions is a key implication.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "In particular, in both phases large spontaneous magnetic moments are obtained for Fe and Mn at all considered volumes"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::9172eb676e6fea28",
+      "question": "What specific definition or calculation method is used to derive the 'mean magnetic moment { m I }' from the underlying spin configurations in the LSF model?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The text introduces { m I } as a mean value; the averaging protocol (Boltzmann weighted, Monte Carlo, or mean-field) must be known to interpret the magnitude.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "display the mean magnetic moments { m I } (I = Co, Cr, Fe, or Ni)"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::09797ab56978b094",
+      "question": "Does the 'monotonic dependency' on temperature hold for all components, or are there anomalies (e.g., maxima/minima) near specific phase transition temperatures that the plot might obscure?",
+      "question_type": "boundary",
+      "reading_step": "find_boundary",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Monotonic behavior is a strong claim; in complex HEAs, non-monotonic behavior often occurs near structural or magnetic transitions, so checking the limits is important.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The mean magnetic moment m I in both phases exhibits a monotonic dependency on volume and temperature"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::d94150c75047256b",
+      "question": "How does the 'finite magnetic moment' induced in Cr at 50 K compare to the typical values reported for pure Cr, given that Cr is antiferromagnetic in its standard state?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "extend",
+      "relevance": "adjacent",
+      "rationale": "Cr in HEAs behaves differently than pure Cr; the magnitude of induced moment must be contextualized against known magnetic behaviors of the constituent elements.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "finite magnetic moments have been thermally induced for Cr, Ni and Co at all volumes even at the lowest temperature considered here (50 K)"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::3535f3fcde98b3f9",
+      "question": "What specific experimental thermal lattice expansion data from reference [40] was used to generate the contour plots in Fig. 1?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The passage explicitly cites reference [40] for thermal lattice expansion; knowing the specific data is crucial for replication.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Taking the experimentally determined thermal lattice expansion [40] into account (indicated by stars in the contour plots in Fig. 1 )"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::a0e4baf4b5a4210b",
+      "question": "Why does the magnetic moment difference between fcc and hcp phases decrease as temperature increases, and is this driven by entropy or specific electronic changes?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text notes the difference 'slightly reduces with increasing temperature', inviting an inquiry into the physical cause.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "and this difference slightly reduces with increasing temperature"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::333eaa63a6b0d592",
+      "question": "How does the Ni magnetic moment in the hcp phase compare to pure Ni, given the reported values are 0.24-0.63 μB?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Ni in HCP often has a low moment; comparing to pure Ni helps assess the alloying effect described in Table 1.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "m Ni in the two phases is almost identical at the considered temperatures with difference less than 0.005 μ B"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::91fa216581af4cee",
+      "question": "What is the specific free energy formulation used to derive Δ F fcc→hcp in the FS scheme versus the LSF scheme?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Understanding the free energy calculation method is essential to evaluate the stability results presented in Fig. 2.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The free energy differences between the fcc and hcp phases, i.e., Δ F fcc→hcp = F hcp − F fcc , derived from the FS and LSF schemes are compared in Fig. 2"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::31eca885fc0a7244",
+      "question": "How does the 'prevailing contribution' of LSFs to Co, Cr, and Ni manifest in the specific numerical values in Table 1?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text states LSFs are prevailing, but the table shows finite moments; understanding the magnitude of this contribution is key.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "whereas LSFs give the prevailing contribution to the m I of Co, Cr and Ni in both the fcc and hcp phases"
+      ],
+      "confidence": 0.92
+    },
+    {
+      "question_id": "PMC6093928::reader_question::c0093898ffd89050",
+      "question": "At what temperature does the fcc phase become energetically preferable over the hcp phase if the Wigner-Seitz radius is exactly 2.65 Bohr?",
+      "question_type": "boundary",
+      "reading_step": "find_boundary",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text gives a range (50 to 1200 K) where stability depends on radius; pinpointing the crossover at the threshold is necessary.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "When the Wigner-Seitz radius is below (above) ~2.64 Bohr (2.68 Bohr), the hcp (fcc) phase is energetically preferable at all considered temperatures ranging from 50 to 1200 K"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::81518f2107fb3c91",
+      "question": "Why are the mean magnetic moments for Co and Cr in the fcc phase higher than in the hcp phase at 900 K, contrary to the trend at 100 K?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Table 1 shows a crossover where Co and Cr moments in fcc surpass hcp at high T, which contradicts the lower T trend.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "At 100 K, the difference in m I between the two phases amounts to ~0.05, 0.03, 0.17 and 0.23 μ B for Co, Cr, Fe, and Mn, respectively"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::a87bb101ad93c5db",
+      "question": "How is the 'intrinsic stacking fault energy' (γ_isf) calculated in the LSF scheme, and does it account for the magnetic disorder?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The text promises to elaborate on γ_isf next; understanding the calculation method is vital for follow-up work.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "we elaborate on the influence of LSFs in PM CoCrFeMnNi in the sequence of the lattice stability, the intrinsic stacking fault energy γ isf"
+      ],
+      "confidence": 0.88
+    },
+    {
+      "question_id": "PMC6093928::reader_question::dec6e3a34a9ce039",
+      "question": "Does the 'nearly identical' Ni moment in fcc and hcp imply that Ni does not participate in the phase stability driving force?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "If Ni moments are identical, its contribution to the magnetic entropy or free energy difference might be negligible, affecting the stability mechanism.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Furthermore, m Ni in the two phases is almost identical at the considered temperatures with difference less than 0.005 μ B"
+      ],
+      "confidence": 0.87
+    },
+    {
+      "question_id": "PMC6093928::reader_question::0a208c584cf5b172",
+      "question": "Are the temperatures 100 K, 300 K, and 900 K chosen arbitrarily or do they represent specific physical transitions or experimental conditions?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Understanding the selection of discrete temperature points in Table 1 helps assess the resolution of the thermal profile.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [
+        "evidence_result:0"
+      ],
+      "evidence_spans": [
+        "The mean magnetic moments { m I } of alloy components in PM CoCrFeMnNi as a function of temperature for the fcc and hcp phases"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::40f6a5246f9a08cd",
+      "question": "What is the magnitude of the interfacial energy σ between fcc and hcp phases at the specific temperature where phase stability switches?",
+      "question_type": "follow_up",
+      "reading_step": "plan_follow_up",
+      "reader_intent": "extend",
+      "relevance": "adjacent",
+      "rationale": "The text mentions interfacial energy σ will be discussed next; knowing its value at the crossover point is a logical next step.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "and the interfacial energy σ between the fcc and hcp phases"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::c5dc6b7b5d117881",
+      "question": "Does the 'thermal lattice expansion' applied in the calculation account for anisotropic expansion along different crystallographic axes in the hcp phase?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The method uses 'thermal lattice expansion'; hcp anisotropy is often significant, making this a critical detail for accuracy.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Taking the experimentally determined thermal lattice expansion [40] into account"
+      ],
+      "confidence": 0.88
+    },
+    {
+      "question_id": "PMC6093928::reader_question::f4ed00595222441b",
+      "question": "What specific experimental values from ref. [40] are plotted as stars on the volume-temperature phase diagrams?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The passage states stars indicate experimental thermal lattice expansion data, but does not define the specific dataset or source details.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The thermal lattice expansion measured in ref. [40] is indicated by stars."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::f4b883b137cb0fb1",
+      "question": "Why does the LSF scheme produce straight contour lines while the FS scheme shows distinct shape changes?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text attributes the difference to how magnetic moments ({μ_0 I} vs {m_I}) and their temperature dependence affect entropy.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the noticeable changes in the shape of contour lines in the FS calculations [indicated by the arrows in panel (a)] emerge from the distinct { μ 0 I } in the fcc and hcp phases"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::d20fc91ac721b45a",
+      "question": "How exactly do LSFs alter the magnetic entropy and internal energy contributions to the free energy difference?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The passage claims partial contributions are 'considerably altered' but points to Fig. 3 for details not present here.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the partial contributions to Δ F fcc→hcp , i.e., the magnetic entropy and internal energy, may be considerably altered by LSFs at finite temperature"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::565ef2ecf890e929",
+      "question": "Is the small influence of LSFs on the phase boundary a result of compensating errors between energy and entropy terms?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "LSFs significantly change free energy magnitudes yet the phase boundary (ΔF=0) shifts only slightly; the mechanism for this cancellation is unclear.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "LSFs yield small influence on the phase boundary (defined here as Δ F fcc→hcp = 0) of PM CoCrFeMnNi"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6093928::reader_question::9cab96ece2349869",
+      "question": "What is the magnitude of the error bars mentioned for the experimental value of ~633 K?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text mentions 'error bars stated in the experiments [16]' but does not specify their numerical value, which is crucial for assessing agreement.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "especially when taking into account the error bars stated in the experiments [16]"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::e1fa00e163ac763b",
+      "question": "How does the omission of the 'explicit phonon effect' specifically bias the predicted critical temperature?",
+      "question_type": "limitation",
+      "reading_step": "find_boundary",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The discrepancy between predicted (~430 K) and experimental (~633 K) values is attributed to missing phonons, but the direction and magnitude of this bias are not quantified.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "also the fact that the explicit phonon effect is not considered in the present theory"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::8b8aee775419b1fa",
+      "question": "What specific values of {μ_0 I} and {m_I} are used to calculate the magnetic entropy in the FS and LSF schemes?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "adjacent",
+      "rationale": "The text links contour line shapes to these magnetic moment values, which are critical for reproducing the results.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "amplified by temperature in the calculation of magnetic entropy. These changes are significantly eliminated by the gradually varying { m I } induced via LSFs"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::5cb17145dafa3f40",
+      "question": "How does the term '2σ' in the stacking fault energy equation account for the interfacial energy contribution?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The equation γ_isf = γ_isf_int + γ_isf_mag + 2σ is presented without defining the physical meaning or magnitude of σ.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "i.e., γ i s f = γ i s f int + γ i s f mag + 2 σ"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::90f293e4eeed11e8",
+      "question": "Why does the Olson and Cohen model [41] specifically treat the stacking fault as a two-layer embryo in the hcp structure?",
+      "question_type": "rationale",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The passage cites this model to evaluate γ_isf but does not explain why this specific geometric model was chosen for this HEA.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Considering an intrinsic stacking fault in fcc alloys as a two-layer embryo in the hcp structure embedded in the fcc matrix, the thermodynamic model proposed by Olson and Cohen [41] was formulated to evaluate γ"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC6093928::reader_question::bc88c44dae1dea7e",
+      "question": "How do the partial contributions γ_isf_int and γ_isf_mag vary with temperature for the FS calculations compared to LSF?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Panel (b) displays these bars, but the text does not explicitly describe the trend differences between the two schemes in the current passage.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The bars in panel (b) display the partial contributions to γ isf from the internal energy γ i s f int and the magnetic entropy γ i s f mag"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::c31c8e4813c54d95",
+      "question": "Is the critical temperature of ~430 K from LSF calculations consistent across different volumes near the experimental lattice parameter?",
+      "question_type": "boundary",
+      "reading_step": "find_boundary",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The passage gives a single critical temperature value but the phase boundary is a function of volume; it is unclear if this value holds at the specific experimental volume.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [
+        "evidence_result:1"
+      ],
+      "evidence_spans": [
+        "Referring to the experimental volumes [40] indicated by stars, the critical temperature of fcc-hcp phase transition at ambient pressure is determined to be ~430 K in the LSF calculations"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::ce642dbaa11961d0",
+      "question": "What specific range of volumes was considered in the contour plots for the free energy difference?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The text discusses free energy as a function of volume but does not state the numerical boundaries of the volume range simulated.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Free energy difference between the fcc and hcp phases, Δ F fcc→hcp = F hcp − F fcc , as a function of volume and temperature"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::6614ecf1bf8e12e9",
+      "question": "Does the 'smooth dependencies' mentioned for LSF imply a loss of accuracy in capturing phase transitions?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "While LSFs smooth the contours, it is unclear if this smoothing obscures physical features that exist in the FS calculation.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the LSFs at finite temperature systemically lower the absolute magnitude of Δ F fcc→hcp , and promote rather smooth dependencies of Δ F fcc→hcp on volume and temperature"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6093928::reader_question::e249dc70edc2aa21",
+      "question": "How does the temperature dependence of {m_I} in the LSF scheme specifically differ from the {μ_0 I} in the FS scheme?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text contrasts 'distinct' vs 'gradually varying' moments but does not explain the mathematical or physical basis for this difference.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "gradually varying { m I } induced via LSFs in both the fcc and hcp phases"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::f1a12fac65bd103a",
+      "question": "Why is the experimental value of ~633 K considered 'in good agreement' with the calculated ~430 K despite a 200 K discrepancy?",
+      "question_type": "counterfactual",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "A 30% deviation is significant; the text relies on the missing phonon effect as an excuse, but the threshold for 'good agreement' is not defined.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The critical temperature predicted here is in good agreement with the experimental value of ~633 K"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::e4904d5aae662270",
+      "question": "How is the interfacial energy σ of 5 mJ m−2 specifically calculated or justified as a constant value in this model?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The value is critical for the Olson and Cohen model; its origin determines the accuracy of the SFE prediction.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Taking the computed Δ F fcc→hcp and a constant σ of 5 mJ m −2 (discussed below) as inputs to the model"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::8eec47d67bf3fd4a",
+      "question": "What specific experimental evidence justifies the use of stars to indicate 'experimentally determined lattice expansion' in the model?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The model relies on experimental data for lattice expansion; knowing the source validates the boundary conditions.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Taking the experimentally determined lattice expansion (indicated by the stars) into account"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::e5e3dcf48c001587",
+      "question": "Is the reduction in magnetic entropy contribution γ_isf_mag due to LSFs directly proportional to the similarity of magnetic states between fcc and hcp phases?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text explicitly links the entropy reduction to similar magnetic states; this causal link needs verification.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "LSFs considerably reduce the contribution emerging from the magnetic entropy γ i s f mag (owing to the similar magnetic states in the fcc and hcp phases"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::84901502e8b81b11",
+      "question": "How does the 'positive temperature dependence of γ isf' compare quantitatively with the results from Huang et al. [42] beyond just the magnitude difference?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Comparing trends with prior work helps assess if the observed behavior is unique or a general feature of HEAs.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The positive temperature dependence of γ isf predicted here is comparable with that reported by Huang et al . [42]"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::b34c4259a320fbe1",
+      "question": "What is the physical mechanism behind the 'magneto-volume coupling at thermal excitations' that ultimately dominates the temperature dependence?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "This is identified as the dominant factor; understanding the coupling mechanism is essential for modeling.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [
+        "mechanism_principle:0"
+      ],
+      "evidence_spans": [
+        "The positive temperature dependence of γ isf is ultimately dominated by the magneto-volume coupling at thermal excitations"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::6dcc1689fbea493a",
+      "question": "Why is the internal energy part γ_isf_int noticeably increased by LSFs while the magnetic entropy part is reduced?",
+      "question_type": "rationale",
+      "reading_step": "identify_gap",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The opposing effects on the two partial contributions need a clear explanation to understand the net SFE change.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "whilst noticeably increasing the internal energy part γ i s f int"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::089953a611f4d05a",
+      "question": "Does the saturation of γ isf at high temperatures and large volumes observed in the LSF scheme imply a specific limit to the magnetic disorder?",
+      "question_type": "boundary",
+      "reading_step": "find_boundary",
+      "reader_intent": "extend",
+      "relevance": "direct",
+      "rationale": "Saturation behavior suggests a physical limit or a specific regime of magnetic fluctuations.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "showing a tendency to saturate at high temperatures and large volumes"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::cf30936e285f7c63",
+      "question": "What specific range of volumes (Bohr radii) was used to generate the contour plots that led to the reported saturation behavior?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "adjacent",
+      "rationale": "The volume dependence is central to the model; the sampling range affects the observed saturation.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "γ isf monotonically increases with volume"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6093928::reader_question::9e8899ffbea730db",
+      "question": "How would the predicted critical temperature of ~260 K change if the constant σ value of 5 mJ m−2 were varied by ±1 mJ m−2?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Sensitivity analysis of the constant σ is crucial for assessing the robustness of the predicted zero-crossing point.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "a constant σ of 5 mJ m −2"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::ec098104e3274a5a",
+      "question": "What specific details of the 'similar magnetic states' in Fig. 1 explain the significant reduction in γ_isf_mag when LSFs are included?",
+      "question_type": "evidence",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text references Fig. 1 to explain the entropy reduction; the content of that figure is the missing evidence.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "owing to the similar magnetic states in the fcc and hcp phases, see Fig. 1"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::d8a8e42c94dcb737",
+      "question": "Is the 'good agreement' between the role of LSFs in this paper and the reported literature applicable to other high entropy alloys beyond CoCrFeMnNi?",
+      "question_type": "transfer",
+      "reading_step": "assess_relevance",
+      "reader_intent": "extend",
+      "relevance": "adjacent",
+      "rationale": "Generalizing the findings to other alloys depends on whether the specific magnetic state similarity is a universal trait.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [
+        "mechanism_principle:2"
+      ],
+      "evidence_spans": [
+        "The role of LSFs disclosed in PM CoCrFeMnNi is in good agreement with that reported in"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC6093928::reader_question::f7f1c3f69bb7590e",
+      "question": "Does the decrease in SFE by 13.5 mJ m−2 in the fcc-stable region significantly alter the stacking fault width compared to the FS calculation?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "SFE directly controls stacking fault width; a large change implies a significant microstructural consequence.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "γ isf accounting for LSFs decreases in the most fcc-stable region by an upper change of ~13.5 mJ m −2"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::eeb996623bde3469",
+      "question": "What specific experimental method was used to determine the 'experimentally determined lattice expansion' indicated by stars in Fig. 3?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Replication requires knowing the source of the experimental lattice expansion data used to anchor the model.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Taking the experimentally determined lattice expansion (indicated by the stars) into account"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::6143a921b88bf391",
+      "question": "How does the 'magneto-volume coupling' specifically manifest in the free energy difference ΔF_fcc→hcp at thermal excitations?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The mechanism linking volume, magnetism, and free energy is the core of the proposed explanation.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [
+        "mechanism_principle:0"
+      ],
+      "evidence_spans": [
+        "The positive temperature dependence of γ isf is ultimately dominated by the magneto-volume coupling at thermal excitations"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::77dd3f1d2941287b",
+      "question": "Why does the text claim the magnitude of γ_isf is lower in this work compared to Ref [42] despite the similar temperature dependence?",
+      "question_type": "rationale",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Identifying the root cause of the magnitude difference helps isolate the specific effect of LSFs.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [
+        "prior_limitation:2"
+      ],
+      "evidence_spans": [
+        "the magnitudes of γ isf accounting for LSFs are lower than those found in ref. [42] , because the magnetic contribution determined in the work is significantly reduced owing to LSFs"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::d2d0f2e0267d5aef",
+      "question": "Does the linear increase of γ_isf from 50 K to 1000 K observed in the LSF scheme hold true for temperatures above 1000 K?",
+      "question_type": "boundary",
+      "reading_step": "find_boundary",
+      "reader_intent": "extend",
+      "relevance": "adjacent",
+      "rationale": "Extrapolating beyond the calculated range tests the limits of the 'saturation' tendency mentioned.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [
+        "evidence_result:2"
+      ],
+      "evidence_spans": [
+        "keep rising to 31 mJ m −2 at 1000 K"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6093928::reader_question::e0db4602844dbfa0",
+      "question": "How sensitive is the predicted increase of 31 mJ m−2 at 1000 K to the specific choice of the Olson and Cohen model parameters?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Model sensitivity determines if the specific high-temperature value is a robust prediction or an artifact of the model.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [
+        "prior_approach:1"
+      ],
+      "evidence_spans": [
+        "the thermodynamic model proposed by Olson and Cohen [41] was formulated to evaluate γ isf"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::3a3b1b85d159a8d5",
+      "question": "What is the definition of 'PM CoCrFeMnNi' in the context of the LSF calculations, and does it imply a specific magnetic configuration at the start?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Clarifying the initial state (paramagnetic) is essential to interpret the magnetic entropy calculations.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [
+        "evidence_result:2"
+      ],
+      "evidence_spans": [
+        "γ isf of PM CoCrFeMnNi is predicted from the LSF calculations"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::04b842dd5b732800",
+      "question": "How is the 'positive temperature dependence of γ_isf' quantitatively linked to the magneto-volume coupling in the thermal excitations regime?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text claims domination by magneto-volume coupling; the specific mathematical or physical link needs clarification.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [
+        "mechanism_principle:0"
+      ],
+      "evidence_spans": [
+        "The positive temperature dependence of γ isf is ultimately dominated by the magneto-volume coupling at thermal excitations"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::3ea371dc22687309",
+      "question": "Why does the inclusion of LSFs and lattice expansion result in a negative γ_isf value of -15~2 mJ m⁻² specifically between 77–293 K?",
+      "question_type": "rationale",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "A negative stacking fault energy implies hcp is more stable; understanding the drivers is crucial for interpretation.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the γ isf of PM fcc CoCrFeMnNi is predicted to be as low as −15~2 mJ m −2 when accounting for LSFs and lattice expansion"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::1d76a1d1f2c49076",
+      "question": "What specific kinetic barriers are cited as the reason fcc remains metastable at cryogenic temperatures despite hcp being thermodynamically stable?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The text mentions barriers but refers to citations; identifying the nature of these barriers is essential for deformation modeling.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the fcc phase would remain metastable, because of, e.g., high kinetic barriers [16] , [43]"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::2b6f60f614763834",
+      "question": "How does the reduction in γ_isf specifically drive the enhancement of plastic deformation by nano-twins versus slip at cryogenic temperatures?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "apply",
+      "relevance": "direct",
+      "rationale": "Understanding the link between low SFE and the specific deformation mode (nano-twins) is key for mechanical property prediction.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [
+        "causal_claim:2"
+      ],
+      "evidence_spans": [
+        "With decreasing temperature, the plastic deformation by nano-twins and stacking faults is enhanced owing to the reduced γ isf"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::549983195bc30520",
+      "question": "What exact procedure was used to calculate the interfacial energy σ using the supercell approach and the Olson and Cohen model?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The calculation of σ relies on a specific thermodynamic model and computational setup that needs verification for replication.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "By using the Δ F fcc→hcp and the γ isf computed adopting the supercell approach, we calculated σ via the thermodynamic model proposed by Olson and Cohen [41]"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::9bc83c81f6fa4e52",
+      "question": "Does the slight reduction of σ by 0.5~0.7 mJ m⁻² in the 300–900 K range significantly alter the predicted critical stress for deformation twinning?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Assessing the mechanical consequence of the small change in σ is important for engineering applications.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "It is evident from Fig. 4 that the LSFs at finite temperature slightly lower σ by 0.5~0.7 mJ m −2 in the temperature interval 300–900 K"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6093928::reader_question::3f7af91743bd3116",
+      "question": "Why is the temperature coefficient for σ with LSFs (~0.0025 mJ m⁻² K⁻¹) so close to the FS calculation (~0.0028 mJ m⁻² K⁻¹) despite different absolute values?",
+      "question_type": "rationale",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Similar slopes suggest a common underlying thermal mechanism, which requires mechanistic explanation.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the σ accounting for LSFs slightly decreases at a coefficient of ~0.0025 mJ m −2 K −1 , which is very close to the one derived from the FS calculations, i.e., ~0.0028 mJ m −2 K −1"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::a0409321712fe6e1",
+      "question": "How consistent are the 0 K values of ~6.1 and 7.0 mJ m⁻² with the specific microstructural state of Fe-Cr-Ni austenitic stainless steels used by Li et al.?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Comparing the extrapolated 0 K values with literature requires checking if the alloy systems and states are truly comparable.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "showing a good consistency with the values calculated for Fe-Cr-Ni austenitic stainless steels by Li et al . [44] , i.e., 7.5–9.0 mJ m −2 at 0 K"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC6093928::reader_question::2fa26ec065967e50",
+      "question": "What experimental volumes reported in ref. [40] were specifically used to account for thermal lattice expansion in the calculation of σ?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Replication requires the exact experimental data source for lattice expansion used in the model.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The thermal lattice expansion was accounted for using the experimental volumes reported in ref. [40]"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::02d65155f4465fc8",
+      "question": "If the temperature range extended beyond 1200 K, would the linear decrease of σ with a coefficient of ~0.0025 mJ m⁻² K⁻¹ remain valid?",
+      "question_type": "boundary",
+      "reading_step": "find_boundary",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Extrapolating linear trends to high temperatures risks hitting phase instability limits or non-linear effects.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "In the temperature interval 50–1200 K, the σ"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::202163637f289a1a",
+      "question": "How does the 'good agreement' with PM γ-Fe and Fe-Mn alloys constrain the universality of LSF effects in high entropy alloys?",
+      "question_type": "transfer",
+      "reading_step": "assess_relevance",
+      "reader_intent": "extend",
+      "relevance": "adjacent",
+      "rationale": "Checking if the mechanism holds for other systems validates the broader applicability of the LSF model.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [
+        "mechanism_principle:2"
+      ],
+      "evidence_spans": [
+        "The role of LSFs disclosed in PM CoCrFeMnNi is in good agreement with that reported in PM γ -Fe [39] and Fe-22.5 at.% Mn [36]"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6093928::reader_question::e902995f730b48a6",
+      "question": "What specific assumptions in the Olson and Cohen model might be violated when applied to the complex local chemical environment of a high entropy alloy?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Standard models often assume ideal conditions; checking assumptions in a disordered HEC is critical.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "we calculated σ via the thermodynamic model proposed by Olson and Cohen [41]"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC6093928::reader_question::fadc8accd8146022",
+      "question": "Does the negative γ_isf value (-15 to -2 mJ m⁻²) imply that the fcc phase would spontaneously decompose into hcp without kinetic barriers?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Thermodynamic stability suggests transformation; understanding the role of the mentioned kinetic barriers is vital.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the γ isf of PM fcc CoCrFeMnNi is predicted to be as low as −15~2 mJ m −2 when accounting for LSFs and lattice expansion"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::4ee4e643f4ee3a60",
+      "question": "How does the magnitude of the LSF effect on σ (0.5-0.7 mJ m⁻²) compare to the uncertainty inherent in the supercell DFT calculations?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Determining if the observed LSF effect is statistically significant or within computational noise.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "It is evident from Fig. 4 that the LSFs at finite temperature slightly lower σ by 0.5~0.7 mJ m −2 in the temperature interval 300–900 K"
+      ],
+      "confidence": 0.65
+    },
+    {
+      "question_id": "PMC6093928::reader_question::75a6f4eebc8666ba",
+      "question": "Does the reported range of 3.1–6.0 mJ m−2 (LSF) and 3.6–6.8 mJ m−2 (FS) represent the absolute values or a trend after subtracting a baseline?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text states the values vary in a specific range; I need to know if these are absolute energies or relative changes to interpret the 5 mJ m−2 reference correctly.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 8,
+      "grounded_role_refs": [
+        "evidence_result:3"
+      ],
+      "evidence_spans": [
+        "the σ of PM CoCrFeMnNi is estimated to slightly vary in the range of ~3.1–6.0 and 3.6–6.8 mJ m −2 for the LSF and FS calculations, respectively."
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6093928::reader_question::ca0e9928f772c610",
+      "question": "Why is the error bar for γ_isf capped at 4 mJ m−2 when the difference between the FS and LSF maximum values is only 0.8 mJ m−2?",
+      "question_type": "rationale",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The logic connecting the small variation range (LSF vs FS) to the large stated error bar (4 mJ m−2) for a constant 5 mJ m−2 assumption seems inconsistent.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 8,
+      "grounded_role_refs": [
+        "evidence_result:3"
+      ],
+      "evidence_spans": [
+        "the σ of PM CoCrFeMnNi is estimated to slightly vary in the range of ~3.1–6.0 and 3.6–6.8 mJ m −2 for the LSF and FS calculations, respectively. Therefore, the error bar of γ isf associated with using the constant σ equal to 5 mJ m −2 is expected to be less than 4 mJ m −2"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::afc1d5d20e8e6e3b",
+      "question": "Why does the conclusion state the hcp phase is energetically preferable at low temperatures, yet σ remains positive (3.1–6.0 mJ m−2) down to 50 K?",
+      "question_type": "counterfactual",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "If hcp is preferable (negative SFE), one might expect negative or near-zero interfacial energy at low T; the positive σ range contradicts a simple expectation of instability.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The hcp phase is energetically preferable against the fcc one at low temperatures and volumes, which is responsible for the negative stacking fault energy at these conditions."
+      ],
+      "confidence": 0.88
+    },
+    {
+      "question_id": "PMC6093928::reader_question::40592adac1779cc3",
+      "question": "How does the 'magneto-volume coupling' specifically cause σ to increase with temperature, and is this trend linear across the 50–1200 K range?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text links temperature-dependent SFE increase to magneto-volume coupling, but the relationship for interfacial energy σ is not explicitly detailed beyond the range.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Dominated by the magneto-volume coupling at thermal excitations, the stacking fault energy increases with temperature"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::be401e83295bc23a",
+      "question": "If the temperature exceeds 1200 K, does the positive σ ensure hcp stability is fully suppressed or could the negative SFE reappear?",
+      "question_type": "boundary",
+      "reading_step": "find_boundary",
+      "reader_intent": "apply",
+      "relevance": "adjacent",
+      "rationale": "The data stops at 1200 K; understanding the behavior beyond this limit is crucial for high-temperature processing applications.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "In the temperature interval 50–1200 K, the σ of PM CoCrFeMnNi is estimated to slightly vary in the range of ~3.1–6.0"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6093928::reader_question::7ea4bddd07068bb3",
+      "question": "How does the 'sizable magnetic moment' of Co, Cr, and Ni quantitatively contribute to the ~6 mJ m−2 value of σ at high temperatures?",
+      "question_type": "rationale",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text links magnetic moments to finite-temperature properties; I need to know the quantitative link to the interfacial energy value.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "We show that the LSFs induce sizable magnetic moments for Co, Cr and Ni, whilst slightly increasing the magnetic moment of Fe and Mn"
+      ],
+      "confidence": 0.82
+    },
+    {
+      "question_id": "PMC6093928::reader_question::e68784a0daca4e59",
+      "question": "What is the physical significance of the error bar being less than 4 mJ m−2 for a constant σ assumption, and is it dominated by the LSF/FS difference?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The error bar definition is vague; I need to know if it accounts for temperature dependence or just the scheme difference to assess the constant σ approximation.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Therefore, the error bar of γ isf associated with using the constant σ equal to 5 mJ m −2 is expected to be less than 4 mJ m −2 for both the LSF and FS calculations."
+      ],
+      "confidence": 0.88
+    },
+    {
+      "question_id": "PMC6093928::reader_question::804eebf6a1682220",
+      "question": "Does the negative SFE at low temperatures imply that the interfacial energy σ could theoretically become negative, or does it remain strictly positive?",
+      "question_type": "counterfactual",
+      "reading_step": "find_boundary",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Negative SFE suggests hcp preference, but the text says σ is positive (3.1–6.0); I need to understand the mathematical relationship between them.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "which is responsible for the negative stacking fault energy at these conditions"
+      ],
+      "confidence": 0.78
+    },
+    {
+      "question_id": "PMC6093928::reader_question::6bb1f4b1b681a621",
+      "question": "If the 'magneto-volume coupling' were turned off, would the σ values drop below zero or simply decrease linearly with temperature?",
+      "question_type": "counterfactual",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "extend",
+      "relevance": "exploratory",
+      "rationale": "The text attributes the increase in SFE to this coupling; removing it would test its necessity for the observed positive σ trend.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Dominated by the magneto-volume coupling at thermal excitations, the stacking fault energy increases with temperature"
+      ],
+      "confidence": 0.65
+    },
+    {
+      "question_id": "PMC6093928::reader_question::6fa68af856a85017",
+      "question": "How does the spin-density distribution x(μ) change between the fcc and hcp phases in the CoCrFeMnNi system specifically?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The integral depends on x(μ), which is phase-dependent; differences here would directly explain the LSF energetics differences.",
+      "source_section": "Methods.part1",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "m I ( w , T ) [30] , which is formulated as m I = ∫ μ 2 ⋅ x ( μ ) d μ with x ( μ ) being the spin-density distribution of longitudinal magnetic component μ"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::d7e03434726630dd",
+      "question": "Does the 'accurate description' claim rely on the lattice expansion data [34] or the elastic constants [29] being more reliable for this alloy?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The validation list includes multiple properties; understanding which one drove the confidence in the magnetic state model is crucial.",
+      "source_section": "Methods.part1",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the predicted finite-temperature properties such as single-crystal elastic constants [29] , [30] , lattice expansion [34] and intrinsic energy barriers [39] confirm the accurate description of the magnetic state at elevated temperatures"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::8cb271d5f3d825ef",
+      "question": "How is the DLM (Disordered Local Moment) paramagnet state defined for the CoCrFeMnNi HEA compared to the standard bcc/fcc Fe used for validation?",
+      "question_type": "method",
+      "reading_step": "clarify",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The DLM assumption is central to E_int; its definition for a multi-component HEA may differ from the binary/ternary validations.",
+      "source_section": "Methods.part1",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "While the internal energy E int is approximated by the total energy of a DLM paramagnet with local magnetic moments { M I }"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::9fc1cbe54ea2de51",
+      "question": "In the mean-field expression S mag = k B ∑ I c I ⋅ ln ( M I + 1 ), how are the chemical concentrations c I determined for a disordered HEA?",
+      "question_type": "method",
+      "reading_step": "clarify",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The formula requires c_I values; in a high entropy alloy with local ordering or short-range order, the effective c_I might differ from stoichiometry.",
+      "source_section": "Methods.part1",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "S mag = k B ∑ I c I ⋅ ln ( M I + 1 ) ( k B is the Boltzmann constant and c I is the chemical concentration)"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::991840ecbe6a82a9",
+      "question": "Does the distinction between M_I (FS) and m_I (LSF) imply that the LSF calculation does not re-optimize the lattice for each magnetic state?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "If M_I and m_I are treated as fixed inputs from different calculation types, the coupling between magnetism and volume relaxation might be approximated.",
+      "source_section": "Methods.part1",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "M I represents the equilibrium magnetic moment μ 0 I in the conventional FS calculations, while it is the mean magnetic moment m I in the LSF calculations"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6093928::reader_question::7fdd126749baa700",
+      "question": "How does the Olson and Cohen thermodynamic model [41] handle the magnetic entropy contribution ΔF when transitioning from the supercell calculation to the phase stability prediction?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The model combines γ_isf_SC and ΔF; understanding how the magnetic entropy term integrates into this specific equation is key to the mechanism.",
+      "source_section": "Methods.part1",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The fcc-hcp phase stability was evaluated by the free energy difference between the two phases, i.e., Δ F fcc→hcp = F hcp − F fcc , which also entered the thermodynamic model proposed by Olson and Cohen [41] to compute the stacking fault energy γ isf"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::3deab22305c4f73a",
+      "question": "Is the interfacial area A per atom constant across the different temperatures and magnetic states in the calculation of σ?",
+      "question_type": "method",
+      "reading_step": "clarify",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Since lattice expansion is accounted for in F_alpha, A might vary with T; assuming it constant could introduce error.",
+      "source_section": "Methods.part1",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "2 σ = γ i s f SC − 2 Δ F fcc → hcp / A ( A is the interfacial area per atom)"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::673cfb3af48bf157",
+      "question": "Why is the supercell stacking fault energy γ_isf_SC assumed to be the baseline for separating the interfacial energy from the phase stability contribution?",
+      "question_type": "rationale",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The method subtracts a theoretical phase stability term from a simulated fault energy; the validity of this subtraction depends on the supercell method's ability to capture the magnetic state correctly.",
+      "source_section": "Methods.part1",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "γ i s f SC is the stacking fault energy calculated using the supercell approach, in which we assumed"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::1018a1af677b9503",
+      "question": "What specific 'intrinsic energy barriers [39]' were calculated in the previous work to validate the LSF methodology for Fe-Cr-Ni alloys?",
+      "question_type": "follow_up",
+      "reading_step": "plan_follow_up",
+      "reader_intent": "extend",
+      "relevance": "adjacent",
+      "rationale": "Knowing the specific barriers helps assess if the same mechanism (LSFs) is valid for the different barriers in the HEA stacking fault context.",
+      "source_section": "Methods.part1",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "intrinsic energy barriers [39] confirm the accurate description of the magnetic state at elevated temperatures"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC6093928::reader_question::939fea6fa601e258",
+      "question": "Does the notation μ_0 I in the text refer to the moment at 0 K or the moment in the disordered local moment state?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The distinction is critical for understanding the baseline energy E_int; the text says 'conventional FS calculations' but context implies a magnetic state.",
+      "source_section": "Methods.part1",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "M I represents the equilibrium magnetic moment μ 0 I in the conventional FS calculations"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6093928::reader_question::1dabaa5b7667161e",
+      "question": "If the magnetic moment M_I fluctuates, how does the mean-field entropy approximation account for the distribution width of these moments?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The formula uses a mean value; the width of the distribution (LSFs) might carry entropy not captured by the simple ln(M+1) term.",
+      "source_section": "Methods.part1",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "S mag = k B ∑ I c I ⋅ ln ( M I + 1 )"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::6c8a444e12fc7bc1",
+      "question": "Why was the assumption of an ideal c/a ratio of 8/3 used for hcp rather than optimizing it, given that lattice relaxation was otherwise omitted?",
+      "question_type": "assumption",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Using an ideal ratio while omitting relaxation might introduce significant error in the energy difference if the alloy deviates from ideal hcp geometry.",
+      "source_section": "Methods.part2",
+      "chunk_index": 10,
+      "grounded_role_refs": [
+        "constraint:0",
+        "constraint:1"
+      ],
+      "evidence_spans": [
+        "In the present application, an ideal c / a ratio of 8/3 was employed for the hcp structure, the finite-temperature volume of which was assumed to be identical with the fcc one."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6093928::reader_question::46ecd45188729966",
+      "question": "Does assuming the finite-temperature volume of the hcp phase is identical to the fcc phase ignore the volume difference that might arise from magnetic fluctuations in the hcp structure?",
+      "question_type": "counterfactual",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "This assumption is critical for the free energy difference calculation; neglecting volume expansion differences could skew the stacking fault energy results.",
+      "source_section": "Methods.part2",
+      "chunk_index": 10,
+      "grounded_role_refs": [
+        "constraint:1"
+      ],
+      "evidence_spans": [
+        "the finite-temperature volume of which was assumed to be identical with the fcc one."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::bf14bebb72e9a764",
+      "question": "What specific structural changes occur at the faulted interface if structural relaxation is omitted in the supercell calculation?",
+      "question_type": "limitation",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Omitting relaxation ignores atomic shuffling, which is often crucial for accurate interfacial energy calculations in high entropy alloys.",
+      "source_section": "Methods.part2",
+      "chunk_index": 10,
+      "grounded_role_refs": [
+        "constraint:2"
+      ],
+      "evidence_spans": [
+        "The structural relaxation in the faulted supercell was omitted."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6093928::reader_question::d2d28385bde32cd7",
+      "question": "How does the DLM picture combined with CPA handle the local chemical ordering that might exist around the stacking fault in the CoCrFeMnNi alloy?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text assumes chemical disorder via CPA, but stacking faults often induce local ordering that standard CPA might miss.",
+      "source_section": "Methods.part2",
+      "chunk_index": 10,
+      "grounded_role_refs": [
+        "prior_approach:5"
+      ],
+      "evidence_spans": [
+        "The magnetic and chemical disorders were described by the DLM picture [26] – [28] in combination with the coherent-potential approximation (CPA) [50] , [51] ."
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6093928::reader_question::d1e94511dc44b9b3",
+      "question": "What is the reference state for the 'intrinsic energy barriers' mentioned in [39], and how does the magnetic state assumption in the supercell differ from the validation case in [39]?",
+      "question_type": "comparison",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The method relies on a specific magnetic configuration assumption from a previous paper; understanding if this changes for the HEA is key.",
+      "source_section": "Methods.part2",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "we assumed that the magnetic state of the atomic layers nearest to the intrinsic stacking fault is the same as in the hcp structure, while the remaining layers were treated identically to the fcc case [39] ."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6093928::reader_question::750fe8d9aae88238",
+      "question": "How does the linear thermal expansion assumption in ref. [40] affect the accuracy of the fcc volume input if the expansion is non-linear near the Curie temperature?",
+      "question_type": "boundary",
+      "reading_step": "find_boundary",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "If the material exhibits non-linear expansion, the assumed volumes will be inaccurate, affecting the calculated phase stability.",
+      "source_section": "Methods.part2",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The experimental volumes of fcc CoCrFeMnNi at various temperatures were determined from the measurements reported in ref. [40] by assuming a linear thermal expansion in the considered temperature interval."
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6093928::reader_question::303c8c20ffac7336",
+      "question": "Why was the scalar-relativistic approximation chosen over the full relativistic treatment for the EMTO method in this specific high-entropy alloy context?",
+      "question_type": "rationale",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "High atomic numbers (like W or Ta in other HEAs, though not here, but Mn/Co/Fe/Ni are significant) might require full relativistic treatment; the choice needs justification.",
+      "source_section": "Methods.part2",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "adopting the scalar-relativistic approximation in combination with the soft-core scheme."
+      ],
+      "confidence": 0.65
+    },
+    {
+      "question_id": "PMC6093928::reader_question::842b5c2644b7e5af",
+      "question": "Does the 'soft-core scheme' in EMTO affect the description of the core electrons differently for the magnetic elements compared to the non-magnetic ones?",
+      "question_type": "method",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The soft-core scheme is a technical detail that might impact the accuracy of magnetic moment calculations if not applied uniformly.",
+      "source_section": "Methods.part2",
+      "chunk_index": 10,
+      "grounded_role_refs": [
+        "prior_approach:6"
+      ],
+      "evidence_spans": [
+        "The self-consistent electronic structure calculations and the total energy calculations were carried out within the generalized gradient approximation as parametrized by Perdew-Burke-Ernzerhof (PBE) [49] ."
+      ],
+      "confidence": 0.6
+    },
+    {
+      "question_id": "PMC6093928::reader_question::43697eb9ca150272",
+      "question": "How does the omission of structural relaxation in the faulted supercell specifically impact the calculated stacking fault energy γ_isf_SC value?",
+      "question_type": "boundary",
+      "reading_step": "find_boundary",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "This is a major approximation; the user needs to know the magnitude of the error introduced by not relaxing the atomic positions.",
+      "source_section": "Methods.part2",
+      "chunk_index": 10,
+      "grounded_role_refs": [
+        "constraint:2"
+      ],
+      "evidence_spans": [
+        "The structural relaxation in the faulted supercell was omitted."
+      ],
+      "confidence": 0.95
     }
   ]
 }

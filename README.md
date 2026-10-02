@@ -224,6 +224,27 @@ question is a specific, answerable, falsifiable information need whose answer ch
 materials-design, mechanism, boundary-condition, or experiment decision. It is not a topic label,
 summary request, or generic future-work prompt.
 
+For high-recall question generation that follows a scientist's thought process while reading, use
+`reader_question_generate.py`. Unlike the small decision-question set, this pass asks many
+passage-level clarification, rationale, mechanism, method, evidence, comparison, relevance,
+counterfactual, boundary, assumption, limitation, transfer, replication, and follow-up questions.
+It carries recent reading state across chunks, requires an exact paper-text evidence span for every
+question, checkpoints each chunk, and removes only exact duplicates:
+
+```bash
+.venv/bin/python reader_question_generate.py \
+  --input-dir experiments/high_temperature_hea_qwen35b/data/corpus/text \
+  --papers-dir experiments/high_temperature_hea_qwen35b/outputs/papers \
+  --out-dir /tmp/reader-questions \
+  --checkpoint-dir /tmp/reader-question-checkpoints \
+  --workers 4 \
+  --resume \
+  --install
+```
+
+See [`prompts/reader-question-generation.md`](prompts/reader-question-generation.md) for the six
+generation and validation steps. Evaluate the result with `evaluate_reader_questions.py`.
+
 ## Setup
 
 ```bash
@@ -269,6 +290,16 @@ Evaluate and consolidate role/question outputs:
   --evidence-dir role_questions --source-dir texts \
   --output results/role_question_evaluation.json \
   --roles-jsonl results/roles.jsonl \
+  --questions-jsonl results/decision_questions.jsonl
+```
+
+Evaluate and consolidate high-recall reader questions after installing them:
+
+```bash
+.venv/bin/python evaluate_reader_questions.py \
+  --question-dir experiments/high_temperature_hea_qwen35b/outputs/papers \
+  --source-dir experiments/high_temperature_hea_qwen35b/data/corpus/text \
+  --output results/reader_question_evaluation.json \
   --questions-jsonl results/questions.jsonl
 ```
 

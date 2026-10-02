@@ -3,6 +3,8 @@ from __future__ import annotations
 import unittest
 
 from role_question_extract import (
+    READER_WORDS_PER_CHUNK,
+    _reading_chunks,
     _validate_questions,
     _validate_reconciled,
     _validate_reconciled_with_ref_map,
@@ -159,6 +161,44 @@ class RoleQuestionValidationTests(unittest.TestCase):
 
         self.assertEqual(rejected, [])
         self.assertEqual(questions[0]["grounded_role_refs"], ["evidence_result:0"])
+
+    def test_accepts_grounded_reader_question_without_decision_gate(self) -> None:
+        reconciled, _ = _validate_reconciled(self.roles, self.source)
+        rows = [{
+            "question": "Why did the authors select chromium as the added element?",
+            "question_type": "rationale",
+            "reader_intent": "understand",
+            "rationale": "An active reader would question the material choice.",
+            "source_section": "Introduction",
+            "chunk_index": 0,
+            "grounded_role_refs": [],
+            "evidence_spans": [
+                "Cr addition reduced mass gain from 10.4 to 5.1 mg/cm2 at 800 C."
+            ],
+            "confidence": 0.8,
+        }]
+
+        questions, rejected = _validate_questions(
+            rows,
+            "paper-1",
+            self.source,
+            reconciled,
+        )
+
+        self.assertEqual(rejected, [])
+        self.assertEqual(questions[0]["reader_intent"], "understand")
+        self.assertTrue(questions[0]["question_id"].startswith("paper-1::reader_question::"))
+
+    def test_reading_chunks_are_small_exact_and_exclude_references(self) -> None:
+        introduction = " ".join(f"word{i}" for i in range(READER_WORDS_PER_CHUNK + 100))
+        source = f"Introduction\n{introduction}\nReferences\nExcluded citation text."
+
+        chunks = _reading_chunks(source)
+
+        self.assertGreater(len(chunks), 1)
+        self.assertTrue(all(chunk.text in source for chunk in chunks))
+        self.assertTrue(all(len(chunk.text.split()) <= READER_WORDS_PER_CHUNK for chunk in chunks))
+        self.assertFalse(any("Excluded citation" in chunk.text for chunk in chunks))
 
 
 if __name__ == "__main__":

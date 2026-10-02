@@ -12,6 +12,7 @@ PMCxxxxxxx/
 └── output/
     ├── roles.json
     ├── questions.json
+    ├── reader_question_rejections.json
     └── rejected_items.json
 ```
 
@@ -22,6 +23,10 @@ extracted, scored, or used as evidence by the data pipeline.
 
 The JATS XML is the machine-readable article input. Exact evidence grounding is validated against
 the structure-preserving text generated from that XML.
+
+`questions.json` contains the high-recall reader questions. `reader_question_rejections.json`
+retains invalid model candidates and exact duplicates removed from overlapping chunks for audit.
+The older `rejected_items.json` records the original role/decision-question extraction audit.
 
 Each `metadata.json` records the article citation metadata, license, PMC version, checksum-qualified
 PMC OA PDF source, and the visual-only use restriction.

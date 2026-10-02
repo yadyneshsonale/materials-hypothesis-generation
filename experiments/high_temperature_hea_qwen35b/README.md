@@ -38,7 +38,7 @@ Cr2O3-dominant protective scale in a W-rich alloy above 1000 C may be chemically
 volatile chromium oxides can form. The generated candidate is therefore a testable research lead,
 not a validated recommendation; an alumina-forming alternative should be evaluated.
 
-### Eleven-role and question extraction
+### Eleven-role and high-recall reader-question extraction
 
 A second pass retained the original 11-role representation while applying stricter role semantics,
 exact source grounding, and a new definition of a useful question.
@@ -47,21 +47,26 @@ exact source grounding, and a new definition of a useful question.
 | --- | ---: |
 | Papers with role/question output | 50/50 |
 | Reconciled role claims | 1,271 |
-| Valid decision questions | 81 |
+| Grounded reader questions | 8,848 |
 | Invalid persisted items | 0 |
-| Mean questions per paper | 1.62 |
-| Mean question confidence | 0.8074 |
-| Papers with no sufficiently grounded question | 10 |
-| Rejected model candidates | 191 |
+| Mean questions per paper | 176.96 |
+| Median questions per paper | 168.5 |
+| Questions per paper, minimum–maximum | 79–314 |
+| Mean question confidence | 0.8440 |
+| Exact grounding rate | 100% |
+| Papers with no grounded question | 0 |
+| Rejected model candidates | 1,914 |
 
-A **decision question** is a specific, answerable, and falsifiable information need whose answer
-changes a materials-design choice, causal-mechanism choice, boundary condition, or experiment.
-Every accepted question records its rationale, decision use, required measurements, grounded role
-references, exact source passages, and confidence.
+A **reader question** captures a useful thought that may arise while reading: what a term means,
+what method or material is being used, why a choice was made, how a mechanism works, whether the
+evidence is sufficient, whether the result is relevant elsewhere, what would happen if a variable
+changed, where the result fails, or what experiment should follow. Every accepted question records
+its type, reading step, intent, relevance tier, rationale, exact source passage, and confidence.
 
-The 81 questions comprise 26 boundary, 19 discrimination, 18 causal, 16 intervention, and two
-baseline questions. The pipeline emits zero questions rather than manufacture one when the paper's
-role evidence does not support a decision-useful uncertainty.
+The high-recall pass generated 1,858 clarification, 1,493 method, 1,411 mechanism, 890 rationale,
+669 counterfactual, 625 comparison, 602 assumption, 527 evidence, 315 boundary, 134 follow-up,
+130 limitation, 112 relevance, 63 replication, and 19 transfer questions. The earlier set of 81
+strict decision questions is preserved in `results/decision_questions.jsonl`.
 
 ## Folder contents
 
@@ -87,8 +92,10 @@ high_temperature_hea_qwen35b/
 │   ├── corpus_evaluation.json
 │   ├── adaptive_trace.json
 │   ├── role_question_evaluation.json
+│   ├── reader_question_evaluation.json
 │   ├── roles.jsonl               # 1,271 consolidated grounded role claims
-│   └── questions.jsonl           # 81 consolidated decision questions
+│   ├── decision_questions.jsonl  # original 81 strict decision questions
+│   └── questions.jsonl           # 8,848 grounded reader questions
 └── pilot/
     ├── materials_evidence/       # six manually curated grounded units
     ├── evaluation.json
@@ -130,7 +137,7 @@ Evaluate the persisted outputs:
   --output experiments/high_temperature_hea_qwen35b/results/corpus_evaluation.json
 ```
 
-Extract the 11 roles and decision questions:
+Extract the 11 roles and strict decision questions:
 
 ```bash
 .venv/bin/python role_question_extract.py \
@@ -149,6 +156,17 @@ Arrange the output, retrieve checksum-verified PMC OA PDFs, and split roles from
   --workers 6
 ```
 
+Generate high-recall reader questions using the existing reconciled roles:
+
+```bash
+.venv/bin/python reader_question_generate.py \
+  --input-dir experiments/high_temperature_hea_qwen35b/data/corpus/text \
+  --papers-dir experiments/high_temperature_hea_qwen35b/outputs/papers \
+  --out-dir /tmp/reader-questions \
+  --checkpoint-dir /tmp/reader-question-checkpoints \
+  --workers 4 --resume --install
+```
+
 The PDF in each paper's `input/` directory is **only for visual inspection**. The pipeline does
 not parse or use it. The JATS XML is the machine-readable source.
 
@@ -163,7 +181,8 @@ Then open `http://127.0.0.1:8765` in a local browser. For the VS Code integrated
 
 - a ranked 50-paper selector;
 - a visual-only rendered PDF pane with page and zoom controls;
-- count-labelled multi-select role filters and decision-question cards;
+- count-labelled multi-select role filters and reader-question cards;
+- question search plus type, intent, and relevance filters;
 - exact XML-derived evidence chunks with the selected span highlighted; and
 - navigation to the corresponding PDF page with coordinate-level passage highlights.
 
@@ -190,6 +209,16 @@ Validate and consolidate the organized role/question outputs:
   --source-dir experiments/high_temperature_hea_qwen35b/data/corpus/text \
   --output experiments/high_temperature_hea_qwen35b/results/role_question_evaluation.json \
   --roles-jsonl experiments/high_temperature_hea_qwen35b/results/roles.jsonl \
+  --questions-jsonl experiments/high_temperature_hea_qwen35b/results/decision_questions.jsonl
+```
+
+Validate and consolidate the high-recall questions:
+
+```bash
+.venv/bin/python evaluate_reader_questions.py \
+  --question-dir experiments/high_temperature_hea_qwen35b/outputs/papers \
+  --source-dir experiments/high_temperature_hea_qwen35b/data/corpus/text \
+  --output experiments/high_temperature_hea_qwen35b/results/reader_question_evaluation.json \
   --questions-jsonl experiments/high_temperature_hea_qwen35b/results/questions.jsonl
 ```
 

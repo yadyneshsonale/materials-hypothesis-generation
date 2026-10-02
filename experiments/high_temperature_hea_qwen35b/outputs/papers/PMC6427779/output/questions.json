@@ -1,27 +1,2046 @@
 {
-  "schema_version": "role-question-1.0",
+  "schema_version": "reader-question-3.0",
   "paper_id": "PMC6427779",
+  "generation_mode": "high_recall_reader_questions",
+  "steps": [
+    "read overlapping paper passage",
+    "carry recent paper-reading state",
+    "generate many passage-triggered questions",
+    "validate exact source grounding and schema",
+    "remove exact duplicates only",
+    "link questions to overlapping reconciled roles"
+  ],
+  "chunks_processed": 11,
+  "model_calls": 11,
+  "resumed_chunks": 0,
   "questions": [
     {
-      "question_id": "PMC6427779::decision_question::690aa965fae2ceea",
-      "question": "What is the minimum oxygen content in the SLM argon atmosphere that triggers significant elemental segregation in NbMoTaW, leading to a measurable drop in corrosion resistance compared to the 20 ppm baseline?",
-      "question_type": "causal",
-      "rationale": "The study achieved excellent corrosion resistance at <20 ppm oxygen, but the causal link between trace oxygen levels, segregation formation, and corrosion couple creation is hypothesized but not quantitatively bounded.",
-      "decision_use": "Defines the critical oxygen threshold for the inert gas supply in SLM manufacturing to ensure the material retains its marine-grade corrosion resistance.",
+      "question_id": "PMC6427779::reader_question::fd5aa8501567ae74",
+      "question": "What exactly does 'linear energy density of up to 2.83 J/mm' mean in terms of the specific SLM process parameters used?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "To replicate the study, I need to know if this single value represents an optimal point, a range, or a specific setting, and what other parameters (laser power, speed, hatch spacing) were used to achieve it.",
+      "source_section": "Abstract",
+      "chunk_index": 0,
       "grounded_role_refs": [
-        "constraint:0",
-        "causal_claim:2",
-        "evidence_result:5"
-      ],
-      "answer_requirements": [
-        "Systematically vary oxygen content (e.g., 5, 10, 20, 50, 100 ppm)",
-        "Perform SEM/EDS mapping to quantify segregation zones",
-        "Measure corrosion current density to identify the inflection point where resistance drops significantly"
+        "evidence_result:0"
       ],
       "evidence_spans": [
-        "in a protective atmosphere of argon with an amount of oxygen under 20 ppm",
-        "the free-corrosion current of the HEA is reduced by two orders of magnitude compared with that of the 316 L steel",
-        "This is because the existence of a small amount of composition segregation in the alloy as mentioned before, which is readily forming corrosion couples and makes the alloy more"
+        "linear energy density of up to 2.83 J/mm"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::0b896bc834fdbaf4",
+      "question": "Which specific element in the NbMoTaW system exhibited the negative deviation, and why does it differ from the others?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The abstract mentions 'the element' singularly, implying one specific element deviates due to its lower melting point and density, but does not identify which one (likely Nb). Understanding which element is critical for predicting segregation behavior.",
+      "source_section": "Abstract",
+      "chunk_index": 0,
+      "grounded_role_refs": [
+        "evidence_result:1"
+      ],
+      "evidence_spans": [
+        "the element with a lower melting point and lower density showed a negative deviation"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::fd48e73e9dcfe867",
+      "question": "How exactly is the 'negative deviation' defined here, and does this imply elemental segregation or just a bulk composition shift from the starting powder?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "A 'negative deviation' of up to 5% could mean the element is depleted in the solidified alloy relative to the powder feedstock, or it could refer to local variations. The distinction determines if the material is homogeneous.",
+      "source_section": "Abstract",
+      "chunk_index": 0,
+      "grounded_role_refs": [
+        "evidence_result:1"
+      ],
+      "evidence_spans": [
+        "negative deviation (no more than 5%) of the molar ratio"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::09ac133fd6b25c17",
+      "question": "What specific metrics or testing standards define the 'excellent' microhardness and corrosion resistance compared to traditional superalloys?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Qualitative claims like 'excellent' need quantitative backing. Knowing the specific superalloy baseline (e.g., Inconel 718) and the measured values (e.g., Vickers hardness, corrosion rate in mpy) is essential for assessing the trade-offs.",
+      "source_section": "Abstract",
+      "chunk_index": 0,
+      "grounded_role_refs": [
+        "evidence_result:2"
+      ],
+      "evidence_spans": [
+        "The HEA shows an excellent microstructure, microhardness, and corrosion resistance performance compared with traditional superalloys"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::586f19fcafc9a825",
+      "question": "Does the formation of a 'single BCC solid solution' hold true for the entire build height, or is there a risk of secondary phase formation at different cooling rates?",
+      "question_type": "boundary",
+      "reading_step": "find_boundary",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "SLM involves rapid cooling, but varying thermal histories can lead to phase separation. The abstract claims a single phase, but I need to know if this is a local observation or a bulk characteristic, and if thermal gradients cause other phases.",
+      "source_section": "Abstract",
+      "chunk_index": 0,
+      "grounded_role_refs": [
+        "evidence_result:0"
+      ],
+      "evidence_spans": [
+        "a single BCC solid solution of NbMoTaW alloy was formed"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6427779::reader_question::34aaf137c5f53119",
+      "question": "Are the cited high-temperature limits of 1100 °C and up to 3000 °C absolute failure points or operational service limits for the superalloys mentioned?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Understanding the distinction between service limits and melting/failure points is crucial for evaluating the NbMoTaW advantage.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "serving in high-temperature (≤ 1100 °C) environments. However, for super high temperature conditions of up to 1500 °C and 3000 °C"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::0a6f129224160fb7",
+      "question": "Does the definition of 'near equal atomic percent' in the HEA definition allow for significant deviations that could affect the stability of the BCC structure in NbMoTaW?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "The text defines HEAs loosely; knowing the tolerance for 'near equal' helps assess if the NbMoTaW composition in the study truly fits the definition.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "solid-solution alloys that contain more than five principal elements in equal or near equal atomic percent (at%)"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::c55c1791965f7cb4",
+      "question": "Which specific mechanisms are implied by 'cocktail effects' that allow properties to be adjusted by composition changes in this specific refractory HEA context?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The term is a buzzword; identifying the specific physical or chemical interactions (e.g., lattice distortion, sluggish diffusion) is essential for mechanism understanding.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "According to the cocktail effects of HEAs, the alloy properties can be adjusted by composition changes and via alloying"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::a56ed27fbf2ad669",
+      "question": "What specific alloying elements or heat treatments were used by Senkov et al. to achieve the specific mechanical properties reported for the NbMoTaW alloy?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The passage cites specific strength values but does not detail the processing history beyond 'vacuum arc-melting', which is critical for replication.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [
+        "prior_approach:0"
+      ],
+      "evidence_spans": [
+        "Senkov and others [ [11] , [12] ] prepared a body-centered cubic (BCC) structure refractory HEA with near-equiatomic concentrations, using NbMoTaW, which was produced by vacuum arc-melting"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::0b90bcaefd62365d",
+      "question": "How does the yield strength of 405 MPa at 1600 °C compare quantitatively to the melting points of the 'most existing nickel-based superalloys' mentioned?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The claim that the HEA strength is higher than the melting point of Ni-superalloys is a strong comparison that requires verifying the melting point values of those superalloys.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "which is higher than the melting point of most existing nickel-based superalloys"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::b3f3e1d3a9ad88ec",
+      "question": "What is the specific value or range of the 'low ductility' at room temperature for the NbMoTaW HEA that makes it difficult to process?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text states ductility is 'low' but provides no numerical value, making it hard to assess the severity of the processing challenge.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [
+        "prior_limitation:0"
+      ],
+      "evidence_spans": [
+        "However, the ductility of the NbMoTaW HEA at room temperature is low"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::cd9a5d7f3c973650",
+      "question": "Why is the standard procedure of 're-melting four times and flipping' considered insufficient for achieving full homogeneity in NbMoTaW specifically?",
+      "question_type": "rationale",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text notes the difficulty of full mixing and the standard solution, but doesn't explain why this specific alloy is particularly resistant to homogenization.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "To achieve a homogeneous distribution of elements in the alloy, the buttons are usually re-melted four times and flipped for each melt by vacuum arc melting"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::3f5ea7b76caf2de6",
+      "question": "Is the 'highest melting temperature' of 1800 °C for investment casting a hard material limit of the mold or a limitation of the furnace technology used in the study?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Understanding if this is a fundamental material constraint or a technological one determines if the limitation can be overcome.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [
+        "prior_limitation:2"
+      ],
+      "evidence_spans": [
+        "For the casting process, the highest melting temperature is only 1800 °C, which is far from enough for the NbMoTaW alloy in this study"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::a53f41afc3fa9617",
+      "question": "What specific microstructural features or phases are expected to form in the 'powder-bed-based layer manufacturing' process that differ from the vacuum arc-melted buttons?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Different processing (SLM vs. arc melting) often leads to different cooling rates and phase formations; the passage implies a method change but not the structural consequence yet.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Selective laser melting (SLM) is a powder-bed-based layer manufacturing technique"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::6343b303af7ab33a",
+      "question": "How does the 'high strength' of the NbMoTaW HEA at room temperature specifically contribute to the 'very difficult to process' claim in terms of machining or forming?",
+      "question_type": "rationale",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text links high strength and low ductility to processing difficulty; understanding the specific failure mode (e.g., cracking, tool wear) is needed.",
+      "source_section": "Introduction.part1",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The low ductility at room temperature and high strength of refractory HEAs render them very difficult to process"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::faed5aa7bcbf7939",
+      "question": "What specific parameters define the 'high density of energy inputs' in the SLM process mentioned?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Understanding the energy density is critical for replicating the specific thermal cycles described.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "in which a high density of energy inputs at each laser pulse cycle"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::d0b3868698a70820",
+      "question": "How does the interaction between plasma, electrons, and photons specifically alter the melt pool dynamics in refractory alloys?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "These interactions are cited as key heat transfer mechanisms that might be unique to high-melting-point materials.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "interactions between plasma, electrons, and photons"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::1505ba02f322d575",
+      "question": "What are the quantitative proportions of heat removed by each dissipation method listed in the thermal behavior summary?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The relative importance of each heat loss mechanism determines the cooling rate and microstructure.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "heat being removed by plasma emission, reflected light, radiation, phase transition, thermal convection, and conduction"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::306726c7538959d0",
+      "question": "Why does the paper claim SLM avoids the need for 'tools and molds' compared to conventional manufacturing?",
+      "question_type": "rationale",
+      "reading_step": "clarify",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "This highlights the cost and design freedom advantages of SLM for complex refractory shapes.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "producing 3D parts of complex shapes without tools and molds"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::5f0cfc5750e47a92",
+      "question": "What specific range of 'very high cooling rates' is achieved in this SLM setup for NbMoTaW?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Cooling rates dictate grain size and phase formation, which are central to the alloy's properties.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "SLM process has very high cooling rates"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::dc7a6591b59a87ce",
+      "question": "How does the 'short interaction time' of the laser specifically prevent the formation of brittle intermetallics in NbMoTaW?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Understanding this mechanism is key to justifying SLM over traditional casting for this alloy.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "only a very small volume of material is heated by laser during a short interaction time"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::a389b7436a69d3d6",
+      "question": "Why did Kunce et al. observe a 'two-phase structure' while this study expects a 'solid solution' for NbMoTaW?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Differences in composition or processing parameters between studies need to be reconciled to predict outcomes.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the two alloys both exhibited a two-phase structure"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::904e45d496e4f2ed",
+      "question": "What specific 'miscibility' issues are expected in the NbMoTaW system during the SLM solidification process?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The study explicitly states examining miscibility, implying a known risk of segregation or phase separation.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "we examined the miscibility and solidification of NbMoTaW refractory HEA synthesized via SLM"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::4c47c184c2399f35",
+      "question": "What specific 'corrosion resistance' mechanisms are being targeted for analysis in the NbMoTaW SLM samples?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Corrosion performance is a key selling point of HEAs; the mechanism of improvement is unknown.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "conducted elemental, microhardness, and corrosion resistance analysis of the samples"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::3fa8a33ed2829012",
+      "question": "Why is NbMoTaW specifically highlighted as a 'serious problem' for traditional hot working compared to other HEAs?",
+      "question_type": "rationale",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Understanding the specific failure modes of NbMoTaW in traditional processing justifies the SLM approach.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [
+        "prior_limitation:4"
+      ],
+      "evidence_spans": [
+        "manufacturing of NbMoTaW HEA is still a serious problem for traditional hot working"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::2ebb4c0ea8111b0a",
+      "question": "Does the 'laser cladding' method used by Zhang et al. offer a viable alternative pathway for NbMoTaW coating applications?",
+      "question_type": "transfer",
+      "reading_step": "plan_follow_up",
+      "reader_intent": "extend",
+      "relevance": "adjacent",
+      "rationale": "Laser cladding is a related process that might be more suitable for specific surface engineering needs.",
+      "source_section": "Introduction.part2",
+      "chunk_index": 2,
+      "grounded_role_refs": [
+        "prior_approach:1"
+      ],
+      "evidence_spans": [
+        "Zhang et al. [ [14] ] synthesized a refractory HEA coating with composition close to TiZrNbWMo"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::1125add279a91938",
+      "question": "Why was a specific mass ratio of 184:181:96:93 used to achieve the nominal 'equal atomic percent' composition?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The atomic ratio is equimolar, but the mass ratio is distinct; understanding the conversion is vital for accurate powder preparation.",
+      "source_section": "Material And Methods.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "particles were mixed with a mass ratio m w : m Ta : m Mo : m Nb of 184:181:96:93"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::d26058d0460a1c8f",
+      "question": "Does the 'mechanical milling' for 2 hours alter the particle size distribution or introduce contamination that affects SLM flowability?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Milling changes powder characteristics; the duration and duration must be sufficient to mix but not degrade flow properties.",
+      "source_section": "Material And Methods.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "powders were then mechanically milled in a KQM-X/B planetary ball mill for 2 h"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::6aaa8c022a3ad7f6",
+      "question": "How critical is the specific drying condition of 45 °C for 8 hours to the final porosity of the printed parts?",
+      "question_type": "method",
+      "reading_step": "clarify",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Moisture in powder leads to pores; the specific temperature and time define the moisture removal threshold.",
+      "source_section": "Material And Methods.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "dried at 45 °C for 8 h"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::1055aab86522cf0e",
+      "question": "Why was C45 steel selected as the substrate instead of a refractory alloy or a specialized mounting material?",
+      "question_type": "assumption",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Substrate choice affects thermal conductivity and residual stress; steel may react differently than the alloy itself.",
+      "source_section": "Material And Methods.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The substrate was C45 steel plate with a size of 50 mm× 50 mm × 20 mm"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::eb08c7dabdb14d63",
+      "question": "What is the exact composition of the 'mixed multi-element powders' before milling, and were any binders used?",
+      "question_type": "clarification",
+      "reading_step": "identify_gap",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The passage mentions mixed powders but does not specify if binders or other minor elements were added.",
+      "source_section": "Material And Methods.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The NbMoTaW HEA was fabricated with mixed multi-element powders"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6427779::reader_question::9fc3322cebf2bfaa",
+      "question": "How does the 'S-cross scanning' strategy specifically influence the residual stress distribution compared to a unidirectional strategy?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Scanning strategy dictates heat accumulation and stress; the specific 'S-cross' pattern needs justification.",
+      "source_section": "Material And Methods.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "with S-cross scanning in x and y directions"
+      ],
+      "confidence": 0.88
+    },
+    {
+      "question_id": "PMC6427779::reader_question::5d8084ce236e5a06",
+      "question": "Why does the linear energy density equation use (n + 1) for the number of remelting times in the calculation of ρ Q?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The user needs to verify if the formula correctly accounts for the total energy input including the initial pass plus remelts.",
+      "source_section": "Material And Methods.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "ρ Q = ( n + 1 ) P L f P A m i x / v"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::eeb4320d78e39010",
+      "question": "What is the value of the laser absorption rate (A mix) for this specific mixed powder composition?",
+      "question_type": "clarification",
+      "reading_step": "identify_gap",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The variable A mix is in the energy density equation, but its numerical value is not provided in the text.",
+      "source_section": "Material And Methods.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "A mix is the laser absorption rate of the mixed powder"
+      ],
+      "confidence": 0.92
+    },
+    {
+      "question_id": "PMC6427779::reader_question::9cb8f0369149c34f",
+      "question": "How does the 'remelting twice' process affect the grain refinement compared to a single pass?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Multiple passes alter thermal history; the mechanism of grain refinement via remelting is a key hypothesis.",
+      "source_section": "Material And Methods.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "underwent remelting twice for each layer"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::04e2c96b8646b8ba",
+      "question": "Is the 'oxygen under 20 ppm' strictly maintained throughout the entire build, or just at the start?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "adjacent",
+      "rationale": "Oxygen levels can fluctuate during long builds; continuous monitoring vs. initial purge affects oxide formation.",
+      "source_section": "Material And Methods.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [
+        "constraint:0"
+      ],
+      "evidence_spans": [
+        "protective atmosphere of argon with an amount of oxygen under 20 ppm"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::10e0b065bce9df8c",
+      "question": "How does the 0.5 mm layer thickness compare to standard SLM parameters for refractory alloys, and what is the trade-off for resolution?",
+      "question_type": "boundary",
+      "reading_step": "assess_relevance",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Standard SLM often uses 30-50 microns; 100 microns is thick and may affect surface finish or defect density.",
+      "source_section": "Material And Methods.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The fabricated sample model was a cuboid with a size around 10 mm × 10 mm × 0.5 mm"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6427779::reader_question::267ea0cce870b706",
+      "question": "Does the 'mixed multi-element powders' approach lead to segregation issues that the ball milling was intended to mitigate?",
+      "question_type": "rationale",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Ball milling is used for homogeneity; the question probes if the process effectively solved the segregation inherent to mixed powders.",
+      "source_section": "Material And Methods.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The NbMoTaW HEA was fabricated with mixed multi-element powders"
+      ],
+      "confidence": 0.82
+    },
+    {
+      "question_id": "PMC6427779::reader_question::9dbbbc3168f333e1",
+      "question": "What specific resolution or sensitivity limits of the HITACHI SU-8010 were utilized for the EDS analysis of the microstructures?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The instrument is named, but the specific settings (acceleration voltage, spot size) are missing for replication.",
+      "source_section": "Material And Methods.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "observed in a HITACHI SU-8010 (Hitachi, Japan, Tokyo) scanning electron microscope (SEM)"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::dd7846f84cda2fda",
+      "question": "What is the exact calibration procedure for the Avantes reflectance system to ensure accurate absorption rate calculation?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The method relies on indirect measurement, so calibration is critical for data validity.",
+      "source_section": "Material And Methods.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The reflectance of the powder was measured in a system by Avantes Co., The Netherlands."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::aa4977ac466770de",
+      "question": "Does the assumption that laser transmission does not occur in metal powders hold true for the specific NbMoTaW alloy and fiber laser used?",
+      "question_type": "assumption",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "This fundamental assumption validates the A=1-R equation; if false, the energy density model is flawed.",
+      "source_section": "Material And Methods.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [
+        "constraint:1"
+      ],
+      "evidence_spans": [
+        "It can be assumed that transmission of the laser does not occur in metal powders, and the relationship between the absorption and the reflectance of metal is A = 1− R"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::9b4e385f7bde854d",
+      "question": "How does the particle size distribution from the Mastersizer 2000 compare to the size distribution observed via SEM for consistency?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Comparing laser diffraction bulk data with SEM surface morphology checks for representative sampling.",
+      "source_section": "Material And Methods.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The particle size was analyzed with the laser diffraction particle size analyzer Mastersizer 2000 (Malvern, UK), and the average particle sizes were investigated."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::f964241537fac3b8",
+      "question": "What is the specific scanning rate used during the potentiodynamic polarization tests for the 3.5% wt NaCl solution?",
+      "question_type": "clarification",
+      "reading_step": "identify_gap",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The voltage range is given, but the scan rate is essential for kinetic corrosion analysis.",
+      "source_section": "Material And Methods.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The scanning voltage range was set from −0.2 V to +0.2 V."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::b425421e7e5b9693",
+      "question": "How does the resin encapsulation of the 6 mm × 6 mm patterns affect the exposed area accuracy for current density calculations?",
+      "question_type": "clarification",
+      "reading_step": "identify_gap",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Small errors in exposed area measurement significantly skew corrosion rate results.",
+      "source_section": "Material And Methods.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The patterns of HEA and 316 L steel, as the working electrode, were cut into a square of 6 mm × 6 mm. Then the surfaces of the patterns were encapsulated with non-conductive resin and only one surface was left."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::47c2fad7322a224d",
+      "question": "What specific standard reference [21] was used for counting grain and dendrite sizes, and does it define the image analysis threshold?",
+      "question_type": "method",
+      "reading_step": "identify_gap",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Image analysis results are highly sensitive to the specific counting protocol and software thresholds used.",
+      "source_section": "Material And Methods.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The grain and dendrite sizes were counted by the standard reference [ [21] ]."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::ca5b465cdedc2f51",
+      "question": "What surface preparation steps were performed on the HEA specimens before the resin encapsulation and corrosion testing?",
+      "question_type": "method",
+      "reading_step": "identify_gap",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Surface roughness from SLM or cutting can significantly alter polarization curve reproducibility.",
+      "source_section": "Material And Methods.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Subsequently, the samples were cut and their surfaces were analyzed further."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::f0a24f6fa25b839e",
+      "question": "How does the A=1-R assumption handle the porosity differences caused by the remelting times in samples S1, S2, and S3?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Porosity changes effective surface area and reflectance, potentially invalidating the absorption rate calculation if not accounted for.",
+      "source_section": "Material And Methods.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Subsequently, A of the powder to the fiber laser was investigated by testing the reflectance ( R ) of the elements."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::409b4b29b79019c0",
+      "question": "How exactly are the individual absorption rates (A_Mo, A_W, etc.) quantified from the laser source and powder bed setup?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "To replicate the process, I need to know the specific measurement technique used to derive the A values.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The order of the absorption rate of laser in the elements powder to the laser is A Mo > A W > A Nb > A Ta , as shown in Figure 2"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::90bc5a492962dd2e",
+      "question": "Why was the powder particle size specifically designed to be inversely proportional to laser absorption, and is there a theoretical limit to this design strategy?",
+      "question_type": "rationale",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The text links absorption to size design; I want to understand the physical justification for this specific inverse correlation.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Thus, the average size of the powder is designed in the same corresponding order, D Mo (94.9 um) > D W (45.0 um) > D Nb (21.5 um) > D Ta (13.7 um)."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::a8fb99aa94a276cf",
+      "question": "What specific 'hollow structure with gaps' exists in the pure Mo powder that causes its higher absorption compared to the mixed powder?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "This is a counter-intuitive finding (pure Mo > mixed) that requires visual or microstructural evidence to explain the mechanism.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The absorption of the Mo powder is higher than that of the mixed powder, since the Mo powder can trap the laser radiation easily in the hollow structure with gaps."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::2c610ef2865ccd42",
+      "question": "What specific statistical threshold or image analysis method was used to determine that the diffraction peaks are 'relatively concentrated'?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Subjective terms like 'concentrated' need quantitative backing to assess compositional uniformity.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Besides, the diffraction peaks of (100), (200) and (211) are relatively concentrated, which means that the composition is uniform."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::2df32746c0d7956a",
+      "question": "What specific mechanism causes Nb and Mo to exhibit larger composition fluctuations than Ta and W at the micro grain scale?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "extend",
+      "relevance": "direct",
+      "rationale": "If certain elements segregate more, it could lead to local variations in mechanical or corrosion properties.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The amplitudes of composition fluctuations for Nb and Mo in micro scale are larger than those of Ta and W."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::1a03888712a608d7",
+      "question": "Did the researchers account for the different melting points and thermal conductivities of the five elements when designing the specific particle size distribution?",
+      "question_type": "rationale",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "The size distribution was based on absorption, but thermal properties also drive segregation and melt pool dynamics in HEAs.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Thus, the average size of the powder is designed in the same corresponding order, D Mo (94.9 um) > D W (45.0 um) > D Nb (21.5 um) > D Ta (13.7 um)."
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6427779::reader_question::22efc218e2e9ca7d",
+      "question": "Is the 'mixed multi-element powder' absorption higher than *all* constituent powders, or just 'most' as stated, and which specific powder was the exception?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text says 'higher than most... except for Mo', which implies Mo is the only exception; I need to confirm this comparison logic.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "It is notable that the absorption of the mixed powder is higher than that of most powders except for Mo powder"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::04e15743a17c7d3f",
+      "question": "Does the 'relatively high density' inferred from the metallic luster correlate with porosity measurements in the text, and were porosity levels quantified?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Visual appearance is subjective; quantitative density/porosity data is needed to validate the claim of 'relatively high density'.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The surface of the sample is smooth and has a distinctive metallic luster, which suggests relatively high density."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::a682069289e585de",
+      "question": "What is the exact EDS spot size or step size used in Figure 4c to detect the micro-scale composition fluctuations of Nb and Mo?",
+      "question_type": "method",
+      "reading_step": "identify_gap",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Without knowing the spatial resolution of the EDS scan, the magnitude of the 'amplitudes' cannot be interpreted.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Besides, the composition distribution among micro grains is measured in Figure 4 c."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::6c10b5b4e790e939",
+      "question": "If the powder size distribution were reversed (e.g., larger Mo powder and smaller Ta powder), how would the energy absorption and melt pool stability change?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "extend",
+      "relevance": "adjacent",
+      "rationale": "Testing the sensitivity of the process to the specific size-absorption correlation helps define the robustness of the manufacturing method.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Thus, the average size of the powder is designed in the same corresponding order, D Mo (94.9 um) > D W (45.0 um) > D Nb (21.5 um) > D Ta (13.7 um)."
+      ],
+      "confidence": 1.0
+    },
+    {
+      "question_id": "PMC6427779::reader_question::bffff98160b22ec9",
+      "question": "What is the specific magnitude of the 'larger' composition fluctuations for Nb and Mo compared to Ta and W, and was statistical analysis performed?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text states fluctuations are larger but lacks quantitative data to assess severity.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The amplitudes of composition fluctuations for Nb and Mo in micro scale are larger than those of Ta and W."
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::071af7916357f5d2",
+      "question": "Does the 'segregation between inner grains and boundaries' observed for Nb and Mo contribute to mechanical anisotropy, and is this discussed?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Segregation is a critical microstructural feature affecting properties, yet the passage focuses only on composition.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "and Nb and Mo show segregation between inner grains and boundaries."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::d7d7c2a544f97339",
+      "question": "What is the exact value of the 'smallest' average molar ratio for Ta mentioned in the repeatability experiments?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text highlights Ta having the largest ratio but does not explicitly state the smallest value in this sentence context.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Ta had the largest average molar ratio (at%) with 28.21%, Nb had the lowest average ratio (21.50%)"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::24521cbd32917faf",
+      "question": "Are the 'experimental fluctuations' of 0.99 and 0.16 standard deviations, standard errors, or ranges?",
+      "question_type": "method",
+      "reading_step": "identify_gap",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Understanding the statistical metric is essential for assessing the reliability of the composition deviation results.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "and their experimental fluctuations (0.99 and 0.16, respectively) in the three experiments are small."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::708f5477266335e2",
+      "question": "How does the 'negative deviation' of -3.5 at% for Mo compare to the theoretical prediction based on evaporation rates?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text claims evaporation causes negative deviation; comparing the magnitude to theoretical models validates the mechanism.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Mo and Nb, with lower melting points and densities, showed negative deviations of −0.16 at% and −3.5 at%, respectively"
+      ],
+      "confidence": 0.88
+    },
+    {
+      "question_id": "PMC6427779::reader_question::f9047b7b9b6a489f",
+      "question": "Does the 'mixing process between different metal liquids' described occur before or after the high-density energy input phase?",
+      "question_type": "method",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The temporal sequence of melting, spreading, and mixing is crucial for understanding the segregation mechanism.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Meanwhile, as the high-density energy continuously inputs, powders with high melting points are also fused, and there is a mixing process between different metal liquids."
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6427779::reader_question::d399c8e4ea6aef95",
+      "question": "Is the 'liquid density' factor independent of the 'melting point' factor in the authors' proposed model, or are they coupled?",
+      "question_type": "rationale",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text lists both as factors but the relationship (e.g., do lower melting points correlate with lower densities?) is implied but not explicit.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "There are several factors leading to the composition deviation, such as melting point, liquid density, powder sides, and energy absorption of powders."
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC6427779::reader_question::11f4b8fcd7a152d6",
+      "question": "What is the specific 'powder sides' (likely side effects or size) mentioned as a factor, and is it a typo for 'particle size'?",
+      "question_type": "clarification",
+      "reading_step": "identify_gap",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The term 'powder sides' is ambiguous and likely a translation or typographical error affecting the interpretation of causes.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "There are several factors leading to the composition deviation, such as melting point, liquid density, powder sides, and energy absorption of powders."
+      ],
+      "confidence": 0.65
+    },
+    {
+      "question_id": "PMC6427779::reader_question::7d20b25e0a02699d",
+      "question": "How does the 'liquid spreads on a larger surface area' phenomenon quantitatively affect the energy absorption efficiency of the mixed powder?",
+      "question_type": "rationale",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The mechanism links spreading to energy absorption, but the quantitative impact on the final composition is not detailed.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the powders with lower melting point are fused first and the liquid spreads on a larger surface area and absorbs more energy than the solid powders."
+      ],
+      "confidence": 0.82
+    },
+    {
+      "question_id": "PMC6427779::reader_question::9ec08f988e3014c5",
+      "question": "Does the 'floating' of low-density liquid and 'dropping' of high-density liquid explain the specific -3.5 at% deviation of Mo?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text proposes a buoyancy mechanism; checking if it aligns with the magnitude of Mo's deviation is logical.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The liquid with lower density tends to float to the surface and the high-density liquid tends to drop, meaning that the lower-density liquid on the surface is exposed to the laser and receives more energy."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::7a4caa25c07fb8d6",
+      "question": "What is the threshold 'boiling point' temperature difference between Nb/Mo and Ta/W that drives the selective evaporation?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text states lower melting point elements arrive at the boiling point earlier, but the temperature gap is not specified.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "In the end, these elements with lower melting points arrive at the boiling point earlier and evaporate more during the SLM process"
+      ],
+      "confidence": 0.78
+    },
+    {
+      "question_id": "PMC6427779::reader_question::e6647a7a16396ef2",
+      "question": "How does the 'laser absorptivity' of the individual powders (Figure 5 d) compare to the absorptivity of the mixed powder bed?",
+      "question_type": "comparison",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text mentions absorptivity as a factor and refers to Figure 5d, but does not explicitly compare single vs. mixed absorptivity values.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Figure 5 d shows the average particle size of four powders (black) and laser absorptivity (blue)."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::fd12ef1a8741026e",
+      "question": "If the laser power were increased, would the 'evaporation' of Nb and Mo become so severe that the alloy composition deviates beyond the 3.5 at% range?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text links energy input to evaporation; changing the energy variable tests the robustness of the observed deviation.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Meanwhile, as the high-density energy continuously inputs, powders with high melting points are also fused"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6427779::reader_question::34d09c9240fc14e6",
+      "question": "Does the 'sintering repeatability experiment' involve melting the same powder multiple times or processing different powder batches?",
+      "question_type": "method",
+      "reading_step": "identify_gap",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Understanding the experimental setup is necessary to interpret the 'composition deviation' and 'fluctuations' correctly.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Thus, three groups of sintering repeatability experiments were performed to verify the composition deviation of the samples."
+      ],
+      "confidence": 0.72
+    },
+    {
+      "question_id": "PMC6427779::reader_question::5fac38d692b6b5e2",
+      "question": "Is the '28.21%' average ratio for Ta consistent with the theoretical 25%, and is the deviation considered acceptable for high-performance applications?",
+      "question_type": "assumption",
+      "reading_step": "assess_relevance",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text notes the deviation is 'small' but does not contextualize if this magnitude is within industry tolerances.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Ta had the largest average molar ratio (at%) with 28.21%, Nb had the lowest average ratio (21.50%)"
+      ],
+      "confidence": 0.68
+    },
+    {
+      "question_id": "PMC6427779::reader_question::088db7112a1dc0ac",
+      "question": "Does the 'certain degree of causal relationship' between particle size and laser absorptivity imply a direct physical coupling, or is it a statistical correlation in this specific powder blend?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "To determine if the observed correlation is a fundamental material property or an artifact of the specific powder batch used.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "It is obvious that the average particle size and laser absorptivity both have a similar variation trend and a certain degree of causal relationship."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::7f52af5c8b0452a2",
+      "question": "How does the 'bigger powder size' of Mo specifically 'slow down the rate of melting' quantitatively, and is this due to thermal diffusion time or surface area effects?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "To understand the specific thermal physics governing the suppression of Mo evaporation despite high absorptivity.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Specifically, for Mo powder, although it has a higher laser absorption rate, the bigger powder size slows down the rate of melting, which causes lower mass loss and deviation compared with Nb."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::7a2a9d2b82aa9839",
+      "question": "Is the 'approximate equimolar ratio distribution' defined as within ±3.5 at%, and does this range hold true for all 4 elements or just the most deviant one?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "To establish the precise compositional uniformity criteria used to claim 'equimolar' status for the alloy.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Although there is a maximal 3.5% composition deviation, as a HEA, the constituent range from 5–35% is acceptable"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::07d734aadc096355",
+      "question": "What specific experimental evidence supports the claim that the 'composition deviation does not influence the phase and microstructure'?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "To verify if phase analysis (XRD) or microstructural mapping was performed specifically to rule out deviation effects.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "and the composition deviation does not influence the phase and microstructure."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::765f0167250b918f",
+      "question": "Are the 'lamellar martensite structure dendrites' a direct result of the rapid solidification, or could they be a transformation product during cooling to room temperature?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "To distinguish between solidification microstructure and post-solidification phase transformations.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "many lamellar martensite structure dendrites appear on the top of the molten pools."
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6427779::reader_question::bb51ca3610b6df81",
+      "question": "How does the 'primary and secondary dendrite arm spacing' of 6.59 μm and 1.68 μm quantitatively affect the hardness or yield strength compared to the 20-30 μm spacing in cast samples?",
+      "question_type": "relevance",
+      "reading_step": "assess_relevance",
+      "reader_intent": "apply",
+      "relevance": "adjacent",
+      "rationale": "To link the microstructural metrics directly to mechanical performance predictions.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "compared with the as-cast dendrite arm spacing of approximately 20 to 30 μm"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::e232d7babcaaf705",
+      "question": "Does the 'extremely high temperature gradient' mentioned imply a specific thermal simulation model was used, or is this an inferred value from the observed grain size?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "To determine if the high cooling rates are measured or calculated, affecting the reliability of the 'rapid solidification' claim.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "under the rapid solidification condition of the laser processing, the grains and dendrites as a sub-structure grew and developed with an extremely high temperature gradient"
+      ],
+      "confidence": 0.6
+    },
+    {
+      "question_id": "PMC6427779::reader_question::8b937855115b6c6f",
+      "question": "If the 'growth-driving force was large but the growth-time was limited', how does this constraint specifically prevent the formation of large, brittle grains in the SLM process?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "To understand the kinetic competition between nucleation and growth that leads to fine grains.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "This means that when the grain nuclei formed, their growth-driving force was large but the growth-time was limited."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::03fdd8e7534b4dc0",
+      "question": "What is the specific definition of 'fine structure' in this context, and does it refer solely to grain size or also to the secondary dendrite arm spacing?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "To ensure 'fine structure' is consistently defined across the microstructural discussion.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 7,
+      "grounded_role_refs": [
+        "hypothesis_statement:1"
+      ],
+      "evidence_spans": [
+        "The fine structure is thought to improve the mechanical properties of the final part."
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6427779::reader_question::8e52db1496ba870a",
+      "question": "Is the '200 μm' grain size in the reference [12] for as-cast material representative of all casting methods or specific to a particular cooling condition?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "To validate the baseline against which the SLM grain refinement is being measured.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "compared with the 200 μm of as-cast NbMoTaW HEA grain size [ [12] ]"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::9558730212876227",
+      "question": "How does the 'preferential orientations of the grains are in all directions' impact the anisotropy of the mechanical properties compared to typical directional solidification in casting?",
+      "question_type": "relevance",
+      "reading_step": "assess_relevance",
+      "reader_intent": "apply",
+      "relevance": "direct",
+      "rationale": "To assess the isotropy of the SLM microstructure and its implications for component design.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The preferential orientations of the grains are in all directions"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC6427779::reader_question::5288d151dda6f030",
+      "question": "If the 'second branches are interlaced with each other', does this suggest a high degree of grain boundary interlocking that would specifically improve fracture toughness?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "To link the specific morphological feature of interlaced branches to a predicted mechanical property.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "and the second branches are interlaced with each other."
+      ],
+      "confidence": 0.65
+    },
+    {
+      "question_id": "PMC6427779::reader_question::6629924653ce6c84",
+      "question": "Does the 'maximal 3.5% composition deviation' apply to the entire build volume or only to the specific sample section analyzed in the text?",
+      "question_type": "assumption",
+      "reading_step": "assess_relevance",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "To determine if the deviation is a local anomaly or a systematic global issue.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Although there is a maximal 3.5% composition deviation"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::1bfd73c0e5224e3e",
+      "question": "What specific mechanical property improvements are predicted by the Hall–Petch law for BCC polycrystals with the observed grain sizes?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text cites the HP law to link grain size to properties but does not specify the magnitude of improvement for this specific microstructure.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [
+        "mechanism_principle:0"
+      ],
+      "evidence_spans": [
+        "The well-known Hall–Petch (HP) law [ [22] , [23] ] illustrates the dependence of the grain size with the macroscopic plastic"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::0fbb207d0526ef74",
+      "question": "Does the comparison of plastic strain ɛ p = 0.2% for as-cast material versus the SLM material imply the SLM material has significantly higher ductility?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text highlights the brittleness of the cast alloy as a problem to be solved, implying SLM improves it, but no quantitative ductility value is given for the SLM sample.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [
+        "prior_approach:4"
+      ],
+      "evidence_spans": [
+        "It has been reported that the as-cast NbMoTaW HEA is brittle with plastic strain ɛ p = 0.2%"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::79eaa047a87d2a81",
+      "question": "Are the references [22] and [23] specifically applicable to the NbMoTaW BCC system, or do they cover general BCC metals where the correlation might differ?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text generalizes the HP law to 'polycrystal BCC metal' to justify the SLM improvement, which might mask specific alloy behaviors.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Therefore, the plasticity, fatigue strength, and creep rate of the polycrystal BCC metal are improved when the grain size decreases [ [24] ]."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::4b7fd38ffe98a520",
+      "question": "Why were pure Nb, Mo, Ta, and W included in the microhardness comparison if the alloy is composed of these elements?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text lists these elements to show the HEA is harder than its constituents, but the mechanism (solid solution strengthening vs. microstructure) needs clarification.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "compared with the microhardness data of pure Nb, Mo, Ta, W, and four kinds of surperalloys"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::19205ed60f5d57b8",
+      "question": "What specific SLM processing parameters (e.g., laser power, scan speed) resulted in the 826 Hv hardness value?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "adjacent",
+      "rationale": "The hardness is a key result, but the process parameters generating this specific microstructure and property are not detailed in this passage.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [
+        "evidence_result:3"
+      ],
+      "evidence_spans": [
+        "the average microhardness value of the NbMoTaW HEA s (sintering by SLM) sample is 826 Hv."
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::2fba3e830aaac180",
+      "question": "Is the hardness improvement in SLM samples (826 Hv) vs. arc-melted samples (446 Hv) solely due to grain refinement, or does rapid solidification induce other hardening mechanisms like solute trapping?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text attributes the improvement to 'grain refinement due to rapid cooling,' but other mechanisms like phase suppression might contribute.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "compared with the HEA a (sintering by arc melting) sample (446 Hv) [ [12] ], the HEA s sample also demonstrates a better hardness performance, which shows the advantage of grain refinement due to rapid cooling"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::3f218ae37f322cfa",
+      "question": "How does the 'better hardness properties at high temperatures' of NbMoTaW HEA compare quantitatively to the specific superalloy mentioned (e.g., Inconel 718)?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "The text claims better high-temp hardness based on Senkov et al., but does not provide the data or specify which superalloy it outperforms.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "NbMoTaW HEA also has better hardness properties at high temperatures than superalloys."
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6427779::reader_question::801b367520faf066",
+      "question": "What defines the 'two points worth noting' in Figure 7, and does the figure reveal the distribution of hardness values or just the average?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text references Figure 7 for the data, but without seeing the figure, the statistical variance or outlier behavior is unknown.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The results are shown in Figure 7 and there are two points worth noting in the figure."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::7b294e81d4b4326a",
+      "question": "Why is self-corrosive potential considered 'only a reference' while current density (I_corr) is the key parameter for judging corrosiveness?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text states this electrochemical principle but does not explain the underlying thermodynamic or kinetic reasoning for the reader's benefit.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "According to the electrochemical theory, there are two parameters to characterize corrosiveness, self-corrosive potential ( E corr ) and self-corrosive current ( I corr ), among which self-corrosive potential is only a reference."
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::40b96043de137dd0",
+      "question": "What is the 'two kinds of patterns' mentioned in the corrosion section—does this refer to different scanning strategies or different heat treatments?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The term 'patterns' is ambiguous without context; it could refer to laser scan vectors, hatch spacing, or surface textures.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "In this study, the surface areas of two kinds of patterns are the same, so the free-corrosion current"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::c4c63be529f5d1d1",
+      "question": "Does the lack of reported I_corr values in this passage mean the corrosion results were inconclusive or simply not yet presented?",
+      "question_type": "limitation",
+      "reading_step": "find_boundary",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The passage ends mid-sentence regarding the key corrosion metric, preventing any assessment of the alloy's corrosion performance.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "so the free-corrosion current"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::9429cf887039ee38",
+      "question": "How does the 'slender shape' of the dendritic branches specifically influence crack propagation paths compared to equiaxed grains?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The text mentions slender branches but does not discuss their mechanical consequence on fracture toughness or crack deflection.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "dendritic branches were slender in shape, and the dendrite arm spacing was far less than that in other solidification processes such as casting."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::96044411adbb982a",
+      "question": "If the 'fine structure' improves mechanical properties, why does the text still claim 'further study of mechanical properties is still necessary'?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "There is an apparent contradiction between the strong claim of improvement and the need for further study, suggesting missing data or validation.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Therefore, the plasticity, fatigue strength, and creep rate of the polycrystal BCC metal are improved when the grain size decreases [ [24] ]. Therefore, NbMoTaW alloy fabricated by SLM is a promising method for producing refractory HEA parts, although further study of mechanical properties is still necessary."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::358d8c21dfce306a",
+      "question": "What is the specific value of the 'grain size' that corresponds to the 826 Hv hardness, given the text emphasizes the relationship between the two?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The Hall-Petch law requires grain size, and the hardness is given, but the specific grain size measurement for the 826 Hv sample is not in this text.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 8,
+      "grounded_role_refs": [
+        "evidence_result:3"
+      ],
+      "evidence_spans": [
+        "the average microhardness value of the NbMoTaW HEA s (sintering by SLM) sample is 826 Hv."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::b3790050ec640310",
+      "question": "Does the 'linear fitting' method used to obtain I_corr values account for the non-linear Tafel regions, or could this introduce significant error in the extrapolation?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "To assess the validity of the electrochemical data extraction method.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "In Figure 8 , the I corr of NbMoTaW HEA and 316L steel can be obtained by linear fitting"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::b410275b48aa346c",
+      "question": "How does the extremely low I_corr value (8.716 × 10 −11 A) for the HEA compare to literature values for bulk cast NbMoTaW, and does SLM processing specifically enable this?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "To determine if the high corrosion resistance is a result of the specific SLM microstructure.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "free-corrosion current I corrH = 8.716 × 10 −11 A"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::0cc50d820b415be9",
+      "question": "What specific elemental segregation phases are responsible for creating the 'corrosion couples' that make the HEA 'active', and how are they identified?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "To understand the micro-mechanism behind the paradoxical 'active' tendency despite high resistance.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [
+        "causal_claim:2"
+      ],
+      "evidence_spans": [
+        "This is because the existence of a small amount of composition segregation in the alloy as mentioned before, which is readily forming corrosion couples"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::1ef5376e8f9d4e36",
+      "question": "Does the 1 mm corrosion depth in 316L steel represent uniform attack or deep localized pitting, and what was the exposure time for this measurement?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "To gauge the severity of the failure mode in the baseline material.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "a strong corrosion happens in 316 L steel, with a corrosion depth of even up to 1 mm"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::329a5039b7683c1c",
+      "question": "Was the 'slight segregation' of elements in the SLM alloy uniform across the entire sample, or could local variations explain the observed 'pitting corrosion'?",
+      "question_type": "assumption",
+      "reading_step": "assess_relevance",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "To link microstructural inhomogeneity to specific failure modes like pitting.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "although a slight segregation of elements exists in the HEA"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::4c191da454254012",
+      "question": "How does the 'easy passivation' of Nb, Mo, and Ta specifically manifest in the 3.5%wt NaCl solution to overcome the active corrosion tendency?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "To understand the chemical mechanism of passivation in this specific environment.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [
+        "causal_claim:3"
+      ],
+      "evidence_spans": [
+        "the elements Nb, Mo, and Ta contained in the alloy are all the easy passivation metals"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::cee9e81964d86d4d",
+      "question": "Did the 'high voltage' scanning in the range of −1.5 to +2 V cause electrolysis or other electrochemical artifacts that might have accelerated the observed corrosion?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "To assess if the test conditions artificially induced damage.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "scanned at high voltage in the range of −1.5 to +2 V in 3.5%wt NaCl solution environment"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6427779::reader_question::0ebaffbcadabc791",
+      "question": "What specific 'patterns' were used for the corrosion depth measurement (Figure 9), and were they identical to those used for the electrochemical testing?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "To ensure experimental consistency between the electrochemical and visual results.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the patterns of NbMoTaW and 316 L steel were also scanned at high voltage"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::6aea0e6de2b9be4a",
+      "question": "Does the 'crack of the sample' extending in Figure 9b indicate stress corrosion cracking, or is it purely mechanical damage from the manufacturing process exacerbated by corrosion?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "To distinguish between intrinsic material failure and manufacturing defects.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "only the crack of the sample has a certain extent of extension"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::926c9b939fbe38db",
+      "question": "How does the 'lost weight' measurement quantitatively correlate with the 1 mm depth in 316L versus the pitting in the HEA, and what was the surface area for this calculation?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "To verify the consistency between mass loss and visual depth measurements.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [
+        "evidence_result:5"
+      ],
+      "evidence_spans": [
+        "from the extent of lost weight, the NbMoTaW HEA also shows stronger corrosion resistance"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::91ce84af057b5f89",
+      "question": "Does the negative deviation of 'no more than 5%' in the conclusion refer to the composition, density, or melting point, and how does this affect corrosion predictions?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "To understand the precision of the SLM process and its link to material properties.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the element with the lowest melting point and density showed a negative deviation (no more than 5%) of"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::bb40a8b50650f7bc",
+      "question": "Are the 'two orders of magnitude' difference in I_corr values statistically significant given the potential for surface roughness variations in SLM samples?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "To assess the robustness of the claim regarding corrosion resistance superiority.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [
+        "evidence_result:4"
+      ],
+      "evidence_spans": [
+        "the free-corrosion current of the HEA is reduced by two orders of magnitude compared with that of the 316 L steel"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::8294309db7ecc3c7",
+      "question": "Does the 'strong corrosion' in 316L steel extend through the entire pattern thickness, or is it localized to specific regions, and how was 'depth' measured?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "To understand the geometry of the failure in the control sample.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "a strong corrosion happens in 316 L steel, with a corrosion depth of even up to 1 mm"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::3d88243416d60bc4",
+      "question": "How does the '3.5%wt NaCl solution' environment simulate actual service conditions for this alloy, or are there other aggressive ions present in real applications?",
+      "question_type": "relevance",
+      "reading_step": "assess_relevance",
+      "reader_intent": "apply",
+      "relevance": "adjacent",
+      "rationale": "To extrapolate the findings to broader industrial applications.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "excellent corrosion resistance in the 3.5 %wt NaCl solution"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6427779::reader_question::d888ab23fa80dc74",
+      "question": "Is the 'negative deviation' in the conclusion referring to the composition of the NbMoTaW alloy or the SLM process parameters, and why is it relevant to the study's goals?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "To clarify the scope of the conclusion regarding alloy formation success.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "element with the lowest melting point and density showed a negative deviation (no more than 5%) of"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::a3ccb6c1375b545b",
+      "question": "Did the 'slight segregation' mentioned in the text lead to the formation of secondary phases that could be detected by EDS or XRD to confirm the corrosion couples?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "To identify missing characterization data that would support the corrosion mechanism.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [
+        "causal_claim:2"
+      ],
+      "evidence_spans": [
+        "existence of a small amount of composition segregation in the alloy as mentioned before"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::859f492441c70257",
+      "question": "How does the 'easy passivation' of Mo and Ta in this specific SLM microstructure compare to their behavior in a homogeneous, cast alloy?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "extend",
+      "relevance": "adjacent",
+      "rationale": "To explore if the rapid solidification enhances passivation capabilities.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 9,
+      "grounded_role_refs": [
+        "causal_claim:3"
+      ],
+      "evidence_spans": [
+        "the elements Nb, Mo, and Ta contained in the alloy are all the easy passivation metals"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6427779::reader_question::d4137873ed3da251",
+      "question": "What specific grain refinement mechanisms in SLM led to the 13.4 μm grains and 6.59 μm dendrites compared to the much larger as-cast sizes?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The paper attributes hardness to refinement but does not explain the physical origin of the specific size reduction.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the extremely fine grains and dendrites produced in the HEA sample by SLM had sizes of 13.4 μm and 6.59 μm, respectively, which are far smaller than those observed in as-cast samples."
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC6427779::reader_question::149cf9c786a00d2e",
+      "question": "Which specific 'four kinds of superalloys' and 'HEA' were used as the baseline for the microhardness comparison reaching 826 Hv?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Identifying the specific superalloys is crucial to evaluate the magnitude of the performance gain claimed.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "which is much higher than the microhardness data of HEA a , pure Nb, Mo, Ta, W, and four kinds of surperalloys."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::c00b8a9a10bad73b",
+      "question": "What electrochemical conditions or surface preparation were required to measure the extremely low current of 8.716 × 10 −11 A for the NbMoTaW sample?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Measuring currents two orders of magnitude lower than steel requires specific instrumentation sensitivity and noise control.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "for NbMoTaW is I corrH = 8.716 × 10 −11 A, and for 316 L steel, I corrS = 8.815 × 10 −9 A"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::cffd861ef59be0ca",
+      "question": "Is the 826 Hv microhardness value a Vickers hardness measured on the as-built surface, or did it require polishing and etching to remove the SLM roughness?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "SLM surface roughness can artificially inflate microhardness readings if not properly accounted for.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the microhardness of NbMoTaW HEA s can reach 826 Hv"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC6427779::reader_question::34503d5be4d28a93",
+      "question": "How does the 'negative deviation (no more than 5%)' in molar ratio specifically alter the local chemical potential and affect the observed corrosion resistance?",
+      "question_type": "rationale",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "While the text claims composition deviation doesn't influence phase, the corrosion mechanism is highly sensitive to local stoichiometry.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the element with the lowest melting point and density showed a negative deviation (no more than 5%) of molar ratio in the fabricated alloy."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC6427779::reader_question::50b45772e185ed4c",
+      "question": "Does the claim that 'composition deviation does not influence the phase and microstructure' hold true for the specific Nb-rich segregation zones that might form during SLM?",
+      "question_type": "counterfactual",
+      "reading_step": "find_boundary",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Nb often segregates in HEAs; the text's blanket statement needs verification against actual microstructural analysis.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Fortunately, as a HEA, the constituent range of 5–35% is acceptable and the composition deviation does not influence the phase and microstructure."
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC6427779::reader_question::85a0f95d2d9e0a29",
+      "question": "What specific instrument or calibration standard was used to ensure the accuracy of the I_corr measurements which differ by two orders of magnitude?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Two orders of magnitude difference is significant, but requires verification of the measurement technique's detection limit.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the free-corrosion current of HEA is reduced by two orders of magnitude compared with 316 L steel."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC6427779::reader_question::29d8fb02632ad7d7",
+      "question": "How does the 'energy absorption of powders' mentioned in the context specifically correlate with the observed 'negative deviation' in the final composition?",
+      "question_type": "rationale",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The text links powder properties to composition deviation but omits the specific physical mechanism of this relationship.",
+      "source_section": "Results And Discussion.part6",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "because of the melting point, liquid density, particle size, and energy absorption of powders, the element with the lowest melting point and density showed a negative deviation"
       ],
       "confidence": 0.75
     }

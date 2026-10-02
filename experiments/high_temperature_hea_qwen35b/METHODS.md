@@ -190,3 +190,35 @@ The run produced 1,271 role claims and 81 questions. Ten papers produced no acce
 this is an intentional no-quota behavior. Across the corpus, 191 model candidates were rejected
 for non-verbatim spans, invalid role references, malformed question syntax, or other schema
 violations. All persisted items passed deterministic revalidation.
+
+## 11. High-recall reader-question generation
+
+The 81-question run above intentionally optimized precision for hypothesis-planning decisions and
+therefore does not represent the volume of questions a scientist naturally asks while reading.
+The high-recall pass preserves the reconciled roles but replaces the question-generation stage.
+
+The XML-derived text is read in approximately 450-word windows with 50-word overlap. For each
+window, Qwen receives the paper title, section and progress, the preceding passage tail, and the 12
+most recent accepted questions as continuity state. The model generates multiple questions per
+claim or methodological choice across 14 types and ten reading steps. Questions may be directly
+relevant, adjacent transfers, or exploratory extensions; relevance is metadata for later
+filtering, not an acceptance gate.
+
+Every accepted question contains one exact contiguous evidence span from the current passage.
+Continuity state is explicitly prohibited as evidence. Deterministic validation rejects malformed
+or non-verbatim items, and only exact duplicates are removed across overlapping chunks.
+Near-duplicates remain because this stage optimizes recall. Each completed chunk is atomically
+checkpointed using paper and chunk hashes, allowing interruption-safe resume. Four paper workers
+feed the four Qwen server slots while preserving sequential reading state within each paper.
+
+The complete run processed 775 reading chunks. It made 730 new model calls and reused 46
+checkpointed chunks; one oversized response was recovered by splitting its passage. Deterministic
+validation retained 8,848 questions and audited 1,914 rejected candidates. All 50 papers produced
+questions, with a mean of 176.96, median of 168.5, and range of 79–314 questions per paper.
+Every persisted evidence span was an exact substring of the XML-derived paper text (100% grounding;
+zero invalid persisted items).
+
+The accepted questions cover all configured reader modes: 6,809 direct, 1,995 adjacent, and 44
+exploratory questions; and intents of understand (2,968), evaluate (3,543), apply (397), replicate
+(1,477), and extend (463). The full type and reading-step distributions are stored in
+`results/reader_question_evaluation.json`.

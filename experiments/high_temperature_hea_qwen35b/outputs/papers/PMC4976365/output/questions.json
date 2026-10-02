@@ -1,45 +1,2050 @@
 {
-  "schema_version": "role-question-1.0",
+  "schema_version": "reader-question-3.0",
   "paper_id": "PMC4976365",
+  "generation_mode": "high_recall_reader_questions",
+  "steps": [
+    "read overlapping paper passage",
+    "carry recent paper-reading state",
+    "generate many passage-triggered questions",
+    "validate exact source grounding and schema",
+    "remove exact duplicates only",
+    "link questions to overlapping reconciled roles"
+  ],
+  "chunks_processed": 12,
+  "model_calls": 12,
+  "resumed_chunks": 0,
   "questions": [
     {
-      "question_id": "PMC4976365::decision_question::fb7cbddd0a026770",
-      "question": "Does the proposed ternary-based force field for Al0.1CrCoFeNi maintain accuracy at experimentally relevant strain rates (~10^2 s^-1), given the current model requires ~10^10 s^-1 to observe clustering transitions within feasible simulation times?",
-      "question_type": "intervention",
-      "rationale": "Answering this determines if the current force field can be used to predict deformation behavior under realistic conditions, or if significant parameter recalibration is needed to bridge the 8-order-of-magnitude strain rate gap.",
-      "decision_use": "Decides whether to use the current potential for high-strain rate predictions or to invest in developing a new potential/acceleration method capable of simulating quasi-static deformation.",
+      "question_id": "PMC4976365::reader_question::eb339d9d4858d014",
+      "question": "What specific force fields or potential parameters are proposed to overcome the 'absence of applicable force fields' mentioned?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "To understand the core methodological contribution and whether it solves the stated limitation.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
       "grounded_role_refs": [
-        "constraint:1",
-        "hypothesis_statement:1"
-      ],
-      "answer_requirements": [
-        "Run MD simulations of Al0.1CrCoFeNi at 10^2 s^-1 strain rate using the proposed potential and compare the clustering transition strain and magnitude to the 10^10 s^-1 baseline results."
+        "hypothesis_statement:0"
       ],
       "evidence_spans": [
-        "Higher strain rates, ~10 10 s −1 , are chosen to provide predictions within reasonable computational wall-clock times due to length and time scale limitations in MD simulations. This trend restricts the use of experimentally-realizable high strain rates, ~10 2 s −1 .",
-        "However, high-strain compression can induce a clustering-to-ordering transition in these multi-element materials."
+        "To extend investigations, we propose a set of intermolecular potential parameters for a quinary Al-Cr-Co-Fe-Ni alloy"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::6f004524cd6dccde",
+      "question": "How exactly is the combination of 'Embedded Atom Method and Lennard-Jones potential' implemented to model this specific quinary system?",
+      "question_type": "method",
+      "reading_step": "clarify",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The mechanism relies on a hybrid potential; the specific implementation details are crucial for replication.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [
+        "hypothesis_statement:0"
+      ],
+      "evidence_spans": [
+        "using the available ternary Embedded Atom Method and Lennard-Jones potential in classical molecular-dynamics simulations"
       ],
       "confidence": 0.9
     },
     {
-      "question_id": "PMC4976365::decision_question::49151e75622a2d34",
-      "question": "Is the observed clustering-to-ordering transition in Al0.1CrCoFeNi at high strain primarily driven by the spinodal instability (Tsp ≈ 840 K) predicted by the force field, or by the thermal disorder induced above 500 K, given the competing mechanisms?",
-      "question_type": "discrimination",
-      "rationale": "The paper attributes clustering to spinodal instability and disorder to temperature effects; distinguishing the dominant driver at high strain is essential for selecting the correct control parameter (temperature vs. strain rate).",
-      "decision_use": "Informs whether the experimental design should focus on maintaining temperatures below 500 K to preserve order or targeting the spinodal temperature to trigger the transition.",
-      "grounded_role_refs": [
-        "hypothesis_statement:3",
-        "mechanism_principle:0",
-        "evidence_result:0"
-      ],
-      "answer_requirements": [
-        "Perform simulations at constant strain rates with varying temperatures (e.g., 400 K, 600 K, 850 K) and measure the onset strain of the clustering transition to determine if it correlates with Tsp or the disorder threshold."
-      ],
+      "question_id": "PMC4976365::reader_question::0559c038903817e1",
+      "question": "What specific KKR-CPA calculations were used as the reference to validate the MD-derived properties?",
+      "question_type": "evidence",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Understanding the validation benchmark is essential to assess the credibility of the new potential.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
       "evidence_spans": [
-        "The diverging Al-Ni pair of α αβ ( k = [000]) at the spinodal temperature (T sp ) indicates the absolute instability of the alloy that forces clustering in Al 0.1 CrCoFeNi",
-        "However, as a temperature rise induces disorder in the atomistic rearrangement, this correlation decreases above 500 K in the simulated HEA."
+        "The simulation results are validated by a comparison to first-principles Korringa-Kohn-Rostoker (KKR) - Coherent Potential Approximation (CPA) [KKR-CPA] calculations"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::4ff17980a295aaa0",
+      "question": "Which specific properties (lattice constants, bulk moduli, etc.) were found to be in quantitative agreement?",
+      "question_type": "evidence",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Knowing which properties matched validates the specific scope of the potential's accuracy.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The simulation results are validated by a comparison to first-principles Korringa-Kohn-Rostoker (KKR) - Coherent Potential Approximation (CPA) [KKR-CPA] calculations for the HEA structural properties (lattice constants and bulk moduli), relative stability, pair probabilities, and high-temperature short-range ordering"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::5ba3e519b9c7cd07",
+      "question": "What is the threshold of Al content (x) below which 'large chemical clustering' is observed?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "This defines the compositional regime of interest for the observed phenomena.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "We study Al x CrCoFeNi for Al ranging from 0 ≤ x ≤2 mole fractions, and find that the HEA shows large chemical clustering over a wide temperature range for x < 0.5"
+      ],
+      "confidence": 1.0
+    },
+    {
+      "question_id": "PMC4976365::reader_question::1514705f033556dc",
+      "question": "What specific 'atomistic rearrangements' constitute the 'clustering-to-ordering transition' under compression?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "To understand the fundamental physical mechanism driving the phase change.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "At various temperatures high-strain compression promotes atomistic rearrangements in Al 0.1 CrCoFeNi, resulting in a clustering-to-ordering transition"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::66dd065f4f238a45",
+      "question": "Why is the clustering-to-ordering transition 'absent for tensile loading' in this alloy?",
+      "question_type": "rationale",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Understanding the asymmetry between compression and tension reveals the stress-state dependence of the mechanism.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "resulting in a clustering-to-ordering transition that is absent for tensile loading"
       ],
       "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::f55a1b3b4950eb3d",
+      "question": "What are the specific mechanisms behind the 'large fluctuations under stress' mentioned in the context of thermo-plastic instability?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "To understand the cause of the instability and its link to deformation failure.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Large fluctuations under stress, and at higher temperatures, are attributed to the thermo-plastic instability in Al 0.1 CrCoFeNi"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::1ceca8baa1784205",
+      "question": "At what specific temperatures does the 'wide temperature range' for chemical clustering extend up to?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "apply",
+      "relevance": "direct",
+      "rationale": "The temperature limits are critical for applying this material to service conditions.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "find that the HEA shows large chemical clustering over a wide temperature range for x < 0.5"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::f97c110064ec8214",
+      "question": "How does the 'entropy increases as N ln N' scaling compare quantitatively to the 'interacting pairs increase as N^2' in this specific quinary system?",
+      "question_type": "rationale",
+      "reading_step": "test_evidence",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "To evaluate the theoretical basis for the ordering enthalpy overcoming entropy at low temperatures.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "With increasing the number of alloying elements (N), it should be noted, however, that the entropy increases as N ln N whereas interacting pairs that may drive chemical order increase as N 2"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC4976365::reader_question::29bb23469631bdab",
+      "question": "What are the specific strain rates defined as 'low strain rates' versus 'high-strain rates' in the context of the deformation mechanisms discussed?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "apply",
+      "relevance": "adjacent",
+      "rationale": "To distinguish between the deformation regimes (slip/twinning vs. adiabatic shear bands).",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The deformation process in HEAs for quasi-static loading at low strain rates (10 −2 to 10 −4 s −1 ) reveals the contributions of slip and twinning mechanisms"
+      ],
+      "confidence": 1.0
+    },
+    {
+      "question_id": "PMC4976365::reader_question::1acc030e040a92d4",
+      "question": "Does the study provide atomic-scale images or data confirming the 'localized strain accumulating along the adiabatic shear bands'?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "To verify if the claim about shear bands is supported by the MD simulation data presented.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The deformation behavior at high-strain rates (<10 2 s −1 ), even for conventional alloys undergoing dynamic loading, is complex due to the localized strain accumulating along the adiabatic shear bands"
+      ],
+      "confidence": 0.6
+    },
+    {
+      "question_id": "PMC4976365::reader_question::a466f9006fd850d4",
+      "question": "What is the critical strain rate threshold where the transition from slip/twinning to amorphization or shear banding occurs in this specific HEA?",
+      "question_type": "boundary",
+      "reading_step": "find_boundary",
+      "reader_intent": "apply",
+      "relevance": "direct",
+      "rationale": "To identify the operational limits of the material's crystalline structure under deformation.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "High-strain rates in a crystalline lattice can lead to amorphization"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC4976365::reader_question::8c61948006a8d72f",
+      "question": "Are the 'first-principles' KKR-CPA calculations performed for the specific Al0.1CrCoFeNi composition or a general model?",
+      "question_type": "method",
+      "reading_step": "clarify",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "To ensure the validation benchmark matches the specific alloy composition being studied.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The simulation results are validated by a comparison to first-principles Korringa-Kohn-Rostoker (KKR) - Coherent Potential Approximation (CPA) [KKR-CPA] calculations for the HEA structural properties"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::c23a8c65cafb9907",
+      "question": "What specific 'thermo-plastic instability' criteria are used to identify the transition from stable to unstable deformation?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "To understand the analytical method used to detect the instability mentioned.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Large fluctuations under stress, and at higher temperatures, are attributed to the thermo-plastic instability in Al 0.1 CrCoFeNi"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::b27073ac37dd3980",
+      "question": "How does the 'operational definition' of HEAs based on configurational entropy hold when the mixing entropy is not sufficient to prevent ordering at low temperatures?",
+      "question_type": "assumption",
+      "reading_step": "assess_relevance",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "To challenge the foundational definition of HEAs in the context of this specific alloy's low-temperature behavior.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Often, an operational definition for HEAs is a solid-solution phase stabilized by the higher configurational entropy that increases with increasing temperature"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC4976365::reader_question::e91ca843d4d9383b",
+      "question": "Is the 'amorphization' at high strain rates a reversible or permanent structural change in this simulation?",
+      "question_type": "follow_up",
+      "reading_step": "plan_follow_up",
+      "reader_intent": "extend",
+      "relevance": "adjacent",
+      "rationale": "To understand the microstructural consequences and potential for recovery after deformation.",
+      "source_section": "Abstract.part1",
+      "chunk_index": 0,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "High-strain rates in a crystalline lattice can lead to amorphization"
+      ],
+      "confidence": 0.6
+    },
+    {
+      "question_id": "PMC4976365::reader_question::5ab16bf36acb3013",
+      "question": "Which specific intermolecular potentials (EAM or LJ) from which literature sources are used as the basis for the new Al-Cr-Co-Fe-Ni force field?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The text mentions using 'available ternary EAM and LJ potentials' but does not cite the specific sources or parameterizations, which are critical for replication.",
+      "source_section": "Abstract.part2",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "using the available ternary Embedded Atom Method (EAM) and Lennard-Jones (LJ) potentials"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::cc6bb4d02821cdce",
+      "question": "What specific validation criteria or error margins were accepted to declare the new force-field potentials 'validated' against experiments and KKR-CPA?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The claim of validation is made, but the quantitative metrics (e.g., % error in lattice constant) are not specified in this passage.",
+      "source_section": "Abstract.part2",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "validate our force-field potentials by the comparison with available experiments and new first-principles Korringa-Kohn-Rostoker (KKR) - Coherent Potential Approximation (CPA) electronic-structure predictions"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::d881811db20f5880",
+      "question": "Does the KKR-CPA calculation in this study explicitly resolve the 'pair by pair' electronic origin for clustering, or does it provide a general trend?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The passage claims KKR-CPA predicts behavior 'pair by pair', which is a specific level of detail that needs verification against the method's typical output.",
+      "source_section": "Abstract.part2",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "the underlying electronic origin for the chemical clustering or ordering behavior – pair by pair"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::1da58e6b98fded45",
+      "question": "How does the 'system-size-limiting' nature of first-principles calculations specifically constrain the observation of deformation dynamics in this alloy?",
+      "question_type": "assumption",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The text states first-principles are 'system-size-limiting' but does not define the specific size limits or the resulting physical artifacts that necessitate MD.",
+      "source_section": "Abstract.part2",
+      "chunk_index": 1,
+      "grounded_role_refs": [
+        "prior_approach:0"
+      ],
+      "evidence_spans": [
+        "computationally-expensive and system-size-limiting first-principles calculations, which are restricted in scope for understanding the deformation dynamics of very large systems"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC4976365::reader_question::31c5a6553f77ec2a",
+      "question": "What is the specific quenching rate range applied in the MD simulations to study the clustering-ordering characteristics?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The passage ends by mentioning the roles of 'temperature and quenching rates' but does not specify the values used in the simulation protocol.",
+      "source_section": "Abstract.part2",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The roles of temperature and quenching rates on the clustering-ordering characteristics"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::006fc56ec69a7ef6",
+      "question": "Is the 'Al 0.1 CrCoFeNi' model HEA composition fixed at a single stoichiometry, or does the force field support compositional variations?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "apply",
+      "relevance": "direct",
+      "rationale": "The paper focuses on a 'model quinary' with a specific composition, but it is unclear if the derived parameters are transferable to other Al contents.",
+      "source_section": "Abstract.part2",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "relevant force-field parameters for a model quinary Al 0.1 CrCoFeNi HEA"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::321d2829544facd5",
+      "question": "How does the new force field handle the interaction between Aluminum and the other elements, given that Al often drives clustering in Al-containing HEAs?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Since the paper highlights 'chemical clustering' and Al is the minority element, understanding how the potential captures Al-specific interactions is crucial.",
+      "source_section": "Abstract.part2",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "derive relevant force-field parameters for a model quinary Al 0.1 CrCoFeNi HEA"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC4976365::reader_question::93b67afb852a34e4",
+      "question": "Does the 'lack of robust intermolecular potentials' apply to all multi-element alloys or specifically to the Al-Cr-Co-Fe-Ni system?",
+      "question_type": "assumption",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "The text cites a general lack of potentials as the motivation, but the extent of this limitation for this specific quinary system needs clarification.",
+      "source_section": "Abstract.part2",
+      "chunk_index": 1,
+      "grounded_role_refs": [
+        "problem_motivation:2"
+      ],
+      "evidence_spans": [
+        "Classical MD simulations are unable to provide quantitatively accurate predictions of mechanical deformation for these multi-element alloys due to the lack of robust intermolecular potentials"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::716af5d6fdfbfe53",
+      "question": "How exactly does the pair correlation function g_alpha-beta(r) distinguish between clustering and ordering in this specific alloy model?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The passage mentions using g(r) to 'identify ordering and clustering mechanisms', but the specific signature or criterion used for identification is not detailed.",
+      "source_section": "Abstract.part2",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "pair correlation function [g(|r | ) or g α − β (r)] that helps identify ordering and clustering mechanisms"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::73be3dd3853945af",
+      "question": "Are the 'available experiments' used for validation published in the same year or are they historical data from the literature?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The text mentions comparing with 'available experiments' but does not specify the source or date, which affects the relevance of the validation.",
+      "source_section": "Abstract.part2",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "validate our force-field potentials by the comparison with available experiments"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC4976365::reader_question::3b1eed1f96e357a1",
+      "question": "What specific 'first-principles' software or functional (e.g., DFT, GGA) is implied by the term 'KKR-CPA' in this context?",
+      "question_type": "method",
+      "reading_step": "clarify",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "While KKR-CPA is named, the specific implementation details or exchange-correlation functionals used are not provided in this passage.",
+      "source_section": "Abstract.part2",
+      "chunk_index": 1,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "new first-principles Korringa-Kohn-Rostoker (KKR) - Coherent Potential Approximation (CPA) electronic-structure predictions"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::63e075e2528cf4b0",
+      "question": "What specific numerical values or ranges for 'quenching rates' were applied to observe the clustering-ordering characteristics?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The text mentions investigating quenching rates but does not specify the values, which are critical for replicating the study.",
+      "source_section": "Abstract.part3",
+      "chunk_index": 2,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The roles of temperature and quenching rates on the clustering-ordering characteristics in Al 0.1 CrCoFeNi are also investigated."
+      ],
+      "confidence": 1.0
+    },
+    {
+      "question_id": "PMC4976365::reader_question::b86eda13bb9a878e",
+      "question": "What specific intermolecular potentials or basis sets underpin the 'KKR-CPA method' used to calculate the thermodynamic linear-response parameters?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Understanding the specific implementation of KKR-CPA is crucial to assess the accuracy of the chemical interchange energies derived.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "thermodynamic linear-response based on the KKR-CPA method"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::0124bf8a4b08f755",
+      "question": "How do the 'positive formation enthalpies' of both A1 and A2 phases quantitatively justify the prediction of clustering rather than ordering in this specific alloy?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Positive enthalpy typically implies phase separation or clustering, but the mechanism for why it dominates over ordering needs clarification.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [
+        "hypothesis_statement:2"
+      ],
+      "evidence_spans": [
+        "positive formation enthalpies of A1 and A2 phases imply that clustering is expected in the HEA"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::6635dd97b5a9e50a",
+      "question": "What is the exact numerical range of 'quenching rates' applied in the MD simulations from 2,200 K to 300 K?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The quenching rate is a critical parameter controlling the resulting microstructure, yet the specific value is omitted here.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Al 0.1 CrCoFeNi is quenched from the melt phase, starting at 2,200 K"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::cbe7382dc6091c00",
+      "question": "Why was 2,200 K chosen as the starting temperature for quenching when the experimental melting point is reported around 1,690 K?",
+      "question_type": "rationale",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Starting significantly above melting ensures a fully disordered melt, but the specific margin (approx. 500 K) needs justification.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "starting at 2,200 K"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::19d011b834186bb5",
+      "question": "Does the 'thermodynamic cost to swap' (chemical interchange energy) account for vibrational entropy contributions at the simulation temperatures?",
+      "question_type": "assumption",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Chemical interchange energies are often electronic; omitting vibrational terms could skew predictions at high temperatures.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "thermodynamic cost to swap α and β atom types at two distinct sites"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC4976365::reader_question::10a9b5183d65c24d",
+      "question": "How does the 'larger atom size' of Aluminum specifically alter the lattice ordering parameters in the A1 vs A2 phase transition region?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "Atomic size mismatch is a key driver for strain, but the quantitative link to the specific phase boundaries is needed.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "due to the larger atom size, compared to other constituents, which considerably changes the lattice ordering"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::e9258a617d941b56",
+      "question": "Are the 'semi-empirical CALPHAD calculations' used for comparison in the range x=0.1 consistent with the KKR-CPA predictions for clustering?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Validation against CALPHAD is mentioned, but the degree of agreement or specific discrepancies at low Al content is not detailed.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Our findings are in agreement with experimental observations [24] and semi-empirical CALPHAD calculations [29]"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::d9915d2d5c4d5094",
+      "question": "What specific 'Fourier wave-vector' k values correspond to the maxima in the chemical interchange energy that define the dominant clustering mode?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text mentions k=k0 defines the mode, but the specific reciprocal lattice vector for this system is not provided.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "k = k 0 , for a specific α-β pair, it defines the unstable chemical mode and the dominant pair correlations"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::757b4e090512feee",
+      "question": "Does the 'charge self-consistent potentials' approach in the KKR-CPA method capture the specific electronic screening effects unique to the Al-Cr bond?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Al interactions are often complex; knowing if charge self-consistency handles this specific pair is vital for mechanism validity.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "using the thermodynamic linear-response based on the KKR-CPA method and its charge self-consistent potentials and densities"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC4976365::reader_question::00dc7447477f5103",
+      "question": "What specific experimental data points from reference [24] were used to validate the 'similar global stability' predicted by the simulations?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text cites agreement but does not list the specific phase fractions or transition temperatures from the experiment.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Our findings are in agreement with experimental observations [24]"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::5fa1cefd7bd2e080",
+      "question": "Is the 'Warren-Cowley short-range order' parameter calculated for all possible pairs, or only the specific Al-Transition Metal pairs?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Understanding the scope of the SRO analysis determines if the clustering mechanism is fully characterized.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "We also calculate the Warren-Cowley short-range order (SRO) parameters, α αβ ( k ), for all α-β pairs"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::1ac8bd67d351d4d0",
+      "question": "What is the specific definition of 'unstable chemical mode' in the context of the positive formation enthalpy and the resulting clustering behavior?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The term 'unstable' implies a dynamic or thermodynamic instability that drives the system; the precise physical meaning is needed.",
+      "source_section": "Results And Discussion.part1",
+      "chunk_index": 3,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "it defines the unstable chemical mode and the dominant pair correlations"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::cb018ac448512875",
+      "question": "Does the specific wave-vector k = [000] for the Al-Ni pair imply the formation of specific Al-Al or Ni-Ni clusters, or could other local environments be present?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text links a specific k-vector to clustering in real space, but the exact nature of the resulting local atomic arrangement needs verification.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "manifested in the observable α αβ ( k ) through the Al-Ni pair with a peak at k = [000] (i.e., Al-Al or Ni-Ni pairs clusters in real space)"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::160a17160fcc71d8",
+      "question": "What is the physical significance of the weak Al-Cr nearest-neighbor ordering appearing at k = [001] compared to the strong Al-Ni clustering at the Gamma point?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Understanding why one interaction dominates while another remains weak helps identify the primary drivers of the alloy's phase stability.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "a weak Al-Cr nearest-neighbor ordering at k = [001] (X-point)"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::9279cd8b9d3b8112",
+      "question": "How is the spinodal temperature T_sp = 840 K determined, and does the divergence of the Al-Ni pair at this temperature strictly imply absolute instability?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The connection between a calculated thermodynamic parameter and the onset of absolute instability is a critical theoretical assumption.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [
+        "hypothesis_statement:3"
+      ],
+      "evidence_spans": [
+        "The diverging Al-Ni pair of α αβ ( k = [000]) at the spinodal temperature (T sp ) indicates the absolute instability of the alloy that forces clustering"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::f4aeea6489878fa8",
+      "question": "Why does the calculated spinodal temperature of 840 K show good agreement with the experimental range of 813–823 K for a broader composition range 0 ≤ x ≤ 0.3?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Comparing a specific prediction for x=0.1 against a general experimental range tests the robustness and transferability of the model.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [
+        "evidence_result:0"
+      ],
+      "evidence_spans": [
+        "The calculated spinodal temperature, T sp = 840 K, shows good agreement with the experimentally-observed transition temperature of 813–823 K for Al x CrCoFeNi, 0 ≤ x ≤ 0.3 [24]"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::f79537869cae506d",
+      "question": "What specific lattice parameters (a0) were predicted by LDA, GGA, and GGA-c, and why does the GGA-c correction yield the best match to room-temperature measurements?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The choice of exchange-correlation functional significantly impacts structural predictions, requiring justification for the superior performance of GGA-c.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "We predict the lattice parameter ( a 0 ) from KKR-CPA as 3.45 Å through local density approximation (LDA), 3.51 Å from the generalized gradient approximation (GGA), and 3.57 Å from the GGA corrected (GGA-c) for thermal expansion from zero-point phonon contributions from Grüneison theory"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::c8d696d75e48f4d0",
+      "question": "Is the MD simulation lattice constant of 3.55 Å at 0 K consistent with the GGA-c prediction of 3.57 Å given the thermal expansion corrections included in the latter?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Comparing MD results at 0 K with DFT results corrected for thermal effects tests the consistency of the two simulation methods.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [
+        "evidence_result:1"
+      ],
+      "evidence_spans": [
+        "The MD simulations find 3.55 Å at 0 K, in reasonable agreement with KKR and experiment"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC4976365::reader_question::c2569644737b60ec",
+      "question": "What is the numerical value of the bulk modulus B = 1.58 MPa obtained from GGA-c, and is this unit (MPa) appropriate for a metal with a bulk modulus typically in the range of 100 GPa?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "A bulk modulus of 1.58 MPa is physically unrealistic for a refractory metal alloy, suggesting a potential typo or unit conversion error in the text.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "KKR-CPA also yield improved structural properties (e.g., lattice constant, ‘ a 0 ’, and bulk modulus, ‘B’) using GGA-c, i.e., a 0 = 3.57 Å and B = 1.58 MPa at 300 K"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::342067e48595906a",
+      "question": "How exactly is the bulk modulus 'B' evaluated in the MD simulations, and does the method of evaluating curvature at a0 (3.55 Å) introduce any specific artifacts?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The methodology for deriving mechanical properties from energy curves needs scrutiny to ensure accuracy and reproducibility.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "MD simulations [31] [32] finds B by evaluating the curvature of the energy curve ( Fig. 4 ) at a 0 (3.55 Å)"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::7f956e47ec91cf83",
+      "question": "What specific 'new force fields' are implied for the MD simulations mentioned, and do they account for the specific Al-Cr interactions observed in the KKR-CPA results?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The text mentions comparing to MD simulations from new force fields but does not detail them, which is crucial for interpreting the clustering mechanism.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "and that can be compared to MD simulations from new force fields"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::a75ee1d58711a8a7",
+      "question": "Does the 'probability sum rules' mentioned for multiple pairs having peaks at k0 limit the ability to distinguish between competing clustering modes?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The mathematical constraints on pair correlations could obscure the interpretation of which specific interactions are dominant.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "a typical one will be dominant and other pairs will show correlations due to probability sum rules [28]"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC4976365::reader_question::c62139b904878519",
+      "question": "What is the specific definition of the 'EAM-LJ force-field' used for validation, and how does its parameterization handle the long-wavelength clustering of Al and Ni?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "adjacent",
+      "rationale": "The validation of the force field is contingent on its ability to capture the specific clustering physics described earlier.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "For the validation of the proposed EAM-LJ force-field, before analyzing structural and deformation behavior"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::d2d7d1df6cbb9b39",
+      "question": "What is the magnitude of the discrepancy between the KKR-CPA lattice constant (3.57 Å) and the experimental measurement (3.57 Å), and is the agreement considered accidental given the approximations?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Even though values match, understanding the precision and sources of error is necessary to trust the model's predictive power for other properties.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "which is in agreement with room-temperature measurements (3.57 Å) [30]"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::f4485297e743c580",
+      "question": "What specific data points from reference [31] and [32] were used to validate the bulk modulus calculation in the MD simulations?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "The text cites these references for the MD bulk modulus calculation but does not provide the specific values or methods used in those papers.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "MD simulations [31] [32] finds B by evaluating the curvature of the energy curve ( Fig. 4 ) at a 0 (3.55 Å)"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC4976365::reader_question::b1bab86bda1b68ce",
+      "question": "If the composition x were increased beyond 0.1, would the Al-Ni clustering at k=[000] remain the dominant mode, or would the weak Al-Cr ordering at k=[001] become significant?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "extend",
+      "relevance": "adjacent",
+      "rationale": "The paper cites experimental data for x up to 0.3, prompting a question about the evolution of the dominant chemical mode with composition.",
+      "source_section": "Results And Discussion.part2",
+      "chunk_index": 4,
+      "grounded_role_refs": [
+        "evidence_result:0"
+      ],
+      "evidence_spans": [
+        "experimentally-observed transition temperature of 813–823 K for Al x CrCoFeNi, 0 ≤ x ≤ 0.3 [24]"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::6b45f7e53a7401e2",
+      "question": "What specific numerical values for lattice constant a0 and bulk modulus B are listed in Table 1 for x = 0.1, 1.0, and 1.5, and how do they compare to the 3.55 Å and 1.58 MPa values mentioned earlier?",
+      "question_type": "evidence",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text references Table 1 for quantitative validation but does not provide the data in this passage.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "a detailed quantitative comparison for ‘ a 0 ’ and ‘B’ for Al x CrCoFeNi at x = 0.1, 1.0 and 1.5 mole fraction are given in Table 1"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::371c157e9354169b",
+      "question": "Does the unit 'MPa' for bulk modulus B = 1.58 MPa in the previous section represent a typo for GPa, and is this unit consistency maintained in the new Table 1 data?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Previous context noted a suspiciously low unit for bulk modulus; checking Table 1 is crucial for validation.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "evaluating the curvature of the energy curve ( Fig. 4 ) at a 0 (3.55 Å)"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::c2562eb9a323741f",
+      "question": "What specific 'unfavorable neighboring atomic pairs' are identified in the g(r) analysis, and how does the text quantify 'no significant contribution' for unlike pairs other than Al-Cr?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The claim of clustering relies on distinguishing significant vs. insignificant pair correlations.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "While the Al-Al pair correlation dominates all the like pairs, no significant contribution is noted from unlike pairs except Al-Cr [ Fig. 5a ]"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::6d3bb456cd4186f1",
+      "question": "Why does the linear-response method exclude the 'size effect' of local site displacements, and how does this specific omission cause the discrepancy in Al-Ni probability observed in Fig. 6?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Understanding the source of the discrepancy between first-principles and MD is key to validating the force field.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [
+        "mechanism_principle:1"
+      ],
+      "evidence_spans": [
+        "The difference in the Al-Ni probability is attributed to the fact that the “size effect”, which includes local site displacements is not included in the ( k ;T) calculations"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::9c7b3e9badd17f4e",
+      "question": "How exactly is 'size effect' defined in the context of (k;T) calculations, and what would be the expected outcome if it were included in the linear-response model?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "extend",
+      "relevance": "adjacent",
+      "rationale": "Clarifying the definition of the missing term helps assess the robustness of the theoretical comparison.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [
+        "mechanism_principle:1"
+      ],
+      "evidence_spans": [
+        "The difference in the Al-Ni probability is attributed to the fact that the “size effect”, which includes local site displacements is not included in the ( k ;T) calculations"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::a0f459ed4d718ed3",
+      "question": "What is the specific magnitude of the 'marginal increase' in the Al-Al peak g(r) between 300 K and 500 K, and is this increase statistically significant given the simulation noise?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text attributes this increase to cluster growth, but without numbers, the claim is qualitative.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [
+        "causal_claim:0"
+      ],
+      "evidence_spans": [
+        "There is a marginal increase in the peak, g(r), of the Al-Al pairs in Fig. 7 while going from 300 to 500 K, which is attributed to an initial increase in the size of the Al-Al cluster size"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::4ebb78eb7b8189bb",
+      "question": "What specific 'atomistic rearrangement' mechanism causes the Al-Al correlation to decrease above 500 K, and how does this relate to the spinodal temperature of 840 K mentioned earlier?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Connecting the thermal disorder onset to the previously identified spinodal temperature is necessary for a complete picture.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [
+        "mechanism_principle:0"
+      ],
+      "evidence_spans": [
+        "However, as a temperature rise induces disorder in the atomistic rearrangement, this correlation decreases above 500 K in the simulated HEA"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::f0253d133371d873",
+      "question": "Is the 'thermo-plastic instability' in the shear band caused by adiabatic heating or a phase transformation, and does the text provide thermal conductivity data to support the heating model?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The stress drop is attributed to thermal softening, but the physical origin of the instability needs verification.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Above the flow stress, the thermo-plastic instability in the shear band causes thermal softening that dominates the stress-strain regime till an engineering strain of 0.6%"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::c49341db91c0e93b",
+      "question": "How does the 'drastic drop in flow stress' at 77 K and 300 K compare quantitatively to the drop at 700 K, given the text states softening is 'more profound' at higher temperatures?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The statement that softening is more profound at high temperatures seems counter-intuitive if the drop is 'drastic' at low temps; clarification of the stress-strain curve shape is needed.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Thermal softening is more profound at elevated temperatures (700 K and above), as evident by the drastic drop in the flow stress at lower temperatures (77 K and 300 K)"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::c5aa8f72866b148b",
+      "question": "What is the exact engineering strain value where the 'consistent flow stress' resumes after the initial drop, and what microstructural mechanism stabilizes the stress at this point?",
+      "question_type": "limitation",
+      "reading_step": "identify_gap",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text cuts off at 'A consistent flow stress is observed', leaving the post-softening behavior undefined.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "A consistent flow stress is observed"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::79408824ecc036a5",
+      "question": "Why does the flow stress drop from 125 MPa to 90 MPa as temperature increases from 300 K to 700 K, and does this trend align with the thermal softening model or indicate a different deformation mechanism?",
+      "question_type": "rationale",
+      "reading_step": "assess_relevance",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Understanding the temperature dependence of flow stress is critical for determining the alloy's service limits.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "For compressive loading, a peak flow stress of ~125 MPa is recorded at 77 and 300 K, while it is ~90 MPa at 700 and 1,000 K"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::83018cf5732435ca",
+      "question": "Does the 'shear band' formation at 0.6% strain indicate a brittle-like failure or a localized ductile deformation, and how does the clustering of Al affect this localization?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "apply",
+      "relevance": "adjacent",
+      "rationale": "Linking the chemical clustering (Al-Al) to the mechanical failure mode is a key research question.",
+      "source_section": "Results And Discussion.part3",
+      "chunk_index": 5,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Above the flow stress, the thermo-plastic instability in the shear band causes thermal softening that dominates the stress-strain regime till an engineering strain of 0.6%"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::fe2d0782a3b10233",
+      "question": "What is the specific strain rate value of 10^10 s^-1 mentioned, and how does this high rate specifically drive the shear-induced disordering mechanism in this alloy?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text links the specific high strain rate to shock compression effects; understanding the threshold for this transition is critical.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Compression at the high-strain rate (10 10 s −1 ) in our investigation is identical to an shock compression treatment [35] ."
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::d04f2038cad42dae",
+      "question": "Why does the clustering phase dominate under tensile strain while the ordered phase forms under compressive strain, and does this imply a fundamental difference in the activation energy barriers for ordering?",
+      "question_type": "rationale",
+      "reading_step": "assess_relevance",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "The text explicitly contrasts the phase evolution in tension vs. compression, suggesting a strain-mode-dependent mechanism.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "However, for the corresponding tensile strain case, the clustering phase still dominates, as it induces a plastic flow condition, similar to a wire-drawing process. Thus, the transition to ordering state among the different elements of the Al 0.1 CrCoFeNi is possible only for the high compressive strain condition."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::9a64f9a52d46cfe5",
+      "question": "How do the stress fluctuations at elevated temperatures compare quantitatively to the instability fluctuations seen in Bulk Metallic Glasses (BMGs) cited in references [33] and [34]?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text draws an analogy to BMGs; determining the degree of similarity or difference is necessary for mechanistic validation.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "This thermo-plastic instability in Al 0.1 CrCoFeNi leads to shear-induced disordering similar to the structural changes arising in bulk metallic glasses (BMGs) [33] [34] ."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::e8fd955e4c31f32b",
+      "question": "What specific structural parameters (e.g., order parameter S) define the 'clustering to ordering transition' mentioned in relation to the pair correlations in Fig. 9?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The transition is described qualitatively via pair correlations, but a quantitative measure is needed for replication.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Under compressive loading the clustering to ordering transition occurs with the increase in unlike pair correlations (e.g., Al-Co andAl-Cr) and decrease in like pair correlations (e.g., Al-Al), Fig. 9 ."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::e25c37f7ad586932",
+      "question": "Does the 'abrupt increase' in flow stress beyond strain hardening indicate a specific phase transformation or a change in dislocation mechanisms, and is this observed at all temperatures?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text notes an abrupt stress increase after hardening; linking this to a microstructural cause is key.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Strain hardening at various temperatures occurs at approximately similar strains, and beyond it the flow stress abruptly increases."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::02e9e4275a793d15",
+      "question": "What specific microstructural features distinguish the 'wide spectrum of thermo-plastic instability fluctuations' from the standard shear band instability mentioned in the text?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text contrasts two types of instability; understanding their difference is essential for interpreting the failure modes.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The wide spectrum of thermo-plastic instability fluctuations at elevated temperatures is dissimilar to the instability found in shear bands of alloys under compressive loading conditions."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::73ec04003cfd48a5",
+      "question": "How does the 'wire-drawing process' analogy for tensile deformation explain the suppression of ordering in the clustering phase?",
+      "question_type": "rationale",
+      "reading_step": "assess_relevance",
+      "reader_intent": "apply",
+      "relevance": "adjacent",
+      "rationale": "The text uses an analogy; understanding the physical constraints of wire-drawing helps explain the lack of ordering.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "However, for the corresponding tensile strain case, the clustering phase still dominates, as it induces a plastic flow condition, similar to a wire-drawing process."
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC4976365::reader_question::c99005d0204e7c78",
+      "question": "What is the specific mechanism by which 'mechanical alloying and shock compression' of the Fe-Cu system [35] resulted in the A1-A2 transformation, and how does this map to the current HEA results?",
+      "question_type": "rationale",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The text relies on external literature [35] to explain the transformation; the mechanism in the literature must be understood to apply it here.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Literature also suggests that mechanical alloying and shock compression of the Fe-Cu alloy system results in the A1 - A2 transformation [35] ."
+      ],
+      "confidence": 0.65
+    },
+    {
+      "question_id": "PMC4976365::reader_question::f6afc108a3bb6910",
+      "question": "Does the 'absence of well-developed force-field functions' mentioned in the summary imply that the current force-field validation for structural properties is insufficient for accurate deformation predictions?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The summary frames the study as addressing a gap in force-fields; assessing the robustness of this solution is necessary.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Thus, we address the absence of well-developed force-field functions for"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::83c537a3fc5bf0f6",
+      "question": "How does the 'plastic flow occurs across the temperature range considered (77 K to 1,000 K)' in tension compare to the 'drastic drop in flow stress' seen in compression, and what does this imply about the material's ductility limits?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text contrasts tensile stability with compressive softening; this comparison defines the material's service envelope.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "In the case of tensile deformation [ Fig. 8b ], beyond the ultimate tensile stress (or critical flow stress) of ~75 MPa, a plastic flow occurs across the temperature range considered (77 K to 1,000 K)."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::54dc2a8d945cab3b",
+      "question": "What specific 'first-principles calculations' were used to validate the pair probabilities, and were these calculations performed on the exact Al 0.1 CrCoFeNi composition or a simplified model?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Validation is a cornerstone of the study; knowing the reference method and composition is essential for assessing credibility.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "In this report, we establish a force-field for a quinary Al-Cr-Co-Fe-Ni alloy and validate it by comparing structural properties, relative stability, and pair probabilities with first-principles calculations and limited experimental results."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::e662d98e5b36c378",
+      "question": "Why is strain hardening 'abruptly increasing' after the hardening regime in compression, whereas no strain hardening is observed in tension, and does this relate to the shear band dynamics?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text highlights a stark difference in hardening behavior between tension and compression, requiring a mechanistic explanation.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "No strain hardening is observed under tensile deformation."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::966e99b9892a3a3f",
+      "question": "Does the 'similar to the structural changes arising in bulk metallic glasses' analogy imply that the current HEA might exhibit glass-like shear band localization or amorphization under high strain rates?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "extend",
+      "relevance": "exploratory",
+      "rationale": "The text links the HEA behavior to BMGs; exploring the implications of this similarity for failure modes is valuable.",
+      "source_section": "Results And Discussion.part4",
+      "chunk_index": 6,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "This thermo-plastic instability in Al 0.1 CrCoFeNi leads to shear-induced disordering similar to the structural changes arising in bulk metallic glasses (BMGs) [33] [34] ."
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC4976365::reader_question::aa7eaa1363970698",
+      "question": "Which specific 'first-principles calculations' and 'limited experimental results' were used as the benchmark for validating the structural properties and pair probabilities?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "To assess the rigor of the potential validation and ensure the force-field is grounded in reliable data.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "validate it by comparing structural properties, relative stability, and pair probabilities with first-principles calculations and limited experimental results."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::7a0570b5c216881e",
+      "question": "What are the specific EAM-LJ parameter values provided for the self- and cross-interactions of Al, Cr, Co, Fe, and Ni in the alloy?",
+      "question_type": "replication",
+      "reading_step": "identify_gap",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The text states they provide parameters but does not list them in this passage, which is essential for independent reproduction.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "provide the EAM-LJ parameters to define the self- and cross-interactions of the participating elements in the alloy."
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::dc520bee5e4119fc",
+      "question": "What specific pair correlation functions or metrics define the 'clustering driven by Al-Ni pair correlations' and the resulting 'large clustering domains'?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Understanding the quantitative definition of clustering is necessary to interpret the simulation results accurately.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "electronic-structure-based linear-response calculations predict clustering driven by Al-Ni pair correlations (forcing Al-Al and Ni-Ni clustering behavior). The MD simulations are in agreement with the clustering trend, as given by the large clustering domains of like pairs dominated by Al-Al."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::17000db9f0149e87",
+      "question": "What specific 'atomistic rearrangements' at high strains are responsible for the observed clustering-to-ordering transition under compressive loading?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "To understand the microscopic physics driving the phase transition, one must identify the specific atomic movements involved.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The HEA shows a clustering-to-ordering transition under compressive loading, which is attributed to atomistic rearrangements at high strains."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::9a014e9fec776a3f",
+      "question": "Which specific 'pair correlations' are presented to corroborate the ordering behavior, and how do their values change during the transition?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The text claims corroboration via pair correlations, so verifying the specific evidence (likely radial distribution functions) is crucial.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Corresponding pair correlations further corroborates the ordering behavior in the strained alloy."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::abee1f452bede799",
+      "question": "How does the 'linear-response' method used for predicting clustering compare to the direct MD simulation approach in terms of computational cost and accuracy?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Understanding the trade-off between the prediction method and the simulation method helps evaluate the workflow efficiency.",
+      "source_section": "Results And Discussion.part5",
+      "chunk_index": 7,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "electronic-structure-based linear-response calculations predict clustering driven by Al-Ni pair correlations"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC4976365::reader_question::7c40ab641561b214",
+      "question": "What specific version of the KKR-Green's function code was used, and does it include full-potential corrections beyond the scalar-relativistic approximation mentioned?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The text states 'scalar-relativistic approximation is used' and mentions 'approach those of full-potential methods', but does not specify if a full-potential calculation was actually performed or just the scalar-relativistic one.",
+      "source_section": "Methods.part1",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The scalar-relativistic approximation is used for the valence electrons (no spin-orbit terms)."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::bf1f33b62f80143e",
+      "question": "Is a 20 × 20 × 20 k-point mesh sufficient for accurately resolving the electronic structure of an arbitrary N-component alloy with compositional fluctuations in the CPA framework?",
+      "question_type": "assumption",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "High symmetry and high component count usually require dense k-point sampling; the user needs to know if this density is adequate for the specific 'arbitrary N-component' case.",
+      "source_section": "Methods.part1",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Brillioun-zone integrations use a special k-point method [44] with a 20 × 20 × 20 mesh."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::003152c6310c9a65",
+      "question": "Why were s-, p-, d-, and f-symmetries included up to L_max = 3, and is f-symmetry necessary for accurately describing the scattering matrices of Cr, Co, Fe, and Ni in this range?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "Including f-symmetries increases computational cost significantly; the user needs to know if this was critical for the specific elements in the alloy.",
+      "source_section": "Methods.part1",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "With L max = 3, we include s-, p-, d-, and f - symmetries in the basis."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::1b4d56957de6557b",
+      "question": "How does the 'special k-point method [44]' specifically handle the disorder averaging required by the Coherent Potential Approximation in a 5-component alloy?",
+      "question_type": "clarification",
+      "reading_step": "clarify",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "Standard k-point methods don't inherently solve disorder; the specific method cited [44] is crucial for understanding the CPA implementation.",
+      "source_section": "Methods.part1",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Brillioun-zone integrations use a special k-point method [44] with a 20 × 20 × 20 mesh."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::59dc07885266dc17",
+      "question": "Does the 'complex-energy Gauss-Legendre semicircular contour with 24 points' accurately capture the density of states near the Fermi level for these specific metallic alloys?",
+      "question_type": "evidence",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The number of integration points determines the resolution of the energy integral; 24 points might be insufficient for sharp features in the DOS.",
+      "source_section": "Methods.part1",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Potentials, charge densities, and total energies are obtained, using a complex-energy Gauss-Legendre semicircular contour with 24 points,"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC4976365::reader_question::17bc9c5565992c92",
+      "question": "What is the specific impact of 'no spin-orbit terms' on the magnetic moment predictions for the Fe and Co components in this high-entropy alloy?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Fe and Co are magnetic; omitting spin-orbit coupling could significantly affect the electronic structure and magnetic ordering predictions.",
+      "source_section": "Methods.part1",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The scalar-relativistic approximation is used for the valence electrons (no spin-orbit terms)."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::793bdc7ae3a3237d",
+      "question": "How does the 'Voronoi polyhedra (VP) integration' differ from standard muffin-tin sphere integration in calculating the charge densities for these irregular atomic environments?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "VP integration is a specific technique for handling the irregular shapes in disordered alloys; understanding its difference is key to the method's validity.",
+      "source_section": "Methods.part1",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Electronic properties and total energies are evaluated using the Voronoi polyhedra (VP) integration [46] for spherically-averaged radial functions in the site-centered, spherical-harmonic (Y L ) basis"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::07fa34dfed9473e7",
+      "question": "How does the 'analytically expanded to second-order' linear-response approach compare in accuracy to Monte Carlo simulations for predicting the ordering transition temperatures?",
+      "question_type": "comparison",
+      "reading_step": "compare",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Linear-response is an approximation; comparing it to a more rigorous method like MC simulations helps gauge the reliability of the predicted SRO.",
+      "source_section": "Methods.part1",
+      "chunk_index": 8,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The KKR-CPA grand potential (or free energy) is analytically expanded to second-order in compositional fluctuations for an arbitrary N-component alloy."
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC4976365::reader_question::f4e834cbf35d5249",
+      "question": "What is the specific value of the spinodal temperature (T_sp) and the maximum wavevector for this alloy, given that the entropy term diverges at this point?",
+      "question_type": "clarification",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The divergence at T_sp is critical for understanding the onset of instability; without the specific value, the phase stability prediction is incomplete.",
+      "source_section": "Methods.part2",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "it diverges at the spinodal temperature T sp for a specific maximum wavevector"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::c5dbb333ea6203be",
+      "question": "Why were Lennard-Jones potentials specifically chosen for the Al-Cr and Co-Cr cross interactions instead of developing or fitting new EAM parameters?",
+      "question_type": "rationale",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Using LJ for specific cross-interactions in an EAM-based model is a significant compromise that likely limits transferability; the reason matters for validation.",
+      "source_section": "Methods.part2",
+      "chunk_index": 9,
+      "grounded_role_refs": [
+        "rejected_alternative:0"
+      ],
+      "evidence_spans": [
+        "Only the Al-Cr and Co-Cr cross interactions are modeled, using the Lennard-Jones (LJ) potential [23] [56] [57] , due to the lack of the available EAM/alloy parameters for these interactions."
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::9aee2016a6d3bb71",
+      "question": "What specific mixing rule parameters were applied, and how does the Lorentz-Berthelot rule's assumption of geometric/ arithmetic means affect the predicted cohesive energy for these mismatched atomic sizes?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "LJ potentials with standard mixing rules often fail for large size mismatches; checking the deviation mentioned is crucial for reliability.",
+      "source_section": "Methods.part2",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The Lorentz-Berthelot mixing rule is used to describe the cross interactions between Al-Cr and Co-Cr"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::50c5b520a932b7b0",
+      "question": "Given the <2% deviation in cohesive energy mentioned, does this imply the model is valid for studying high-strain deformation where bond breaking and significant energy fluctuations occur?",
+      "question_type": "boundary",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "Low energy deviation at equilibrium does not guarantee accuracy under high strain or dynamic loading conditions.",
+      "source_section": "Methods.part2",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "We note that there is <2% deviation in the cohesive energy and negligible change in the system density with the"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC4976365::reader_question::751a7d6dd8272b9a",
+      "question": "How does the 'logarithmic frequency mesh' specifically handle the Matsubara poles to ensure the response functions are interpolated correctly at the temperatures of interest?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The mesh type affects numerical stability and accuracy; understanding the interpolation strategy is key to trusting the electronic structure results.",
+      "source_section": "Methods.part2",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "( k ;T) is evaluated on a logarithmic frequency mesh containing all Matsubara poles, such that the response functions can be interpolated to the correct poles, i.e., temperature"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::d4cb031666641db4",
+      "question": "Why were s-, p-, d-, and f-symmetries included in the potential parameter assimilation, and is f-symmetry necessary for the specific cross-interactions modeled with LJ?",
+      "question_type": "rationale",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "LJ potentials are isotropic and do not include angular terms; mixing them with EAM which often uses angular terms requires careful justification.",
+      "source_section": "Methods.part2",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Here, we assimilate the EAM/alloy potential parameters for Al, Co, Fe and Ni from the EAM database"
+      ],
+      "confidence": 0.6
+    },
+    {
+      "question_id": "PMC4976365::reader_question::759742bb428ee116",
+      "question": "How does the 'negligible change in system density' observed with the mixed LJ potential impact the accuracy of predicting vacancy formation or void nucleation during high-strain deformation?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "apply",
+      "relevance": "adjacent",
+      "rationale": "Density is a static property; deformation mechanisms like void nucleation are highly sensitive to local lattice distortions which LJ might not capture well.",
+      "source_section": "Methods.part2",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "We note that there is <2% deviation in the cohesive energy and negligible change in the system density with the"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC4976365::reader_question::220444d76b204901",
+      "question": "What specific version of the LAMMPS package and what specific potentials within the EAM database were used to ensure the reproducibility of the MD trajectories?",
+      "question_type": "replication",
+      "reading_step": "identify_gap",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The text cites [54] [55] but does not specify version numbers or exact potential filenames, which are essential for exact replication.",
+      "source_section": "Methods.part2",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The highly-parallelized Large-scale Atomistic Molecular Massively Parallelized Simulator [54] (LAMMPS) package is used for MD"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::a57ad2171e286890",
+      "question": "Does the use of the '12-6' form for the LJ potential adequately capture the repulsive core of the Al-Cr interaction, given the size mismatch between Al and Cr?",
+      "question_type": "mechanism",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "The 12-6 form is a generic approximation; for HEAs with large atomic size differences, it may lead to unrealistic repulsion or attraction.",
+      "source_section": "Methods.part2",
+      "chunk_index": 9,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "We employ the Lennard-Jones potential (LJ) in the 12-6 form given by:"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::295fd5b9c991de1f",
+      "question": "Why was the cut-off radius specifically set to 10 Å, and does this value exceed the interaction range for the Lennard-Jones potential used in this high-entropy alloy?",
+      "question_type": "rationale",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The choice of cutoff affects accuracy and computational cost; the text links it to a specific deviation threshold.",
+      "source_section": "Methods.part3",
+      "chunk_index": 10,
+      "grounded_role_refs": [
+        "constraint:0"
+      ],
+      "evidence_spans": [
+        "Thus, we employ a cut-off radius of r cut-off = 10 Å in all our MD simulations to obtain accurate results in a reasonable amount of computational time."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::a13d5421c6eddf39",
+      "question": "What specific values were the elemental composition ratios for Al, Cr, Co, Fe, and Ni in the Table 3 reference mentioned?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The simulation cell composition is critical for reproducibility, yet the specific atomic percentages are only referenced in a table.",
+      "source_section": "Methods.part3",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "composed of randomly-distributed Al, Cr, Co, Fe and Ni atoms, shown in Fig. 1 , is constructed with the elemental composition as described in Table 3 ."
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::b1bc36efe2fc11e4",
+      "question": "Does the 'steepest descent algorithm' effectively handle the potential energy landscape of this 62,500-atom system without getting trapped in local minima?",
+      "question_type": "counterfactual",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Steepest descent is slow for large systems; the question probes the sufficiency of this minimization method for the specific atom count.",
+      "source_section": "Methods.part3",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Energy minimization is carried out, using the steepest descent algorithm, with the energy and force tolerance set to 10 −15 units"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::f123bb8192b28779",
+      "question": "Why was a stopping tolerance of 10^-15 units chosen, and is this precision physically meaningful or computationally excessive for the LJ potential?",
+      "question_type": "rationale",
+      "reading_step": "inspect_choice",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Extreme precision tolerances may not impact the final thermodynamic state but indicate a specific methodological preference.",
+      "source_section": "Methods.part3",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "stopping tolerance for energy is unitless while force has a unit of eV/Å), to obtain the geometrically-optimized lattice configuration"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::de97753a2c6b6fc0",
+      "question": "How does the 90 ps melting step at 2,200 K compare to the melting temperature of Al0.1CrCoFeNi, and is 2,200 K sufficiently above the melting point?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The melting protocol is critical; without the known T_melt, the validity of the '90 ps melt' step is uncertain.",
+      "source_section": "Methods.part3",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The optimized structure is initialized at 2,200 K under an isothermal-isobaric (NPT) ensemble at a pressure of 0 MPa for 90 picoseconds (ps) to melt the alloy"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC4976365::reader_question::678e290dd05c9c1d",
+      "question": "Why was the slower cooling rate of 5.42 K/ps tested if the study ultimately adopted the faster rate of 21.11 K/ps for all simulations?",
+      "question_type": "rationale",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text mentions testing two rates but only justifies the selection of one based on radial distribution function results.",
+      "source_section": "Methods.part3",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "rapid quenching of the alloy under the NPT ensemble at 0 MPa with two different cooling rates of 21.11 K/ps and 5.42 K/ps, respectively"
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::855de19513e116ce",
+      "question": "What specific temperature range between 77 K and 1,500 K was achieved or targeted for the final structural analysis?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "direct",
+      "rationale": "The text mentions a range but does not specify the exact set point(s) used for the subsequent mechanical tests.",
+      "source_section": "Methods.part3",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "to reach the desired temperatures between 77 K and 1,500 K."
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::7042053bf767e00e",
+      "question": "Does the use of a coupling time of 0.001 ps for the Nosé-Hoover thermostat/barostat introduce artificial oscillations in the temperature or pressure control?",
+      "question_type": "counterfactual",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Coupling times must be long enough to not interfere with natural dynamics; 0.001 ps is very short.",
+      "source_section": "Methods.part3",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "We employ the Nosé-Hoover thermostat and barostat, each with a coupling time of 0.001 ps."
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::f39a17086a08d024",
+      "question": "How does the 'absence of thermodynamic constraints' in the final 1 ns NVE phase ensure the system hasn't drifted from the desired state?",
+      "question_type": "counterfactual",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Switching to NVE removes control mechanisms; the question asks how stability is confirmed in this phase.",
+      "source_section": "Methods.part3",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Finally, the entire system is simulated in the absence of thermodynamic constraints for further 1 ns under the NVE (microcanonical) ensemble to ensure that we obtain an equilibrated structure."
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::6ce8e6506fc8e609",
+      "question": "Why does the lack of significant change in g(r) at 300 K justify using the faster quench rate for the entire temperature range up to 1,500 K?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Structural sensitivity to quench rate might increase at higher temperatures; extrapolating from 300 K is a potential assumption.",
+      "source_section": "Methods.part3",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "we observe no significant change in g(r) for different atomic pairs with varying quenching rates at a fixed temperature (300 K). Thus, for all simulations, in the present study, a quench rate of 21.11 K/ps is maintained."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::2a0c722a921dc103",
+      "question": "What specific algorithm is used for the 'tensile and compressive loadings' described as being performed 'at desired temperatures'?",
+      "question_type": "method",
+      "reading_step": "identify_gap",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The text ends abruptly before describing the loading protocol (strain rate, direction, or deformation mode), leaving a critical gap.",
+      "source_section": "Methods.part3",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Next, tensile and compressive loadings of the alloy are performed independently at desired temperatures. The simulation cell"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::7ae69149bc3e30ec",
+      "question": "How does the 62,500 atom system size compare to finite size effects in the context of high-strain deformation of HEAs?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Deformation mechanisms like dislocation nucleation are size-dependent; 2.5 nm is a small simulation cell.",
+      "source_section": "Methods.part3",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The simulation cell contains 62,500 atoms"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::a42225abaf51c387",
+      "question": "Does the 'unitless' energy tolerance in the minimization step imply a specific normalization of the Lennard-Jones potential energy scale?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "The text states force is in eV/Å but energy is unitless, which is unusual for standard MD software and needs clarification.",
+      "source_section": "Methods.part3",
+      "chunk_index": 10,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "stopping tolerance for energy is unitless while force has a unit of eV/Å)"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::9aaf3f6444161f90",
+      "question": "Does the NPT control of lateral boundaries during uniaxial deformation inadvertently relax the Poisson effect or alter the true triaxial stress state?",
+      "question_type": "counterfactual",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The lateral boundary control method dictates how the sample responds to Poisson contraction, potentially affecting deformation mechanics.",
+      "source_section": "Methods.part4",
+      "chunk_index": 11,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "while lateral boundaries are controlled using the NPT equations of motion to zero pressure."
+      ],
+      "confidence": 0.9
+    },
+    {
+      "question_id": "PMC4976365::reader_question::34530aa7bce1602c",
+      "question": "How does the specific strain rate of 10^10 s^-1 compare to the critical strain rate for transition between deformation mechanisms like twinning versus slip in this specific alloy?",
+      "question_type": "counterfactual",
+      "reading_step": "change_variable",
+      "reader_intent": "evaluate",
+      "relevance": "adjacent",
+      "rationale": "High strain rates can suppress certain mechanisms; knowing if 10^10 s^-1 falls in a transition regime is crucial.",
+      "source_section": "Methods.part4",
+      "chunk_index": 11,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "with a strain rate of 10 10 s −1"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::7ef954b6f2958163",
+      "question": "Why is the engineering strain capped at exactly 0.9% when studying high-strain deformation, and does this limit prevent observation of failure or saturation?",
+      "question_type": "assumption",
+      "reading_step": "identify_gap",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "0.9% is a very low strain for 'high-strain deformation'; this cutoff might miss key phenomena like necking or fracture.",
+      "source_section": "Methods.part4",
+      "chunk_index": 11,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "for the engineering strain of 0.9%"
+      ],
+      "confidence": 0.95
+    },
+    {
+      "question_id": "PMC4976365::reader_question::bb67a760829ae53b",
+      "question": "What specific algorithm or software implementation is used to enforce the NPT equations of motion for the lateral boundaries during the deformation step?",
+      "question_type": "method",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "adjacent",
+      "rationale": "Different NPT implementations can yield different stress states; replication requires knowing the specific algorithm.",
+      "source_section": "Methods.part4",
+      "chunk_index": 11,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "lateral boundaries are controlled using the NPT equations of motion to zero pressure"
+      ],
+      "confidence": 0.7
+    },
+    {
+      "question_id": "PMC4976365::reader_question::73a40abbe348bdbc",
+      "question": "Does the claim that these deformation characteristics are representative of experimentally-applied high strain rates (~10^2 s^-1) hold if the deformation mechanism is strain-rate sensitive in this alloy?",
+      "question_type": "counterfactual",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "The authors admit the rate is unrealistic; the validity of the 'representative' claim depends on whether mechanisms change between 10^10 and 10^2 s^-1.",
+      "source_section": "Methods.part4",
+      "chunk_index": 11,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "Nevertheless, deformation characteristics observed in our investigation are representative of those observed for experimentally-applied high strain rates"
+      ],
+      "confidence": 0.85
+    },
+    {
+      "question_id": "PMC4976365::reader_question::f13ab90c5184d3b5",
+      "question": "What specific 'different elements' are being analyzed in the pair correlations, and how are the 'neighborhoods' of chosen species defined geometrically?",
+      "question_type": "clarification",
+      "reading_step": "inspect_choice",
+      "reader_intent": "replicate",
+      "relevance": "direct",
+      "rationale": "The analysis method relies on pair correlations; without defining the cutoff radius or element subsets, the data interpretation is ambiguous.",
+      "source_section": "Methods.part4",
+      "chunk_index": 11,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "pair correlations of different elements in the neighborhood of the chosen species"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::b54d8f013d6648fe",
+      "question": "Does the 'length and time scale limitations' mentioned specifically refer to the simulation cell size of 62,500 atoms or the interatomic potential choice?",
+      "question_type": "clarification",
+      "reading_step": "identify_gap",
+      "reader_intent": "understand",
+      "relevance": "adjacent",
+      "rationale": "Understanding the bottleneck helps assess if the high strain rate is a fundamental limitation of the system or just the current setup.",
+      "source_section": "Methods.part4",
+      "chunk_index": 11,
+      "grounded_role_refs": [
+        "constraint:1"
+      ],
+      "evidence_spans": [
+        "due to length and time scale limitations in MD simulations"
+      ],
+      "confidence": 0.75
+    },
+    {
+      "question_id": "PMC4976365::reader_question::76f8f19e8dff6ff5",
+      "question": "How does the uniaxial deformation in the <100> direction specifically interact with the predicted clustering-ordering discussed in the title, and is this orientation the most favorable for testing that hypothesis?",
+      "question_type": "rationale",
+      "reading_step": "trace_mechanism",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "Crystal orientation relative to loading direction significantly affects deformation; <100> might be a specific choice to highlight or mask clustering effects.",
+      "source_section": "Methods.part4",
+      "chunk_index": 11,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "The simulation cell is deformed in the x -direction of <100>"
+      ],
+      "confidence": 0.8
+    },
+    {
+      "question_id": "PMC4976365::reader_question::c921f04530849696",
+      "question": "Is the 'zero pressure' constraint in the lateral directions strictly maintained throughout the entire 0.9% strain, or does it fluctuate as the material yields?",
+      "question_type": "counterfactual",
+      "reading_step": "test_evidence",
+      "reader_intent": "evaluate",
+      "relevance": "direct",
+      "rationale": "If pressure fluctuates significantly, the 'zero pressure' assumption might be invalid for interpreting stress states in the yielded material.",
+      "source_section": "Methods.part4",
+      "chunk_index": 11,
+      "grounded_role_refs": [],
+      "evidence_spans": [
+        "lateral boundaries are controlled using the NPT equations of motion to zero pressure"
+      ],
+      "confidence": 0.8
     }
   ]
 }

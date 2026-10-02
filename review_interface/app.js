@@ -2,6 +2,12 @@ const state = {
   papers: [],
   paper: null,
   activeRoles: null,
+  questionFilters: {
+    search: "",
+    type: "all",
+    intent: "all",
+    relevance: "all",
+  },
   selectedItem: null,
   pdfPage: 1,
   pdfZoom: 1,
@@ -170,22 +176,82 @@ function renderQuestions() {
   const container = $("questionsPanel");
   container.replaceChildren();
   if (!state.paper.questions.length) {
-    container.append(make("div", "empty", "No decision question passed grounding validation for this paper."));
+    $("questionResultCount").textContent = "0 / 0";
+    container.append(make("div", "empty", "No grounded reader question is available for this paper."));
     return;
   }
-  state.paper.questions.forEach((item) => {
+  const search = state.questionFilters.search.toLowerCase();
+  const questions = state.paper.questions.filter((item) => (
+    (state.questionFilters.type === "all" || item.question_type === state.questionFilters.type)
+    && (state.questionFilters.intent === "all" || item.reader_intent === state.questionFilters.intent)
+    && (state.questionFilters.relevance === "all" || item.relevance === state.questionFilters.relevance)
+    && (!search || `${item.question} ${item.rationale || ""}`.toLowerCase().includes(search))
+  ));
+  $("questionResultCount").textContent = `${questions.length} / ${state.paper.questions.length}`;
+  if (!questions.length) {
+    container.append(make("div", "empty", "No questions match these filters."));
+    return;
+  }
+  questions.forEach((item) => {
     const card = make("button", "card question-card");
     const top = make("div", "card-top");
     top.append(make("span", "badge", item.question_type));
     top.append(make("span", "page", item.pdf_page ? `PDF p. ${item.pdf_page}` : "XML evidence"));
     card.append(top, make("p", "", item.question));
-    card.append(make("p", "card-detail", `Decision use: ${item.decision_use}`));
+    const detail = item.reader_intent
+      ? [
+          item.reading_step?.replaceAll("_", " "),
+          item.reader_intent.replaceAll("_", " "),
+          item.relevance,
+          item.source_section || "source passage",
+          item.rationale,
+        ].filter(Boolean).join(" · ")
+      : `Decision use: ${item.decision_use}`;
+    card.append(make("p", "card-detail", detail));
     card.addEventListener("click", () => {
       item.card = card;
-      showEvidence(item, `${item.question_type} decision question`);
+      showEvidence(
+        item,
+        `${item.question_type} ${item.reader_intent ? "reader" : "decision"} question`,
+      );
     });
     container.append(card);
   });
+}
+
+function setSelectOptions(select, values, allLabel) {
+  select.replaceChildren();
+  const allOption = document.createElement("option");
+  allOption.value = "all";
+  allOption.textContent = allLabel;
+  select.append(allOption);
+  values.forEach((value) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = value.replaceAll("_", " ");
+    select.append(option);
+  });
+}
+
+function renderQuestionFilters() {
+  const questions = state.paper.questions;
+  setSelectOptions(
+    $("questionTypeFilter"),
+    [...new Set(questions.map((item) => item.question_type).filter(Boolean))].sort(),
+    "All types",
+  );
+  setSelectOptions(
+    $("questionIntentFilter"),
+    [...new Set(questions.map((item) => item.reader_intent).filter(Boolean))].sort(),
+    "All intents",
+  );
+  setSelectOptions(
+    $("questionRelevanceFilter"),
+    [...new Set(questions.map((item) => item.relevance).filter(Boolean))].sort(),
+    "All relevance",
+  );
+  $("questionSearch").value = "";
+  state.questionFilters = {search: "", type: "all", intent: "all", relevance: "all"};
 }
 
 function renderPaper() {
@@ -209,6 +275,7 @@ function renderPaper() {
   state.activeRoles = null;
   renderRoleFilters();
   renderRoles();
+  renderQuestionFilters();
   renderQuestions();
 }
 
@@ -228,6 +295,7 @@ function configureTabs() {
       tab.classList.add("active");
       $(tab.dataset.panel).classList.remove("hidden");
       $("roleFilters").classList.toggle("hidden", tab.dataset.panel !== "rolesPanel");
+      $("questionFilters").classList.toggle("hidden", tab.dataset.panel !== "questionsPanel");
     });
   });
 }
@@ -239,6 +307,20 @@ async function initialize() {
   $("nextPage").addEventListener("click", () => renderPdfPage(state.pdfPage + 1));
   $("zoomOut").addEventListener("click", () => setPdfZoom(state.pdfZoom - 0.2));
   $("zoomIn").addEventListener("click", () => setPdfZoom(state.pdfZoom + 0.2));
+  $("questionSearch").addEventListener("input", (event) => {
+    state.questionFilters.search = event.target.value.trim();
+    renderQuestions();
+  });
+  for (const [id, key] of [
+    ["questionTypeFilter", "type"],
+    ["questionIntentFilter", "intent"],
+    ["questionRelevanceFilter", "relevance"],
+  ]) {
+    $(id).addEventListener("change", (event) => {
+      state.questionFilters[key] = event.target.value;
+      renderQuestions();
+    });
+  }
   const response = await fetch("/api/papers");
   if (!response.ok) throw new Error("Failed to load papers");
   state.papers = await response.json();
