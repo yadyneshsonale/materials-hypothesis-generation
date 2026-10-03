@@ -5,6 +5,14 @@ high-temperature high-entropy-alloy experiment. It documents what the inputs are
 prompts were used, how papers were chunked, which rules controlled role and question generation,
 how outputs were validated, and how the files should be interpreted.
 
+**In brief:** each paper folder contains the original JATS XML, a visual-reference PDF, citation
+metadata, reconciled argumentative roles, high-recall reader questions, and rejection audits. The
+Qwen3.5-35B-A3B pipeline converted the XML into section-preserving text, processed it in
+overlapping chunks, extracted 11 role types, generated questions that mimic a scientist's reading
+process, and retained linked material–process–structure–mechanism–property evidence. Every accepted
+role and question was checked against an exact quotation from the XML-derived paper text; the
+consolidated files and corpus-level evaluations are stored in the adjacent `results/` directory.
+
 ## Summary
 
 | Output | Papers | Accepted records | Exact grounding |
