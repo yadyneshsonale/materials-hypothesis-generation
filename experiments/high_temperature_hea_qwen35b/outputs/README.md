@@ -18,6 +18,260 @@ The current per-paper `questions.json` files contain the **8,848 high-recall rea
 The earlier set of 81 strict decision questions is preserved in
 [`../results/decision_questions.jsonl`](../results/decision_questions.jsonl).
 
+## Start here: what this experiment is doing
+
+The project starts with 50 research papers about high-temperature high-entropy alloys. A long-term
+goal is to use the literature to support new, testable materials hypotheses. Raw papers cannot be
+given safely to a hypothesis generator without preserving where each statement came from and what
+kind of statement it is.
+
+This experiment therefore creates three different views of every paper:
+
+1. **Argumentative roles:** What job does a passage perform in the paper's argument? For example,
+   does it state a problem, report evidence, propose a mechanism, or describe a limitation?
+2. **Reader questions:** What might a scientist naturally ask while reading that passage? For
+   example, why was a temperature selected, what evidence supports a mechanism, or would the
+   result transfer to another alloy?
+3. **Linked materials evidence:** What material, treatment, structure, mechanism, condition, and
+   outcome belong together in one evidence chain?
+
+These are complementary outputs:
+
+- roles help explain the paper's argument;
+- questions expose uncertainty and possible next reasoning steps; and
+- linked evidence is the safest representation for later hypothesis generation.
+
+None of these outputs is treated as automatically true merely because the model produced it.
+Every accepted item must point back to exact text in the paper, and domain experts must still judge
+scientific correctness and usefulness.
+
+## The complete journey of one paper
+
+The following steps happen for each paper.
+
+### Step 1: store the source article
+
+The original open-access JATS XML is stored as:
+
+```text
+papers/<PMCID>/input/article.xml
+```
+
+A checksum-verified PDF is stored beside it for a human to view:
+
+```text
+papers/<PMCID>/input/article.pdf
+```
+
+The PDF is not the extraction source. It may format citations, formulas, and columns differently
+from the XML.
+
+### Step 2: convert XML into readable extraction text
+
+The XML is converted into structure-preserving plain text under
+[`../data/corpus/text/`](../data/corpus/text/). The text retains section order and section labels
+such as Abstract, Introduction, Methods, Results, Discussion, and Conclusion.
+
+This text is the authoritative source for:
+
+- model input;
+- exact evidence checks;
+- section names in outputs; and
+- context displayed in the review interface.
+
+### Step 3: divide the paper into manageable passages
+
+The paper is too long to process as one undifferentiated prompt. It is divided into passages:
+
+- the role pass primarily follows article sections, with a 900-word/100-word-overlap fallback;
+- the reader-question pass uses smaller approximately 450-word passages with 50-word overlap; and
+- reference, acknowledgment, and supporting-information end matter is excluded from reader
+  questions.
+
+Overlap prevents a statement at a chunk boundary from losing its context.
+
+### Step 4: ask Qwen to extract role candidates
+
+For each role passage, Qwen receives:
+
+```text
+SYSTEM INSTRUCTIONS
+  - definitions of all 11 roles
+  - distinctions between easily confused roles
+  - exact evidence-copying rules
+  - required JSON shape
+
+SECTION GUIDANCE
+  - current article section and likely role emphasis
+
+CURRENT PAPER PASSAGE
+  - XML-derived text from this paper only
+```
+
+The prompt asks the model to return zero or more candidates:
+
+```json
+{
+  "role": "evidence_result",
+  "content": "A concise interpretation of what the passage reports.",
+  "evidence_span": "An exact contiguous quotation from the supplied passage."
+}
+```
+
+The prompt does **not** ask the model to fill every role. An empty role is preferable to inventing
+unsupported content.
+
+### Step 5: validate and reconcile roles
+
+Code checks each candidate before it can continue:
+
+- the role key must be one of the 11 allowed roles;
+- `content` cannot be empty; and
+- `evidence_span` must be an exact substring of the supplied passage.
+
+Valid chunk candidates are then sent to a paper-level reconciliation prompt. That prompt merges
+only genuine duplicates, keeps different materials and operating regimes separate, selects the
+single best role, and preserves exact evidence.
+
+The final roles are written to:
+
+```text
+papers/<PMCID>/output/roles.json
+```
+
+### Step 6: read the paper again to generate questions
+
+Question generation is a separate high-recall pass. It does not ask for only a few polished
+hypothesis questions. Instead, it imitates the ongoing thoughts of a scientist reading the paper.
+
+For each 450-word passage, Qwen receives:
+
+```text
+SYSTEM INSTRUCTIONS
+  - examples of scientific reading questions
+  - 14 allowed question types
+  - 10 allowed reading steps
+  - intent and relevance labels
+  - exact evidence and JSON rules
+
+READING STATE
+  - paper title
+  - current section
+  - progress through the paper, for example 8/21
+  - final 100 words of the preceding passage
+  - 12 most recent accepted questions
+
+CURRENT PAPER PASSAGE
+  - the only text permitted to supply evidence
+```
+
+The reading state helps the model maintain continuity and avoid asking exactly the same question
+again. It is **not** allowed to serve as evidence.
+
+The model returns records such as:
+
+```json
+{
+  "question": "What specific vacuum pressure and air flow conditions defined the oxidation environments?",
+  "question_type": "clarification",
+  "reading_step": "clarify",
+  "reader_intent": "understand",
+  "relevance": "direct",
+  "rationale": "Oxidation behavior is sensitive to atmosphere.",
+  "evidence_span": "Mn is the major oxide-forming element in both vacuum and air environments",
+  "confidence": 0.95
+}
+```
+
+This example means:
+
+- the scientist is trying to understand an underspecified condition;
+- the question is directly about the paper;
+- the rationale explains why the thought matters; and
+- the exact quotation records what triggered the thought.
+
+### Step 7: validate, deduplicate, and link questions
+
+Code checks every question for allowed categories, length, syntax, rationale, confidence, and exact
+grounding in the current passage. Only exact duplicate question text is removed. Similar questions
+are retained intentionally because relevance and redundancy filtering happen later.
+
+If a question's evidence overlaps a reconciled role, the question records that role reference.
+The final questions are written to:
+
+```text
+papers/<PMCID>/output/questions.json
+```
+
+Rejected candidates are written to:
+
+```text
+papers/<PMCID>/output/reader_question_rejections.json
+```
+
+### Step 8: extract linked materials evidence
+
+A separate prompt asks for evidence units that keep the scientific relationship intact:
+
+```text
+material + intervention -> structure -> mechanism -> outcome
+                        + conditions + comparison + provenance
+```
+
+This prevents a later agent from accidentally combining, for example, the processing condition
+from one alloy with the mechanism or measured property of another.
+
+The output is written to:
+
+```text
+materials_evidence/<PMCID>.json
+```
+
+### Step 9: review outputs beside the paper
+
+The interface loads the roles and questions, displays their exact XML-derived context, finds the
+best corresponding PDF page, and draws visual highlights. A reviewer can filter roles and search
+or filter questions by type, intent, and relevance.
+
+The highlighted PDF is a convenience for inspection. The exact XML-derived evidence remains the
+authoritative provenance.
+
+## Inputs, prompts, and outputs at a glance
+
+| Stage | Input given to model | Main prompt request | Accepted output | Stored at |
+| --- | --- | --- | --- | --- |
+| Role extraction | One XML-derived section or passage | Identify only supported argumentative roles and quote exact evidence | Raw role candidates | `papers/<PMCID>/output/roles.json` under `raw_by_role` |
+| Role reconciliation | Valid role candidates from one paper | Merge duplicates, separate regimes, enforce strict role definitions | Final role claims | `papers/<PMCID>/output/roles.json` under `reconciled_by_role` |
+| Reader questions | One 450-word passage plus continuity state | Ask many natural scientific-reading questions triggered by the passage | Grounded questions with type, step, intent, relevance, rationale, and confidence | `papers/<PMCID>/output/questions.json` |
+| Linked evidence | XML-derived paper chunks | Preserve linked material/process/structure/mechanism/property evidence | Structured evidence units | `materials_evidence/<PMCID>.json` |
+| Deterministic evaluation | Stored JSON plus complete XML-derived text | No model call; recheck schema and exact provenance | Corpus metrics and invalid-item report | `../results/*.json` and `*.jsonl` |
+
+## A concrete role example
+
+Suppose a passage says that mass gain decreased after adding an element.
+
+- `evidence_result` is appropriate if the passage reports the measured decrease.
+- `causal_claim` is appropriate only if the paper claims that the addition caused the decrease.
+- `mechanism_principle` is appropriate only if the paper explains why, such as formation of a
+  dense protective oxide.
+- `hypothesis_statement` is not appropriate if the behavior has already been observed; a
+  hypothesis must be a prospective testable expectation.
+
+A final role record therefore separates interpretation from provenance:
+
+```json
+{
+  "content": "Chromium addition reduced oxidation mass gain at 800 C.",
+  "evidence_spans": [
+    "Cr addition reduced mass gain from 10.4 to 5.1 mg/cm2 at 800 C."
+  ],
+  "conflicting": false
+}
+```
+
+`content` is concise model interpretation. `evidence_spans` is the exact source needed to verify
+that interpretation.
+
 ## Directory layout
 
 ```text
@@ -210,18 +464,39 @@ The prompt asks questions such as:
 
 ### Question types
 
-The allowed `question_type` values are:
-
-`clarification`, `rationale`, `mechanism`, `method`, `evidence`, `comparison`, `relevance`,
-`counterfactual`, `boundary`, `assumption`, `limitation`, `transfer`, `replication`, and
-`follow_up`.
+| Question type | What the reader is asking |
+| --- | --- |
+| `clarification` | What does a term, value, material, condition, or statement mean? |
+| `rationale` | Why did the authors make this choice? |
+| `mechanism` | How or why could the reported behavior occur? |
+| `method` | What procedure, instrument, model, parameter, or analysis was used? |
+| `evidence` | What observation supports the claim, and is it sufficient? |
+| `comparison` | How does this differ from a baseline, another material, or prior work? |
+| `relevance` | Does this matter for the reader's problem or design goal? |
+| `counterfactual` | What would happen if a variable or choice changed? |
+| `boundary` | Under what condition does the behavior stop, reverse, or fail? |
+| `assumption` | What unstated or stated assumption does the result depend on? |
+| `limitation` | What uncertainty, confounder, missing control, or weakness restricts the conclusion? |
+| `transfer` | Would the result carry to another alloy, process, scale, or environment? |
+| `replication` | What information is needed to reproduce the work? |
+| `follow_up` | What should be measured, tested, or read next? |
 
 ### Reading steps
 
 Each question also records the thought operation that produced it:
 
-`clarify`, `inspect_choice`, `trace_mechanism`, `test_evidence`, `compare`,
-`assess_relevance`, `change_variable`, `find_boundary`, `identify_gap`, or `plan_follow_up`.
+| Reading step | Thought operation |
+| --- | --- |
+| `clarify` | Resolve what the passage means. |
+| `inspect_choice` | Examine why a material, method, parameter, or design was selected. |
+| `trace_mechanism` | Follow the proposed causal or physical explanation. |
+| `test_evidence` | Judge whether the evidence supports the claim. |
+| `compare` | Contrast against another condition, material, baseline, or report. |
+| `assess_relevance` | Decide whether the finding matters for another goal or system. |
+| `change_variable` | Consider the effect of changing a controllable variable. |
+| `find_boundary` | Identify a validity or failure regime. |
+| `identify_gap` | Notice missing information, assumptions, uncertainty, or controls. |
+| `plan_follow_up` | Form the next reading, measurement, or experiment step. |
 
 ### Intent and relevance
 
