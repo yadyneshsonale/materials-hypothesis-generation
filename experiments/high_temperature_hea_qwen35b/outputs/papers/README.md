@@ -18,8 +18,9 @@ PMCxxxxxxx/
 
 ## Important PDF notice
 
-The PDFs are included **only for visual inspection by human readers**. They are not parsed,
-extracted, scored, or used as evidence by the data pipeline.
+The PDFs are included **only for visual inspection by human readers**. They are not used to
+generate, score, or ground pipeline evidence. The review interface may read the PDF text layer
+after extraction solely to position visual highlight rectangles.
 
 The JATS XML is the machine-readable article input. Exact evidence grounding is validated against
 the structure-preserving text generated from that XML.
