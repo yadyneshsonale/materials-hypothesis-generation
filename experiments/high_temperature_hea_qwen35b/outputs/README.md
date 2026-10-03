@@ -41,7 +41,8 @@ This experiment therefore creates three different views of every paper:
    example, why was a temperature selected, what evidence supports a mechanism, or would the
    result transfer to another alloy?
 3. **Linked materials evidence:** What material, treatment, structure, mechanism, condition, and
-   outcome belong together in one evidence chain?
+   outcome belong together in one evidence chain? These records are stored beside this directory
+   at [`../materials_evidence/`](../materials_evidence/).
 
 These are complementary outputs:
 
@@ -232,7 +233,7 @@ from one alloy with the mechanism or measured property of another.
 The output is written to:
 
 ```text
-materials_evidence/<PMCID>.json
+../materials_evidence/<PMCID>.json
 ```
 
 ### Step 9: review outputs beside the paper
@@ -251,7 +252,7 @@ authoritative provenance.
 | Role extraction | One XML-derived section or passage | Identify only supported argumentative roles and quote exact evidence | Raw role candidates | `papers/<PMCID>/output/roles.json` under `raw_by_role` |
 | Role reconciliation | Valid role candidates from one paper | Merge duplicates, separate regimes, enforce strict role definitions | Final role claims | `papers/<PMCID>/output/roles.json` under `reconciled_by_role` |
 | Reader questions | One 450-word passage plus continuity state | Ask many natural scientific-reading questions triggered by the passage | Grounded questions with type, step, intent, relevance, rationale, and confidence | `papers/<PMCID>/output/questions.json` |
-| Linked evidence | XML-derived paper chunks | Preserve linked material/process/structure/mechanism/property evidence | Structured evidence units | `materials_evidence/<PMCID>.json` |
+| Linked evidence | XML-derived paper chunks | Preserve linked material/process/structure/mechanism/property evidence | Structured evidence units | `../materials_evidence/<PMCID>.json` |
 | Deterministic evaluation | Stored JSON plus complete XML-derived text | No model call; recheck schema and exact provenance | Corpus metrics and invalid-item report | `../results/*.json` and `*.jsonl` |
 
 ## A concrete role example
@@ -285,8 +286,6 @@ that interpretation.
 ```text
 outputs/
 ├── README.md
-├── materials_evidence/
-│   └── <PMCID>.json
 └── papers/
     ├── README.md
     └── <PMCID>/
@@ -625,7 +624,7 @@ current per-paper question output.
 
 ## Linked materials-evidence output
 
-[`materials_evidence/`](materials_evidence/) contains records designed for hypothesis generation.
+[`../materials_evidence/`](../materials_evidence/) contains records designed for hypothesis generation.
 Unlike flat argumentative roles, each unit attempts to preserve a linked chain:
 
 ```text

@@ -82,8 +82,8 @@ high_temperature_hea_qwen35b/
 │       ├── metadata.json
 │       ├── screening_audit.json
 │       └── text/                 # 50 structure-preserving pipeline inputs
+├── materials_evidence/           # linked evidence, one JSON record per paper
 ├── outputs/
-│   ├── materials_evidence/       # linked evidence, one JSON record per paper
 │   └── papers/                   # one organized folder per research paper
 │       └── <PMCID>/
 │           ├── input/            # JATS XML and visual-only PDF
@@ -121,7 +121,7 @@ export MATHG_CONTEXT_WINDOW=32768
 
 .venv/bin/python materials_extract.py \
   --input-dir experiments/high_temperature_hea_qwen35b/data/corpus/text \
-  --out-dir experiments/high_temperature_hea_qwen35b/outputs/materials_evidence \
+  --out-dir experiments/high_temperature_hea_qwen35b/materials_evidence \
   --workers 4 --resume
 ```
 
@@ -132,7 +132,7 @@ Evaluate the persisted outputs:
 
 ```bash
 .venv/bin/python evaluate_materials_corpus.py \
-  --evidence-dir experiments/high_temperature_hea_qwen35b/outputs/materials_evidence \
+  --evidence-dir experiments/high_temperature_hea_qwen35b/materials_evidence \
   --source-dir experiments/high_temperature_hea_qwen35b/data/corpus/text \
   --output experiments/high_temperature_hea_qwen35b/results/corpus_evaluation.json
 ```
@@ -232,7 +232,7 @@ mkdir -p /tmp/empty-legacy-outputs
   /tmp/empty-legacy-outputs \
   experiments/high_temperature_hea_qwen35b/results/adaptive_trace.json \
   --max-depth 0 \
-  --materials-evidence experiments/high_temperature_hea_qwen35b/outputs/materials_evidence
+  --materials-evidence experiments/high_temperature_hea_qwen35b/materials_evidence
 ```
 
 See [METHODS.md](METHODS.md) for selection rules, extraction safeguards, runtime details, metric
