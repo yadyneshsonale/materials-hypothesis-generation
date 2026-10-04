@@ -1,0 +1,68 @@
+{
+  "schema_version": "temporal-hypothesis-benchmark-1.0",
+  "paper_id": "PMC11077685",
+  "publication_date": "2024-02-28",
+  "split": "validation",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "model_cutoff_status": "unknown",
+  "queries": {
+    "broad": {
+      "text": "What additive manufacturing strategy and post-processing route can enable the fabrication of a refractory high-entropy alloy family (Group IV-V transition metals) capable of retaining high-temperature structural integrity, and what specific microstructural state is hypothesized to optimize mechanical performance while mitigating the inherent brittleness associated with interstitial impurities?",
+      "source_role_refs": [
+        "PMC11077685:problem_motivation:0",
+        "PMC11077685:prior_limitation:2",
+        "PMC11077685:hypothesis_statement:0"
+      ]
+    },
+    "problem_constrained": {
+      "text": "Given that refractory high-entropy alloys containing Group IV elements are highly susceptible to embrittlement via oxygen uptake during processing, leading to the precipitation of brittle alpha-HCP phases that raise the transition temperature, how can a powder-based extrusion method be adapted to manage oxygen content during the thermal decomposition of hydride precursors? Specifically, what thermal history and environmental constraints are required to achieve a dense bulk form without catastrophic cracking, and how can the formation of metastable phases be controlled to maximize high-temperature yield strength?",
+      "source_role_refs": [
+        "PMC11077685:prior_limitation:2",
+        "PMC11077685:prior_limitation:3",
+        "PMC11077685:constraint:0",
+        "PMC11077685:hypothesis_statement:0"
+      ]
+    },
+    "expert_context": {
+      "text": "We aim to synthesize an equiatomic HfNbTaTiZr alloy via ink-extrusion additive manufacturing using a precursor blend of metallic and hydride powders. The process relies on the sequential thermal decomposition of hydrides (TaH0.5, NbH, HfH2, TiH2, ZrH2) to drive alloying, where decomposition temperatures correlate with hydride formation enthalpies. To prevent the formation of alpha-HCP phases induced by dissolved oxygen (an alpha-stabilizer) which would otherwise degrade mechanical properties, the sintering atmosphere must be strictly controlled using an oxygen getter. The goal is to achieve a nearly fully dense microstructure where slow cooling results in a dual-phase (alpha-BCC + beta-BCC) structure, but a rapid quench from the homogenization temperature traps a metastable single-phase beta-BCC structure. Propose a hypothesis for the specific oxygen getter material and sintering regime that balances dehydrogenation kinetics with oxygen scavenging, predict the resulting phase constitution and grain size after rapid quenching, and design a falsification experiment using in-situ X-ray diffraction to verify the sequence of phase transformations and the absence of alpha-Ti during the critical decomposition window.",
+      "source_role_refs": [
+        "PMC11077685:hypothesis_statement:0",
+        "PMC11077685:mechanism_principle:0",
+        "PMC11077685:prior_limitation:3",
+        "PMC11077685:constraint:0",
+        "PMC11077685:evidence_result:1",
+        "PMC11077685:mechanism_principle:0"
+      ]
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "Equiatomic HfNbTaTiZr ink blend containing hydride powders (HfH2, NbH, TaH0.5, TiH2, ZrH2) and metallic Ti/Nb, dispersed in a polystyrene/binder matrix",
+    "intervention": "3D ink extrusion printing followed by de-binding in flowing hydrogen, and vacuum sintering at 1400°C for 18 hours with titanium sponge oxygen getter",
+    "conditions": "Vacuum atmosphere (<3×10⁻⁶ torr), sequential heating to 1400°C, followed by water quenching from 1500°C for phase stabilization",
+    "structural_mediator": "Sequential decomposition of hydrides driven by formation enthalpy differences (Ta→Nb→Hf/Ti/Zr), enabling in-situ alloying and oxygen scavenging",
+    "mechanism": "Interstitial strengthening from controlled oxygen uptake (≈1.0 wt.%) combined with phase stabilization; quenching suppresses alpha-HCP formation to retain metastable beta-BCC; silicide coating provides oxidation resistance via self-healing (Zr,Hf)O2 oxide filling",
+    "predicted_outcome": "Nearly fully dense bulk with metastable single beta-BCC phase (after quench) and excellent high-temperature compression strength; significant reduction in oxidation rate compared to uncoated baseline",
+    "baseline": "Cast HfNbTaTiZr or uncoated sintered samples prone to cracking, alpha-HCP embrittlement, and rapid oxidation (k ≈ 570 mg² cm⁻⁴ h⁻¹)",
+    "boundary": "Oxygen content must be maintained around 1.0 wt.%; cooling rate dictates phase stability (slow cooling yields alpha+beta, quenching yields single beta); sintering time must exceed 15 min to achieve full densification",
+    "discriminating_measurement": "In-situ X-ray diffraction monitoring of hydride decomposition onset temperatures and phase shifts during heating; post-quench XRD/EBSD for phase identification and grain size (target ~33 µm)",
+    "actual_result": "Successfully printed and sintered alloys with ≈1 wt.% O showing excellent mechanical properties at high temperatures; quenching yielded metastable single beta-BCC phase with 33 ± 19 µm grain size; silicide coating reduced parabolic rate constant by ~700x (k ≈ 0.80 mg² cm⁻⁴ h⁻¹)"
+  },
+  "leakage_audit": {
+    "excluded_result_information": [
+      "Specific parabolic rate constant values (570 vs 0.80 mg² cm⁻⁴ h⁻¹)",
+      "Exact grain size measurement (33 ± 19 µm)",
+      "Precise oxygen content value (0.996 wt.%)",
+      "The 700-fold improvement factor",
+      "Specific decomposition onset temperatures (e.g., 290°C, 380°C, 410°C)",
+      "Specific binder/solvent chemistry (Polystyrene, DCM, Dibutyl phthalate)",
+      "The specific 'lattice-core sandwich' geometry demonstration",
+      "The exact composition of the pack cementation mixture (Si, Al2O3, Na3AlF6 ratios)"
+    ],
+    "remaining_risks": [
+      "The 'expert_context' query explicitly mentions 'titanium sponge' as the getter, which is a specific implementation detail from the hidden target. This could be considered a partial leak of the intervention recipe.",
+      "The 'problem_constrained' query mentions the specific mechanism of 'alpha-HCP precipitation' which is a very specific structural outcome, though framed as a failure mode to be mitigated.",
+      "The 'broad' query mentions 'Group IV-V transition metals' which is the specific family, though this is general knowledge for the field."
+    ]
+  },
+  "deterministic_leakage_flags": []
+}

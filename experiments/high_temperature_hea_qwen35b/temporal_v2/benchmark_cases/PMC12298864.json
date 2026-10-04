@@ -1,0 +1,69 @@
+{
+  "schema_version": "temporal-hypothesis-benchmark-1.0",
+  "paper_id": "PMC12298864",
+  "publication_date": "2025-07-09",
+  "split": "test",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "model_cutoff_status": "unknown",
+  "hidden_target_source": "v2_current_paper_evidence",
+  "queries": {
+    "broad": {
+      "text": "For a multi-principal element alloy system known for limited ductility in cast forms, propose a processing route and phase constitution that would simultaneously achieve nanocrystalline grain sizes below 50 nm and a dual-phase solid solution structure, thereby enhancing hardness and yield strength without inducing brittle intermetallic formation. Support this hypothesis with prior evidence regarding grain refinement mechanisms and phase stability limits, define the boundary conditions where this microstructure becomes unstable, and suggest a falsification experiment to distinguish this mechanism from simple solid solution strengthening.",
+      "source_role_refs": [
+        "PMC12298864:problem_motivation:1",
+        "PMC12298864:problem_motivation:0"
+      ]
+    },
+    "problem_constrained": {
+      "text": "Given a CoCrFeNiTi high-entropy alloy where conventional casting yields porosity and a homogeneous but soft single-phase structure, and where previous attempts suffered from low hardness, propose a solid-state processing strategy involving high-energy milling followed by rapid sintering. The target is to suppress porosity while driving the formation of a fine-grained nanocrystalline solid solution (dominated by FCC with minor BCC) rather than a brittle HCP phase often associated with Titanium-rich systems. Incorporate known constraints on displacement rates and thermal expansion during sintering into the hypothesis. Define the operating regime (temperature/strain rate) where this dual-phase stability is maximized, and propose a specific mechanical test (e.g., indentation load and dwell time) that would falsify the claim that the observed hardness is due to grain refinement rather than solute strengthening.",
+      "source_role_refs": [
+        "PMC12298864:prior_limitation:0",
+        "PMC12298864:prior_limitation:1",
+        "PMC12298864:prior_limitation:2",
+        "PMC12298864:constraint:0",
+        "PMC12298864:constraint:1",
+        "PMC12298864:constraint:2"
+      ]
+    },
+    "expert_context": {
+      "text": "Design a hypothesis for the synthesis of a CoCrFeNiTi high-entropy alloy that overcomes the low hardness and porosity associated with casting by utilizing the synergistic effects of prolonged high-energy ball milling and spark plasma sintering. The hypothesis must posit that milling durations of ~6 hours induce sufficient lattice strain and grain refinement to lower the energy barrier for a specific FCC/BCC solid solution transition, while SPS at 1000°C facilitates densification without triggering excessive HCP precipitation driven by Ti. Use the principle that VEC and atomic radius mismatch govern the phase stability in this specific transition. Identify the boundary where sintering temperature exceeds the threshold for grain growth or phase decomposition, and specify a falsification experiment involving Vickers hardness testing at low loads to isolate grain boundary strengthening from precipitation hardening. Ensure the hypothesis does not rely on post-hoc optimization of the exact sintering curve but rather on the fundamental thermodynamics of the ball-milled state.",
+      "source_role_refs": [
+        "PMC12298864:causal_claim:0",
+        "PMC12298864:causal_claim:1",
+        "PMC12298864:causal_claim:2",
+        "PMC12298864:mechanism_principle:1",
+        "PMC12298864:prior_limitation:2"
+      ]
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "Elemental powders of Co, Cr, Fe, Ni, Ti with high purity (99.5%+) and specific particle size distributions, nominally equimolar.",
+    "intervention": "High-energy ball milling (HEBM) in an argon atmosphere for 1-6 hours, followed by Spark Plasma Sintering (SPS) in a vacuum environment at 900-1000°C for 10 minutes.",
+    "conditions": "Milling at 400 rpm with a 20:1 ball-to-powder weight ratio; SPS heating rate of 50°C/min, holding time 10 min, mold diameter 30.4 mm.",
+    "structural_mediator": "Prolonged milling induces severe lattice strain and crystal size reduction (<48 nm), promoting a non-equilibrium nanocrystalline solid solution; SPS accelerates diffusion and densification while suppressing porosity, stabilizing a mixed 83% FCC / 17% BCC phase structure.",
+    "mechanism": "Hardness and strength enhancement arise from the synergistic combination of grain boundary strengthening (Hall-Petch) due to nanocrystalline grain sizes, dislocation density accumulation from milling, and solid solution strengthening, while the specific phase mix is stabilized by the thermodynamic influence of Titanium's atomic radius and melting point.",
+    "predicted_outcome": "A bulk alloy with density >6.5 g/cm³, Vickers hardness of ~675 Hv, and compressive strength of ~1894 MPa, exhibiting intergranular fracture characteristics indicative of high strength but limited ductility.",
+    "baseline": "Cast CoCrFeNiTi alloys which suffer from porosity, heterogeneous microstructure, and significantly lower hardness/strength.",
+    "boundary": "The process window is bounded by the sintering temperature where density saturates (around 1000°C) and milling duration where grain coarsening or phase decomposition might occur if held too long or at too high a temperature.",
+    "discriminating_measurement": "Vickers hardness testing at 0.05 kN with 15 s dwell time, combined with XRD analysis in the 20°-80° 2θ range to resolve the FCC/BCC phase fractions and grain size.",
+    "actual_result": "The alloy achieved a hardness of 675 Hv, compressive strength of 1894 MPa, and yield stress of 1238 MPa at 1000°C sintering temperature, with a microstructure consisting of 83% FCC and 17% BCC phases and grain sizes below 48 nm."
+  },
+  "leakage_audit": {
+    "excluded_result_information": [
+      "Specific hardness value of 675 Hv",
+      "Specific compressive strength value of 1894 MPa",
+      "Specific yield stress value of 1238 MPa",
+      "Exact phase fraction (83% FCC, 17% BCC)",
+      "Exact grain size limit (48 nm)",
+      "The specific sintering temperature (1000°C) that yielded maximum strength",
+      "The specific milling duration (6 hours) associated with peak hardness",
+      "The specific density value (6.73 g/cm³)"
+    ],
+    "remaining_risks": [
+      "The query 'expert_context' mentions the 'specific FCC/BCC solid solution transition' which, while not listing percentages, strongly hints at the dual-phase outcome described in the hidden target. A model with access to the hidden target might infer the exact ratio.",
+      "The query 'problem_constrained' references 'high-energy ball milling and rapid sintering' which is the specific intervention; while not a leak of the result, it narrows the search space to exactly the paper's method, potentially allowing a model to deduce the result by retrieving the only known successful case in this narrow domain.",
+      "The mention of 'Titanium-rich systems' and 'HCP precipitation' in the queries, while based on general materials knowledge, is used here to frame the specific mechanism described in the paper's mechanism claim (PMC12298864:mechanism_principle:0). If the model knows the paper, it might conflate the general risk with the specific paper's finding."
+    ]
+  },
+  "deterministic_leakage_flags": []
+}

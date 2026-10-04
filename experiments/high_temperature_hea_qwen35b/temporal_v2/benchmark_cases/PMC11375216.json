@@ -1,0 +1,62 @@
+{
+  "schema_version": "temporal-hypothesis-benchmark-1.0",
+  "paper_id": "PMC11375216",
+  "publication_date": "2024-09-04",
+  "split": "validation",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "model_cutoff_status": "unknown",
+  "queries": {
+    "broad": {
+      "text": "I am investigating the impact of chemical short-range order (SRO) on the thermal conductivity of concentrated refractory high-entropy alloys. Specifically, I need a hypothesis regarding whether SRO formation typically enhances or suppresses lattice heat transport, along with the supporting physical mechanisms. Please outline the expected boundary conditions and propose a falsification experiment to distinguish between scattering-dominated and ordering-dominated transport regimes.",
+      "source_role_refs": [
+        "PMC11375216:problem_motivation:0"
+      ]
+    },
+    "problem_constrained": {
+      "text": "We are studying a single-phase bcc refractory high-entropy alloy (e.g., HfNbTaTiZr) where existing analytical models fail to capture the role of chemical short-range order in phonon transport. A known limitation in the field is that standard potential functions may not correctly predict SRO evolution, and prior literature on fcc systems suggests SRO should reduce thermal conductivity by increasing scattering. However, we observe a regime where SRO clusters percolate. Given the operating regime of high-temperature stability (single-phase bcc) and the failure of serial/parallel mixing models to predict the magnitude of conductivity changes, formulate a hypothesis on the net effect of SRO on thermal conductivity. Include the specific design constraints regarding the potential energy surface and propose an experiment to verify if the conductivity change is driven by a percolative transition rather than simple scattering.",
+      "source_role_refs": [
+        "PMC11375216:constraint:0",
+        "PMC11375216:prior_limitation:0",
+        "PMC11375216:contradiction:0",
+        "PMC11375216:contradiction:4"
+      ]
+    },
+    "expert_context": {
+      "text": "In the context of the HfNbTaTiZr system, we utilize Monte Carlo schemes to simulate various degrees of chemical SRO, leading to the formation of specific binary clusters (e.g., HfTi, TiZr) and a subsequent percolative transition. While the general expectation is that precipitates or ordered phases would act as strong phonon scattering centers (reducing conductivity), preliminary atomistic modeling suggests a counter-intuitive result where the lattice distortion is actually reduced by the formation of ordered B2-like structures. This reduction in distortion, combined with the specific percolation pathways of the SRO clusters, may lead to a net increase in lattice heat conductivity. Construct a hypothesis that accounts for the modification of the high-frequency phonon density of states and the transition from random to ordered binary phases. Define the boundary conditions for this 'conductivity increase' vs. the 'conductivity decrease' typically seen in random alloys, and specify a discriminating measurement (e.g., comparing atomic displacement amplitudes or high-frequency DOS features) to validate the mechanism of reduced scattering times versus enhanced percolative transport.",
+      "source_role_refs": [
+        "PMC11375216:mechanism_principle:0",
+        "PMC11375216:mechanism_principle:1",
+        "PMC11375216:mechanism_principle:2",
+        "PMC11375216:evidence_result:0",
+        "PMC11375216:contradiction:3"
+      ]
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "Random bcc HfNbTaTiZr refractory high-entropy alloy",
+    "intervention": "Induce varying degrees of chemical short-range order (SRO) via Monte Carlo simulation, leading to the formation of HfTi and TiZr clusters and percolation pathways",
+    "conditions": "Atomistic simulation (Monte Carlo for structure, non-equilibrium molecular dynamics for transport), single-phase bcc model constraint, room to high-temperature regime",
+    "structural_mediator": "Ordered B2-like structures and percolative SRO cluster pathways",
+    "mechanism": "SRO reduces lattice distortion (reducing scattering) and creates high-conductivity percolation pathways, outweighing the scattering effect of the precipitates themselves; modifies high-frequency phonon density of states",
+    "predicted_outcome": "Lattice heat conductivity increases by approximately 12% relative to the random alloy state",
+    "baseline": "Random alloy with high lattice distortion and no SRO clustering",
+    "boundary": "Applicability extends to other HEAs (including fcc) and depends on the percolation of specific ordered binary clusters; distinct from random fcc alloys where conductivity typically decreases significantly with temperature",
+    "discriminating_measurement": "Quantification of lattice heat conductivity increase (12%) and reduction in atomic displacements (12.5%) compared to random state; analysis of phonon density of states modifications",
+    "actual_result": "SRO increases lattice heat conductivity by ~12% due to percolative transitions and reduced lattice distortion, contradicting the expectation that ordered phases always reduce conductivity via scattering"
+  },
+  "leakage_audit": {
+    "excluded_result_information": [
+      "Specific 12% increase value in the queries",
+      "Specific 12.5% reduction in atomic displacements",
+      "Explicit naming of HfTi and TiZr clusters in the broad query",
+      "Specific mention of 'B2' structures in the broad query",
+      "The exact numerical comparison to the 70% decrease in 4-element random alloys",
+      "The specific DOI or paper title"
+    ],
+    "remaining_risks": [
+      "The 'expert_context' query mentions specific cluster names (HfTi, TiZr) which might be considered a leak if the user is expected to discover the specific chemistry from scratch, though it serves as scientific context.",
+      "The 'problem_constrained' query explicitly mentions the 12% result in the description of the counter-intuitive finding, which slightly violates the 'do not reveal result' rule if interpreted strictly as part of the problem statement rather than the expected mechanism."
+    ]
+  },
+  "deterministic_leakage_flags": []
+}

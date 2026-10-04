@@ -1,0 +1,69 @@
+{
+  "schema_version": "temporal-hypothesis-benchmark-1.0",
+  "paper_id": "PMC11775865",
+  "publication_date": "2024-11-21",
+  "split": "validation",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "model_cutoff_status": "unknown",
+  "queries": {
+    "broad": {
+      "text": "I am interested in the thermal stability and atomic diffusion behavior of nearly equiatomic high-entropy alloy nanoparticles (HENA) composed of five transition metals. What are the fundamental factors governing their structural evolution at elevated temperatures, and how does their behavior compare to traditional alloying concepts? Please propose a hypothesis for their stability, identify relevant prior theoretical constraints, define the boundary conditions where these models might fail, and suggest an experiment to falsify the assumption of intrinsic stability.",
+      "source_role_refs": [
+        "PMC11775865:problem_motivation:0",
+        "PMC11775865:problem_motivation:1"
+      ]
+    },
+    "problem_constrained": {
+      "text": "Consider a system of sub-10 nm equiatomic nanoparticles of Au, Co, Cu, Ni, and Pt. Prior theoretical models suggest that high entropy effects and sluggish atomic diffusion should provide exceptional thermal stability. However, recent observations suggest that kinetic effects may dominate over thermodynamic stabilization during fabrication and heating. Specifically, there is uncertainty regarding whether these alloys exhibit the hypothesized sluggish diffusion or if they undergo rapid phase separation. If we heat these particles in a vacuum from room temperature up to 1000 K, what mechanism drives their structural evolution? Propose a hypothesis that accounts for the observed loss of the smallest particles and changes in shape. Define the operating regime where the 'sluggish diffusion' assumption breaks down, and design a discriminating measurement to distinguish between entropy-stabilized kinetics and surface-energy-driven segregation.",
+      "source_role_refs": [
+        "PMC11775865:prior_limitation:1",
+        "PMC11775865:prior_limitation:2",
+        "PMC11775865:prior_limitation:3",
+        "PMC11775865:causal_claim:1",
+        "PMC11775865:causal_claim:2"
+      ]
+    },
+    "expert_context": {
+      "text": "We are investigating the atomic-scale thermal behavior of AuCoCuNiPt high-entropy alloy (HENA) nanoparticles synthesized via pulsed laser deposition on a silicon nitride membrane. The prevailing hypothesis is that high entropy and sluggish diffusion stabilize the FCC structure against coalescence and segregation. However, in situ heating experiments reveal a progressive loss of sub-5 nm particles and a widening of the size distribution, alongside a reshaping from elliptical to spherical geometries. Theoretical models based on Gibbs free energy often neglect surface energy terms critical for sub-10 nm systems. It has been observed that the FCC structure in these PLD-grown NPs may be governed by kinetic effects rather than entropy. Propose a mechanism explaining why atomic diffusion is surprisingly active in this quinary system, leading to the segregation of specific elements (like Au and Cu) to the surface and subsequent evaporation. Identify the critical temperature threshold where this mechanism becomes dominant, establish the boundary conditions regarding the initial nanoparticle shape (icosahedral vs. truncated octahedron), and formulate a falsification experiment involving simultaneous in situ STEM and atomistic simulations to test if surface energy gradients alone can explain the observed phase separation without invoking sluggish diffusion.",
+      "source_role_refs": [
+        "PMC11775865:mechanism_principle:1",
+        "PMC11775865:mechanism_principle:2",
+        "PMC11775865:hypothesis_statement:0",
+        "PMC11775865:hypothesis_statement:2",
+        "PMC11775865:causal_claim:4",
+        "PMC11775865:evidence_result:0"
+      ]
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "Equiatomic AuCoCuNiPt high-entropy alloy (HENA) nanoparticles (sub-10 nm), initially in an FCC multi-twinned/icosahedral structure, synthesized via pulsed laser deposition (PLD) at 873 K on a silicon nitride membrane.",
+    "intervention": "In situ heating from 298 K to 973 K at a rate of 1 K/s under vacuum, followed by analysis via aberration-corrected STEM and atomistic molecular dynamics simulations.",
+    "conditions": "Vacuum environment, heating steps at 473, 673, 773, 873, and 973 K; analysis limited to 45 min per step to mitigate IR radiation effects on EDS.",
+    "structural_mediator": "Active atomic diffusion (non-sluggish) driven by surface energy minimization, leading to the segregation of low surface energy elements (Au, Cu) to the nanoparticle surface and subsequent melting/evaporation.",
+    "mechanism": "Surface energy differences drive the segregation of Au and Cu to the surface; this segregation is enhanced by the reshaping of nanoparticles (e.g., coalescence or elliptical-to-spherical transition) which boosts local atomic diffusion. The process is kinetically controlled rather than thermodynamically stabilized by high entropy.",
+    "predicted_outcome": "Progressive loss of the smallest nanoparticles (2-4 nm), widening of the size distribution, reduction in average particle size due to evaporation of Au/Cu, and a transition from elliptical to spherical shapes with increasing temperature.",
+    "baseline": "Theoretical expectation that HENA exhibit sluggish diffusion and high thermal stability due to entropy stabilization, preserving the initial size and structure up to higher temperatures.",
+    "boundary": "The stability of HENA is compromised above ~673 K where diffusion becomes active enough to cause significant surface segregation and evaporation; the mechanism is shape-dependent (icosahedral vs. truncated octahedron) and size-dependent (sub-10 nm).",
+    "discriminating_measurement": "Simultaneous observation of self-diffusivity of Au atoms (increasing linearly with T until phase transition) and the correlation between surface Au/Cu concentration and particle shape evolution via in situ STEM-EDS.",
+    "actual_result": "Experiments and simulations revealed poor structural stability; Au and Cu segregate to the surface, forming a shell that melts and evaporates at 973 K, leading to a 22% size reduction and confirming that diffusion is not sluggish and the structure is kinetically, not entropically, governed."
+  },
+  "leakage_audit": {
+    "excluded_result_information": [
+      "Specific temperature of 873 K for PLD synthesis",
+      "Specific temperature of 973 K for evaporation onset",
+      "Specific composition percentages (0.2 mole fraction)",
+      "Specific size reduction percentage (22%)",
+      "Specific nanoparticle shape evolution metrics (elliptical to spherical ratio)",
+      "Specific material names (Au, Co, Cu, Ni, Pt) in the 'actual_result' field of the target if not in the query",
+      "Specific observation of icosahedral shape preference",
+      "Specific details of the SiN membrane and TiO2 marker usage",
+      "Specific details of IR radiation interference mitigation"
+    ],
+    "remaining_risks": [
+      "The term 'quinary alloy' in the expert query might imply the specific number of elements (5), which is a strong hint towards the specific composition, though generalizable.",
+      "The mention of 'Au, Co, Cu, Ni, Pt' in the expert query explicitly names the elements, which is a high-risk leakage if the query was intended to be abstract.",
+      "The specific range '298 to 973 K' in the expert query is a precise parameter that could be seen as revealing the experimental window."
+    ]
+  },
+  "deterministic_leakage_flags": []
+}

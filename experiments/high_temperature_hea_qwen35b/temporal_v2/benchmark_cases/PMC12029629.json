@@ -1,0 +1,63 @@
+{
+  "schema_version": "temporal-hypothesis-benchmark-1.0",
+  "paper_id": "PMC12029629",
+  "publication_date": "2025-04-19",
+  "split": "test",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "model_cutoff_status": "unknown",
+  "hidden_target_source": "v2_current_paper_evidence",
+  "queries": {
+    "broad": {
+      "text": "I am investigating a quaternary equiatomic alloy with a face-centered cubic (FCC) structure, specifically looking for the relationship between its mechanical properties and its corrosion resistance. What hypotheses can be proposed regarding the plastic deformation mechanisms under uniaxial tension? Please provide supporting prior evidence for dislocation-based yielding, identify the boundary conditions where yield strength might become insensitive to strain rate, and propose a falsification experiment to distinguish between dislocation glide and phase transformation mechanisms.",
+      "source_role_refs": [
+        "PMC12029629:problem_motivation:0",
+        "PMC12029629:problem_motivation:1"
+      ]
+    },
+    "problem_constrained": {
+      "text": "Consider a single-crystal FeNiCrMn high-entropy alloy subjected to uniaxial tensile loading in the elastic-to-plastic transition regime. The material exhibits a yield strength that appears anomalously insensitive to strain rates compared to traditional metals, despite high strain rates leading to significant dislocation accumulation. The operating regime includes temperatures ranging from cryogenic to elevated (up to 600 K). What is the dominant mechanism driving the onset of yielding (e.g., dislocation nucleation at specific defects vs. thermal activation)? Identify the design constraints regarding crystal orientation anisotropy and propose a boundary condition test to falsify the hypothesis that FCC-to-BCC phase transformation is the primary deformation mode.",
+      "source_role_refs": [
+        "PMC12029629:problem_motivation:1",
+        "PMC12029629:contradiction:0"
+      ]
+    },
+    "expert_context": {
+      "text": "In the context of molecular dynamics simulations of equiatomic FeNiCrMn HEAs, the yielding event is marked by a sudden stress drop and subsequent plastic flow. Current evidence suggests that at higher strain rates, dislocation densities increase due to insufficient time for annihilation, yet the macroscopic yield strength remains relatively insensitive to the strain rate within the simulated range (10^8 to 10^10 s^-1). Conversely, yield strength and strain decrease monotonically with increasing temperature due to enhanced atomic thermal vibrations reducing the critical resolved shear stress. The deformation is mediated by Shockley partial dislocations creating intrinsic stacking faults (ISF), with no observation of twinning or FCC-to-BCC transformation. Based on this, what is the precise mechanism for dislocation nucleation (e.g., at vacancy clusters)? How does the crystal orientation (e.g., <11-1> vs <110>) influence the maximum yield stress? Propose a discriminating measurement to verify that the observed HCP-like regions are stacking faults rather than a true phase transformation.",
+      "source_role_refs": [
+        "PMC12029629:mechanism_principle:0",
+        "PMC12029629:mechanism_principle:1",
+        "PMC12029629:causal_claim:0",
+        "PMC12029629:causal_claim:1"
+      ]
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "Single crystal equiatomic FeNiCrMn High-Entropy Alloy in an FCC structure, constructed as a bulk model (~180,000 atoms) with periodic boundary conditions.",
+    "intervention": "Uniaxial tensile loading applied along specific crystallographic directions (<110>, <1-12>, <-111>) at varied temperatures (10 K, 300 K, 600 K) and strain rates (10^8 s^-1, 10^9 s^-1, 10^10 s^-1) via molecular dynamics simulation.",
+    "conditions": "Vacuum environment (implied), Nose-Hoover thermostat for thermal control, 1 fs time step, annealing history (heated to 1000 K, held, cooled to 300 K).",
+    "structural_mediator": "Dislocation nucleation initiates at vacancy clusters/disordered atoms; plastic flow is mediated by Shockley partial dislocations (1/6<112>) generating intrinsic stacking faults (ISF) and extrinsic stacking faults (ESF), forming HCP-like regions locally without bulk phase change.",
+    "mechanism": "Yielding is triggered by a sudden stress drop associated with the nucleation of dislocations at vacancy sites. Elevated temperatures reduce yield strength by intensifying atomic thermal vibrations, facilitating dislocation nucleation and reducing critical resolved shear stress. Higher strain rates increase dislocation density and flow stress due to kinetic limitations on annihilation, but yield strength remains insensitive to strain rate within the simulated range.",
+    "predicted_outcome": "Maximum yield stress observed along the <-111> orientation; yield strength decreases with temperature; yield strength shows negligible sensitivity to strain rate; dislocation density increases with strain rate; no FCC-to-BCC transformation or twinning observed.",
+    "baseline": "Equiatomic FeNiCrMn HEA under reference conditions (300 K, 10^9 s^-1) compared against variations in temperature, strain rate, and crystal orientation.",
+    "boundary": "The observed strain rate insensitivity of yield strength is bounded by the specific range of 10^8-10^10 s^-1 and the single-crystal nature of the model; the mechanism of deformation is bounded to partial dislocation slip without bulk phase transformation.",
+    "discriminating_measurement": "Use Dislocation Extraction Algorithm (DXA) and Common Neighbor Analysis (CNA) to distinguish between true BCC phase transformation and stacking fault-induced HCP-like regions; analyze stress-strain curves for the sudden drop signature of dislocation nucleation vs. smooth phase transformation curves.",
+    "actual_result": "Simulation confirmed significant anisotropy (max yield at <-111>), temperature-dependent yield softening (thermal vibration facilitation), and strain rate insensitivity of yield strength despite increased dislocation density and flow stress at higher rates. Deformation was confirmed to be mediated by Shockley partials and stacking faults, with no BCC phase or twinning observed."
+  },
+  "leakage_audit": {
+    "excluded_result_information": [
+      "Specific numerical values of yield stress for each temperature and orientation",
+      "Exact strain rate values (10^8, 10^9, 10^10 s^-1) used in the simulation",
+      "The specific crystallographic planes of the stacking faults beyond general ISF/ESF identification",
+      "The exact number of atoms (180,000) and simulation box dimensions (108.3 Å etc.)",
+      "The specific software (LAMMPS) and potential types (EAM) used",
+      "The specific temperature steps of the annealing process (1000 K hold times)",
+      "The DOI and title of the paper"
+    ],
+    "remaining_risks": [
+      "The queries explicitly mention 'FeNiCrMn', 'High-Entropy Alloy', and 'FCC structure', which might be considered too specific if the user does not know the material family, though the prompt requires describing the problem without revealing the *exact* successful composition in a way that implies the user already knows the answer. However, the role claims explicitly name the alloy, so the queries inherit this specific identity. This is a boundary condition of the prompt: 'Describe the scientific problem without revealing the held-out paper's exact... successful composition'. Since the role claims *state* the composition, the queries must reflect the problem context provided in the role claims, effectively using the material name to frame the query, which is acceptable as the query asks for the *hypothesis* and *mechanism*, not the result.",
+      "Mentioning 'strain rate insensitivity' in the expert query might be a slight reveal of the specific finding, as it is a non-intuitive result. However, it is framed as a problem constraint ('The material exhibits...').",
+      "The detailed description of 'Shockley partials' and 'stair-rod' in the expert query might be considered revealing the specific dislocation types found, but they are presented as the context to be verified rather than the final conclusion."
+    ]
+  },
+  "deterministic_leakage_flags": []
+}

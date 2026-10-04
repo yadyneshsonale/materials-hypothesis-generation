@@ -1,0 +1,66 @@
+{
+  "schema_version": "temporal-hypothesis-benchmark-1.0",
+  "paper_id": "PMC11606917",
+  "publication_date": "2024-11-29",
+  "split": "validation",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "model_cutoff_status": "unknown",
+  "queries": {
+    "broad": {
+      "text": "I am interested in high-entropy alloys for extreme temperature applications. How can we predict melting properties such as the melting temperature, entropy of fusion, and heat capacity for multi-component systems where experimental data is sparse or unreliable due to high melting points? I am looking for a hypothesis on a computational methodology that balances accuracy with the need to screen vast compositional spaces, along with prior evidence on why standard approaches struggle in this regime and what a valid boundary condition for such a method would be.",
+      "source_role_refs": [
+        "PMC11606917:problem_motivation:0",
+        "PMC11606917:prior_limitation:0",
+        "PMC11606917:prior_limitation:1"
+      ]
+    },
+    "problem_constrained": {
+      "text": "We are analyzing a refractory BCC high-entropy alloy (Ta-based) where standard experimental measurements of melting properties are infeasible. Current ab initio free energy methods are prohibitively expensive due to the need for thermodynamic integration over the full phase space. Furthermore, existing empirical potentials (like EAM) often fail to capture the complex liquid structure in multi-component systems, while machine learning potentials are computationally demanding. I need a hypothesis for an intervention that replaces the expensive thermodynamic integration step with a more efficient perturbation scheme using a specific class of machine learning potentials. The solution must address the trade-off between computational cost (currently limiting throughput) and the accuracy required to resolve subtle free energy differences. What are the known failure modes of existing TOR-TILD or similar approaches in multi-component spaces, and what falsification experiment could distinguish a true efficiency gain from an artifact of the potential's training set?",
+      "source_role_refs": [
+        "PMC11606917:prior_limitation:2",
+        "PMC11606917:prior_limitation:4",
+        "PMC11606917:constraint:1"
+      ]
+    },
+    "expert_context": {
+      "text": "Consider a TaVCrW refractory high-entropy alloy. The objective is to calculate its melting temperature and related thermodynamic properties using Density Functional Theory (DFT). The standard approach (TOR-TILD) relies on expensive thermodynamic integration. We hypothesize that substituting the reference potential (EAM) with a Machine Learning Interatomic Potential (MTP) and replacing thermodynamic integration with free energy perturbation (FEP) can achieve significant speedups while maintaining sub-meV accuracy, provided the MTP accurately reproduces the ab initio phase-space distribution even for complex liquids. Prior work suggests that electronic excitations (specifically the gap in the Density of States at the Fermi level) can shift the melting point by tens of Kelvin, and that Short-Range Order (SRO) in the solid phase can introduce a stabilization energy of ~2-3 meV/atom. However, there are limitations: (1) The empirical 'underbinding/overbinding' rules for GGA-PBE/LDA functionals do not hold for V and Cr at 0K, potentially propagating errors; (2) High-temperature magnetic fluctuations are typically neglected but may be relevant. The computational cost must be reduced by >80% compared to the baseline TOR-TILD method. Propose the specific structural mediator (the MTP's ability to reproduce phase-space distributions) that enables the substitution of TI with FEP. What is the boundary condition regarding the supercell size and temperature range (2000-2400 K) needed to validate the SRO contribution? Design a falsification experiment comparing the new method against the original TOR-TILD on a benchmark system (e.g., a simpler alloy) to ensure the free energy difference does not exceed 0.5 meV/atom.",
+      "source_role_refs": [
+        "PMC11606917:hypothesis_statement:0",
+        "PMC11606917:mechanism_principle:0",
+        "PMC11606917:causal_claim:0",
+        "PMC11606917:mechanism_principle:1",
+        "PMC11606917:constraint:2",
+        "PMC11606917:causal_claim:1"
+      ]
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "BCC refractory high-entropy alloy with nominal composition TaVCrW (disordered solid state)",
+    "intervention": "Substitution of the empirical Embedded Atom Method (EAM) potential with a Machine Learning Interatomic Potential (MTP) for the liquid phase, and replacement of expensive thermodynamic integration (TI) calculations with free energy perturbation (FEP) calculations.",
+    "conditions": "DFT-based free energy approach; Temperature range 2000–2400 K for SRO analysis; Supercell size 12x12x12 (3456 atoms) for MTP training/MD; Exchange-correlation functionals GGA-PBE and LDA; 0 GPa pressure.",
+    "structural_mediator": "High-fidelity MTP capable of closely reproducing the ab initio phase-space distribution for multi-component alloys, with training errors < 1 meV/atom.",
+    "mechanism": "The MTP enables efficient sampling for FEP, avoiding the slow convergence of TI. The electronic Gibbs energy difference (arising from a DOS gap at the Fermi level) and Solid-state Short-Range Order (SRO) stabilization (~2.4 meV/atom) act as critical physical contributions shifting the melting temperature. The FEP method leverages the small variance in energy differences between MTP and DFT to converge free energy rapidly.",
+    "predicted_outcome": "Computational resource savings of 80% (or ~20x speedup) compared to the original TOR-TILD method, with free energy differences between the new method and TI < 0.5 meV/atom, and melting points shifting by 48–57 K due to electronic excitations.",
+    "baseline": "Original TOR-TILD methodology using two EAM potentials and computationally expensive thermodynamic integration based on ab initio MD.",
+    "boundary": "The method is limited by the quality of the MTP training set; magnetic fluctuations at high temperatures are treated as having negligible impact (based on test calculations); SRO contribution is small but non-negligible (~25 K shift); the empirical rules for GGA/LDA under/overbinding do not hold for V/Cr, introducing uncertainty relative to CALPHAD data.",
+    "discriminating_measurement": "Comparison of free energy results between FEP (MTP) and TI (EAM) on a benchmark system (e.g., VW system) showing agreement within 0.5 meV/atom, and the specific energy difference attributed to electronic excitations (48 K shift for GGA-PBE).",
+    "actual_result": "The proposed method achieved 80% computational savings and predicted melting points 193 K (GGA-PBE) and 160 K (LDA) below the extrapolated CALPHAD value. Electronic excitations contributed a 48 K (GGA-PBE) and 57 K (LDA) shift, and SRO stabilized the solid phase by 2.4 meV/atom. The method agreed reasonably with CALPHAD values within the estimated uncertainty of the CALPHAD database."
+  },
+  "leakage_audit": {
+    "excluded_result_information": [
+      "Exact numerical savings (80%, 20x)",
+      "Specific melting point shift values (48 K, 57 K, 193 K, 160 K)",
+      "Specific SRO stabilization energy (2.4 meV/atom)",
+      "Specific supercell dimensions (12x12x12, 16x16x32)",
+      "Specific energy difference threshold (0.5 meV/atom)",
+      "The exact alloy composition details (TaVCrW) in the context of the result, though the element names are necessary for the problem definition",
+      "The specific benchmark system (VW) mentioned in the text as a validation step"
+    ],
+    "remaining_risks": [
+      "The queries, particularly the 'expert_context', contain enough specific constraints (e.g., 'MTP replacing TI', 'TaVCrW', 'electronic excitations', 'SRO') that a model might infer the specific paper's contribution if it has been trained on the full text, even if exact numbers are omitted.",
+      "The phrase 'underbinding/overbinding does not hold for V and Cr' is a specific, idiosyncratic finding that, if included in the query, acts as a strong signature of the paper's content.",
+      "The combination of 'EAM vs MTP' and 'TI vs FEP' is a specific methodological signature that might be recognized as the paper's core innovation without explicit numbers."
+    ]
+  },
+  "deterministic_leakage_flags": []
+}
