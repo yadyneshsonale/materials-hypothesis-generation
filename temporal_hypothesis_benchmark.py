@@ -318,6 +318,7 @@ def build_cases(
         if label == "test" or (include_validation and label == "validation")
     }
     completed = 0
+    excluded: list[dict[str, str]] = []
     for paper_id in sorted(selected, key=lambda item: metadata[item]["earliest_public_date"]):
         destination = output_dir / f"{paper_id}.json"
         if resume and destination.exists():
@@ -330,11 +331,25 @@ def build_cases(
         current_units = [
             unit.to_dict() for unit in units if unit.claim_ownership == "current_paper"
         ]
-        if not current_units:
-            raise ValueError(f"{paper_id} has no current-paper v2 evidence")
+        target_roles = _role_items(papers_dir, paper_id, TARGET_ROLE_TYPES)
+        if not current_units and not target_roles:
+            excluded.append({
+                "paper_id": paper_id,
+                "reason": "no current-paper v2 evidence or reconciled target roles",
+            })
+            print(
+                f"[temporal-cases] {paper_id} excluded: no hidden-target evidence",
+                file=sys.stderr,
+            )
+            continue
+        target_source = (
+            "v2_current_paper_evidence"
+            if current_units
+            else "reconciled_target_roles_fallback"
+        )
         prompt = {
             "safe_role_candidates": _role_items(papers_dir, paper_id, QUERY_ROLE_TYPES),
-            "target_role_candidates": _role_items(papers_dir, paper_id, TARGET_ROLE_TYPES),
+            "target_role_candidates": target_roles,
             "normalized_current_paper_evidence_for_hidden_target_only": current_units,
         }
         payload = _validate_case_payload(chat_json(
@@ -362,6 +377,7 @@ def build_cases(
                 "retrospective_temporal_reconstruction",
             ),
             "model_cutoff_status": metadata[paper_id].get("model_cutoff_status", "unknown"),
+            "hidden_target_source": target_source,
             **payload,
             "deterministic_leakage_flags": detected,
         }
@@ -376,6 +392,8 @@ def build_cases(
         "validation_year": validation_year,
         "split_counts": dict(Counter(split.values())),
         "case_count": completed,
+        "excluded_case_count": len(excluded),
+        "excluded_cases": excluded,
         "cases": sorted(selected),
     }
     atomic_json(output_dir / "summary.json", summary)

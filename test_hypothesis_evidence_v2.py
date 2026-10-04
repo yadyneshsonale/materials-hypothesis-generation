@@ -11,7 +11,8 @@ from hypothesis_evidence_v2 import (
     load_evidence,
     write_evidence_record,
 )
-from materials_extract_v2 import extract_paper
+from chunking import Chunk
+from materials_extract_v2 import _validate_rows, extract_paper
 
 
 def _row() -> dict:
@@ -77,6 +78,19 @@ class HypothesisEvidenceV2Tests(unittest.TestCase):
         unit = HypothesisEvidenceUnit.from_dict(row, paper_id="paper-1")
         self.assertEqual(len(unit.measurements[0]["value"]), 3)
         self.assertEqual(unit.limitations[0]["type"], "measurement")
+
+    def test_retains_exact_spans_and_audits_non_verbatim_spans(self) -> None:
+        row = _row()
+        exact = row["evidence_spans"][0]
+        row["evidence_spans"].append("A normalized sentence that is not in the source.")
+        accepted, rejected = _validate_rows(
+            {"units": [row]},
+            "paper-1",
+            Chunk("Results", exact, 0),
+        )
+        self.assertEqual(len(accepted), 1)
+        self.assertEqual(accepted[0].evidence_spans, [exact])
+        self.assertRegex(rejected[0]["reason"], "dropped 1 non-verbatim")
 
     def test_rejects_unknown_mechanism_status(self) -> None:
         row = _row()

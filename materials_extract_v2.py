@@ -142,6 +142,30 @@ def _validate_rows(
     for index, row in enumerate(rows):
         candidate = dict(row) if isinstance(row, dict) else {"raw": row}
         candidate["source_section"] = chunk.section
+        spans = candidate.get("evidence_spans")
+        if isinstance(spans, list):
+            exact_spans = [
+                span
+                for span in spans
+                if isinstance(span, str) and span.strip() and span.strip() in chunk.text
+            ]
+            dropped_spans = [
+                span
+                for span in spans
+                if not isinstance(span, str) or span.strip() not in chunk.text
+            ]
+            if exact_spans and dropped_spans:
+                candidate["evidence_spans"] = exact_spans
+                rejected.append({
+                    "section": chunk.section,
+                    "model_unit_index": index,
+                    "reason": (
+                        f"dropped {len(dropped_spans)} non-verbatim evidence span(s); "
+                        "retained exact spans"
+                    ),
+                    "candidate_evidence_spans": spans,
+                    "dropped_evidence_spans": dropped_spans,
+                })
         try:
             accepted.append(HypothesisEvidenceUnit.from_dict(
                 candidate,
