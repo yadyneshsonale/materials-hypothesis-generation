@@ -514,6 +514,26 @@ def retrieve(query: str, records: Iterable[RetrievalRecord], limit: int = 14) ->
     return [record for _, record in scored[:limit]]
 
 
+def compact_evidence_payload(
+    records: Iterable[RetrievalRecord],
+    *,
+    max_text_chars: int = 1600,
+) -> list[dict[str, Any]]:
+    payload = []
+    for record in records:
+        text = _normalize(record.text)
+        if len(text) > max_text_chars:
+            text = text[:max_text_chars].rsplit(" ", 1)[0] + " ..."
+        payload.append({
+            "record_id": record.record_id,
+            "paper_id": record.paper_id,
+            "publication_date": record.publication_date,
+            "kind": record.kind,
+            "evidence": text,
+        })
+    return payload
+
+
 def _validate_generation(payload: Any, allowed_ids: set[str]) -> dict[str, Any]:
     if not isinstance(payload, dict) or not str(payload.get("hypothesis", "")).strip():
         raise ValueError("hypothesis generation response is invalid")
@@ -579,7 +599,7 @@ def run_experiments(
                     continue
                 query = case["queries"][level]["text"]
                 selected = retrieve(query, records)
-                evidence_payload = [item.to_dict() for item in selected]
+                evidence_payload = compact_evidence_payload(selected)
                 generation = _validate_generation(
                     chat_json(
                         _GENERATE_SYSTEM,

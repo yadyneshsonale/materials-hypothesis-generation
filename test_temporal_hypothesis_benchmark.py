@@ -6,6 +6,7 @@ from temporal_hypothesis_benchmark import (
     RetrievalRecord,
     _eligible,
     chronological_split,
+    compact_evidence_payload,
     retrieve,
 )
 
@@ -53,6 +54,20 @@ class TemporalHypothesisBenchmarkTests(unittest.TestCase):
         ]
         selected = retrieve("improve oxidation resistance and reduce mass gain", records)
         self.assertEqual(selected[0].record_id, "1")
+
+    def test_compact_evidence_payload_bounds_prompt_size(self) -> None:
+        record = RetrievalRecord(
+            "1",
+            "old",
+            "2020-01-01",
+            "v2_evidence",
+            "oxidation " * 1000,
+            {"large": "structured payload" * 1000},
+        )
+        payload = compact_evidence_payload([record], max_text_chars=200)
+        self.assertLessEqual(len(payload[0]["evidence"]), 204)
+        self.assertNotIn("structured", payload[0])
+        self.assertEqual(payload[0]["record_id"], "1")
 
 
 if __name__ == "__main__":
