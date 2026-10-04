@@ -548,6 +548,67 @@ def _validate_generation(payload: Any, allowed_ids: set[str]) -> dict[str, Any]:
     return payload
 
 
+def generate_with_citation_repair(
+    user_payload: dict[str, Any],
+    allowed_ids: set[str],
+) -> dict[str, Any]:
+    raw = chat_json(
+        _GENERATE_SYSTEM,
+        json.dumps(user_payload, ensure_ascii=False),
+        max_tokens=5000,
+    )
+    try:
+        validated = _validate_generation(raw, allowed_ids)
+        validated["citation_validation"] = {
+            "status": "valid",
+            "removed_unknown_ids": [],
+        }
+        return validated
+    except ValueError as first_error:
+        repair_payload = {
+            **user_payload,
+            "validation_error": str(first_error),
+            "allowed_evidence_ids": sorted(allowed_ids),
+            "previous_invalid_response": raw,
+            "repair_instruction": (
+                "Regenerate the JSON response. Evidence ID arrays may contain only exact IDs "
+                "from allowed_evidence_ids. Do not create, shorten, or infer an ID."
+            ),
+        }
+        repaired = chat_json(
+            _GENERATE_SYSTEM,
+            json.dumps(repair_payload, ensure_ascii=False),
+            max_tokens=5000,
+        )
+        try:
+            validated = _validate_generation(repaired, allowed_ids)
+            validated["citation_validation"] = {
+                "status": "valid_after_regeneration",
+                "removed_unknown_ids": [],
+                "initial_error": str(first_error),
+            }
+            return validated
+        except ValueError as second_error:
+            if not isinstance(repaired, dict) or not str(repaired.get("hypothesis", "")).strip():
+                raise ValueError(
+                    f"generation remained invalid after regeneration: {second_error}"
+                ) from second_error
+            unknown: set[str] = set()
+            for key in ("supporting_evidence_ids", "conflicting_evidence_ids"):
+                values = [str(item) for item in repaired.get(key, [])]
+                unknown.update(set(values) - allowed_ids)
+                repaired[key] = [item for item in values if item in allowed_ids]
+            if not unknown:
+                raise
+            repaired["citation_validation"] = {
+                "status": "unknown_ids_removed_after_failed_regeneration",
+                "removed_unknown_ids": sorted(unknown),
+                "initial_error": str(first_error),
+                "regeneration_error": str(second_error),
+            }
+            return _validate_generation(repaired, allowed_ids)
+
+
 def _validate_score(payload: Any) -> dict[str, Any]:
     if not isinstance(payload, dict) or not isinstance(payload.get("scores"), dict):
         raise ValueError("score response must contain scores")
@@ -600,16 +661,12 @@ def run_experiments(
                 query = case["queries"][level]["text"]
                 selected = retrieve(query, records)
                 evidence_payload = compact_evidence_payload(selected)
-                generation = _validate_generation(
-                    chat_json(
-                        _GENERATE_SYSTEM,
-                        json.dumps({
-                            "query": query,
-                            "knowledge_cutoff": cutoff,
-                            "eligible_evidence": evidence_payload,
-                        }, ensure_ascii=False),
-                        max_tokens=5000,
-                    ),
+                generation = generate_with_citation_repair(
+                    {
+                        "query": query,
+                        "knowledge_cutoff": cutoff,
+                        "eligible_evidence": evidence_payload,
+                    },
                     {item.record_id for item in selected},
                 )
                 score = _validate_score(chat_json(

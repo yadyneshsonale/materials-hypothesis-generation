@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import unittest
+from unittest.mock import patch
 
 from temporal_hypothesis_benchmark import (
     RetrievalRecord,
     _eligible,
     chronological_split,
     compact_evidence_payload,
+    generate_with_citation_repair,
     retrieve,
 )
 
@@ -68,6 +70,29 @@ class TemporalHypothesisBenchmarkTests(unittest.TestCase):
         self.assertLessEqual(len(payload[0]["evidence"]), 204)
         self.assertNotIn("structured", payload[0])
         self.assertEqual(payload[0]["record_id"], "1")
+
+    @patch("temporal_hypothesis_benchmark.chat_json")
+    def test_generation_regenerates_unknown_evidence_ids(self, chat_mock) -> None:
+        base = {
+            "hypothesis": "A testable hypothesis.",
+            "supporting_evidence_ids": ["invented"],
+            "conflicting_evidence_ids": [],
+        }
+        repaired = {
+            **base,
+            "supporting_evidence_ids": ["allowed"],
+        }
+        chat_mock.side_effect = [base, repaired]
+        result = generate_with_citation_repair(
+            {"query": "test", "eligible_evidence": []},
+            {"allowed"},
+        )
+        self.assertEqual(result["supporting_evidence_ids"], ["allowed"])
+        self.assertEqual(
+            result["citation_validation"]["status"],
+            "valid_after_regeneration",
+        )
+        self.assertEqual(chat_mock.call_count, 2)
 
 
 if __name__ == "__main__":
