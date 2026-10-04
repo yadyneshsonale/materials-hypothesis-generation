@@ -179,6 +179,47 @@ Review the PDF and generated evidence side by side:
 Then open `http://127.0.0.1:8765` in a local browser. For the VS Code integrated browser, use
 `http://<machine-ip>:8765` because its loopback interface is isolated. The interface provides:
 
+## Temporal hypothesis-reconstruction v2
+
+The v2 experiment preserves all existing outputs and writes new artifacts under
+`temporal_v2/`. It tests whether an agent can reconstruct a held-out paper's hypothesis using
+only papers available before the held-out paper's earliest public date.
+
+The public Qwen3.5-35B-A3B documentation does not state a precise training-data cutoff. Therefore,
+the experiment does not call pre-cutoff papers unseen. It records those cases as retrospective
+temporal reconstructions and permits a strict unseen claim only if a documented model cutoff is
+later supplied and the test paper postdates it.
+
+The automatic workflow performs:
+
+1. exact JATS publication-date and work-family audit;
+2. conservative triage of the 8,848 reader questions;
+3. resumable normalized v2 evidence extraction;
+4. exact-grounding and schema evaluation;
+5. leakage-safe broad, constrained, and expert-context query construction;
+6. chronological train/validation/test case construction;
+7. roles-only, v1-evidence, v2-evidence, and v2-plus-role/question ablations;
+8. structured reconstruction, evidence, boundary, and falsification scoring.
+
+Run it in a detached tmux session:
+
+```bash
+tmux new-session -d -s mathg-temporal-v2 \
+  "cd $(pwd) && bash run_temporal_v2_experiments.sh"
+```
+
+The runner starts and health-checks the local Qwen server itself. It is restart-safe: completed
+papers, cases, and experiment runs are skipped. Monitor it with:
+
+```bash
+cat experiments/high_temperature_hea_qwen35b/temporal_v2/status.json
+tail -f experiments/high_temperature_hea_qwen35b/temporal_v2/logs/pipeline.log
+tmux attach -t mathg-temporal-v2
+```
+
+Closing VS Code does not stop a detached tmux session. The run is complete only when
+`temporal_v2/COMPLETE` exists and `status.json` reports `state: complete`.
+
 - a ranked 50-paper selector;
 - a visual-only rendered PDF pane with page and zoom controls;
 - count-labelled multi-select role filters and reader-question cards;
