@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from hypothesis_evidence_v2 import atomic_json, load_evidence
-from llm_client import chat_json, provider_info
+from llm_client import LLMError, chat_json, provider_info
 from question_evidence import (
     ANSWER_STATUSES,
     DOMAINS,
@@ -27,6 +27,8 @@ from question_evidence import (
 SCHEMA_VERSION = "question-centered-pipeline-1.0"
 QUESTION_BATCH_SIZE = 6
 MAX_CANDIDATES_PER_QUESTION = 4
+ADJUDICATION_BATCH_SIZE = 30
+SYNTHESIS_ANSWER_LIMIT = 24
 _TOKEN_RE = re.compile(r"[a-z0-9]+")
 _STATUS_ALIASES = {
     "answered_in_same_paper": "answered_same_paper",
@@ -548,25 +550,43 @@ def adjudicate_questions(
 ) -> list[tuple[str, list[dict[str, Any]]]]:
     if len(questions) == 1:
         return [("single_question", questions)]
-    payload = chat_json(
-        _ADJUDICATE_SYSTEM,
-        json.dumps({
-            "coarse_facets": facets,
-            "questions": [
-                {
-                    "question_id": row["question_id"],
-                    "question": row["question"],
-                    "question_type": row["question_type"],
-                    "question_function": row["facets"].get("question_function", ""),
-                    "material_family": row["facets"].get("material_family", ""),
-                    "design_variable": row["facets"].get("design_variable", ""),
-                    "mechanism_topic": row["facets"].get("mechanism_topic", ""),
-                }
-                for row in questions
-            ],
-        }, ensure_ascii=False),
-        max_tokens=5000,
-    )
+    if len(questions) > ADJUDICATION_BATCH_SIZE:
+        groups = []
+        for start in range(0, len(questions), ADJUDICATION_BATCH_SIZE):
+            for label, rows in adjudicate_questions(
+                questions[start:start + ADJUDICATION_BATCH_SIZE],
+                facets,
+            ):
+                groups.append((f"batch_{start // ADJUDICATION_BATCH_SIZE + 1}:{label}", rows))
+        return groups
+    try:
+        payload = chat_json(
+            _ADJUDICATE_SYSTEM,
+            json.dumps({
+                "coarse_facets": facets,
+                "questions": [
+                    {
+                        "question_id": row["question_id"],
+                        "question": row["question"],
+                        "question_type": row["question_type"],
+                        "question_function": row["facets"].get("question_function", ""),
+                        "material_family": row["facets"].get("material_family", ""),
+                        "design_variable": row["facets"].get("design_variable", ""),
+                        "mechanism_topic": row["facets"].get("mechanism_topic", ""),
+                    }
+                    for row in questions
+                ],
+            }, ensure_ascii=False),
+            max_tokens=5000,
+        )
+    except LLMError as error:
+        if len(questions) <= 2:
+            return [(f"adjudication_failed:{error}", [row]) for row in questions]
+        middle = len(questions) // 2
+        return (
+            adjudicate_questions(questions[:middle], facets)
+            + adjudicate_questions(questions[middle:], facets)
+        )
     by_id = {row["question_id"]: row for row in questions}
     assigned: set[str] = set()
     groups: list[tuple[str, list[dict[str, Any]]]] = []
@@ -683,6 +703,24 @@ def build_clusters(
             },
         }
         if synthesize and answers and (len(questions) > 1 or len(papers) > 1):
+            selected_answers = []
+            answers_by_paper: dict[str, list[dict[str, Any]]] = defaultdict(list)
+            for answer in sorted(
+                answers.values(),
+                key=lambda item: (item["publication_date"], item["answer_id"]),
+            ):
+                answers_by_paper[answer["paper_id"]].append(answer)
+            while len(selected_answers) < SYNTHESIS_ANSWER_LIMIT and answers_by_paper:
+                exhausted = []
+                for paper_id in sorted(answers_by_paper):
+                    if answers_by_paper[paper_id]:
+                        selected_answers.append(answers_by_paper[paper_id].pop(0))
+                        if len(selected_answers) >= SYNTHESIS_ANSWER_LIMIT:
+                            break
+                    if not answers_by_paper[paper_id]:
+                        exhausted.append(paper_id)
+                for paper_id in exhausted:
+                    answers_by_paper.pop(paper_id, None)
             compact_answers = [
                 {
                     key: answer.get(key)
@@ -692,20 +730,27 @@ def build_clusters(
                         "boundary_limitation", "epistemic_status",
                     )
                 }
-                for answer in answers.values()
+                for answer in selected_answers
             ]
-            model = chat_json(
-                _SYNTHESIS_SYSTEM,
-                json.dumps({
-                    "facets": facets,
-                    "adjudication_label": adjudication_label,
-                    "question_variants": [row["question"] for row in questions],
-                    "answers": compact_answers,
-                }, ensure_ascii=False),
-                max_tokens=4000,
-            )
-            if isinstance(model, dict):
-                synthesis = model
+            try:
+                model = chat_json(
+                    _SYNTHESIS_SYSTEM,
+                    json.dumps({
+                        "facets": facets,
+                        "adjudication_label": adjudication_label,
+                        "question_variants": [row["question"] for row in questions[:30]],
+                        "answers": compact_answers,
+                        "omitted_answer_count": len(answers) - len(selected_answers),
+                    }, ensure_ascii=False),
+                    max_tokens=4000,
+                )
+                if isinstance(model, dict):
+                    synthesis = model
+            except LLMError as error:
+                synthesis["compatibility"] = {
+                    "scientifically_coherent": False,
+                    "incompatibilities": [f"synthesis generation failed: {error}"],
+                }
             allowed = set(answers)
             for key in ("supporting_answer_ids", "conflicting_answer_ids"):
                 cited = synthesis.get("synthesis", {}).get(key, [])
