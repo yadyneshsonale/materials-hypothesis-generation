@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Question-Centered Evidence Review</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; }
+    body { margin: 0; color: #17202a; background: #f4f6f7; }
+    header { padding: 1rem 1.5rem; background: #17324d; color: white; }
+    header h1 { margin: 0 0 .35rem; font-size: 1.35rem; }
+    main { display: grid; grid-template-columns: 34% 66%; height: calc(100vh - 82px); }
+    aside, article { overflow: auto; padding: 1rem; }
+    aside { border-right: 1px solid #ccd1d1; background: white; }
+    input, select { width: 100%; box-sizing: border-box; padding: .55rem; margin-bottom: .55rem; }
+    button { width: 100%; text-align: left; border: 0; border-bottom: 1px solid #e5e7e9;
+      padding: .7rem .3rem; background: white; cursor: pointer; }
+    button:hover { background: #eef5fb; }
+    .meta { color: #5d6d7e; font-size: .8rem; }
+    .card { background: white; border: 1px solid #d5d8dc; border-radius: 6px;
+      padding: .85rem; margin-bottom: .8rem; }
+    .span { background: #fff4cc; border-left: 3px solid #d4ac0d; padding: .55rem; }
+    h2, h3 { color: #17324d; }
+    pre { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Question-Centered Evidence Review</h1>
+  <div>Inspect topic purity, paper-specific answers, conditions, provenance, and synthesis.</div>
+</header>
+<main>
+  <aside>
+    <input id="search" placeholder="Search canonical questions">
+    <select id="domain"><option value="">All domains</option></select>
+    <div id="list"></div>
+  </aside>
+  <article id="detail"><p>Select a cluster.</p></article>
+</main>
+<script>
+const list = document.querySelector("#list");
+const detail = document.querySelector("#detail");
+const domain = document.querySelector("#domain");
+const search = document.querySelector("#search");
+let rows = [];
+const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g,
+  c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+
+async function load() {
+  const params = new URLSearchParams({search: search.value, domain: domain.value});
+  rows = await (await fetch(`/api/clusters?${params}`)).json();
+  const domains = [...new Set(rows.map(row => row.domain))].sort();
+  if (domain.options.length === 1) {
+    domains.forEach(value => domain.add(new Option(value.replaceAll("_", " "), value)));
+  }
+  list.innerHTML = rows.map(row => `<button data-file="${escapeHtml(row.file)}">
+    <strong>${escapeHtml(row.canonical_question)}</strong>
+    <div class="meta">${escapeHtml(row.domain)} / ${escapeHtml(row.subtopic)}
+      · ${row.paper_count} papers · ${row.answer_count} answers</div></button>`).join("");
+  list.querySelectorAll("button").forEach(button =>
+    button.addEventListener("click", () => show(button.dataset.file)));
+}
+
+async function show(file) {
+  const row = await (await fetch(`/api/cluster/${encodeURIComponent(file)}`)).json();
+  const synthesis = row.cross_paper_synthesis || {};
+  detail.innerHTML = `<h2>${escapeHtml(row.canonical_question)}</h2>
+    <p class="meta">${escapeHtml(row.facets.domain)} / ${escapeHtml(row.facets.subtopic)}
+      · ${row.question_count} questions from ${row.paper_count} papers</p>
+    <div class="card"><h3>Cross-paper synthesis</h3>
+      <p><b>Consensus:</b> ${escapeHtml(synthesis.consensus)}</p>
+      <p><b>Different approaches:</b> ${escapeHtml(synthesis.different_approaches)}</p>
+      <p><b>Conditions:</b> ${escapeHtml(synthesis.condition_dependencies)}</p>
+      <p><b>Contradictions:</b> ${escapeHtml(synthesis.contradictions)}</p>
+      <p><b>Unresolved gap:</b> ${escapeHtml(synthesis.unresolved_gap)}</p>
+      <p><b>Candidate hypothesis:</b> ${escapeHtml(synthesis.candidate_hypothesis)}</p>
+      <p><b>Experiment:</b> ${escapeHtml(synthesis.discriminating_experiment)}</p></div>
+    <h3>Paper-specific answers</h3>
+    ${(row.answers || []).map(answer => `<div class="card">
+      <b>${escapeHtml(answer.paper_id)}</b> <span class="meta">${escapeHtml(answer.publication_date)}
+      · ${escapeHtml(answer.epistemic_status)}</span>
+      <p>${escapeHtml(answer.answer)}</p>
+      <p><b>Material:</b> ${escapeHtml(answer.material)}<br>
+      <b>Conditions:</b> ${escapeHtml(answer.conditions)}<br>
+      <b>Outcome:</b> ${escapeHtml(answer.measurement_outcome)}</p>
+      ${(answer.evidence_spans || []).map(span =>
+        `<div class="span">${escapeHtml(span)}</div>`).join("")}</div>`).join("")}
+    <h3>Question variants</h3>
+    ${(row.question_variants || []).map(q => `<div class="card">${escapeHtml(q.question)}
+      <div class="meta">${escapeHtml(q.paper_id)} · ${escapeHtml(q.resolution_status)}</div>
+      </div>`).join("")}`;
+}
+search.addEventListener("input", () => { clearTimeout(window.timer); window.timer=setTimeout(load,250); });
+domain.addEventListener("change", load);
+load();
+</script>
+</body>
+</html>

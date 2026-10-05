@@ -220,6 +220,30 @@ tmux attach -t mathg-temporal-v2
 Closing VS Code does not stop a detached tmux session. The run is complete only when
 `temporal_v2/COMPLETE` exists and `status.json` reports `state: complete`.
 
+## Question-centered evidence experiment
+
+The next experiment uses questions as the only agent-facing knowledge representation. It resolves
+each question into separately grounded paper answers, forms condition-aware scientific topic
+clusters, and shows how different papers approach the same question. Normalized v2 evidence is
+retained behind the interface for provenance and answer validation.
+
+The five temporal ablations compare:
+
+1. raw questions;
+2. grouped questions without answers;
+3. grouped questions with paper-specific grounded answers;
+4. grouped questions with temporally filtered cross-paper synthesis; and
+5. grouped answers plus exposed v2 evidence.
+
+Run the complete workflow in tmux:
+
+```bash
+tmux new-session -d -s mathg-question-centered \
+  "cd $(pwd) && bash run_question_centered_experiments.sh"
+```
+
+See `question_centered/README.md` for output contracts, monitoring, and the browser review command.
+
 - a ranked 50-paper selector;
 - a visual-only rendered PDF pane with page and zoom controls;
 - count-labelled multi-select role filters and reader-question cards;
