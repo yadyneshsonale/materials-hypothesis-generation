@@ -1,0 +1,120 @@
+{
+  "schema_version": "section-aware-extraction-1.0",
+  "paper_id": "PMC6093928",
+  "provider": "openai",
+  "trigger_count": 1,
+  "cross_section_link_count": 2,
+  "question_count": 2,
+  "triggers": [
+    {
+      "evidence_unit_id": "PMC6093928::hypothesis_evidence_v2::1ba9f7bd30b7483f",
+      "anchor_chunk_ids": [
+        "PMC6093928::chunk::000::abstract::b3f2cb8881"
+      ],
+      "validated_links": [
+        {
+          "chunk_id": "PMC6093928::chunk::002::results_and_discussion::13b860da4c",
+          "section": "Results And Discussion",
+          "relation": "method",
+          "evidence_spans": [
+            "Accounting for the LSFs at finite temperature (contour plots in Fig. 1 ), finite magnetic moments have been thermally induced for Cr, Ni and Co at all volumes even at the lowest temperature considered here (50 K) in both the fcc and hcp phases."
+          ],
+          "reason": "The trigger claims LSFs induce magnetic moments; this chunk provides the specific lowest temperature threshold (50 K) and confirms the induction in both phases, validating the simulation conditions mentioned in the abstract."
+        },
+        {
+          "chunk_id": "PMC6093928::chunk::005::references::bc4aeeff5d",
+          "section": "References",
+          "relation": "comparison",
+          "evidence_spans": [
+            "High pressure synthesis of a hexagonal close-packed phase of the high-entropy alloy CrMnFeCoNi."
+          ],
+          "reason": "The trigger discusses hcp phase stability at cryogenic temperatures; the reference list confirms the existence of an hcp phase synthesized via high pressure, providing a physical baseline for the simulated low-T stability."
+        }
+      ],
+      "questions": [
+        {
+          "question_id": "PMC6093928::cross_section_question::e5c5741e8c2a49e3",
+          "question": "What specific temperature range defines the transition where the stacking fault energy changes sign from negative to positive, and how does this transition temperature correlate with the onset of nano-twin suppression observed experimentally?",
+          "question_function": "find_boundary",
+          "why_it_matters": "The abstract states negative SFE at cryogenic T and positive SFE with increasing T, but does not define the crossover point which is critical for predicting mechanical behavior limits.",
+          "known_context": "LSFs induce magnetic moments at 50 K (lowest considered); hcp is preferable at cryogenic T resulting in negative SFE; SFE increases with T suppressing nano-twins.",
+          "unresolved_information": "The exact temperature value where SFE crosses zero and the specific experimental evidence for the nano-twin suppression threshold.",
+          "source_chunk_ids": [
+            "PMC6093928::chunk::000::abstract::b3f2cb8881",
+            "PMC6093928::chunk::002::results_and_discussion::13b860da4c"
+          ],
+          "evidence_spans": [
+            "The hcp phase is energetically preferable to the fcc one at cryogenic temperatures, which results in negative stacking fault energy at these conditions.",
+            "With increasing temperature, the stacking fault energy increases, suppressing the formation of stacking faults and nano-twins."
+          ],
+          "confidence": 0.9
+        },
+        {
+          "question_id": "PMC6093928::cross_section_question::b694f306f87748f8",
+          "question": "How do the magnetic moments of Co, Cr, and Ni evolve specifically across the volume-temperature phase space to drive the stabilization of the hcp phase over the fcc phase?",
+          "question_function": "explain_mechanism",
+          "why_it_matters": "The paper links LSF-induced moments to phase stability, but the mechanism connecting specific moment magnitudes to the free energy difference (ΔF) is the core theoretical contribution.",
+          "known_context": "LSFs induce sizable magnetic moments for Co, Cr, Ni in both fcc and hcp; hcp is energetically preferable at low T; magnetic entropy is evaluated via a mean-field expression.",
+          "unresolved_information": "The quantitative relationship or derivative showing how the specific thermal evolution of {m_Co, m_Cr, m_Ni} directly lowers F_hcp relative to F_fcc.",
+          "source_chunk_ids": [
+            "PMC6093928::chunk::002::results_and_discussion::13b860da4c"
+          ],
+          "evidence_spans": [
+            "We show that the LSFs induce sizable magnetic moments for Co, Cr and Ni, whilst slightly increasing the magnetic moment of Fe and Mn in both the fcc and hcp phases."
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "research_thread": {
+        "scientific_problem": "Understanding the magnetic origin of phase stability and mechanical response (stacking fault formation) in Cantor alloy (CoCrFeMnNi) at finite temperatures.",
+        "material_system": "CoCrFeMnNi High Entropy Alloy (Cantor Alloy)",
+        "sample_lineage": "Polymorphic (fcc and hcp) paramagnetic state",
+        "intervention": "First-principles simulation accounting for longitudinal spin fluctuations (LSFs) as a function of temperature and volume.",
+        "baseline": "Standard DFT or models neglecting LSFs, or assuming purely static magnetic states.",
+        "conditions": "Finite temperature (starting 50K), paramagnetic state, fcc and hcp crystal structures.",
+        "structure": "Face-centered cubic (fcc) and hexagonal close-packed (hcp) polymorphs.",
+        "outcome": "LSFs induce sizable magnetic moments in Co, Cr, Ni; hcp is energetically preferred at cryogenic T; negative stacking fault energy at low T, positive at high T; suppression of nano-twins at high T.",
+        "mechanism": "Longitudinal spin fluctuations generate temperature-dependent magnetic moments that alter the magnetic entropy contribution to free energy, shifting the stability balance between fcc and hcp phases.",
+        "hypothesis_value": "High - connects magnetic fluctuations directly to mechanical failure modes (nano-twinning) and phase stability in high-entropy alloys.",
+        "alternative_explanations": [
+          "Phase stability driven purely by vibrational entropy without magnetic contributions.",
+          "Stability driven by static magnetic ordering rather than paramagnetic spin fluctuations."
+        ],
+        "boundaries": [
+          "Temperature range below which hcp is stable (cryogenic).",
+          "Stacking fault energy sign change (negative to positive)."
+        ],
+        "null_or_negative_results": [
+          "No magnetic moments induced for Mn (only slight increase)."
+        ],
+        "missing_information": [
+          "Exact numerical values for the crossover temperature of SFE.",
+          "Quantitative validation of the simulated nano-twin suppression against specific experimental strain rates or temperatures."
+        ],
+        "provenance": {
+          "trigger_evidence_unit_id": "PMC6093928::hypothesis_evidence_v2::1ba9f7bd30b7483f",
+          "supporting_chunk_ids": [
+            "PMC6093928::chunk::000::abstract::b3f2cb8881",
+            "PMC6093928::chunk::002::results_and_discussion::13b860da4c",
+            "PMC6093928::chunk::005::references::bc4aeeff5d"
+          ],
+          "evidence_spans": [
+            "Here we use first-principles alloy theory to investigate the magnetic structure of polymorphic CoCrFeMnNi in the paramagnetic state by accounting for the longitudinal spin fluctuations (LSFs) as a function of temperature.",
+            "In both face-centered cubic (fcc) and hexagonal close-packed (hcp) structures, the LSFs induce sizable magnetic moments for Co, Cr and Ni.",
+            "The impact of LSFs is demonstrated on the phase stability, stacking fault energy and the fcc-hcp interfacial energy.",
+            "The hcp phase is energetically preferable to the fcc one at cryogenic temperatures, which results in negative stacking fault energy at these conditions.",
+            "With increasing temperature, the stacking fault energy increases, suppressing the formation of stacking faults and nano-twins.",
+            "Accounting for the LSFs at finite temperature (contour plots in Fig. 1 ), finite magnetic moments have been thermally induced for Cr, Ni and Co at all volumes even at the lowest temperature considered here (50 K) in both the fcc and hcp phases.",
+            "High pressure synthesis of a hexagonal close-packed phase of the high-entropy alloy CrMnFeCoNi."
+          ]
+        }
+      }
+    }
+  ],
+  "rejected": [
+    {
+      "evidence_unit_id": "PMC6093928::hypothesis_evidence_v2::1ba9f7bd30b7483f",
+      "reason": "no exact linked spans for chunk_id=PMC6093928::chunk::003::methods::f3287d9a39"
+    }
+  ]
+}

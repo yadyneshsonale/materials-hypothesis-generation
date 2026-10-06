@@ -1,0 +1,345 @@
+{
+  "schema_version": "section-aware-extraction-1.0",
+  "paper_id": "PMC11355469",
+  "provider": "openai",
+  "trigger_count": 3,
+  "cross_section_link_count": 7,
+  "question_count": 6,
+  "triggers": [
+    {
+      "evidence_unit_id": "PMC11355469::hypothesis_evidence_v2::5deaf817ec3dca66",
+      "anchor_chunk_ids": [
+        "PMC11355469::chunk::000::abstract::097bca92f1"
+      ],
+      "validated_links": [
+        {
+          "chunk_id": "PMC11355469::chunk::004::discussion::2794822e91",
+          "section": "Discussion",
+          "relation": "mechanism",
+          "evidence_spans": [
+            "The density of dislocations at 600 K was significantly reduced compared with that at 300 K, resulting in the increase of the elastic modulus of the material from 173 GPa to 219 GPa."
+          ],
+          "reason": "The Discussion section explicitly repeats the specific mechanism linking reduced dislocation density at 600 K to the elastic modulus increase (173 to 219 GPa) claimed in the trigger, confirming the causal link asserted in the Abstract."
+        },
+        {
+          "chunk_id": "PMC11355469::chunk::003::results::79bc52ff5d",
+          "section": "Results",
+          "relation": "sample_lineage",
+          "evidence_spans": [
+            "When the temperature reaches 1200 K, the change of the normal force amplitude increases, and the value of the positive force decreases by about 40 nN from that found below 900 K."
+          ],
+          "reason": "The Results section provides the quantitative context for the boundary condition mentioned in the trigger (900 K failure), detailing the specific force drop and delamination mechanisms at 1200 K that follow the sharp wear resistance decrease at 900 K."
+        }
+      ],
+      "questions": [
+        {
+          "question_id": "PMC11355469::cross_section_question::a04d79d5eac16a54",
+          "question": "Does the observed increase in elastic modulus from 173 GPa to 219 GPa at 600 K (attributed to reduced dislocation density) persist if the friction velocity or strain rate is varied, or is this strictly a temperature-dependent phenomenon driven by lattice disorder recovery?",
+          "question_function": "test_evidence",
+          "why_it_matters": "The trigger and Discussion attribute the modulus increase solely to temperature-driven dislocation reduction. The Introduction notes that friction velocity affects tangential/normal forces via thermal softening and strain hardening. Determining if the modulus behavior is robust to strain-rate changes is critical to validating the temperature-only mechanism.",
+          "known_context": "Dislocation density is significantly reduced at 600 K compared to 300 K, causing elastic modulus to rise from 173 GPa to 219 GPa (Abstract, Discussion). Friction velocity changes affect tangential and normal forces (Introduction).",
+          "unresolved_information": "Whether the elastic modulus enhancement at 600 K is independent of strain rate or friction velocity, or if it is an artifact of the specific sliding speed (10 m/s) used in the simulation.",
+          "source_chunk_ids": [
+            "PMC11355469::chunk::000::abstract::097bca92f1",
+            "PMC11355469::chunk::004::discussion::2794822e91"
+          ],
+          "evidence_spans": [
+            "The density of dislocations at 600 K was significantly reduced compared with that at 300 K, resulting in the increase of the elastic modulus of the material from 173 GPa to 219 GPa."
+          ],
+          "confidence": 0.9
+        },
+        {
+          "question_id": "PMC11355469::cross_section_question::4cfe9cbe46143b3d",
+          "question": "What is the specific mechanism by which Shockley incomplete dislocations connecting via stair rods at 900 K leads to the sharp decrease in wear resistance, and does this connect to the observed loss of elastic recovery ability?",
+          "question_function": "explain_mechanism",
+          "why_it_matters": "The trigger identifies 900 K as the boundary where wear resistance fails. The Results section mentions that at 900 K, dislocation connections",
+          "known_context": "At 900 K, Shockley incomplete dislocations connect via stair rods, damaging elastic recovery. Wear resistance decreases sharply at 900 K (Abstract, Results).",
+          "unresolved_information": "The precise link between the damaged elastic recovery and the macroscopic wear rate at 900 K, and whether the delamination seen at 1200 K is a continuation of the 900 K failure mode.",
+          "source_chunk_ids": [
+            "PMC11355469::chunk::000::abstract::097bca92f1",
+            "PMC11355469::chunk::003::results::79bc52ff5d"
+          ],
+          "evidence_spans": [
+            "When the temperature reaches 900 K, the wear resistance of the FeNiCrCoCu high entropy alloy coating decreases sharply."
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "research_thread": {
+        "scientific_problem": "Determining the temperature-dependent mechanisms of wear failure and elastic modulus enhancement in FeNiCrCoCu coatings on Cu matrices.",
+        "material_system": "FeNiCrCoCu high entropy alloy coating on single crystal Cu matrix",
+        "sample_lineage": "Simulation model initialized at 300 K, subjected to friction and nanoindentation at 300 K, 600 K, 900 K, and 1200 K.",
+        "intervention": "Variation of ambient temperature during molecular dynamics simulation of friction and indentation.",
+        "baseline": "Behavior at 300 K (ordered lattice, higher dislocation density).",
+        "conditions": "Temperature: 300-1200 K; Friction speed: 10 m/s; Indenter speed: 10 m/s; Model: Molecular Dynamics.",
+        "structure": "Ordered lattice at 300-600 K; Rapid disorder at 900-1200 K; Dislocation density peaks at 300 K, drops at 600 K, drops further at 900-1200 K.",
+        "outcome": "Elastic modulus increases at 600 K (173->219 GPa) then drops; Wear resistance is excellent up to 900 K then fails sharply; Normal force decreases significantly at high temperatures.",
+        "mechanism": "Temperature-driven dislocation evolution: Reduced dislocation density at 600 K stiffens the lattice (higher modulus), while rapid disorder and delamination at 900+ K cause softening and wear failure.",
+        "hypothesis_value": "High",
+        "alternative_explanations": [
+          "Strain rate hardening effects might confound the temperature-only analysis, as noted in cited literature regarding friction velocity.",
+          "Thermal softening of the Cu substrate (melting point proximity) might be a primary driver of failure rather than just coating lattice disorder."
+        ],
+        "boundaries": [
+          "Temperature > 900 K: Sharp decrease in wear resistance due to lattice disorder and disconnection of elastic recovery."
+        ],
+        "null_or_negative_results": [
+          "Wear resistance does not improve beyond 600 K; it degrades sharply at 900 K.",
+          "Dislocation density does not increase with temperature; it decreases at higher temperatures."
+        ],
+        "missing_information": [
+          "Quantitative data on wear rate values (not just 'sharp decrease').",
+          "Effect of varying strain rate/friction speed on the 600 K modulus anomaly.",
+          "Direct experimental validation of the MD predictions."
+        ],
+        "provenance": {
+          "trigger_evidence_unit_id": "PMC11355469::hypothesis_evidence_v2::5deaf817ec3dca66",
+          "supporting_chunk_ids": [
+            "PMC11355469::chunk::000::abstract::097bca92f1",
+            "PMC11355469::chunk::004::discussion::2794822e91",
+            "PMC11355469::chunk::003::results::79bc52ff5d"
+          ],
+          "evidence_spans": [
+            "In this study, the wear resistance of the FeNiCrCoCu high entropy alloy coating was systematically analyzed by the molecular dynamics method.",
+            "The friction and nanoindentation simulation of this coating material were carried out by controlling the ambient temperature.",
+            "The results show that with the increase of temperature, the disorder of the lattice structure increases, which leads to an increase of the tangential force and friction coefficient in the friction process.",
+            "At 300 K and 600 K, the ordered lattice structure of the high entropy alloy coating material is basically the same, and thus its hardness is basically the same.",
+            "However, the dislocation density at 600 K is significantly reduced compared with that at 300 K, resulting in an increase of the elastic modulus of the material from 173 GPa to 219 GPa.",
+            "At temperatures of 900 K and 1200 K, lattice disorder takes place rapidly, and dislocation density also decreases significantly, resulting in a significant decrease in the hardness and elastic modulus of the material.",
+            "When the temperature reaches 900 K, the wear resistance of the FeNiCrCoCu high entropy alloy coating decreases sharply.",
+            "The density of dislocations at 600 K was significantly reduced compared with that at 300 K, resulting in the increase of the elastic modulus of the material from 173 GPa to 219 GPa.",
+            "When the temperature reaches 1200 K, the change of the normal force amplitude increases, and the value of the positive force decreases by about 40 nN from that found below 900 K."
+          ]
+        }
+      }
+    },
+    {
+      "evidence_unit_id": "PMC11355469::hypothesis_evidence_v2::a592dc9e57c4d7ba",
+      "anchor_chunk_ids": [
+        "PMC11355469::chunk::001::introduction::201bec5221"
+      ],
+      "validated_links": [
+        {
+          "chunk_id": "PMC11355469::chunk::004::discussion::2794822e91",
+          "section": "Discussion",
+          "relation": "comparison",
+          "evidence_spans": [
+            "Through the above research and analysis, the following conclusions were obtained: (1) In the friction process of the FeNiCrCoCu high entropy alloy coating, the value of the normal force decreases greatly due to thermal softening with the increase of temperature."
+          ],
+          "reason": "The Discussion section provides the current paper's experimental/simulation outcome (normal force decrease due to thermal softening) which serves as a direct comparison to the cited work [26] that claims friction velocity reduces tangential force via thermal softening. It allows for a cross-validation of the 'thermal softening' mechanism."
+        },
+        {
+          "chunk_id": "PMC11355469::chunk::001::introduction::201bec5221",
+          "section": "Introduction",
+          "relation": "sample_lineage",
+          "evidence_spans": [
+            "Li et al. [ [26] ] found that FeNiCrCoCu high entropy alloy coating on the surface of a Cu matrix can effectively improve the wear resistance of the material by the molecular dynamics method."
+          ],
+          "reason": "The Introduction explicitly cites the same material system (FeNiCrCoCu on Cu matrix) and method (MD) as the trigger, confirming the lineage and establishing the baseline for the cited comparison regarding friction velocity."
+        }
+      ],
+      "questions": [
+        {
+          "question_id": "PMC11355469::cross_section_question::770bf903f7b8ea58",
+          "question": "Given that the cited work [26] attributes reduced tangential force to friction velocity-induced thermal softening, does the current study's observation that normal force decreases with *temperature* (while velocity is constant at 10 m/s) suggest that thermal softening is a dominant factor over strain-rate hardening in the high-temperature regime (900-1200 K)?",
+          "question_function": "compare",
+          "why_it_matters": "The cited work [26] suggests a balance between thermal softening (reducing tangential force) and strain hardening (increasing normal force). The current study isolates temperature. Comparing these helps determine if thermal softening is the primary driver of failure at high temperatures, independent of strain rate effects.",
+          "known_context": "Cited work [26] claims increased friction velocity reduces tangential force (thermal softening) and increases normal force (strain hardening). Current study shows normal force decreases greatly with temperature increase (Discussion).",
+          "unresolved_information": "Whether the 'strain hardening' effect observed in [26] is negligible at the high temperatures (900-1200 K) simulated in the current study, effectively isolating thermal softening.",
+          "source_chunk_ids": [
+            "PMC11355469::chunk::001::introduction::201bec5221",
+            "PMC11355469::chunk::004::discussion::2794822e91"
+          ],
+          "evidence_spans": [
+            "In the friction process of the FeNiCrCoCu high entropy alloy coating, the value of the normal force decreases greatly due to thermal softening with the increase of temperature."
+          ],
+          "confidence": 0.8
+        },
+        {
+          "question_id": "PMC11355469::cross_section_question::4a905df1d844bf75",
+          "question": "Does the formation of BCC structures mentioned in the cited work [27] (due to laser heating) play a role in the interface stability observed in the current MD simulation at lower temperatures (300-600 K), where no melting was simulated?",
+          "question_function": "transfer",
+          "why_it_matters": "The cited work [27] describes a manufacturing mechanism (laser heating/melting) that creates protective BCC phases. The current study uses a pre-equilibrated coating. Determining if the current model implicitly captures similar protective phases or if the lack of interface reaction explains the differences in wear behavior is crucial for transferability.",
+          "known_context": "Cited work [27] found laser heating creates BCC structures that protect the matrix. Current study uses FeNiCrCoCu on Cu matrix in MD without explicit melting of the interface mentioned (Results: 'coating material basically did not produce stacking faults').",
+          "unresolved_information": "Whether the stable interface in the current MD simulation (300-600 K) is due to the inherent properties of the MD model or if it mimics the BCC-protected interface described in [27].",
+          "source_chunk_ids": [
+            "PMC11355469::chunk::001::introduction::201bec5221"
+          ],
+          "evidence_spans": [
+            "Li et al. [ [26] ] found that FeNiCrCoCu high entropy alloy coating on the surface of a Cu matrix can effectively improve the wear resistance of the material by the molecular dynamics method.",
+            "They reached the conclusion that an increase of the friction velocity results in the reduction of the tangential force affected by material thermal softening and the increase of the normal force affected by material strain rate hardening, and therefore leads to the reduction of the friction coefficient [ [26] ]."
+          ],
+          "confidence": 0.6
+        }
+      ],
+      "research_thread": {
+        "scientific_problem": "Understanding the comparative impact of friction velocity (cited) vs. temperature (current) on the tribological performance of FeNiCrCoCu coatings.",
+        "material_system": "FeNiCrCoCu coating on Cu matrix (Current) and Al substrate (Cited [27]), AlCoCrFe (Cited [27]).",
+        "sample_lineage": "Cited work [26] uses MD with varying friction velocity; Cited work [27] uses laser-processed coatings; Current work uses MD with varying temperature.",
+        "intervention": "Varying friction velocity (Cited) vs. varying ambient temperature (Current).",
+        "baseline": "Conventional wear-resistant steel (Cited [25]).",
+        "conditions": "Cited: Friction velocity varied. Current: Temperature 300-1200 K, constant velocity 10 m/s.",
+        "structure": "Cited [27]: BCC structures at interface. Current: FCC lattice with evolving dislocation density.",
+        "outcome": "Cited: Wear resistance ~2x steel, velocity reduces friction coefficient. Current: Wear resistance fails at 900 K, normal force drops with heat.",
+        "mechanism": "Cited: Thermal softening reduces tangential force, strain hardening increases normal force. Current: Thermal softening reduces normal force and causes lattice disorder.",
+        "hypothesis_value": "Medium",
+        "alternative_explanations": [
+          "The difference in substrate (Cu vs Al) might account for differences in thermal softening behavior.",
+          "The MD model might not fully capture the laser-induced metallurgical changes (BCC formation) described in [27]."
+        ],
+        "boundaries": [
+          "Temperature range > 900 K (Current study failure).",
+          "Friction velocity effects (Cited study)."
+        ],
+        "null_or_negative_results": [
+          "None explicitly, but the contrast between velocity-induced hardening and temperature-induced softening highlights a gap.",
+          "Cited work notes lack of study on high-temperature performance."
+        ],
+        "missing_information": [
+          "Direct comparison of strain rate hardening effects at the specific temperatures studied in the current paper.",
+          "Quantitative wear rate data for the current model to match the '0.2e-6' cited value."
+        ],
+        "provenance": {
+          "trigger_evidence_unit_id": "PMC11355469::hypothesis_evidence_v2::a592dc9e57c4d7ba",
+          "supporting_chunk_ids": [
+            "PMC11355469::chunk::001::introduction::201bec5221",
+            "PMC11355469::chunk::004::discussion::2794822e91"
+          ],
+          "evidence_spans": [
+            "Li et al. [ [26] ] found that FeNiCrCoCu high entropy alloy coating on the surface of a Cu matrix can effectively improve the wear resistance of the material by the molecular dynamics method.",
+            "They reached the conclusion that an increase of the friction velocity results in the reduction of the tangential force affected by material thermal softening and the increase of the normal force affected by material strain rate hardening, and therefore leads to the reduction of the friction coefficient [ [26] ].",
+            "In the interface area between the high entropy alloy coating and the Al substrate, due to the laser heating during the manufacturing process of the high entropy alloy coating, a part of the substrate melts and reacts with other elements in the coating forming several BCC structures which can effectively protect the matrix material from wear. [ [27] ].",
+            "Through the above research and analysis, the following conclusions were obtained: (1) In the friction process of the FeNiCrCoCu high entropy alloy coating, the value of the normal force decreases greatly due to thermal softening with the increase of temperature."
+          ]
+        }
+      }
+    },
+    {
+      "evidence_unit_id": "PMC11355469::hypothesis_evidence_v2::cd82c61c01a2b953",
+      "anchor_chunk_ids": [
+        "PMC11355469::chunk::002::materials_and_methods::0084617595"
+      ],
+      "validated_links": [
+        {
+          "chunk_id": "PMC11355469::chunk::002::materials_and_methods::0084617595",
+          "section": "Materials And Methods",
+          "relation": "sample_lineage",
+          "evidence_spans": [
+            "In the nanoindentation model, single crystal Cu was used as the matrix material and FeNiCrCoCu high entropy alloy was used as the coating material.",
+            "The model size of the Cu matrix was 100 Å × 100 Å × 55 Å, and the total number of atoms was 47,111."
+          ],
+          "reason": "This chunk confirms the specific sample composition (Cu matrix/FeNiCrCoCu coating), dimensions, and atom count described in the trigger, validating the sample lineage for the simulation."
+        },
+        {
+          "chunk_id": "PMC11355469::chunk::002::materials_and_methods::0084617595",
+          "section": "Materials And Methods",
+          "relation": "boundary",
+          "evidence_spans": [
+            "pressed into the matrix at a speed of 10 m/s along the negative direction of the Z axis, with a depth of 10 Å"
+          ],
+          "reason": "This chunk describes the indentation depth (10 Å) used in the simulation setup, which directly contrasts with the 30 Å depth listed in the trigger's boundary conditions, indicating a discrepancy or evolution in the experimental protocol that needs resolution."
+        },
+        {
+          "chunk_id": "PMC11355469::chunk::003::results::79bc52ff5d",
+          "section": "Results",
+          "relation": "mechanism",
+          "evidence_spans": [
+            "At a temperature of 1200 K, the Shockley incomplete dislocation in the high entropy alloy coating and the Cu matrix showed obvious delamination during the friction process"
+          ],
+          "reason": "This chunk provides the mechanistic outcomes (dislocation evolution, delamination) resulting from the temperature-dependent processes defined in the trigger, linking the test conditions to the observed structural failures."
+        }
+      ],
+      "questions": [
+        {
+          "question_id": "PMC11355469::cross_section_question::ab47a32ef95e0327",
+          "question": "Given the trigger specifies a loading depth of 30 Å but the retrieved methods text explicitly mentions a depth of 10 Å, which indentation depth was actually used to generate the 900 K and 1200 K delamination results reported in the Results section?",
+          "question_function": "test_evidence",
+          "why_it_matters": "Resolving this discrepancy is critical for determining the stress state (indentation depth affects contact pressure and dislocation nucleation thresholds) and validating the reproducibility of the reported high-temperature failure mechanisms.",
+          "known_context": "The trigger lists a pressing depth of 30 Å, while the retrieved methods text explicitly states a depth of 10 Å.",
+          "unresolved_information": "The actual indentation depth used for the specific results regarding delamination at 1200 K and dislocation connectivity at 900 K.",
+          "source_chunk_ids": [
+            "PMC11355469::chunk::002::materials_and_methods::0084617595",
+            "PMC11355469::chunk::003::results::79bc52ff5d"
+          ],
+          "evidence_spans": [
+            "the pressing depth was 30 Å"
+          ],
+          "confidence": 0.9
+        },
+        {
+          "question_id": "PMC11355469::cross_section_question::8e5cf1c66dc7c0cf",
+          "question": "The Results section attributes the decrease in normal force at 1200 K to rapid increases in disordered lattice structures; does the specific depth of the coating (21 Å) relative to the indentation depth determine if the observed 'delamination' is a coating-matrix interface failure or a bulk coating failure?",
+          "question_function": "explain_mechanism",
+          "why_it_matters": "Understanding whether the failure mode is interfacial (delamination at the coating/matrix boundary) or bulk (within the HEA layer) dictates the relevant design strategies for improving wear resistance (adhesion vs. bulk ductility).",
+          "known_context": "Coating thickness is 21 Å; disordered structure and delamination are observed at 1200 K.",
+          "unresolved_information": "The specific location of the delamination relative to the 21 Å coating thickness and the interface, and whether the depth of the indenter penetrates beyond the coating into the matrix.",
+          "source_chunk_ids": [
+            "PMC11355469::chunk::002::materials_and_methods::0084617595",
+            "PMC11355469::chunk::003::results::79bc52ff5d"
+          ],
+          "evidence_spans": [
+            "The high entropy alloy coating was also set as 21 Å"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "research_thread": {
+        "scientific_problem": "How does elevated temperature (up to 1200 K) affect the deformation mechanisms, specifically dislocation evolution and interface integrity, of a 21 Å thick FeNiCrCoCu high entropy alloy coating on a single crystal Cu matrix under nanoindentation?",
+        "material_system": "Cu matrix / FeNiCrCoCu (1:1:1:1:1) high entropy alloy coating",
+        "sample_lineage": "Simulated single crystal FCC / FCC model with 47,111 atoms; relaxed via conjugate gradient and thermal cycling.",
+        "intervention": "Nanoindentation loading (10 m/s) followed by unloading at temperatures of 300 K, 600 K, 900 K, and 1200 K.",
+        "baseline": "300 K indentation (implied stable state with limited dislocations).",
+        "conditions": "Simulated vacuum, NVT/NVE ensembles, loading/unloading time 300 ps, specific indentation depth (discrepancy between 10 Å and 30 Å reported).",
+        "structure": "Single crystal FCC Cu matrix, FCC HEA coating, initial equilibrium element distribution.",
+        "outcome": "At 900 K: extended Shockley dislocations and stair rod connections reducing elastic recovery. At 1200 K: significant delamination, disordered structure increase, reduced normal force.",
+        "mechanism": "Thermal softening reduces normal force; high temperature promotes dislocation climb/glide and stacking fault formation leading to interface delamination and loss of structural stability.",
+        "hypothesis_value": "High entropy alloy coatings on Cu may exhibit catastrophic interface failure at temperatures >900 K due to thermal softening and dislocation interaction, limiting their high-temperature tribological application.",
+        "alternative_explanations": [
+          "Delamination could be an artifact of the 30 Å depth if it exceeds the coating thickness, or the 10 Å depth might be the actual simulation parameter."
+        ],
+        "boundaries": [
+          "Indentation depth (reported 10 Å vs 30 Å)",
+          "Coating thickness (21 Å)",
+          "Temperature limit (1200 K shows failure)."
+        ],
+        "null_or_negative_results": [
+          "At 600 K, the coating structure remained stable with minimal stacking faults."
+        ],
+        "missing_information": [
+          "Confirmation of the exact indentation depth used for the high-temperature results.",
+          "Specific stress-strain curves for the unloading phase at 1200 K."
+        ],
+        "provenance": {
+          "trigger_evidence_unit_id": "PMC11355469::hypothesis_evidence_v2::cd82c61c01a2b953",
+          "supporting_chunk_ids": [
+            "PMC11355469::chunk::002::materials_and_methods::0084617595",
+            "PMC11355469::chunk::003::results::79bc52ff5d"
+          ],
+          "evidence_spans": [
+            "In the nanoindentation model, single crystal Cu was used as the matrix material and FeNiCrCoCu high entropy alloy was used as the coating material.",
+            "The same lattice types of both materials were set.",
+            "The model size of the Cu matrix was 100 Å × 100 Å × 55 Å, and the total number of atoms was 47,111.",
+            "The ambient temperature was also set at 300 K, 600 K, 900 K, and 1200 K.",
+            "The high entropy alloy coating was also set as 21 Å.",
+            "The substrate and coating adopted the same crystal orientation as above.",
+            "In order to eliminate unreasonable structure in the model, the conjugate gradient algorithm [ [38] ] was used to minimize the energy, and then the model was relaxed.",
+            "The relaxation process is consistent with the friction model above.",
+            "The final distribution of the five elements Fe, Ni, Cr, Co, and Cu in the high entropy alloy coating reached the equilibrium state after the relaxation process.",
+            "After the model reached the equilibrium state, the atoms in the range of 0~5 Å, 5~10 Å, and 10~55 Å in the Z direction were set as the boundary layer, constant temperature layer, and Cu layer, and the high entropy alloy coating was set as the high entropy alloy layer, as shown in Figure 2 .",
+            "Periodic boundary conditions were used in the X and Y directions of the model, and contractive boundary conditions were used in the Z direction.",
+            "The atoms in the boundary layer were fixed as rigid bodies, and the Cu layer and high entropy alloy layer were set as the NVE ensemble.",
+            "The setting of the constant temperature layer adopted the Langevin method to control the temperature.",
+            "The temperature was controlled as 300 K, 600 K, 900 K, and 1200 K, respectively.",
+            "The bottom of the virtual indenter contacted with the top of the simulation model, and there was no pressure.",
+            "After the simulation position was determined, it started to press into the matrix material at the speed of 10 m/s.",
+            "The loading process lasted for 300 ps, and the pressing depth was 30 Å.",
+            "After that, the unloading started at the same speed as the loading, and the unloading time lasted for 300 ps.",
+            "pressed into the matrix at a speed of 10 m/s along the negative direction of the Z axis, with a depth of 10 Å",
+            "At a temperature of 1200 K, the Shockley incomplete dislocation in the high entropy alloy coating and the Cu matrix showed obvious delamination during the friction process"
+          ]
+        }
+      }
+    }
+  ],
+  "rejected": []
+}

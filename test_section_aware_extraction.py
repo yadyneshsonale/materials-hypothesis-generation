@@ -111,6 +111,14 @@ The precipitates may explain the higher strength of Alloy A."""
             row["questions"][0]["question_function"],
             "explain_mechanism",
         )
+        self.assertEqual(
+            row["research_thread"]["provenance"]["trigger_evidence_unit_id"],
+            self.unit["unit_id"],
+        )
+        self.assertIn(
+            method["chunk_id"],
+            row["research_thread"]["provenance"]["supporting_chunk_ids"],
+        )
 
 
 if __name__ == "__main__":

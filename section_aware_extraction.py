@@ -335,6 +335,15 @@ def _validate_trigger(
         question = str(row.get("question", "")).strip()
         if not question or not question.endswith("?") or question.casefold() in seen:
             continue
+        why_it_matters = str(row.get("why_it_matters", "")).strip()
+        unresolved_information = str(row.get("unresolved_information", "")).strip()
+        if not why_it_matters or not unresolved_information:
+            rejected.append({
+                "evidence_unit_id": unit["unit_id"],
+                "question": question,
+                "reason": "question requires why_it_matters and unresolved_information",
+            })
+            continue
         source_ids = [
             str(item) for item in row.get("source_chunk_ids", [])
             if str(item) in allowed_source_ids
@@ -369,9 +378,9 @@ def _validate_trigger(
             "question_id": _stable_question_id(paper_id, unit["unit_id"], question),
             "question": question,
             "question_function": str(row.get("question_function", "")).strip(),
-            "why_it_matters": str(row.get("why_it_matters", "")).strip(),
+            "why_it_matters": why_it_matters,
             "known_context": str(row.get("known_context", "")).strip(),
-            "unresolved_information": str(row.get("unresolved_information", "")).strip(),
+            "unresolved_information": unresolved_information,
             "source_chunk_ids": source_ids,
             "evidence_spans": spans,
             "confidence": confidence,
@@ -399,6 +408,24 @@ def _validate_trigger(
         ] if isinstance(thread.get(key, []), list) else []
         for key in list_fields
     })
+    normalized_thread["provenance"] = {
+        "trigger_evidence_unit_id": unit["unit_id"],
+        "supporting_chunk_ids": list(dict.fromkeys(
+            anchor_ids + [link["chunk_id"] for link in links]
+        )),
+        "evidence_spans": list(dict.fromkeys(
+            [
+                str(span)
+                for span in unit.get("evidence_spans", [])
+                if str(span).strip()
+            ]
+            + [
+                span
+                for link in links
+                for span in link["evidence_spans"]
+            ]
+        )),
+    }
     return {
         "evidence_unit_id": unit["unit_id"],
         "anchor_chunk_ids": anchor_ids,
@@ -622,6 +649,7 @@ def evaluate(
     total_spans = 0
     unknown_evidence = 0
     unknown_chunks = 0
+    invalid_thread_provenance = 0
     cross_section_questions = 0
     questions = 0
     links = 0
@@ -643,6 +671,21 @@ def evaluate(
                 for span in link.get("evidence_spans", []):
                     total_spans += 1
                     exact_spans += bool(chunk and span in chunk["text"])
+            provenance = trigger.get("research_thread", {}).get("provenance", {})
+            invalid_thread_provenance += (
+                provenance.get("trigger_evidence_unit_id") != trigger["evidence_unit_id"]
+            )
+            invalid_thread_provenance += sum(
+                item not in chunks
+                for item in provenance.get("supporting_chunk_ids", [])
+            )
+            for span in provenance.get("evidence_spans", []):
+                total_spans += 1
+                exact_spans += any(
+                    span in chunks[item]["text"]
+                    for item in provenance.get("supporting_chunk_ids", [])
+                    if item in chunks
+                )
             for question in trigger.get("questions", []):
                 questions += 1
                 source_sections = {
@@ -672,10 +715,12 @@ def evaluate(
         "grounding_rate": round(exact_spans / max(total_spans, 1), 4),
         "unknown_evidence_ids": unknown_evidence,
         "unknown_chunk_ids": unknown_chunks,
+        "invalid_thread_provenance": invalid_thread_provenance,
         "verified": (
             exact_spans == total_spans
             and not unknown_evidence
             and not unknown_chunks
+            and not invalid_thread_provenance
         ),
     }
     atomic_json(result_path, result)

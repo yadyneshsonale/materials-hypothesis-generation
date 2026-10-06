@@ -1,0 +1,275 @@
+{
+  "schema_version": "section-aware-extraction-1.0",
+  "paper_id": "PMC12298864",
+  "provider": "openai",
+  "trigger_count": 2,
+  "cross_section_link_count": 5,
+  "question_count": 5,
+  "triggers": [
+    {
+      "evidence_unit_id": "PMC12298864::hypothesis_evidence_v2::5da6be55a1c47f2c",
+      "anchor_chunk_ids": [
+        "PMC12298864::chunk::002::materials_and_methods::c3550ed72f"
+      ],
+      "validated_links": [
+        {
+          "chunk_id": "PMC12298864::chunk::003::results::858eee0deb",
+          "section": "Results",
+          "relation": "sample_lineage",
+          "evidence_spans": [
+            "XRD studies showed that the crystal structures of CoCrFeNiTi HEA powders are FCC and BCC phases, which are produced by the mechanical alloying process after ball milling for 6 h.",
+            "The broader peaks observed in the X-ray diffraction patterns of powder mixtures subjected to extended milling times ( Figure 2 ) provide further evidence of severe cold deformation within the powder particles."
+          ],
+          "reason": "Validates the structural state (FCC/BCC phases, cold deformation) of the powder resulting from the HEBM process described in the trigger."
+        },
+        {
+          "chunk_id": "PMC12298864::chunk::003::results::858eee0deb",
+          "section": "Results",
+          "relation": "comparison",
+          "evidence_spans": [
+            "As the sintering temperature increases from 1000 °C to 1050 °C, the density of the alloy increases from 6.73 g/cm 3 to 6.98 g/cm 3 , further approaching the theoretical value."
+          ],
+          "reason": "Confirms the density behavior and temperature range mentioned in the trigger's sintering parameters, providing context for the density measurements."
+        }
+      ],
+      "questions": [
+        {
+          "question_id": "PMC12298864::cross_section_question::048018308d8ab87e",
+          "question": "How does the 6-hour milling duration specified in the Results section (resulting in FCC/BCC phases) compare to the 1-6 hour range in Methods regarding the degree of phase transformation and peak broadening?",
+          "question_function": "compare",
+          "why_it_matters": "To determine if the 6h duration is the optimal or saturation point for phase evolution and strain hardening before sintering.",
+          "known_context": "Methods specify milling durations from 1-6 hours; Results state 6h milling produces FCC and BCC phases with broad peaks indicating severe cold deformation.",
+          "unresolved_information": "The specific XRD data (peak width, intensity) for intermediate times (1-5h) is referenced but not detailed in the provided text to allow a direct comparison of the evolution curve.",
+          "source_chunk_ids": [
+            "PMC12298864::chunk::002::materials_and_methods::c3550ed72f",
+            "PMC12298864::chunk::003::results::858eee0deb"
+          ],
+          "evidence_spans": [
+            "XRD studies showed that the crystal structures of CoCrFeNiTi HEA powders are FCC and BCC phases, which are produced by the mechanical alloying process after ball milling for 6 h."
+          ],
+          "confidence": 0.85
+        },
+        {
+          "question_id": "PMC12298864::cross_section_question::35cfa3ab65fe2ff9",
+          "question": "Given the sintering temperature range of 900-1000°C in Methods and the density increase mentioned at 1000-1050°C in Results, what is the precise density saturation behavior within the 900-1000°C range for the CoCrFeNiTi alloy?",
+          "question_function": "find_boundary",
+          "why_it_matters": "To establish the process window limit where sintering density ceases to increase significantly, preventing unnecessary energy use or grain growth.",
+          "known_context": "Methods: Sintering at 900-1000°C for 10 min. Results: Density increases from 6.73 to 6.98 g/cm3 between 1000°C and 1050°C.",
+          "unresolved_information": "The specific density values and trend specifically within the 900°C to 1000°C interval are not explicitly quantified in the provided text segments, only a reference to the curve (Figure 8).",
+          "source_chunk_ids": [
+            "PMC12298864::chunk::002::materials_and_methods::c3550ed72f",
+            "PMC12298864::chunk::003::results::858eee0deb"
+          ],
+          "evidence_spans": [
+            "As the sintering temperature increases from 1000 °C to 1050 °C, the density of the alloy increases from 6.73 g/cm 3 to 6.98 g/cm 3"
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "research_thread": {
+        "scientific_problem": "Determining the optimal processing parameters (milling time and sintering temperature) for CoCrFeNiTi HEA to achieve desired phase constitution and density without excessive energy input or microstructural degradation.",
+        "material_system": "CoCrFeNiTi High-Entropy Alloy",
+        "sample_lineage": "Elemental powders (Co, Cr, Fe, Ni, Ti) -> HEBM (1-6h) -> Sintered Bulk (900-1000°C)",
+        "intervention": "High-energy ball milling duration (1-6h) and Spark Plasma Sintering temperature (900-1000°C).",
+        "baseline": "Raw elemental powders and standard conventional sintering methods (implied by comparison in intro).",
+        "conditions": "Argon atmosphere (milling), Vacuum (sintering), 400 rpm (milling), 50°C/min heating rate, 10 min hold.",
+        "structure": "Nanocrystalline solid solution (83% FCC, 17% BCC) after milling; Fine-grained with nanoprecipitates after sintering.",
+        "outcome": "High hardness (675-684 HV), high compressive strength (1894 MPa), and density approaching theoretical values.",
+        "mechanism": "Mechanical alloying induces severe cold deformation and phase transformation; SPS consolidates with lattice expansion attributed to Ti.",
+        "hypothesis_value": "Synergistic control of phase stability and microstructure via MA/SPS allows for exceptional strength but sacrifices ductility.",
+        "alternative_explanations": [
+          "Hardness increase due to grain refinement alone rather than Ti-induced lattice expansion.",
+          "Density variation due to residual porosity rather than temperature-dependent sintering kinetics."
+        ],
+        "boundaries": [
+          "Sintering temperature range 900-1000°C for optimal density; >1000°C may lead to grain growth.",
+          "Milling duration >6h may not yield significant additional phase transformation based on 6h endpoint."
+        ],
+        "null_or_negative_results": [
+          "Low ductility indicated by intergranular fracture in bulk samples."
+        ],
+        "missing_information": [
+          "Specific density values for 900-1000°C range (only 950°C mentioned as low density, 1000-1050°C trend mentioned).",
+          "Quantitative data on peak broadening evolution between 1-6h milling times.",
+          "Exact sintering pressure applied (implied but not quantified)."
+        ],
+        "provenance": {
+          "trigger_evidence_unit_id": "PMC12298864::hypothesis_evidence_v2::5da6be55a1c47f2c",
+          "supporting_chunk_ids": [
+            "PMC12298864::chunk::002::materials_and_methods::c3550ed72f",
+            "PMC12298864::chunk::003::results::858eee0deb"
+          ],
+          "evidence_spans": [
+            "High–entropy alloy powders composed of CoCrFeNiTi were prepared using a mechanical alloying process through high–energy ball milling (HEBM) under argon atmosphere.",
+            "These elemental powders included cobalt (99.8% purity, particle ranging from 45 µm to 60 µm), chromium (99.7% purity, particle ranging from 10 µm to 30 µm), iron (99.96% purity, particle ranging from 10 µm to 20 µm), nickel (99.5% purity, particle ranging from 45 µm to 60 µm), and titanium (99.95% purity, particle ranging from 2 µm to 5 µm).",
+            "The milling process was conducted using a planetary ball mill model QM–1SP4, utilizing a stainless steel cylindrical vessel and balls with diameters between 5 mm and 10 mm.",
+            "A ball to mill weight ratio of 20:1 was maintained.",
+            "The milling container was evacuated and filled with argon gas three times to ensure an inert atmosphere.",
+            "The ball milling was executed at a rotational speed of 400 rpm, with milling durations spanning from 1 h to 6 h.",
+            "The bulk CoCrFeNiTi high–entropy alloy was prepared via spark plasma sintering (SPS) in a vacuum environment.",
+            "The powder was placed in a cylindrical graphite mold with a 30.4 mm internal diameter.",
+            "The heating process was initiated at a rising rate of 50 °C/min until reaching the sintering temperature in the range of 900 °C to 1000 °C.",
+            "The samples remained at the sintering temperature for 10 min.",
+            "To study phase transformation, X-ray diffraction (XRD) analysis was used, equipped with Cu–Kα radiation (λ = 0.15406 nm).",
+            "The diffraction patterns were recorded with a 2θ range of 20°to 80° and diffractometer step of 0.05°.",
+            "For structural characterization, scanning electron microscopy (SEM, HITACHI, SU8010, Tokyo, Japan) euqipped with energy dispersive spectroscopy (EDS) was conducted using a Nanosem 450 microscope.",
+            "The Vickers hardness measurements were taken at ten distinct locations on each sample to calculate the mean hardness value.",
+            "The sintered alloy samples were ultrasonically cleaned in ethanol for 10 min to remove any surface contaminants.",
+            "Indentations were made at a load of 0.05 kN with a dwell time of 15 s.",
+            "Compressive strength tests were conducted on five samples, and the average values were reported for analysis.",
+            "The specimens were loaded at a constant displacement rate of 0.5 mm/min, corresponding to an initial strain rate of 1 × 10 −3 s −1 .",
+            "XRD studies showed that the crystal structures of CoCrFeNiTi HEA powders are FCC and BCC phases, which are produced by the mechanical alloying process after ball milling for 6 h.",
+            "The broader peaks observed in the X-ray diffraction patterns of powder mixtures subjected to extended milling times ( Figure 2 ) provide further evidence of severe cold deformation within the powder particles.",
+            "As the sintering temperature increases from 1000 °C to 1050 °C, the density of the alloy increases from 6.73 g/cm 3 to 6.98 g/cm 3 , further approaching the theoretical value."
+          ]
+        }
+      }
+    },
+    {
+      "evidence_unit_id": "PMC12298864::hypothesis_evidence_v2::e097165f347ded04",
+      "anchor_chunk_ids": [
+        "PMC12298864::chunk::003::results::858eee0deb"
+      ],
+      "validated_links": [
+        {
+          "chunk_id": "PMC12298864::chunk::003::results::858eee0deb",
+          "section": "Results",
+          "relation": "figure",
+          "evidence_spans": [
+            "Figure 7 a displayed the compressive stress–strain curve of the HEAs synthesized at 900 °C, 950 °C, and 1000 °C.",
+            "Figure 7 b presents the fracture morphologies of the CoCrFeNiTi high–entropy alloy."
+          ],
+          "reason": "Directly links the trigger's mechanical data (strength, yield, hardness) and fracture observations to the specific figures cited."
+        },
+        {
+          "chunk_id": "PMC12298864::chunk::003::results::858eee0deb",
+          "section": "Results",
+          "relation": "mechanism",
+          "evidence_spans": [
+            "The enhanced hardness can be attributed to the high titanium content, which induced lattice expansion.",
+            "Additionally, the regions of deformation are marked by arrows, which confirms that nanoprecipitates play an important role in high strength and low ductility."
+          ],
+          "reason": "Validates the inferred mechanisms (Ti lattice expansion, nanoprecipitate strengthening) cited in the trigger's evidence spans."
+        },
+        {
+          "chunk_id": "PMC12298864::chunk::002::materials_and_methods::c3550ed72f",
+          "section": "Materials And Methods",
+          "relation": "method",
+          "evidence_spans": [
+            "The bulk CoCrFeNiTi high–entropy alloy was prepared via spark plasma sintering (SPS) in a vacuum environment.",
+            "The heating process was initiated at a rising rate of 50 °C/min until reaching the sintering temperature in the range of 900 °C to 1000 °C.",
+            "The samples remained at the sintering temperature for 10 min."
+          ],
+          "reason": "Confirms the specific processing parameters (SPS, 10 min hold) used to generate the sample tested in the trigger."
+        }
+      ],
+      "questions": [
+        {
+          "question_id": "PMC12298864::cross_section_question::0ab228e874d080b5",
+          "question": "How does the 10-minute holding time at sintering temperatures (Methods) specifically influence the density saturation observed at 1000°C versus the lower density at 950°C (Results)?",
+          "question_function": "test_evidence",
+          "why_it_matters": "To distinguish whether the density difference is due to insufficient holding time or insufficient temperature for diffusion, informing process optimization.",
+          "known_context": "Methods: 10 min hold at 900-1000°C. Results: Density at 950°C is 6.57 g/cm3 (lower than theoretical), 1000°C is 6.73 g/cm3.",
+          "unresolved_information": "The specific density trend or value at exactly 1000°C relative to the 950°C value in the context of the fixed 10 min hold is not fully detailed in the text snippet provided (only 1000-1050 trend and 950 low density are explicit).",
+          "source_chunk_ids": [
+            "PMC12298864::chunk::002::materials_and_methods::c3550ed72f",
+            "PMC12298864::chunk::003::results::858eee0deb"
+          ],
+          "evidence_spans": [
+            "The samples remained at the sintering temperature for 10 min.",
+            "When the sintering temperature is 950 °C, the measured density of the alloy is much lower than the theoretical density with 6.57 g/cm 3 ."
+          ],
+          "confidence": 0.75
+        },
+        {
+          "question_id": "PMC12298864::cross_section_question::e4a4f4b0a0ce2f33",
+          "question": "What is the quantitative relationship between the 'nanoprecipitates' identified in Figure 7b and the specific reduction in ductility (intergranular fracture) compared to the bulk CoCrFeNiTi properties at 900°C?",
+          "question_function": "compare",
+          "why_it_matters": "To validate the author's hypothesis that nanoprecipitates are the primary cause of the observed low ductility and high strength trade-off.",
+          "known_context": "Results state nanoprecipitates play an important role in high strength and low ductility, and 1000°C samples show intergranular fracture.",
+          "unresolved_information": "Comparative data on the fracture morphology and ductility metrics for the 900°C and 950°C samples is not provided in the text to establish a correlation with the precipitate density/size.",
+          "source_chunk_ids": [
+            "PMC12298864::chunk::003::results::858eee0deb"
+          ],
+          "evidence_spans": [
+            "Additionally, the regions of deformation are marked by arrows, which confirms that nanoprecipitates play an important role in high strength and low ductility.",
+            "The SPS CoCrFeNiTi HEA tested at 1000 °C exhibited the highest peak stress, followed by 950 °C and 900 °C."
+          ],
+          "confidence": 0.8
+        },
+        {
+          "question_id": "PMC12298864::cross_section_question::52b88e77c3d016a3",
+          "question": "Does the reported 'high titanium content' mechanism for lattice expansion hold true if the actual composition was not strictly equimolar as implied by the nominal composition, and how does this affect the hardness comparison with Stellite?",
+          "question_function": "find_boundary",
+          "why_it_matters": "To assess the robustness of the hardness mechanism claim given the 'Composition not explicitly defined' limitation in the first trigger.",
+          "known_context": "Trigger 1 notes composition is nominal and purity of elements is given but atomic/weight percent not explicitly defined for the final alloy. Trigger 2 claims enhanced hardness due to high Ti content.",
+          "unresolved_information": "The actual atomic/weight fraction of Titanium in the final alloy versus the nominal equimolar assumption is unknown.",
+          "source_chunk_ids": [
+            "PMC12298864::chunk::003::results::858eee0deb"
+          ],
+          "evidence_spans": [
+            "The enhanced hardness can be attributed to the high titanium content, which induced lattice expansion."
+          ],
+          "confidence": 0.7
+        }
+      ],
+      "research_thread": {
+        "scientific_problem": "Understanding the trade-off between strength (yield stress, compressive strength) and ductility in SPS-processed CoCrFeNiTi HEA and determining the dominant strengthening mechanisms (lattice expansion vs. precipitation).",
+        "material_system": "CoCrFeNiTi Bulk High-Entropy Alloy",
+        "sample_lineage": "Milled powder (1-6h) -> SPS at 900-1000°C -> Bulk Disk (10 mm thick, 6 mm diameter).",
+        "intervention": "Variation in Sintering Temperature (900, 950, 1000°C) and comparison with commercial Stellite alloy.",
+        "baseline": "Commercial Stellite alloy (500 Hv); 900°C and 950°C sintered samples.",
+        "conditions": "SPS at 1000°C (peak strength), vacuum, 10 min hold, 50°C/min heating.",
+        "structure": "Fine-grained with nanoprecipitates, intergranular fracture morphology.",
+        "outcome": "Peak stress 1894 MPa, Yield stress 1238 MPa, Hardness 525-675 Hv, Density 6.73 g/cm3 at 1000°C.",
+        "mechanism": "Lattice expansion from Ti content and nanoprecipitate pinning (high strength, low ductility).",
+        "hypothesis_value": "High Ti content and SPS-induced nanoprecipitates provide superior strength over commercial alloys but at the cost of ductility.",
+        "alternative_explanations": [
+          "Hardness due to grain refinement alone.",
+          "Strength due to residual stress from rapid cooling rather than Ti expansion."
+        ],
+        "boundaries": [
+          "Sintering temperature >1000°C may reduce density saturation or cause grain coarsening.",
+          "Low ductility limits application in high-strain scenarios."
+        ],
+        "null_or_negative_results": [
+          "No ductility improvement observed despite high strength.",
+          "Density at 950°C significantly below theoretical."
+        ],
+        "missing_information": [
+          "Actual composition of the bulk alloy (wt% vs at%).",
+          "Quantitative volume fraction of nanoprecipitates.",
+          "Strain rate sensitivity at elevated temperatures."
+        ],
+        "provenance": {
+          "trigger_evidence_unit_id": "PMC12298864::hypothesis_evidence_v2::e097165f347ded04",
+          "supporting_chunk_ids": [
+            "PMC12298864::chunk::003::results::858eee0deb",
+            "PMC12298864::chunk::002::materials_and_methods::c3550ed72f"
+          ],
+          "evidence_spans": [
+            "The bulk CoCrFeNiTi high–entropy alloy exhibited superior microhardness compared to commercial alloys like Stellite (500 Hv) and nickel/cobalt–based superalloys.",
+            "The enhanced hardness can be attributed to the high titanium content, which induced lattice expansion.",
+            "Figure 7 a displayed the compressive stress–strain curve of the HEAs synthesized at 900 °C, 950 °C, and 1000 °C.",
+            "The SPS CoCrFeNiTi HEA tested at 1000 °C exhibited the highest peak stress, followed by 950 °C and 900 °C.",
+            "The curve indicated that the alloy achieved maximum strength of 1894 MPa and yield stress of 1238 MPa at 1000 °C.",
+            "Figure 7 b presents the fracture morphologies of the CoCrFeNiTi high–entropy alloy.",
+            "The SPS–processed CoCrFeNiTi HEA underwent intergranular fracture.",
+            "Additionally, the regions of deformation are marked by arrows, which confirms that nanoprecipitates play an important role in high strength and low ductility.",
+            "Figure 8 shows the measured density of CoCrFeNiTi high–entropy alloy samples produced at different sintering temperatures and compares them with its theoretical density.",
+            "When the sintering temperature is 950 °C, the measured density of the alloy is much lower than the theoretical density with 6.57 g/cm 3 .",
+            "The bulk CoCrFeNiTi high–entropy alloy was prepared via spark plasma sintering (SPS) in a vacuum environment.",
+            "The heating process was initiated at a rising rate of 50 °C/min until reaching the sintering temperature in the range of 900 °C to 1000 °C.",
+            "The samples remained at the sintering temperature for 10 min."
+          ]
+        }
+      }
+    }
+  ],
+  "rejected": [
+    {
+      "evidence_unit_id": "PMC12298864::hypothesis_evidence_v2::5da6be55a1c47f2c",
+      "reason": "no exact linked spans for chunk_id=PMC12298864::chunk::001::introduction::614f98a476"
+    }
+  ]
+}
