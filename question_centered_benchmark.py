@@ -340,12 +340,22 @@ def audit(
     runs = [json.loads(path.read_text()) for path in runs_dir.glob("PMC*.json")]
     temporal = 0
     test_leaks = 0
+    work_family_leaks = 0
     citation_errors = 0
     for run_row in runs:
         ids = {row["record_id"] for row in run_row["retrieved_records"]}
+        test_family = str(
+            metadata.get(run_row["paper_id"], {}).get("work_family_id") or ""
+        )
         for record in run_row["retrieved_records"]:
             temporal += record["publication_date"] >= run_row["knowledge_cutoff"]
             test_leaks += record["paper_id"] == run_row["paper_id"]
+            record_family = str(
+                metadata.get(record["paper_id"], {}).get("work_family_id") or ""
+            )
+            work_family_leaks += bool(
+                test_family and record_family and record_family == test_family
+            )
         cited = set(run_row["generation"].get("supporting_evidence_ids", []))
         cited.update(run_row["generation"].get("conflicting_evidence_ids", []))
         citation_errors += len(cited - ids)
@@ -369,8 +379,11 @@ def audit(
         "matrix_complete": actual_matrix == expected_matrix,
         "temporal_violations": temporal,
         "test_paper_leaks": test_leaks,
+        "same_work_family_leaks": work_family_leaks,
         "invalid_citations": citation_errors,
-        "verified": not temporal and not test_leaks and not citation_errors,
+        "verified": not any(
+            (temporal, test_leaks, work_family_leaks, citation_errors)
+        ),
     }
     atomic_json(output, result)
     if not result["verified"] or not result["matrix_complete"]:

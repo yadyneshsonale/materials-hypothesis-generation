@@ -83,7 +83,7 @@ class QuestionCenteredBenchmarkTests(unittest.TestCase):
             runs = root / "runs"
             cases.mkdir()
             runs.mkdir()
-            (cases / "test.json").write_text(json.dumps({"paper_id": "test"}))
+            (cases / "PMCtest.json").write_text(json.dumps({"paper_id": "PMCtest"}))
             (root / "metadata.json").write_text(json.dumps({"papers": []}))
             for variant in (
                 "raw_questions",
@@ -92,8 +92,8 @@ class QuestionCenteredBenchmarkTests(unittest.TestCase):
                 "grouped_synthesis",
                 "grouped_answers_v2",
             ):
-                (runs / f"test__broad__{variant}.json").write_text(json.dumps({
-                    "paper_id": "test",
+                (runs / f"PMCtest__broad__{variant}.json").write_text(json.dumps({
+                    "paper_id": "PMCtest",
                     "query_level": "broad",
                     "variant": variant,
                     "knowledge_cutoff": "2024-01-01",
@@ -111,6 +111,62 @@ class QuestionCenteredBenchmarkTests(unittest.TestCase):
                 query_levels=("broad",),
             )
         self.assertTrue(result["matrix_complete"])
+
+    def test_audit_rejects_same_work_family_leak(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            cases = root / "cases"
+            runs = root / "runs"
+            cases.mkdir()
+            runs.mkdir()
+            (cases / "PMCtest.json").write_text(json.dumps({"paper_id": "PMCtest"}))
+            (root / "metadata.json").write_text(json.dumps({
+                "papers": [
+                    {
+                        "paper_id": "PMCtest",
+                        "earliest_public_date": "2024-01-01",
+                        "work_family_id": "shared-work",
+                    },
+                    {
+                        "paper_id": "related",
+                        "earliest_public_date": "2020-01-01",
+                        "work_family_id": "shared-work",
+                    },
+                ],
+            }))
+            for variant in (
+                "raw_questions",
+                "grouped_questions",
+                "grouped_answers",
+                "grouped_synthesis",
+                "grouped_answers_v2",
+            ):
+                (runs / f"PMCtest__broad__{variant}.json").write_text(json.dumps({
+                    "paper_id": "PMCtest",
+                    "query_level": "broad",
+                    "variant": variant,
+                    "knowledge_cutoff": "2024-01-01",
+                    "retrieved_records": [{
+                        "record_id": "record-1",
+                        "paper_id": "related",
+                        "publication_date": "2020-01-01",
+                    }],
+                    "generation": {
+                        "supporting_evidence_ids": [],
+                        "conflicting_evidence_ids": [],
+                    },
+                }))
+            with self.assertRaises(ValueError):
+                audit(
+                    root / "metadata.json",
+                    cases,
+                    runs,
+                    root / "audit.json",
+                    query_levels=("broad",),
+                )
+            result = json.loads((root / "audit.json").read_text())
+        self.assertEqual(result["same_work_family_leaks"], 5)
+        self.assertFalse(result["verified"])
 
 
 if __name__ == "__main__":
