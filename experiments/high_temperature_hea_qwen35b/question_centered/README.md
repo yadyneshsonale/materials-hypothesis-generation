@@ -25,18 +25,138 @@ instead of being converted into facts.
 
 ```mermaid
 flowchart LR
-    A[Paper questions] --> B[Retrieve validated v2 evidence]
-    B --> C[Qwen resolves each question]
-    C --> D[Grounded paper-specific answers]
-    D --> E[Normalize scientific facets]
-    E --> F[Group compatible questions]
-    F --> G[Cross-paper synthesis]
-    G --> H[Temporal hypothesis benchmark]
+    A[JATS XML papers] --> B[Section-aware chunks]
+    B --> C[Qwen v2 evidence extraction]
+    C --> D[Exact-span and schema validation]
+    D --> E[Validated v2 factual evidence]
+    B --> F[Reader-question generation]
+    F --> G[Retrieve up to four eligible v2 units]
+    E --> G
+    G --> H[Qwen resolves each question]
+    H --> I[Grounded paper-specific answers]
+    I --> J[Normalize scientific facets]
+    J --> K[Group compatible questions]
+    K --> L[Cross-paper synthesis]
+    L --> M[Temporal hypothesis benchmark]
 ```
 
 In brief, this pipeline starts with questions generated while reading the papers, finds evidence
 that can answer each question, preserves unresolved questions as gaps, groups scientifically
 equivalent questions across papers, and compares the different paper-specific answers.
+
+## Shared factual foundation: v2 evidence
+
+The questions are not the factual database. Both recent extraction pipelines rely on normalized
+**v2 evidence**, stored in
+[`../temporal_v2/materials_evidence_v2/`](../temporal_v2/materials_evidence_v2/).
+
+V2 evidence was introduced because separate role outputs could lose the relationship among a
+material, its processing, its structure, and its measured property. One v2 unit keeps the complete
+scientific chain together:
+
+```text
+material and sample state
+  -> processing or intervention
+  -> resulting structure
+  -> test conditions
+  -> measured outcome
+  -> baseline or comparison
+  -> proposed mechanism
+  -> boundary or limitation
+  -> exact source text
+```
+
+### How v2 evidence is extracted
+
+Qwen reads one bounded paper section at a time and is instructed to:
+
+1. identify a specific material and sample state;
+2. preserve ordered processing steps;
+3. record structure observations and how they were measured;
+4. attach the exact test temperature, environment, load, time, or simulation conditions;
+5. retain numerical results, units, uncertainties, and measurement methods;
+6. identify the baseline, changed variables, controlled variables, and confounders;
+7. distinguish an observed result from an inferred or hypothesized mechanism;
+8. record boundaries, failures, null results, and limitations when stated;
+9. copy exact contiguous source spans; and
+10. avoid guessing missing values or silently converting units.
+
+The model returns records with this structure:
+
+```json
+{
+  "unit_id": "PMC123::hypothesis_evidence_v2::...",
+  "paper_id": "PMC123",
+  "study_type": "experiment",
+  "claim_ownership": "current_paper",
+  "sample": {},
+  "process_steps": [],
+  "structure_observations": [],
+  "test_conditions": {},
+  "measurements": [],
+  "comparison": {},
+  "mechanisms": [],
+  "boundaries": [],
+  "limitations": [],
+  "evidence_spans": [],
+  "source_section": "Results",
+  "extraction_confidence": 0.95,
+  "result_revealing": true
+}
+```
+
+### Important v2 fields
+
+| Field | What it preserves |
+|---|---|
+| `sample` | Sample ID, material, composition, form, initial state, orientation, and density/porosity |
+| `process_steps` | Ordered actions, parameters, and resulting sample states |
+| `structure_observations` | Phase, grain, precipitate, defect, or scale observations and methods |
+| `test_conditions` | Temperature, time, environment, pressure, load, strain rate, radiation, or simulation conditions |
+| `measurements` | Property, numerical value, unit, uncertainty, direction, method, and replicate count |
+| `comparison` | Baseline, changed and controlled variables, confounders, and effect size |
+| `mechanisms` | Mechanism assertion, epistemic status, evidence strength, alternatives, and needed discriminating measurement |
+| `boundaries` | Tested threshold, operating limit, or failure mode |
+| `limitations` | Experimental, measurement, model, applicability, or confounding limitations |
+| `evidence_spans` | Verbatim source text used to validate the record |
+
+`claim_ownership` prevents cited background from being misattributed to the current paper:
+
+- `current_paper`: this paper produced, measured, calculated, simulated, or tested the claim;
+- `cited_work`: this paper is describing a claim from earlier literature.
+
+`result_revealing` marks units that disclose an intervention, result, mechanism, conclusion, or
+quantitative finding. That field helps prevent held-out benchmark queries from accidentally
+revealing the answer.
+
+### V2 validation
+
+Model output is accepted only after deterministic validation:
+
+- every evidence span must occur verbatim in the supplied paper section;
+- identifiers and categorical values must be valid;
+- numeric fields must contain a number or `null`;
+- required sample-process-structure-condition-result links must be present;
+- duplicate evidence IDs are rejected;
+- invalid units are recorded as rejected rather than converted into valid-looking evidence.
+
+The completed v2 run contains 276 valid units across 50 papers: 185 current-paper units and 91
+cited-work units, with 100% exact XML grounding and zero invalid persisted units.
+
+### How this pipeline uses v2 evidence
+
+For every reader question, deterministic retrieval selects at most four eligible v2 units using
+question-term overlap, same-paper preference, current-paper-claim preference, and publication-date
+eligibility. Qwen may answer only from those supplied units. The selected v2 ID provides the answer
+paper, date, conditions, and authoritative exact spans.
+
+Therefore:
+
+```text
+question = what the agent wants to know
+v2 evidence = what the papers actually report
+grounded answer = the validated connection between them
+```
 
 ## Inputs
 

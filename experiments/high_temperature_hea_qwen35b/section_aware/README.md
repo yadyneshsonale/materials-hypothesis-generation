@@ -16,17 +16,151 @@ The main outputs are in [`papers/`](./papers/). There is one JSON file for each 
 
 ```mermaid
 flowchart LR
-    A[Paper + validated v2 evidence] --> B[Build section and chunk map]
-    B --> C[Retrieve related Methods, Results, figures, and tables]
-    C --> D[Qwen validates same sample and experiment]
-    D --> E[Cross-section questions]
-    E --> F[Research thread]
-    F --> G[Exact-span and provenance validation]
+    A[JATS XML paper] --> B[Section-aware chunks]
+    B --> C[Qwen v2 evidence extraction]
+    C --> D[Exact-span and schema validation]
+    D --> E[Validated v2 factual evidence]
+    B --> F[Build section and chunk map]
+    E --> G[Scientific trigger]
+    F --> H[Retrieve related Methods, Results, figures, and tables]
+    G --> H
+    H --> I[Qwen validates same sample and experiment]
+    I --> J[Cross-section questions]
+    J --> K[Research thread]
+    K --> L[Exact-span and provenance validation]
 ```
 
 In brief, this pipeline starts from a validated scientific result, searches elsewhere in the same
 paper for the method, sample history, figure, comparison, mechanism, or boundary needed to
 understand it, and generates questions only after Qwen checks that those passages belong together.
+
+## Shared factual foundation: v2 evidence
+
+This pipeline does not use an arbitrary sentence as its scientific starting point. It starts from
+one normalized, validated **v2 evidence unit** stored in
+[`../temporal_v2/materials_evidence_v2/`](../temporal_v2/materials_evidence_v2/).
+
+V2 evidence keeps the complete scientific relationship together:
+
+```text
+material and sample state
+  -> processing or intervention
+  -> resulting structure
+  -> test conditions
+  -> measured outcome
+  -> baseline or comparison
+  -> proposed mechanism
+  -> boundary or limitation
+  -> exact source text
+```
+
+This corrects the main weakness of separate role records. A processing statement, structure
+observation, and property result are useful for hypothesis generation only when the system knows
+that they refer to the same composition, sample state, treatment, and experiment.
+
+### How v2 evidence is extracted
+
+Qwen reads one bounded section of one JATS XML paper at a time. The extraction prompt requires it
+to:
+
+1. identify the exact material, composition, and sample state;
+2. retain processing as an ordered sequence;
+3. record structural observations and characterization methods;
+4. preserve temperature, time, atmosphere, pressure, loading, strain rate, radiation, or simulation
+   conditions;
+5. store measured properties, numerical values, units, uncertainties, and methods;
+6. identify the baseline, changed variables, controlled variables, and confounders;
+7. distinguish observed results from inferred, calculated, simulated, cited, or hypothesized
+   mechanisms;
+8. record tested boundaries, failure modes, null results, and limitations;
+9. copy complete, exact source sentences whenever possible; and
+10. leave missing values empty or `null` rather than guessing.
+
+One evidence unit has this top-level shape:
+
+```json
+{
+  "unit_id": "PMC123::hypothesis_evidence_v2::...",
+  "paper_id": "PMC123",
+  "study_type": "experiment",
+  "claim_ownership": "current_paper",
+  "sample": {},
+  "process_steps": [],
+  "structure_observations": [],
+  "test_conditions": {},
+  "measurements": [],
+  "comparison": {},
+  "mechanisms": [],
+  "boundaries": [],
+  "limitations": [],
+  "evidence_spans": [],
+  "source_section": "Results",
+  "extraction_confidence": 0.95,
+  "result_revealing": true
+}
+```
+
+### What each part contains
+
+| Field | Contents |
+|---|---|
+| `sample` | Stable local sample ID, material name, nominal/measured composition, form, initial state, dimensions/orientation, and density/porosity |
+| `process_steps` | Ordered action, processing parameters, and the resulting state |
+| `structure_observations` | Feature, quantitative or qualitative value, uncertainty, method, and observed/inferred/calculated/simulated status |
+| `test_conditions` | Temperature, time, environment, pressure, load, strain rate, thermal history, radiation, tribology, and simulation settings |
+| `measurements` | Property, value, unit, uncertainty, direction, method, and replicates |
+| `comparison` | Baseline sample, changed and controlled variables, confounders, and effect size |
+| `mechanisms` | Assertion, epistemic status, evidence strength, supporting observations, alternatives, and discriminating measurement |
+| `boundaries` | Variable, threshold, operator, failure mode, and evidence status |
+| `limitations` | Experimental, measurement, model, applicability, or confounding limitation and its impact |
+| `evidence_spans` | Exact contiguous text copied from the paper section |
+
+### Current-paper versus cited-work ownership
+
+Every unit is labeled:
+
+- `current_paper` when the paper produced, measured, calculated, simulated, or explicitly tested
+  the claim;
+- `cited_work` when the paper is only summarizing prior literature.
+
+This prevents an Introduction statement about another study from being treated as an experiment
+performed by the current paper.
+
+### Result-revealing records
+
+`result_revealing` is `true` when a record discloses an intervention, result, quantitative finding,
+mechanism, or conclusion that must be hidden from a held-out benchmark query. A Methods-only sample
+lineage record can be marked `false`.
+
+### Deterministic v2 validation
+
+Before persistence, the code verifies:
+
+- every evidence span occurs verbatim in the source chunk;
+- required field types and categorical values are valid;
+- measurement and composition numbers are numeric or `null`;
+- sample, process, structure, conditions, and result are sufficiently connected;
+- stable evidence IDs are unique.
+
+Invalid units are rejected explicitly. The completed run contains 276 valid units across 50 papers:
+185 current-paper units and 91 cited-work units, with 100% exact XML grounding.
+
+### How the section-aware agent uses a v2 unit
+
+Each v2 unit becomes one **scientific trigger**. Its sample, processing, structure, conditions,
+measurement, comparison, mechanism, boundaries, and exact spans become the retrieval query. The
+agent finds the trigger's source chunk, searches other sections for missing context, and asks Qwen
+to accept links only when they concern the same sample, state, experiment, figure, table, or
+scientific comparison.
+
+Therefore:
+
+```text
+v2 evidence = validated factual result
+retrieved passages = related context elsewhere in the same paper
+section-aware question = what remains scientifically unresolved
+research thread = auditable interpretation assembled from both
+```
 
 ## The central idea
 
@@ -78,7 +212,12 @@ interface over the validated evidence.
 
 ```mermaid
 flowchart TD
-    A[Paper from the 50-paper corpus] --> B[Section-aware chunking]
+    A0[JATS XML paper] --> V1[Qwen v2 evidence extraction]
+    V1 --> V2[Exact-span and schema validation]
+    V2 --> D[Validated v2 evidence unit]
+
+    A0 --> A[Paper from the 50-paper corpus]
+    A --> B[Section-aware chunking]
     B --> C[Paper map]
 
     C --> C1[Section names]
