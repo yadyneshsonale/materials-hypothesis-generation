@@ -1,0 +1,300 @@
+{
+  "schema_version": "section-aware-extraction-1.0",
+  "paper_id": "PMC7512559",
+  "provider": "openai",
+  "trigger_count": 3,
+  "cross_section_link_count": 5,
+  "question_count": 5,
+  "triggers": [
+    {
+      "evidence_unit_id": "PMC7512559::hypothesis_evidence_v2::54c64daff06b9d3e",
+      "anchor_chunk_ids": [
+        "PMC7512559::chunk::000::abstract::cb41644a7c"
+      ],
+      "validated_links": [
+        {
+          "chunk_id": "PMC7512559::chunk::003::discussion::49b8051d92",
+          "section": "Discussion",
+          "relation": "mechanism",
+          "evidence_spans": [
+            "Based on Equation (1) where p is generally equal to 2 for a dislocation-controlled creep, an increase in the stress exponent Δ n due to dynamic recrystallization is expressed as [ [47] ]: (2) Δ n = n a p p − n = 2 ln ( d 1 / d 2 ) ln ( σ 2 / σ 1 ) where n a p p is the experimentally measured apparent stress exponent, n is the stress exponent prior to the occurrence of recrystallization, d 1 and d 2 denote the average grains size before and after dynamic recrystallization, and σ 1 and σ 2 are the corresponding stress levels."
+          ],
+          "reason": "This section provides the theoretical framework and mathematical derivation (Equation 2) used to attribute the observed increase in stress exponent (from ~5-6 to 8.9-14) specifically to dynamic recrystallization, directly linking the microstructural observation of DRX mentioned in the trigger to the quantitative creep data."
+        },
+        {
+          "chunk_id": "PMC7512559::chunk::002::results::222a43df1d",
+          "section": "Results",
+          "relation": "figure",
+          "evidence_spans": [
+            "In order to eliminate the influence of temperature on creep rate, the normalized creep rates ε ˙ k T exp ( Q / R T ) / G versus the shear modulus-compensated stresses σ / G were plotted in Figure 5 , where activation energies Q were taken to be 268 kJ mol −1 and 380 kJ mol −1 for region I and region II, respectively"
+          ],
+          "reason": "This passage describes Figure 5, which is the diffusion-compensated data plot referenced in the trigger as the primary evidence for the 'stress-assisted dislocation climb' mechanism and the separation of LSR/HSR data using specific activation energies."
+        }
+      ],
+      "questions": [
+        {
+          "question_id": "PMC7512559::cross_section_question::63ab6a76d782cba4",
+          "question": "Given the formula linking stress exponent increase to grain size reduction (d1/d2) in Equation (2), what are the specific values of the average grain sizes before and after dynamic recrystallization (d1 and d2) reported in the full text, and how well do they quantitatively account for the observed jump in stress exponent from ~5.5 to ~11.5?",
+          "question_function": "test_evidence",
+          "why_it_matters": "The paper asserts a mechanistic link between DRX and the high stress exponent via Equation 2, but the trigger and snippets do not provide the specific grain size reduction data required to verify this calculation. Validating the magnitude of grain refinement is crucial to distinguishing DRX as the sole cause versus a contributory factor.",
+          "known_context": "The stress exponent increases from 5-6 (LSR) to 8.9-14 (HSR), and DRX is observed at high stress. Equation (2) relates the exponent change to the ratio of grain sizes before and after recrystallization.",
+          "unresolved_information": "The specific values of grain size 'd1' (pre-DRX) and 'd2' (post-DRX) required to calculate the theoretical Δn.",
+          "source_chunk_ids": [
+            "PMC7512559::chunk::003::discussion::49b8051d92",
+            "PMC7512559::chunk::002::results::222a43df1d"
+          ],
+          "evidence_spans": [
+            "Based on Equation (1) where p is generally equal to 2 for a dislocation-controlled creep, an increase in the stress exponent Δ n due to dynamic recrystallization is expressed as [ [47] ]: (2) Δ n = n a p p − n = 2 ln ( d 1 / d 2 ) ln ( σ 2 / σ 1 )"
+          ],
+          "confidence": 0.9
+        },
+        {
+          "question_id": "PMC7512559::cross_section_question::092c806ae1b6e288",
+          "question": "If the activation energy in HSR (380 kJ/mol) is attributed to barriers from precipitates and severe initial deformation, why is this value significantly lower than the activation energies for lattice diffusion of the constituent elements (288–317 kJ/mol) only slightly exceeded, yet the text claims it is 'abnormally high' and distinct from the LSR mechanism?",
+          "question_function": "explain_mechanism",
+          "why_it_matters": "There is a potential ambiguity in the paper's reasoning: the HSR activation energy (380) is higher than lattice diffusion (288-317), but the text also notes LSR (268) is comparable to lattice diffusion. The question probes whether the 'barrier' explanation for HSR is consistent with the magnitude of energy increase or if other mechanisms (like threshold stress) are implied but not quantified.",
+          "known_context": "LSR activation energy is 268 kJ/mol (comparable to lattice diffusion). HSR activation energy is 380 kJ/mol. Precipitates and severe deformation are cited as barriers increasing activation energy in HSR.",
+          "unresolved_information": "Whether the 112 kJ/mol increase (from 268 to 380) is solely sufficient to be attributed to precipitate barriers, or if the 'barrier' mechanism implies a threshold stress component that alters the interpretation of the activation energy calculation itself.",
+          "source_chunk_ids": [
+            "PMC7512559::chunk::002::results::222a43df1d",
+            "PMC7512559::chunk::003::discussion::49b8051d92"
+          ],
+          "evidence_spans": [
+            "The anomalously high stress exponent and activation energy in HSR were attributed to the combinative effects of dynamic recrystallization and precipitation."
+          ],
+          "confidence": 0.8
+        }
+      ],
+      "research_thread": {
+        "scientific_problem": "Determining the specific microstructural contributions (dynamic recrystallization vs. precipitation barriers) to the abnormally high stress exponent (8.9-14) and activation energy (380 kJ/mol) in the high-stress region of equiatomic CoCrFeNiMn creep.",
+        "material_system": "CoCrFeNiMn equiatomic high-entropy alloy",
+        "sample_lineage": "Fine-grained tensile creep specimens, as-processed",
+        "intervention": "Tensile creep deformation at 500-600 °C and 140-400 MPa",
+        "baseline": "Low-stress region behavior (stress exponent 5-6, activation energy 268 kJ/mol)",
+        "conditions": "Intermediate temperature (500-600 °C), stress range 140-400 MPa",
+        "structure": "Dynamic recrystallization, M23C6/Cr-rich σ precipitates at grain boundaries, dislocation jog/tangle configurations",
+        "outcome": "Transition to high-stress region with stress exponent 8.9-14 and activation energy 380 kJ/mol",
+        "mechanism": "Stress-assisted dislocation climb (LSR) transitioning to a regime dominated by coordinative effects of DRX and precipitation (HSR)",
+        "hypothesis_value": "The hypothesis that DRX and precipitation cooperatively drive the abnormal creep parameters in HSR provides a mechanistic explanation for the deviation from standard power-law creep (n=5), suggesting that microstructural evolution during deformation fundamentally alters the rate-controlling mechanism.",
+        "alternative_explanations": [
+          "Threshold stress behavior due to precipitate interactions"
+        ],
+        "boundaries": [
+          "Transition point between LSR and HSR",
+          "Limitations of lattice diffusion model for HSR"
+        ],
+        "null_or_negative_results": [],
+        "missing_information": [
+          "Quantitative grain size reduction (d1/d2) to verify Equation 2",
+          "Direct microstructural comparison of precipitate density between LSR and HSR",
+          "Measurement of threshold stress"
+        ],
+        "provenance": {
+          "trigger_evidence_unit_id": "PMC7512559::hypothesis_evidence_v2::54c64daff06b9d3e",
+          "supporting_chunk_ids": [
+            "PMC7512559::chunk::000::abstract::cb41644a7c",
+            "PMC7512559::chunk::003::discussion::49b8051d92",
+            "PMC7512559::chunk::002::results::222a43df1d"
+          ],
+          "evidence_spans": [
+            "The tensile creep behavior of an equiatomic CoCrFeNiMn high-entropy alloy was systematically investigated over an intermediate temperature range (500–600 °C) and applied stress (140–400 MPa).",
+            "The alloy exhibited a stress-dependent transition from a low-stress region (LSR-region I) to a high-stress region (HSR-region II).",
+            "The LSR was characterized by a stress exponent of 5 to 6 and an average activation energy of 268 kJ mol −1 , whereas the HSR showed much higher corresponding values of 8.9–14 and 380 kJ mol −1 .",
+            "Microstructural examinations on the deformed samples revealed remarkable dynamic recrystallization at higher stress levels.",
+            "Dislocation jogging and tangling configurations were frequently observed in LSR and HSR at 550 and 600 °C, respectively.",
+            "Moreover, dynamic precipitates identified as M 23 C 6 or a Cr-rich σ phase were formed along grain boundaries in HSR.",
+            "The diffusion-compensated strain rate versus modulus-compensated stress data analysis implied that the creep deformation in both stress regions was dominated by stress-assisted dislocation climb controlled by lattice diffusion.",
+            "Nevertheless, the abnormally high stress exponents in HSR were ascribed to the coordinative contributions of dynamic recrystallization and dynamic precipitation.",
+            "Simultaneously, the barriers imposed by these precipitates and severe initial deformation were referred to so as to increase the activation energy for creep deformation.",
+            "Based on Equation (1) where p is generally equal to 2 for a dislocation-controlled creep, an increase in the stress exponent Δ n due to dynamic recrystallization is expressed as [ [47] ]: (2) Δ n = n a p p − n = 2 ln ( d 1 / d 2 ) ln ( σ 2 / σ 1 ) where n a p p is the experimentally measured apparent stress exponent, n is the stress exponent prior to the occurrence of recrystallization, d 1 and d 2 denote the average grains size before and after dynamic recrystallization, and σ 1 and σ 2 are the corresponding stress levels.",
+            "In order to eliminate the influence of temperature on creep rate, the normalized creep rates ε ˙ k T exp ( Q / R T ) / G versus the shear modulus-compensated stresses σ / G were plotted in Figure 5 , where activation energies Q were taken to be 268 kJ mol −1 and 380 kJ mol −1 for region I and region II, respectively"
+          ]
+        }
+      }
+    },
+    {
+      "evidence_unit_id": "PMC7512559::hypothesis_evidence_v2::bc6d94ecb8b53369",
+      "anchor_chunk_ids": [
+        "PMC7512559::chunk::001::introduction::316f02dec2"
+      ],
+      "validated_links": [
+        {
+          "chunk_id": "PMC7512559::chunk::003::discussion::49b8051d92",
+          "section": "Discussion",
+          "relation": "comparison",
+          "evidence_spans": [
+            "Unfortunately, it is difficult to precisely estimate the values of boundary obstacle stress and the decrease in the stress exponent, due to the ambiguous interaction between dynamic precipitation and recrystallization."
+          ],
+          "reason": "This passage directly addresses the limitation mentioned in the trigger (uncertainty in mechanism due to unexamined microstructure) by acknowledging the difficulty in decoupling the effects of precipitation and recrystallization in the current study, thereby validating the need for the cited work's comparison."
+        }
+      ],
+      "questions": [
+        {
+          "question_id": "PMC7512559::cross_section_question::18293151495a189c",
+          "question": "Given that the cited AlxCoCrFeNi study reported a stress exponent of 8.8 and activation energy of 334 kJ/mol attributed to bcc phase grain boundaries, does the CoCrFeNiMn HSR data (n=8.9-14, Q=380) suggest a similar grain-boundary-dominated mechanism, or does the presence of dynamic precipitation in CoCrFeNiMn indicate a distinct strengthening regime?",
+          "question_function": "compare",
+          "why_it_matters": "The cited work attributes high parameters to grain boundary density in a bcc phase, while the current study attributes them to DRX and precipitation. Comparing these values and mechanisms is essential to determine if the high stress exponent in CoCrFeNiMn is a general feature of bcc-like high-stress creep or unique to the precipitation-hardened regime.",
+          "known_context": "Cited work (AlxCoCrFeNi): n=8.8, Q=334, attributed to bcc phase and grain boundaries, mechanism not microstructurally confirmed. Current study (CoCrFeNiMn): n=8.9-14, Q=380, attributed to DRX and precipitation.",
+          "unresolved_information": "Whether the high stress exponent in CoCrFeNiMn is primarily driven by the grain boundary density (similar to the cited Al-alloy) or if the precipitates are the dominant factor, given the ambiguity in separating these effects.",
+          "source_chunk_ids": [
+            "PMC7512559::chunk::001::introduction::316f02dec2",
+            "PMC7512559::chunk::003::discussion::49b8051d92"
+          ],
+          "evidence_spans": [
+            "The high-stress exponent of 8.8 and activation energy of 334 kJ mol −1 were simply explained by the increasing grain boundary in the initial body-center-cubic (bcc) phase.",
+            "The anomalously high stress exponent and activation energy in HSR were attributed to the combinative effects of dynamic recrystallization and precipitation."
+          ],
+          "confidence": 0.85
+        }
+      ],
+      "research_thread": {
+        "scientific_problem": "Distinguishing the dominant microstructural drivers (grain boundaries vs. precipitates vs. DRX) for high stress exponents in high-entropy alloys, using the cited AlxCoCrFeNi study as a baseline for grain-boundary effects.",
+        "material_system": "AlxCoCrFeNi (cited) vs CoCrFeNiMn (current)",
+        "sample_lineage": "Cited: AlxCoCrFeNi with varying Al content; Current: Equiatomic CoCrFeNiMn",
+        "intervention": "Stress relaxation (cited) vs. Tensile creep (current)",
+        "baseline": "AlxCoCrFeNi with lower Al content (higher creep resistance)",
+        "conditions": "Cited: Not fully specified in snippet (stress relaxation); Current: 500-600 °C, 140-400 MPa",
+        "structure": "Cited: bcc phase, increasing grain boundaries; Current: DRX, M23C6/σ precipitates",
+        "outcome": "Both show high stress exponents (~8.8 vs ~8.9-14) and elevated activation energies",
+        "mechanism": "Cited: Dislocation cross-slip due to SFE and grain boundary interactions; Current: Dislocation climb + DRX/Precipitation barriers",
+        "hypothesis_value": "Comparing these two systems allows for a potential separation of 'grain boundary density' effects (cited) from 'precipitation + DRX' effects (current), refining the understanding of what drives the 'abnormal' n>8 behavior in HEAs.",
+        "alternative_explanations": [
+          "Grain boundary sliding or density effects in both systems"
+        ],
+        "boundaries": [
+          "Validity of mechanism attribution in cited work (unexamined microstructure)",
+          "Ambiguity in separating precipitation and recrystallization effects in current work"
+        ],
+        "null_or_negative_results": [],
+        "missing_information": [
+          "Microstructural confirmation of grain boundary density in the cited Al-alloy study",
+          "Direct quantitative comparison of precipitate density and grain size evolution between the two alloy systems"
+        ],
+        "provenance": {
+          "trigger_evidence_unit_id": "PMC7512559::hypothesis_evidence_v2::bc6d94ecb8b53369",
+          "supporting_chunk_ids": [
+            "PMC7512559::chunk::001::introduction::316f02dec2",
+            "PMC7512559::chunk::003::discussion::49b8051d92"
+          ],
+          "evidence_spans": [
+            "The investigation on creep behavior of AlxCoCrFeNi (x = 0.15, 0.60) alloys using the stress relaxation method [ [24] ] demonstrated a lower creep resistance for higher Al content alloy, which was attributed to the easier dislocation cross-slip due to its higher stacking fault energy. The high-stress exponent of 8.8 and activation energy of 334 kJ mol −1 were simply explained by the increasing grain boundary in the initial body-center-cubic (bcc) phase. The dislocation configurations and microstructural evolution were not examined to confirm the validity of the proposed creep mechanism.",
+            "Unfortunately, it is difficult to precisely estimate the values of boundary obstacle stress and the decrease in the stress exponent, due to the ambiguous interaction between dynamic precipitation and recrystallization."
+          ]
+        }
+      }
+    },
+    {
+      "evidence_unit_id": "PMC7512559::hypothesis_evidence_v2::b8f6a52d87dc4548",
+      "anchor_chunk_ids": [
+        "PMC7512559::chunk::003::discussion::49b8051d92"
+      ],
+      "validated_links": [
+        {
+          "chunk_id": "PMC7512559::chunk::002::results::222a43df1d",
+          "section": "Results",
+          "relation": "comparison",
+          "evidence_spans": [
+            "In the low-stress region (subsequently denoted as LSR-region I), the stress exponent values vary in the range of 5 to 6, and the average activation energy Q takes a value of 268 kJ mol −1 .",
+            "On the contrary, in the high-stress region (subsequently denoted as HSR-region II), the stress exponents are in the range of 8.9–14, and the activation energy is Q = 359–410 kJ/mol with an average value of 380 kJ mol −1 ."
+          ],
+          "reason": "This chunk provides the quantitative baseline (LSR data) and the comparative context (HSR data) for the trigger's claim regarding stress exponents and activation energies, confirming the specific values and regions discussed."
+        },
+        {
+          "chunk_id": "PMC7512559::chunk::003::discussion::49b8051d92",
+          "section": "Discussion",
+          "relation": "figure",
+          "evidence_spans": [
+            "As shown in Figure 6 , obvious dynamic recrystallization occurred in the present CoCrFeNiMn alloy in HSR."
+          ],
+          "reason": "This chunk explicitly links the observation of dynamic recrystallization to Figure 6, validating the structural evidence cited in the trigger."
+        }
+      ],
+      "questions": [
+        {
+          "question_id": "PMC7512559::cross_section_question::dd8447be62f7cfcb",
+          "question": "How does the specific morphology and spatial distribution of the nano-sized M23C6 and σ phase precipitates observed in HSR (Figure 6) quantitatively differ from the dislocation substructure features in LSR to justify the distinct activation energy increase?",
+          "question_function": "compare",
+          "why_it_matters": "Distinguishing the specific morphological contributions of precipitates versus dislocation networks is essential to resolve the 'ambiguous interaction' limitation mentioned in the trigger, allowing for better quantification of boundary obstacle stress.",
+          "known_context": "The paper reports high stress exponents (8.9–14) and activation energy (380 kJ/mol) in HSR, attributed to combined dynamic recrystallization and precipitation, while LSR has lower values (5-6, 268 kJ/mol) dominated by dislocation climb.",
+          "unresolved_information": "The specific quantitative relationship between the observed precipitate distribution (nano-sized M23C6, σ phase) and the calculated boundary obstacle stress, which the authors state is difficult to estimate precisely.",
+          "source_chunk_ids": [
+            "PMC7512559::chunk::003::discussion::49b8051d92",
+            "PMC7512559::chunk::002::results::222a43df1d"
+          ],
+          "evidence_spans": [
+            "TEM observations provide clear evidence of dynamic precipitation in HSR.",
+            "The anomalously high stress exponent and activation energy in HSR were attributed to the combinative effects of dynamic recrystallization and precipitation."
+          ],
+          "confidence": 0.85
+        },
+        {
+          "question_id": "PMC7512559::cross_section_question::3b2f87b0f2122ca7",
+          "question": "Can the stress exponent values of 8.9–14 in the HSR be theoretically reconstructed using a composite model that explicitly couples the grain refinement from dynamic recrystallization (p=2) with the precipitate hardening threshold stress, to determine if the observed values exceed the additive prediction?",
+          "question_function": "test_evidence",
+          "why_it_matters": "The paper notes that recrystallization alone is insufficient to explain the high stress exponents. A quantitative composite model would define the boundary of this mechanism and resolve the ambiguity regarding the 'coordinative contributions'.",
+          "known_context": "Recrystallization is generally associated with p=2 in the grain size term, and high stress exponents in HSR are linked to both recrystallization and precipitation. The power-law breakdown is ruled out.",
+          "unresolved_information": "A mathematical formulation or calculated value demonstrating the magnitude of the stress exponent increase solely due to the interaction of recrystallization and precipitation, versus the observed 8.9-14.",
+          "source_chunk_ids": [
+            "PMC7512559::chunk::003::discussion::49b8051d92"
+          ],
+          "evidence_spans": [
+            "Based on Equation (1) where p is generally equal to 2 for a dislocation-c",
+            "The anomalously high stress exponent and activation energy in HSR were attributed to the combinative effects of dynamic recrystallization and precipitation."
+          ],
+          "confidence": 0.75
+        }
+      ],
+      "research_thread": {
+        "scientific_problem": "Determining the precise mechanism and quantitative contributions of dynamic precipitation and recrystallization to the abnormally high stress exponents (8.9–14) in CoCrFeNiMn HEA under high-stress intermediate-temperature creep.",
+        "material_system": "CoCrFeNiMn equiatomic high-entropy alloy",
+        "sample_lineage": "Fine-grained tensile creep specimens, transitioning from as-received to dynamic recrystallization and precipitation states.",
+        "intervention": "High-stress creep deformation at 500–600 °C (HSR-region II).",
+        "baseline": "Low-stress creep deformation (LSR-region I) at 500–600 °C, where n=5-6 and Q=268 kJ/mol.",
+        "conditions": "Intermediate temperature (500–600 °C), high stress (140–400 MPa range for HSR), constant stress tension.",
+        "structure": "LSR: Dislocation climb with jog configurations. HSR: Refined grains, dynamic recrystallization, nano-sized M23C6 and Cr-rich σ phase precipitates, tangled/curved dislocations.",
+        "outcome": "Abnormally high stress exponents (8.9–14) and activation energy (380 kJ/mol) in HSR, attributed to lattice-diffusion controlled dislocation climb modulated by precipitate barriers and recrystallization.",
+        "mechanism": "Stress-assisted dislocation climb controlled by lattice diffusion, with rate-limiting factors modified by dynamic precipitation (barrier stress) and dynamic recrystallization (grain boundary sliding/refinement).",
+        "hypothesis_value": "The hypothesis that combined dynamic recrystallization and precipitation creates a synergistic effect to increase activation energy and stress exponent beyond standard dislocation climb values, distinguishing HSR from LSR behavior in HEAs.",
+        "alternative_explanations": [
+          "Power-law breakdown (rejected due to lack of deviation in log-log plots)",
+          "Sole dynamic recrystallization (rejected as insufficient for the magnitude of n)",
+          "Dynamic recrystallization without precipitation"
+        ],
+        "boundaries": [
+          "Stress level threshold separating LSR and HSR mechanisms",
+          "Temperature range (intermediate, not higher than 600 °C)"
+        ],
+        "null_or_negative_results": [
+          "No deviation observed from linear relationship on double-logarithmic curves of log ε ˙ ~ log σ, ruling out power-law breakdown."
+        ],
+        "missing_information": [
+          "Precise quantification of the boundary obstacle stress due to ambiguous interaction between dynamic precipitation and recrystallization.",
+          "Mathematical decoupling of the specific contribution of recrystallization vs. precipitation to the stress exponent value."
+        ],
+        "provenance": {
+          "trigger_evidence_unit_id": "PMC7512559::hypothesis_evidence_v2::b8f6a52d87dc4548",
+          "supporting_chunk_ids": [
+            "PMC7512559::chunk::003::discussion::49b8051d92",
+            "PMC7512559::chunk::002::results::222a43df1d"
+          ],
+          "evidence_spans": [
+            "The observed jog configurations are indicative of a dislocation climb process, and thus the stress-assisted dislocation climb controlled by lattice diffusion may be the operative creep mechanism of the present high-entropy alloy in LSR.",
+            "Contrary to LSR, creep deformation in HSR exhibits abnormally high stress exponents of 8.9–14 and an average activation energy of 380 kJ mol −1 .",
+            "As shown in Figure 6 , obvious dynamic recrystallization occurred in the present CoCrFeNiMn alloy in HSR.",
+            "TEM observations provide clear evidence of dynamic precipitation in HSR.",
+            "The anomalously high stress exponent and activation energy in HSR were attributed to the combinative effects of dynamic recrystallization and precipitation.",
+            "However, lattice-diffusion controlled dislocation climb is still responsible for the deformation mechanism in HSR.",
+            "In the low-stress region (subsequently denoted as LSR-region I), the stress exponent values vary in the range of 5 to 6, and the average activation energy Q takes a value of 268 kJ mol −1 .",
+            "On the contrary, in the high-stress region (subsequently denoted as HSR-region II), the stress exponents are in the range of 8.9–14, and the activation energy is Q = 359–410 kJ/mol with an average value of 380 kJ mol −1 ."
+          ]
+        }
+      }
+    }
+  ],
+  "rejected": [
+    {
+      "evidence_unit_id": "PMC7512559::hypothesis_evidence_v2::b8f6a52d87dc4548",
+      "reason": "no exact linked spans for chunk_id=PMC7512559::chunk::003::discussion::49b8051d92"
+    }
+  ]
+}

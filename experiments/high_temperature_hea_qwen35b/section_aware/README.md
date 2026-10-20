@@ -12,6 +12,22 @@ thread.
 
 The main outputs are in [`papers/`](./papers/). There is one JSON file for each paper.
 
+## Pipeline at a glance
+
+```mermaid
+flowchart LR
+    A[Paper + validated v2 evidence] --> B[Build section and chunk map]
+    B --> C[Retrieve related Methods, Results, figures, and tables]
+    C --> D[Qwen validates same sample and experiment]
+    D --> E[Cross-section questions]
+    E --> F[Research thread]
+    F --> G[Exact-span and provenance validation]
+```
+
+In brief, this pipeline starts from a validated scientific result, searches elsewhere in the same
+paper for the method, sample history, figure, comparison, mechanism, or boundary needed to
+understand it, and generates questions only after Qwen checks that those passages belong together.
+
 ## The central idea
 
 Consider a simplified paper:
@@ -629,6 +645,15 @@ section_aware/
 ├── README.md
 ├── COMPLETE
 ├── status.json
+├── outputs/
+│   ├── 1/
+│   │   ├── paper.pdf
+│   │   ├── paper.xml
+│   │   ├── metadata.json
+│   │   └── extracted_questions.json
+│   ├── ...
+│   ├── 50/
+│   └── index.json
 ├── paper_maps/
 │   ├── PMC10142552.json
 │   ├── ...
@@ -642,6 +667,31 @@ section_aware/
     ├── evaluation.json
     └── quality_review.json
 ```
+
+### `outputs/`
+
+[`outputs/`](./outputs/) provides an easy-to-browse, self-contained bundle for every paper. Folder
+numbers follow the canonical citation-ranked corpus manifest:
+
+```text
+outputs/<rank>/
+├── paper.pdf
+├── paper.xml
+├── metadata.json
+└── extracted_questions.json
+```
+
+- `paper.pdf` is the original open-access PDF for visual inspection.
+- `paper.xml` is the original open-access JATS XML from which the corpus text was derived.
+- `metadata.json` records the rank, PMC ID, title, DOI, publication year, license, pipeline, and
+  question count.
+- `extracted_questions.json` is the complete section-aware output for that paper. It contains the
+  evidence triggers, anchor chunks, validated cross-section links, extracted questions, known
+  context, unresolved information, research threads, provenance, and rejected records.
+- `index.json` maps ranks 1 through 50 to paper IDs and metadata.
+
+These are presentation bundles. The canonical section-aware records remain in `papers/`, and each
+bundle's metadata points to its canonical source.
 
 ### `paper_maps/`
 

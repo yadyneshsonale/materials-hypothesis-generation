@@ -21,6 +21,23 @@ Questions organize retrieval, but they do not replace evidence. Every answer poi
 v2 evidence unit and carries exact XML spans. Unsupported questions remain explicitly unresolved
 instead of being converted into facts.
 
+## Pipeline at a glance
+
+```mermaid
+flowchart LR
+    A[Paper questions] --> B[Retrieve validated v2 evidence]
+    B --> C[Qwen resolves each question]
+    C --> D[Grounded paper-specific answers]
+    D --> E[Normalize scientific facets]
+    E --> F[Group compatible questions]
+    F --> G[Cross-paper synthesis]
+    G --> H[Temporal hypothesis benchmark]
+```
+
+In brief, this pipeline starts with questions generated while reading the papers, finds evidence
+that can answer each question, preserves unresolved questions as gaps, groups scientifically
+equivalent questions across papers, and compares the different paper-specific answers.
+
 ## Inputs
 
 - `../temporal_v2/question_triage.json`: 8,848 reader questions generated from 50 papers.
@@ -120,6 +137,15 @@ held-out-paper leaks, zero same-work-family leaks, and zero invalid generated ci
 
 ```text
 question_centered/
+├── outputs/               # easy-to-browse paper bundles numbered 1 through 50
+│   ├── 1/
+│   │   ├── paper.pdf
+│   │   ├── paper.xml
+│   │   ├── metadata.json
+│   │   └── extracted_questions.json
+│   ├── ...
+│   ├── 50/
+│   └── index.json
 ├── resolved_questions/    # one file per paper plus summary.json
 ├── clusters/              # one file per final cluster plus summary.json
 ├── benchmark_runs/        # 180 run files plus aggregate summary.json
@@ -130,6 +156,31 @@ question_centered/
 ├── status.json
 └── COMPLETE
 ```
+
+### Numbered `outputs/` folders
+
+[`outputs/`](./outputs/) is the simplest way to inspect the experiment paper by paper. The folder
+number is the paper's canonical citation-ranked position from the 50-paper corpus manifest:
+
+```text
+outputs/<rank>/
+├── paper.pdf
+├── paper.xml
+├── metadata.json
+└── extracted_questions.json
+```
+
+- `paper.pdf` is the original open-access PDF for visual reading.
+- `paper.xml` is the original open-access JATS XML used to construct the text corpus.
+- `metadata.json` identifies the rank, PMC ID, title, DOI, year, license, pipeline, and question
+  count.
+- `extracted_questions.json` is the complete question-centered per-paper output. It contains every
+  question, resolution status, scientific facets, grounded answers, evidence IDs, exact spans, and
+  rejected records.
+- `index.json` maps all ranks from 1 to 50 to their PMC IDs and metadata.
+
+These numbered folders are presentation bundles. The canonical pipeline files remain in
+`resolved_questions/`, and `metadata.json` records the canonical source path.
 
 Runtime logs, resolver checkpoints, adjudication caches, temporal synthesis caches, PID files, and
 server-health files are intentionally excluded from version control.
