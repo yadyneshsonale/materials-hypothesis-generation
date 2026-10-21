@@ -396,6 +396,11 @@ includes the screened open-access JATS corpus, Qwen3.5-35B-A3B linked-evidence o
 candidate records, aggregate evaluation, adaptive-agent trace, machine-readable configuration,
 methods, limitations, and exact rerun commands.
 
+A cutoff-audited evaluation of a tool-calling agent against three baselines is documented in
+[`experiments/high_temperature_hea_qwen35b/eval_v3/`](experiments/high_temperature_hea_qwen35b/eval_v3/README.md).
+It uses each held-out paper's earliest public date as the cutoff, generates locally with Qwen3.5-35B-A3B,
+and judges with TRAPI GPT-5.6.
+
 Run masked-paper recovery:
 
 ```bash

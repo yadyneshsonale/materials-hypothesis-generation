@@ -1,0 +1,105 @@
+{
+  "schema_version": "temporal-eval-v3-1.0",
+  "run_id": "PMC11606917__problem_constrained__v2_oneshot",
+  "paper_id": "PMC11606917",
+  "query_level": "problem_constrained",
+  "setting": "v2_oneshot",
+  "publication_date": "2024-11-29",
+  "query": "We are analyzing a refractory BCC high-entropy alloy (Ta-based) where standard experimental measurements of melting properties are infeasible. Current ab initio free energy methods are prohibitively expensive due to the need for thermodynamic integration over the full phase space. Furthermore, existing empirical potentials (like EAM) often fail to capture the complex liquid structure in multi-component systems, while machine learning potentials are computationally demanding. I need a hypothesis for an intervention that replaces the expensive thermodynamic integration step with a more efficient perturbation scheme using a specific class of machine learning potentials. The solution must address the trade-off between computational cost (currently limiting throughput) and the accuracy required to resolve subtle free energy differences. What are the known failure modes of existing TOR-TILD or similar approaches in multi-component spaces, and what falsification experiment could distinguish a true efficiency gain from an artifact of the potential's training set?",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "eligible_paper_count": 45,
+  "corpus_records": {
+    "chunks": 269,
+    "evidence_units": 257
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Replacing full thermodynamic integration with a 'Local Chemical Environment Perturbation' (LCEP) scheme using a Moment Tensor Polynomial (MTP) potential trained specifically on high-temperature liquid configurations will yield melting free energy differences within 2% of DFT benchmarks for Ta-based BCC HEAs, whereas standard EAM potentials will fail by >15% due to an inability to capture the specific short-range order (SRO) of the liquid phase.",
+    "material_initial_state": "Ta-based BCC high-entropy alloy (e.g., Ta-W-Cr-V or similar refractory composition) in a disordered solid solution state at temperatures approaching the melting point.",
+    "intervention": "Implement a perturbation scheme where the potential energy surface is sampled not by integrating over the entire phase space, but by applying localized chemical environment perturbations (swapping local atomic species within a fixed coordination shell) to a pre-equilibrated liquid structure, using a Moment Tensor Polynomial (MTP) potential trained on AIMD liquid snapshots.",
+    "conditions": "Temperature range 2000 K to 3500 K (liquid phase), zero pressure, NPT ensemble, with the MTP potential trained on a dataset including high-temperature liquid configurations and solid-liquid interfaces to ensure transferability.",
+    "structural_mediator": "Short-range order (SRO) and local coordination environments in the liquid phase, which are known to be composition-dependent and critical for accurate free energy estimation in multi-component systems.",
+    "mechanism": "Standard EAM potentials fail in multi-component liquids because they rely on pairwise or simple many-body terms that cannot capture the complex, composition-dependent electronic screening and local ordering (e.g., Cr-V clustering or Ta-W segregation tendencies) observed in refractory HEA liquids. The MTP potential, by utilizing higher-order descriptors and being trained on liquid-specific AIMD data, captures these subtle SRO variations. The LCEP scheme exploits this accuracy by calculating free energy differences via local perturbations (similar to thermodynamic integration but restricted to the relevant local configuration space), avoiding the exponential cost of global phase space integration.",
+    "predicted_outcome": "The MTP-LCEP method will predict a melting temperature and free energy difference that matches DFT-based thermodynamic integration results within statistical error, while reducing computational cost by a factor of >100 compared to full integration. Conversely, EAM-based LCEP will show significant deviation (>15%) due to inaccurate liquid structure prediction.",
+    "baseline": "Standard thermodynamic integration using EAM potentials or full-phase-space integration using DFT (which is currently deemed prohibitively expensive).",
+    "boundary": "The hypothesis holds for refractory BCC HEAs where liquid structure is dominated by strong chemical interactions (negative enthalpies of mixing) and fails for systems where the liquid is purely ideal or where the training set lacks high-temperature liquid data. It is bounded by the size of the training set required to capture the specific multi-component SRO.",
+    "uncertainty": "There is uncertainty regarding whether the specific class of MTP potentials can be trained sufficiently on the limited high-temperature liquid data available for refractory HEAs without overfitting to the solid phase. Additionally, the 'local perturbation' scheme assumes that the free energy landscape is locally harmonic or well-behaved around the liquid state, which may not hold near the melting point where anharmonic effects are severe.",
+    "supporting_evidence_ids": [
+      "PMC6397024::hypothesis_evidence_v2::e69adc3294a34141",
+      "PMC8282813::hypothesis_evidence_v2::413ba39b1e86aee0",
+      "PMC8398136::hypothesis_evidence_v2::18816744491b6185"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Perform a comparative study on a Ta-based BCC HEA (e.g., Ta-W-Cr-V) using three methods: (1) Full thermodynamic integration with DFT (reference, limited to small supercells), (2) LCEP with an MTP potential trained on liquid AIMD data, and (3) LCEP with a standard EAM potential. All methods will be run at the same temperature (e.g., 2500 K) and pressure (0 GPa).",
+      "measurements": [
+        "Calculated Gibbs free energy difference (ΔG) between solid and liquid phases",
+        "Predicted melting temperature (Tm)",
+        "Radial distribution function (RDF) and Warren-Cowley SRO parameters of the liquid phase",
+        "Computational time per free energy point"
+      ],
+      "falsification_rule": "The hypothesis is falsified if: (a) The MTP-LCEP method yields a ΔG or Tm deviation >5% from the DFT reference, or (b) The MTP-LCEP method shows no significant reduction in computational cost compared to a full integration approach on a comparable system, or (c) The EAM-LCEP method outperforms the MTP-LCEP method in accuracy, indicating that the specific liquid SRO is not the limiting factor."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "accessed_record_ids": [
+    "PMC6908586::hypothesis_evidence_v2::7fcb4a706dfb42b5",
+    "PMC8282813::hypothesis_evidence_v2::413ba39b1e86aee0",
+    "PMC6397024::hypothesis_evidence_v2::e69adc3294a34141",
+    "PMC8398136::hypothesis_evidence_v2::18816744491b6185",
+    "PMC11375712::hypothesis_evidence_v2::5e325136ef03d4b0",
+    "PMC6427779::hypothesis_evidence_v2::fb095d0ba0462b35",
+    "PMC4999872::hypothesis_evidence_v2::7df497fa65d2c45e",
+    "PMC8282813::hypothesis_evidence_v2::d32229df8f44afd7",
+    "PMC5978046::hypothesis_evidence_v2::990faf09cfe1733e",
+    "PMC9026100::hypothesis_evidence_v2::a447c4328ed7c462",
+    "PMC6908586::hypothesis_evidence_v2::403e1097c9c2420d",
+    "PMC6197204::hypothesis_evidence_v2::659bd4a35dd31a34",
+    "PMC6397024::hypothesis_evidence_v2::28b429ee2b07cc50",
+    "PMC10759803::hypothesis_evidence_v2::9712ecc1b33dd7f8"
+  ],
+  "cited_evidence_ids": [
+    "PMC6397024::hypothesis_evidence_v2::e69adc3294a34141",
+    "PMC8282813::hypothesis_evidence_v2::413ba39b1e86aee0",
+    "PMC8398136::hypothesis_evidence_v2::18816744491b6185"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "PMC6397024::hypothesis_evidence_v2::e69adc3294a34141",
+      "paper_id": "PMC6397024",
+      "publication_date": "2019-03-01",
+      "kind": "v2_evidence",
+      "text": "PMC6397024::hypothesis_evidence_v2::e69adc3294a34141 PMC6397024 simulation current_paper simulation_CE_CMC W-Ta-Cr-V alloy model 38 at% W / 36 at% Ta / 15 at% Cr / 11 at% V  W 0.38 at.%  Ta 0.36 at.%  Cr 0.15 at.%  V 0.11 at.%  atomic lattice BCC underlying crystalline lattice   1 DFT calculation density functional theory enthalpies of mixing for 270 structures 2 Cluster expansion  Hamiltonian with effective cluster interactions 3 Canonical Monte Carlo (CMC) simulation 1000 K room temperature to 1000 K configurational entropy and phase separation Cr-V rich precipitate composition   62 at% Cr, 30 at% V, 5 at% W, 3 at% Ta  CMC simulation calculated SRO parameters   strong segregation tendency of Cr and V  Warren-Cowley SRO analysis calculated 1000 K (simulated); room temperature (simulated)      isothermal annealing simulation   cluster expansion methodology, DFT-based Hamiltonian, canonical Monte Carlo enthalpy of mixing   negative for W-Ta, W-V, Cr-V; positive for Ta-V, Cr-W   DFT/CE  local concentration   62 at% Cr, 30 at% V in precipitate   2D cell subdivision  simulation_random_mix disordered BCC solid solution temperature composition segregation crystal lattice composition kine"
+    },
+    {
+      "record_id": "PMC8282813::hypothesis_evidence_v2::413ba39b1e86aee0",
+      "paper_id": "PMC8282813",
+      "publication_date": "2021-07-15",
+      "kind": "v2_evidence",
+      "text": "PMC8282813::hypothesis_evidence_v2::413ba39b1e86aee0 PMC8282813 mixed current_paper sample_fabricated_8_alloys High-Entropy Alloys (HEAs) Eight alloys identified from HTC screening  constituent elements  wt.%  ingot as-cast (drop-cast after arc-melting) 3 mm diameter, 6 mm length for compression; ϕ6 mm × 12 mm for neutron tests  1 fabrication arc-melting 99.9 wt.% ingot 2 homogenization at least six times chemically homogeneous ingot 3 casting drop-casting as-cast sample microstructure   characterized  SEM, APT, TEM observed crystal structure   characterized  Synchrotron XRD observed local atomic structure   characterized  APT observed atomic arrangement   predicted  AIMD simulations simulated order-disorder transition   modeled  MC simulations simulated Room temperature; Elevated temperature up to 1050 °C/1080 °C (PDF); 1600 °C (AIMD liquid density); 30K (APT base) 24 min hold for PDF at selected temperatures; 10^7 MC steps; 1 fs time step (AIMD) Vacuum (~10^-6 mbar) for PDF; High vacuum for arc-melting Ambient (compression); 0 pressure target for liquid density (AIMD) Uniaxial compression (neutron); Hydraulic Mechanical Testing System (MTS) 2 × 10^-4 s^-1 Ramp rate of 10 °C/min f"
+    },
+    {
+      "record_id": "PMC8398136::hypothesis_evidence_v2::18816744491b6185",
+      "paper_id": "PMC8398136",
+      "publication_date": "2021-08-19",
+      "kind": "v2_evidence",
+      "text": "PMC8398136::hypothesis_evidence_v2::18816744491b6185 PMC8398136 mixed current_paper simulation_Ag_NW Silver (Ag) Nanowire Ag  Ag 1.0 mole_fraction  nanowire relaxed and equilibrated bulk FCC crystal circular cross-section (110), z-axis [110]  1 relaxation conjugate gradient minimization minimum energy configuration 2 equilibration 77 K, 300 K, 1000 K 0 Langevin Berendsen equilibrated at zero pressure 3 NVE_relaxation 50 ps NVE relaxed in microcanonical ensemble 4 tensile_deformation 10^8 1/s z NVT tensilely deformed  77, 300, and 1000 K 50 ps (NVE) periodic boundary conditions along z, free in x and y 0 (during equilibration) tensile 10^8 1/s equilibrated then deformed   LAMMPS, EAM potential, 1.0 fs time step atomic_stress    z-direction Virial theorem averaging  simulation_Ag_NW Ag NW baseline temperature material_composition (vs HEA) crystallographic_orientation cross_section strain_rate     stacking_fault_energy similar_to    hypothesized model Dependent on accuracy of EAM potential Potential limitations in reproducing specific defect energies Therefore, we have chosen silver (Ag) nanowires which have similar SFEs to the CoNiCrFeMn HEAs. Therefore, in the current study, we have"
+    }
+  ],
+  "tool_calls": 0,
+  "turns": 0,
+  "tool_trace": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "unknown_record_ids": 0,
+    "invalid_citations": 0,
+    "query_leak": 0
+  },
+  "elapsed_seconds": 64.26
+}

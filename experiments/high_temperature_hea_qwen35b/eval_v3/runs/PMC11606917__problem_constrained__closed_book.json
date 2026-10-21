@@ -1,0 +1,59 @@
+{
+  "schema_version": "temporal-eval-v3-1.0",
+  "run_id": "PMC11606917__problem_constrained__closed_book",
+  "paper_id": "PMC11606917",
+  "query_level": "problem_constrained",
+  "setting": "closed_book",
+  "publication_date": "2024-11-29",
+  "query": "We are analyzing a refractory BCC high-entropy alloy (Ta-based) where standard experimental measurements of melting properties are infeasible. Current ab initio free energy methods are prohibitively expensive due to the need for thermodynamic integration over the full phase space. Furthermore, existing empirical potentials (like EAM) often fail to capture the complex liquid structure in multi-component systems, while machine learning potentials are computationally demanding. I need a hypothesis for an intervention that replaces the expensive thermodynamic integration step with a more efficient perturbation scheme using a specific class of machine learning potentials. The solution must address the trade-off between computational cost (currently limiting throughput) and the accuracy required to resolve subtle free energy differences. What are the known failure modes of existing TOR-TILD or similar approaches in multi-component spaces, and what falsification experiment could distinguish a true efficiency gain from an artifact of the potential's training set?",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "eligible_paper_count": 45,
+  "corpus_records": {
+    "chunks": 269,
+    "evidence_units": 257
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Replacing full thermodynamic integration in Ta-based BCC high-entropy alloys with a perturbation scheme using a moment tensor polynomial (MTP) machine learning potential trained exclusively on liquid-state configurations will reduce computational cost by an order of magnitude while maintaining accuracy in free energy differences, provided the training set explicitly includes high-temperature disordered liquid structures to avoid extrapolation errors.",
+    "material_initial_state": "Ta-based BCC high-entropy alloy in a solid state with prohibitively expensive ab initio free energy calculations due to the need for full phase space thermodynamic integration.",
+    "intervention": "Implement a perturbation-based free energy calculation scheme utilizing a Moment Tensor Polynomial (MTP) machine learning potential, trained specifically on liquid-phase atomic configurations at temperatures near the melting point.",
+    "conditions": "Multi-component refractory environment with complex liquid structure; computational resources limited for full thermodynamic integration; temperatures near the melting point of the Ta-based alloy.",
+    "structural_mediator": "The specific arrangement of local atomic environments in the liquid phase captured by the MTP potential's descriptor, which must accurately represent the disordered multi-component liquid structure without relying on solid-state training data.",
+    "mechanism": "The MTP potential approximates the potential energy surface of the liquid phase with high fidelity at a fraction of the cost of ab initio methods, allowing the perturbation scheme to estimate free energy differences directly from liquid-phase sampling without the need for slow, expensive thermodynamic integration paths through the solid-liquid coexistence region.",
+    "predicted_outcome": "A significant reduction in computational time (e.g., >10x speedup) for calculating melting properties with a deviation in predicted free energy differences of less than 5% compared to high-fidelity benchmarks, assuming the liquid training set is sufficient.",
+    "baseline": "Standard ab initio thermodynamic integration requiring full phase space sampling, which is currently computationally prohibitive for the target multi-component system.",
+    "boundary": "The hypothesis holds only if the MTP potential is trained on a diverse and representative set of liquid configurations; it fails if the training set is biased towards solid-like structures or low-temperature liquid states, leading to extrapolation errors in the high-temperature regime.",
+    "uncertainty": "There is significant uncertainty regarding the specific failure modes of TOR-TILD or similar approaches in multi-component spaces as no eligible evidence was provided to confirm known artifacts. The accuracy of the MTP potential in capturing the complex liquid structure of Ta-based HEAs is also uncertain without empirical validation data.",
+    "supporting_evidence_ids": [],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Perform a blind test where the MTP potential is trained on a subset of liquid configurations from a Ta-based HEA, and then used to predict the free energy difference between two distinct liquid states (e.g., at 0.9 Tm and 1.1 Tm). Compare these predictions against a small-scale, high-accuracy ab initio thermodynamic integration calculation for the same states.",
+      "measurements": [
+        "Free energy difference (ΔF) between liquid states at T1 and T2",
+        "Computational time per configuration",
+        "Root Mean Square Error (RMSE) of predicted forces and energies against ab initio benchmarks"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the MTP-based perturbation scheme yields a free energy difference with an error greater than 10% compared to the ab initio benchmark, or if the computational speedup is less than 2x while maintaining the same accuracy level, indicating that the potential fails to capture the necessary liquid complexity or the perturbation scheme introduces artifacts."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "accessed_record_ids": [],
+  "cited_evidence_ids": [],
+  "cited_evidence": [],
+  "tool_calls": 0,
+  "turns": 0,
+  "tool_trace": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "unknown_record_ids": 0,
+    "invalid_citations": 0,
+    "query_leak": 0
+  },
+  "elapsed_seconds": 23.69
+}
