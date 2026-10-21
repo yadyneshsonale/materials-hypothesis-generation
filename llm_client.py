@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import time
 from typing import Any
 
@@ -121,6 +122,55 @@ def chat_json(system: str, user: str, max_tokens: int = 4000, retries: int = 3) 
 
 def provider_info() -> str:
     return _provider()
+
+
+JUDGE_TRAPI_DEPLOYMENT = os.environ.get("JUDGE_TRAPI_DEPLOYMENT", "gpt-5.6-sol_2026-07-09")
+
+
+def judge_info() -> str:
+    """Identifies the judge backend in evaluation outputs."""
+    if os.environ.get("JUDGE_PROVIDER", "trapi") == "trapi":
+        return f"trapi:{JUDGE_TRAPI_DEPLOYMENT}"
+    return f"{os.environ.get('JUDGE_PROVIDER')}:{os.environ.get('OPENAI_MODEL', '')}"
+
+
+def judge_chat_json(system: str, user: str, max_tokens: int = 8000, retries: int = 6) -> Any:
+    """Judge calls go to TRAPI GPT-5.6 by default, so the local generator never scores its own output.
+
+    Rate limits (HTTP 429) are retried after the wait TRAPI reports; other transient failures are
+    retried with exponential backoff. Truncated responses raise TruncatedError.
+    """
+    if os.environ.get("JUDGE_PROVIDER", "trapi") != "trapi":
+        return chat_json(system, user, max_tokens=max_tokens, retries=retries)
+    url = (f"{TRAPI_ENDPOINT}/openai/deployments/{JUDGE_TRAPI_DEPLOYMENT}"
+           f"/chat/completions?api-version={TRAPI_API_VERSION}")
+    payload = {
+        "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+        "max_completion_tokens": max_tokens,
+        "response_format": {"type": "json_object"},
+    }
+    timeout = float(os.environ.get("MATHG_REQUEST_TIMEOUT", "240"))
+    last_err: Exception | None = None
+    for attempt in range(retries):
+        try:
+            headers = {"Authorization": f"Bearer {_trapi_token()}", "Content-Type": "application/json"}
+            resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
+            if resp.status_code == 429:
+                match = re.search(r"in (\d+) seconds", resp.text)
+                time.sleep(min(int(match.group(1)) + 2 if match else 30, 120))
+                last_err = LLMError(f"rate limited: {resp.text[:160]}")
+                continue
+            resp.raise_for_status()
+            choice = resp.json()["choices"][0]
+            if choice.get("finish_reason") == "length":
+                raise TruncatedError(f"judge response truncated at max_completion_tokens={max_tokens}")
+            return json.loads(choice["message"]["content"])
+        except TruncatedError:
+            raise
+        except Exception as e:  # noqa: BLE001 - retry transient failures
+            last_err = e
+            time.sleep(2 ** min(attempt, 5))
+    raise LLMError(f"judge call failed after {retries} attempts: {last_err}")
 
 
 _encoder = None
