@@ -21,6 +21,8 @@ from temporal_eval_v3 import (
     eligible_ids,
     exact_sign_test,
     holm_adjust,
+    judge_all,
+    judge_pair_once,
     query_leak,
     resolve_pair,
     run_tool_agent,
@@ -227,6 +229,74 @@ class TemporalEvalV3Tests(unittest.TestCase):
             self.assertAlmostEqual(primary[("tool_agent", "closed_book")]["mean_difference"], 3.0)
             self.assertIn("holm_adjusted_p", primary[("tool_agent", "closed_book")])
             self.assertTrue((out / "results" / "summary.md").exists())
+
+    def _write_run_fixture(self, root: Path) -> tuple[Path, Path]:
+        cases = root / "cases"
+        out = root / "eval"
+        cases.mkdir()
+        (cases / "PMCT.json").write_text(json.dumps({
+            "paper_id": "PMCT", "publication_date": "2021-03-01", "hidden_target": {"intervention": "x"},
+        }))
+        (out / "runs").mkdir(parents=True)
+        record = {"record_id": "A::c1", "paper_id": "A", "publication_date": "2015-05-01",
+                  "kind": "chunk:Results", "text": "alpha beta"}
+        for setting in SETTINGS:
+            (out / "runs" / f"PMCT__broad__{setting}.json").write_text(json.dumps({
+                "run_id": f"PMCT__broad__{setting}", "paper_id": "PMCT", "query_level": "broad",
+                "setting": setting, "status": "ok", "query": "q",
+                "generation": {"hypothesis": "h", "supporting_evidence_ids": ["A::c1"],
+                               "conflicting_evidence_ids": [],
+                               "citation_validation": {"status": "valid", "removed_unknown_ids": []}},
+                "cited_evidence": [record],
+            }))
+        return cases, out
+
+    def test_judge_payload_hides_record_ids_kinds_and_pipeline_metadata(self) -> None:
+        record_id = "PMC9::hypothesis_evidence_v2::abc123"
+        run = {
+            "query": "q",
+            "generation": {"hypothesis": "h", "supporting_evidence_ids": [record_id],
+                           "conflicting_evidence_ids": [],
+                           "citation_validation": {"status": "valid", "removed_unknown_ids": []}},
+            "cited_evidence": [{"record_id": record_id, "paper_id": "PMC9", "publication_date": "2019-01-01",
+                                "kind": "hypothesis_evidence_v2", "text": "alpha beta"}],
+        }
+        sent: dict[str, str] = {}
+
+        def capture(system: str, user: str, max_tokens: int = 8000, retries: int = 6) -> dict[str, object]:
+            sent["user"] = user
+            return {"winner": "A", "confidence": 0.5, "reason": ""}
+
+        with patch("temporal_eval_v3.judge_chat_json", side_effect=capture):
+            judge_pair_once({"hidden_target": {}}, run, run)
+        for hidden in ("::", "hypothesis_evidence_v2", "citation_validation", '"kind"'):
+            self.assertNotIn(hidden, sent["user"])
+        payload = json.loads(sent["user"])
+        self.assertEqual(payload["candidate_A"]["generated_hypothesis"]["supporting_evidence_ids"], ["E1"])
+        self.assertEqual(payload["candidate_A"]["cited_evidence"][0]["evidence_id"], "E1")
+
+    def test_judge_stage_records_failures_then_retries_them(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            cases, out = self._write_run_fixture(Path(directory))
+            with patch("temporal_eval_v3.judge_absolute", side_effect=llm_client.LLMError("truncated")), \
+                    patch("temporal_eval_v3.judge_pair_once", side_effect=llm_client.LLMError("truncated")):
+                judge_all(cases_dir=cases, output_dir=out, workers=1, resume=False)
+            errors = sorted((out / "judgments" / "errors").glob("*.json"))
+            self.assertEqual(len(errors), len(SETTINGS) + len(PAIRS))
+            self.assertEqual(list((out / "judgments" / "absolute").glob("*.json")), [])
+            self.assertEqual(json.loads(errors[0].read_text())["error_type"], "LLMError")
+
+            def score(run, case):
+                return {"run_id": run["run_id"], "scores": {dim: 2 for dim in ALL_DIMENSIONS},
+                        "classification": "partial_reconstruction", "judge": "trapi:fake-judge"}
+
+            with patch("temporal_eval_v3.judge_absolute", side_effect=score), \
+                    patch("temporal_eval_v3.judge_pair_once",
+                          side_effect=lambda case, first, second: {"winner": "A", "confidence": 0.5, "reason": ""}):
+                judge_all(cases_dir=cases, output_dir=out, workers=1, resume=True)
+            self.assertEqual(list((out / "judgments" / "errors").glob("*.json")), [])
+            self.assertEqual(len(list((out / "judgments" / "absolute").glob("*.json"))), len(SETTINGS))
+            self.assertEqual(len(list((out / "judgments" / "pairwise").glob("*.json"))), len(PAIRS))
 
     def test_analyze_fails_integrity_for_missing_pairs_or_mixed_generators(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

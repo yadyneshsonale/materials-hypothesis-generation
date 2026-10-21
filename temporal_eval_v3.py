@@ -540,14 +540,38 @@ def generate_all(
 
 # ---------------------------------------------------------------- judging
 
+def _blind_candidate(run: dict[str, Any]) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    """Hide record IDs, source kinds and pipeline metadata so the judge cannot tell settings apart.
+
+    Cited records get neutral labels (E1, E2, ...) used in both the citation lists and the evidence list.
+    """
+    labels = {record["record_id"]: f"E{index + 1}" for index, record in enumerate(run["cited_evidence"])}
+    generation = {key: value for key, value in run["generation"].items() if key != "citation_validation"}
+    for field in ("supporting_evidence_ids", "conflicting_evidence_ids"):
+        generation[field] = [labels[rid] for rid in generation.get(field, []) if rid in labels]
+    evidence = [{
+        "evidence_id": labels[record["record_id"]],
+        "paper_id": record["paper_id"],
+        "publication_date": record["publication_date"],
+        "text": record["text"],
+    } for record in run["cited_evidence"]]
+    return generation, evidence
+
+
+def _record_judge_error(path: Path, identity: dict[str, Any], error: Exception) -> None:
+    atomic_json(path, {"schema_version": SCHEMA_VERSION, **identity,
+                       "error_type": type(error).__name__, "error": str(error)[:500]})
+
+
 def judge_absolute(run: dict[str, Any], case: dict[str, Any]) -> dict[str, Any]:
+    generation, evidence = _blind_candidate(run)
     payload = {
         "query": run["query"],
         "hidden_target": case["hidden_target"],
-        "generated_hypothesis": run["generation"],
-        "cited_evidence": run["cited_evidence"],
+        "generated_hypothesis": generation,
+        "cited_evidence": evidence,
     }
-    score = _validate_score(judge_chat_json(_SCORE_SYSTEM, json.dumps(payload, ensure_ascii=False), max_tokens=6000))
+    score = _validate_score(judge_chat_json(_SCORE_SYSTEM, json.dumps(payload, ensure_ascii=False), max_tokens=12000))
     return {
         "schema_version": SCHEMA_VERSION,
         "run_id": run["run_id"],
@@ -561,13 +585,15 @@ def judge_absolute(run: dict[str, Any], case: dict[str, Any]) -> dict[str, Any]:
 
 def judge_pair_once(case: dict[str, Any], first: dict[str, Any], second: dict[str, Any]) -> dict[str, Any]:
     """Judge with `first` shown as candidate A and `second` as candidate B."""
+    generation_a, evidence_a = _blind_candidate(first)
+    generation_b, evidence_b = _blind_candidate(second)
     payload = {
         "query": first["query"],
         "hidden_target": case["hidden_target"],
-        "candidate_A": {"generated_hypothesis": first["generation"], "cited_evidence": first["cited_evidence"]},
-        "candidate_B": {"generated_hypothesis": second["generation"], "cited_evidence": second["cited_evidence"]},
+        "candidate_A": {"generated_hypothesis": generation_a, "cited_evidence": evidence_a},
+        "candidate_B": {"generated_hypothesis": generation_b, "cited_evidence": evidence_b},
     }
-    result = judge_chat_json(PAIR_SYSTEM, json.dumps(payload, ensure_ascii=False), max_tokens=6000)
+    result = judge_chat_json(PAIR_SYSTEM, json.dumps(payload, ensure_ascii=False), max_tokens=12000)
     if not isinstance(result, dict):
         result = {}
     winner = str(result.get("winner", "tie")).strip().upper()
@@ -603,20 +629,34 @@ def judge_all(
     }
     abs_dir = output_dir / "judgments" / "absolute"
     pair_dir = output_dir / "judgments" / "pairwise"
-    abs_dir.mkdir(parents=True, exist_ok=True)
-    pair_dir.mkdir(parents=True, exist_ok=True)
+    errors_dir = output_dir / "judgments" / "errors"
+    for directory in (abs_dir, pair_dir, errors_dir):
+        directory.mkdir(parents=True, exist_ok=True)
     counts = {"absolute": 0, "pairwise": 0}
 
     def absolute_job(run: dict[str, Any]) -> None:
-        atomic_json(abs_dir / f"{run['run_id']}.json", judge_absolute(run, cases[run["paper_id"]]))
+        error_path = errors_dir / f"{run['run_id']}.json"
+        try:
+            judgment = judge_absolute(run, cases[run["paper_id"]])
+        except Exception as error:  # noqa: BLE001 - recorded and left unjudged so a rerun retries it
+            _record_judge_error(error_path, {"run_id": run["run_id"]}, error)
+            return
+        atomic_json(abs_dir / f"{run['run_id']}.json", judgment)
+        error_path.unlink(missing_ok=True)
 
     def pair_job(paper_id: str, level: str, first_name: str, second_name: str) -> None:
+        name = f"{paper_id}__{level}__{first_name}__vs__{second_name}"
+        error_path = errors_dir / f"{name}.json"
         first = runs[f"{paper_id}__{level}__{first_name}"]
         second = runs[f"{paper_id}__{level}__{second_name}"]
-        ab = judge_pair_once(cases[paper_id], first, second)
-        ba = judge_pair_once(cases[paper_id], second, first)
+        try:
+            ab = judge_pair_once(cases[paper_id], first, second)
+            ba = judge_pair_once(cases[paper_id], second, first)
+        except Exception as error:  # noqa: BLE001 - recorded and left unjudged so a rerun retries it
+            _record_judge_error(error_path, {"pair": name}, error)
+            return
         outcome, consistency = resolve_pair(first_name, second_name, ab, ba)
-        atomic_json(pair_dir / f"{paper_id}__{level}__{first_name}__vs__{second_name}.json", {
+        atomic_json(pair_dir / f"{name}.json", {
             "schema_version": SCHEMA_VERSION,
             "paper_id": paper_id,
             "query_level": level,
@@ -628,6 +668,7 @@ def judge_all(
             "outcome": outcome,
             "consistency": consistency,
         })
+        error_path.unlink(missing_ok=True)
 
     abs_jobs = [
         run for run in runs.values()
@@ -815,12 +856,14 @@ def analyze(*, cases_dir: Path, output_dir: Path) -> dict[str, Any]:
         "judges": judges,
         "pairs_expected": pairs_expected,
         "pairs_judged": len(pairwise),
+        "judge_errors": len(list((output_dir / "judgments" / "errors").glob("*.json"))),
     }
     integrity["verified"] = bool(
         integrity["runs_present"] == expected_runs
         and integrity["runs_failed"] == 0
         and integrity["runs_judged"] == expected_runs
         and integrity["pairs_judged"] == pairs_expected
+        and integrity["judge_errors"] == 0
         and len(generators) == 1
         and len(judges) == 1
         and integrity["temporal_violations"] == 0
@@ -851,7 +894,13 @@ def analyze(*, cases_dir: Path, output_dir: Path) -> dict[str, Any]:
 
 
 def render_summary(analysis: dict[str, Any]) -> str:
-    lines = ["| Setting | Runs judged | Reconstruction (0-4) | Overall (0-4) | Failed | Tool calls | Records accessed |",
+    integrity = analysis["integrity"]
+    header = (
+        f"Integrity verified: {integrity['verified']}. Runs judged {integrity['runs_judged']}/{integrity['expected_runs']}; "
+        f"pairs judged {integrity['pairs_judged']}/{integrity['pairs_expected']}; judge errors {integrity['judge_errors']}; "
+        f"generator {', '.join(integrity['generators'])}; judge {', '.join(integrity['judges'])}."
+    )
+    lines = [header, "", "| Setting | Runs judged | Reconstruction (0-4) | Overall (0-4) | Failed | Tool calls | Records accessed |",
              "|---|---:|---:|---:|---:|---:|---:|"]
     for setting, row in analysis["by_setting"].items():
         lines.append(
