@@ -145,6 +145,26 @@ class TemporalEvalV3Tests(unittest.TestCase):
         self.assertEqual(resolve_pair("x", "y", {"winner": "A"}, {"winner": "A"}), ("tie", "position_inconsistent"))
         self.assertEqual(resolve_pair("x", "y", {"winner": "TIE"}, {"winner": "TIE"}), ("tie", "consistent"))
 
+    def test_tool_budget_is_enforced_per_call_within_a_batch(self) -> None:
+        record = RetrievalRecord("A::c1", "A", "2015-05-01", "chunk:Results",
+                                 "alpha beta gamma delta epsilon", {})
+        corpus = EligibleCorpus(_metadata(), {"A"}, [record])
+        hypothesis = {"hypothesis": "Alloying with alpha raises strength.",
+                      "supporting_evidence_ids": [], "conflicting_evidence_ids": []}
+        batch = [{"id": f"call_{index}", "type": "function",
+                  "function": {"name": "list_papers", "arguments": "{}"}} for index in range(3)]
+        replies = iter([
+            {"content": "", "tool_calls": batch},
+            {"content": "", "tool_calls": [{"id": "submit", "type": "function", "function": {
+                "name": "submit_hypothesis", "arguments": json.dumps({"hypothesis": hypothesis})}}]},
+        ])
+
+        with patch("temporal_eval_v3.MAX_TOOL_CALLS", 2):
+            result = run_tool_agent("query", "2021-03-01", corpus, call_model=lambda messages, tools: next(replies))
+        self.assertEqual(result["tool_calls"], 2)
+        refused = [step for step in result["trace"] if step.get("refused") == "budget_exhausted"]
+        self.assertEqual(len(refused), 1)
+
     def test_statistics_helpers(self) -> None:
         p_value, positive, negative = exact_sign_test([1.0, 1.0, 1.0, 1.0, -1.0])
         self.assertAlmostEqual(p_value, 0.375)

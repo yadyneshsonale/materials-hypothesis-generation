@@ -80,7 +80,9 @@ if ! curl --fail --silent "$HEALTH_URL" >/dev/null 2>&1; then
     echo "model not found: $MODEL_PATH" >&2
     exit 1
   fi
-  CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0,1,2,3}" \
+    # Sampling temperature for every generation request: the tool agent also sets 0.2 explicitly, and one-shot
+    # requests carry no temperature so they inherit this server default.
+    CUDA_VISIBLE_DEVICES="${CUDA_VISIBLE_DEVICES:-0,1,2,3}" \
     "$LLAMA_SERVER" \
     --model "$MODEL_PATH" \
     --host 127.0.0.1 \
@@ -92,6 +94,7 @@ if ! curl --fail --silent "$HEALTH_URL" >/dev/null 2>&1; then
     --tensor-split 1,1,1,1 \
     --flash-attn off \
     --jinja \
+    --temp 0.2 \
     --metrics \
     >"$LOG_DIR/llama-server.log" 2>&1 &
   SERVER_PID=$!

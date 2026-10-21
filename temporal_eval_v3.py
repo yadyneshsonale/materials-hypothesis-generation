@@ -234,7 +234,8 @@ def call_local_with_tools(messages: list[dict[str, Any]], tools: list[dict[str, 
         "tools": tools,
         "tool_choice": "auto",
         "temperature": 0.2,
-        "max_tokens": 1800,
+        # Same output cap as one-shot generation in generate_with_citation_repair (max_tokens=5000).
+        "max_tokens": 5000,
     }
     template_kwargs = os.environ.get("OPENAI_CHAT_TEMPLATE_KWARGS")
     if template_kwargs:
@@ -375,6 +376,12 @@ def run_tool_agent(
                 trace.append({"turn": turn, "tool": name, "accepted": True})
                 validated = {**validated, "citation_validation": {"status": "valid", "removed_unknown_ids": []}}
                 return {"generation": validated, "trace": trace, "tool_calls": tool_calls, "turns": turn + 1}
+            if tool_calls >= MAX_TOOL_CALLS:
+                result = {"error": "tool budget exhausted; call submit_hypothesis"}
+                trace.append({"turn": turn, "tool": name, "refused": "budget_exhausted"})
+                messages.append({"role": "tool", "tool_call_id": call["id"],
+                                 "content": json.dumps(result, ensure_ascii=False)})
+                continue
             if not isinstance(args, dict):
                 result: dict[str, Any] = {"error": "tool arguments must be a JSON object"}
             elif name == "list_papers":
