@@ -23,6 +23,7 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 8 | 2026-10-21 | MatKG download, data check and leakage design (replaces the "blocked" status) | 1.2 GB of MatKG files | none | none | Complete (see correction below) | [matkg/](../../matkg/) (not committed) |
 | 9 | 2026-10-22 | MatKG temporal index and augmented tool agent (eval v4) | 84.1 M rows; 12 cases, 36 KG runs | Qwen | TRAPI GPT-5.6 | Complete; 1 baseline unit missing (not verified) | [eval_v4_matkg/](./eval_v4_matkg/) |
 | 10 | 2026-10-22 | Citation-graph and citation-count paper selection | 50 corpus papers; 224 candidates; 37 with PMC text | none | none | Complete (analysis only) | [citation_graph/](./citation_graph/) |
+| 11 | 2026-10-22 | Critique-augmented hypothesis revision (3 critics + reviser, self-revise control, fresh baseline) | 12 cases, 36 units per arm | Qwen (baseline), Llama 3.3 70B (reviser) | TRAPI GPT-5.6 | Complete, verified | [eval_critique/](./eval_critique/) |
 
 ## Correction to section 8 (MatKG)
 

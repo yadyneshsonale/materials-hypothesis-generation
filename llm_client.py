@@ -134,21 +134,25 @@ def judge_info() -> str:
     return f"{os.environ.get('JUDGE_PROVIDER')}:{os.environ.get('OPENAI_MODEL', '')}"
 
 
-def judge_chat_json(system: str, user: str, max_tokens: int = 8000, retries: int = 6) -> Any:
-    """Judge calls go to TRAPI GPT-5.6 by default, so the local generator never scores its own output.
+def trapi_chat_json(deployment: str, system: str, user: str, *, max_tokens: int,
+                    token_field: str = "max_completion_tokens", temperature: float | None = None,
+                    retries: int = 6) -> Any:
+    """JSON chat call to a named TRAPI deployment.
 
-    Rate limits (HTTP 429) are retried after the wait TRAPI reports; other transient failures are
-    retried with exponential backoff. Truncated responses raise TruncatedError.
+    token_field follows the deployment's API: OpenAI reasoning and recent models take max_completion_tokens,
+    while some open models take max_tokens. temperature is omitted when None (required for o-series models).
+    Rate limits (HTTP 429) are retried after the wait TRAPI reports; other transient failures are retried
+    with exponential backoff. Truncated responses raise TruncatedError.
     """
-    if os.environ.get("JUDGE_PROVIDER", "trapi") != "trapi":
-        return chat_json(system, user, max_tokens=max_tokens, retries=retries)
-    url = (f"{TRAPI_ENDPOINT}/openai/deployments/{JUDGE_TRAPI_DEPLOYMENT}"
+    url = (f"{TRAPI_ENDPOINT}/openai/deployments/{deployment}"
            f"/chat/completions?api-version={TRAPI_API_VERSION}")
-    payload = {
+    payload: dict[str, Any] = {
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
-        "max_completion_tokens": max_tokens,
+        token_field: max_tokens,
         "response_format": {"type": "json_object"},
     }
+    if temperature is not None:
+        payload["temperature"] = temperature
     timeout = float(os.environ.get("MATHG_REQUEST_TIMEOUT", "240"))
     last_err: Exception | None = None
     for attempt in range(retries):
@@ -163,14 +167,21 @@ def judge_chat_json(system: str, user: str, max_tokens: int = 8000, retries: int
             resp.raise_for_status()
             choice = resp.json()["choices"][0]
             if choice.get("finish_reason") == "length":
-                raise TruncatedError(f"judge response truncated at max_completion_tokens={max_tokens}")
+                raise TruncatedError(f"TRAPI response from {deployment} truncated at {token_field}={max_tokens}")
             return json.loads(choice["message"]["content"])
         except TruncatedError:
             raise
         except Exception as e:  # noqa: BLE001 - retry transient failures
             last_err = e
             time.sleep(2 ** min(attempt, 5))
-    raise LLMError(f"judge call failed after {retries} attempts: {last_err}")
+    raise LLMError(f"TRAPI call to {deployment} failed after {retries} attempts: {last_err}")
+
+
+def judge_chat_json(system: str, user: str, max_tokens: int = 8000, retries: int = 6) -> Any:
+    """Judge calls go to TRAPI GPT-5.6 by default, so the local generator never scores its own output."""
+    if os.environ.get("JUDGE_PROVIDER", "trapi") != "trapi":
+        return chat_json(system, user, max_tokens=max_tokens, retries=retries)
+    return trapi_chat_json(JUDGE_TRAPI_DEPLOYMENT, system, user, max_tokens=max_tokens, retries=retries)
 
 
 _encoder = None
