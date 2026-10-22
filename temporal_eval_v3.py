@@ -30,6 +30,7 @@ import requests
 
 from hypothesis_evidence_v2 import atomic_json, load_evidence
 from llm_client import LLMError, judge_chat_json, judge_info, provider_info
+from matkg_index import TemporalKG, fact_record_id, fact_text
 from temporal_hypothesis_benchmark import (
     QUERY_LEVELS,
     RetrievalRecord,
@@ -136,6 +137,21 @@ TOOLS = [
     }},
 ]
 SUBMIT_ONLY = [TOOLS[-1]]
+KG_TOOL = {"type": "function", "function": {
+    "name": "kg_lookup",
+    "description": ("Look up materials-knowledge-graph co-occurrence statistics for a topic phrase (an element, "
+                    "property, process or microstructure term). Returns facts built only from papers published before "
+                    "the cutoff, each with a record_id. A fact can be cited only after read_record on that record_id."),
+    "parameters": {
+        "type": "object",
+        "properties": {"topic": {"type": "string"}},
+        "required": ["topic"],
+        "additionalProperties": False,
+    },
+}}
+KG_TOOLS = TOOLS[:3] + [KG_TOOL, TOOLS[3]]
+KG_SYSTEM_NOTE = (" You may also call kg_lookup(topic) for co-occurrence facts from earlier materials abstracts; "
+                  "read a fact's record_id before citing it.")
 
 PAIR_SYSTEM = (
     "You compare two materials-science hypotheses written for the same query. Decide which one better "
@@ -212,7 +228,7 @@ def audit_accessed(
             continue
         counts["temporal_violations"] += int(record.publication_date >= cutoff)
         counts["test_paper_leaks"] += int(record.paper_id == test_paper_id)
-        family = str(metadata[record.paper_id].get("work_family_id") or "")
+        family = str(metadata.get(record.paper_id, {}).get("work_family_id") or "")
         counts["family_leaks"] += int(bool(test_family and family and family == test_family))
     return counts
 
@@ -256,13 +272,33 @@ def call_local_with_tools(messages: list[dict[str, Any]], tools: list[dict[str, 
 class EligibleCorpus:
     """Tool-facing view of the eligible corpus. Every record it returns is already cutoff-eligible."""
 
-    def __init__(self, metadata: dict[str, dict[str, Any]], eligible: set[str], records: list[RetrievalRecord]):
+    def __init__(self, metadata: dict[str, dict[str, Any]], eligible: set[str], records: list[RetrievalRecord],
+                 kg: Any = None):
         self.metadata = metadata
         self.eligible = eligible
         self.records = list(records)
         self.lookup = {record.record_id: record for record in self.records}
         self.seen_ids: set[str] = set()
         self.read_ids: set[str] = set()
+        self.kg = kg
+
+    def kg_lookup(self, topic: str) -> dict[str, Any]:
+        """Pre-cutoff MatKG co-occurrence facts. Each fact becomes a readable record (must be read before citing)."""
+        if self.kg is None:
+            return {"error": "kg_lookup is not enabled for this run"}
+        found = self.kg.cooccurrences(topic)
+        facts = []
+        for fact in found["facts"]:
+            record_id = fact_record_id(found["anchors"], fact["neighbor"])
+            record = RetrievalRecord(
+                record_id, f"matkg:{record_id.rsplit('::', 1)[-1]}", f"{fact['latest_year']}-12-31",
+                "kg_cooccurrence", fact_text(found["anchors"], fact), {"papers": fact["papers"]},
+            )
+            self.lookup[record_id] = record
+            self.seen_ids.add(record_id)
+            facts.append({"record_id": record_id, "neighbor": fact["neighbor"], "snippet": _snippet(record.text)})
+        return {"topic": topic, "matched_terms": found["anchors"], "facts": facts,
+                "note": "" if facts else "no pre-cutoff facts for this topic; try a different term"}
 
     def list_papers(self) -> dict[str, Any]:
         papers = sorted(self.eligible, key=lambda pid: (self.metadata[pid]["earliest_public_date"], pid))
@@ -338,14 +374,15 @@ def run_tool_agent(
     corpus: EligibleCorpus,
     *,
     call_model: Any = call_local_with_tools,
+    kg_enabled: bool = False,
 ) -> dict[str, Any]:
     trace: list[dict[str, Any]] = []
     messages: list[dict[str, Any]] = [
         {"role": "system", "content": TOOL_SYSTEM.format(
-            max_calls=MAX_TOOL_CALLS, fields=", ".join(HYPOTHESIS_FIELDS))},
+            max_calls=MAX_TOOL_CALLS, fields=", ".join(HYPOTHESIS_FIELDS)) + (KG_SYSTEM_NOTE if kg_enabled else "")},
         {"role": "user", "content": json.dumps({"query": query, "knowledge_cutoff": cutoff}, ensure_ascii=False)},
     ]
-    tools = TOOLS
+    tools = KG_TOOLS if kg_enabled else TOOLS
     tool_calls = 0
     for turn in range(MAX_MODEL_TURNS):
         message = call_model(messages, tools)
@@ -390,6 +427,8 @@ def run_tool_agent(
                 result = corpus.search(str(args.get("query", "")), args.get("k", 6))
             elif name == "read_record":
                 result = corpus.read(str(args.get("record_id", "")), args.get("offset", 0))
+            elif name == "kg_lookup":
+                result = corpus.kg_lookup(str(args.get("topic", "")))
             else:
                 result = {"error": f"unknown tool {name}"}
             tool_calls += 1
@@ -408,6 +447,16 @@ def _generator_identity() -> str:
     return f"{provider_info()}:{os.environ.get('OPENAI_MODEL', '')}"
 
 
+def kg_excluded_dois(paper_id: str, metadata: dict[str, dict[str, Any]]) -> set[str]:
+    """DOIs that must never contribute KG facts: the held-out paper and its work family."""
+    target = metadata[paper_id]
+    family = str(target.get("work_family_id") or "")
+    dois = {str(target.get("doi") or "")}
+    if family:
+        dois |= {str(row.get("doi") or "") for row in metadata.values() if row.get("work_family_id") == family}
+    return {doi.lower() for doi in dois if doi}
+
+
 def build_corpus_and_run(
     case: dict[str, Any],
     level: str,
@@ -416,6 +465,7 @@ def build_corpus_and_run(
     v2_units: list[Any],
     paper_maps_dir: Path,
     output_dir: Path,
+    kg_db: Path | None = None,
 ) -> dict[str, Any]:
     paper_id = case["paper_id"]
     cutoff = case["publication_date"]
@@ -437,9 +487,19 @@ def build_corpus_and_run(
             generation, accessed = run_oneshot(query, cutoff, chunk_records)
         elif setting == "v2_oneshot":
             generation, accessed = run_oneshot(query, cutoff, unit_records)
-        elif setting == "tool_agent":
-            corpus = EligibleCorpus(metadata, eligible, records)
-            result = run_tool_agent(query, cutoff, corpus)
+        elif setting in ("tool_agent", "tool_agent_kg"):
+            kg = None
+            if setting == "tool_agent_kg":
+                if kg_db is None:
+                    raise ValueError("tool_agent_kg requires a MatKG index (kg_db)")
+                kg = TemporalKG(kg_db, cutoff, kg_excluded_dois(paper_id, metadata))
+            try:
+                corpus = EligibleCorpus(metadata, eligible, records, kg=kg)
+                result = run_tool_agent(query, cutoff, corpus, kg_enabled=kg is not None)
+            finally:
+                if kg is not None:
+                    kg.close()
+            lookup.update(corpus.lookup)
             generation = result["generation"]
             accessed = sorted(corpus.seen_ids | corpus.read_ids)
             trace, tool_calls, turns = result["trace"], result["tool_calls"], result["turns"]
@@ -510,6 +570,7 @@ def generate_all(
     case_ids: list[str] | None,
     workers: int,
     resume: bool,
+    kg_db: Path | None = None,
 ) -> dict[str, int]:
     metadata = _date_map(metadata_path)
     v2_units = load_evidence(v2_dir)
@@ -527,7 +588,8 @@ def generate_all(
     completed = 0
     with ThreadPoolExecutor(max_workers=workers) as pool:
         futures = [
-            pool.submit(build_corpus_and_run, case, level, setting, metadata, v2_units, paper_maps_dir, output_dir)
+            pool.submit(build_corpus_and_run, case, level, setting, metadata, v2_units, paper_maps_dir, output_dir,
+                        kg_db)
             for case, level, setting in jobs
         ]
         for future in as_completed(futures):
@@ -621,6 +683,7 @@ def judge_all(
     output_dir: Path,
     workers: int,
     resume: bool,
+    pairs: tuple[tuple[str, str], ...] = PAIRS,
 ) -> dict[str, int]:
     cases = {case["paper_id"]: case for case in load_cases(cases_dir, None)}
     runs = {
@@ -675,7 +738,7 @@ def judge_all(
         if run["status"] == "ok" and not (resume and (abs_dir / f"{run['run_id']}.json").exists())
     ]
     pair_jobs = []
-    for first_name, second_name in PAIRS:
+    for first_name, second_name in pairs:
         for paper_id in sorted(cases):
             for level in QUERY_LEVELS:
                 key_a, key_b = f"{paper_id}__{level}__{first_name}", f"{paper_id}__{level}__{second_name}"
@@ -935,11 +998,12 @@ def main() -> None:
     parser.add_argument("--output-dir", type=Path, default=EXPERIMENT_DIR / "eval_v3")
     sub = parser.add_subparsers(dest="command", required=True)
     gen = sub.add_parser("generate")
-    gen.add_argument("--setting", action="append", choices=SETTINGS)
+    gen.add_argument("--setting", action="append", choices=SETTINGS + ("tool_agent_kg",))
     gen.add_argument("--level", action="append", choices=QUERY_LEVELS)
     gen.add_argument("--case", action="append")
     gen.add_argument("--workers", type=int, default=4)
     gen.add_argument("--resume", action="store_true")
+    gen.add_argument("--kg-db", type=Path, default=None, help="MatKG SQLite index, required for tool_agent_kg")
     judge = sub.add_parser("judge")
     judge.add_argument("--workers", type=int, default=4)
     judge.add_argument("--resume", action="store_true")
@@ -950,7 +1014,7 @@ def main() -> None:
             cases_dir=args.cases_dir, metadata_path=args.metadata, v2_dir=args.v2_dir,
             paper_maps_dir=args.paper_maps_dir, output_dir=args.output_dir,
             settings=tuple(args.setting or SETTINGS), levels=tuple(args.level or QUERY_LEVELS),
-            case_ids=args.case, workers=args.workers, resume=args.resume,
+            case_ids=args.case, workers=args.workers, resume=args.resume, kg_db=args.kg_db,
         )
     elif args.command == "judge":
         result = judge_all(cases_dir=args.cases_dir, output_dir=args.output_dir,

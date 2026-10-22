@@ -1,0 +1,203 @@
+{
+  "schema_version": "temporal-eval-v3-1.0",
+  "run_id": "PMC11606917__expert_context__tool_agent",
+  "paper_id": "PMC11606917",
+  "query_level": "expert_context",
+  "setting": "tool_agent",
+  "publication_date": "2024-11-29",
+  "query": "Consider a TaVCrW refractory high-entropy alloy. The objective is to calculate its melting temperature and related thermodynamic properties using Density Functional Theory (DFT). The standard approach (TOR-TILD) relies on expensive thermodynamic integration. We hypothesize that substituting the reference potential (EAM) with a Machine Learning Interatomic Potential (MTP) and replacing thermodynamic integration with free energy perturbation (FEP) can achieve significant speedups while maintaining sub-meV accuracy, provided the MTP accurately reproduces the ab initio phase-space distribution even for complex liquids. Prior work suggests that electronic excitations (specifically the gap in the Density of States at the Fermi level) can shift the melting point by tens of Kelvin, and that Short-Range Order (SRO) in the solid phase can introduce a stabilization energy of ~2-3 meV/atom. However, there are limitations: (1) The empirical 'underbinding/overbinding' rules for GGA-PBE/LDA functionals do not hold for V and Cr at 0K, potentially propagating errors; (2) High-temperature magnetic fluctuations are typically neglected but may be relevant. The computational cost must be reduced by >80% compared to the baseline TOR-TILD method. Propose the specific structural mediator (the MTP's ability to reproduce phase-space distributions) that enables the substitution of TI with FEP. What is the boundary condition regarding the supercell size and temperature range (2000-2400 K) needed to validate the SRO contribution? Design a falsification experiment comparing the new method against the original TOR-TILD on a benchmark system (e.g., a simpler alloy) to ensure the free energy difference does not exceed 0.5 meV/atom.",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "eligible_paper_count": 45,
+  "corpus_records": {
+    "chunks": 269,
+    "evidence_units": 257
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Substituting the EAM reference potential with a Moment Tensor Potential (MTP) and replacing thermodynamic integration (TI) with Free Energy Perturbation (FEP) in DFT-based melting point calculations for TaVCrW refractory high-entropy alloys will achieve >80% computational speedup while maintaining sub-meV/atom accuracy, provided the MTP accurately reproduces the ab initio phase-space distribution including Short-Range Order (SRO) effects and electronic excitation contributions.",
+    "material_initial_state": "TaVCrW refractory high-entropy alloy in solid phase with local chemical Short-Range Order (SRO) stabilized at ~800 K, exhibiting ~2-3 meV/atom stabilization energy relative to random solid solution.",
+    "intervention": "Replace EAM potential with MTP trained on DFT data for Ta, V, Cr, W systems; replace thermodynamic integration (TOR-TILD) with Free Energy Perturbation (FEP) for free energy calculation.",
+    "conditions": "Temperature range 2000-2400 K; supercell size ≥ 500 atoms to capture SRO correlations; DFT calculations using GGA-PBE functional with explicit treatment of electronic excitations near Fermi level.",
+    "structural_mediator": "MTP's ability to reproduce the ab initio phase-space distribution including SRO configurations and electronic density of states features, enabling accurate free energy differences via FEP without expensive TI sampling.",
+    "mechanism": "MTP provides near-DFT accuracy at MD cost, allowing extensive sampling of liquid/solid coexistence; FEP computes free energy differences directly from phase-space overlaps, bypassing TI's slow convergence; SRO stabilization energy (~2-3 meV/atom) and electronic excitation shifts (tens of K) are captured by MTP's training on diverse configurations.",
+    "predicted_outcome": "Melting temperature calculated with <0.5 meV/atom free energy error compared to TOR-TILD; computational cost reduced by >80%; SRO contribution to melting point shift accurately quantified.",
+    "baseline": "TOR-TILD method using EAM potentials and thermodynamic integration, requiring extensive sampling and high computational cost.",
+    "boundary": "Supercell size must be ≥500 atoms to capture SRO correlations; temperature range 2000-2400 K must be used to validate SRO contribution; MTP training set must include V and Cr configurations at 0K to avoid underbinding/overbinding errors.",
+    "uncertainty": "Electronic excitation effects and high-temperature magnetic fluctuations may introduce additional shifts not fully captured by MTP; GGA-PBE functional errors for V and Cr at 0K may propagate; SRO stabilization energy uncertainty of ±0.5 meV/atom.",
+    "supporting_evidence_ids": [
+      "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": "Compare MTP+FEP vs TOR-TILD on benchmark system (e.g., MoNbTaW RHEA) at 2000-2400 K; compute free energy difference between solid and liquid phases; if |ΔF_MTP+FEP - ΔF_TOR-TILD| > 0.5 meV/atom, hypothesis is falsified.",
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "accessed_record_ids": [
+    "PMC10142552::chunk::002::materials_and_methods::ec6d71c0fc",
+    "PMC10154406::chunk::001::introduction::c389c7efcd",
+    "PMC10154406::chunk::002::results::85fd43f3b9",
+    "PMC10154406::chunk::004::methods::0cea90c5b3",
+    "PMC11206460::chunk::000::abstract::6292b9f5e5",
+    "PMC11206460::chunk::002::results::f86fd515a6",
+    "PMC11375216::chunk::003::results::d197c1da89",
+    "PMC11375216::chunk::004::discussion::b8d7d6bc43",
+    "PMC11375216::chunk::005::references::48bdf21317",
+    "PMC11375712::chunk::000::abstract::02180281cf",
+    "PMC11375712::chunk::003::results_and_discussion::ca02584b0b",
+    "PMC11775865::chunk::000::abstract::cfe160ba3c",
+    "PMC11775865::chunk::003::experimental_section::84d34988ea",
+    "PMC4976365::chunk::001::results_and_discussion::52452acf65",
+    "PMC4976365::chunk::002::methods::7c4234ec35",
+    "PMC6093928::chunk::000::abstract::b3f2cb8881",
+    "PMC6093928::chunk::001::introduction::2dc33c3a9e",
+    "PMC6093928::chunk::005::references::bc4aeeff5d",
+    "PMC6397024::chunk::001::introduction::6f2d9e1dbc",
+    "PMC6397024::chunk::003::discussion::f2c029ec39",
+    "PMC6397024::chunk::006::references::c749882494",
+    "PMC6427779::chunk::000::abstract::df84b48db4",
+    "PMC7299626::chunk::000::abstract::87106cd549",
+    "PMC7513042::chunk::004::discussion::ef977a5008",
+    "PMC8282813::chunk::002::results::f43af866b9",
+    "PMC8282813::chunk::004::methods::fd16072951",
+    "PMC8357793::chunk::001::introduction::0cf0f01e08",
+    "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63",
+    "PMC8357793::chunk::003::methods::71d8ca4246"
+  ],
+  "cited_evidence_ids": [
+    "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63",
+      "paper_id": "PMC8357793",
+      "publication_date": "2021-08-11",
+      "kind": "chunk:Results And Discussion",
+      "text": "Machine-learning interatomic potential\n\nIn this section, we discuss the results of the development of the interatomic-potential model used to enable the application of MD simulations of dislocation properties in bcc MoNbTaW. We employ the general framework of machine-learning (ML)-based approaches, which have emerged recently as a systematic framework to develop potentials with accuracies near that of the underlying DFT calculations for elemental and multicomponent systems [24] , [44] – [46] . Here, using training data reported previously [24] for elemental, binary, ternary, and quaternary systems in Nb–Ta–Mo–W, we developed a potential for the MoNbTaW RHEA based on the moment tensor potential (MTP) formalism, which has been found to feature an excellent balance between accuracy and computational cost [46] . The flowchart for constructing the MTP is shown in Fig. 1a with the methodological details provided in “Methods”. The basic materials property predictions of the MTP model are provided in Supplementary Table 1 . Figure 1b, c shows a comparison of the DFT- and MTP-predicted energies and forces for both training and test sets. While the mean absolute errors (MAEs) of energies of "
+    }
+  ],
+  "tool_calls": 12,
+  "turns": 13,
+  "tool_trace": [
+    {
+      "turn": 0,
+      "tool": "list_papers",
+      "args": {},
+      "result_chars": 7848
+    },
+    {
+      "turn": 1,
+      "tool": "search_corpus",
+      "args": {
+        "query": "TaVCrW refractory high-entropy alloy melting temperature DFT thermodynamic integration FEP MTP",
+        "k": 5
+      },
+      "result_chars": 2202
+    },
+    {
+      "turn": 2,
+      "tool": "search_corpus",
+      "args": {
+        "query": "Machine Learning Interatomic Potential MTP free energy perturbation FEP melting point DFT",
+        "k": 5
+      },
+      "result_chars": 2385
+    },
+    {
+      "turn": 3,
+      "tool": "search_corpus",
+      "args": {
+        "query": "thermodynamic integration TOR-TILD melting point high entropy alloy",
+        "k": 5
+      },
+      "result_chars": 2341
+    },
+    {
+      "turn": 4,
+      "tool": "search_corpus",
+      "args": {
+        "query": "Short-Range Order SRO stabilization energy meV atom high entropy alloy",
+        "k": 5
+      },
+      "result_chars": 2388
+    },
+    {
+      "turn": 5,
+      "tool": "search_corpus",
+      "args": {
+        "query": "electronic excitations gap Density of States Fermi level melting point shift Kelvin",
+        "k": 5
+      },
+      "result_chars": 2417
+    },
+    {
+      "turn": 6,
+      "tool": "search_corpus",
+      "args": {
+        "query": "GGA-PBE LDA underbinding overbinding V Cr 0K functional error",
+        "k": 5
+      },
+      "result_chars": 2334
+    },
+    {
+      "turn": 7,
+      "tool": "search_corpus",
+      "args": {
+        "query": "magnetic fluctuations high temperature neglected high entropy alloy",
+        "k": 5
+      },
+      "result_chars": 2178
+    },
+    {
+      "turn": 8,
+      "tool": "read_record",
+      "args": {
+        "record_id": "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63"
+      },
+      "result_chars": 2623
+    },
+    {
+      "turn": 9,
+      "tool": "read_record",
+      "args": {
+        "record_id": "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63",
+        "offset": 2400
+      },
+      "result_chars": 2636
+    },
+    {
+      "turn": 10,
+      "tool": "read_record",
+      "args": {
+        "record_id": "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63",
+        "offset": 4800
+      },
+      "result_chars": 2626
+    },
+    {
+      "turn": 11,
+      "tool": "read_record",
+      "args": {
+        "record_id": "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63",
+        "offset": 7200
+      },
+      "result_chars": 2669
+    },
+    {
+      "turn": 12,
+      "tool": "submit_hypothesis",
+      "accepted": true
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "unknown_record_ids": 0,
+    "invalid_citations": 0,
+    "query_leak": 0
+  },
+  "elapsed_seconds": 70.59
+}

@@ -1,0 +1,211 @@
+{
+  "schema_version": "temporal-eval-v3-1.0",
+  "run_id": "PMC11606917__problem_constrained__tool_agent",
+  "paper_id": "PMC11606917",
+  "query_level": "problem_constrained",
+  "setting": "tool_agent",
+  "publication_date": "2024-11-29",
+  "query": "We are analyzing a refractory BCC high-entropy alloy (Ta-based) where standard experimental measurements of melting properties are infeasible. Current ab initio free energy methods are prohibitively expensive due to the need for thermodynamic integration over the full phase space. Furthermore, existing empirical potentials (like EAM) often fail to capture the complex liquid structure in multi-component systems, while machine learning potentials are computationally demanding. I need a hypothesis for an intervention that replaces the expensive thermodynamic integration step with a more efficient perturbation scheme using a specific class of machine learning potentials. The solution must address the trade-off between computational cost (currently limiting throughput) and the accuracy required to resolve subtle free energy differences. What are the known failure modes of existing TOR-TILD or similar approaches in multi-component spaces, and what falsification experiment could distinguish a true efficiency gain from an artifact of the potential's training set?",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "eligible_paper_count": 45,
+  "corpus_records": {
+    "chunks": 269,
+    "evidence_units": 257
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Replacing full thermodynamic integration with a free energy perturbation (FEP) scheme using a Moment Tensor Potential (MTP) trained on multi-component refractory HEA configurations will yield accurate melting free energy differences with 10-100x reduced computational cost, provided the MTP training set explicitly includes liquid-phase configurations and high-temperature disordered states to avoid extrapolation artifacts.",
+    "material_initial_state": "Ta-based refractory BCC high-entropy alloy (e.g., TaNbMoW or similar quinary system) in solid solution state at temperatures near melting point",
+    "intervention": "Implement free energy perturbation (FEP) using a Moment Tensor Potential (MTP) trained on DFT data from elemental, binary, ternary, and quaternary refractory systems plus explicit liquid-phase configurations, replacing thermodynamic integration over full phase space",
+    "conditions": "Temperature range 2000-3000 K, pressure 1 atm, system size >1000 atoms, time step 1 fs, using MTP with cutoff radius 4.7 Å and level 14",
+    "structural_mediator": "Moment Tensor Potential (MTP) capturing local chemical short-range order and liquid structure through rotationally invariant descriptors",
+    "mechanism": "FEP calculates free energy differences via exponential averaging of energy differences between solid and liquid states sampled by MTP, avoiding the need for slow convergence of thermodynamic integration paths; MTP's polynomial expansion of local environments provides DFT-level accuracy at MD computational cost",
+    "predicted_outcome": "Melting free energy differences resolved within 5 meV/atom accuracy with computational cost reduced by factor of 10-100 compared to thermodynamic integration, enabling high-throughput screening of Ta-based HEA compositions",
+    "baseline": "Standard thermodynamic integration using ab initio molecular dynamics (AIMD) or expensive empirical potentials (EAM) that fail to capture liquid structure in multi-component systems",
+    "boundary": "Valid for compositions within training set chemical space (Ta-Nb-Mo-W-V systems); fails for extreme compositions or novel elements not represented in training data; accuracy degrades if liquid configurations are absent from training set",
+    "uncertainty": "Potential artifacts from MTP extrapolation to liquid states if training set lacks sufficient high-temperature disordered configurations; uncertainty in free energy estimates may increase by 20-50% if liquid-phase DFT data is sparse",
+    "supporting_evidence_ids": [
+      "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63",
+      "PMC8357793::chunk::003::methods::71d8ca4246"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": "Compare MTP-FEP melting free energies against direct AIMD thermodynamic integration for a subset of Ta-based HEA compositions; if MTP-FEP deviates by >10 meV/atom from AIMD results, the efficiency gain is an artifact of potential training set limitations; additionally, test MTP predictions on liquid structure factors from neutron scattering experiments to verify liquid-phase accuracy",
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "accessed_record_ids": [
+    "PMC10142552::chunk::002::materials_and_methods::ec6d71c0fc",
+    "PMC10142552::chunk::003::results_and_discussion::274e13c6a8",
+    "PMC10154406::chunk::001::introduction::c389c7efcd",
+    "PMC11077685::chunk::002::results_and_discussion::a284dbd27f",
+    "PMC11206460::chunk::001::introduction::e80cc84e75",
+    "PMC11206460::chunk::002::results::f86fd515a6",
+    "PMC11206460::hypothesis_evidence_v2::68e8019451e602aa",
+    "PMC11375216::chunk::004::discussion::b8d7d6bc43",
+    "PMC11375216::chunk::005::references::48bdf21317",
+    "PMC11775865::chunk::002::results::a8e7aca6ea",
+    "PMC11775865::chunk::003::experimental_section::84d34988ea",
+    "PMC4976365::chunk::001::results_and_discussion::52452acf65",
+    "PMC4976365::chunk::002::methods::7c4234ec35",
+    "PMC4976365::chunk::003::references::e9cfe20bfa",
+    "PMC4999872::chunk::000::abstract::7a7d39c713",
+    "PMC6093928::chunk::003::methods::f3287d9a39",
+    "PMC6427779::chunk::001::introduction::78240aa8aa",
+    "PMC6427779::chunk::003::results_and_discussion::4ec9838552",
+    "PMC8201384::chunk::003::results_and_discussion::6a39231e11",
+    "PMC8201384::hypothesis_evidence_v2::e28184ea10997eb5",
+    "PMC8282813::chunk::003::discussion::b590527e4b",
+    "PMC8357793::chunk::000::abstract::42ea6c8bbe",
+    "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63",
+    "PMC8357793::chunk::003::methods::71d8ca4246",
+    "PMC9026100::chunk::002::results_and_discussion::ffd8024f4a",
+    "PMC9026100::hypothesis_evidence_v2::a447c4328ed7c462",
+    "PMC9229239::chunk::001::introduction::d4357504cd",
+    "PMC9229239::chunk::007::references::3e6876bec3",
+    "PMC9955357::chunk::006::references::1a6129e73f"
+  ],
+  "cited_evidence_ids": [
+    "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63",
+    "PMC8357793::chunk::003::methods::71d8ca4246"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63",
+      "paper_id": "PMC8357793",
+      "publication_date": "2021-08-11",
+      "kind": "chunk:Results And Discussion",
+      "text": "Machine-learning interatomic potential\n\nIn this section, we discuss the results of the development of the interatomic-potential model used to enable the application of MD simulations of dislocation properties in bcc MoNbTaW. We employ the general framework of machine-learning (ML)-based approaches, which have emerged recently as a systematic framework to develop potentials with accuracies near that of the underlying DFT calculations for elemental and multicomponent systems [24] , [44] – [46] . Here, using training data reported previously [24] for elemental, binary, ternary, and quaternary systems in Nb–Ta–Mo–W, we developed a potential for the MoNbTaW RHEA based on the moment tensor potential (MTP) formalism, which has been found to feature an excellent balance between accuracy and computational cost [46] . The flowchart for constructing the MTP is shown in Fig. 1a with the methodological details provided in “Methods”. The basic materials property predictions of the MTP model are provided in Supplementary Table 1 . Figure 1b, c shows a comparison of the DFT- and MTP-predicted energies and forces for both training and test sets. While the mean absolute errors (MAEs) of energies of "
+    },
+    {
+      "record_id": "PMC8357793::chunk::003::methods::71d8ca4246",
+      "paper_id": "PMC8357793",
+      "publication_date": "2021-08-11",
+      "kind": "chunk:Methods",
+      "text": "Machine-learning interatomic potential\n\nThe MTP model and its formalism have been extensively studied and applied in the previous work [44] , [61] , [62] . The MTP essentially constructs contracted rotationally invariant local environment descriptors for each atom in the system and builds a polynomial regressed correlation between the potential energy surface (PES) and these descriptors. The descriptors, named moment tensors, are devised as follows: 9 \\documentclass[12pt]{minimal} \\usepackage{amsmath} \\usepackage{wasysym} \\usepackage{amsfonts} \\usepackage{amssymb} \\usepackage{amsbsy} \\usepackage{mathrsfs} \\usepackage{upgreek} \\setlength{\\oddsidemargin}{-69pt} \\begin{document}$${M}_{\\mu ,\\nu }({R})={\\sum }_{j}{f}_{\\mu }(|{{{R}}}_{ij}|,{z}_{i},{z}_{j})\\underbrace{{R}_{ij}\\otimes \\cdots \\otimes {R}_{ij}}_{{\\nu} \\,{{{{{\\rm{times}}}}}}},$$\\end{document} M μ , ν ( R ) = ∑ j f μ ( ∣ R i j ∣ , z i , z j ) R i j ⊗ ⋯ ⊗ R i j ⏟ ν times , where the functions \\documentclass[12pt]{minimal} \\usepackage{amsmath} \\usepackage{wasysym} \\usepackage{amsfonts} \\usepackage{amssymb} \\usepackage{amsbsy} \\usepackage{mathrsfs} \\usepackage{upgreek} \\setlength{\\oddsidemargin}{-69pt} \\begin{document}$${f}_{\\mu "
+    }
+  ],
+  "tool_calls": 12,
+  "turns": 13,
+  "tool_trace": [
+    {
+      "turn": 0,
+      "tool": "list_papers",
+      "args": {},
+      "result_chars": 7848
+    },
+    {
+      "turn": 1,
+      "tool": "search_corpus",
+      "args": {
+        "query": "TOR-TILD thermodynamic integration machine learning potential high entropy alloy free energy",
+        "k": 8
+      },
+      "result_chars": 3745
+    },
+    {
+      "turn": 2,
+      "tool": "read_record",
+      "args": {
+        "record_id": "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63"
+      },
+      "result_chars": 2623
+    },
+    {
+      "turn": 3,
+      "tool": "read_record",
+      "args": {
+        "record_id": "PMC8357793::chunk::002::results_and_discussion::3b0e2c5f63",
+        "offset": 2400
+      },
+      "result_chars": 2636
+    },
+    {
+      "turn": 4,
+      "tool": "search_corpus",
+      "args": {
+        "query": "thermodynamic integration TOR-TILD failure modes multi-component liquid structure machine learning potential",
+        "k": 8
+      },
+      "result_chars": 3755
+    },
+    {
+      "turn": 5,
+      "tool": "search_corpus",
+      "args": {
+        "query": "moment tensor potential MTP liquid structure free energy perturbation high entropy alloy",
+        "k": 8
+      },
+      "result_chars": 3725
+    },
+    {
+      "turn": 6,
+      "tool": "search_corpus",
+      "args": {
+        "query": "failure modes thermodynamic integration multi-component liquid structure empirical potential EAM machine learning",
+        "k": 8
+      },
+      "result_chars": 3782
+    },
+    {
+      "turn": 7,
+      "tool": "search_corpus",
+      "args": {
+        "query": "Ta-based refractory high entropy alloy melting free energy liquid structure",
+        "k": 8
+      },
+      "result_chars": 3790
+    },
+    {
+      "turn": 8,
+      "tool": "search_corpus",
+      "args": {
+        "query": "perturbation scheme free energy difference machine learning potential training set artifact",
+        "k": 8
+      },
+      "result_chars": 3752
+    },
+    {
+      "turn": 9,
+      "tool": "read_record",
+      "args": {
+        "record_id": "PMC8357793::chunk::003::methods::71d8ca4246"
+      },
+      "result_chars": 2677
+    },
+    {
+      "turn": 10,
+      "tool": "read_record",
+      "args": {
+        "record_id": "PMC8357793::chunk::003::methods::71d8ca4246",
+        "offset": 2400
+      },
+      "result_chars": 2694
+    },
+    {
+      "turn": 11,
+      "tool": "read_record",
+      "args": {
+        "record_id": "PMC8357793::chunk::003::methods::71d8ca4246",
+        "offset": 4800
+      },
+      "result_chars": 2670
+    },
+    {
+      "turn": 12,
+      "tool": "submit_hypothesis",
+      "accepted": true
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "unknown_record_ids": 0,
+    "invalid_citations": 0,
+    "query_leak": 0
+  },
+  "elapsed_seconds": 72.39
+}
