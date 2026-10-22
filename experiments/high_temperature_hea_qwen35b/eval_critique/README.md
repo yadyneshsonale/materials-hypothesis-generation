@@ -54,12 +54,16 @@ run time, and the check is also tested.
 | Llama 3.3 70B Instruct | `Llama-3.3-70B-Instruct_5` | December 2023 | Meta model card (github.com/meta-llama/llama-models, llama3_3) | Evidence critic, reviser |
 | OpenAI o1 | `o1_2024-12-17` | Oct 1, 2023 | developers.openai.com/api/docs/models/o1 | Consistency critic |
 | GPT-4o | `gpt-4o_2024-11-20` | Oct 1, 2023 | developers.openai.com/api/docs/models/gpt-4o | Falsifiability critic |
-| GPT-OSS-120B | `gpt-oss-120b_1` | June 2024 | developers.openai.com/api/docs/models/gpt-oss-120b | Excluded (after cutoff) |
+| GPT-OSS-120B | `gpt-oss-120b_1` | June 2024 | Web search summary; official page not fetched | Excluded (after cutoff) |
 | Mistral Large 3 | `Mistral-Large-3_1` | October 2024 | third-party listing | Excluded (after cutoff) |
 | DeepSeek-V3.2 | `DeepSeek-V3.2_1` | May 2025 | third-party listing | Excluded (after cutoff) |
 
-Other deployments on the list (GPT-4.1, GPT-5 family, GPT-5.x, GPT-6 family, Qwen3.5, Kimi, Grok, DeepSeek-V4)
-all have cutoffs in 2024 or later, so they were excluded by the same rule.
+The other deployments on the list (GPT-4.1, GPT-5 family, GPT-5.x, GPT-6 family, Qwen3.5, Kimi, Grok, DeepSeek-V4)
+were not checked individually. They were not used, because they are later models whose cutoffs were not
+confirmed from the sources consulted. Before any of them is used, its cutoff needs checking on the official page.
+The GPT-OSS-120B, Mistral Large 3 and DeepSeek-V3.2 dates come from a web search summary and third-party listings,
+not from official pages. Each is after 2024-01-02 according to those sources, so the exclusion stands unless an
+official page shows otherwise.
 
 **Family independence.** The reviser (Llama) is outside the OpenAI family used by the judge, and the evidence
 critic is also non-OpenAI. Two critics (o1, GPT-4o) share a family with the GPT-5.6 judge. That could bias
