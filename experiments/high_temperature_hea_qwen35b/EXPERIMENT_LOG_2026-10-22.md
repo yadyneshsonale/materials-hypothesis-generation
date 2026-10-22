@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 11)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 12)
 
 This document is the full record of every experiment on the 50-paper high-temperature HEA corpus: date,
 configuration, results, integrity and status. Experiments 0 to 7 are described in detail in the committed
@@ -27,6 +27,7 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 9 | 2026-10-22 | MatKG temporal index and augmented tool agent (eval v4) | 84.1 M rows; 12 cases, 36 KG runs | Qwen | TRAPI GPT-5.6 | Complete; 1 baseline unit missing (not verified) | [eval_v4_matkg/](./eval_v4_matkg/) |
 | 10 | 2026-10-22 | Citation-graph and citation-count paper selection | 50 corpus papers; 224 candidates; 37 with PMC text | none | none | Complete (analysis only) | [citation_graph/](./citation_graph/) |
 | 11 | 2026-10-22 | Critique-augmented hypothesis revision (3 critics + reviser, self-revise control, fresh baseline) | 12 cases, 36 units per arm | Qwen (baseline), Llama 3.3 70B (reviser) | TRAPI GPT-5.6 | Complete, verified | [eval_critique/](./eval_critique/) |
+| 12 | 2026-10-22 | Failure analysis across all 8 methods (error coding, evidence ceiling, confound checks) | 288 units, 1,087 fatal errors | none | GPT-5.6 (coder) | Complete (analysis only) | [failure_analysis/](./failure_analysis/) |
 
 ## Correction to section 8 (MatKG)
 
@@ -292,6 +293,30 @@ put uncertainty only in the `uncertainty` field. Add a judge-side check for hedg
 cannot count as improvement. Repeat the noise check on more papers before reading effects of about 0.1.
 
 Full details: [eval_critique/README.md](./eval_critique/README.md).
+
+## Experiment 12: failure analysis across all methods
+
+**Question.** Where and why does each method fail?
+
+**Method.** The analysis covers all 288 units (8 methods × 36) and the judge's 1,087 fatal errors. GPT-5.6
+coded each error into 11 categories (a hand spot-check agreed on 37 of 40). An evidence-ceiling test rated
+the 20 pre-cutoff records most similar to each target. Confound checks compared effects within query level
+and paper, and used the resample arm to measure regression to the mean.
+
+**Main results.**
+
+- Query level drives scores far more than method (broad about 0.7–1.0, expert_context about 2.1–2.6, methods
+  within 0.15 of each other).
+- Wrong mechanism (19–24%), unsupported evidence claims (20–26%) and wrong conditions (10–18%) are the largest
+  error categories for every method. Physics errors are rare (1–7%).
+- Missing evidence is not the bottleneck. No case lacked supportive earlier records, and the cases rated most
+  reconstructible did not score higher.
+- On expert_context queries, tool-agent runs that read supportive prior art scored lower on mechanism and
+  outcome (association, 23 vs 13 units).
+- Critique helps weak hypotheses (about +0.11 beyond regression) and hurts strong ones (about −0.24).
+- Run-to-run noise is about 0.31 per unit, and 19–20% of pairwise verdicts flip with presentation order.
+
+Full details: [failure_analysis/README.md](./failure_analysis/README.md).
 
 ## Comparability and limits, experiments 8 to 11
 
