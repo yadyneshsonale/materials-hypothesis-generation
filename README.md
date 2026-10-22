@@ -394,7 +394,9 @@ The complete 50-paper high-temperature HEA study is archived in
 [`experiments/high_temperature_hea_qwen35b/`](experiments/high_temperature_hea_qwen35b/). It
 includes the screened open-access JATS corpus, Qwen3.5-35B-A3B linked-evidence outputs, rejected
 candidate records, aggregate evaluation, adaptive-agent trace, machine-readable configuration,
-methods, limitations, and exact rerun commands.
+methods, limitations, and exact rerun commands. Every experiment, with dates, methods, results,
+and status, is listed in
+[`EXPERIMENT_LOG.md`](experiments/high_temperature_hea_qwen35b/EXPERIMENT_LOG.md).
 
 A cutoff-audited evaluation of a tool-calling agent against three baselines is documented in
 [`experiments/high_temperature_hea_qwen35b/eval_v3/`](experiments/high_temperature_hea_qwen35b/eval_v3/README.md).
