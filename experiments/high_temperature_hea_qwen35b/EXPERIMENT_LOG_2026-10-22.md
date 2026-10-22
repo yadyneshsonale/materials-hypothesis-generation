@@ -7,7 +7,8 @@ and they supersede section 8 ("MatKG, planned, blocked") of that log. The commit
 because its working-tree copy has uncommitted changes from another session (it is empty in the working tree).
 Once that is resolved, this document can be merged into the log.
 
-Last updated 2026-10-22 (adds the shared configuration reference and experiment 11).
+Last updated 2026-10-22 (adds the shared configuration reference, experiment 11 and the full experiment 12
+failure analysis).
 
 Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 and 2026-10-22 runs).
 
@@ -316,9 +317,110 @@ and paper, and used the resample arm to measure regression to the mean.
 - Critique helps weak hypotheses (about +0.11 beyond regression) and hurts strong ones (about −0.24).
 - Run-to-run noise is about 0.31 per unit, and 19–20% of pairwise verdicts flip with presentation order.
 
+**Configuration.**
+
+| Item | Value |
+|---|---|
+| Date | 2026-10-22 |
+| Units | 288 (8 methods × 36); 287 judged, 1 generation failure (closed_book, PMC11375712 broad) |
+| Error coder | GPT-5.6 (`gpt-5.6-sol_2026-07-09`), one call per judged unit with errors (273 calls), 11 fixed categories |
+| Coder check | 40 random labels reviewed by hand: 37 agree. The 3 disagreements were between neighbouring categories |
+| Evidence ceiling | Top 20 eligible pre-cutoff records per case, retrieved with the hidden target as the query (same `retrieve` as the methods). GPT-5.6 rated each record 0–2 for intervention and mechanism support and the set 0–2 for reconstructibility (12 calls) |
+| Hard failure | Reconstruction ≤ 0.5 |
+| Hedge counter | may, might, could, potentially, possibly, uncertain, unclear, likely, perhaps, suggest(s), further investigation, require(s) further |
+
+**Failures by method.**
+
+| Method | Reconstruction | Hard failures | Zero on intervention | Zero on evidence validity | Errors per unit | Where it fails | Why |
+|---|---:|---:|---:|---:|---:|---|---|
+| tool_agent | 1.64 | 14% | 14% | 22% | 3.67 | Unsupported claims | Uses all 12 calls every run; reads 3.6 distinct records; ~1.5 calls spent paging; cites 2.4 |
+| tool_agent_kg | 1.63 | 22% | 22% | 25% | 3.78 | Most hard failures | KG lookups displace searches (3.8 vs 6.0 per run); KG cited in 5 of 36 runs |
+| self_revise | 1.60 | 17% | 14% | 33% | 3.61 | Little change (22 of 36 units unchanged) | No new information; change (−0.04) within noise |
+| closed_book | 1.56 | 17% | 20% | 11% | 3.49 | Highest zero rate on all four core dimensions (20%) | No grounding; generic design. 2024 papers 1.66 vs 2025–26 1.35, possible prior knowledge (4 late papers only) |
+| text_oneshot | 1.56 | 11% | 25% | 14% | 3.64 | Misses the intervention most often | Shown supportive evidence in 100% of runs, cited it in 94%, but did not turn it into the target's intervention |
+| resample | 1.55 | 14% | 17% | 31% | 3.89 | As tool_agent | Second sample of tool_agent; measures noise |
+| v2_oneshot | 1.49 | 17% | 22% | 11% | 4.00 | Most unsupported verdicts of the eval_v3 methods (12) | Structured units drop context; highest physics-error share (7%) |
+| critique | 1.49 | 11% | 11% | 25% | 4.22 | Most errors per unit; 3.47 hedge words per hypothesis | Reviser answers critiques by softening claims; judge rates them vague |
+
+**Error categories (share of each method's errors).**
+
+| Category | closed_book | text_oneshot | v2_oneshot | tool_agent | resample | tool_agent_kg | self_revise | critique |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| wrong_mechanism | 24% | 20% | 19% | 21% | 21% | 23% | 22% | 22% |
+| evidence_unsupported | 11% | 24% | 23% | 20% | 25% | 26% | 22% | 22% |
+| wrong_conditions | 14% | 16% | 10% | 17% | 18% | 15% | 15% | 15% |
+| wrong_intervention | 12% | 14% | 13% | 11% | 10% | 9% | 14% | 12% |
+| wrong_outcome | 12% | 8% | 11% | 10% | 6% | 7% | 7% | 9% |
+| untestable_or_vague | 12% | 6% | 8% | 4% | 6% | 7% | 8% | 12% |
+| wrong_baseline | 8% | 5% | 4% | 7% | 6% | 7% | 7% | 6% |
+| physical_error | 6% | 5% | 7% | 4% | 3% | 2% | 2% | 1% |
+| internal_inconsistency | 2% | 2% | 3% | 4% | 2% | 2% | 3% | 1% |
+| evidence_contradicted | 0% | 1% | 1% | 2% | 2% | 2% | 1% | 1% |
+
+**Reconstruction by query level.**
+
+| Level | closed_book | text_oneshot | v2_oneshot | tool_agent | resample | tool_agent_kg | self_revise | critique |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| broad | 0.75 | 0.79 | 0.73 | 0.79 | 0.79 | 0.69 | 0.75 | 0.96 |
+| problem_constrained | 1.46 | 1.52 | 1.44 | 1.65 | 1.48 | 1.60 | 1.69 | 1.40 |
+| expert_context | 2.40 | 2.38 | 2.29 | 2.48 | 2.38 | 2.60 | 2.35 | 2.10 |
+
+**Evidence ceiling and evidence use.** No case was rated 0. Nine cases were rated 1 (right direction, but
+the specific intervention needs a new idea) and three were rated 2 (`PMC11355469`, `PMC12298864`,
+`PMC12941549`). The rated-2 cases scored lower, not higher, at problem_constrained (1.28 vs 1.61) and
+expert_context (1.91 vs 2.53).
+
+| Level (tool arms pooled) | Read supportive record | Reconstruction if read | Reconstruction if not |
+|---|---:|---:|---:|
+| broad | 81% | 0.75 | 0.79 |
+| problem_constrained | 50% | 1.67 | 1.49 |
+| expert_context | 64% | 2.28 | 2.85 |
+
+On expert_context, reading supportive prior art left intervention unchanged (2.96 vs 2.92) but lowered
+mechanism (2.26 vs 2.85), outcome (1.96 vs 3.23) and conditions (1.96 vs 2.38). The average within-paper
+effect of reading supportive records was −0.11 (range −1.82 to +1.28).
+
+**Critique vs regression to the mean** (split on the original tool_agent score):
+
+| Original score | critique change | resample change (no revision) | Effect beyond regression |
+|---|---:|---:|---:|
+| below 1.5 | +0.07 | −0.04 | about +0.11 |
+| 1.5 or above | −0.38 | −0.14 | about −0.24 |
+
+When the reviser changed the cited records (14 units), the score fell by 0.32 on average, against 0.05
+when it kept them.
+
+**Failures from the benchmark, not the methods.**
+
+- Broad queries are under-specified: wrong intervention is 16% of their errors and wrong baseline 9%, against
+  5% and 5% at expert_context.
+- Hardest papers: `PMC12941549` (0.96 average over methods; 29% wrong conditions, because its target test
+  conditions are not implied by the query) and `PMC11077685` (1.00; 32% wrong intervention, because its 3D ink
+  extrusion route is unusual). Easiest: `PMC12806431` (2.16).
+- Target type explains little: computational targets 1.48–1.65 and processing targets 1.33–1.64.
+- Noise: the two tool-agent samples differ by 0.31 per unit (SD 0.38), 7 of 36 units change classification,
+  and the means differ by 0.09.
+- Position bias: 20 of 107 (eval_v3) and 29 of 143 (eval_v4) pairwise verdicts flip with presentation order.
+- Only one unit defeated every method: `PMC11375712` broad (best 0.25).
+
+**Suggested fixes, in priority order.**
+
+1. Fix the benchmark: drop or rescore broad queries, flag targets whose details the query cannot imply, and
+   report results per level.
+2. Generate several samples per unit and calibrate the judge against an expert.
+3. Target mechanism reasoning, the largest error category for every method.
+4. Stop the agent wasting budget on paging, so it reads more distinct sources.
+5. Guard against copying precedent on specific queries.
+6. Apply critique only to weak hypotheses, and forbid hedging in the reviser.
+7. Make KG lookups free or relation-typed rather than raw co-occurrence.
+
+**Limits.** The error coder and evidence ceiling used the same GPT-5.6 deployment as the judge. The evidence
+ceiling only looks at a lexical top 20, so it may undercount available evidence. All comparisons are
+observational over 12 papers. The anchoring and memorisation findings are associations, not tested causes.
+
 Full details: [failure_analysis/README.md](./failure_analysis/README.md).
 
-## Comparability and limits, experiments 8 to 11
+## Comparability and limits, experiments 8 to 12
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
