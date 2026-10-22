@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 12)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 13)
 
 This document is the full record of every experiment on the 50-paper high-temperature HEA corpus: date,
 configuration, results, integrity and status. Experiments 0 to 7 are described in detail in the committed
@@ -29,6 +29,7 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 10 | 2026-10-22 | Citation-graph and citation-count paper selection | 50 corpus papers; 224 candidates; 37 with PMC text | none | none | Complete (analysis only) | [citation_graph/](./citation_graph/) |
 | 11 | 2026-10-22 | Critique-augmented hypothesis revision (3 critics + reviser, self-revise control, fresh baseline) | 12 cases, 36 units per arm | Qwen (baseline), Llama 3.3 70B (reviser) | TRAPI GPT-5.6 | Complete, verified | [eval_critique/](./eval_critique/) |
 | 12 | 2026-10-22 | Failure analysis across all 8 methods (error coding, evidence ceiling, confound checks) | 288 units, 1,087 fatal errors | none | GPT-5.6 (coder) | Complete (analysis only) | [failure_analysis/](./failure_analysis/) |
+| 13 | 2026-10-22 | Intermediate-stage metrics for all 8 methods (replay, grounding audit, inferability, critique review, judge retest, cross-family judge) | 288 units; 1,256 LLM calls; 108 replays | none | GPT-5.6 (×3), DeepSeek-V4-Pro | Complete (analysis only) | [stage_metrics/](./stage_metrics/) |
 
 ## Correction to section 8 (MatKG)
 
@@ -420,7 +421,61 @@ observational over 12 papers. The anchoring and memorisation findings are associ
 
 Full details: [failure_analysis/README.md](./failure_analysis/README.md).
 
-## Comparability and limits, experiments 8 to 12
+## Experiment 13: intermediate-stage metrics for all methods
+
+**Question.** Where in the pipeline does each method lose quality: query, retrieval, reading, grounding,
+reasoning, hypothesis form, revision, KG use, or judging?
+
+**Method.** Computed over the stored outputs of all 8 methods (288 units; nothing regenerated):
+
+- Deterministic replay of all 108 tool runs; all 108 reproduce the stored accessed records exactly.
+- `text-embedding-3-large` (256 dimensions) for novelty, relevance and diversity.
+- Target-free GPT-5.6 audit per hypothesis (287): claim grounding, causal chain, contradictions, mechanism
+  source, falsifiability, specificity, uncertainty and composition claims.
+- Diagnostic GPT-5.6 inferability rating per query (36).
+- Target-free GPT-5.6 review of every revision (72).
+- Two more GPT-5.6 judgments of every output (574).
+- One DeepSeek-V4-Pro judgment of every output (287).
+
+All 1,256 LLM calls completed with zero errors.
+
+**Main results.**
+
+| Stage | Key metric | Result |
+|---|---|---|
+| Query | Target stated or implied by query vs score | ρ = 0.82; broad queries give away 0.61/2, expert 1.55/2 |
+| Retrieval | Tool runs that surface a supportive record | 94–100%, within about 3 calls |
+| Reading | Supportive records surfaced but not read | 56–67%; only 6–7% of supportive records read |
+| Reading | Read calls spent paging | 23–30% |
+| Grounding | Claims entailed / at least partly supported by cited evidence | 12–15% / 33–41% |
+| Grounding | Supported claims resting on another alloy system | 48–61% |
+| Grounding | Numbers untraceable to seen evidence (generation methods) | 32–44% |
+| Reasoning | Mechanism transferred without justification | 39–56% of evidence-using hypotheses |
+| Reasoning | Complete causal chain | 57–69%; critique 33% |
+| Form | Falsifiability checklist | 0.79–0.91; critique 0.69 |
+| Form | Stated uncertainty vs score (calibration) | ρ between −0.24 and 0.14: uncalibrated |
+| Critique | Valid findings / corrected | 70% valid (+20% partly) / 13% corrected (36% hedged) |
+| KG | Facts used per lookup; searches per run (KG vs plain) | 0.23; 3.8 vs 5.9 |
+| Judge | GPT-5.6 test-retest | ICC 0.96, within-unit SD 0.10 |
+| Judge | Cross-family judge (DeepSeek-V4-Pro) | unit ρ 0.90, +0.42 more lenient, method-ranking τ 0.32 |
+| Selection | Best of 2 samples / best of 8 methods | 1.75 (+0.11) / 1.97 (+0.33) |
+
+**Interpretation.**
+
+- Agents find the right evidence but don't read it, and they ground few claims.
+- Mechanisms are borrowed from other systems without justification.
+- Critique identifies real problems but answers them with hedges.
+- The judge is consistent with itself, but method rankings change with the judge family.
+- Choosing among samples or methods has more headroom than any method change so far.
+
+**Limits.** The audit and review use the same model family as the judge. Supportive-evidence metrics depend
+on the lexical top-20 oracle. Composition checks cover 24 claims and flagged 7, of which 3 were genuine on
+manual review. Number tracing is a string match. The expert calibration set (30 units) is prepared but not
+labelled.
+
+Full details: [stage_metrics/README.md](./stage_metrics/README.md).
+
+## Comparability and limits, experiments 8 to 13
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
