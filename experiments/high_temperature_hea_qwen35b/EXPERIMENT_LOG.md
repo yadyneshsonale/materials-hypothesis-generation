@@ -262,6 +262,11 @@ was available to approve it, and I did not retry or route around the denial. No 
 downloaded, and none are in the repository or in the working directory. Shell access was also
 denied for a later read-only check, so the new log is not yet committed.
 
+**Update (2026-10-21, later):** the user approved the download in chat. The permission gate still
+blocked it, and a follow-up approval request got no answer. Nothing was downloaded, and I did not
+route around the gate. The MatKG work is paused until the files are placed in
+`/home/t-ydsonale/data/matkg` or the permission prompt is approved.
+
 **Leakage risk that must be solved before any run:** MatKG was built from more than 5 million
 papers, so it includes papers published after the cutoffs and possibly the held-out papers
 themselves. Using it unfiltered would leak the answer. The required design is:
