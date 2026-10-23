@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 14)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 15)
 
 This document is the full record of every experiment on the 50-paper high-temperature HEA corpus: date,
 configuration, results, integrity and status. Experiments 0 to 7 are described in detail in the committed
@@ -31,6 +31,7 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 12 | 2026-10-22 | Failure analysis across all 8 methods (error coding, evidence ceiling, confound checks) | 288 units, 1,087 fatal errors | none | GPT-5.6 (coder) | Complete (analysis only) | [failure_analysis/](./failure_analysis/) |
 | 13 | 2026-10-22 | Intermediate-stage metrics for all 8 methods (replay, grounding audit, inferability, critique review, judge retest, cross-family judge) | 288 units; 1,256 LLM calls; 108 replays | none | GPT-5.6 (×3), DeepSeek-V4-Pro | Complete (analysis only) | [stage_metrics/](./stage_metrics/) |
 | 14 | 2026-10-22 to 2026-10-23 | Extraction rubrics (card, effects, mechanisms, gaps, mixed) vs raw text, v2 units and closed-book, equal evidence budget, 2 samples | 50 papers × 4 rubrics extracted; 576 runs | Qwen | GPT-5.6, DeepSeek-V4-Pro | Complete; 2 runs (1 closed-book unit) failed after retry | [rubric_eval/](./rubric_eval/) |
+| 15 | 2026-10-23 | Failure analysis of experiment 14 (extraction fidelity, retrieval, evidence use, error coding, reproduced generation failure) | 574 runs, 2,282 fatal errors, 160 records checked | none | GPT-5.6 (coder) | Complete (analysis only) | [rubric_eval/failure/](./rubric_eval/failure/) |
 
 ## Correction to section 8 (MatKG)
 
@@ -532,7 +533,45 @@ unit failed in v3), and each was retried once.
 
 Full details: [rubric_eval/README.md](./rubric_eval/README.md).
 
-## Comparability and limits, experiments 8 to 14
+## Experiment 15: failure analysis of the extraction-rubric experiment
+
+**Question.** What breaks in the extraction-rubric pipeline, and at which stage?
+
+**Method.**
+
+- Error coding: the 2,282 fatal errors from the 574 judged runs, coded by GPT-5.6 into the 11-category taxonomy.
+- Extraction fidelity: 40 random records per rubric checked field by field against the source paper (GPT-5.6,
+  target-free).
+- Retrieval and use: whether a target-anticipating record (evidence-ceiling rating) was in context and cited,
+  compared within level and within paper.
+- Generation: the reproducible closed-book failure rerun three times with the raw output saved.
+- A run counts as a failure if reconstruction ≤ 1.0.
+
+**What breaks, ranked by impact.**
+
+1. **Broad queries (benchmark).** 79–96% failure in every arm; 6 of 12 broad units fail in all 8 arms.
+2. **Evidence use (reasoning).** In 83–97% of runs, a target-anticipating record is in context, and most failures
+   cite one. Citing it does not raise scores within paper (−0.01, +0.06, −0.10 by level). Strongly supportive
+   records help slightly on open queries (+0.10, +0.15) but hurt on expert queries (−0.13, worse in 6 of 8
+   units). Wrong mechanism appears in 69–87% of failing runs. Mechanisms from the model's own reasoning fail less
+   often (16% vs 34–41% at problem_constrained).
+3. **Diluted context.** Only 25–37% of citations are supportive for gaps, mixed and effects, against 81% for cards.
+   The effects arm adopts the wrong baseline in 54% of its failures.
+4. **Extraction.** 86–93% of fields are supported and 7–13% distorted. The mechanisms rubric's scope-limit (25%)
+   and alternatives (24%) fields are the least reliable, and those are the fields meant to stop transfer. 15–35%
+   of records mix in cited work despite the own-work rule.
+5. **Closed-book prompt conflict.** The shared prompt says "use only supplied evidence", and closed-book supplies
+   none. On `PMC11375712` broad the model refuses (empty fields) 3 of 3 times. 52 of 70 successful closed-book runs
+   carry a "no evidence supplied" caveat.
+6. **No dominant arm.** The best arm per unit is spread across all 8 arms (mean best–worst gap 0.68).
+
+**Fixes.** Repair the broad level; give closed-book its own prompt; add a system-match step before using evidence;
+re-extract scope fields with per-field quotes and paraphrase checks; prefer cards or raw text with better retrieval;
+select or ensemble across representations.
+
+Full details: [rubric_eval/failure/README.md](./rubric_eval/failure/README.md).
+
+## Comparability and limits, experiments 8 to 15
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
