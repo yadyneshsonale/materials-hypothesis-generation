@@ -1,0 +1,71 @@
+{
+  "paper_id": "PMC11606917",
+  "rubric": "card",
+  "extractor": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "source_chars": 67237,
+  "windows": 2,
+  "stats": {
+    "proposed": 2,
+    "kept": 2,
+    "quotes_offered": 6,
+    "quotes_valid": 6
+  },
+  "records": [
+    {
+      "record_id": "PMC11606917::rubric_card::000::5d1b1b26fa",
+      "item": {
+        "research_question": "How can the computational cost of calculating ab initio melting properties for multi-component high-entropy alloys be reduced while maintaining sub-meV accuracy?",
+        "material_system": "TaVCrW high-entropy alloy (bcc refractory)",
+        "processing_route": "A hierarchical approach combining EAM potentials, Moment Tensor Potentials (MTP), and Density Functional Theory (DFT) using Free Energy Perturbation (FEP) to replace thermodynamic integration (TI); specifically, an optimized MTP replaces one EAM potential and TI is replaced by FEP for the liquid free energy calculation.",
+        "test_conditions": "GGA-PBE and LDA exchange-correlation functionals; temperatures ranging from 2200 K to 2500 K; volumes on a 5 × 6 (V, T) grid; comparison against CALPHAD extrapolated values and original TOR-TILD method.",
+        "key_findings": [
+          "The proposed method achieves an 80% reduction in computational resources compared to the hybrid TOR-TILD method.",
+          "The total CPU time for the new approach is 285,802 core hours, compared to 5,918,147 for the original TOR-TILD method.",
+          "The melting point calculated with GGA-PBE is 2376 K, and with LDA is 2409 K, both lower than the CALPHAD value of 2569 K.",
+          "The electronic contribution to the free energy causes a melting point shift of 48 K for GGA-PBE and 57 K for LDA.",
+          "Short-range order (SRO) stabilizes the solid phase by approximately 2.4 meV/atom, resulting in a melting temperature shift of about 25 K.",
+          "The energy difference between the MTP and DFT computed via FEP is only 0.5 meV/atom.",
+          "The predicted enthalpy of fusion is 25.9 kJ/mol (GGA-PBE) and 25.6 kJ/mol (LDA), slightly larger than the CALPHAD value of 23.8 kJ/mol."
+        ],
+        "mechanism": "The method utilizes a specially designed MTP that closely overlaps with the ab initio liquid phase-space distribution, allowing the expensive thermodynamic integration step to be substituted with efficient free energy perturbation calculations. The approach hierarchically combines the speed of classical EAM potentials for coexistence calculations with the accuracy of MTP and DFT for free energy corrections.",
+        "limitations": "The MTP is optimized solely for the liquid phase and is not guaranteed to be transferable to other parts of the DFT phase space; high-temperature magnetic fluctuations were not included in the calculations; the CALPHAD comparison relies on binary subsystem extrapolation which introduces uncertainty.",
+        "future_work": "Future extensions could integrate electronic MTPs to better capture electronic contributions; more elaborate treatments of magnetism (e.g., dynamical mean-field theory) may be needed for systems with strong magnetic fluctuations; the method can serve as an accurate reference for designing faster machine-learning potentials for compositional screening.",
+        "quotes": [
+          "The method achieves overall savings of computational resources by 80% compared to current alternatives.",
+          "The proposed approach is contrasted with the original TOR-TILD method and with a hybrid TOR-TILD method in Fig. 1.",
+          "The energy differences between the MTP and DFT computed by free energy perturbation and thermodynamic integration are relatively small (0.5 meV/atom)."
+        ],
+        "part": "1/2"
+      },
+      "text": "Paper card. Question: How can the computational cost of calculating ab initio melting properties for multi-component high-entropy alloys be reduced while maintaining sub-meV accuracy?. System: TaVCrW high-entropy alloy (bcc refractory). Processing: A hierarchical approach combining EAM potentials, Moment Tensor Potentials (MTP), and Density Functional Theory (DFT) using Free Energy Perturbation (FEP) to replace thermodynamic integration (TI); specifically, an optimized MTP replaces one EAM potential and TI is replaced by FEP for the liquid free energy calculation.. Test conditions: GGA-PBE and LDA exchange-correlation functionals; temperatures ranging from 2200 K to 2500 K; volumes on a 5 × 6 (V, T) grid; comparison against CALPHAD extrapolated values and original TOR-TILD method.. Findings: The proposed method achieves an 80% reduction in computational resources compared to the hybrid TOR-TILD method.; The total CPU time for the new approach is 285,802 core hours, compared to 5,918,147 for the original TOR-TILD method.; The melting point calculated with GGA-PBE is 2376 K, and with LDA is 2409 K, both lower than the CALPHAD value of 2569 K.; The electronic contribution to the free energy causes a melting point shift of 48 K for GGA-PBE and 57 K for LDA.; Short-range order (SRO) stabilizes the solid phase by approximately 2.4 meV/atom, resulting in a melting temperature shift of about 25 K.; The energy difference between the MTP and DFT computed via FEP is only 0.5 meV/atom.; The predicted enthalpy of fusion is 25.9 kJ/mol (GGA-PBE) and 25.6 kJ/mol (LDA), slightly larger than the CALPHAD value of 23.8 kJ/mol.. Mechanism: The method utilizes a specially designed MTP that closely overlaps with the ab initio liquid phase-space distribution, allowing the expensive thermodynamic integration step to be substituted with efficient free energy perturbation calculations. The approach hierarchically combines the speed of classical EAM potentials for coexistence calculations with the accuracy of MTP and DFT for free energy corrections.. Limitations: The MTP is optimized solely for the liquid phase and is not guaranteed to be transferable to other parts of the DFT phase space; high-temperature magnetic fluctuations were not included in the calculations; the CALPHAD comparison relies on binary subsystem extrapolation which introduces uncertainty.. Future work: Future extensions could integrate electronic MTPs to better capture electronic contributions; more elaborate treatments of magnetism (e.g., dynamical mean-field theory) may be needed for systems with strong magnetic fluctuations; the method can serve as an accurate reference for designing faster machine-learning potentials for compositional screening.. Quote: \"The method achieves overall savings of computational resources by 80% compared to current alternatives.\""
+    },
+    {
+      "record_id": "PMC11606917::rubric_card::001::38afc98c6c",
+      "item": {
+        "research_question": "How can ab initio melting property calculations for high entropy alloys be accelerated by integrating machine learning potentials (MTP) into the TOR-TILD workflow to reduce computational cost while maintaining DFT accuracy?",
+        "material_system": "TaVCrW (Tantalum-Vanadium-Chromium-Tungsten) high entropy alloy",
+        "processing_route": "Five-step workflow: (1) Interface method with EAM potential on 16×16×32 supercell (16,384 atoms) for 50 ps (1 fs timestep) to find T_EAM^m; (2) Thermodynamic integration from EAM to MTP liquid free energy; (3) Unfolding MTP liquid free energy surface via pressure integration over volume and internal energy integration over temperature using 12×12×12 supercell (3,456 atoms); (4) MTP MD simulations on 4×4×4 supercell (128 atoms) to generate trajectories; (5) Free energy perturbation from MTP to DFT using 128-atom snapshots with high-converged DFT (450 eV cutoff, 4×4×4 k-mesh).",
+        "test_conditions": "Temperatures ranging from 2200 K to 2800 K; Pressures at 0 GPa; Electronic smearing of 0.195 eV; Langevin thermostat with friction parameter 0.01 fs⁻¹; MD timestep of 5 fs for MTP; Monte Carlo simulations for short-range order in 2000–2400 K range.",
+        "key_findings": [
+          "The standard error of the EAM melting point prediction is well below 1 K.",
+          "The difference in free energy between an effective quasiharmonic and an Einstein reference is only 0.7 meV/atom.",
+          "The RMSE of the high-quality MTP (level 24) for GGA-PBE liquid calculations is 2.6 meV/atom.",
+          "Computational effort is reduced by a magnitude of 10⁴ in CPU core hours compared to hybrid TOR-TILD.",
+          "The variance of the energy difference between MTP and DFT is very small, allowing the free energy to converge quickly.",
+          "Training and validation errors for the low-rank interatomic potentials (LRP) are below 1 meV/atom.",
+          "Energy variation among configurations in training set test calculations is below 0.2 meV/atom."
+        ],
+        "mechanism": "The method accelerates calculations by using a fast EAM potential to locate the melting point and volumes, then performing thermodynamic integration to transfer free energy to a machine learning potential (MTP). The MTP, trained on high-converged DFT data, replaces the slow ab initio MD in the thermodynamic integration steps. Finally, free energy perturbation theory is applied to correct the MTP free energy to DFT accuracy using a small set of uncorrelated snapshots, leveraging the small variance in energy differences between the two potentials.",
+        "limitations": "The text notes that applying MTP is much slower than using EAM, necessitating a smaller supercell size (12×12×12) compared to EAM simulations (16×16×16). Additionally, the EAM potential was fitted only to solid DFT energies, though the authors argue accurate EAM melting point prediction is not required due to subsequent corrections.",
+        "future_work": "Not stated",
+        "quotes": [
+          "The computational effort is tremendously reduced by a magnitude of 10 4 in CPU core hours compared to the hybrid TOR-TILD",
+          "Importantly, the variance of the difference in these energies is very small, and the free energy in Eq. ( 6 ) converges quickly.",
+          "The RMSE of the highMTP for the GGA-PBE liquid calculations is 2.6 meV/atom"
+        ],
+        "part": "2/2"
+      },
+      "text": "Paper card. Question: How can ab initio melting property calculations for high entropy alloys be accelerated by integrating machine learning potentials (MTP) into the TOR-TILD workflow to reduce computational cost while maintaining DFT accuracy?. System: TaVCrW (Tantalum-Vanadium-Chromium-Tungsten) high entropy alloy. Processing: Five-step workflow: (1) Interface method with EAM potential on 16×16×32 supercell (16,384 atoms) for 50 ps (1 fs timestep) to find T_EAM^m; (2) Thermodynamic integration from EAM to MTP liquid free energy; (3) Unfolding MTP liquid free energy surface via pressure integration over volume and internal energy integration over temperature using 12×12×12 supercell (3,456 atoms); (4) MTP MD simulations on 4×4×4 supercell (128 atoms) to generate trajectories; (5) Free energy perturbation from MTP to DFT using 128-atom snapshots with high-converged DFT (450 eV cutoff, 4×4×4 k-mesh).. Test conditions: Temperatures ranging from 2200 K to 2800 K; Pressures at 0 GPa; Electronic smearing of 0.195 eV; Langevin thermostat with friction parameter 0.01 fs⁻¹; MD timestep of 5 fs for MTP; Monte Carlo simulations for short-range order in 2000–2400 K range.. Findings: The standard error of the EAM melting point prediction is well below 1 K.; The difference in free energy between an effective quasiharmonic and an Einstein reference is only 0.7 meV/atom.; The RMSE of the high-quality MTP (level 24) for GGA-PBE liquid calculations is 2.6 meV/atom.; Computational effort is reduced by a magnitude of 10⁴ in CPU core hours compared to hybrid TOR-TILD.; The variance of the energy difference between MTP and DFT is very small, allowing the free energy to converge quickly.; Training and validation errors for the low-rank interatomic potentials (LRP) are below 1 meV/atom.; Energy variation among configurations in training set test calculations is below 0.2 meV/atom.. Mechanism: The method accelerates calculations by using a fast EAM potential to locate the melting point and volumes, then performing thermodynamic integration to transfer free energy to a machine learning potential (MTP). The MTP, trained on high-converged DFT data, replaces the slow ab initio MD in the thermodynamic integration steps. Finally, free energy perturbation theory is applied to correct the MTP free energy to DFT accuracy using a small set of uncorrelated snapshots, leveraging the small variance in energy differences between the two potentials.. Limitations: The text notes that applying MTP is much slower than using EAM, necessitating a smaller supercell size (12×12×12) compared to EAM simulations (16×16×16). Additionally, the EAM potential was fitted only to solid DFT energies, though the authors argue accurate EAM melting point prediction is not required due to subsequent corrections.. Quote: \"The computational effort is tremendously reduced by a magnitude of 10 4 in CPU core hours compared to the hybrid TOR-TILD\""
+    }
+  ]
+}

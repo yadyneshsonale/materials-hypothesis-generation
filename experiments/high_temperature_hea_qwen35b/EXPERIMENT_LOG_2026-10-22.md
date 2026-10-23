@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 13)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 14)
 
 This document is the full record of every experiment on the 50-paper high-temperature HEA corpus: date,
 configuration, results, integrity and status. Experiments 0 to 7 are described in detail in the committed
@@ -30,6 +30,7 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 11 | 2026-10-22 | Critique-augmented hypothesis revision (3 critics + reviser, self-revise control, fresh baseline) | 12 cases, 36 units per arm | Qwen (baseline), Llama 3.3 70B (reviser) | TRAPI GPT-5.6 | Complete, verified | [eval_critique/](./eval_critique/) |
 | 12 | 2026-10-22 | Failure analysis across all 8 methods (error coding, evidence ceiling, confound checks) | 288 units, 1,087 fatal errors | none | GPT-5.6 (coder) | Complete (analysis only) | [failure_analysis/](./failure_analysis/) |
 | 13 | 2026-10-22 | Intermediate-stage metrics for all 8 methods (replay, grounding audit, inferability, critique review, judge retest, cross-family judge) | 288 units; 1,256 LLM calls; 108 replays | none | GPT-5.6 (×3), DeepSeek-V4-Pro | Complete (analysis only) | [stage_metrics/](./stage_metrics/) |
+| 14 | 2026-10-22 to 2026-10-23 | Extraction rubrics (card, effects, mechanisms, gaps, mixed) vs raw text, v2 units and closed-book, equal evidence budget, 2 samples | 50 papers × 4 rubrics extracted; 576 runs | Qwen | GPT-5.6, DeepSeek-V4-Pro | Complete; 2 runs (1 closed-book unit) failed after retry | [rubric_eval/](./rubric_eval/) |
 
 ## Correction to section 8 (MatKG)
 
@@ -475,7 +476,63 @@ labelled.
 
 Full details: [stage_metrics/README.md](./stage_metrics/README.md).
 
-## Comparability and limits, experiments 8 to 13
+## Experiment 14: extraction rubrics
+
+**Question.** Which extraction rubric, meaning what to pull out of each earlier paper, gives the agent the best
+evidence for hypothesis generation?
+
+**Method.**
+
+- Four rubrics extracted by the local generator (Qwen) from all 50 papers, with references stripped and long papers
+  windowed: card (one digest per paper), effects (intervention → effect records), mechanisms (mechanism with scope)
+  and gaps (limitations, open problems and levers). Every item needs at least one verbatim quote verified against
+  the paper.
+- Eight arms: closed_book, text_chunks, v2_units, card, effects, mechanisms, gaps, and mixed (effects + mechanisms +
+  gaps in one pool).
+- Every evidence arm gets the same 16,000-character budget (record cap 1,600 characters; 3,200 for cards), and each
+  unit gets two samples.
+- Judged by GPT-5.6 and DeepSeek-V4-Pro, plus a target-free grounding audit and a per-representation evidence
+  ceiling.
+
+**Extraction.** 1,513 quote-verified records (55 cards, 609 effects, 423 mechanisms, 426 gaps). 97–100% of items
+kept, and 90–95% of quotes verified.
+
+**Results** (reconstruction 0–4, mean of 2 samples per unit):
+
+| Arm | GPT-5.6 | DeepSeek-V4-Pro |
+|---|---:|---:|
+| closed_book | 1.65 | 2.20 |
+| text_chunks | 1.56 | 2.00 |
+| card | 1.52 | 1.98 |
+| v2_units | 1.52 | 1.96 |
+| effects | 1.51 | 1.95 |
+| gaps | 1.48 | 1.89 |
+| mechanisms | 1.46 | 1.90 |
+| mixed | 1.39 | 1.86 |
+
+- The two judges rank the arms almost identically (τ = 0.93).
+- No rubric beats raw text. Card and effects tie with it.
+- Mixed is lowest (−0.17 vs text under GPT-5.6, CI −0.25 to −0.09; −0.14 under DeepSeek, CI −0.27 to −0.01),
+  but does not survive the Holm correction.
+- Closed-book is highest, but only on 2024 targets (1.68 vs 1.49 for text). On the four 2025–26 targets, text (1.69)
+  beats it (1.59), which fits memorisation of older papers.
+
+**Why.** The distilled rubrics keep the target-anticipating information (mixed has the most strongly supportive
+records). But serving mechanisms and effects detached from their study pushes the generator to borrow mechanisms from
+other alloys:
+
+- Within level, hypotheses with a borrowed mechanism score 1.10 vs 1.80 (problem_constrained) and 2.22 vs 2.73
+  (expert_context) on mechanism agreement, compared with those whose mechanism came from the model's own reasoning.
+- Mixed borrows without justification in up to 88% of runs, and cards in the fewest (42–54%).
+- Retrieval from the large mixed pool also puts the fewest supportive records in context.
+
+**Integrity.** 574 of 576 runs ok, each judged twice and audited. Zero temporal, family or held-out-paper leaks,
+zero invalid citations. The two failed runs are both samples of the closed-book `PMC11375712` broad unit (the same
+unit failed in v3), and each was retried once.
+
+Full details: [rubric_eval/README.md](./rubric_eval/README.md).
+
+## Comparability and limits, experiments 8 to 14
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
