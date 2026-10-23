@@ -1,0 +1,170 @@
+{
+  "run_id": "PMC11606917__problem_constrained__card_systemmatch__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "problem_constrained",
+  "arm": "card_systemmatch",
+  "sample": 1,
+  "query": "We are analyzing a refractory BCC high-entropy alloy (Ta-based) where standard experimental measurements of melting properties are infeasible. Current ab initio free energy methods are prohibitively expensive due to the need for thermodynamic integration over the full phase space. Furthermore, existing empirical potentials (like EAM) often fail to capture the complex liquid structure in multi-component systems, while machine learning potentials are computationally demanding. I need a hypothesis for an intervention that replaces the expensive thermodynamic integration step with a more efficient perturbation scheme using a specific class of machine learning potentials. The solution must address the trade-off between computational cost (currently limiting throughput) and the accuracy required to resolve subtle free energy differences. What are the known failure modes of existing TOR-TILD or similar approaches in multi-component spaces, and what falsification experiment could distinguish a true efficiency gain from an artifact of the potential's training set?",
+  "publication_date": "2024-11-29",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "target_system": "Ta-based refractory BCC high-entropy alloy (RHEA), specifically a multi-component equiatomic or near-equiatomic system (e.g., TaMoNbW or TaNbHfZr variants) in a liquid or near-melting state, where the goal is to calculate free energy differences for phase stability or melting point prediction.",
+    "evidence_appraisal": [
+      {
+        "record_id": "PMC6197204::rubric_card::000::faac17e0f4",
+        "record_system": "AlCoFeNi-based HEAs (FCC/B2/BCC mix)",
+        "difference_from_target": "Target is Ta-based BCC RHEA; this record is Al-based with complex magnetic interactions (Co/Cr) and FCC/B2 ordering. The thermodynamic drivers (magnetic entropy, specific enthalpies of mixing) differ significantly from refractory BCC systems.",
+        "transfer": "does_not_transfer",
+        "reason": "Different alloy class (Al-based vs. Refractory Ta-based), different dominant crystal structures (FCC/B2 vs. BCC), and different thermodynamic drivers (magnetic vs. vibrational/chemical). The specific failure modes of TOR-TILD in multi-component spaces are not addressed here."
+      },
+      {
+        "record_id": "PMC8357793::rubric_card::000::f1033e6496",
+        "record_system": "MoNbTaW refractory high-entropy alloy (BCC)",
+        "difference_from_target": "Target is liquid/free energy calculation; this record focuses on solid-state dislocation mobility and Short-Range Order (SRO) effects at 300-2000 K. However, it uses Machine Learning Potentials (MTP) for a Ta-based system.",
+        "transfer": "partially",
+        "reason": "The system (MoNbTaW) is a direct match for the target alloy family (Ta-based RHEA). The methodology (Machine Learning Potential) is relevant. However, the property studied (dislocation mobility) is solid-state, not liquid free energy. The mechanism of SRO affecting energy barriers is transferable as a concept for how potentials capture local order, but the specific application to liquid thermodynamics requires extrapolation."
+      },
+      {
+        "record_id": "PMC11375216::rubric_card::001::2376e969d1",
+        "record_system": "HfNbTaTiZr refractory high-entropy alloy (BCC)",
+        "difference_from_target": "Target is liquid free energy; this record studies lattice thermal conductivity and SRO evolution in the solid state. It uses MD/MC with potentials.",
+        "transfer": "partially",
+        "reason": "System is a refractory BCC HEA, matching the target family. The use of MD/MC to evolve SRO is relevant to the challenge of capturing complex liquid/solid structures. However, it does not address free energy integration or melting properties directly. The finding that SRO reduces atomic displacement is relevant to potential accuracy."
+      },
+      {
+        "record_id": "PMC7512559::rubric_card::000::77895ab356",
+        "record_system": "CoCrFeNiMn FCC HEA",
+        "difference_from_target": "Target is Ta-based BCC; this is Co-based FCC. Focus is on creep, not free energy or liquid structure.",
+        "transfer": "does_not_transfer",
+        "reason": "Different crystal structure (FCC vs BCC), different alloy system, and different property focus (creep vs. thermodynamics)."
+      },
+      {
+        "record_id": "PMC9229239::rubric_card::000::d51a656491",
+        "record_system": "WTaMoNbV refractory high-entropy alloy (BCC)",
+        "difference_from_target": "Target is computational free energy; this is an experimental study of LPBF processing and microstructure. It notes elemental segregation due to melting point differences.",
+        "transfer": "does_not_transfer",
+        "reason": "Experimental processing route (LPBF) vs. computational simulation. While it confirms segregation in Ta-based alloys, it does not provide a mechanism for free energy calculation or potential failure modes in thermodynamic integration."
+      },
+      {
+        "record_id": "PMC11206460::rubric_card::001::a1d10fc1a4",
+        "record_system": "NbTaTiV refractory high-entropy alloy (BCC)",
+        "difference_from_target": "Target is liquid free energy; this is an experimental elastic constant measurement via RUS.",
+        "transfer": "does_not_transfer",
+        "reason": "Experimental measurement of elastic constants, not a computational method for free energy or liquid structure analysis."
+      }
+    ],
+    "hypothesis": "Replace the standard thermodynamic integration (TI) with a perturbation scheme using a Machine Learning Potential (MLP) trained on high-temperature liquid configurations of the Ta-based RHEA, specifically utilizing a 'liquid-state active learning' loop to correct for the failure of standard EAM potentials in capturing multi-component liquid structure. The intervention involves generating a training set that includes liquid snapshots at temperatures near the expected melting point (Tm) and applying a 'thermodynamic perturbation' where the MLP is used to calculate the free energy difference between the liquid and a reference solid state via a thermodynamic cycle (e.g., Frenkel-Ladd or thermodynamic integration along a coupling parameter) but with the MLP providing the potential energy surface at a fraction of the cost of ab initio. The specific failure mode of TOR-TILD (or similar TI approaches) in multi-component spaces is the 'sampling bottleneck' where the potential fails to capture the correct local coordination in the liquid due to insufficient training data on high-entropy disorder, leading to artificial ordering or incorrect entropy estimates. The proposed solution uses the MLP's ability to interpolate complex chemical environments (as seen in MoNbTaW SRO studies) to resolve these subtle free energy differences.",
+    "material_initial_state": "Ta-based refractory BCC high-entropy alloy (e.g., TaMoNbW) in a disordered liquid state at temperatures near the melting point (Tm), with no pre-existing long-range order.",
+    "intervention": "Implement a Machine Learning Potential (MLP) trained on a dataset of liquid configurations generated via high-temperature ab initio molecular dynamics (AIMD) or high-fidelity DFT, followed by a 'perturbation-based free energy calculation' (e.g., using the thermodynamic integration of a coupling parameter λ from a reference harmonic solid to the liquid, or a thermodynamic cycle involving a 'liquid-to-liquid' perturbation). The MLP will be used to evaluate the potential energy surface for the liquid phase, replacing the expensive ab initio step in the integration.",
+    "conditions": "Temperature range: 0.9 Tm to 1.1 Tm (where Tm is the estimated melting point of the Ta-based RHEA). Pressure: 1 atm. Simulation time: Sufficient to sample the liquid structure (e.g., >100 ps per λ window).",
+    "structural_mediator": "Chemical Short-Range Order (SRO) and local coordination environments in the liquid phase, which are critical for accurate free energy estimation in multi-component systems. The MLP must capture the 'diffuse antiphase boundary' like energy costs associated with local chemical fluctuations in the liquid.",
+    "mechanism": "Derived from materials science principles and the partial transfer from PMC8357793 and PMC11375216. In multi-component liquids, standard potentials (EAM) fail because they cannot capture the complex, non-linear dependence of energy on local chemical composition (the 'chemical landscape'). The MLP, trained on high-temperature liquid data, learns the energy landscape of these complex local environments. The perturbation scheme works by calculating the free energy difference (ΔF) between the liquid and a reference state. The 'failure mode' of standard TI is that if the potential is inaccurate in the liquid (due to poor training on disordered states), the integration path yields an incorrect ΔF. The MLP corrects this by providing a more accurate energy surface for the liquid, allowing the perturbation to converge. The mechanism relies on the MLP's ability to interpolate the energy of local chemical clusters (similar to SRO in solids) which dominate the entropy and enthalpy of the liquid.",
+    "predicted_outcome": "The MLP-based perturbation scheme will reduce the computational cost of free energy calculation by a factor of 10-100 compared to full ab initio TI, while maintaining an accuracy within 5% of the true melting point (or free energy difference). The method will successfully resolve the subtle free energy differences between competing liquid structures (e.g., random vs. SRO-liquid) that standard potentials miss. The predicted melting point will be within 50 K of the experimental value (if available) or consistent with high-fidelity DFT benchmarks.",
+    "baseline": "Standard thermodynamic integration using EAM or classical potentials, which typically fails to capture the correct liquid structure and entropy in multi-component systems, leading to large errors in predicted melting points (often >100 K error) or incorrect phase stability predictions.",
+    "boundary": "The method is valid for Ta-based RHEAs with BCC solid phases and liquid structures dominated by chemical disorder. It may fail if the liquid exhibits strong pre-melting ordering or if the MLP training set does not cover the specific high-temperature chemical configurations of the target alloy.",
+    "uncertainty": "High uncertainty regarding the exact training set size required to capture the full complexity of the liquid state in a 5-component system. The accuracy of the MLP depends heavily on the diversity of the training data; if the liquid structure is highly dynamic, the potential may not generalize well to all configurations encountered during the integration. The 'perturbation' itself may introduce artifacts if the reference state is too far from the liquid state.",
+    "supporting_evidence_ids": [
+      "PMC8357793::rubric_card::000::f1033e6496",
+      "PMC11375216::rubric_card::001::2376e969d1"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Perform a 'blind test' where the MLP is trained on a subset of the Ta-based RHEA liquid configurations (e.g., 50% of the data) and then used to predict the free energy of a held-out set of liquid configurations. Compare the predicted free energy against a small set of high-fidelity ab initio calculations (e.g., 10-20 snapshots) that were not used in training. Additionally, run the perturbation scheme on a known binary system (e.g., Ta-W) where the melting point is well-established to verify the method's baseline accuracy before applying it to the multi-component system.",
+      "measurements": [
+        "Free energy difference (ΔF) between liquid and solid states",
+        "Melting point (Tm) derived from ΔF",
+        "Radial distribution function (RDF) of the liquid phase",
+        "Local coordination numbers"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the MLP-based perturbation scheme predicts a melting point or free energy difference that deviates by more than 10% from the high-fidelity ab initio benchmark (or experimental value if available) for the binary or multi-component system. Additionally, if the RDF or coordination numbers of the liquid predicted by the MLP show significant deviations (e.g., >5% in peak positions or heights) from the ab initio reference, the potential is deemed insufficient for the task."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "packed_ids": [
+    "PMC6197204::rubric_card::000::faac17e0f4",
+    "PMC8357793::rubric_card::000::f1033e6496",
+    "PMC11375216::rubric_card::001::2376e969d1",
+    "PMC7512559::rubric_card::000::77895ab356",
+    "PMC9229239::rubric_card::000::d51a656491",
+    "PMC11206460::rubric_card::001::a1d10fc1a4"
+  ],
+  "packed_chars": 15658,
+  "packed_papers": 6,
+  "cited_ids": [
+    "PMC11375216::rubric_card::001::2376e969d1",
+    "PMC8357793::rubric_card::000::f1033e6496"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "PMC11375216::rubric_card::001::2376e969d1",
+      "paper_id": "PMC11375216",
+      "publication_date": "2024-09-04",
+      "kind": "rubric:card",
+      "text": "Paper card. Question: How does the evolution of chemical short-range order (SRO) and the formation of ordered clusters affect the lattice thermal conductivity of a refractory high-entropy alloy?. System: Equiatomic bcc HfNbTaTiZr (HEA). Processing: Molecular Dynamics (MD) simulations combined with Monte Carlo (MC) Kawasaki exchange process; samples evolved from random to SRO over up to 4.7 million MC steps at 300 K.. Test conditions: Temperature of 300 K for primary analysis; additional calculations at 1000 K and 1300 K; simulation time scale near 1 ns.. Findings: Thermal conductivity increases by 12% for the case of maximum SRO (after 4.7 million MC steps) compared to the random alloy.; The random alloy has a thermal conductivity of 0.765 W/(Km), while the SRO alloy reaches 0.86 W/(Km).; The increase in heat conductivity is small when only small ordered clusters are present (≤ 10^4 MC steps) but increases more strongly when large or percolating clusters form (≥ 10^5 MC steps).; SRO leads to a 12.5% reduction of atomic displacements due to the formation of ordered phases.; The cluster size distribution follows a power law with a Fisher exponent τ = 2.19.; The fractal dimension of t"
+    },
+    {
+      "record_id": "PMC8357793::rubric_card::000::f1033e6496",
+      "paper_id": "PMC8357793",
+      "publication_date": "2021-08-11",
+      "kind": "rubric:card",
+      "text": "Paper card. Question: How does chemical short-range order (SRO) affect the mobility mechanisms of screw and edge dislocations in the MoNbTaW refractory high-entropy alloy over a wide temperature range?. System: MoNbTaW refractory high-entropy alloy (RHEA), specifically comparing a random solid solution (RSS) and an equilibrium state with SRO at 800 K. Processing: Molecular dynamics (MD) simulations using a machine-learning moment tensor potential (MTP); SRO states were equilibrated using a hybrid MD/Monte Carlo (MD/MC) approach at 800 K; dislocation lines created with a periodic length of ~15 nm. Test conditions: Shear stresses ranging from 0 to 3.0 GPa applied at temperatures from 300 K to 2000 K. Findings: At 300 K, the presence of SRO provides an extra strengthening of approximately 180 MPa for screw dislocations.; The strengthening effect of SRO on screw dislocations attenuates with increasing temperature, becoming negligible at 2000 K where mobility curves for RSS and SRO samples overlap.; A cross-slip locking mechanism is observed for screw dislocations, where jogs form on different slip planes, causing the dislocation to become immobile or requiring extra stress to unlock.; "
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "invalid_citations": 0
+  },
+  "elapsed_seconds": 128.01,
+  "target_system": "Ta-based refractory BCC high-entropy alloy (RHEA), specifically a multi-component equiatomic or near-equiatomic system (e.g., TaMoNbW or TaNbHfZr variants) in a liquid or near-melting state, where the goal is to calculate free energy differences for phase stability or melting point prediction.",
+  "evidence_appraisal": [
+    {
+      "record_id": "PMC6197204::rubric_card::000::faac17e0f4",
+      "record_system": "AlCoFeNi-based HEAs (FCC/B2/BCC mix)",
+      "difference_from_target": "Target is Ta-based BCC RHEA; this record is Al-based with complex magnetic interactions (Co/Cr) and FCC/B2 ordering. The thermodynamic drivers (magnetic entropy, specific enthalpies of mixing) differ significantly from refractory BCC systems.",
+      "transfer": "does_not_transfer",
+      "reason": "Different alloy class (Al-based vs. Refractory Ta-based), different dominant crystal structures (FCC/B2 vs. BCC), and different thermodynamic drivers (magnetic vs. vibrational/chemical). The specific failure modes of TOR-TILD in multi-component spaces are not addressed here."
+    },
+    {
+      "record_id": "PMC8357793::rubric_card::000::f1033e6496",
+      "record_system": "MoNbTaW refractory high-entropy alloy (BCC)",
+      "difference_from_target": "Target is liquid/free energy calculation; this record focuses on solid-state dislocation mobility and Short-Range Order (SRO) effects at 300-2000 K. However, it uses Machine Learning Potentials (MTP) for a Ta-based system.",
+      "transfer": "partially",
+      "reason": "The system (MoNbTaW) is a direct match for the target alloy family (Ta-based RHEA). The methodology (Machine Learning Potential) is relevant. However, the property studied (dislocation mobility) is solid-state, not liquid free energy. The mechanism of SRO affecting energy barriers is transferable as a concept for how potentials capture local order, but the specific application to liquid thermodynamics requires extrapolation."
+    },
+    {
+      "record_id": "PMC11375216::rubric_card::001::2376e969d1",
+      "record_system": "HfNbTaTiZr refractory high-entropy alloy (BCC)",
+      "difference_from_target": "Target is liquid free energy; this record studies lattice thermal conductivity and SRO evolution in the solid state. It uses MD/MC with potentials.",
+      "transfer": "partially",
+      "reason": "System is a refractory BCC HEA, matching the target family. The use of MD/MC to evolve SRO is relevant to the challenge of capturing complex liquid/solid structures. However, it does not address free energy integration or melting properties directly. The finding that SRO reduces atomic displacement is relevant to potential accuracy."
+    },
+    {
+      "record_id": "PMC7512559::rubric_card::000::77895ab356",
+      "record_system": "CoCrFeNiMn FCC HEA",
+      "difference_from_target": "Target is Ta-based BCC; this is Co-based FCC. Focus is on creep, not free energy or liquid structure.",
+      "transfer": "does_not_transfer",
+      "reason": "Different crystal structure (FCC vs BCC), different alloy system, and different property focus (creep vs. thermodynamics)."
+    },
+    {
+      "record_id": "PMC9229239::rubric_card::000::d51a656491",
+      "record_system": "WTaMoNbV refractory high-entropy alloy (BCC)",
+      "difference_from_target": "Target is computational free energy; this is an experimental study of LPBF processing and microstructure. It notes elemental segregation due to melting point differences.",
+      "transfer": "does_not_transfer",
+      "reason": "Experimental processing route (LPBF) vs. computational simulation. While it confirms segregation in Ta-based alloys, it does not provide a mechanism for free energy calculation or potential failure modes in thermodynamic integration."
+    },
+    {
+      "record_id": "PMC11206460::rubric_card::001::a1d10fc1a4",
+      "record_system": "NbTaTiV refractory high-entropy alloy (BCC)",
+      "difference_from_target": "Target is liquid free energy; this is an experimental elastic constant measurement via RUS.",
+      "transfer": "does_not_transfer",
+      "reason": "Experimental measurement of elastic constants, not a computational method for free energy or liquid structure analysis."
+    }
+  ]
+}

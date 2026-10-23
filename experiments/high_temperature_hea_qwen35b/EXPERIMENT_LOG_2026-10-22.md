@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 15)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 16)
 
 This document is the full record of every experiment on the 50-paper high-temperature HEA corpus: date,
 configuration, results, integrity and status. Experiments 0 to 7 are described in detail in the committed
@@ -32,6 +32,7 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 13 | 2026-10-22 | Intermediate-stage metrics for all 8 methods (replay, grounding audit, inferability, critique review, judge retest, cross-family judge) | 288 units; 1,256 LLM calls; 108 replays | none | GPT-5.6 (×3), DeepSeek-V4-Pro | Complete (analysis only) | [stage_metrics/](./stage_metrics/) |
 | 14 | 2026-10-22 to 2026-10-23 | Extraction rubrics (card, effects, mechanisms, gaps, mixed) vs raw text, v2 units and closed-book, equal evidence budget, 2 samples | 50 papers × 4 rubrics extracted; 576 runs | Qwen | GPT-5.6, DeepSeek-V4-Pro | Complete; 2 runs (1 closed-book unit) failed after retry | [rubric_eval/](./rubric_eval/) |
 | 15 | 2026-10-23 | Failure analysis of experiment 14 (extraction fidelity, retrieval, evidence use, error coding, reproduced generation failure) | 574 runs, 2,282 fatal errors, 160 records checked | none | GPT-5.6 (coder) | Complete (analysis only) | [rubric_eval/failure/](./rubric_eval/failure/) |
+| 16 | 2026-10-23 | Targeted improvements (fixed closed-book prompt, system-match appraisal on text and cards, knowledge-first refinement, ensemble selection) vs experiment-14 baselines | 288 new runs + 72 selections | Qwen | GPT-5.6, DeepSeek-V4-Pro | Complete, verified | [improvements/](./improvements/) |
 
 ## Correction to section 8 (MatKG)
 
@@ -680,7 +681,82 @@ cover 7–11 units per level and are associations, not controlled tests.
 
 Full details: [rubric_eval/failure/README.md](./rubric_eval/failure/README.md).
 
-## Comparability and limits, experiments 8 to 15
+## Experiment 16: targeted improvements vs baselines
+
+**Question.** Do fixes aimed at the experiment-15 failures beat the baselines?
+
+**Arms.** Each uses the same generator, evidence budget, two samples per unit and two judges as experiment 14; only
+the prompt changes, or for knowledge_first an extra step.
+
+| Arm | Change | Targets |
+|---|---|---|
+| closed_book_fixed | Own prompt allowing the model's own pre-cutoff knowledge | Closed-book prompt conflict |
+| text_systemmatch / card_systemmatch | Appraise each record (system, conditions, difference from target, transfer verdict) before writing; use only transferable mechanisms | Cross-system mechanism transfer |
+| knowledge_first | Own-knowledge draft (closed_book_fixed), then revise with raw text used only to correct and test it | Own-reasoning mechanisms fail least |
+| ensemble_select | Local model picks one of six blinded candidates, without the target | No arm dominates |
+
+**Configuration.**
+
+- Baselines are the experiment-14 runs: closed_book, text_chunks, card, v2_units.
+- Output cap 7,000 tokens for the new arms (appraisal JSON); 5,000 for the baselines.
+- Primary comparison: each new arm against text_chunks, with Holm correction over 5. Units are the mean of 2
+  samples, with a paper-clustered bootstrap and sign test.
+
+**Results** (reconstruction 0–4):
+
+| Arm | GPT-5.6 | DeepSeek-V4-Pro | Non-broad (GPT-5.6) |
+|---|---:|---:|---:|
+| closed_book (baseline) | **1.65** | **2.20** | **2.06** |
+| card_systemmatch | 1.62 | 2.02 | 2.02 |
+| ensemble_select | 1.59 | 2.12 | 2.00 |
+| text_systemmatch | 1.57 | 2.13 | 1.96 |
+| text_chunks (baseline) | 1.56 | 2.00 | 2.00 |
+| card (baseline) | 1.52 | 1.98 | 1.92 |
+| v2_units (baseline) | 1.52 | 1.96 | 1.99 |
+| closed_book_fixed | 1.49 | 1.97 | 1.84 |
+| knowledge_first | 1.42 | 1.99 | 1.77 |
+
+**Main comparisons.**
+
+- text_systemmatch − text: +0.01 (GPT-5.6) and +0.14 (DeepSeek, CI +0.02 to +0.25).
+- card_systemmatch − card: +0.09 and +0.04.
+- closed_book_fixed − closed_book: −0.13 and −0.18 (both CIs exclude zero).
+- knowledge_first − text: −0.14 (GPT-5.6, CI −0.26 to 0.00).
+- No primary comparison survives Holm (smallest p = 0.11).
+
+**Why.**
+
+- *System-match* raises mechanism agreement (1.53 → 1.62 on text, 1.50 → 1.64 on cards), evidence validity
+  (1.10 → 1.39; 0.86 → 1.25), specificity (0.60 → 0.76) and justified transfers (10% → 25% on text). It does not
+  reduce unjustified transfer on cards, and it doubles hypothesis length.
+- The appraisals show the corpus mismatch: 53% of appraised records were judged non-transferable and only 5–8%
+  fully transferable.
+- *Fixing the closed-book prompt hurt.* Free of the evidence-only rule, the model proposes bolder, more novel
+  interventions (novelty 1.90 → 2.31) that match the target less (intervention 1.83 → 1.51). The benchmark rewards
+  conservative, query-adjacent hypotheses.
+- *Knowledge-first* kept 94–97% of the draft's wording, improved 12 of 72 samples and hurt 28.
+- *The selector has a position bias:* it picks the first candidate 72% of the time. Its picks score 1.59, against
+  1.53 for a random pick and 1.93 for an oracle that picks the judge's best.
+
+**Integrity.**
+
+- 288 of 288 new runs succeeded, each judged twice and audited; 72 selections, no fallbacks.
+- Zero leakage, zero invalid citations.
+- Two runs failed on the first pass, were retried once and succeeded; their selections were redone.
+- A selector leak-check false positive ("card" inside "discarded") was fixed and tested.
+
+**Recommendation.**
+
+- Adopt system-match appraisal with cards as the evidence path, plus a no-hedging rule.
+- Keep the cautious closed-book prompt as the baseline.
+- Drop knowledge-first in this form.
+- Fix the selector (pairwise judging in both orders, or a stronger target-free selector) before relying on
+  ensembles; the oracle gap is the largest headroom.
+- Repair the broad level.
+
+Full details: [improvements/README.md](./improvements/README.md).
+
+## Comparability and limits, experiments 8 to 16
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.

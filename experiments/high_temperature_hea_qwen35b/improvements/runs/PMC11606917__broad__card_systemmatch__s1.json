@@ -1,0 +1,170 @@
+{
+  "run_id": "PMC11606917__broad__card_systemmatch__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "broad",
+  "arm": "card_systemmatch",
+  "sample": 1,
+  "query": "I am interested in high-entropy alloys for extreme temperature applications. How can we predict melting properties such as the melting temperature, entropy of fusion, and heat capacity for multi-component systems where experimental data is sparse or unreliable due to high melting points? I am looking for a hypothesis on a computational methodology that balances accuracy with the need to screen vast compositional spaces, along with prior evidence on why standard approaches struggle in this regime and what a valid boundary condition for such a method would be.",
+  "publication_date": "2024-11-29",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "target_system": "Multi-component high-entropy alloys (HEAs) for extreme temperature applications, specifically focusing on predicting melting temperature (Tm), entropy of fusion (ΔSf), and heat capacity (Cp) in the absence of experimental data.",
+    "evidence_appraisal": [
+      {
+        "record_id": "PMC11206460::rubric_card::000::bd033a5c9c",
+        "record_system": "NbTaTiV refractory HEA (BCC)",
+        "difference_from_target": "Focuses on elastic/plastic deformation, dislocation mobility, and elastic constants at RT to 900°C. Does not measure or predict melting properties (Tm, ΔSf, Cp).",
+        "transfer": "does_not_transfer",
+        "reason": "The study addresses mechanical properties and elastic moduli, not thermodynamic phase transition properties like melting. The mechanisms described (lattice distortion affecting dislocation cores) are distinct from those governing solid-liquid phase transitions."
+      },
+      {
+        "record_id": "PMC6397024::rubric_card::000::dc8ce9971b",
+        "record_system": "W-Ta-V-Cr refractory HEA (BCC)",
+        "difference_from_target": "Focuses on radiation resistance, defect recombination, and precipitation under irradiation. No data on melting thermodynamics.",
+        "transfer": "does_not_transfer",
+        "reason": "The study investigates defect kinetics under irradiation, not equilibrium thermodynamic properties like melting point or entropy of fusion. The mechanisms (rough energy landscape for defect recombination) do not directly translate to predicting Tm."
+      },
+      {
+        "record_id": "PMC10384371::rubric_card::000::8d6800c362",
+        "record_system": "CrMnFeCoNi equiatomic HEA (FCC)",
+        "difference_from_target": "Focuses on oxidation kinetics and phase transformations in vacuum/air up to 1100°C. Mentions ThermoCalc predictions but highlights discrepancies due to kinetics.",
+        "transfer": "partially",
+        "reason": "While it uses ThermoCalc (a CALPHAD tool) for phase prediction, it explicitly notes that thermodynamic calculations assume equilibrium and fail to capture kinetic effects (diffusion, nucleation) at high temperatures. It does not provide a validated methodology for predicting Tm or ΔSf, but confirms the utility and limitations of CALPHAD in HEAs."
+      },
+      {
+        "record_id": "PMC4145285::rubric_card::000::ade5504bfd",
+        "record_system": "AlCoCrFeNi 2.1 eutectic HEA (FCC/B2)",
+        "difference_from_target": "Focuses on mechanical strength/ductility and microstructure design via eutectic concept. Mentions CALPHAD as a design tool.",
+        "transfer": "partially",
+        "reason": "The paper explicitly proposes using CALPHAD thermodynamics calculations for designing HEAs. While it doesn't detail melting property prediction, it validates the use of CALPHAD as a foundational tool for HEA design, which is the basis for predicting Tm and ΔSf."
+      },
+      {
+        "record_id": "PMC5627260::rubric_card::000::2fe5dc5f1b",
+        "record_system": "Ni-based High Entropy Superalloy (HESA)",
+        "difference_from_target": "Focuses on creep behavior, precipitate stability, and lattice misfit at high temperatures (up to 982°C).",
+        "transfer": "does_not_transfer",
+        "reason": "The study analyzes creep mechanisms and precipitate evolution, not the fundamental melting thermodynamics. The high-temperature stability is a result of microstructure, not a direct predictor of Tm."
+      },
+      {
+        "record_id": "PMC11206460::rubric_card::001::a1d10fc1a4",
+        "record_system": "NbTaTiV HEA (BCC)",
+        "difference_from_target": "Focuses on determining elastic constants via Resonant Ultrasound Spectroscopy (RUS).",
+        "transfer": "does_not_transfer",
+        "reason": "This is an experimental method for measuring elastic moduli, not a computational methodology for predicting melting properties."
+      }
+    ],
+    "hypothesis": "A hybrid computational methodology combining CALPHAD (CALculation of PHAse Diagrams) with Machine Learning (ML) corrections for configurational entropy and lattice distortion effects is required to predict melting properties in HEAs. Standard CALPHAD approaches, while capable of predicting phase stability (as noted in PMC10384371 and PMC4145285), often struggle with the accuracy of Tm and ΔSf in HEAs due to the assumption of ideal mixing and the neglect of severe lattice distortion and local chemical ordering effects. The proposed method should use CALPHAD to generate a baseline thermodynamic database for the multi-component system, then apply an ML model trained on known HEA melting data to correct the configurational entropy term (ΔS_conf) and the enthalpy of fusion (ΔH_f) based on atomic size mismatch (δ) and valence electron concentration (VEC). This balances the rigorous thermodynamic framework of CALPHAD with the data-driven ability of ML to capture non-ideal interactions in high-entropy regimes.",
+    "material_initial_state": "Multi-component alloy system (5+ elements) in a liquid or solid solution state, with no prior experimental melting data available.",
+    "intervention": "Perform CALPHAD calculations to estimate initial Tm and ΔSf assuming ideal mixing; subsequently apply a Machine Learning correction factor derived from descriptors including atomic radius difference (δ), electronegativity difference (Δχ), and valence electron concentration (VEC) to refine the predictions.",
+    "conditions": "High-temperature regime (T > 1000 K), vacuum or inert atmosphere to prevent oxidation (as per PMC10384371 limitations), and compositional spaces where experimental data is sparse.",
+    "structural_mediator": "Configurational entropy and lattice distortion energy, which deviate from ideal solution behavior in HEAs.",
+    "mechanism": "Derived from materials-science principles: The melting temperature is governed by the balance of enthalpy and entropy of fusion. In HEAs, the high configurational entropy stabilizes the solid phase, while severe lattice distortion (caused by atomic size mismatch) increases the enthalpy of the solid phase, potentially raising Tm. Standard CALPHAD often underestimates these non-ideal effects. The ML component corrects the entropy of fusion (ΔSf) by learning the correlation between atomic descriptors (δ, VEC) and the deviation from ideal mixing, effectively modeling the 'rough energy landscape' mentioned in PMC6397024 as a factor influencing thermodynamic stability. This approach addresses the limitations of pure thermodynamic calculations noted in PMC10384371 where kinetic and non-ideal effects cause discrepancies.",
+    "predicted_outcome": "The hybrid method will predict Tm within ±50 K and ΔSf within ±10% of experimental values for novel HEAs, significantly outperforming standard CALPHAD (which may have errors >100 K for Tm in complex HEAs) and pure ML models trained on ordered compounds (which fail to capture lattice distortion effects).",
+    "baseline": "Standard CALPHAD calculations assuming ideal mixing and no lattice distortion effects, which typically yield inaccurate Tm predictions for high-entropy systems due to the neglect of non-ideal interactions.",
+    "boundary": "The method is valid for single-phase solid solution HEAs (BCC, FCC, or HCP) with moderate to high atomic size mismatch (δ > 3%). It may fail for systems prone to rapid phase separation or amorphization where the liquid structure is highly disordered and the solid-liquid interface is not well-defined by standard thermodynamic models.",
+    "uncertainty": "High uncertainty exists in the ML correction term if the training data does not cover the specific range of atomic size mismatches or valence electron concentrations of the target alloy. The assumption of a single-phase solid solution may be invalid if the alloy is near a eutectic point (as in PMC4145285), leading to multi-phase melting behavior that standard Tm definitions do not capture.",
+    "supporting_evidence_ids": [
+      "PMC10384371::rubric_card::000::8d6800c362",
+      "PMC4145285::rubric_card::000::ade5504bfd"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Synthesize a novel quaternary or quinary HEA with extreme atomic size mismatch (δ > 5%) and known VEC, for which no melting data exists. Measure Tm and ΔSf using Differential Scanning Calorimetry (DSC) and high-temperature X-ray diffraction (HTXRD) in a vacuum. Compare these experimental values against predictions from standard CALPHAD and the proposed hybrid CALPHAD-ML method.",
+      "measurements": [
+        "Melting onset temperature (Tm) via DSC",
+        "Enthalpy of fusion (ΔH_f) via DSC",
+        "Phase evolution during heating via HTXRD",
+        "Atomic size mismatch (δ) and VEC calculation"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the hybrid method's prediction error for Tm exceeds 100 K (the typical error of standard CALPHAD) or if the ML correction term shows no correlation with the experimental deviation from ideal mixing, indicating that lattice distortion effects are not the primary driver of melting property deviations in this regime."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "packed_ids": [
+    "PMC11206460::rubric_card::000::bd033a5c9c",
+    "PMC6397024::rubric_card::000::dc8ce9971b",
+    "PMC10384371::rubric_card::000::8d6800c362",
+    "PMC4145285::rubric_card::000::ade5504bfd",
+    "PMC5627260::rubric_card::000::2fe5dc5f1b",
+    "PMC11206460::rubric_card::001::a1d10fc1a4"
+  ],
+  "packed_chars": 15797,
+  "packed_papers": 5,
+  "cited_ids": [
+    "PMC10384371::rubric_card::000::8d6800c362",
+    "PMC4145285::rubric_card::000::ade5504bfd"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "PMC10384371::rubric_card::000::8d6800c362",
+      "paper_id": "PMC10384371",
+      "publication_date": "2023-07-17",
+      "kind": "rubric:card",
+      "text": "Paper card. Question: What are the time–temperature-dependent oxidation mechanisms and phase transformations of CrMnFeCoNi high-entropy alloy in vacuum and air environments, and how do they compare with thermodynamic predictions?. System: Equiatomic CrMnFeCoNi high-entropy alloy (20 at.% each of Cr, Co, Fe, Mn, Ni). Processing: Arc melting and drop casting of 3 N purity elements in a vacuum of ~7 × 10⁻⁴ Pa followed by argon refilling to ~8.4 × 10⁴ Pa; annealing at 900 °C for 48 h; cold rolling to 1.6 mm thickness; mechanical and mirror polishing with 1 μm diamond suspension for in situ analysis. Test conditions: In situ high-temperature X-ray diffraction (HTXRD) from 25 °C to 1100 °C at 15 °C/min heating rate with 5 min stabilization at 50 °C intervals; two environments: vacuum (~4.2 × 10⁻⁶ atm) and air (1.0 atm); CuKα radiation (λ = 0.154 nm), 40 kV, 40 mA, 2θ range 30–80°. Findings: Mn is the major oxide-forming element in both vacuum and air, leading to non-protective oxides and bulk Mn depletion.; In vacuum, only MnO (halite-type) formed at 700 °C, with no Cr₂O₃, Fe₂O₃, or Fe₃O₄ detected.; In air, Mn₂O₃ formed initially at 550 °C, transforming to Mn₃O₄ at 950 °C, with MnCr₂O₄ a"
+    },
+    {
+      "record_id": "PMC4145285::rubric_card::000::ade5504bfd",
+      "paper_id": "PMC4145285",
+      "publication_date": "2014-08-27",
+      "kind": "rubric:card",
+      "text": "Paper card. Question: How can high-entropy alloys (HEAs) be designed to simultaneously achieve high fracture strength and high ductility while overcoming issues of inferior castability and compositional segregation?. System: AlCoCrFeNi 2.1 (atomic portion) eutectic high-entropy alloy (EHEA). Processing: Vacuum induction melting of commercially pure elements (Al, Co, Ni: 99.9 wt.%; Cr, Fe: 99.5 ~ 99.6 wt.%) in a BN crucible; heating to 600°C for 1 hour; pouring at 1500°C into a MgO crucible (220 mm length, 62 mm upper ID, 50 mm bottom ID) under argon atmosphere (0.06 MPa); subsequent cold rolling with 8% thickness reduction for some specimens.. Test conditions: Room temperature tensile tests at strain rate 1 × 10⁻³ s⁻¹ (Instron 5569); high-temperature tensile tests at 600°C and 700°C at strain rate 1 × 10⁻³ s⁻¹ (Gleeble 3500); cold rolled specimens tested at room temperature at strain rate 2 × 10⁻³ s⁻¹.. Findings: The as-cast alloy exhibited a fine lamellar fcc/B2 microstructure with an inter-lamellar spacing of about 2 μm.; Room temperature tensile test showed a fracture stress of 944 MPa and an elongation of 25.6% (engineering values).; The alloy maintained high strength and ducti"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "invalid_citations": 0
+  },
+  "elapsed_seconds": 104.31,
+  "target_system": "Multi-component high-entropy alloys (HEAs) for extreme temperature applications, specifically focusing on predicting melting temperature (Tm), entropy of fusion (ΔSf), and heat capacity (Cp) in the absence of experimental data.",
+  "evidence_appraisal": [
+    {
+      "record_id": "PMC11206460::rubric_card::000::bd033a5c9c",
+      "record_system": "NbTaTiV refractory HEA (BCC)",
+      "difference_from_target": "Focuses on elastic/plastic deformation, dislocation mobility, and elastic constants at RT to 900°C. Does not measure or predict melting properties (Tm, ΔSf, Cp).",
+      "transfer": "does_not_transfer",
+      "reason": "The study addresses mechanical properties and elastic moduli, not thermodynamic phase transition properties like melting. The mechanisms described (lattice distortion affecting dislocation cores) are distinct from those governing solid-liquid phase transitions."
+    },
+    {
+      "record_id": "PMC6397024::rubric_card::000::dc8ce9971b",
+      "record_system": "W-Ta-V-Cr refractory HEA (BCC)",
+      "difference_from_target": "Focuses on radiation resistance, defect recombination, and precipitation under irradiation. No data on melting thermodynamics.",
+      "transfer": "does_not_transfer",
+      "reason": "The study investigates defect kinetics under irradiation, not equilibrium thermodynamic properties like melting point or entropy of fusion. The mechanisms (rough energy landscape for defect recombination) do not directly translate to predicting Tm."
+    },
+    {
+      "record_id": "PMC10384371::rubric_card::000::8d6800c362",
+      "record_system": "CrMnFeCoNi equiatomic HEA (FCC)",
+      "difference_from_target": "Focuses on oxidation kinetics and phase transformations in vacuum/air up to 1100°C. Mentions ThermoCalc predictions but highlights discrepancies due to kinetics.",
+      "transfer": "partially",
+      "reason": "While it uses ThermoCalc (a CALPHAD tool) for phase prediction, it explicitly notes that thermodynamic calculations assume equilibrium and fail to capture kinetic effects (diffusion, nucleation) at high temperatures. It does not provide a validated methodology for predicting Tm or ΔSf, but confirms the utility and limitations of CALPHAD in HEAs."
+    },
+    {
+      "record_id": "PMC4145285::rubric_card::000::ade5504bfd",
+      "record_system": "AlCoCrFeNi 2.1 eutectic HEA (FCC/B2)",
+      "difference_from_target": "Focuses on mechanical strength/ductility and microstructure design via eutectic concept. Mentions CALPHAD as a design tool.",
+      "transfer": "partially",
+      "reason": "The paper explicitly proposes using CALPHAD thermodynamics calculations for designing HEAs. While it doesn't detail melting property prediction, it validates the use of CALPHAD as a foundational tool for HEA design, which is the basis for predicting Tm and ΔSf."
+    },
+    {
+      "record_id": "PMC5627260::rubric_card::000::2fe5dc5f1b",
+      "record_system": "Ni-based High Entropy Superalloy (HESA)",
+      "difference_from_target": "Focuses on creep behavior, precipitate stability, and lattice misfit at high temperatures (up to 982°C).",
+      "transfer": "does_not_transfer",
+      "reason": "The study analyzes creep mechanisms and precipitate evolution, not the fundamental melting thermodynamics. The high-temperature stability is a result of microstructure, not a direct predictor of Tm."
+    },
+    {
+      "record_id": "PMC11206460::rubric_card::001::a1d10fc1a4",
+      "record_system": "NbTaTiV HEA (BCC)",
+      "difference_from_target": "Focuses on determining elastic constants via Resonant Ultrasound Spectroscopy (RUS).",
+      "transfer": "does_not_transfer",
+      "reason": "This is an experimental method for measuring elastic moduli, not a computational methodology for predicting melting properties."
+    }
+  ]
+}
