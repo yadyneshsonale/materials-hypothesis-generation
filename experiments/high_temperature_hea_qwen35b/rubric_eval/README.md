@@ -209,6 +209,17 @@ papers.
 baseline quality (2.33), and has the lowest novelty (1.90). Evidence arms raise novelty (2.11–2.32) by proposing
 ideas from other systems, which are rated more novel but match the target less.
 
+## Failure analysis
+
+A stage-by-stage failure analysis of this experiment is in [failure/README.md](failure/README.md). In short:
+
+- Broad queries fail 79–96% in every arm.
+- Target-anticipating evidence reaches the context in 83–97% of runs, but citing it doesn't raise scores within
+  a paper, and it hurts on expert queries.
+- Wrong mechanisms appear in 69–87% of failing runs.
+- The scope fields of the mechanisms rubric are the least faithful extractions.
+- The recurring closed-book failure is a prompt conflict ("use only supplied evidence" with none supplied).
+
 ## Recommendations
 
 1. **Keep raw text or cards as the representation.** No distilled rubric beat raw text. Cards tie with it with about

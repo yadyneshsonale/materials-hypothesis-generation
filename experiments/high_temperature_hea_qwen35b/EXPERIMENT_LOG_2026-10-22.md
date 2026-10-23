@@ -569,6 +569,115 @@ Full details: [rubric_eval/README.md](./rubric_eval/README.md).
 re-extract scope fields with per-field quotes and paraphrase checks; prefer cards or raw text with better retrieval;
 select or ensemble across representations.
 
+**Configuration.**
+
+| Item | Value |
+|---|---|
+| Date | 2026-10-23 |
+| Runs analysed | 574 judged runs of experiment 14 (8 arms × 12 papers × 3 levels × 2 samples, minus 2 failed) |
+| Failure definition | Reconstruction (mean of intervention, condition, mechanism, outcome; 0–4) ≤ 1.0 |
+| Error coding | GPT-5.6 (`gpt-5.6-sol_2026-07-09`), 549 calls, 2,282 fatal errors, same 11 categories as experiment 12 |
+| Extraction fidelity | GPT-5.6, 40 random records per rubric (seed 20261023), 1,064 fields checked against the paper window the record came from; target-free |
+| "Supportive" record | Rated 1–2 for intervention or mechanism support among each representation's 20 records most similar to the target (experiment 14 evidence ceiling); "strongly supportive" = rated 2 |
+| Generation reproduction | Local Qwen server, same prompt and settings as experiment 14, raw output saved, 3 attempts |
+| Total new LLM calls | 709 GPT-5.6 + 3 Qwen; 0 errors |
+
+**Failure rate by arm and level.**
+
+| Level | closed_book | text_chunks | v2_units | card | effects | mechanisms | gaps | mixed |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| broad | 82% | 83% | 96% | 79% | 88% | 88% | 88% | 92% |
+| problem_constrained | 17% | 25% | 21% | 38% | 21% | 38% | 33% | 33% |
+| expert_context | 4% | 0% | 0% | 0% | 8% | 0% | 4% | 8% |
+
+Units failing in every arm (best arm score in brackets): PMC10759803 (0.88), PMC11077685 (0.75), PMC11375216 (0.88),
+PMC11375712 (0.12), PMC11606917 (0.88), PMC12941549 (0.88), all at the broad level.
+
+**Where failures happen in the evidence pipeline.**
+
+| | text_chunks | v2_units | card | effects | mechanisms | gaps | mixed |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Runs with a supportive record in context | 97% | 94% | 97% | 83% | 94% | 94% | 89% |
+| Supportive records in context (mean) | 4.03 | 3.56 | 3.67 | 3.94 | 4.14 | 3.97 | 2.61 |
+| Share of in-context supportive records cited | 53% | 61% | 55% | 48% | 52% | 30% | 55% |
+| Share of citations that are supportive | 55% | 53% | **81%** | 37% | 44% | **25%** | 27% |
+| Failures | 26 | 28 | 28 | 28 | 30 | 30 | 32 |
+| … no supportive record in context | 2 | 4 | 2 | 6 | 4 | 4 | 7 |
+| … in context, not cited | 1 | 1 | 0 | 3 | 3 | 8 | 7 |
+| … supportive record cited | 23 | 23 | 26 | 19 | 23 | 18 | 18 |
+
+**Does citing supportive evidence help?** Mean reconstruction difference between runs of the same paper and level
+(evidence arms pooled):
+
+| Level | Any supportive cited vs none | Strongly supportive cited vs none |
+|---|---:|---:|
+| broad | −0.01 (11 units; 7 better, 4 worse) | +0.10 (7 units; 5 better, 2 worse) |
+| problem_constrained | +0.06 (9 units; 4 better, 5 worse) | +0.15 (9 units; 6 better, 3 worse) |
+| expert_context | −0.10 (8 units; 2 better, 6 worse) | −0.13 (8 units; 2 better, 6 worse) |
+
+**Mechanism source vs outcome** (target-free audit labels, evidence arms pooled):
+
+| Level | Mechanism source | Runs | Reconstruction | Failure rate |
+|---|---|---:|---:|---:|
+| broad | model's own reasoning | 37 | 0.72 | 78% |
+| broad | transferred without justification | 98 | 0.60 | 88% |
+| problem_constrained | model's own reasoning | 56 | 1.74 | **16%** |
+| problem_constrained | transferred with justification | 27 | 1.36 | 41% |
+| problem_constrained | transferred without justification | 84 | 1.33 | 34% |
+| expert_context | model's own reasoning | 45 | **2.66** | 0% |
+| expert_context | transferred with justification | 7 | 2.21 | 14% |
+| expert_context | transferred without justification | 116 | 2.30 | 3% |
+
+**Error categories.** Share of failing runs with at least one error of each category:
+
+| Category | closed_book | text_chunks | v2_units | card | effects | mechanisms | gaps | mixed |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| wrong_mechanism | 70% | 69% | 82% | 71% | 75% | **87%** | 83% | 78% |
+| evidence_unsupported | 65% | 81% | 79% | 79% | 82% | 80% | 83% | 81% |
+| wrong_intervention | 74% | 77% | 71% | 61% | 57% | 63% | 77% | 53% |
+| wrong_conditions | 48% | 54% | 61% | 46% | 46% | 57% | 63% | 44% |
+| wrong_outcome | 39% | 54% | 36% | 39% | 32% | 33% | 33% | 44% |
+| wrong_baseline | 26% | 27% | 36% | 29% | **54%** | 43% | 23% | 44% |
+| evidence_contradicted | 0% | 12% | 0% | 4% | **29%** | 20% | 3% | 19% |
+| untestable_or_vague | 35% | 15% | 25% | 36% | 36% | 23% | 13% | 16% |
+| physical_error | 13% | 12% | 18% | 14% | 21% | 10% | 17% | 19% |
+| internal_inconsistency | 4% | 12% | 7% | 7% | 11% | 13% | 3% | 3% |
+| Fatal errors per run (all runs) | 3.53 | 3.81 | 4.10 | 4.18 | 3.94 | 4.10 | 4.06 | 4.08 |
+
+**Extraction fidelity** (40 random records per rubric):
+
+| | card | effects | mechanisms | gaps |
+|---|---:|---:|---:|---:|
+| Fields supported | 90% | 93% | 87% | 86% |
+| Fields distorted | 9% | 7% | 13% | 10% |
+| Fields not in the paper | 1% | 0% | 0% | 4% |
+| Records with every field supported | 50% | 65% | 33% | 70% |
+| Records mixing in cited work | 35% | 15% | 30% | 15% |
+| Least reliable field (share not supported) | key findings 17% | processing 10% | scope limits 25%, alternatives 24% | lever 23% |
+
+Typical distortions:
+- wrong comparison base (a grain-size increase measured from the wrong reference)
+- wrong treatment (annealing reported where the paper says aging)
+- roles swapped (a comparison sample reported as an alternative mechanism)
+- added claims (a Laves phase called brittle when the paper doesn't say so)
+
+**Reproduced generation failure.** Closed-book, PMC11375712 broad, three attempts, all `finish_reason=stop`. Every time
+the model returned the full schema with every field empty, and wrote in `uncertainty`, for example, "The provided
+evidence list is empty… No hypothesis can be generated without violating the constraint to use only supplied
+temporally eligible evidence." The cause is the shared generation prompt, not a formatting bug. The same
+pressure shows as an evidence caveat in 52 of 70 successful closed-book runs here and 29 of 35 in eval v3.
+
+**Best arm per unit.** closed_book 9, card 9, effects 5, v2_units 4, text_chunks 4, mechanisms 2, gaps 2, mixed 1. The
+mean gap between best and worst arm on a unit is 0.68.
+
+**Paper hot spots.** PMC12941549 (0.86, 73% failures; wrong conditions 26% of errors: the query doesn't imply the target's
+test conditions); PMC11077685 (0.95, 56%; wrong intervention 34%: unusual hydride ink-extrusion route); PMC11087546
+(1.47, 60%). Easiest: PMC12806431 (2.34, 4%).
+
+**Limits.** "Supportive" counts only cover each representation's top 20 records by similarity to the target, so they
+are lower bounds. Coding, fidelity and ceiling all use GPT-5.6, the same family as the judge. Within-paper comparisons
+cover 7–11 units per level and are associations, not controlled tests.
+
 Full details: [rubric_eval/failure/README.md](./rubric_eval/failure/README.md).
 
 ## Comparability and limits, experiments 8 to 15
