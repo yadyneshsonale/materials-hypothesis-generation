@@ -198,3 +198,26 @@ recorded in that table. Each entry ends with how it relates to the experiments i
 5. **Rank in both orders** (ResearchBench) for any selector or pairwise judge, to remove position bias.
 6. **Report a target-free quality score** (ACCELMAT quality criteria). It is not affected by query leakage, and it
    lets runs on queries without a single correct answer still be scored.
+
+## How each benchmark builds its evaluation inputs (checked 2026-10-23 against the papers and repositories)
+
+| Work | Input written by | Source of the input | Answer kept out by | Contamination control | Gaps found |
+|---|---|---|---|---|---|
+| MatDesign / ACCELMAT | Materials experts, by hand (no script) | Whole paper | Nothing formal | Papers from January 2024; models with late-2023 cutoffs | Several rows leak the answer: row 40's constraint says "must be cerium-based (cerium nitrate, cerium oxide)", the exact ground-truth material; row 26's goal statement names the answer's composite. The paper never discusses this. |
+| SCIMON | Sentence classifier and IE system | Abstract only: Background sentences are input, Method/Objective sentences are target | Similarity filter (background–target cosine ≤ 10th percentile) plus manual check, only on the 194-item gold subset | Temporal split (train < 2021, test 2022); background KG and citation neighbours restricted to before year Y | Seed terms come from the target side; only about 16% appear in the background |
+| MOOSE-Chem | 3 chemistry PhD students | Paper | Written guideline: "Background survey shouldn't contain any information/method in inspiration or hypothesis… Background question cannot contain any information in inspiration or hypothesis"; a "strict" variant removes directional hints | 51 papers from 2024; GPT-4o (Oct 2023 cutoff) | — (the clearest positive example) |
+| ResearchBench | LLM agent with self-refinement | Introduction and related work | Only an undocumented prompt phrase ("without referencing specific inspirations or conclusions") | Papers from 2024, plus a post-July-2024 subset | The expert checklist (91.9% accuracy) does not ask about leakage |
+| IdeaBench | Rule | Abstracts of the target's background-cited references only; the target paper is never shown | By construction; the ground truth is a GPT-4o paraphrase without results or numbers | 2024 papers; models with pre-2024 cutoffs | — |
+| Concept-graph link prediction | Fine-tuned LLaMA-2 concept extraction | 221k OpenAlex abstracts | Temporal split: train edges 2017–2019, test 2020–2022; embeddings computed only from text before the cutoff year | Feature gating only | No check of LLM pretraining contamination |
+| Beyond Designer's Knowledge | Authors | Author-written design problems; literature retrieved only before the gpt-4-1106 cutoff (April 2023) | Flagship ideas published after the cutoff | Explicit | Admits that other ideas may reflect references in the training data |
+| HEP, PriM, TopoMAS | Authors (HEP, PriM); not stated (TopoMAS) | Task statements | Ground truth from tools or simulators, not from the literature | None discussed | No leakage discussion |
+
+**Rules adopted for benchmark v3** ([benchmark_v3/README.md](./benchmark_v3/README.md)):
+
+1. Introduction-only source with the paper's own contribution removed (ResearchBench source, SCIMON split).
+2. The writer never sees the answer, and MOOSE-Chem's background/question rule is applied.
+3. A separate checker with the answer lists leaking phrases and steering (MOOSE-Chem guideline, automated).
+4. A lexical gate on every query, not only a gold subset (SCIMON's filter, applied to all).
+5. Failed levels are rewritten or flagged, never silently kept (MatDesign's failure mode).
+6. The generator's training cutoff precedes every held-out paper (all benchmarks), and a memorisation probe checks
+   it (a gap in all of them).

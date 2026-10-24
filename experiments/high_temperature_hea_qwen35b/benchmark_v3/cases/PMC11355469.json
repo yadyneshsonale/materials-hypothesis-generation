@@ -1,0 +1,59 @@
+{
+  "schema_version": "benchmark-v3-1.0",
+  "paper_id": "PMC11355469",
+  "publication_date": "2024-08-07",
+  "split": "validation",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "introduction_without_own_contribution",
+  "query_writer": "trapi:gpt-5.6-sol_2026-07-09",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "queries": {
+    "broad": {
+      "text": "For high-entropy-alloy coatings used in wear-resistant applications, what single intervention could improve wear resistance across operating temperatures? Formulate one hypothesis specifying the intervention, its expected mechanism, the predicted improvement relative to an otherwise identical unmodified coating, the temperature and sliding conditions under which it should hold, the prior evidence supporting it, and an experiment with a clear result that would falsify it.",
+      "passed_gate": true,
+      "overlap": 0.02,
+      "raw_overlap_exp19_metric": 0.018,
+      "source_role_refs": []
+    },
+    "problem_constrained": {
+      "text": "For a FeNiCrCoCu high-entropy-alloy coating on a Cu matrix, whose overall wear resistance and microscopic deformation behavior across different temperatures remain unclear, what single intervention could improve its wear resistance under sliding conditions spanning different temperatures, friction velocities, and wear depths? State one hypothesis that identifies the intervention, explains the mechanism, predicts the outcome relative to the unchanged FeNiCrCoCu coating tested under identical conditions, defines the operating limits of the prediction, cites supporting evidence from the introduction, and proposes a falsification experiment capable of resolving microscopic deformation during wear.",
+      "passed_gate": true,
+      "overlap": 0.059,
+      "raw_overlap_exp19_metric": 0.055,
+      "source_role_refs": []
+    },
+    "expert_context": {
+      "text": "FeNiCrCoCu is considered promising for high-heat wear-resistant use and is suitable for thin-film applications; because bulk preparation is expensive, applying it as a coating on a conventional metal is more practical. Earlier studies reported improved wear or mechanical performance from high-entropy-alloy coatings on Al, Ni, and titanium-alloy substrates, and simulations of FeNiCrCoCu on Cu indicated that sliding speed affects tangential and normal forces. Other work associated composition and grain size with changes in wear damage. However, most prior studies examined a limited operating regime or the properties of the alloys themselves rather than the overall wear resistance of coatings under varied thermal conditions. Subject to retaining FeNiCrCoCu as a coating on a Cu matrix, what single intervention could improve its overall wear resistance during sliding across varied thermal and contact regimes? Present one hypothesis specifying the intervention, its causal mechanism, the predicted outcome relative to an unchanged coating in matched tests, the boundaries within which it should hold, supporting evidence from the introduction, and an experiment with a clear rejection criterion for both the predicted outcome and the proposed mechanism.",
+      "passed_gate": false,
+      "overlap": 0.039,
+      "raw_overlap_exp19_metric": 0.036,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "FeNiCrCoCu high entropy alloy coating (21 Å thick) adhered to a single-crystal Cu matrix (100 Å × 100 Å × 55 Å), both with FCC lattice structure and orientation [100], [010], [001].",
+    "intervention": "Nanoindentation and friction simulation using a virtual indenter pressed at 10 m/s to a depth of 30 Å (loading 300 ps) followed by unloading at the same speed (300 ps), conducted at controlled ambient temperatures of 300 K, 600 K, 900 K, and 1200 K.",
+    "conditions": "Periodic boundary conditions in X and Y; contractive boundary in Z; NVE ensemble for bulk; Langevin thermostat for constant temperature layer; lattice constant fixed at 3.56 Å.",
+    "structural_mediator": "Evolution of lattice disorder and dislocation density: ordered lattice with stable dislocation density at 300-600 K; rapid lattice disorder and significant dislocation density reduction at 900-1200 K; increased HCP atom fraction with temperature.",
+    "mechanism": "At 600 K, reduced dislocation density increases elastic modulus. At >900 K, rapid lattice softening and disorder cause a sharp decrease in hardness and elastic modulus, shifting the deformation mechanism from stacking faults to lattice disorder, leading to increased tangential force and friction coefficient.",
+    "predicted_outcome": "Wear resistance and hardness remain relatively stable up to 600 K, then decrease sharply above 900 K; friction coefficient and tangential force increase with temperature, with significant fluctuations above 900 K.",
+    "baseline": "Room temperature (300 K) performance with ordered lattice structure and higher dislocation density.",
+    "boundary": "Critical temperature threshold of 900 K, above which wear resistance decreases sharply due to onset of rapid lattice disorder.",
+    "discriminating_measurement": "Correlation between the number of HCP atoms, dislocation line length, and the friction coefficient/elastic modulus values across the temperature range.",
+    "actual_result": "Hardness drops from ~17.4 GPa at 300/600 K to ~10.2 GPa at 900 K and ~8.6 GPa at 1200 K; Elastic modulus increases from 173 GPa to 219 GPa at 600 K then declines; Wear resistance decreases sharply at 900 K; Friction coefficient fluctuates intensely above 900 K."
+  },
+  "hidden_target_source": "copied from the experiment-3 case (unchanged answer key)",
+  "rounds": 4,
+  "source": {
+    "kept_chars": 5126,
+    "removed_sentences": 1,
+    "removed_preview": [
+      "Therefore, in response to the shortcomings of current research for high entropy alloy coatings, this study aimed to analyze the influencing mechanism of wear resistance of FeNiCrCoCu high entropy allo"
+    ]
+  },
+  "old_queries": {
+    "broad": "For a high-entropy alloy coating system on a transition metal matrix, what is the relationship between ambient temperature and tribological performance? Please hypothesize the dominant mechanism linking thermal conditions to wear resistance and propose a boundary where performance degrades.",
+    "problem_constrained": "Consider a FeNiCrCoCu high-entropy alloy coating on a Cu matrix under nanoindentation and friction conditions. The system is observed to have stable wear resistance and high elastic modulus at room temperature (300 K), but a sharp decline in wear resistance occurs at elevated temperatures. Given that lattice softening and atomic disorder are potential failure modes, how does the evolution of dislocation density and stacking fault structures with temperature explain the transition from stable to unstable wear behavior? Define the critical temperature threshold where the mechanism shifts from defect-mediated plasticity to rapid lattice disorder.",
+    "expert_context": "Using molecular dynamics simulations of a single-crystal FeNiCrCoCu high-entropy alloy coating on a single-crystal Cu matrix, investigate the thermomechanical response during nanoindentation (30 Å depth, 10 m/s velocity) at 300 K, 600 K, 900 K, and 1200 K. Existing data suggests that while dislocation density decreases at 600 K (increasing elastic modulus), rapid lattice disorder emerges at higher temperatures, correlating with a sharp drop in hardness and wear resistance. Hypothesize the specific sequence of microstructural events (e.g., stacking fault annihilation, dislocation starvation, amorphization onset) that causes the friction coefficient to spike and the material to lose wear resistance above 900 K. Propose a falsification experiment using hexagonal close-packed (HCP) atom counting and dislocation line length analysis to distinguish between thermal softening due to disorder versus mechanical annealing effects."
+  }
+}

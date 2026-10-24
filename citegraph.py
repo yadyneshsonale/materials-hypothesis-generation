@@ -41,11 +41,12 @@ import requests
 import llm_client as lc
 import rubric_eval as rx
 from hypothesis_evidence_v2 import atomic_json
-from temporal_eval_v3 import EXPERIMENT_DIR, QUERY_LEVELS, _generator_identity
+from temporal_eval_v3 import EXPERIMENT_DIR, QUERY_LEVELS, RUN_ROOT, _generator_identity
 from temporal_hypothesis_benchmark import _read_json
 
-OUT = EXPERIMENT_DIR / "citegraph"
-PAPERS = OUT / "papers"
+OUT = RUN_ROOT / "citegraph"
+# Downloaded papers, their cards and citer statements are pre-cutoff material shared by every run root.
+PAPERS = EXPERIMENT_DIR / "citegraph" / "papers"
 CASES_OUT = OUT / "cases"
 N_SEEDS = 10
 K_PER_SEED = 3
@@ -859,7 +860,7 @@ from temporal_hypothesis_benchmark import (  # noqa: E402
 VARIANTS = ("graph_selection", "graph_profiles", "graph_profiles_systemmatch", "corroboration_weighted",
             "graph_tool_agent")
 BASELINES = {"closed_book": rx.OUT, "text_chunks": rx.OUT, "card": rx.OUT,
-             "card_systemmatch": EXPERIMENT_DIR / "improvements"}
+             "card_systemmatch": RUN_ROOT / "improvements"}
 PRIMARY_BASELINE = "text_chunks"
 PROFILE_CAP = rx.RECORD_MAX_CHARS_BY_ARM["card"]
 STATEMENTS_IN_PROFILE = 8

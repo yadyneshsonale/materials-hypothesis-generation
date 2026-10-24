@@ -1,0 +1,60 @@
+{
+  "schema_version": "benchmark-v3-1.0",
+  "paper_id": "PMC12029629",
+  "publication_date": "2025-04-19",
+  "split": "test",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "introduction_without_own_contribution",
+  "query_writer": "trapi:gpt-5.6-sol_2026-07-09",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "queries": {
+    "broad": {
+      "text": "For high-entropy alloys, what single intervention could improve dynamic strength–ductility performance? Formulate one hypothesis that identifies the intervention, explains its mechanism, predicts the improvement relative to an untreated baseline, defines the boundary conditions under which it should hold, cites supporting prior evidence, and proposes a decisive experiment that could falsify it.",
+      "passed_gate": true,
+      "overlap": 0.013,
+      "raw_overlap_exp19_metric": 0.012,
+      "source_role_refs": []
+    },
+    "problem_constrained": {
+      "text": "For the Co-free FeNiCrMn high-entropy alloy derived from the Cantor alloy, whose dynamic mechanical behavior remains insufficiently understood, what single intervention could improve its balance of strength and ductility under dynamic loading across different temperatures and strain rates? Formulate one hypothesis specifying the intervention, its mechanism, the predicted outcome relative to the unmodified FeNiCrMn baseline, the temperature and strain-rate limits of validity, supporting prior evidence, and a falsification experiment.",
+      "passed_gate": true,
+      "overlap": 0.065,
+      "raw_overlap_exp19_metric": 0.072,
+      "source_role_refs": []
+    },
+    "expert_context": {
+      "text": "The Co-free FeNiCrMn high-entropy alloy is intended to retain the favorable mechanical performance of the equiatomic CoCrFeMnNi Cantor alloy while reducing cost and preserving a useful strength–ductility balance. Existing FeNiCrMn research has focused mainly on corrosion rather than dynamic loading. Molecular-dynamics studies of related high- and medium-entropy alloys have examined temperature, strain rate, cracking, voids, and compositional variation, demonstrating condition-dependent mechanical responses, but they do not establish how to improve FeNiCrMn under dynamic loading. Given the constraints of remaining Co-free, controlling cost, and retaining balanced strength and ductility, what single intervention could improve the dynamic mechanical performance of FeNiCrMn over a defined range of temperatures and strain rates? State one hypothesis containing the intervention, the causal mechanism, a predicted outcome relative to unmodified FeNiCrMn, its boundary conditions, supporting evidence from prior studies, and a decisive falsification experiment.",
+      "passed_gate": true,
+      "overlap": 0.065,
+      "raw_overlap_exp19_metric": 0.084,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "Single crystal equiatomic FeNiCrMn High-Entropy Alloy in an FCC structure, constructed as a bulk model (~180,000 atoms) with periodic boundary conditions.",
+    "intervention": "Uniaxial tensile loading applied along specific crystallographic directions (<110>, <1-12>, <-111>) at varied temperatures (10 K, 300 K, 600 K) and strain rates (10^8 s^-1, 10^9 s^-1, 10^10 s^-1) via molecular dynamics simulation.",
+    "conditions": "Vacuum environment (implied), Nose-Hoover thermostat for thermal control, 1 fs time step, annealing history (heated to 1000 K, held, cooled to 300 K).",
+    "structural_mediator": "Dislocation nucleation initiates at vacancy clusters/disordered atoms; plastic flow is mediated by Shockley partial dislocations (1/6<112>) generating intrinsic stacking faults (ISF) and extrinsic stacking faults (ESF), forming HCP-like regions locally without bulk phase change.",
+    "mechanism": "Yielding is triggered by a sudden stress drop associated with the nucleation of dislocations at vacancy sites. Elevated temperatures reduce yield strength by intensifying atomic thermal vibrations, facilitating dislocation nucleation and reducing critical resolved shear stress. Higher strain rates increase dislocation density and flow stress due to kinetic limitations on annihilation, but yield strength remains insensitive to strain rate within the simulated range.",
+    "predicted_outcome": "Maximum yield stress observed along the <-111> orientation; yield strength decreases with temperature; yield strength shows negligible sensitivity to strain rate; dislocation density increases with strain rate; no FCC-to-BCC transformation or twinning observed.",
+    "baseline": "Equiatomic FeNiCrMn HEA under reference conditions (300 K, 10^9 s^-1) compared against variations in temperature, strain rate, and crystal orientation.",
+    "boundary": "The observed strain rate insensitivity of yield strength is bounded by the specific range of 10^8-10^10 s^-1 and the single-crystal nature of the model; the mechanism of deformation is bounded to partial dislocation slip without bulk phase transformation.",
+    "discriminating_measurement": "Use Dislocation Extraction Algorithm (DXA) and Common Neighbor Analysis (CNA) to distinguish between true BCC phase transformation and stacking fault-induced HCP-like regions; analyze stress-strain curves for the sudden drop signature of dislocation nucleation vs. smooth phase transformation curves.",
+    "actual_result": "Simulation confirmed significant anisotropy (max yield at <-111>), temperature-dependent yield softening (thermal vibration facilitation), and strain rate insensitivity of yield strength despite increased dislocation density and flow stress at higher rates. Deformation was confirmed to be mediated by Shockley partials and stacking faults, with no BCC phase or twinning observed."
+  },
+  "hidden_target_source": "copied from the experiment-3 case (unchanged answer key)",
+  "rounds": 1,
+  "source": {
+    "kept_chars": 5075,
+    "removed_sentences": 2,
+    "removed_preview": [
+      "This paper used molecular dynamics simulations to investigate the effects of different crystal orientations, temperatures, and strain rates on the mechanical properties and plastic deformation mechani",
+      "The aim was to reveal the deformation mechanisms of the FeNiCrMn HEA and provide a theoretical foundation for its future development."
+    ]
+  },
+  "old_queries": {
+    "broad": "I am investigating a quaternary equiatomic alloy with a face-centered cubic (FCC) structure, specifically looking for the relationship between its mechanical properties and its corrosion resistance. What hypotheses can be proposed regarding the plastic deformation mechanisms under uniaxial tension? Please provide supporting prior evidence for dislocation-based yielding, identify the boundary conditions where yield strength might become insensitive to strain rate, and propose a falsification experiment to distinguish between dislocation glide and phase transformation mechanisms.",
+    "problem_constrained": "Consider a single-crystal FeNiCrMn high-entropy alloy subjected to uniaxial tensile loading in the elastic-to-plastic transition regime. The material exhibits a yield strength that appears anomalously insensitive to strain rates compared to traditional metals, despite high strain rates leading to significant dislocation accumulation. The operating regime includes temperatures ranging from cryogenic to elevated (up to 600 K). What is the dominant mechanism driving the onset of yielding (e.g., dislocation nucleation at specific defects vs. thermal activation)? Identify the design constraints regarding crystal orientation anisotropy and propose a boundary condition test to falsify the hypothesis that FCC-to-BCC phase transformation is the primary deformation mode.",
+    "expert_context": "In the context of molecular dynamics simulations of equiatomic FeNiCrMn HEAs, the yielding event is marked by a sudden stress drop and subsequent plastic flow. Current evidence suggests that at higher strain rates, dislocation densities increase due to insufficient time for annihilation, yet the macroscopic yield strength remains relatively insensitive to the strain rate within the simulated range (10^8 to 10^10 s^-1). Conversely, yield strength and strain decrease monotonically with increasing temperature due to enhanced atomic thermal vibrations reducing the critical resolved shear stress. The deformation is mediated by Shockley partial dislocations creating intrinsic stacking faults (ISF), with no observation of twinning or FCC-to-BCC transformation. Based on this, what is the precise mechanism for dislocation nucleation (e.g., at vacancy clusters)? How does the crystal orientation (e.g., <11-1> vs <110>) influence the maximum yield stress? Propose a discriminating measurement to verify that the observed HCP-like regions are stacking faults rather than a true phase transformation."
+  }
+}

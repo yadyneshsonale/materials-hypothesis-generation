@@ -68,6 +68,11 @@ def chat_json(system: str, user: str, max_tokens: int = 4000, retries: int = 3) 
     if provider == "dryrun":
         return {}
 
+    if provider == "trapi":
+        temperature = os.environ.get("MATHG_TEMPERATURE")
+        return trapi_chat_json(TRAPI_DEPLOYMENT, system, user, max_tokens=max_tokens,
+                               temperature=float(temperature) if temperature else None, retries=max(retries, 8))
+
     if provider == "openai":
         api_key = os.environ["OPENAI_API_KEY"]
         base_url = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
@@ -98,6 +103,8 @@ def chat_json(system: str, user: str, max_tokens: int = 4000, retries: int = 3) 
             "max_completion_tokens": max_tokens,
             "response_format": {"type": "json_object"},
         }
+        if os.environ.get("MATHG_TEMPERATURE"):
+            payload["temperature"] = float(os.environ["MATHG_TEMPERATURE"])
     else:
         raise LLMError(f"unknown MATHG_PROVIDER={provider!r}")
 
@@ -175,6 +182,94 @@ def trapi_chat_json(deployment: str, system: str, user: str, *, max_tokens: int,
             last_err = e
             time.sleep(2 ** min(attempt, 5))
     raise LLMError(f"TRAPI call to {deployment} failed after {retries} attempts: {last_err}")
+
+
+SINGLE_TOOL_DEPLOYMENTS = ("Llama-",)
+SINGLE_TOOL_NAME = "act"
+
+
+def wrap_tools(tools: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Some deployments (Llama on Azure) accept only one tool definition, so every tool becomes one 'act' call."""
+    lines = []
+    for tool in tools:
+        fn = tool["function"]
+        lines.append(f"- {fn['name']}: {fn.get('description', '')} Arguments schema: "
+                     f"{json.dumps(fn.get('parameters', {}).get('properties', {}))}")
+    return [{"type": "function", "function": {
+        "name": SINGLE_TOOL_NAME,
+        "description": "Call one of the available tools. Available tools:\n" + "\n".join(lines),
+        "parameters": {"type": "object", "properties": {
+            "tool": {"type": "string", "enum": [t["function"]["name"] for t in tools]},
+            "arguments": {"type": "object", "description": "Arguments for the chosen tool, matching its schema."}},
+            "required": ["tool", "arguments"]}}}]
+
+
+def _wrap_message(message: dict[str, Any]) -> dict[str, Any]:
+    if not message.get("tool_calls"):
+        return message
+    calls = []
+    for call in message["tool_calls"]:
+        try:
+            arguments = json.loads(call["function"].get("arguments") or "{}")
+        except json.JSONDecodeError:
+            arguments = {}
+        calls.append({**call, "function": {"name": SINGLE_TOOL_NAME, "arguments": json.dumps(
+            {"tool": call["function"]["name"], "arguments": arguments})}})
+    return {**message, "tool_calls": calls}
+
+
+def _unwrap_message(message: dict[str, Any]) -> dict[str, Any]:
+    if not message.get("tool_calls"):
+        return message
+    calls = []
+    for call in message["tool_calls"]:
+        try:
+            wrapped = json.loads(call["function"].get("arguments") or "{}")
+        except json.JSONDecodeError:
+            wrapped = {}
+        name = str(wrapped.get("tool", "")) if isinstance(wrapped, dict) else ""
+        arguments = wrapped.get("arguments", {}) if isinstance(wrapped, dict) else {}
+        if isinstance(arguments, str):
+            try:
+                arguments = json.loads(arguments)
+            except json.JSONDecodeError:
+                arguments = {}
+        calls.append({"id": call.get("id", ""), "type": "function",
+                      "function": {"name": name or "unknown", "arguments": json.dumps(arguments)}})
+    return {**message, "tool_calls": calls}
+
+
+def trapi_chat_with_tools(messages: list[dict[str, Any]], tools: list[dict[str, Any]], retries: int = 6) -> dict[str, Any]:
+    """Tool-calling chat turn on the TRAPI generator deployment (TRAPI_DEPLOYMENT). Returns the assistant message."""
+    url = (f"{TRAPI_ENDPOINT}/openai/deployments/{TRAPI_DEPLOYMENT}"
+           f"/chat/completions?api-version={TRAPI_API_VERSION}")
+    single = TRAPI_DEPLOYMENT.startswith(SINGLE_TOOL_DEPLOYMENTS)
+    if single:
+        tools = wrap_tools(tools)
+        messages = [_wrap_message(m) if m.get("role") == "assistant" else m for m in messages]
+    payload: dict[str, Any] = {"messages": messages, "tools": tools, "tool_choice": "auto",
+                               "max_completion_tokens": 5000}
+    if os.environ.get("MATHG_TEMPERATURE"):
+        payload["temperature"] = float(os.environ["MATHG_TEMPERATURE"])
+    timeout = float(os.environ.get("MATHG_REQUEST_TIMEOUT", "240"))
+    last_err: Exception | None = None
+    for attempt in range(retries):
+        try:
+            headers = {"Authorization": f"Bearer {_trapi_token()}", "Content-Type": "application/json"}
+            resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
+            if resp.status_code == 429:
+                match = re.search(r"in (\d+) seconds", resp.text)
+                time.sleep(min(int(match.group(1)) + 2 if match else 30, 120))
+                last_err = LLMError(f"rate limited: {resp.text[:160]}")
+                continue
+            resp.raise_for_status()
+            message = resp.json()["choices"][0]["message"]
+            message = {k: v for k, v in message.items() if k in ("role", "content", "tool_calls")}
+            return _unwrap_message(message) if single else message
+        except Exception as e:  # noqa: BLE001 - retry transient failures
+            last_err = e
+            time.sleep(2 ** min(attempt, 5))
+    raise LLMError(f"TRAPI tool call to {TRAPI_DEPLOYMENT} failed after {retries} attempts: {last_err}")
 
 
 def judge_chat_json(system: str, user: str, max_tokens: int = 8000, retries: int = 6) -> Any:

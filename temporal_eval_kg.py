@@ -21,6 +21,8 @@ from typing import Any
 
 from hypothesis_evidence_v2 import atomic_json
 from temporal_eval_v3 import (
+    CASES_DIR,
+    RUN_ROOT,
     ALL_DIMENSIONS,
     BOOTSTRAP_RESAMPLES,
     BOOTSTRAP_SEED,
@@ -41,12 +43,11 @@ from temporal_hypothesis_benchmark import _read_json
 KG_SETTING = "tool_agent_kg"
 BASELINES = ("closed_book", "text_oneshot", "v2_oneshot", "tool_agent")
 KG_PAIRS = tuple((KG_SETTING, baseline) for baseline in BASELINES)
-CASES_DIR = EXPERIMENT_DIR / "temporal_v2" / "benchmark_cases"
 METADATA = EXPERIMENT_DIR / "temporal_v2" / "temporal_metadata.json"
 V2_DIR = EXPERIMENT_DIR / "temporal_v2" / "materials_evidence_v2"
 PAPER_MAPS = EXPERIMENT_DIR / "section_aware" / "paper_maps"
-SOURCE_V3 = EXPERIMENT_DIR / "eval_v3"
-OUTPUT_V4 = EXPERIMENT_DIR / "eval_v4_matkg"
+SOURCE_V3 = RUN_ROOT / "eval_v3"
+OUTPUT_V4 = RUN_ROOT / "eval_v4_matkg"
 DEFAULT_KG_DB = Path.home() / "matkg_index" / "entdoi.sqlite"
 
 

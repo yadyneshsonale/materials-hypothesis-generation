@@ -25,6 +25,8 @@ from typing import Any
 from hypothesis_evidence_v2 import atomic_json, load_evidence
 from llm_client import LLMError, trapi_chat_json
 from temporal_eval_v3 import (
+    CASES_DIR,
+    RUN_ROOT,
     ALL_DIMENSIONS,
     BOOTSTRAP_RESAMPLES,
     BOOTSTRAP_SEED,
@@ -46,12 +48,11 @@ from temporal_eval_v3 import (
 )
 from temporal_hypothesis_benchmark import _date_map, _read_json, _validate_generation
 
-CASES_DIR = EXPERIMENT_DIR / "temporal_v2" / "benchmark_cases"
 METADATA = EXPERIMENT_DIR / "temporal_v2" / "temporal_metadata.json"
 V2_DIR = EXPERIMENT_DIR / "temporal_v2" / "materials_evidence_v2"
 PAPER_MAPS = EXPERIMENT_DIR / "section_aware" / "paper_maps"
-BASE_DIR = EXPERIMENT_DIR / "eval_v3"
-OUT_DIR = EXPERIMENT_DIR / "eval_critique"
+BASE_DIR = RUN_ROOT / "eval_v3"
+OUT_DIR = RUN_ROOT / "eval_critique"
 
 CRITIC_SCHEMA = "temporal-eval-critique-1.0"
 CRITIC_MAX_TOKENS = 3000

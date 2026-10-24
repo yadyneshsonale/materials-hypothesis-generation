@@ -1,0 +1,61 @@
+{
+  "schema_version": "benchmark-v3-1.0",
+  "paper_id": "PMC11375216",
+  "publication_date": "2024-09-04",
+  "split": "validation",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "introduction_without_own_contribution",
+  "query_writer": "trapi:gpt-5.6-sol_2026-07-09",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "queries": {
+    "broad": {
+      "text": "For high-entropy alloys intended for thermal-insulation or radiation-resistant applications, what single intervention could reduce phonon thermal conductivity? Formulate one testable hypothesis that specifies the intervention, the physical mechanism, the predicted change relative to an otherwise comparable untreated alloy, the temperature and material-state boundaries over which it should hold, the prior evidence supporting it, and an experiment whose result would falsify it.",
+      "passed_gate": true,
+      "overlap": 0.032,
+      "raw_overlap_exp19_metric": 0.027,
+      "source_role_refs": []
+    },
+    "problem_constrained": {
+      "text": "Starting from bulk HfNbTaTiZr, whose low thermal conductivity is desirable for thermal insulation, what single intervention could further reduce its phonon thermal conductivity relative to the starting material? The hypothesis should address the limitation that phonon and electronic contributions are estimated to be similar from nearly 0 to 200 K, while the available 300–1200 K measurements concern a sample containing 1 wt.% oxygen. Specify the proposed intervention, its mechanism, the predicted outcome relative to the unchanged bulk baseline, the temperatures and material states for which the prediction applies, supporting prior evidence, and a decisive falsification experiment.",
+      "passed_gate": true,
+      "overlap": 0.065,
+      "raw_overlap_exp19_metric": 0.054,
+      "source_role_refs": []
+    },
+    "expert_context": {
+      "text": "Starting from bulk HfNbTaTiZr, what single intervention could further reduce its lattice contribution to thermal conductivity relative to the unchanged material? Earlier studies examined heat transport in idealized fcc and bcc concentrated alloys using atomistic calculations, DFT coupled to analytical models, or Debye-based estimates. Most simulations treated perfect, defect-free bulk crystals, while experiments below 200 K inferred separate lattice and electronic contributions from thermal-conductivity and electrical-resistivity measurements. For HfNbTaTiZr, these contributions were estimated to have similar magnitudes from nearly 0 to 200 K; measurements from 300 to 1200 K instead concern a sample containing 1 wt.% oxygen, limiting direct comparison with the starting material. Formulate one testable hypothesis specifying the intervention, its physical mechanism, a quantitative or directional prediction relative to unchanged bulk HfNbTaTiZr, the temperature and material-state boundaries of the prediction, supporting prior evidence, and an experiment that would falsify the hypothesis while separating lattice-mediated from electronic heat transport.",
+      "passed_gate": true,
+      "overlap": 0.0,
+      "raw_overlap_exp19_metric": 0.027,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "Random bcc HfNbTaTiZr refractory high-entropy alloy",
+    "intervention": "Induce varying degrees of chemical short-range order (SRO) via Monte Carlo simulation, leading to the formation of HfTi and TiZr clusters and percolation pathways",
+    "conditions": "Atomistic simulation (Monte Carlo for structure, non-equilibrium molecular dynamics for transport), single-phase bcc model constraint, room to high-temperature regime",
+    "structural_mediator": "Ordered B2-like structures and percolative SRO cluster pathways",
+    "mechanism": "SRO reduces lattice distortion (reducing scattering) and creates high-conductivity percolation pathways, outweighing the scattering effect of the precipitates themselves; modifies high-frequency phonon density of states",
+    "predicted_outcome": "Lattice heat conductivity increases by approximately 12% relative to the random alloy state",
+    "baseline": "Random alloy with high lattice distortion and no SRO clustering",
+    "boundary": "Applicability extends to other HEAs (including fcc) and depends on the percolation of specific ordered binary clusters; distinct from random fcc alloys where conductivity typically decreases significantly with temperature",
+    "discriminating_measurement": "Quantification of lattice heat conductivity increase (12%) and reduction in atomic displacements (12.5%) compared to random state; analysis of phonon density of states modifications",
+    "actual_result": "SRO increases lattice heat conductivity by ~12% due to percolative transitions and reduced lattice distortion, contradicting the expectation that ordered phases always reduce conductivity via scattering"
+  },
+  "hidden_target_source": "copied from the experiment-3 case (unchanged answer key)",
+  "rounds": 2,
+  "source": {
+    "kept_chars": 8403,
+    "removed_sentences": 3,
+    "removed_preview": [
+      "In the present study, we focus on the effect of chemical SRO on the vibrational density of states and the phonon heat conductivity in a prototypical refractory HEA, HfNbTaTiZr, which crystallizes in t",
+      "Using an atomistic model of this alloy, we are able to study, besides the random alloy, various degrees of chemical SRO in the alloy.",
+      "As a result, we show that chemical SRO can modify the heat conductivity in a sizable way."
+    ]
+  },
+  "old_queries": {
+    "broad": "I am investigating the impact of chemical short-range order (SRO) on the thermal conductivity of concentrated refractory high-entropy alloys. Specifically, I need a hypothesis regarding whether SRO formation typically enhances or suppresses lattice heat transport, along with the supporting physical mechanisms. Please outline the expected boundary conditions and propose a falsification experiment to distinguish between scattering-dominated and ordering-dominated transport regimes.",
+    "problem_constrained": "We are studying a single-phase bcc refractory high-entropy alloy (e.g., HfNbTaTiZr) where existing analytical models fail to capture the role of chemical short-range order in phonon transport. A known limitation in the field is that standard potential functions may not correctly predict SRO evolution, and prior literature on fcc systems suggests SRO should reduce thermal conductivity by increasing scattering. However, we observe a regime where SRO clusters percolate. Given the operating regime of high-temperature stability (single-phase bcc) and the failure of serial/parallel mixing models to predict the magnitude of conductivity changes, formulate a hypothesis on the net effect of SRO on thermal conductivity. Include the specific design constraints regarding the potential energy surface and propose an experiment to verify if the conductivity change is driven by a percolative transition rather than simple scattering.",
+    "expert_context": "In the context of the HfNbTaTiZr system, we utilize Monte Carlo schemes to simulate various degrees of chemical SRO, leading to the formation of specific binary clusters (e.g., HfTi, TiZr) and a subsequent percolative transition. While the general expectation is that precipitates or ordered phases would act as strong phonon scattering centers (reducing conductivity), preliminary atomistic modeling suggests a counter-intuitive result where the lattice distortion is actually reduced by the formation of ordered B2-like structures. This reduction in distortion, combined with the specific percolation pathways of the SRO clusters, may lead to a net increase in lattice heat conductivity. Construct a hypothesis that accounts for the modification of the high-frequency phonon density of states and the transition from random to ordered binary phases. Define the boundary conditions for this 'conductivity increase' vs. the 'conductivity decrease' typically seen in random alloys, and specify a discriminating measurement (e.g., comparing atomic displacement amplitudes or high-frequency DOS features) to validate the mechanism of reduced scattering times versus enhanced percolative transport."
+  }
+}

@@ -1,6 +1,6 @@
 # Critique-augmented hypothesis revision (eval_critique)
 
-> **Caveat (added 2026-10-23, experiment 19).** The benchmark queries used here leak the held-out answer: 8% of the answer's words appear in broad queries, 20% in problem_constrained and 47% in expert_context, and per-unit overlap correlates 0.77–0.86 with judge scores. Paired comparisons between methods on the same query remain fair. Absolute scores, differences between query levels and conclusions about query inferability or evidence use are confounded. See [query_leakage/README.md](../query_leakage/README.md).
+> **Caveat (added 2026-10-23, experiment 19).** The benchmark queries used here leak the held-out answer: 8% of the answer's words appear in broad queries, 20% in problem_constrained and 47% in expert_context, and per-unit overlap correlates 0.77–0.86 with judge scores. Paired comparisons between methods on the same query remain fair. Absolute scores, differences between query levels and conclusions about query inferability or evidence use are confounded. See [query_leakage/README.md](../query_leakage/README.md). All evaluations were rerun on leak-free queries with a pre-cutoff generator: scores fell from about 1.5 to about 0.5 and the level gradient disappeared. See [rerun_v3/README.md](../rerun_v3/README.md).
 
 
 **Question.** Does a panel of critic LLMs, each checking one aspect of a tool-agent hypothesis against the

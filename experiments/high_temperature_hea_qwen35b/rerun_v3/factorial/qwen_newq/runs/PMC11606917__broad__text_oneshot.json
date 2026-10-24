@@ -1,0 +1,104 @@
+{
+  "schema_version": "temporal-eval-v3-1.0",
+  "run_id": "PMC11606917__broad__text_oneshot",
+  "paper_id": "PMC11606917",
+  "query_level": "broad",
+  "setting": "text_oneshot",
+  "publication_date": "2024-11-29",
+  "query": "For high-entropy alloys, what single intervention could enable more accurate and computationally efficient prediction of melting temperature and other melting properties? State the hypothesized intervention and its mechanism, predict its performance relative to current prediction capabilities, define the conditions under which it should remain valid, identify prior evidence that supports the hypothesis, and propose a decisive experiment or benchmark that could falsify it.",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "eligible_paper_count": 45,
+  "corpus_records": {
+    "chunks": 269,
+    "evidence_units": 257
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Integrating a machine-learned interatomic potential trained on first-principles KKR-CPA formation enthalpies and short-range ordering data into Molecular Dynamics (MD) simulations will enable computationally efficient and accurate prediction of melting temperatures and phase stability in high-entropy alloys, outperforming current CALPHAD-based screening which suffers from exponential scaling with composition complexity.",
+    "material_initial_state": "A quinary or higher-order High-Entropy Alloy (HEA) system (e.g., Al-Cr-Co-Fe-Ni or Nb-Mo-Ta-W) in a disordered solid solution state, where current computational models struggle to accurately capture the interplay between chemical clustering, short-range ordering, and thermal stability due to the lack of validated force fields or the high cost of first-principles calculations.",
+    "intervention": "Develop and deploy a hybrid computational workflow that utilizes a machine-learned interatomic potential (MLIP) specifically parameterized against high-fidelity first-principles KKR-CPA data (formation enthalpy, lattice constants, bulk moduli, and short-range order parameters) to drive large-scale Molecular Dynamics (MD) simulations for melting point prediction.",
+    "conditions": "The intervention is valid for multi-component alloys (5+ elements) where chemical clustering and short-range ordering significantly influence phase stability, and where the computational cost of full first-principles (DFT/KKR-CPA) sampling of the liquid phase or large supercells is prohibitive. It assumes the training dataset for the MLIP covers the relevant compositional space and temperature range of interest.",
+    "structural_mediator": "The accuracy of the predicted melting temperature is mediated by the MLIP's ability to correctly reproduce the thermo-plastic instability and the clustering-to-ordering transition observed in the solid phase, which are critical precursors to melting in HEAs. The mediator is the fidelity of the potential in capturing the local chemical environment fluctuations that drive the solid-liquid transition.",
+    "mechanism": "Current CALPHAD methods rely on thermodynamic databases that often lack high-order interaction parameters for complex HEAs, leading to inaccuracies or requiring massive computational resources (scaling exponentially with component number) to screen compositions. First-principles methods (like KKR-CPA) are accurate but too slow for dynamic melting simulations. The proposed intervention uses an MLIP to bridge this gap: it learns the complex, non-linear energy landscape of the HEA from accurate first-principles data, allowing MD simulations to model the atomic dynamics of melting (including clustering and disordering) at a fraction of the computational cost of DFT, while maintaining the accuracy of the underlying physics.",
+    "predicted_outcome": "The MLIP-driven MD approach will predict melting temperatures within 5% of experimental values (or high-fidelity KKR-CPA benchmarks) for complex HEAs, with a computational speedup of 3-4 orders of magnitude compared to direct first-principles MD, enabling the rapid screening of vast compositional spaces that are currently intractable for CALPHAD or DFT alone.",
+    "baseline": "Current prediction capabilities rely on either semi-empirical CALPHAD calculations (which are fast but often inaccurate for complex HEAs due to missing high-order terms) or direct first-principles MD (which is accurate but computationally prohibitive for large systems and long timescales required for melting).",
+    "boundary": "The hypothesis may fail for HEAs containing elements with strong magnetic interactions or electronic effects not well-captured by the training data, or for systems where the melting mechanism involves complex phase separation or amorphization not present in the training set. It is also bounded by the quality of the initial first-principles data used to train the potential.",
+    "uncertainty": "There is uncertainty regarding the transferability of the MLIP to compositions significantly outside the training set (e.g., extreme off-equiatomic ratios) and whether the specific clustering behaviors observed in specific HEAs (like Al-Cr-Co-Fe-Ni) are generalizable to all refractory HEAs without retraining. The extent to which 'sluggish diffusion' or other kinetic effects in the liquid phase are captured by the potential is also uncertain.",
+    "supporting_evidence_ids": [
+      "PMC4976365::chunk::000::abstract::c056d652e0",
+      "PMC4976365::chunk::001::results_and_discussion::52452acf65",
+      "PMC8398136::chunk::000::abstract::92875111a7"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Select a quinary HEA system (e.g., Al0.1CrCoFeNi) with a known experimental melting point. Perform three sets of simulations: (1) Direct first-principles MD (DFT-MD) on a small supercell to establish a high-fidelity benchmark for the melting temperature; (2) Standard CALPHAD prediction for the same composition; (3) The proposed MLIP-driven MD simulation on a large supercell (10,000+ atoms) to capture long-range clustering effects. The MLIP will be trained exclusively on the KKR-CPA data and small-cell DFT data for this system.",
+      "measurements": [
+        "Melting temperature (Tm) determined by the onset of rapid diffusion and loss of shear modulus in all three methods.",
+        "Computational time required per simulation step.",
+        "Accuracy of predicted short-range order parameters at temperatures just below Tm."
+      ],
+      "falsification_rule": "The hypothesis is falsified if the MLIP-driven MD prediction of Tm deviates by more than 10% from the DFT-MD benchmark (which serves as the ground truth for the specific system), OR if the MLIP fails to capture the specific clustering-to-ordering transition observed in the DFT-MD simulation, resulting in a qualitatively different melting mechanism, despite the MLIP being trained on the relevant first-principles data."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "accessed_record_ids": [
+    "PMC6427779::chunk::000::abstract::df84b48db4",
+    "PMC6397024::chunk::001::introduction::6f2d9e1dbc",
+    "PMC5627260::chunk::001::introduction::40d6c7eeec",
+    "PMC10154406::chunk::000::abstract::f895614108",
+    "PMC4976365::chunk::001::results_and_discussion::52452acf65",
+    "PMC8510135::chunk::001::introduction::e6ecd3ac9d",
+    "PMC11775865::chunk::000::abstract::cfe160ba3c",
+    "PMC11087546::chunk::000::abstract::0f6f5ee9c1",
+    "PMC5461481::chunk::002::discussion::aad813a188",
+    "PMC4976365::chunk::000::abstract::c056d652e0",
+    "PMC7475834::chunk::000::abstract::d1ff4579e4",
+    "PMC8398136::chunk::000::abstract::92875111a7",
+    "PMC8282813::chunk::003::discussion::b590527e4b",
+    "PMC5578249::chunk::004::materials_and_methods::ba8ffc4fdc"
+  ],
+  "cited_evidence_ids": [
+    "PMC4976365::chunk::000::abstract::c056d652e0",
+    "PMC4976365::chunk::001::results_and_discussion::52452acf65",
+    "PMC8398136::chunk::000::abstract::92875111a7"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "PMC4976365::chunk::000::abstract::c056d652e0",
+      "paper_id": "PMC4976365",
+      "publication_date": "2016-08-08",
+      "kind": "chunk:Abstract",
+      "text": "Computational investigations of structural, chemical, and deformation behavior in high-entropy alloys (HEAs), which possess notable mechanical strength, have been limited due to the absence of applicable force fields. To extend investigations, we propose a set of intermolecular potential parameters for a quinary Al-Cr-Co-Fe-Ni alloy, using the available ternary Embedded Atom Method and Lennard-Jones potential in classical molecular-dynamics simulations. The simulation results are validated by a comparison to first-principles Korringa-Kohn-Rostoker (KKR) - Coherent Potential Approximation (CPA) [KKR-CPA] calculations for the HEA structural properties (lattice constants and bulk moduli), relative stability, pair probabilities, and high-temperature short-range ordering. The simulation (MD)-derived properties are in quantitative agreement with KKR-CPA calculations (first-principles) and experiments. We study Al x CrCoFeNi for Al ranging from 0 ≤ x ≤2 mole fractions, and find that the HEA shows large chemical clustering over a wide temperature range for x < 0.5. At various temperatures high-strain compression promotes atomistic rearrangements in Al 0.1 CrCoFeNi, resulting in a clusterin"
+    },
+    {
+      "record_id": "PMC4976365::chunk::001::results_and_discussion::52452acf65",
+      "paper_id": "PMC4976365",
+      "publication_date": "2016-08-08",
+      "kind": "chunk:Results And Discussion",
+      "text": "The response of atoms to cluster or order in alloys offers deep insights to the microstructural behavior. This trend is particularly important for multi-component alloys, because the ordering can drive the system to various microstructural states, such as crystalline or intermetallic solids, from the disordered FCC ( A1 ), BCC ( A2 ), or HCP ( A3 ) conditions. In Al x CrCoFeNi, the Al content can influence the final structural configuration [6] [23] [24] [25] [26] [27] due to the larger atom size, compared to other constituents, which considerably changes the lattice ordering. When the mole fraction of Al <0.3, a single-phase A1 is observed, and a single-phase A2 is found for Al >1.17, while a two-phase ( A1 + A2 ) for 0.3 ≤ Al ≤1.17 is reported [24] [26] . Using the methods and approximations for accurate estimates of the formation enthalpy and relative energy of A1 and A2 phases [28] , the first-principles KKR-CPA results in Fig. 2 for Al of 0 < x < 2 mole fractions predict a similar global stability found in the experiment, i.e., A1 for x < 0.5, A1 + A2 for 0.5 ≤ Al ≤1.25, and A2 for Al > 1.25. While the A1 phase is more stable than A2 for smaller x , the positive formation enth"
+    },
+    {
+      "record_id": "PMC8398136::chunk::000::abstract::92875111a7",
+      "paper_id": "PMC8398136",
+      "publication_date": "2021-08-19",
+      "kind": "chunk:Abstract",
+      "text": "High strength and ductility, often mutually exclusive properties of a structural material, are also responsible for damage tolerance. At low temperatures, due to high surface energy, single element metallic nanowires such as Ag usually transform into a more preferred phase via nucleation and propagation of partial dislocation through the nanowire, enabling superplasticity. In high entropy alloy (HEA) CoNiCrFeMn nanowires, the motion of the partial dislocation is hindered by the friction due to difference in the lattice parameter of the constituent atoms which is responsible for the hardening and lowering the ductility. In this study, we have examined the temperature-dependent superplasticity of single component Ag and multicomponent CoNiCrFeMn HEA nanowires using molecular dynamics simulations. The results demonstrate that Ag nanowires exhibit apparent temperature-dependent superplasticity at cryogenic temperature due to (110) to (100) cross-section reorientation behavior. Interestingly, HEA nanowires can perform exceptional strength-ductility trade-offs at cryogenic temperatures. Even at high temperatures, HEA nanowires can still maintain good flow stress and ductility prior to fa"
+    }
+  ],
+  "tool_calls": 0,
+  "turns": 0,
+  "tool_trace": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "unknown_record_ids": 0,
+    "invalid_citations": 0,
+    "query_leak": 0
+  },
+  "elapsed_seconds": 91.43
+}

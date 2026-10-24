@@ -1,0 +1,116 @@
+{
+  "schema_version": "temporal-eval-v3-1.0",
+  "run_id": "PMC11606917__expert_context__v2_oneshot",
+  "paper_id": "PMC11606917",
+  "query_level": "expert_context",
+  "setting": "v2_oneshot",
+  "publication_date": "2024-11-29",
+  "query": "For refractory materials, experiments at the solid-to-fluid transition are difficult and yield sparse, scattered data, while the large compositional space of high-entropy systems makes systematic screening impractical. DFT free-energy studies can determine the transition from the crossing of solid and dense-fluid Gibbs energies and provide associated thermodynamic properties, but their reliance on extensive ab initio molecular dynamics makes them costly. TOR-TILD has shown high efficiency for elemental and binary systems, yet becomes substantially slower for multicomponent systems. Any broadly useful approach must retain ab initio-level accuracy, represent all thermodynamic effects identified as important, treat both phases around the transition, and remain practical across relevant compositions and temperatures. For a multicomponent high-entropy material in these high-temperature states, what single intervention could improve determination of transition temperature, fusion enthalpy and entropy, volume change, and dense-fluid heat capacity? Formulate one hypothesis specifying the intervention and causal mechanism, its predicted outcome relative to existing experimental and computational baselines, its boundary conditions, supporting prior evidence, and a decisive experiment or benchmark that would falsify it.",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "eligible_paper_count": 45,
+  "corpus_records": {
+    "chunks": 269,
+    "evidence_units": 257
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Integrating a Cluster Expansion (CE) Hamiltonian derived from DFT enthalpies of mixing with Canonical Monte Carlo (CMC) sampling to pre-screen the configurational entropy and phase stability of multicomponent refractory high-entropy alloys (RHEAs) will significantly reduce the computational cost of determining transition properties compared to direct Ab Initio Molecular Dynamics (AIMD), while maintaining accuracy in predicting the solid-to-fluid Gibbs energy crossing.",
+    "material_initial_state": "A multicomponent refractory high-entropy alloy (e.g., W-Ta-Cr-V or similar quinary system) in a disordered BCC solid solution state at high temperatures approaching the melting point.",
+    "intervention": "Construct a Cluster Expansion Hamiltonian using DFT-calculated enthalpies of mixing for a representative set of ordered structures, then perform Canonical Monte Carlo (CMC) simulations to determine the temperature-dependent configurational entropy, short-range order (SRO) parameters, and phase separation tendencies, rather than relying solely on extensive AIMD sampling of the liquid and solid phases.",
+    "conditions": "Temperatures ranging from room temperature to the solid-to-fluid transition (e.g., 1000 K to melting point), under zero pressure or relevant high-temperature stress states, for systems with 5 or more principal elements where AIMD becomes computationally prohibitive.",
+    "structural_mediator": "Configurational entropy and Short-Range Order (SRO) parameters (Warren-Cowley parameters) that modulate the free energy landscape, specifically the enthalpy of mixing contributions from specific binary/ternary interactions (e.g., negative enthalpies in W-Ta, W-V, Cr-V driving segregation) which dictate the stability of the solid phase relative to the dense fluid.",
+    "mechanism": "The CE-CMC approach decouples the expensive electronic structure calculations (DFT) from the extensive sampling of atomic configurations (CMC). By accurately capturing the enthalpy of mixing and SRO effects via the CE Hamiltonian, the method efficiently calculates the configurational contribution to the Gibbs free energy ($G = H - TS$) for both solid and fluid states. This allows for the precise identification of the temperature where $G_{solid} = G_{fluid}$ without the need for the thousands of AIMD steps required to converge the fluid entropy and enthalpy directly, thus bypassing the computational bottleneck of multicomponent AIMD.",
+    "predicted_outcome": "The transition temperature ($T_m$), fusion enthalpy ($\nabla H_{fus}$), fusion entropy ($\nabla S_{fus}$), volume change, and dense-fluid heat capacity will be predicted with ab initio-level accuracy (within 5% of experimental or high-fidelity AIMD benchmarks) but with a computational cost reduction of >90% compared to direct AIMD, making systematic screening of the multicomponent space feasible.",
+    "baseline": "Direct Ab Initio Molecular Dynamics (AIMD) using extensive sampling (e.g., TOR-TILD or similar methods) which becomes substantially slower for multicomponent systems, or experimental methods which yield sparse, scattered data at the solid-to-fluid transition.",
+    "boundary": "The approach is valid for systems where the enthalpy of mixing can be adequately parameterized by a Cluster Expansion (i.e., where the interaction range is not excessively long-range or where the system does not exhibit extreme kinetic trapping that prevents equilibrium sampling in CMC). It assumes the liquid phase can be approximated by a disordered configuration ensemble or that the CE can be extended to the liquid state.",
+    "uncertainty": "Uncertainty exists regarding the accuracy of the Cluster Expansion in representing the highly disordered dense-fluid state, as CE is traditionally optimized for solid-state ordering. If the liquid phase exhibits strong chemical short-range order that deviates significantly from the solid-state CE parameterization, the predicted fluid Gibbs energy may be inaccurate, leading to errors in the transition temperature. Additionally, kinetic effects (e.g., phase separation during cooling) observed in experiments may not be captured by equilibrium CMC.",
+    "supporting_evidence_ids": [
+      "PMC6397024::hypothesis_evidence_v2::e69adc3294a34141",
+      "PMC6397024::hypothesis_evidence_v2::5ad87c827b1d404b",
+      "PMC8282813::hypothesis_evidence_v2::42d146c611fa5cfc",
+      "PMC8282813::hypothesis_evidence_v2::d32229df8f44afd7"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Select a quinary refractory HEA (e.g., W-Ta-Cr-V-Mo) and compute its solid-to-fluid transition properties using both the proposed CE-CMC method and a high-fidelity AIMD benchmark (using a smaller supercell or limited sampling if full AIMD is too costly, but sufficient for validation). Compare the predicted $T_m$, $\nabla H_{fus}$, and $\nabla S_{fus}$ against each other and against any available high-temperature experimental data (e.g., laser heating or synchrotron XRD).",
+      "measurements": [
+        "Solid-to-fluid transition temperature ($T_m$)",
+        "Fusion enthalpy ($\nabla H_{fus}$)",
+        "Fusion entropy ($\nabla S_{fus}$)",
+        "Volume change upon melting",
+        "Dense-fluid heat capacity ($C_p$)",
+        "Short-range order parameters in the liquid phase"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the CE-CMC method predicts a transition temperature ($T_m$) or fusion enthalpy ($\nabla H_{fus}$) that deviates by more than 10% from the AIMD benchmark or experimental data, or if the method fails to capture a known phase separation or ordering transition in the liquid/solid interface that is critical for the thermodynamic stability."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "accessed_record_ids": [
+    "PMC7513042::hypothesis_evidence_v2::c4d89f6f8c2fc316",
+    "PMC8282813::hypothesis_evidence_v2::42d146c611fa5cfc",
+    "PMC10142552::hypothesis_evidence_v2::2f1d7d8457735f63",
+    "PMC6908586::hypothesis_evidence_v2::7fcb4a706dfb42b5",
+    "PMC8282813::hypothesis_evidence_v2::d32229df8f44afd7",
+    "PMC8398136::hypothesis_evidence_v2::765e878a36cb8b1b",
+    "PMC6397024::hypothesis_evidence_v2::e69adc3294a34141",
+    "PMC8510135::hypothesis_evidence_v2::01d995697480b9df",
+    "PMC6397024::hypothesis_evidence_v2::5ad87c827b1d404b",
+    "PMC8282813::hypothesis_evidence_v2::413ba39b1e86aee0",
+    "PMC5627260::hypothesis_evidence_v2::e4b6fee402076baa",
+    "PMC10213035::hypothesis_evidence_v2::9f4bbbcfd9d4efc4",
+    "PMC11355469::hypothesis_evidence_v2::a592dc9e57c4d7ba",
+    "PMC8398136::hypothesis_evidence_v2::18816744491b6185"
+  ],
+  "cited_evidence_ids": [
+    "PMC6397024::hypothesis_evidence_v2::5ad87c827b1d404b",
+    "PMC6397024::hypothesis_evidence_v2::e69adc3294a34141",
+    "PMC8282813::hypothesis_evidence_v2::42d146c611fa5cfc",
+    "PMC8282813::hypothesis_evidence_v2::d32229df8f44afd7"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "PMC6397024::hypothesis_evidence_v2::5ad87c827b1d404b",
+      "paper_id": "PMC6397024",
+      "publication_date": "2019-03-01",
+      "kind": "v2_evidence",
+      "text": "PMC6397024::hypothesis_evidence_v2::5ad87c827b1d404b PMC6397024 mixed cited_work sample_cited_W_PFM Tungsten W  W    Plasma-facing material Leading candidate   1 Exposure to plasma ≥1000 K >10^7 s D and T ions, He ash, neutrons >10^24 m^-2 s^-1 Blistering at <800 K, pits/holes/bubbles at >1600 K, nanostructured surface (fuzz) at 1250-1600 K Brittle failure regimes   transgranular and intergranular failure  observed observed He bubbles  nm nanometer-scale  observed observed Nanostructured surface morphology   fuzz  observed observed <800 K, 1250-1600 K, >1600 K >10^7 s He plasma, D and T ions     He flux, D flux, neutron flux   Flux 1e+24 m^-2 s^-1            Formation of bubbles and fuzz attributed to accumulation of diffusing D and He in extended defects inferred author_interpretation cited_work    Temperature < 800 K blistering observed Temperature > 1600 K pits, holes, bubbles observed applicability Very low fracture toughness restricts useful operating temperature window Severe fabrication difficulties and operational limits applicability Nanostructured surfaces (fuzz) raise concerns for dust generation Potential plasma contamination by high-Z dust Tungsten (W) is the leading P"
+    },
+    {
+      "record_id": "PMC6397024::hypothesis_evidence_v2::e69adc3294a34141",
+      "paper_id": "PMC6397024",
+      "publication_date": "2019-03-01",
+      "kind": "v2_evidence",
+      "text": "PMC6397024::hypothesis_evidence_v2::e69adc3294a34141 PMC6397024 simulation current_paper simulation_CE_CMC W-Ta-Cr-V alloy model 38 at% W / 36 at% Ta / 15 at% Cr / 11 at% V  W 0.38 at.%  Ta 0.36 at.%  Cr 0.15 at.%  V 0.11 at.%  atomic lattice BCC underlying crystalline lattice   1 DFT calculation density functional theory enthalpies of mixing for 270 structures 2 Cluster expansion  Hamiltonian with effective cluster interactions 3 Canonical Monte Carlo (CMC) simulation 1000 K room temperature to 1000 K configurational entropy and phase separation Cr-V rich precipitate composition   62 at% Cr, 30 at% V, 5 at% W, 3 at% Ta  CMC simulation calculated SRO parameters   strong segregation tendency of Cr and V  Warren-Cowley SRO analysis calculated 1000 K (simulated); room temperature (simulated)      isothermal annealing simulation   cluster expansion methodology, DFT-based Hamiltonian, canonical Monte Carlo enthalpy of mixing   negative for W-Ta, W-V, Cr-V; positive for Ta-V, Cr-W   DFT/CE  local concentration   62 at% Cr, 30 at% V in precipitate   2D cell subdivision  simulation_random_mix disordered BCC solid solution temperature composition segregation crystal lattice composition kine"
+    },
+    {
+      "record_id": "PMC8282813::hypothesis_evidence_v2::42d146c611fa5cfc",
+      "paper_id": "PMC8282813",
+      "publication_date": "2021-07-15",
+      "kind": "v2_evidence",
+      "text": "PMC8282813::hypothesis_evidence_v2::42d146c611fa5cfc PMC8282813 mixed current_paper sample_ht_search_discovered precipitation-strengthened lightweight high-entropy alloys        1 high-throughput screening  discovered from thousands of initial compositions 2 multiscale modeling  theoretical understanding of strengthening mechanisms 3 experimental validation  experimental validation of successful and failed cases  room and elevated temperatures            other counterparts composition (lightweight high-entropy) processing (high-throughput screening)     precipitation-strengthening enables enhanced strengths inferred author_interpretation current_paper experimental validation of successful cases theoretical understanding of order-disorder transitions   integrating high-throughput screening, multiscale modeling, and experimental validation is efficient for accelerating discovery inferred author_interpretation current_paper     applicability currently developed ferritic superalloys still exhibit low high-temperature strengths limits their usage Through the high-throughput screening, precipitation-strengthened lightweight high-entropy alloys are discovered from thousands of initial com"
+    },
+    {
+      "record_id": "PMC8282813::hypothesis_evidence_v2::d32229df8f44afd7",
+      "paper_id": "PMC8282813",
+      "publication_date": "2021-07-15",
+      "kind": "v2_evidence",
+      "text": "PMC8282813::hypothesis_evidence_v2::d32229df8f44afd7 PMC8282813 theory cited_work sample_lwhea_alcrfmti Al-Cr-Fe-Mn-Ti lightweight HEA Al-Cr-Fe-Mn-Ti system        Matrix phase   disordered body-centered-cubic (BCC)  cited cited Precipitate phases   ordered B2 and/or L21 precipitates  cited cited Undesired phase   brittle C14 Laves phase  observed observed           Tendency to crack     experimental observation  sample_ferritic_superalloy Precipitation-strengthened ferritic alloys density cost high-temperature strength dislocation motion mechanism lattice distortion dissimilarity of crystal structures different thermal expansion coefficients   Severe local lattice distortion in HEAs impedes dislocation motion, leading to pronounced strengthening. cited cited_claim cited_work existence of many kinds of elements with different atomic sizes   Formation of brittle C14 Laves phase deteriorates properties by increasing crack tendency. observed controlled_intervention cited_work dissimilarity of crystal structures different thermal expansion coefficients between C14 Laves and BCC-base phases   Low lattice misfit decreases nucleation barrier for precipitation, stabilizing precipitates wit"
+    }
+  ],
+  "tool_calls": 0,
+  "turns": 0,
+  "tool_trace": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "unknown_record_ids": 0,
+    "invalid_citations": 0,
+    "query_leak": 0
+  },
+  "elapsed_seconds": 83.08
+}

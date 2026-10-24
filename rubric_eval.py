@@ -39,6 +39,8 @@ from hypothesis_evidence_v2 import atomic_json, load_evidence
 from stage_metrics import AUDIT_SYSTEM, CROSS_JUDGE, HEDGE, _validated_audit, assert_target_free, kendall_tau
 from temporal_eval_v3 import (
     ALL_DIMENSIONS,
+    CASES_DIR,
+    RUN_ROOT,
     BOOTSTRAP_RESAMPLES,
     BOOTSTRAP_SEED,
     CITED_TEXT_CHARS,
@@ -66,9 +68,10 @@ from temporal_hypothesis_benchmark import (
     retrieve,
 )
 
-OUT = EXPERIMENT_DIR / "rubric_eval"
+OUT = RUN_ROOT / "rubric_eval"
+# Rubric extractions describe pre-cutoff corpus papers only and are shared by every run root.
+EXTRACTIONS = EXPERIMENT_DIR / "rubric_eval" / "extractions"
 TEXT_DIR = EXPERIMENT_DIR / "data" / "corpus" / "text"
-CASES_DIR = EXPERIMENT_DIR / "temporal_v2" / "benchmark_cases"
 METADATA = EXPERIMENT_DIR / "temporal_v2" / "temporal_metadata.json"
 V2_DIR = EXPERIMENT_DIR / "temporal_v2" / "materials_evidence_v2"
 PAPER_MAPS = EXPERIMENT_DIR / "section_aware" / "paper_maps"
@@ -319,7 +322,7 @@ def extract_paper(rubric: str, paper_id: str) -> None:
         digest = hashlib.sha1(text_value.encode("utf-8")).hexdigest()[:10]
         records.append({"record_id": f"{paper_id}::rubric_{rubric}::{index:03d}::{digest}", "item": item,
                         "text": text_value})
-    atomic_json(OUT / "extractions" / rubric / f"{paper_id}.json", {
+    atomic_json(EXTRACTIONS / rubric / f"{paper_id}.json", {
         "paper_id": paper_id, "rubric": rubric, "extractor": _generator_identity(),
         "source_chars": len(text), "windows": len(parts), "stats": dict(stats), "records": records,
     })
@@ -328,7 +331,7 @@ def extract_paper(rubric: str, paper_id: str) -> None:
 def extract_stage(workers: int, resume: bool, rubrics: tuple[str, ...]) -> dict[str, int]:
     papers = sorted(p.stem for p in TEXT_DIR.glob("PMC*.txt"))
     jobs = [(f"{r}__{p}", (r, p)) for r in rubrics for p in papers
-            if not (resume and (OUT / "extractions" / r / f"{p}.json").exists())]
+            if not (resume and (EXTRACTIONS / r / f"{p}.json").exists())]
     return run_jobs("extract", jobs, extract_paper, workers)
 
 
@@ -339,7 +342,7 @@ def rubric_records(rubric: str) -> list[RetrievalRecord]:
     if key not in _cache:
         meta = metadata()
         records = []
-        for path in sorted((OUT / "extractions" / rubric).glob("PMC*.json")):
+        for path in sorted((EXTRACTIONS / rubric).glob("PMC*.json")):
             payload = _read_json(path)
             pid = payload["paper_id"]
             for rec in payload["records"]:
@@ -614,7 +617,7 @@ def report() -> dict[str, Any]:
     # extraction
     extraction = {}
     for rubric in RUBRICS:
-        files = [_read_json(p) for p in sorted((OUT / "extractions" / rubric).glob("PMC*.json"))]
+        files = [_read_json(p) for p in sorted((EXTRACTIONS / rubric).glob("PMC*.json"))]
         stats: Counter[str] = Counter()
         for f in files:
             stats.update(f["stats"])

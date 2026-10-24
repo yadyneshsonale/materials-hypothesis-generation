@@ -1,0 +1,61 @@
+{
+  "schema_version": "temporal-eval-v3-1.0",
+  "run_id": "PMC11606917__expert_context__closed_book",
+  "paper_id": "PMC11606917",
+  "query_level": "expert_context",
+  "setting": "closed_book",
+  "publication_date": "2024-11-29",
+  "query": "For refractory materials, experiments at the solid-to-fluid transition are difficult and yield sparse, scattered data, while the large compositional space of high-entropy systems makes systematic screening impractical. DFT free-energy studies can determine the transition from the crossing of solid and dense-fluid Gibbs energies and provide associated thermodynamic properties, but their reliance on extensive ab initio molecular dynamics makes them costly. TOR-TILD has shown high efficiency for elemental and binary systems, yet becomes substantially slower for multicomponent systems. Any broadly useful approach must retain ab initio-level accuracy, represent all thermodynamic effects identified as important, treat both phases around the transition, and remain practical across relevant compositions and temperatures. For a multicomponent high-entropy material in these high-temperature states, what single intervention could improve determination of transition temperature, fusion enthalpy and entropy, volume change, and dense-fluid heat capacity? Formulate one hypothesis specifying the intervention and causal mechanism, its predicted outcome relative to existing experimental and computational baselines, its boundary conditions, supporting prior evidence, and a decisive experiment or benchmark that would falsify it.",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "eligible_paper_count": 45,
+  "corpus_records": {
+    "chunks": 269,
+    "evidence_units": 257
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Integrating a machine-learned interatomic potential (MLIP) trained on a sparse, active-learning-selected subset of DFT free-energy trajectories into the TOR-TILD framework will enable the accurate and efficient calculation of solid-to-fluid transition properties for multicomponent high-entropy materials.",
+    "material_initial_state": "A multicomponent high-entropy refractory material in a solid state at temperatures approaching the melting point.",
+    "intervention": "Replace the ab initio molecular dynamics (AIMD) engine in the TOR-TILD workflow with a machine-learned interatomic potential (MLIP) trained via active learning on a minimal set of high-temperature DFT snapshots, while retaining the TOR-TILD thermodynamic integration protocol.",
+    "conditions": "High-temperature regime near the solid-to-fluid transition (T > 0.8 T_melt) and high compositional complexity (5+ principal elements).",
+    "structural_mediator": "The MLIP surrogate model that captures the complex many-body interactions and anharmonic effects of the high-entropy alloy without the computational cost of DFT, allowing for the extensive sampling required by TOR-TILD.",
+    "mechanism": "The MLIP approximates the DFT potential energy surface with near-ab initio accuracy but at a fraction of the computational cost, enabling the generation of the dense phase-space sampling required for Gibbs free energy crossing determination in multicomponent systems where TOR-TILD with AIMD becomes prohibitively slow.",
+    "predicted_outcome": "The transition temperature, fusion enthalpy, entropy, volume change, and dense-fluid heat capacity will be determined with accuracy comparable to full AIMD-TOR-TILD (within 2-3%) but with a computational speedup of 2-3 orders of magnitude, making systematic screening of high-entropy systems feasible.",
+    "baseline": "Current state-of-the-art: Full AIMD-TOR-TILD (accurate but computationally intractable for multicomponent systems) and standard experimental methods (sparse, scattered data, difficult to perform at transition).",
+    "boundary": "The hypothesis holds only if the MLIP training set is sufficiently diverse to cover the configurational space of the high-entropy alloy and the specific anharmonic modes active near the transition; it may fail for systems with extreme electronic complexity or phase separation not captured by the training data.",
+    "uncertainty": "There is uncertainty regarding whether a single MLIP model can generalize across the entire compositional space of a high-entropy alloy without retraining, and whether the active learning loop can converge within a reasonable number of DFT evaluations given the high dimensionality of the configuration space.",
+    "supporting_evidence_ids": [],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Select a known multicomponent high-entropy alloy with available experimental melting data. Perform the TOR-TILD workflow using (1) full AIMD (as ground truth, limited to a small supercell/time window) and (2) the proposed MLIP-TOR-TILD workflow. Compare the predicted transition temperature and fusion enthalpy against the AIMD results and experimental values.",
+      "measurements": [
+        "Solid-liquid Gibbs free energy crossing point (T_m)",
+        "Enthalpy of fusion (ΔH_fus)",
+        "Entropy of fusion (ΔS_fus)",
+        "Volume change upon melting (ΔV)",
+        "Dense-fluid heat capacity (C_p,fluid)"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the MLIP-TOR-TILD predictions deviate from the AIMD ground truth by more than 5% for T_m or ΔH_fus, or if the computational speedup is less than 10x compared to AIMD while maintaining the same accuracy."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "accessed_record_ids": [],
+  "cited_evidence_ids": [],
+  "cited_evidence": [],
+  "tool_calls": 0,
+  "turns": 0,
+  "tool_trace": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "unknown_record_ids": 0,
+    "invalid_citations": 0,
+    "query_leak": 0
+  },
+  "elapsed_seconds": 67.44
+}

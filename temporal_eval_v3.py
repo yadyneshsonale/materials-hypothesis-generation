@@ -29,7 +29,7 @@ from typing import Any
 import requests
 
 from hypothesis_evidence_v2 import atomic_json, load_evidence
-from llm_client import LLMError, judge_chat_json, judge_info, provider_info
+from llm_client import LLMError, judge_chat_json, judge_info, provider_info, trapi_chat_with_tools
 from matkg_index import TemporalKG, fact_record_id, fact_text
 from temporal_hypothesis_benchmark import (
     QUERY_LEVELS,
@@ -86,6 +86,10 @@ BOOTSTRAP_RESAMPLES = 10000
 BOOTSTRAP_SEED = 20260421
 
 EXPERIMENT_DIR = Path(__file__).resolve().parent / "experiments" / "high_temperature_hea_qwen35b"
+# Outputs and benchmark cases can be redirected so a rerun (for example on rebuilt queries) never overwrites
+# earlier results. Input data (corpus, metadata, evidence, paper maps, MatKG) always come from EXPERIMENT_DIR.
+RUN_ROOT = Path(os.environ.get("MATHG_RUN_ROOT", str(EXPERIMENT_DIR)))
+CASES_DIR = Path(os.environ.get("MATHG_CASES_DIR", str(EXPERIMENT_DIR / "temporal_v2" / "benchmark_cases")))
 
 TOOL_SYSTEM = (
     "You are a materials-science hypothesis agent in a leakage-audited chronological benchmark. "
@@ -243,6 +247,8 @@ def query_leak(query: str, row: dict[str, Any]) -> bool:
 # ---------------------------------------------------------------- local generation
 
 def call_local_with_tools(messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> dict[str, Any]:
+    if provider_info() == "trapi":
+        return trapi_chat_with_tools(messages, tools)
     base = os.environ.get("OPENAI_BASE_URL", "http://127.0.0.1:8000/v1").rstrip("/")
     body: dict[str, Any] = {
         "model": os.environ.get("OPENAI_MODEL", "local"),
@@ -444,6 +450,8 @@ def run_tool_agent(
 
 
 def _generator_identity() -> str:
+    if provider_info() == "trapi":
+        return f"trapi:{os.environ.get('TRAPI_DEPLOYMENT', '')}"
     return f"{provider_info()}:{os.environ.get('OPENAI_MODEL', '')}"
 
 
@@ -991,11 +999,11 @@ def render_summary(analysis: dict[str, Any]) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--cases-dir", type=Path, default=EXPERIMENT_DIR / "temporal_v2" / "benchmark_cases")
+    parser.add_argument("--cases-dir", type=Path, default=CASES_DIR)
     parser.add_argument("--metadata", type=Path, default=EXPERIMENT_DIR / "temporal_v2" / "temporal_metadata.json")
     parser.add_argument("--v2-dir", type=Path, default=EXPERIMENT_DIR / "temporal_v2" / "materials_evidence_v2")
     parser.add_argument("--paper-maps-dir", type=Path, default=EXPERIMENT_DIR / "section_aware" / "paper_maps")
-    parser.add_argument("--output-dir", type=Path, default=EXPERIMENT_DIR / "eval_v3")
+    parser.add_argument("--output-dir", type=Path, default=RUN_ROOT / "eval_v3")
     sub = parser.add_subparsers(dest="command", required=True)
     gen = sub.add_parser("generate")
     gen.add_argument("--setting", action="append", choices=SETTINGS + ("tool_agent_kg",))

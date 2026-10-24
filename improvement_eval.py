@@ -45,6 +45,7 @@ from temporal_eval_v3 import (
     CITED_TEXT_CHARS,
     EXPERIMENT_DIR,
     HYPOTHESIS_FIELDS,
+    RUN_ROOT,
     PRIMARY_DIMENSIONS,
     QUERY_LEVELS,
     _blind_candidate,
@@ -62,7 +63,7 @@ from temporal_hypothesis_benchmark import (
     compact_evidence_payload,
 )
 
-OUT = EXPERIMENT_DIR / "improvements"
+OUT = RUN_ROOT / "improvements"
 BASE = rx.OUT
 SAMPLES = rx.SAMPLES
 BASELINE_ARMS = ("closed_book", "text_chunks", "card", "v2_units")

@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 19)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 21)
 
 Related work (9 hypothesis-generation and materials-KG papers, with how each separates input from answer):
 [RELATED_WORK.md](./RELATED_WORK.md).
@@ -10,8 +10,10 @@ and they supersede section 8 ("MatKG, planned, blocked") of that log. The commit
 because its working-tree copy has uncommitted changes from another session (it is empty in the working tree).
 Once that is resolved, this document can be merged into the log.
 
-Last updated 2026-10-23 (adds experiments 17 and 18, citation-graph evidence variants and their failure
-analysis, and experiment 19, an audit showing that the benchmark queries leak the answer).
+Last updated 2026-10-24. Adds experiments 17–18 (citation-graph variants and their failure analysis), 19 (the
+benchmark queries leak the answer), 20 (leak-free benchmark v3) and 21 (every evaluation rerun on it with a
+pre-cutoff generator). **Read experiments 19 to 21 before using any absolute score or query-level effect from
+experiments 3 to 18.**
 
 Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 and 2026-10-22 runs).
 
@@ -39,6 +41,8 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 17 | 2026-10-23 | Citation-graph evidence: per-case graph of 10 best-cited relevant seeds + co-cited references, node profiles with citer statements; 5 variants (selection, profiles, profiles + system-match, corroboration-weighted, graph tool agent) | 264 full-text papers, 9,899 citer statements, 12 graphs; 360 runs | Qwen | GPT-5.6, DeepSeek-V4-Pro | Complete, verified; 1 run failed after retry | [citegraph/](./citegraph/) |
 | 18 | 2026-10-23 | Failure analysis of experiment 17 (statement fidelity, graph evidence ceiling, retrieval and use, error coding, tool traces) | 90 statements, 24 ceilings, 408 runs coded | none | GPT-5.6 (checker, coder) | Complete (analysis only) | [citegraph/failure/](./citegraph/failure/) |
 | 19 | 2026-10-23 | Audit of answer leakage in the benchmark queries (roles used to write each query, answer-word overlap, correlation with scores) | 36 queries; 7 methods | none | none | Complete (analysis only); affects experiments 3 to 18 | [query_leakage/](./query_leakage/) |
+| 20 | 2026-10-23 | Leak-free benchmark v3 (introduction-only queries, writer never sees the answer, separate checker, lexical gate) and generator memorisation probe | 12 cases × 3 levels; 48 probes | GPT-5.6 (writer, checker) | GPT-5.6 | Complete; 34/36 queries pass the gate | [benchmark_v3/](./benchmark_v3/) |
+| 21 | 2026-10-23 to 2026-10-24 | All evaluations (experiments 7, 9, 11, 14, 16, 17) rerun on benchmark v3 with a pre-cutoff generator, plus a generator × queries factorial | 1,512 generation runs + 72 selections + 288 factorial runs | Llama-3.3-70B (cutoff 2023-12) | GPT-5.6, DeepSeek-V4-Pro | Complete; verified except 1 critique resample run | [rerun_v3/](./rerun_v3/) |
 
 ## Correction to section 8 (MatKG)
 
@@ -947,7 +951,98 @@ orders, which addresses two open problems here: the evidence ceiling against its
 
 Full details: [query_leakage/README.md](./query_leakage/README.md).
 
-## Comparability and limits, experiments 8 to 19
+## Experiment 20: leak-free benchmark v3 and memorisation probe
+
+**Why.**
+
+- Experiment 19 showed the queries leaked the answer.
+- The generator, Qwen3.5-35B-A3B (released 2026-02), may also have been trained on the held-out papers (2024-01
+  to 2026-02). Every published benchmark checked requires papers published after the generator's training cutoff
+  (MatDesign, MOOSE-Chem, IdeaBench, ResearchBench); see [RELATED_WORK.md](./RELATED_WORK.md).
+
+**Queries** ([benchmark_v3/README.md](./benchmark_v3/README.md), `query_builder_v3.py`).
+
+- The source is the Introduction only, with the paper's own contribution removed.
+- The writer (GPT-5.6) never sees the answer and follows MOOSE-Chem's rule: the background may cover earlier work,
+  but no method, material change, structure or mechanism of the answer, and no hint of the solution's direction.
+- A separate checker with the answer lists leaking phrases and steering.
+- A lexical gate (≤ 10% of answer words outside the allowed context) applies to every query.
+- Failed levels are rewritten up to 4 times.
+- The hidden targets are unchanged.
+
+**Result.**
+
+- Answer-word overlap fell from 8% / 20% / 47% to 2% / 6% / 5% (broad / problem / expert).
+- 34 of 36 queries pass the gate. The two that fail are expert queries of computational-method papers, whose
+  background inherently names simulation. They are flagged and reported separately.
+
+**Memorisation probe** (`memorisation_probe.py`). Each model saw a held-out paper's title and year; GPT-5.6 scored
+its recollection against the target.
+
+- Qwen recalled specific correct details beyond the title in 33% of probes, against 8% for Llama-3.3 (cutoff
+  2023-12).
+- Neither claimed to remember any paper.
+- This is weak evidence of contamination.
+
+## Experiment 21: all evaluations rerun on leak-free queries with a pre-cutoff generator
+
+**Setup.**
+
+- Experiments 7, 9, 11, 14, 16 and 17 were rerun unchanged except for two things: the queries (benchmark v3) and
+  the generator, Llama-3.3-70B-Instruct (cutoff 2023-12). Its search phrases, selector, refiner and reviser are
+  also pre-cutoff.
+- Outputs are in `rerun_v3/`; the earlier results are untouched.
+- A factorial runs both generators on both query sets for experiment 7.
+
+**Integrity.**
+
+- 1,512 generation runs and 72 selections.
+- Every rerun experiment is verified except one critique resample run, which twice ended without a submission.
+- Zero temporal, family, target and citation leaks.
+
+**Results** (GPT-5.6 reconstruction, 0–4; full table in [rerun_v3/README.md](./rerun_v3/README.md)).
+
+- **Scores fall from 1.39–1.65 to 0.35–0.60, and the level gradient disappears** (broad, problem and expert all
+  about 0.45–0.6).
+- **Answer overlap no longer predicts the score:** ρ = 0.72–0.88 before, −0.05 to 0.50 after.
+- **Factorial, experiment 7:**
+
+| Generator | Leaky queries | Clean queries |
+|---|---:|---:|
+| Qwen3.5 (post-cutoff) | 1.56 | 0.50 |
+| Llama-3.3 (pre-cutoff) | 1.40 | 0.45 |
+
+  - Query effect: −1.07 [−1.37, −0.76] with Qwen and −0.94 with Llama.
+  - Generator effect: −0.16 on leaky queries and −0.04 on clean queries.
+  - The leakage, not memorisation, inflated the original scores.
+- **Rerun ranking.**
+  - closed_book 0.60 is highest, then graph_profiles 0.55, ensemble_select 0.54 and graph_selection 0.54.
+  - text_chunks scores 0.47 and the agents and critique 0.35–0.46.
+  - No arm beats text_chunks after Holm correction (closed_book +0.13, p = 0.04, Holm 0.66).
+- **Agents are under-tested with Llama.** It made 2.1 tool calls per run (9 of 36 runs had none), and the MatKG
+  agent made calls in only 1 of 36 runs. With Qwen on the clean queries, the evidence arms and the agent are level
+  with or slightly above closed-book (text +0.10, agent +0.08; neither significant).
+
+**Earlier conclusions, revised.**
+
+| Conclusion | Status |
+|---|---|
+| Query inferability drives scores | Withdrawn: it was leakage |
+| Evidence hurts on specific queries | Withdrawn: measured on leaky queries |
+| Closed-book is best | Weakened: not significant, and generator-dependent |
+| No rubric beats raw text | Holds |
+| System-match helps | Not confirmed (+0.01–0.02 on GPT-5.6; highest on DeepSeek) |
+| Citation graph does not beat the corpus | Holds; graph_profiles and graph_selection are now near the top (not significant) |
+| Critique and KG do not help | Hold, but confounded by Llama's minimal tool use |
+
+**Next.**
+
+- Use benchmark v3 for all future work.
+- Have the materials expert review the 36 queries.
+- Rerun the agent arms with a pre-cutoff model that uses tools (gpt-4o when its quota allows).
+- Consider removing exact values from the targets (IdeaBench's paraphrase).
+
+## Comparability and limits, experiments 8 to 21
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -971,3 +1066,5 @@ Full details: [query_leakage/README.md](./query_leakage/README.md).
 - Experiment 19 shows that the queries used in experiments 3 to 18 leak the answer, increasingly from broad to
   expert. Absolute scores and level effects in those experiments should not be read as hypothesis-generation
   ability. Only within-unit comparisons between methods are fair.
+- Experiments 20 and 21 replace the queries and the generator. Rerun scores are comparable with one another, and
+  with the original runs only through the experiment-7 factorial. The hidden targets and judges are unchanged.

@@ -1,0 +1,61 @@
+{
+  "schema_version": "benchmark-v3-1.0",
+  "paper_id": "PMC11606917",
+  "publication_date": "2024-11-29",
+  "split": "validation",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "introduction_without_own_contribution",
+  "query_writer": "trapi:gpt-5.6-sol_2026-07-09",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "queries": {
+    "broad": {
+      "text": "For high-entropy alloys, what single intervention could enable more accurate and computationally efficient prediction of melting temperature and other melting properties? State the hypothesized intervention and its mechanism, predict its performance relative to current prediction capabilities, define the conditions under which it should remain valid, identify prior evidence that supports the hypothesis, and propose a decisive experiment or benchmark that could falsify it.",
+      "passed_gate": true,
+      "overlap": 0.049,
+      "raw_overlap_exp19_metric": 0.042,
+      "source_role_refs": []
+    },
+    "problem_constrained": {
+      "text": "For a multicomponent high-entropy alloy in its high-temperature solid and liquid states, what single intervention could overcome the limited accuracy, availability, and efficiency of determining melting temperature, enthalpy and entropy of fusion, volume change upon melting, and liquid thermodynamic properties across a large compositional space? Formulate one hypothesis that states the intervention and causal mechanism, predicts the outcome relative to current experimental and computational baselines, defines the applicable composition and temperature ranges, identifies supporting prior evidence, and proposes a decisive falsification test against independent reference data.",
+      "passed_gate": true,
+      "overlap": 0.033,
+      "raw_overlap_exp19_metric": 0.042,
+      "source_role_refs": []
+    },
+    "expert_context": {
+      "text": "For refractory materials, experiments at the solid-to-fluid transition are difficult and yield sparse, scattered data, while the large compositional space of high-entropy systems makes systematic screening impractical. DFT free-energy studies can determine the transition from the crossing of solid and dense-fluid Gibbs energies and provide associated thermodynamic properties, but their reliance on extensive ab initio molecular dynamics makes them costly. TOR-TILD has shown high efficiency for elemental and binary systems, yet becomes substantially slower for multicomponent systems. Any broadly useful approach must retain ab initio-level accuracy, represent all thermodynamic effects identified as important, treat both phases around the transition, and remain practical across relevant compositions and temperatures. For a multicomponent high-entropy material in these high-temperature states, what single intervention could improve determination of transition temperature, fusion enthalpy and entropy, volume change, and dense-fluid heat capacity? Formulate one hypothesis specifying the intervention and causal mechanism, its predicted outcome relative to existing experimental and computational baselines, its boundary conditions, supporting prior evidence, and a decisive experiment or benchmark that would falsify it.",
+      "passed_gate": false,
+      "overlap": 0.033,
+      "raw_overlap_exp19_metric": 0.056,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "BCC refractory high-entropy alloy with nominal composition TaVCrW (disordered solid state)",
+    "intervention": "Substitution of the empirical Embedded Atom Method (EAM) potential with a Machine Learning Interatomic Potential (MTP) for the liquid phase, and replacement of expensive thermodynamic integration (TI) calculations with free energy perturbation (FEP) calculations.",
+    "conditions": "DFT-based free energy approach; Temperature range 2000–2400 K for SRO analysis; Supercell size 12x12x12 (3456 atoms) for MTP training/MD; Exchange-correlation functionals GGA-PBE and LDA; 0 GPa pressure.",
+    "structural_mediator": "High-fidelity MTP capable of closely reproducing the ab initio phase-space distribution for multi-component alloys, with training errors < 1 meV/atom.",
+    "mechanism": "The MTP enables efficient sampling for FEP, avoiding the slow convergence of TI. The electronic Gibbs energy difference (arising from a DOS gap at the Fermi level) and Solid-state Short-Range Order (SRO) stabilization (~2.4 meV/atom) act as critical physical contributions shifting the melting temperature. The FEP method leverages the small variance in energy differences between MTP and DFT to converge free energy rapidly.",
+    "predicted_outcome": "Computational resource savings of 80% (or ~20x speedup) compared to the original TOR-TILD method, with free energy differences between the new method and TI < 0.5 meV/atom, and melting points shifting by 48–57 K due to electronic excitations.",
+    "baseline": "Original TOR-TILD methodology using two EAM potentials and computationally expensive thermodynamic integration based on ab initio MD.",
+    "boundary": "The method is limited by the quality of the MTP training set; magnetic fluctuations at high temperatures are treated as having negligible impact (based on test calculations); SRO contribution is small but non-negligible (~25 K shift); the empirical rules for GGA/LDA under/overbinding do not hold for V/Cr, introducing uncertainty relative to CALPHAD data.",
+    "discriminating_measurement": "Comparison of free energy results between FEP (MTP) and TI (EAM) on a benchmark system (e.g., VW system) showing agreement within 0.5 meV/atom, and the specific energy difference attributed to electronic excitations (48 K shift for GGA-PBE).",
+    "actual_result": "The proposed method achieved 80% computational savings and predicted melting points 193 K (GGA-PBE) and 160 K (LDA) below the extrapolated CALPHAD value. Electronic excitations contributed a 48 K (GGA-PBE) and 57 K (LDA) shift, and SRO stabilized the solid phase by 2.4 meV/atom. The method agreed reasonably with CALPHAD values within the estimated uncertainty of the CALPHAD database."
+  },
+  "hidden_target_source": "copied from the experiment-3 case (unchanged answer key)",
+  "rounds": 4,
+  "source": {
+    "kept_chars": 4208,
+    "removed_sentences": 10,
+    "removed_preview": [
+      "Here, we propose an efficient ab initio based approach for liquid free energy calculations inspired by direct upsampling for solid phases.",
+      "A key ingredient to the proposed approach is a specially designed machine-learning interatomic potential.",
+      "This potential can be any machine learning model as long as it shows excellent performance regarding accuracy and efficiency, e.g., the recently developed atomic cluster expansion (ACE) potentials23 o"
+    ]
+  },
+  "old_queries": {
+    "broad": "I am interested in high-entropy alloys for extreme temperature applications. How can we predict melting properties such as the melting temperature, entropy of fusion, and heat capacity for multi-component systems where experimental data is sparse or unreliable due to high melting points? I am looking for a hypothesis on a computational methodology that balances accuracy with the need to screen vast compositional spaces, along with prior evidence on why standard approaches struggle in this regime and what a valid boundary condition for such a method would be.",
+    "problem_constrained": "We are analyzing a refractory BCC high-entropy alloy (Ta-based) where standard experimental measurements of melting properties are infeasible. Current ab initio free energy methods are prohibitively expensive due to the need for thermodynamic integration over the full phase space. Furthermore, existing empirical potentials (like EAM) often fail to capture the complex liquid structure in multi-component systems, while machine learning potentials are computationally demanding. I need a hypothesis for an intervention that replaces the expensive thermodynamic integration step with a more efficient perturbation scheme using a specific class of machine learning potentials. The solution must address the trade-off between computational cost (currently limiting throughput) and the accuracy required to resolve subtle free energy differences. What are the known failure modes of existing TOR-TILD or similar approaches in multi-component spaces, and what falsification experiment could distinguish a true efficiency gain from an artifact of the potential's training set?",
+    "expert_context": "Consider a TaVCrW refractory high-entropy alloy. The objective is to calculate its melting temperature and related thermodynamic properties using Density Functional Theory (DFT). The standard approach (TOR-TILD) relies on expensive thermodynamic integration. We hypothesize that substituting the reference potential (EAM) with a Machine Learning Interatomic Potential (MTP) and replacing thermodynamic integration with free energy perturbation (FEP) can achieve significant speedups while maintaining sub-meV accuracy, provided the MTP accurately reproduces the ab initio phase-space distribution even for complex liquids. Prior work suggests that electronic excitations (specifically the gap in the Density of States at the Fermi level) can shift the melting point by tens of Kelvin, and that Short-Range Order (SRO) in the solid phase can introduce a stabilization energy of ~2-3 meV/atom. However, there are limitations: (1) The empirical 'underbinding/overbinding' rules for GGA-PBE/LDA functionals do not hold for V and Cr at 0K, potentially propagating errors; (2) High-temperature magnetic fluctuations are typically neglected but may be relevant. The computational cost must be reduced by >80% compared to the baseline TOR-TILD method. Propose the specific structural mediator (the MTP's ability to reproduce phase-space distributions) that enables the substitution of TI with FEP. What is the boundary condition regarding the supercell size and temperature range (2000-2400 K) needed to validate the SRO contribution? Design a falsification experiment comparing the new method against the original TOR-TILD on a benchmark system (e.g., a simpler alloy) to ensure the free energy difference does not exceed 0.5 meV/atom."
+  }
+}
