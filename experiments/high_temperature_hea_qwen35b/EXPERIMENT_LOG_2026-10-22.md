@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 18)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 19)
 
 This document is the full record of every experiment on the 50-paper high-temperature HEA corpus: date,
 configuration, results, integrity and status. Experiments 0 to 7 are described in detail in the committed
@@ -7,8 +7,8 @@ and they supersede section 8 ("MatKG, planned, blocked") of that log. The commit
 because its working-tree copy has uncommitted changes from another session (it is empty in the working tree).
 Once that is resolved, this document can be merged into the log.
 
-Last updated 2026-10-23 (adds experiments 17 and 18: citation-graph evidence variants and their failure
-analysis).
+Last updated 2026-10-23 (adds experiments 17 and 18, citation-graph evidence variants and their failure
+analysis, and experiment 19, an audit showing that the benchmark queries leak the answer).
 
 Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 and 2026-10-22 runs).
 
@@ -35,6 +35,7 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 16 | 2026-10-23 | Targeted improvements (fixed closed-book prompt, system-match appraisal on text and cards, knowledge-first refinement, ensemble selection) vs experiment-14 baselines | 288 new runs + 72 selections | Qwen | GPT-5.6, DeepSeek-V4-Pro | Complete, verified | [improvements/](./improvements/) |
 | 17 | 2026-10-23 | Citation-graph evidence: per-case graph of 10 best-cited relevant seeds + co-cited references, node profiles with citer statements; 5 variants (selection, profiles, profiles + system-match, corroboration-weighted, graph tool agent) | 264 full-text papers, 9,899 citer statements, 12 graphs; 360 runs | Qwen | GPT-5.6, DeepSeek-V4-Pro | Complete, verified; 1 run failed after retry | [citegraph/](./citegraph/) |
 | 18 | 2026-10-23 | Failure analysis of experiment 17 (statement fidelity, graph evidence ceiling, retrieval and use, error coding, tool traces) | 90 statements, 24 ceilings, 408 runs coded | none | GPT-5.6 (checker, coder) | Complete (analysis only) | [citegraph/failure/](./citegraph/failure/) |
+| 19 | 2026-10-23 | Audit of answer leakage in the benchmark queries (roles used to write each query, answer-word overlap, correlation with scores) | 36 queries; 7 methods | none | none | Complete (analysis only); affects experiments 3 to 18 | [query_leakage/](./query_leakage/) |
 
 ## Correction to section 8 (MatKG)
 
@@ -866,7 +867,69 @@ fixable failure causes. Drop corroboration_weighted.
 
 Full details: [citegraph/failure/README.md](./citegraph/failure/README.md).
 
-## Comparability and limits, experiments 8 to 18
+## Experiment 19: answer leakage in the benchmark queries
+
+**Question.** How are the queries built, and do they reveal the answer?
+
+**How queries are built.**
+
+- `build_cases` in `temporal_hypothesis_benchmark.py` makes one Qwen call per held-out paper. Into it go the
+  paper's "safe" roles (problem_motivation, prior_limitation, constraint), its result roles (hypothesis_statement,
+  causal_claim, mechanism_principle, evidence_result, contradiction) and its own result evidence.
+- That call writes the three queries and the hidden target together.
+- The only safeguards are the prompt instruction "do not reveal the result" and a check that the title and DOI do
+  not appear in the query.
+
+**Findings** (`query_leakage_audit.py`, `query_leakage/analysis.json`).
+
+| Level | Queries written from result roles | Answer words in query (mean, max) |
+|---|---:|---:|
+| broad | 2 of 12 | 8%, 16% |
+| problem_constrained | 7 of 12 | 20%, 27% |
+| expert_context | 12 of 12 | 47%, 65% |
+
+"Answer words" are the content words of the hidden target's intervention, structural mediator and mechanism.
+
+- Expert queries state the answer outright:
+  - PMC10759803: "addition of ~4 at.% … (Cr) … Laves phase … reticulated … impedes crack extension".
+  - PMC11087546: "approximately 6 GPa at 1473 K … hierarchically patterned microstructure with coherent
+    interfaces".
+- Problem queries give the type of intervention ("introduce a minor alloying element … to induce a secondary
+  intermetallic phase to form a reticulated network").
+- Some broad queries state the outcome. PMC12298864: "grain sizes below 50 nm and a dual-phase solid solution".
+- The builder listed these risks itself in `leakage_audit.remaining_risks`, but nothing acted on them.
+- Other problems:
+  - The query writer is the generator under test (Qwen).
+  - Many expert queries ask the model to justify a stated hypothesis ("Propose a hypothesis where…").
+  - Some queries prescribe the paper's own control experiment.
+  - The hidden target contains exact values (for example 13.5% strength gain, 675 HV) that earlier literature
+    cannot predict.
+- **Leakage predicts the score.** Across the 36 units, Spearman correlation between answer overlap and GPT-5.6
+  score is 0.77–0.86 for all seven methods checked: closed_book 0.86, text_chunks 0.84, card 0.80,
+  card_systemmatch 0.84, graph_profiles 0.77, graph_profiles_systemmatch 0.84, graph_tool_agent 0.84. Within
+  the expert level alone it is 0.66–0.85.
+
+**Impact on earlier experiments.**
+
+- Comparisons between methods on the same query unit stay fair, because every method saw the same text.
+- Absolute scores, the broad-to-expert gradient and the "query inferability drives scores" finding (experiments
+  12, 13 and 15) mostly measure how much of the answer the query gives.
+- "Closed-book is best" and "evidence hurts on specific queries" (experiments 14 to 18) are confounded: when the
+  query already contains the answer, retrieved evidence can only distract.
+
+**Recommended rebuild** (not yet run).
+
+1. Write queries only from pre-result content (introduction, limits of prior work). The query writer never sees
+   result roles or result evidence, and the target is built in a separate call.
+2. Use a model other than the generator as the writer.
+3. Define levels by context, not by answer: broad = family + goal; problem = + baseline alloy, failure mode, test
+   regime; expert = + earlier attempts and constraints. No level names the intervention type.
+4. Gate each query: answer-word overlap below about 10%, and a query-only guesser must score below 2 of 4 on
+   intervention against the target. Otherwise rewrite or drop.
+5. Expert review of the 36 queries, then re-run the key methods (closed_book, text_chunks, card_systemmatch,
+   graph_profiles_systemmatch).
+
+## Comparability and limits, experiments 8 to 19
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -887,3 +950,6 @@ Full details: [citegraph/failure/README.md](./citegraph/failure/README.md).
 - Experiments 17 and 18 build a different evidence pool per case from Europe PMC open-access papers outside the
   50-paper corpus. Their ceilings are directly comparable with experiment 14's, but the papers are not the same
   papers. Seed relevance is lexical, and paywalled works enter only as reference-only nodes.
+- Experiment 19 shows that the queries used in experiments 3 to 18 leak the answer, increasingly from broad to
+  expert. Absolute scores and level effects in those experiments should not be read as hypothesis-generation
+  ability. Only within-unit comparisons between methods are fair.
