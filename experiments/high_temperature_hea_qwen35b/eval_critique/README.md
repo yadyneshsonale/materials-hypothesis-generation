@@ -1,5 +1,8 @@
 # Critique-augmented hypothesis revision (eval_critique)
 
+> **Caveat (added 2026-10-23, experiment 19).** The benchmark queries used here leak the held-out answer: 8% of the answer's words appear in broad queries, 20% in problem_constrained and 47% in expert_context, and per-unit overlap correlates 0.77–0.86 with judge scores. Paired comparisons between methods on the same query remain fair. Absolute scores, differences between query levels and conclusions about query inferability or evidence use are confounded. See [query_leakage/README.md](../query_leakage/README.md).
+
+
 **Question.** Does a panel of critic LLMs, each checking one aspect of a tool-agent hypothesis against the
 evidence the agent read, improve the hypothesis when a reviser rewrites it? The comparison is against the
 unrevised baseline, against a self-revise control (same reviser, no critiques), and against a fresh baseline

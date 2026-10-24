@@ -1,5 +1,8 @@
 # Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 19)
 
+Related work (9 hypothesis-generation and materials-KG papers, with how each separates input from answer):
+[RELATED_WORK.md](./RELATED_WORK.md).
+
 This document is the full record of every experiment on the 50-paper high-temperature HEA corpus: date,
 configuration, results, integrity and status. Experiments 0 to 7 are described in detail in the committed
 [EXPERIMENT_LOG.md](./EXPERIMENT_LOG.md) and summarised here. Experiments 8 to 11 are documented in full here,
@@ -928,6 +931,21 @@ Full details: [citegraph/failure/README.md](./citegraph/failure/README.md).
    intervention against the target. Otherwise rewrite or drop.
 5. Expert review of the 36 queries, then re-run the key methods (closed_book, text_chunks, card_systemmatch,
    graph_profiles_systemmatch).
+
+**How published benchmarks handle this** ([RELATED_WORK.md](./RELATED_WORK.md)).
+
+- ACCELMAT/MatDesign (NAACL Findings 2025): experts extract only a goal statement and constraints as input; the
+  paper's materials and methods are the held-out answer.
+- SCIMON (ACL 2024): abstract sentences are split by role, so Background sentences are input and Method/Objective
+  sentences are targets.
+- ResearchBench (ACL Findings 2026): an LLM agent extracts question and background separately from the hypothesis,
+  and experts validate the extraction (91.9%).
+
+All three keep the answer out of the generator's input by construction, not by instruction; our case builder
+relied on the instruction alone. ResearchBench also scores inspiration retrieval separately and ranks in both
+orders, which addresses two open problems here: the evidence ceiling against its use, and selector position bias.
+
+Full details: [query_leakage/README.md](./query_leakage/README.md).
 
 ## Comparability and limits, experiments 8 to 19
 

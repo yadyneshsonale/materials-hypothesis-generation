@@ -1,5 +1,8 @@
 # Temporal evaluation v3: cutoff-audited tool agent vs. baselines
 
+> **Caveat (added 2026-10-23, experiment 19).** The benchmark queries used here leak the held-out answer: 8% of the answer's words appear in broad queries, 20% in problem_constrained and 47% in expert_context, and per-unit overlap correlates 0.77–0.86 with judge scores. Paired comparisons between methods on the same query remain fair. Absolute scores, differences between query levels and conclusions about query inferability or evidence use are confounded. See [query_leakage/README.md](../query_leakage/README.md).
+
+
 This experiment asks whether an agent that searches and reads only papers published before a target paper's date can reconstruct that paper's design better than simpler baselines. Generation runs on the local Qwen3.5-35B-A3B model. Judging runs on TRAPI GPT-5.6, so the generator never scores its own output.
 
 **Status:** complete, with one open generation failure. 143 of 144 generations are valid and judged. The integrity gate reports `verified: false` for that single failed unit (see Results). `COMPLETE` is written only when the gate verifies, so it is absent.
