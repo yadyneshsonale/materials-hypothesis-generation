@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 16)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 18)
 
 This document is the full record of every experiment on the 50-paper high-temperature HEA corpus: date,
 configuration, results, integrity and status. Experiments 0 to 7 are described in detail in the committed
@@ -7,8 +7,8 @@ and they supersede section 8 ("MatKG, planned, blocked") of that log. The commit
 because its working-tree copy has uncommitted changes from another session (it is empty in the working tree).
 Once that is resolved, this document can be merged into the log.
 
-Last updated 2026-10-22 (adds the shared configuration reference, experiment 11 and the full experiment 12
-failure analysis).
+Last updated 2026-10-23 (adds experiments 17 and 18: citation-graph evidence variants and their failure
+analysis).
 
 Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 and 2026-10-22 runs).
 
@@ -33,6 +33,8 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 14 | 2026-10-22 to 2026-10-23 | Extraction rubrics (card, effects, mechanisms, gaps, mixed) vs raw text, v2 units and closed-book, equal evidence budget, 2 samples | 50 papers × 4 rubrics extracted; 576 runs | Qwen | GPT-5.6, DeepSeek-V4-Pro | Complete; 2 runs (1 closed-book unit) failed after retry | [rubric_eval/](./rubric_eval/) |
 | 15 | 2026-10-23 | Failure analysis of experiment 14 (extraction fidelity, retrieval, evidence use, error coding, reproduced generation failure) | 574 runs, 2,282 fatal errors, 160 records checked | none | GPT-5.6 (coder) | Complete (analysis only) | [rubric_eval/failure/](./rubric_eval/failure/) |
 | 16 | 2026-10-23 | Targeted improvements (fixed closed-book prompt, system-match appraisal on text and cards, knowledge-first refinement, ensemble selection) vs experiment-14 baselines | 288 new runs + 72 selections | Qwen | GPT-5.6, DeepSeek-V4-Pro | Complete, verified | [improvements/](./improvements/) |
+| 17 | 2026-10-23 | Citation-graph evidence: per-case graph of 10 best-cited relevant seeds + co-cited references, node profiles with citer statements; 5 variants (selection, profiles, profiles + system-match, corroboration-weighted, graph tool agent) | 264 full-text papers, 9,899 citer statements, 12 graphs; 360 runs | Qwen | GPT-5.6, DeepSeek-V4-Pro | Complete, verified; 1 run failed after retry | [citegraph/](./citegraph/) |
+| 18 | 2026-10-23 | Failure analysis of experiment 17 (statement fidelity, graph evidence ceiling, retrieval and use, error coding, tool traces) | 90 statements, 24 ceilings, 408 runs coded | none | GPT-5.6 (checker, coder) | Complete (analysis only) | [citegraph/failure/](./citegraph/failure/) |
 
 ## Correction to section 8 (MatKG)
 
@@ -756,7 +758,115 @@ the prompt changes, or for knowledge_first an extra step.
 
 Full details: [improvements/README.md](./improvements/README.md).
 
-## Comparability and limits, experiments 8 to 16
+## Experiment 17: citation-graph evidence variants
+
+**Question.** Does evidence from a per-query citation graph beat the fixed 50-paper corpus, and which way of
+using the graph works best? The user chose every design option and asked for all variants to be run and
+compared with a failure analysis.
+
+**Graph.** One graph per case, built from the problem_constrained query and shared by all three levels.
+
+- Qwen writes search phrases from the query only.
+- Seeds: Europe PMC open-access full text before the cutoff, anchored to the HEA domain and re-ranked by BM25.
+  The top 40 by relevance are ordered by citations before the cutoff year; N = 10, reviews allowed.
+- Backward expansion: k = 3 per seed, ranked by co-citation among seeds, then relevance, then pre-cutoff
+  citations. References without full text are skipped.
+- References resolve to OpenAlex works by DOI, PMID or title (92% resolved).
+- Qwen writes a card per full-text paper and one statement per (citing sentence, cited work) with relation,
+  claim, system and numbers.
+- Nodes are the seeds, the expansion papers and all their pre-cutoff references. A statement from paper A about
+  work C is attached to node C.
+- Built: 264 full-text papers, 9,899 statements; per case 1,298 nodes, 30 full text, 71 with ≥ 2 independent
+  citers.
+
+**Variants.**
+
+- graph_selection: cards of graph papers (control).
+- graph_profiles: card plus citer statements.
+- graph_profiles_systemmatch: profiles with the experiment-16 appraisal.
+- corroboration_weighted: ranked by relevance × independent citers.
+- graph_tool_agent: search_nodes, read_node, who_cites, references, path; 12 calls.
+
+Generator, budget (16,000 characters), two samples, judges and statistics are as in experiments 14 and 16.
+
+**Results** (reconstruction 0–4):
+
+| Arm | GPT-5.6 | DeepSeek-V4-Pro | Non-broad (GPT-5.6) |
+|---|---:|---:|---:|
+| closed_book (baseline) | **1.65** | **2.20** | **2.06** |
+| card_systemmatch (exp 16) | 1.62 | 2.02 | 2.02 |
+| text_chunks (baseline) | 1.56 | 2.00 | 2.00 |
+| graph_selection | 1.52 | 1.91 | 1.97 |
+| graph_profiles | 1.52 | 1.97 | 1.95 |
+| card (baseline) | 1.52 | 1.98 | 1.92 |
+| graph_tool_agent | 1.52 | 1.98 | 1.92 |
+| graph_profiles_systemmatch | 1.49 | 2.06 | 1.91 |
+| corroboration_weighted | 1.49 | 1.97 | 1.93 |
+
+- Against text_chunks, every variant is between −0.07 and −0.03 on GPT-5.6 and between −0.09 and +0.06 on
+  DeepSeek. No Holm-adjusted p is below 0.73.
+- Every variant is below closed_book. The interval excludes zero for graph_selection and corroboration_weighted
+  on both judges.
+- Adding citer statements to the same graph (profiles − selection) changes nothing: 0.00 and +0.06.
+- graph_profiles_systemmatch has the highest evidence validity (1.28) and specificity (0.81) of any arm.
+- The tool agent always exhausts its budget and almost never uses citation edges.
+
+**Integrity.**
+
+- 359 of 360 runs ok. One system-match run hit the output cap on its first attempt and on its single retry.
+- Every ok run judged twice and audited.
+- Zero temporal, target, family or title leaks and zero invalid citations. Nodes are dated by their latest
+  citer.
+
+**Answer.** No graph variant improves on the corpus baselines. The best graph variant, graph_profiles_systemmatch,
+equals card_systemmatch on DeepSeek and is lower on GPT-5.6.
+
+Full details: [citegraph/README.md](./citegraph/README.md).
+
+## Experiment 18: failure analysis of the citation-graph variants
+
+**Findings, in pipeline order.**
+
+- *Statements.* 72% of the 90 checked citer statements are faithful to their sentence, and 90% have the right
+  relation.
+  - Method statements are faithful only 47% of the time (often a restated title), and compares statements 60%
+    (the citing paper's comparison attributed to the cited work).
+  - The cited system is right in only 68% of statements that state one.
+- *Ceiling.* The graph anticipates the target no better than the corpus: 1.25 for profiles and 1.33 for selected
+  cards, against 1.25 for corpus text and 1.42 for corpus cards; about 2 strongly supportive records per case
+  either way.
+  - Half the supportive profiles are reference-only nodes, so statements add coverage but not more anticipation.
+- *Use.* Profiles spread the budget over 13.6 papers instead of 5.7. Supportive citations fall to 46% (85% for
+  cards), and 57% of citations are reference-only nodes.
+  - Corroboration ranking cuts supportive records in context from 3.8 to 1.3 by promoting central, general works.
+  - The agent reads 7 nodes and sees 1.6 supportive records. It uses citation edges in 20 of 72 runs, with no
+    effect on the score (1.53 with, 1.52 without).
+- *Reasoning.* Wrong-baseline (up to 0.46) and wrong-conditions (up to 0.62) errors rise in the graph arms,
+  because the model borrows other alloy classes' starting materials and regimes.
+  - System-match on profiles has the most mechanism (82%) and physical (29%) errors in its failures; citer
+    statements rarely say which system they concern.
+  - Own-reasoning mechanisms still score highest (1.80–1.85 in the profile arms).
+
+**Why the graph does not help.**
+
+1. The evidence ceiling does not rise.
+2. Citation counts and corroboration measure centrality, not query relevance.
+3. Reference-only nodes are thin and partly unfaithful.
+4. The agent does not exploit the structure.
+
+**Best variant.** graph_profiles_systemmatch: highest DeepSeek score, evidence validity and specificity, with
+fixable failure causes. Drop corroboration_weighted.
+
+**Fixes if pursued.**
+
+- Rank by relevance first.
+- Keep reference-only nodes only with at least 2 consistent citers and an explicit system.
+- Take the system from the reference entry. Drop method and compares statements.
+- Give the agent a graph-first protocol with more reads.
+
+Full details: [citegraph/failure/README.md](./citegraph/failure/README.md).
+
+## Comparability and limits, experiments 8 to 18
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -774,3 +884,6 @@ Full details: [improvements/README.md](./improvements/README.md).
   comparisons are within this protocol, and cross-experiment differences should be read with that in mind.
 - Experiments 7, 9 and 11 each use 12 papers. No comparison in any of them survives multiple-comparison
   correction, so none shows a demonstrated improvement.
+- Experiments 17 and 18 build a different evidence pool per case from Europe PMC open-access papers outside the
+  50-paper corpus. Their ceilings are directly comparable with experiment 14's, but the papers are not the same
+  papers. Seed relevance is lexical, and paywalled works enter only as reference-only nodes.

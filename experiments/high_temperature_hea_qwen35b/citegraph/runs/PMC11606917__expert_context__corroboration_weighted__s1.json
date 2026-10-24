@@ -1,0 +1,148 @@
+{
+  "run_id": "PMC11606917__expert_context__corroboration_weighted__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "expert_context",
+  "arm": "corroboration_weighted",
+  "sample": 1,
+  "query": "Consider a TaVCrW refractory high-entropy alloy. The objective is to calculate its melting temperature and related thermodynamic properties using Density Functional Theory (DFT). The standard approach (TOR-TILD) relies on expensive thermodynamic integration. We hypothesize that substituting the reference potential (EAM) with a Machine Learning Interatomic Potential (MTP) and replacing thermodynamic integration with free energy perturbation (FEP) can achieve significant speedups while maintaining sub-meV accuracy, provided the MTP accurately reproduces the ab initio phase-space distribution even for complex liquids. Prior work suggests that electronic excitations (specifically the gap in the Density of States at the Fermi level) can shift the melting point by tens of Kelvin, and that Short-Range Order (SRO) in the solid phase can introduce a stabilization energy of ~2-3 meV/atom. However, there are limitations: (1) The empirical 'underbinding/overbinding' rules for GGA-PBE/LDA functionals do not hold for V and Cr at 0K, potentially propagating errors; (2) High-temperature magnetic fluctuations are typically neglected but may be relevant. The computational cost must be reduced by >80% compared to the baseline TOR-TILD method. Propose the specific structural mediator (the MTP's ability to reproduce phase-space distributions) that enables the substitution of TI with FEP. What is the boundary condition regarding the supercell size and temperature range (2000-2400 K) needed to validate the SRO contribution? Design a falsification experiment comparing the new method against the original TOR-TILD on a benchmark system (e.g., a simpler alloy) to ensure the free energy difference does not exceed 0.5 meV/atom.",
+  "publication_date": "2024-11-29",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Substituting the EAM reference potential with a Machine Learning Interatomic Potential (MTP) trained on TaVCrW ab initio data, and replacing thermodynamic integration (TI) with free energy perturbation (FEP), will reduce the computational cost of calculating the melting temperature by >80% while maintaining an accuracy within 0.5 meV/atom, provided the MTP captures the Short-Range Order (SRO) stabilization energy of ~2-3 meV/atom in the solid phase.",
+    "material_initial_state": "TaVCrW refractory high-entropy alloy in a disordered BCC solid solution phase at 0 K, characterized by potential underbinding/overbinding errors in GGA-PBE/LDA functionals and negligible electronic excitation effects at low temperature.",
+    "intervention": "Replace the EAM potential with a Moment Tensor Potential (MTP) trained on DFT data and replace the thermodynamic integration (TOR-TILD) method with Free Energy Perturbation (FEP) for calculating the solid-liquid free energy difference.",
+    "conditions": "Temperature range of 2000-2400 K; Supercell size sufficient to capture SRO correlations (estimated >100 atoms); Neglect of high-temperature magnetic fluctuations as a first-order approximation.",
+    "structural_mediator": "The MTP's ability to accurately reproduce the ab initio phase-space distribution, specifically capturing the local atomic environments and Short-Range Order (SRO) that contribute ~2-3 meV/atom of stabilization energy, which is critical for the validity of the FEP estimator.",
+    "mechanism": "The MTP provides a computationally efficient surrogate for the DFT energy landscape, allowing for the rapid sampling of phase space required for FEP. The FEP method calculates the free energy difference between solid and liquid states by perturbing the system along a coupling parameter, bypassing the slow convergence of thermodynamic integration. The accuracy is maintained because the MTP preserves the specific SRO and electronic structure features (like the DOS gap) that shift the melting point, which empirical potentials often miss.",
+    "predicted_outcome": "The calculated melting temperature of TaVCrW will be within 10-20 K of the DFT-TOR-TILD baseline (accounting for electronic excitation shifts), with a total computational cost reduction exceeding 80%. The free energy difference between the solid and liquid phases calculated via FEP will deviate by less than 0.5 meV/atom from the TI baseline.",
+    "baseline": "The standard TOR-TILD method using EAM potentials and thermodynamic integration, which is computationally expensive due to the need for extensive sampling and the limitations of EAM in capturing complex liquid structures and SRO.",
+    "boundary": "The hypothesis holds only if the supercell size is large enough to avoid finite-size effects on SRO (likely >100 atoms) and if the temperature range (2000-2400 K) does not trigger magnetic fluctuations that the MTP was not trained to capture. The method fails if the 'underbinding/overbinding' errors of the underlying DFT functional (GGA-PBE/LDA) for V and Cr at 0 K propagate significantly into the liquid phase description.",
+    "uncertainty": "There is uncertainty regarding the impact of high-temperature magnetic fluctuations, which are typically neglected but may shift the melting point. Additionally, the 'underbinding/overbinding' rules for V and Cr at 0 K may not hold, potentially introducing systematic errors in the DFT training data that the MTP will inherit, affecting the absolute accuracy of the melting point prediction.",
+    "supporting_evidence_ids": [
+      "node::W2168686241",
+      "node::W2039061417",
+      "node::W2534691303",
+      "node::W1964522838",
+      "node::W2049639367",
+      "node::W2802652936",
+      "node::W3023402054",
+      "node::W3011399408",
+      "node::W3183767639"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Select a benchmark binary or ternary alloy system (e.g., NbMoTa or a simpler subset of TaVCrW) where high-precision DFT-TOR-TILD melting points are already established. Train an MTP on DFT data for this system. Perform melting point calculations using both the original TOR-TILD method (with EAM) and the proposed MTP+FEP method. Ensure the supercell size is identical and large enough to capture SRO.",
+      "measurements": [
+        "Melting temperature (Tm) calculated by both methods.",
+        "Free energy difference (ΔF) between solid and liquid phases at Tm.",
+        "Computational wall-clock time for each method.",
+        "Short-Range Order (SRO) parameters (e.g., Warren-Cowley parameters) in the solid phase."
+      ],
+      "falsification_rule": "The hypothesis is falsified if the absolute difference in the calculated free energy difference (ΔF) between the MTP+FEP and TOR-TILD methods exceeds 0.5 meV/atom, or if the computational cost reduction is less than 80% while the Tm deviation exceeds 20 K."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "packed_ids": [
+    "node::W2168686241",
+    "node::W2039061417",
+    "node::W2534691303",
+    "node::W1964522838",
+    "node::W2049639367",
+    "node::W2802652936",
+    "node::W3023402054",
+    "node::W3011399408",
+    "node::W3183767639"
+  ],
+  "packed_chars": 15994,
+  "packed_papers": 9,
+  "packed_with_citer_statements": 9,
+  "cited_ids": [
+    "node::W1964522838",
+    "node::W2039061417",
+    "node::W2049639367",
+    "node::W2168686241",
+    "node::W2534691303",
+    "node::W2802652936",
+    "node::W3011399408",
+    "node::W3023402054",
+    "node::W3183767639"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "node::W1964522838",
+      "paper_id": "PMC4366518",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Accelerated exploration of multi-principal element alloys with solid solution phases (2015). Cited 614 times before the cutoff; 2 papers in this graph say something specific about it.\nCorroboration: 2 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nOwn digest: Paper card. Question: How does the number of principal elements (N) in equimolar multi-principal element alloys affect the probability of forming disordered solid solution (SS) phases versus intermetallic (IM) phases, and what are the implications for high-temperature structural applications?. System: Equimolar combinations of 3 to 6 elements from a palette of 26 metallic elements (including Al, Si, Mo, Ta, W, Nb, Ti, V, Re, Zr, Cr, Fe, Co, Ni, etc.). Processing: High-throughput computational screening using the CALPHAD method (Pandat v.8.1 software) to calculate phase diagrams for 134,547 equimolar alloy systems; results filtered for credibility where the fraction of fully assessed binary systems (fAB) equals 1.. Test conditions: Phase diagrams calculated between 600 °C and 3,600 °C; properties evaluated at the solidus temperature (Tm) and at 600 °C; maximum use temperature (Tuse"
+    },
+    {
+      "record_id": "node::W2039061417",
+      "paper_id": "W2039061417",
+      "publication_date": "2022-07-18",
+      "kind": "graph_node",
+      "text": "Paper node: Microstructures and properties of high-entropy alloys (2013). Cited 4731 times before the cutoff; 6 papers in this graph say something specific about it.\nCorroboration: 6 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- finding (from \"High-Entropy Metal Diborides: A New Class of High-Entropy ...\", 2016): five or more elements can be mixed in a HEA in equimolar concentrations to produce a maximum molar configurational entropy of ΔSmix = RlnN [system high-entropy alloys (HEA); values ΔSmix = RlnN, N is the number of equimolar components]\n- finding (from \"High-Entropy Metal Diborides: A New Class of High-Entropy ...\", 2016): suggested that a necessary (but not sufficient) criterion for forming a single-phase (disordered) HEA is that the computed δ of the solid solution should be sufficiently small: δ ≤ δmax ≈ 4% [system single-phase (disordered) HEA; values δ ≤ δmax ≈ 4%]\n- finding (from \"Predicting Elastic Constants of Refractory Complex Concentrated Alloys ...\", 2022): Ω is defined as ΔSmix divided by the ΔHmix and multiplied by alloys' average melting temperature (MT) [system high-entropy alloys]\n- find"
+    },
+    {
+      "record_id": "node::W2049639367",
+      "paper_id": "W2049639367",
+      "publication_date": "2021-06-04",
+      "kind": "graph_node",
+      "text": "Paper node: Mechanical properties of Nb25Mo25Ta25W25 and V20Nb20Mo20Ta20W20 refractory high entropy alloys (2011). Cited 1986 times before the cutoff; 5 papers in this graph say something specific about it.\nCorroboration: 5 independent citing papers; 1 supporting, 0 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- supports (from \"In-Situ Alloy Formation of a WMoTaNbV Refractory Metal ...\", 2021): reported results for vacuum arc molten WMoTaNbV showing a single bcc high entropy phase [system WMoTaNbV; applied to PBF-LB/M B sample]\n- finding (from \"Microstructural Design for Improving Ductility of An Initially ...\", 2018): NbMoTaVW showed weak temperature dependence of yield strength in the temperature range from 600 °C to 1600 °C, with yield strength above 400 MPa at 1600 °C [system NbMoTaVW; applied to RHEAs; values 600 °C to 1600 °C, 400 MPa at 1600 °C]\n- finding (from \"WxNbMoTa Refractory High-Entropy Alloys Fabricated by Laser Cladding ...\", 2019): found that WNbMoTa and WNbMoTaV HEAs have better high-temperature yield strength than traditional superalloys, namely Inconel 718 and Haynes 230 [system WNbMoTa and WNbMoTaV; applied to Inconel 718 and Haynes "
+    },
+    {
+      "record_id": "node::W2168686241",
+      "paper_id": "W2168686241",
+      "publication_date": "2022-07-18",
+      "kind": "graph_node",
+      "text": "Paper node: Classification of Bulk Metallic Glasses by Atomic Size Difference, Heat of Mixing and Period of Constituent Elements and Its Application to Characterization of the Main Alloying Element (2005). Cited 3195 times before the cutoff; 6 papers in this graph say something specific about it.\nCorroboration: 6 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- finding (from \"Predicting Elastic Constants of Refractory Complex Concentrated Alloys ...\", 2022): enthalpy of mixing (ΔHmix) is a descriptor for RCCAs [system bulk metallic glasses; applied to RCCAs]\n- method (from \"Accelerated exploration of multi-principal element alloys with solid ...\", 2015): estimated Hmix for a wide range of atom pairs [system Bulk Metallic Glasses]\n- method (from \"Liquid Phase Separation in High-Entropy Alloys—A Review\", 2018): used the Miedema model for the classification of bulk metallic glasses by atomic size difference and heat of mixing [system bulk metallic glasses]\n- method (from \"WxNbMoTa Refractory High-Entropy Alloys Fabricated by Laser Cladding ...\", 2019): calculated the enthalpy change of the binary liquid alloy composed"
+    },
+    {
+      "record_id": "node::W2534691303",
+      "paper_id": "W2534691303",
+      "publication_date": "2021-06-04",
+      "kind": "graph_node",
+      "text": "Paper node: A critical review of high entropy alloys and related concepts (2016). Cited 5108 times before the cutoff; 6 papers in this graph say something specific about it.\nCorroboration: 6 independent citing papers; 0 supporting, 0 contradicting, 1 extending statements.\nWhat citing papers say about it:\n- finding (from \"In-Situ Imaging of Molten High-Entropy Alloys Using Cold ...\", 2019): showed promising mechanical, thermal, electric, and magnetic properties [system high-entropy alloys]\n- finding (from \"High entropy alloys as a bold step forward ...\", 2019): The field has explored only seven new alloy families, each based on a palette of similar atoms. [values seven]\n- finding (from \"In-Situ Alloy Formation of a WMoTaNbV Refractory Metal ...\", 2021): reported that refractory metal high entropy alloys are by far less investigated [system refractory metal high entropy alloys]\n- finding (from \"In-Situ Alloy Formation of a WMoTaNbV Refractory Metal ...\", 2021): suggested the formation of a single phase solid solution as a further criterion [system high entropy alloys]\n- finding (from \"Liquid Phase Separation in High-Entropy Alloys—A Review\", 2018): reviewed that approximately 85% of "
+    },
+    {
+      "record_id": "node::W2802652936",
+      "paper_id": "W2802652936",
+      "publication_date": "2023-01-13",
+      "kind": "graph_node",
+      "text": "Paper node: Machine learning for phase selection in multi-principal element alloys (2018). Cited 173 times before the cutoff; 3 papers in this graph say something specific about it.\nCorroboration: 3 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- finding (from \"Predicting Elastic Constants of Refractory Complex Concentrated Alloys ...\", 2022): used 118 instances of data set with five descriptors (VEC, ΔSmix, ΔHmix, δ, and χ) to determine the phase in multi-principle element alloys [system multi-principle element alloys; values 118 instances, five descriptors]\n- finding (from \"Predicting Elastic Constants of Refractory Complex Concentrated Alloys ...\", 2022): used 118 instances and five features of the multi-principal element alloys dataset to forecast the alloy's structure [system multi-principal element alloys; values 118 instances, five features]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): showed the superiority of FFANN over other machine learning models in phase prediction [system High entropy alloys (HEAs)]\n- method (from \"High Entropy Alloys Mined From Binary Phase"
+    },
+    {
+      "record_id": "node::W3011399408",
+      "paper_id": "W3011399408",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: First-principles prediction of incipient order in arbitrary high-entropy alloys: exemplified in Ti0.25CrFeNiAl (2020). Cited 51 times before the cutoff; 2 papers in this graph say something specific about it.\nCorroboration: 2 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- method (from \"A machine learning framework for discovering high entropy ...\", 2023): implemented density functional theory for HEAs phase prediction [system Ti0.25CrFeNiAl]\n- method (from \"Recent advances in computational design of structural multi-principal ...\", 2023): uses concentration wave analysis in conjunction with DFT and linear response theory to determine the phase stability of Ti0.25CrFeNiAlx system [system Ti0.25CrFeNiAlx system]"
+    },
+    {
+      "record_id": "node::W3023402054",
+      "paper_id": "W3023402054",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Machine-learning informed prediction of high-entropy solid solution formation: Beyond the Hume-Rothery rules (2020). Cited 111 times before the cutoff; 2 papers in this graph say something specific about it.\nCorroboration: 2 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): found that molar volume, bulk modulus, and melting temperature are the factors that affect phase formation in HEAs [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): showed excellent accuracy in phase prediction while being computationally inexpensive [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): indicated that molar volume, bulk modulus, and melting temperature are the most influential features in HEAs' phase formation [system High entropy alloys (HEAs)]\n- finding (from \"Recent advances in computational design of structural multi-principal ...\", 2023): One of the applications is phase selection, where"
+    },
+    {
+      "record_id": "node::W3183767639",
+      "paper_id": "W3183767639",
+      "publication_date": "2024-07-16",
+      "kind": "graph_node",
+      "text": "Paper node: Machine learning for alloys (2021). Cited 189 times before the cutoff; 1 papers in this graph say something specific about it.\nCorroboration: 1 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- method (from \"Ab initio framework for deciphering trade-off relationships in ...\", 2024): used machine learning for alloys"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "elapsed_seconds": 54.41
+}

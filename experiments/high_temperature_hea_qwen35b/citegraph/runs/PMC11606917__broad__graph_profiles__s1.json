@@ -1,0 +1,120 @@
+{
+  "run_id": "PMC11606917__broad__graph_profiles__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "broad",
+  "arm": "graph_profiles",
+  "sample": 1,
+  "query": "I am interested in high-entropy alloys for extreme temperature applications. How can we predict melting properties such as the melting temperature, entropy of fusion, and heat capacity for multi-component systems where experimental data is sparse or unreliable due to high melting points? I am looking for a hypothesis on a computational methodology that balances accuracy with the need to screen vast compositional spaces, along with prior evidence on why standard approaches struggle in this regime and what a valid boundary condition for such a method would be.",
+  "publication_date": "2024-11-29",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "A hybrid computational framework integrating CALPHAD thermodynamic modeling with machine learning regression trained on mean elemental melting temperatures and bulk moduli will accurately predict the melting temperature and entropy of fusion for refractory high-entropy alloys, overcoming the combinatorial explosion of binary interactions that causes standard CALPHAD to underestimate solid solution stability in high-N systems.",
+    "material_initial_state": "Multi-principal element alloys (MPEAs) with 4 to 6 equimolar components selected from refractory elements (e.g., W, Mo, Ta, Nb, V) and transition metals (e.g., Cr, Fe, Co, Ni), where experimental melting data is sparse or unreliable due to extreme temperatures (>2000 °C).",
+    "intervention": "Construct a predictive model where the input features are the mean melting temperature and mean bulk modulus of the constituent elements, combined with a CALPHAD-based phase diagram calculation filtered for systems with high configurational entropy, to estimate Tm and ΔS_fus.",
+    "conditions": "Systems must be screened for a fraction of fully assessed binary systems (fAB) equal to 1 to ensure thermodynamic database reliability; the model is applied to compositions where the number of elements (N) is between 3 and 6, and the maximum use temperature is estimated as 0.8Tm.",
+    "structural_mediator": "The balance between rising configurational entropy (scaling as ln(N)) and the rapidly increasing number of binary interactions (scaling as (N/2)(N−1)) which drives intermetallic formation; the model mediates this by using bulk modulus and melting temperature as proxies for the strength of these interactions.",
+    "mechanism": "Standard CALPHAD struggles in this regime because the number of binary interactions grows quadratically with N, making the estimation of formation enthalpy (Hf) for intermetallic compounds difficult and often leading to an overestimation of IM stability and underestimation of solid solution (SS) stability. The proposed method bypasses the need to explicitly model every binary interaction by using machine learning to correlate macroscopic elemental properties (melting point, bulk modulus) with phase stability, effectively capturing the net thermodynamic effect of the high-N environment without the computational cost of exhaustive CALPHAD assessments for every new combination.",
+    "predicted_outcome": "The hybrid model will predict a melting temperature (Tm) and entropy of fusion (ΔS_fus) for high-N refractory HEAs with an error margin of <5% compared to available experimental data, while correctly identifying the solid solution phase stability where standard CALPHAD alone predicts intermetallic formation due to the combinatorial complexity of binary parameters.",
+    "baseline": "Standard CALPHAD method using Pandat v.8.1 software which calculates phase diagrams for equimolar systems but struggles with the estimation of Hf for IM compounds and the rapid increase in binary interactions as N increases, leading to a predicted drop in solid solution fraction from 30% (N=3) to 5% (N=6) at Tm.",
+    "boundary": "The method is valid for equimolar or near-equimolar systems where the fraction of fully assessed binary systems (fAB) is 1; it may fail for non-equiatomic systems or those with significant solute segregation where the mean property approximation breaks down.",
+    "uncertainty": "Uncertainty remains regarding the accuracy of the machine learning model when applied to elements with no prior high-temperature thermodynamic data in the training set, as the model relies on the correlation between elemental properties and bulk alloy behavior which may not hold for novel refractory combinations not represented in the 16-element palette used in prior studies.",
+    "supporting_evidence_ids": [
+      "node::W1964522838",
+      "node::W3023402054",
+      "node::W2950904464",
+      "node::W3097579542",
+      "node::W1975568151"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Select 10 novel refractory HEA compositions (N=5) not in the training set, synthesize them via arc-melting, and measure their melting temperatures and entropy of fusion using differential scanning calorimetry (DSC) and high-temperature XRD. Compare these experimental values against predictions from the hybrid model and standard CALPHAD.",
+      "measurements": [
+        "Melting temperature (Tm) via DSC",
+        "Entropy of fusion (ΔS_fus) via DSC",
+        "Phase composition at Tm via high-temperature XRD",
+        "Binary interaction assessment (fAB) for each system"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the hybrid model's prediction error for Tm exceeds 10% for more than 50% of the test set, or if the model incorrectly predicts a solid solution phase where experimental data confirms intermetallic formation, indicating the mean-property approximation fails to capture the specific binary interaction dominance in these systems."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "packed_ids": [
+    "node::W1964522838",
+    "node::W3023402054",
+    "node::W2565212977",
+    "node::W2807029607",
+    "node::W4240891101",
+    "node::W2333442782",
+    "node::W2909848402",
+    "node::W3097579542",
+    "node::W2950904464",
+    "node::W3093884981",
+    "node::W3167529508",
+    "node::W3171992535",
+    "node::W2761796810",
+    "node::W4206757660",
+    "node::W3092942361",
+    "node::W1975568151",
+    "node::W2986413343"
+  ],
+  "packed_chars": 15914,
+  "packed_papers": 17,
+  "packed_with_citer_statements": 16,
+  "cited_ids": [
+    "node::W1964522838",
+    "node::W1975568151",
+    "node::W2950904464",
+    "node::W3023402054",
+    "node::W3097579542"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "node::W1964522838",
+      "paper_id": "PMC4366518",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Accelerated exploration of multi-principal element alloys with solid solution phases (2015). Cited 614 times before the cutoff; 2 papers in this graph say something specific about it.\nOwn digest: Paper card. Question: How does the number of principal elements (N) in equimolar multi-principal element alloys affect the probability of forming disordered solid solution (SS) phases versus intermetallic (IM) phases, and what are the implications for high-temperature structural applications?. System: Equimolar combinations of 3 to 6 elements from a palette of 26 metallic elements (including Al, Si, Mo, Ta, W, Nb, Ti, V, Re, Zr, Cr, Fe, Co, Ni, etc.). Processing: High-throughput computational screening using the CALPHAD method (Pandat v.8.1 software) to calculate phase diagrams for 134,547 equimolar alloy systems; results filtered for credibility where the fraction of fully assessed binary systems (fAB) equals 1.. Test conditions: Phase diagrams calculated between 600 °C and 3,600 °C; properties evaluated at the solidus temperature (Tm) and at 600 °C; maximum use temperature (Tuse) estimated as the lowest of 0.8Tm or the last first-order phase reaction temperature below Tm.. Fi"
+    },
+    {
+      "record_id": "node::W1975568151",
+      "paper_id": "W1975568151",
+      "publication_date": "2015-03-05",
+      "kind": "graph_node",
+      "text": "Paper node: Exploration and Development of High Entropy Alloys for Structural Applications (2014). Cited 729 times before the cutoff; 1 papers in this graph say something specific about it.\nWhat citing papers say about it:\n- finding (from \"Accelerated exploration of multi-principal element alloys with solid ...\", 2015): reported that the median Gibbs energy for IM compounds is -36 kJ mol-1 [system High Entropy Alloys; applied to IM compounds; values -36 kJ mol-1]\n- finding (from \"Accelerated exploration of multi-principal element alloys with solid ...\", 2015): estimated that Sf for IM compounds is generally very small and often zero [system High Entropy Alloys; applied to IM compounds]\n- finding (from \"Accelerated exploration of multi-principal element alloys with solid ...\", 2015): stated that Hf of IM compounds is an essential term but difficult to estimate with no general models [system High Entropy Alloys; applied to IM compounds]\n- method (from \"Accelerated exploration of multi-principal element alloys with solid ...\", 2015): proposed the concepts used in the present work [system High Entropy Alloys]\n- method (from \"Accelerated exploration of multi-principal element alloys wit"
+    },
+    {
+      "record_id": "node::W2950904464",
+      "paper_id": "PMC6565683",
+      "publication_date": "2019-06-13",
+      "kind": "graph_node",
+      "text": "Paper node: Materials informatics for the screening of multi-principal elements and high-entropy alloys (2019). Cited 132 times before the cutoff; 0 papers in this graph say something specific about it.\nOwn digest: Paper card. Question: How can supervised learning strategies combining canonical correlation analysis (CCA) and genetic algorithms (GA) be used to efficiently screen the vast compositional space of high-entropy alloys (HEAs) to identify candidates with high hardness and reasonable ductility?. System: Multi-principal element alloys and high-entropy alloys (HEAs) comprising 5 or more elements; specifically, a 16-element palette (Co, Cr, Fe, Ni, Al, Cu, Mn, Ti, Mo, Nb, Ta, V, W, Zr, Zn, Sn) and synthesized candidates including Co33W07Al33Nb24Cr03 and Ti18Ni24Ta12Cr22Co24.. Processing: Synthesis of candidate alloys via arc-melting compressed pellets of elemental, high-purity powders (Sigma-Aldrich, purity ≥99.9%); pellets were remelted four times to ensure homogeneity; resulting as-cast solid pieces were polished for micro-hardness testing.. Test conditions: Vicker's indentation hardness testing using a LECO LM 248AT model hardness tester with a 100 g load applied for 10 s; "
+    },
+    {
+      "record_id": "node::W3023402054",
+      "paper_id": "W3023402054",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Machine-learning informed prediction of high-entropy solid solution formation: Beyond the Hume-Rothery rules (2020). Cited 111 times before the cutoff; 2 papers in this graph say something specific about it.\nWhat citing papers say about it:\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): found that molar volume, bulk modulus, and melting temperature are the factors that affect phase formation in HEAs [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): showed excellent accuracy in phase prediction while being computationally inexpensive [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): indicated that molar volume, bulk modulus, and melting temperature are the most influential features in HEAs' phase formation [system High entropy alloys (HEAs)]\n- finding (from \"Recent advances in computational design of structural multi-principal ...\", 2023): One of the applications is phase selection, where the ML model is designed to predict whether the MPEAs are in BCC, FCC, or HCP phase and if interme"
+    },
+    {
+      "record_id": "node::W3097579542",
+      "paper_id": "W3097579542",
+      "publication_date": "2023-01-13",
+      "kind": "graph_node",
+      "text": "Paper node: Deep learning-based phase prediction of high-entropy alloys: Optimization, generation, and explanation (2020). Cited 94 times before the cutoff; 1 papers in this graph say something specific about it.\nWhat citing papers say about it:\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): showed the superiority of FFANN over other machine learning models in phase prediction [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): showed excellent accuracy in phase prediction while being computationally inexpensive [system High entropy alloys (HEAs)]\n- method (from \"A machine learning framework for discovering high entropy ...\", 2023): added five more features, such as the mean melting temperature and the mean bulk modulus [system High entropy alloys (HEAs)]"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "elapsed_seconds": 55.98
+}

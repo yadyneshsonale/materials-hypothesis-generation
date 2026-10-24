@@ -1,0 +1,90 @@
+{
+  "run_id": "PMC11606917__broad__graph_selection__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "broad",
+  "arm": "graph_selection",
+  "sample": 1,
+  "query": "I am interested in high-entropy alloys for extreme temperature applications. How can we predict melting properties such as the melting temperature, entropy of fusion, and heat capacity for multi-component systems where experimental data is sparse or unreliable due to high melting points? I am looking for a hypothesis on a computational methodology that balances accuracy with the need to screen vast compositional spaces, along with prior evidence on why standard approaches struggle in this regime and what a valid boundary condition for such a method would be.",
+  "publication_date": "2024-11-29",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "A hybrid computational workflow combining CALPHAD thermodynamic screening with Machine Learning-corrected Moment Tensor Potentials (MTP) can accurately predict melting temperatures and entropy of fusion for high-entropy alloys (HEAs) with N≥5 elements, overcoming the limitations of standard DFT and pure CALPHAD approaches in regimes where binary interaction data is sparse.",
+    "material_initial_state": "Equimolar or near-equimolar multi-principal element alloys (N=3 to 6) from a palette of refractory and transition metals (e.g., Mo, Nb, Ta, W, Ti, Zr, Hf, Cr, Fe, Co, Ni), existing in a disordered solid solution state or a metastable liquid state prior to solidification.",
+    "intervention": "1. Perform high-throughput CALPHAD screening to identify candidate compositions with high solidus temperatures (Tm) and solid solution stability, filtering for systems with high binary interaction counts (quadratic increase in pairs) that typically favor intermetallics. 2. For top candidates, generate large-scale atomic structures (>40,000 atoms) using Neural Evolution Structure (NES) generators. 3. Train Moment Tensor Potentials (MTP) on a sparse DFT dataset of these specific high-entropy configurations to capture local lattice distortion and short-range order effects. 4. Use thermodynamic integration via MTP-based Molecular Dynamics to calculate the free energy difference between solid and liquid phases to derive Tm and entropy of fusion (ΔSfus).",
+    "conditions": "Simulations conducted at temperatures ranging from cryogenic to above the estimated solidus (up to 3,600 °C), with specific focus on the liquid-solid transition region. The method is applied to systems where the number of binary interactions (N(N-1)/2) is high, creating a complex energy landscape where configurational entropy (ln(N)) competes with negative formation enthalpies of specific pairs.",
+    "structural_mediator": "Severe local lattice distortion (LLD) and short-range order (SRO) arising from the mismatch in atomic sizes and electronic structures of the principal elements, which stabilizes the solid solution against intermetallic formation at high temperatures but complicates the free energy landscape.",
+    "mechanism": "Standard DFT is computationally prohibitive for the large supercells required to capture the configurational entropy of N≥5 elements, while standard CALPHAD relies on binary interaction parameters that are often unavailable or unreliable for high-melting refractory pairs, leading to errors in predicting the solidus temperature. The proposed method uses MTP to bridge this gap: MTP captures the non-linear effects of local lattice distortion and SRO (which drive the melting behavior) with near-DFT accuracy but at a fraction of the cost, allowing for the thermodynamic integration necessary to compute melting properties in these complex, high-dimensional compositional spaces.",
+    "predicted_outcome": "The hybrid workflow will predict melting temperatures (Tm) and entropy of fusion (ΔSfus) for N≥5 HEAs with an error margin of <1 meV/atom (relative to DFT benchmarks) and <5% deviation from experimental values where available, successfully identifying compositions where the maximum use temperature (Tuse) remains high (>1,000 °C) despite the high number of components. It will specifically predict that alloys with high configurational entropy but specific negative enthalpy pairs (e.g., Nb-W) will exhibit higher Tm than predicted by simple linear mixing rules.",
+    "baseline": "Standard CALPHAD calculations using only assessed binary databases (fAB=1) which fail for >95% of N≥5 systems due to missing data, and pure DFT calculations which are limited to small supercells (SQS) that cannot adequately sample the configurational space of high-entropy systems, leading to inaccurate entropy estimates.",
+    "boundary": "The method is valid for equimolar or near-equimolar compositions where the solid solution phase is dominant; it may lose accuracy for highly non-equimolar systems where phase separation or complex intermetallic precipitation dominates the thermodynamics, as the training data for MTP would need to explicitly cover these metastable states.",
+    "uncertainty": "Uncertainty remains regarding the transferability of MTP trained on specific refractory systems to other chemical families (e.g., light metal HEAs) without retraining. Additionally, the prediction of the exact entropy of fusion is sensitive to the quality of the DFT training set for liquid phase configurations, which are inherently more disordered and harder to sample than solid phases.",
+    "supporting_evidence_ids": [
+      "PMC4366518::card::0",
+      "PMC10505980::card::0",
+      "PMC7512472::card::0"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Select 5 high-entropy alloys (N=5 or 6) with predicted high Tm (>2000 °C) using the proposed hybrid workflow. Synthesize these alloys via arc-melting and measure their actual melting points using differential scanning calorimetry (DSC) or high-temperature optical pyrometry. Simultaneously, run pure DFT calculations on small SQS models for these same alloys to compare the computational cost and accuracy of the DFT-only approach versus the MTP approach.",
+      "measurements": [
+        "Melting temperature (Tm) via DSC/Pyrometry",
+        "Entropy of fusion (ΔSfus) via DSC integration",
+        "Computational time per atom for DFT vs. MTP",
+        "Phase composition at Tm via XRD"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the MTP-predicted Tm deviates from the experimental Tm by more than 10% for any of the 5 tested alloys, or if the pure DFT approach on small SQS models yields a Tm within 5% of the experimental value while being computationally cheaper than the MTP workflow, indicating that the complexity of the MTP approach is unnecessary for this specific property."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "packed_ids": [
+    "PMC4366518::card::0",
+    "PMC10505980::card::0",
+    "PMC6565683::card::0",
+    "PMC7512472::card::0",
+    "PMC6290247::card::0"
+  ],
+  "packed_chars": 15197,
+  "packed_papers": 5,
+  "packed_with_citer_statements": 0,
+  "cited_ids": [
+    "PMC10505980::card::0",
+    "PMC4366518::card::0",
+    "PMC7512472::card::0"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "PMC10505980::card::0",
+      "paper_id": "PMC10505980",
+      "publication_date": "2023-08-28",
+      "kind": "graph_card",
+      "text": "Paper card. Question: How can computational methods be adapted or developed to address the compositional and configurational complexity of multi-principal element alloys (MPEAs) for structural applications, specifically regarding structure generation, interatomic potentials, and machine learning descriptors?. System: Multi-principal element alloys (MPEAs) including BCC HfNbTaTiZr, FCC CoCrFeMnNi, CoCrMoxNi, Al0.5CoCrCuFeNi, Ti0.25CrFeNiAlx, TiZrHfNb, TiZrHfAl, RhIrPdPtNiCu, CoFeNi, NbMoTaW, CoCrFeNi, CoCrNi, FeNiCuCoCr, MoNbTaTiV, CuFeNiCrCo, and Al-Co-Cr-Cu-Fe-Ni systems. Processing: Computational design utilizing atomistic structure generation algorithms (Neural evolution structure (NES), Order through informed swapping (OTIS)), Density Functional Theory (DFT), Classical Molecular Dynamics (MD) with various Interatomic Potentials (EAM, Moment tensor potentials (MTP), Low-rank potentials (LRP), Gaussian approximation potential (GAP), Random Fourier feature (RFF), Spectral neighbor analysis potential (SNAP)), and Machine Learning (ML) models (ANNs, decision trees, linear regression) trained on experimental or computational databases. Test conditions: Simulations performed at variou"
+    },
+    {
+      "record_id": "PMC4366518::card::0",
+      "paper_id": "PMC4366518",
+      "publication_date": "2015-03-05",
+      "kind": "graph_card",
+      "text": "Paper card. Question: How does the number of principal elements (N) in equimolar multi-principal element alloys affect the probability of forming disordered solid solution (SS) phases versus intermetallic (IM) phases, and what are the implications for high-temperature structural applications?. System: Equimolar combinations of 3 to 6 elements from a palette of 26 metallic elements (including Al, Si, Mo, Ta, W, Nb, Ti, V, Re, Zr, Cr, Fe, Co, Ni, etc.). Processing: High-throughput computational screening using the CALPHAD method (Pandat v.8.1 software) to calculate phase diagrams for 134,547 equimolar alloy systems; results filtered for credibility where the fraction of fully assessed binary systems (fAB) equals 1.. Test conditions: Phase diagrams calculated between 600 °C and 3,600 °C; properties evaluated at the solidus temperature (Tm) and at 600 °C; maximum use temperature (Tuse) estimated as the lowest of 0.8Tm or the last first-order phase reaction temperature below Tm.. Findings: The fraction of solid solution (SS) alloys decreases as the number of elements (N) increases: at Tm, 30% of 3-component alloys are SS, dropping to only 5% for 6-component alloys.; Configurational entr"
+    },
+    {
+      "record_id": "PMC7512472::card::0",
+      "paper_id": "PMC7512472",
+      "publication_date": "2018-11-20",
+      "kind": "graph_card",
+      "text": "Paper card. Question: What thermodynamic factors and specific elemental additions dictate the occurrence of liquid phase separation (LPS) versus single-phase solidification in high-entropy alloys (HEAs), and how do these factors influence microstructure formation?. System: High-entropy alloys (HEAs), multi-principal element alloys (MPEAs), and complex concentrated alloys (CCAs), specifically systems containing Co, Cr, Cu, Fe, Ni, Mn, Al, Ti, V, Nb, Ag, Sn, Mo, and Y2O3 (e.g., CoCrCuFeNi, AgAlCoCrCuNi, CoCrCu, CoCrCuNi, CoCrCuFeNi, CoCrCuMnNi, CoCrCuNiV, AlCoCrCuFeNiSi0.5). Processing: Arc-melting, induction melting, laser cladding, electromagnetic levitation, rapid solidification, and undercooling experiments (e.g., drop tube, molten fused silica fluxing); specific undercooling temperatures noted include ~150 K, 160 K, 190 K, 293 K, and 381 K (0.23Tm). Test conditions: Solidification from liquid state under varying cooling rates (slow cooling, rapid solidification), undercooling past critical temperatures (ΔTcrit), and in-situ neutron transmission imaging during heating and cooling of CoCrCu alloys. Findings: Positive mixing enthalpy (ΔHmix) not compensated by entropy of mixing lea"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "elapsed_seconds": 94.88
+}

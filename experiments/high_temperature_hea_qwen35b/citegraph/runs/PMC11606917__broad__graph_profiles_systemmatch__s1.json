@@ -1,0 +1,187 @@
+{
+  "run_id": "PMC11606917__broad__graph_profiles_systemmatch__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "broad",
+  "arm": "graph_profiles_systemmatch",
+  "sample": 1,
+  "query": "I am interested in high-entropy alloys for extreme temperature applications. How can we predict melting properties such as the melting temperature, entropy of fusion, and heat capacity for multi-component systems where experimental data is sparse or unreliable due to high melting points? I am looking for a hypothesis on a computational methodology that balances accuracy with the need to screen vast compositional spaces, along with prior evidence on why standard approaches struggle in this regime and what a valid boundary condition for such a method would be.",
+  "publication_date": "2024-11-29",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "target_system": "Multi-component high-entropy alloys (HEAs) and multi-principal element alloys (MPEAs) designed for extreme temperature applications, specifically focusing on predicting melting temperature (Tm), entropy of fusion (ΔSf), and heat capacity (Cp) where experimental data is sparse.",
+    "evidence_appraisal": [
+      {
+        "record_id": "node::W1964522838",
+        "record_system": "Equimolar combinations of 3 to 6 elements (Al, Si, Mo, Ta, W, Nb, Ti, V, Re, Zr, Cr, Fe, Co, Ni, etc.)",
+        "difference_from_target": "The target query specifically asks for predicting thermodynamic properties (Tm, ΔSf, Cp) for screening, whereas this record focuses on phase fraction prediction (SS vs IM) and maximum use temperature estimation using CALPHAD. It does not explicitly detail the calculation of entropy of fusion or heat capacity, but provides the framework (CALPHAD) and the critical finding that Tm decreases as N increases.",
+        "transfer": "partially",
+        "reason": "The record validates the use of CALPHAD for high-temperature phase stability and Tm estimation in the target system (MPEAs/HEAs). However, it does not provide the specific mechanism or data for predicting entropy of fusion or heat capacity, which are the core of the query. The mechanism of Tm reduction with N is transferable."
+      },
+      {
+        "record_id": "node::W3023402054",
+        "record_system": "High entropy alloys (HEAs)",
+        "difference_from_target": "Focuses on machine learning (ML) for phase prediction (BCC, FCC, HCP, IM) rather than direct thermodynamic property prediction (Tm, ΔSf, Cp).",
+        "transfer": "partially",
+        "reason": "The record identifies 'melting temperature' and 'bulk modulus' as the most influential features for phase formation in HEAs. This confirms that Tm is a critical descriptor for the target system, supporting the use of ML models that include Tm as an input, but does not provide the method to *predict* Tm itself from first principles or composition alone without experimental data."
+      },
+      {
+        "record_id": "node::W2950904464",
+        "record_system": "Multi-principal element alloys and HEAs (16-element palette)",
+        "difference_from_target": "Focuses on hardness and ductility prediction using regression and genetic algorithms, not thermodynamic properties like Tm or ΔSf.",
+        "transfer": "does_not_transfer",
+        "reason": "The mechanism (CCA + GA for hardness) is specific to mechanical properties and does not address the thermodynamic modeling required for melting properties."
+      },
+      {
+        "record_id": "node::W3092942361",
+        "record_system": "Refractory high entropy alloys",
+        "difference_from_target": "Compares CALPHAD and rule-of-mixtures for refractory HEAs.",
+        "transfer": "partially",
+        "reason": "Directly addresses the 'standard approaches struggle' aspect by comparing CALPHAD (accurate but expensive) with rule-of-mixtures (fast but potentially inaccurate for complex interactions). This supports the hypothesis of using a hybrid or accelerated CALPHAD approach."
+      },
+      {
+        "record_id": "node::W2761796810",
+        "record_system": "Concentrated solid solution alloys",
+        "difference_from_target": "Discusses thermodynamics, noting vibrational entropy is small compared to configurational entropy.",
+        "transfer": "partially",
+        "reason": "Provides a fundamental principle: vibrational entropy is an order of magnitude smaller than configurational entropy. This is crucial for deriving the mechanism for ΔSf prediction in the target system, as it suggests configurational entropy dominates the fusion entropy in these systems."
+      }
+    ],
+    "hypothesis": "A hybrid computational methodology combining high-throughput CALPHAD calculations with machine learning surrogates trained on elemental properties (specifically mean melting temperature and bulk modulus) can accurately predict Tm, ΔSf, and Cp for multi-component HEAs. Standard rule-of-mixtures approaches fail because they neglect the non-linear reduction in Tm caused by the rapid increase in binary interactions as N increases, and they underestimate the stability of solid solutions at high N. The valid boundary condition for this method is that it applies to systems where the configurational entropy dominates the total entropy of fusion (ΔSf ≈ ΔS_config), and the system remains in a single-phase solid solution or a simple mixture of solid solutions without complex intermetallic precipitation that would invalidate the liquidus approximation.",
+    "material_initial_state": "Multi-component alloy compositions (N ≥ 5) selected from a palette of refractory and transition metals (e.g., W, Ta, Mo, Nb, Cr, Fe, Ni, Co) in equimolar or near-equiatomic ratios, initially in a liquid or high-temperature solid state for thermodynamic evaluation.",
+    "intervention": "1. Generate a training dataset using high-throughput CALPHAD (e.g., Pandat) to calculate Tm, ΔSf, and Cp for a diverse set of 3-6 component equimolar alloys. 2. Train a machine learning model (e.g., Random Forest or Neural Network) using elemental descriptors (atomic number, atomic radius, electronegativity, individual element Tm, bulk modulus) and compositional descriptors (configurational entropy, mixing enthalpy, valence electron concentration). 3. Use the trained model to screen vast compositional spaces for Tm and ΔSf. 4. Validate predictions against the CALPHAD results for a subset of high-N alloys.",
+    "conditions": "Temperature range: 600 °C to 3,600 °C (covering the solidus to liquidus of refractory HEAs). Composition space: 3 to 6 principal elements. Phase state: Liquidus and solidus temperatures, entropy of fusion at the melting point.",
+    "structural_mediator": "Configurational entropy (S_config) and the density of binary interaction parameters. The rapid increase in binary interactions (N(N-1)/2) as N increases drives the depression of the melting temperature and the stabilization of the solid solution phase, which the ML model must learn to correlate with the elemental properties.",
+    "mechanism": "Derived from materials science principles and supported by the transfer of the 'Tm decreases with N' finding from node::W1964522838 and the 'vibrational entropy is small' principle from node::W2761796810. In high-entropy alloys, the entropy of fusion (ΔSf) is dominated by the configurational entropy of the liquid and solid phases. Since the vibrational contribution is negligible (order of magnitude smaller), ΔSf can be approximated as the difference in configurational entropy between the liquid and solid. The melting temperature (Tm) is depressed as the number of components (N) increases due to the increasing complexity of the liquid structure and the rapid rise in the number of unfavorable binary interactions, which lowers the Gibbs free energy of the solid phase relative to the liquid less effectively than the entropy term stabilizes the liquid. The proposed ML model learns this non-linear relationship between elemental properties and the resulting Tm/ΔSf, bypassing the computational cost of full CALPHAD for every composition while maintaining accuracy where rule-of-mixtures fails.",
+    "predicted_outcome": "The hybrid ML-CALPHAD approach will predict Tm with an error margin of <5% compared to high-fidelity CALPHAD for N=5-6 alloys, significantly faster than pure CALPHAD. It will correctly predict that Tm decreases by approximately 100-200 °C for each additional principal element beyond N=3 in refractory systems. The predicted entropy of fusion (ΔSf) will be found to be close to the ideal configurational entropy value (R ln N) for single-phase solid solutions, deviating only when intermetallic formation is predicted. The method will successfully identify compositions with Tm > 2000 °C and high ΔSf, suitable for extreme temperature applications.",
+    "baseline": "Standard rule-of-mixtures calculations which assume linear averaging of elemental properties, and pure CALPHAD which is computationally prohibitive for screening >100,000 compositions.",
+    "boundary": "The method is valid for single-phase solid solutions (BCC, FCC, HCP) and simple mixtures of solid solutions. It may fail for systems with strong chemical ordering leading to complex intermetallics where the liquidus is not well-defined by simple entropy arguments, or for systems where the vibrational entropy contribution becomes significant (e.g., near phase transitions or in specific light-element alloys).",
+    "uncertainty": "High uncertainty exists in the prediction of ΔSf for non-equiatomic compositions where the configurational entropy model is less accurate. The uncertainty in Tm predictions increases for N > 6 due to the exponential growth of binary interaction parameters which may not be fully captured by the training set of 3-6 component alloys. The assumption that vibrational entropy is negligible may break down for specific refractory elements with low Debye temperatures.",
+    "supporting_evidence_ids": [
+      "node::W1964522838",
+      "node::W3023402054",
+      "node::W2761796810",
+      "node::W3092942361"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Select 10 novel 5-component refractory HEA compositions predicted by the ML model to have Tm > 2500 °C and ΔSf > 1.5 R. Synthesize these alloys via arc-melting and perform differential scanning calorimetry (DSC) and high-temperature X-ray diffraction (HT-XRD) to measure the actual melting onset and phase transitions. Compare the measured Tm and ΔSf against the ML predictions and the pure rule-of-mixtures predictions.",
+      "measurements": [
+        "Melting onset temperature (Tm) via DSC",
+        "Entropy of fusion (ΔSf) calculated from DSC enthalpy and Tm",
+        "Phase constitution at Tm via HT-XRD",
+        "Heat capacity (Cp) via DSC"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the ML model's prediction error for Tm exceeds 10% for any of the 10 test cases, or if the predicted ΔSf deviates from the measured value by more than 20% in cases where the phase is confirmed to be a single-phase solid solution, indicating that the configurational entropy dominance assumption is incorrect for these specific compositions."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "packed_ids": [
+    "node::W1964522838",
+    "node::W3023402054",
+    "node::W2565212977",
+    "node::W2807029607",
+    "node::W4240891101",
+    "node::W2333442782",
+    "node::W2909848402",
+    "node::W3097579542",
+    "node::W2950904464",
+    "node::W3093884981",
+    "node::W3167529508",
+    "node::W3171992535",
+    "node::W2761796810",
+    "node::W4206757660",
+    "node::W3092942361",
+    "node::W1975568151",
+    "node::W2986413343"
+  ],
+  "packed_chars": 15914,
+  "packed_papers": 17,
+  "packed_with_citer_statements": 16,
+  "cited_ids": [
+    "node::W1964522838",
+    "node::W2761796810",
+    "node::W3023402054",
+    "node::W3092942361"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "node::W1964522838",
+      "paper_id": "PMC4366518",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Accelerated exploration of multi-principal element alloys with solid solution phases (2015). Cited 614 times before the cutoff; 2 papers in this graph say something specific about it.\nOwn digest: Paper card. Question: How does the number of principal elements (N) in equimolar multi-principal element alloys affect the probability of forming disordered solid solution (SS) phases versus intermetallic (IM) phases, and what are the implications for high-temperature structural applications?. System: Equimolar combinations of 3 to 6 elements from a palette of 26 metallic elements (including Al, Si, Mo, Ta, W, Nb, Ti, V, Re, Zr, Cr, Fe, Co, Ni, etc.). Processing: High-throughput computational screening using the CALPHAD method (Pandat v.8.1 software) to calculate phase diagrams for 134,547 equimolar alloy systems; results filtered for credibility where the fraction of fully assessed binary systems (fAB) equals 1.. Test conditions: Phase diagrams calculated between 600 °C and 3,600 °C; properties evaluated at the solidus temperature (Tm) and at 600 °C; maximum use temperature (Tuse) estimated as the lowest of 0.8Tm or the last first-order phase reaction temperature below Tm.. Fi"
+    },
+    {
+      "record_id": "node::W2761796810",
+      "paper_id": "W2761796810",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Thermodynamics of concentrated solid solution alloys (2017). Cited 144 times before the cutoff; 3 papers in this graph say something specific about it.\nWhat citing papers say about it:\n- supports (from \"High-entropy high-hardness metal carbides discovered by entropy descriptors\", 2018): observed that vibrational formation entropy is generally an order of magnitude smaller than configuration entropy [system concentrated solid solution alloys]\n- finding (from \"Recent advances in computational design of structural multi-principal ...\", 2023): Thermodynamics data for 355 MPEA compositions, combining empirical and theoretical approaches using the Hume-Rothery rules, were published. [system concentrated solid solution alloys; applied to MPEAs; values 355]\n- method (from \"High Entropy Alloys Mined From Binary Phase Diagrams\", 2019): Utilised atomistic and thermodynamic parameters to investigate the compositional regions of HEA phases [system Concentrated solid solution alloys]"
+    },
+    {
+      "record_id": "node::W3023402054",
+      "paper_id": "W3023402054",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Machine-learning informed prediction of high-entropy solid solution formation: Beyond the Hume-Rothery rules (2020). Cited 111 times before the cutoff; 2 papers in this graph say something specific about it.\nWhat citing papers say about it:\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): found that molar volume, bulk modulus, and melting temperature are the factors that affect phase formation in HEAs [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): showed excellent accuracy in phase prediction while being computationally inexpensive [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): indicated that molar volume, bulk modulus, and melting temperature are the most influential features in HEAs' phase formation [system High entropy alloys (HEAs)]\n- finding (from \"Recent advances in computational design of structural multi-principal ...\", 2023): One of the applications is phase selection, where the ML model is designed to predict whether the MPEAs are in BCC, FCC, or HCP phase and if interme"
+    },
+    {
+      "record_id": "node::W3092942361",
+      "paper_id": "W3092942361",
+      "publication_date": "2024-07-16",
+      "kind": "graph_node",
+      "text": "Paper node: CALPHAD and rule-of-mixtures: A comparative study for refractory high entropy alloys (2020). Cited 20 times before the cutoff; 1 papers in this graph say something specific about it.\nWhat citing papers say about it:\n- method (from \"Ab initio framework for deciphering trade-off relationships in ...\", 2024): compared CALPHAD and rule-of-mixtures for refractory high entropy alloys [system refractory high entropy alloys]"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "elapsed_seconds": 101.58,
+  "target_system": "Multi-component high-entropy alloys (HEAs) and multi-principal element alloys (MPEAs) designed for extreme temperature applications, specifically focusing on predicting melting temperature (Tm), entropy of fusion (ΔSf), and heat capacity (Cp) where experimental data is sparse.",
+  "evidence_appraisal": [
+    {
+      "record_id": "node::W1964522838",
+      "record_system": "Equimolar combinations of 3 to 6 elements (Al, Si, Mo, Ta, W, Nb, Ti, V, Re, Zr, Cr, Fe, Co, Ni, etc.)",
+      "difference_from_target": "The target query specifically asks for predicting thermodynamic properties (Tm, ΔSf, Cp) for screening, whereas this record focuses on phase fraction prediction (SS vs IM) and maximum use temperature estimation using CALPHAD. It does not explicitly detail the calculation of entropy of fusion or heat capacity, but provides the framework (CALPHAD) and the critical finding that Tm decreases as N increases.",
+      "transfer": "partially",
+      "reason": "The record validates the use of CALPHAD for high-temperature phase stability and Tm estimation in the target system (MPEAs/HEAs). However, it does not provide the specific mechanism or data for predicting entropy of fusion or heat capacity, which are the core of the query. The mechanism of Tm reduction with N is transferable."
+    },
+    {
+      "record_id": "node::W3023402054",
+      "record_system": "High entropy alloys (HEAs)",
+      "difference_from_target": "Focuses on machine learning (ML) for phase prediction (BCC, FCC, HCP, IM) rather than direct thermodynamic property prediction (Tm, ΔSf, Cp).",
+      "transfer": "partially",
+      "reason": "The record identifies 'melting temperature' and 'bulk modulus' as the most influential features for phase formation in HEAs. This confirms that Tm is a critical descriptor for the target system, supporting the use of ML models that include Tm as an input, but does not provide the method to *predict* Tm itself from first principles or composition alone without experimental data."
+    },
+    {
+      "record_id": "node::W2950904464",
+      "record_system": "Multi-principal element alloys and HEAs (16-element palette)",
+      "difference_from_target": "Focuses on hardness and ductility prediction using regression and genetic algorithms, not thermodynamic properties like Tm or ΔSf.",
+      "transfer": "does_not_transfer",
+      "reason": "The mechanism (CCA + GA for hardness) is specific to mechanical properties and does not address the thermodynamic modeling required for melting properties."
+    },
+    {
+      "record_id": "node::W3092942361",
+      "record_system": "Refractory high entropy alloys",
+      "difference_from_target": "Compares CALPHAD and rule-of-mixtures for refractory HEAs.",
+      "transfer": "partially",
+      "reason": "Directly addresses the 'standard approaches struggle' aspect by comparing CALPHAD (accurate but expensive) with rule-of-mixtures (fast but potentially inaccurate for complex interactions). This supports the hypothesis of using a hybrid or accelerated CALPHAD approach."
+    },
+    {
+      "record_id": "node::W2761796810",
+      "record_system": "Concentrated solid solution alloys",
+      "difference_from_target": "Discusses thermodynamics, noting vibrational entropy is small compared to configurational entropy.",
+      "transfer": "partially",
+      "reason": "Provides a fundamental principle: vibrational entropy is an order of magnitude smaller than configurational entropy. This is crucial for deriving the mechanism for ΔSf prediction in the target system, as it suggests configurational entropy dominates the fusion entropy in these systems."
+    }
+  ]
+}

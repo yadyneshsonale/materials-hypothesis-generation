@@ -1,0 +1,184 @@
+{
+  "run_id": "PMC11606917__problem_constrained__graph_tool_agent__s2",
+  "paper_id": "PMC11606917",
+  "query_level": "problem_constrained",
+  "arm": "graph_tool_agent",
+  "sample": 2,
+  "query": "We are analyzing a refractory BCC high-entropy alloy (Ta-based) where standard experimental measurements of melting properties are infeasible. Current ab initio free energy methods are prohibitively expensive due to the need for thermodynamic integration over the full phase space. Furthermore, existing empirical potentials (like EAM) often fail to capture the complex liquid structure in multi-component systems, while machine learning potentials are computationally demanding. I need a hypothesis for an intervention that replaces the expensive thermodynamic integration step with a more efficient perturbation scheme using a specific class of machine learning potentials. The solution must address the trade-off between computational cost (currently limiting throughput) and the accuracy required to resolve subtle free energy differences. What are the known failure modes of existing TOR-TILD or similar approaches in multi-component spaces, and what falsification experiment could distinguish a true efficiency gain from an artifact of the potential's training set?",
+  "publication_date": "2024-11-29",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Replacing full thermodynamic integration (TOR-TILD) with a perturbation-based free energy scheme using Moment Tensor Potentials (MTP) trained on high-temperature liquid configurations will achieve a >4x speedup while maintaining <1 meV/atom accuracy for Ta-based refractory BCC HEAs, provided the training set explicitly includes disordered liquid structures and local chemical environments representative of the multi-component space.",
+    "material_initial_state": "Ta-based refractory BCC high-entropy alloy (e.g., TaVCrW or TaNbHfZr) in solid state at ambient conditions, transitioning to liquid phase near melting point.",
+    "intervention": "Deploy a perturbation-based free energy calculation scheme (e.g., thermodynamic perturbation or FEP) using Moment Tensor Potentials (MTP) instead of full thermodynamic integration (TOR-TILD). The MTP must be trained on a dataset explicitly including high-temperature liquid configurations, disordered local environments, and multi-component chemical diversity to capture complex liquid structure.",
+    "conditions": "Temperature range spanning solid-liquid transition (up to ~3000 K for refractory HEAs); multi-component system with severe lattice distortion; computational environment allowing ML potential evaluation (GPU-accelerated).",
+    "structural_mediator": "Moment Tensor Potential (MTP) capturing many-body interactions and local chemical disorder in liquid phase; perturbation scheme leveraging small energy differences between reference and target states.",
+    "mechanism": "MTPs trained on liquid configurations avoid the need for expensive DFT sampling over full phase space by providing accurate forces/energies for perturbation steps. The perturbation scheme computes free energy differences via ensemble averaging over small deviations, bypassing the need for slow convergence of full thermodynamic integration. Success depends on MTP's ability to generalize to liquid structures not in training set.",
+    "predicted_outcome": "Free energy of melting predicted with <1 meV/atom error compared to DFT benchmarks, with computational cost reduced by >4x. Liquid structure factors (e.g., radial distribution functions) match ab initio MD results within 5% deviation.",
+    "baseline": "Standard TOR-TILD using DFT-based thermodynamic integration, which requires extensive sampling over the full phase space and is computationally prohibitive for multi-component HEAs.",
+    "boundary": "Hypothesis holds only if MTP training set includes sufficient liquid-phase configurations and multi-component chemical diversity. Fails if training set is biased toward solid-phase or binary subsystems, leading to artifacts in liquid structure prediction.",
+    "uncertainty": "Uncertainty arises from potential extrapolation errors of MTP in unexplored regions of configuration space (e.g., extreme local compositions in liquid). Also, perturbation scheme accuracy depends on the magnitude of perturbations being within the linear response regime of the potential.",
+    "supporting_evidence_ids": [
+      "node::W4281670974",
+      "node::W4386210301"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": "Perform a controlled comparison: (1) Compute free energy of melting for a Ta-based HEA using both TOR-TILD (DFT) and the proposed MTP-perturbation scheme. (2) Validate liquid structure via radial distribution functions (RDF) from both methods against experimental X-ray/neutron scattering data. (3) Introduce a 'stress test' by training MTP on a subset of liquid configurations excluding extreme local compositions, then re-evaluate free energy and RDF. If the MTP-perturbation scheme shows >1 meV/atom error or >10% deviation in RDF compared to DFT/experiment under these conditions, the hypothesis is falsified, indicating the efficiency gain is an artifact of the training set.",
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "packed_ids": [
+    "node::W4281670974",
+    "node::W4379879161",
+    "node::W4386210301"
+  ],
+  "packed_chars": 4300,
+  "packed_papers": 3,
+  "packed_with_citer_statements": 2,
+  "cited_ids": [
+    "node::W4281670974",
+    "node::W4386210301"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "node::W4281670974",
+      "paper_id": "W4281670974",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Thermodynamics up to the melting point in a TaVCrW high entropy alloy: Systematic ab initio study aided by machine learning potentials (2022). Cited 14 times before the cutoff; 1 papers in this graph say something specific about it.\nWhat citing papers say about it:\n- method (from \"Recent advances in computational design of structural multi-principal ...\", 2023): introduces thermodynamic integration aided by MTP to simulate high-temperature properties [system TaVCrW high entropy alloy; values four-times speedup, less than 1 meV/atom error]"
+    },
+    {
+      "record_id": "node::W4386210301",
+      "paper_id": "PMC10505980",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Recent advances in computational design of structural multi-principal element alloys (2023). Cited 1 times before the cutoff; 0 papers in this graph say something specific about it.\nOwn digest: Paper card. Question: How can computational methods be adapted or developed to address the compositional and configurational complexity of multi-principal element alloys (MPEAs) for structural applications, specifically regarding structure generation, interatomic potentials, and machine learning descriptors?. System: Multi-principal element alloys (MPEAs) including BCC HfNbTaTiZr, FCC CoCrFeMnNi, CoCrMoxNi, Al0.5CoCrCuFeNi, Ti0.25CrFeNiAlx, TiZrHfNb, TiZrHfAl, RhIrPdPtNiCu, CoFeNi, NbMoTaW, CoCrFeNi, CoCrNi, FeNiCuCoCr, MoNbTaTiV, CuFeNiCrCo, and Al-Co-Cr-Cu-Fe-Ni systems. Processing: Computational design utilizing atomistic structure generation algorithms (Neural evolution structure (NES), Order through informed swapping (OTIS)), Density Functional Theory (DFT), Classical Molecular Dynamics (MD) with various Interatomic Potentials (EAM, Moment tensor potentials (MTP), Low-rank potentials (LRP), Gaussian approximation potential (GAP), Random Fourier feature (RFF), Spectral neighb"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "elapsed_seconds": 99.81,
+  "trace": [
+    {
+      "turn": 0,
+      "tool": "search_nodes",
+      "args": {
+        "query": "TOR-TILD machine learning potentials high-entropy alloys free energy",
+        "k": 5
+      },
+      "result_chars": 2705
+    },
+    {
+      "turn": 1,
+      "tool": "search_nodes",
+      "args": {
+        "query": "thermodynamic integration machine learning potential liquid structure multi-component",
+        "k": 5
+      },
+      "result_chars": 2771
+    },
+    {
+      "turn": 2,
+      "tool": "read_node",
+      "args": {
+        "node_id": "node::W4281670974"
+      },
+      "result_chars": 672
+    },
+    {
+      "turn": 3,
+      "tool": "read_node",
+      "args": {
+        "node_id": "node::W4386210301"
+      },
+      "result_chars": 2513
+    },
+    {
+      "turn": 4,
+      "tool": "read_node",
+      "args": {
+        "node_id": "node::W4386210301",
+        "offset": 2400
+      },
+      "result_chars": 1916
+    },
+    {
+      "turn": 5,
+      "tool": "search_nodes",
+      "args": {
+        "query": "TOR-TILD failure modes liquid structure multi-component machine learning potential",
+        "k": 5
+      },
+      "result_chars": 2712
+    },
+    {
+      "turn": 6,
+      "tool": "read_node",
+      "args": {
+        "node_id": "node::W4379879161"
+      },
+      "result_chars": 660
+    },
+    {
+      "turn": 7,
+      "tool": "search_nodes",
+      "args": {
+        "query": "perturbation scheme free energy machine learning potential liquid structure",
+        "k": 5
+      },
+      "result_chars": 2627
+    },
+    {
+      "turn": 8,
+      "tool": "search_nodes",
+      "args": {
+        "query": "moment tensor potential liquid structure high entropy alloy",
+        "k": 5
+      },
+      "result_chars": 2616
+    },
+    {
+      "turn": 9,
+      "tool": "search_nodes",
+      "args": {
+        "query": "TOR-TILD thermodynamic integration failure multi-component",
+        "k": 5
+      },
+      "result_chars": 2572
+    },
+    {
+      "turn": 10,
+      "tool": "search_nodes",
+      "args": {
+        "query": "perturbation theory free energy machine learning potential liquid",
+        "k": 5
+      },
+      "result_chars": 2666
+    },
+    {
+      "turn": 11,
+      "tool": "search_nodes",
+      "args": {
+        "query": "machine learning potential liquid structure failure mode training set artifact",
+        "k": 5
+      },
+      "result_chars": 2638
+    },
+    {
+      "turn": 12,
+      "tool": "submit_hypothesis",
+      "accepted": true
+    }
+  ],
+  "tool_calls": 12,
+  "turns": 13
+}

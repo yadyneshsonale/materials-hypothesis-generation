@@ -1,0 +1,102 @@
+{
+  "run_id": "PMC11606917__problem_constrained__corroboration_weighted__s2",
+  "paper_id": "PMC11606917",
+  "query_level": "problem_constrained",
+  "arm": "corroboration_weighted",
+  "sample": 2,
+  "query": "We are analyzing a refractory BCC high-entropy alloy (Ta-based) where standard experimental measurements of melting properties are infeasible. Current ab initio free energy methods are prohibitively expensive due to the need for thermodynamic integration over the full phase space. Furthermore, existing empirical potentials (like EAM) often fail to capture the complex liquid structure in multi-component systems, while machine learning potentials are computationally demanding. I need a hypothesis for an intervention that replaces the expensive thermodynamic integration step with a more efficient perturbation scheme using a specific class of machine learning potentials. The solution must address the trade-off between computational cost (currently limiting throughput) and the accuracy required to resolve subtle free energy differences. What are the known failure modes of existing TOR-TILD or similar approaches in multi-component spaces, and what falsification experiment could distinguish a true efficiency gain from an artifact of the potential's training set?",
+  "publication_date": "2024-11-29",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Replacing full thermodynamic integration with a perturbation scheme using a Machine Learning Potential (MLP) trained specifically on liquid-state configurations of refractory BCC HEAs will yield accurate free energy differences for melting, provided the training set explicitly includes high-temperature liquid snapshots to prevent the potential from collapsing into solid-state minima during the perturbation.",
+    "material_initial_state": "Refractory BCC high-entropy alloy (Ta-based, multi-component) in a solid state near the melting point, where standard experimental melting measurements are infeasible.",
+    "intervention": "Implement a perturbation scheme (e.g., thermodynamic perturbation or free energy perturbation) using a Machine Learning Potential (MLP) trained on a dataset enriched with liquid-phase atomic configurations, bypassing the computationally expensive thermodynamic integration over the full phase space.",
+    "conditions": "The MLP must be trained on data covering both solid and liquid phases of the specific Ta-based alloy system, with a focus on high-temperature liquid structures to capture complex multi-component liquid ordering. The perturbation must be applied at temperatures near the solidus/liquidus transition.",
+    "structural_mediator": "The specific arrangement of atoms in the liquid phase (short-range order and coordination numbers) which is often poorly captured by standard EAM potentials but can be learned by MLPs if the training set includes liquid snapshots.",
+    "mechanism": "The MLP learns the complex many-body interactions in the liquid state that empirical potentials miss, allowing the perturbation scheme to accurately estimate the free energy difference between solid and liquid states without sampling the entire phase space via thermodynamic integration. The efficiency gain comes from the MLP's ability to evaluate energies/forces faster than DFT while maintaining accuracy comparable to DFT for the liquid structure.",
+    "predicted_outcome": "The perturbation scheme using the liquid-enriched MLP will predict a melting temperature and free energy difference within 5% of the true value (as estimated by a small-scale DFT thermodynamic integration benchmark), whereas standard EAM potentials will fail to predict the correct liquid structure and yield erroneous free energy differences. The computational cost will be reduced by an order of magnitude compared to full thermodynamic integration.",
+    "baseline": "Standard EAM potentials (which fail to capture complex liquid structure) and full thermodynamic integration using DFT (which is prohibitively expensive).",
+    "boundary": "The hypothesis holds for multi-component refractory BCC alloys where liquid phase separation or complex short-range order is present. It may fail if the MLP training set lacks sufficient diversity in liquid configurations or if the perturbation scheme encounters regions of phase space not covered by the training data (extrapolation error).",
+    "uncertainty": "There is uncertainty regarding the specific failure modes of TOR-TILD or similar approaches in multi-component spaces, as the provided evidence does not explicitly detail these failure modes or the specific performance of TOR-TILD on refractory HEA liquids. The hypothesis assumes that the primary failure mode of existing methods is the inability of standard potentials to capture liquid structure, but the specific artifact of the potential's training set (e.g., overfitting to solid states) is a conjecture based on general ML potential limitations.",
+    "supporting_evidence_ids": [
+      "node::W2039061417",
+      "node::W2802652936",
+      "node::W3023402054",
+      "node::W1964522838"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Perform a controlled comparison where the same Ta-based HEA system is simulated using: (1) Full DFT thermodynamic integration (ground truth, limited to small supercells), (2) Standard EAM potentials with perturbation, and (3) The proposed MLP with perturbation. The MLP will be trained on two datasets: one with only solid-state configurations and one with both solid and liquid configurations. The perturbation scheme will be applied to calculate the free energy difference between solid and liquid states.",
+      "measurements": [
+        "Calculated melting temperature (Tm) from the free energy crossing point",
+        "Liquid structure factor S(q) and radial distribution function g(r) at Tm",
+        "Computational cost (CPU hours) per free energy point",
+        "Deviation of predicted Tm from the DFT ground truth"
+      ],
+      "falsification_rule": "The hypothesis is falsified if: (a) The MLP trained only on solid states yields a Tm within 5% of the DFT ground truth (indicating the perturbation scheme works without liquid training data), or (b) The MLP trained on liquid data yields a Tm that deviates by >10% from the DFT ground truth, or (c) The computational cost of the MLP perturbation scheme is not at least 5x lower than the DFT thermodynamic integration while maintaining accuracy."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "packed_ids": [
+    "node::W2534691303",
+    "node::W2168686241",
+    "node::W2039061417",
+    "node::W3023402054",
+    "node::W2802652936",
+    "node::W1964522838",
+    "node::W4224129425",
+    "node::W2058085399"
+  ],
+  "packed_chars": 15813,
+  "packed_papers": 8,
+  "packed_with_citer_statements": 8,
+  "cited_ids": [
+    "node::W1964522838",
+    "node::W2039061417",
+    "node::W2802652936",
+    "node::W3023402054"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "node::W1964522838",
+      "paper_id": "PMC4366518",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Accelerated exploration of multi-principal element alloys with solid solution phases (2015). Cited 614 times before the cutoff; 2 papers in this graph say something specific about it.\nCorroboration: 2 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nOwn digest: Paper card. Question: How does the number of principal elements (N) in equimolar multi-principal element alloys affect the probability of forming disordered solid solution (SS) phases versus intermetallic (IM) phases, and what are the implications for high-temperature structural applications?. System: Equimolar combinations of 3 to 6 elements from a palette of 26 metallic elements (including Al, Si, Mo, Ta, W, Nb, Ti, V, Re, Zr, Cr, Fe, Co, Ni, etc.). Processing: High-throughput computational screening using the CALPHAD method (Pandat v.8.1 software) to calculate phase diagrams for 134,547 equimolar alloy systems; results filtered for credibility where the fraction of fully assessed binary systems (fAB) equals 1.. Test conditions: Phase diagrams calculated between 600 °C and 3,600 °C; properties evaluated at the solidus temperature (Tm) and at 600 °C; maximum use temperature (Tuse"
+    },
+    {
+      "record_id": "node::W2039061417",
+      "paper_id": "W2039061417",
+      "publication_date": "2022-07-18",
+      "kind": "graph_node",
+      "text": "Paper node: Microstructures and properties of high-entropy alloys (2013). Cited 4731 times before the cutoff; 6 papers in this graph say something specific about it.\nCorroboration: 6 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- finding (from \"High-Entropy Metal Diborides: A New Class of High-Entropy ...\", 2016): five or more elements can be mixed in a HEA in equimolar concentrations to produce a maximum molar configurational entropy of ΔSmix = RlnN [system high-entropy alloys (HEA); values ΔSmix = RlnN, N is the number of equimolar components]\n- finding (from \"High-Entropy Metal Diborides: A New Class of High-Entropy ...\", 2016): suggested that a necessary (but not sufficient) criterion for forming a single-phase (disordered) HEA is that the computed δ of the solid solution should be sufficiently small: δ ≤ δmax ≈ 4% [system single-phase (disordered) HEA; values δ ≤ δmax ≈ 4%]\n- finding (from \"Predicting Elastic Constants of Refractory Complex Concentrated Alloys ...\", 2022): Ω is defined as ΔSmix divided by the ΔHmix and multiplied by alloys' average melting temperature (MT) [system high-entropy alloys]\n- find"
+    },
+    {
+      "record_id": "node::W2802652936",
+      "paper_id": "W2802652936",
+      "publication_date": "2023-01-13",
+      "kind": "graph_node",
+      "text": "Paper node: Machine learning for phase selection in multi-principal element alloys (2018). Cited 173 times before the cutoff; 3 papers in this graph say something specific about it.\nCorroboration: 3 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- finding (from \"Predicting Elastic Constants of Refractory Complex Concentrated Alloys ...\", 2022): used 118 instances of data set with five descriptors (VEC, ΔSmix, ΔHmix, δ, and χ) to determine the phase in multi-principle element alloys [system multi-principle element alloys; values 118 instances, five descriptors]\n- finding (from \"Predicting Elastic Constants of Refractory Complex Concentrated Alloys ...\", 2022): used 118 instances and five features of the multi-principal element alloys dataset to forecast the alloy's structure [system multi-principal element alloys; values 118 instances, five features]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): showed the superiority of FFANN over other machine learning models in phase prediction [system High entropy alloys (HEAs)]\n- method (from \"High Entropy Alloys Mined From Binary Phase"
+    },
+    {
+      "record_id": "node::W3023402054",
+      "paper_id": "W3023402054",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Machine-learning informed prediction of high-entropy solid solution formation: Beyond the Hume-Rothery rules (2020). Cited 111 times before the cutoff; 2 papers in this graph say something specific about it.\nCorroboration: 2 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): found that molar volume, bulk modulus, and melting temperature are the factors that affect phase formation in HEAs [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): showed excellent accuracy in phase prediction while being computationally inexpensive [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): indicated that molar volume, bulk modulus, and melting temperature are the most influential features in HEAs' phase formation [system High entropy alloys (HEAs)]\n- finding (from \"Recent advances in computational design of structural multi-principal ...\", 2023): One of the applications is phase selection, where"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "elapsed_seconds": 41.91
+}

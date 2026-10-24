@@ -1,0 +1,90 @@
+{
+  "run_id": "PMC11606917__problem_constrained__graph_selection__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "problem_constrained",
+  "arm": "graph_selection",
+  "sample": 1,
+  "query": "We are analyzing a refractory BCC high-entropy alloy (Ta-based) where standard experimental measurements of melting properties are infeasible. Current ab initio free energy methods are prohibitively expensive due to the need for thermodynamic integration over the full phase space. Furthermore, existing empirical potentials (like EAM) often fail to capture the complex liquid structure in multi-component systems, while machine learning potentials are computationally demanding. I need a hypothesis for an intervention that replaces the expensive thermodynamic integration step with a more efficient perturbation scheme using a specific class of machine learning potentials. The solution must address the trade-off between computational cost (currently limiting throughput) and the accuracy required to resolve subtle free energy differences. What are the known failure modes of existing TOR-TILD or similar approaches in multi-component spaces, and what falsification experiment could distinguish a true efficiency gain from an artifact of the potential's training set?",
+  "publication_date": "2024-11-29",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Replacing full thermodynamic integration with a perturbation scheme based on Moment Tensor Potentials (MTP) trained on active-learning DFT data for local defect configurations (surfaces, stacking faults) and CPA-calculated bulk elastic properties will yield melting free energy predictions for Ta-based BCC HEAs with <1 meV/atom error at a fraction of the computational cost, provided the training set explicitly captures the multi-component lattice distortion effects.",
+    "material_initial_state": "Ta-based refractory BCC high-entropy alloy (e.g., MoNbTaW or similar multi-principal element system) in a disordered solid solution state, where standard experimental melting measurements are infeasible and DFT-based thermodynamic integration is computationally prohibitive.",
+    "intervention": "Construct a hybrid machine learning potential framework using Moment Tensor Potentials (MTP) trained via active learning on a dataset comprising: (1) DFT-calculated energies and forces for local defect structures (surfaces, unstable stacking faults) to capture local relaxation and lattice distortion, and (2) Coherent Potential Approximation (CPA) derived bulk elastic constants and misfit volumes to ensure global thermodynamic consistency. Use this MTP to perform a perturbation-based free energy calculation (e.g., thermodynamic integration over a small phase space or harmonic/anharmonic perturbation) instead of full phase-space integration.",
+    "conditions": "Simulations performed at high temperatures (approaching melting, >1500 K) and varying compositions within the Ta-based BCC system. The MTP must be trained on configurations representing severe local lattice distortion (LLD) characteristic of refractory HEAs.",
+    "structural_mediator": "Severe local lattice distortion (LLD) and short-range order (SRO) which govern the free energy landscape; the MTP must accurately model the energy penalties associated with these distortions to avoid artifacts.",
+    "mechanism": "The framework leverages the efficiency of CPA for global properties (elastic constants, misfit volumes) and the accuracy of MTP for local atomic relaxations (surfaces, defects). By training MTP on active-learning DFT data that specifically targets the high-energy configurations (defects) rather than just random liquid structures, the potential captures the subtle free energy differences required for melting predictions without the need for expensive full thermodynamic integration over the entire liquid phase space. The perturbation scheme exploits the smoothness of the free energy surface near the solid-liquid transition when local distortions are correctly modeled.",
+    "predicted_outcome": "The MTP-based perturbation scheme will predict the melting temperature and free energy difference between solid and liquid phases with an error margin of less than 1 meV/atom compared to high-fidelity benchmarks, while reducing computational cost by a factor of >4 compared to DFT-based thermodynamic integration (as seen in MoNbTi systems).",
+    "baseline": "Standard DFT-based thermodynamic integration (requiring extensive sampling and high computational cost) and empirical EAM potentials (which fail to capture complex liquid structure and lattice distortion in multi-component systems).",
+    "boundary": "The hypothesis holds for BCC refractory HEAs where local lattice distortion is the dominant strengthening and stability mechanism. It may fail if the system exhibits strong Fermi-surface transitions (e.g., due to Ta) or magnetic effects not captured by the non-magnetic MTP training set, or if the liquid structure involves complex short-range ordering not present in the training defect configurations.",
+    "uncertainty": "There is uncertainty regarding whether the active-learning training set, focused on defects and surfaces, adequately samples the complex liquid structure required for accurate melting free energy. Additionally, the VBA model limitations suggest that strong non-linear effects (like Fermi-surface transitions) might not be fully captured by the current MTP+CPA hybrid approach, potentially leading to artifacts in the free energy prediction for specific Ta-rich compositions.",
+    "supporting_evidence_ids": [
+      "PMC10505980::card::0",
+      "PMC11275555::card::1",
+      "PMC11275555::card::0"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Perform a controlled comparison on a Ta-based BCC HEA (e.g., MoNbTaW) using three methods: (1) Full DFT thermodynamic integration (reference), (2) The proposed MTP-based perturbation scheme, and (3) A standard EAM potential. The MTP will be trained on a dataset explicitly excluding liquid configurations to test if the defect-surface training is sufficient to extrapolate to the liquid state.",
+      "measurements": [
+        "Melting temperature (Tm) derived from the intersection of solid and liquid free energy curves.",
+        "Free energy difference (ΔG) between solid and liquid phases at Tm.",
+        "Radial distribution function (RDF) of the liquid phase to assess structural accuracy.",
+        "Computational time per configuration."
+      ],
+      "falsification_rule": "The hypothesis is falsified if the MTP-based perturbation scheme yields a melting temperature error >1 meV/atom (or >100 K) compared to the DFT reference, or if the liquid RDF shows significant structural artifacts (e.g., missing peaks or incorrect coordination numbers) that correlate with the failure to capture the liquid structure, indicating that the defect-focused training set is insufficient for liquid state thermodynamics."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "packed_ids": [
+    "PMC10505980::card::0",
+    "PMC11275555::card::1",
+    "PMC11275555::card::0",
+    "PMC6820750::card::0",
+    "PMC6472357::card::0"
+  ],
+  "packed_chars": 15109,
+  "packed_papers": 4,
+  "packed_with_citer_statements": 0,
+  "cited_ids": [
+    "PMC10505980::card::0",
+    "PMC11275555::card::0",
+    "PMC11275555::card::1"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "PMC10505980::card::0",
+      "paper_id": "PMC10505980",
+      "publication_date": "2023-08-28",
+      "kind": "graph_card",
+      "text": "Paper card. Question: How can computational methods be adapted or developed to address the compositional and configurational complexity of multi-principal element alloys (MPEAs) for structural applications, specifically regarding structure generation, interatomic potentials, and machine learning descriptors?. System: Multi-principal element alloys (MPEAs) including BCC HfNbTaTiZr, FCC CoCrFeMnNi, CoCrMoxNi, Al0.5CoCrCuFeNi, Ti0.25CrFeNiAlx, TiZrHfNb, TiZrHfAl, RhIrPdPtNiCu, CoFeNi, NbMoTaW, CoCrFeNi, CoCrNi, FeNiCuCoCr, MoNbTaTiV, CuFeNiCrCo, and Al-Co-Cr-Cu-Fe-Ni systems. Processing: Computational design utilizing atomistic structure generation algorithms (Neural evolution structure (NES), Order through informed swapping (OTIS)), Density Functional Theory (DFT), Classical Molecular Dynamics (MD) with various Interatomic Potentials (EAM, Moment tensor potentials (MTP), Low-rank potentials (LRP), Gaussian approximation potential (GAP), Random Fourier feature (RFF), Spectral neighbor analysis potential (SNAP)), and Machine Learning (ML) models (ANNs, decision trees, linear regression) trained on experimental or computational databases. Test conditions: Simulations performed at variou"
+    },
+    {
+      "record_id": "PMC11275555::card::0",
+      "paper_id": "PMC11275555",
+      "publication_date": "2024-07-16",
+      "kind": "graph_card",
+      "text": "Paper card. Question: How can a computationally efficient framework be developed to explore Pareto-optimal compositions and decipher trade-off relationships between strength and ductility in multi-component refractory alloys?. System: Refractory multi-principal element alloys (MPEAs) based on Mo, Nb, Ti, Ta, W, Cr, Zr, Hf, and V (specifically MoNbTi and MoNbTiTa systems). Processing: Integration of Coherent Potential Approximation (CPA) for elastic constants and misfit volumes, actively learned Moment Tensor Potentials (MTP) for surface and unstable stacking fault energies, and a Virtual Bond Approximation (VBA) analytical model within a Bayesian multi-objective optimization workflow using NSGA-II. Test conditions: Search space constrained to 0.0 ≤ ci ≤ 0.75 for most components (Ti ≤ 0.55); evaluation of properties at ambient conditions via first-principles calculations and analytical models. Findings: The strength of Pareto-optimal MoNbTi alloys ranges from ~50 MPa to ~260 MPa, with ductility index D changing from 1.23 to 1.35.; The addition of Ta to MoNbTi creates a disjoint Pareto set (PFA2) with strength >250 MPa, distinct from the MoNbTi(Ta) region (PFA1).; Surface energy conv"
+    },
+    {
+      "record_id": "PMC11275555::card::1",
+      "paper_id": "PMC11275555",
+      "publication_date": "2024-07-16",
+      "kind": "graph_card",
+      "text": "Paper card. Question: How can a computational framework be constructed to decipher trade-off relationships between intrinsic ductility and yield strength in multi-component alloys, specifically for MoNbTi and MoNbTiTa systems?. System: MoNbTi and MoNbTiTa refractory alloys; elemental compounds and selected binary, three- and four-component alloys. Processing: Integration of Moment Tensor Potentials (MTPs) trained via active learning on DFT data; Multi-objective Bayesian optimization using Gaussian Process Regression (GPR) and NSGAII; Virtual Bond Approximation (VBA) parameterization via CPA calculations; t-SNE dimensionality reduction for visualization. Test conditions: DFT computations with PBE functional, 400 eV energy cutoff, 0.15 Å⁻¹ k-point spacing, 0.08 eV Gaussian smearing; MD simulations at 50K, 150K, and 300K; Yield stress calculations assuming strain rate of 5 ⋅ 10⁻⁴ s⁻¹ and reference rate of 10⁴ s⁻¹. Findings: Initial training sets contained 146 and 377 configurations for MoNbTi and MoNbTiTa, respectively, which grew to 381 and 720 configurations after active learning and MD simulations.; Final training set errors for total energies were 6 meV/atom and 19 meV/atom, and f"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "elapsed_seconds": 68.72
+}

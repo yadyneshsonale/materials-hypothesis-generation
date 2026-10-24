@@ -1,0 +1,227 @@
+{
+  "run_id": "PMC11606917__problem_constrained__graph_profiles_systemmatch__s2",
+  "paper_id": "PMC11606917",
+  "query_level": "problem_constrained",
+  "arm": "graph_profiles_systemmatch",
+  "sample": 2,
+  "query": "We are analyzing a refractory BCC high-entropy alloy (Ta-based) where standard experimental measurements of melting properties are infeasible. Current ab initio free energy methods are prohibitively expensive due to the need for thermodynamic integration over the full phase space. Furthermore, existing empirical potentials (like EAM) often fail to capture the complex liquid structure in multi-component systems, while machine learning potentials are computationally demanding. I need a hypothesis for an intervention that replaces the expensive thermodynamic integration step with a more efficient perturbation scheme using a specific class of machine learning potentials. The solution must address the trade-off between computational cost (currently limiting throughput) and the accuracy required to resolve subtle free energy differences. What are the known failure modes of existing TOR-TILD or similar approaches in multi-component spaces, and what falsification experiment could distinguish a true efficiency gain from an artifact of the potential's training set?",
+  "publication_date": "2024-11-29",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "target_system": "Refractory BCC High-Entropy Alloy (Ta-based), liquid state, high-temperature thermodynamic integration",
+    "evidence_appraisal": [
+      {
+        "record_id": "node::W3023402054",
+        "record_system": "High entropy alloys (HEAs), solid solution formation",
+        "difference_from_target": "Focuses on solid-state phase prediction using static descriptors (molar volume, bulk modulus, melting temp) rather than liquid free energy or dynamic perturbation schemes; does not address computational cost of thermodynamic integration.",
+        "transfer": "partially",
+        "reason": "Relevant for identifying key features (melting temp, bulk modulus) that influence phase stability, but lacks specific mechanism for replacing thermodynamic integration with ML potentials in the liquid state."
+      },
+      {
+        "record_id": "node::W1964522838",
+        "record_system": "Equimolar multi-principal element alloys (3-6 elements), solid solution vs intermetallic",
+        "difference_from_target": "Uses CALPHAD for phase diagram calculation, not ML potentials for free energy perturbation; focuses on solidus temperature trends with N, not liquid structure accuracy.",
+        "transfer": "does_not_transfer",
+        "reason": "Methodology (CALPHAD) is fundamentally different from the proposed ML potential perturbation scheme; does not address the specific failure modes of TOR-TILD or liquid structure capture."
+      },
+      {
+        "record_id": "node::W4224129425",
+        "record_system": "Refractory Complex Concentrated Alloys (RHEAs: Nb, Mo, Ta, W, V), elastic properties",
+        "difference_from_target": "Predicts elastic constants (solid state) using ML, not liquid free energy or melting properties; does not discuss thermodynamic integration or liquid structure artifacts.",
+        "transfer": "does_not_transfer",
+        "reason": "Target property (elastic constants) and state (solid) differ from the target (liquid free energy); mechanism for efficiency gain in liquid state is not provided."
+      },
+      {
+        "record_id": "node::W4400700825",
+        "record_system": "Refractory MPEAs (Mo, Nb, Ti, Ta, W, Cr, Zr, Hf, V), strength/ductility trade-offs",
+        "difference_from_target": "Uses Moment Tensor Potentials (MTP) for surface and stacking fault energies (solid state) within a Bayesian optimization; does not address liquid state free energy integration or TOR-TILD failure modes.",
+        "transfer": "partially",
+        "reason": "Demonstrates the utility of MTPs for refractory alloys and the concept of active learning to reduce computational cost, but the application is to solid-state properties, not liquid thermodynamics."
+      },
+      {
+        "record_id": "node::W4290852316",
+        "record_system": "CrMnFeCoNi (Cantor) and CrFeCoNi, ballistic impact (dynamic response)",
+        "difference_from_target": "Uses 2NN MEAM potentials for high-strain-rate MD; focuses on deformation mechanisms and amorphization, not liquid free energy or thermodynamic integration efficiency.",
+        "transfer": "does_not_transfer",
+        "reason": "Potential type (MEAM) and application (dynamic impact) are distinct from the target (ML potentials for liquid free energy); does not address the specific trade-off in thermodynamic integration."
+      },
+      {
+        "record_id": "node::W2938633511",
+        "record_system": "General HEAs and CCAs, fundamental data gaps",
+        "difference_from_target": "Identifies the lack of datasets and thermodynamic models as a bottleneck; mentions CALPHAD limitations but does not propose ML potential solutions for liquid integration.",
+        "transfer": "does_not_transfer",
+        "reason": "General overview of the field's challenges; does not provide a specific mechanism or evidence for the proposed ML perturbation scheme."
+      },
+      {
+        "record_id": "node::W4388632688",
+        "record_system": "bcc Fe–Al alloys, magnetic properties",
+        "difference_from_target": "Develops constrained DFT-based magnetic MTPs for solid-state Fe-Al; addresses magnetic moments as degrees of freedom, not liquid structure or free energy integration.",
+        "transfer": "partially",
+        "reason": "Demonstrates the construction of high-fidelity MTPs for multi-component systems (Fe-Al) and the importance of including specific degrees of freedom (magnetic moments) for accuracy; the principle of using MTPs to replace expensive DFT is transferable, though the specific application (magnetic solid vs. liquid) differs."
+      },
+      {
+        "record_id": "node::W2802652936",
+        "record_system": "Multi-principal element alloys, phase selection",
+        "difference_from_target": "Uses ML to predict phase categories (BCC/FCC/IM) based on static descriptors; does not address liquid free energy or thermodynamic integration.",
+        "transfer": "does_not_transfer",
+        "reason": "Focuses on static phase prediction, not the dynamic free energy landscape required for melting property calculations."
+      },
+      {
+        "record_id": "node::W2346941564",
+        "record_system": "High-Entropy Alloys, W-phase formation",
+        "difference_from_target": "Discusses intermetallic precipitation and hardness; no relevance to liquid free energy or ML potential efficiency.",
+        "transfer": "does_not_transfer",
+        "reason": "Irrelevant to the specific computational problem of liquid free energy integration."
+      }
+    ],
+    "hypothesis": "Replace the standard thermodynamic integration (TOR-TILD) with a perturbation scheme using Moment Tensor Potentials (MTP) trained on a constrained DFT dataset that explicitly includes liquid-like configurations and high-temperature disorder, leveraging the 'active learning' workflow demonstrated in refractory alloy studies to minimize the training set size while capturing the complex liquid structure.",
+    "material_initial_state": "Ta-based refractory BCC high-entropy alloy in the solid state, with a composition space requiring exploration of liquid free energy differences.",
+    "intervention": "Construct a Moment Tensor Potential (MTP) trained on a dataset generated via constrained DFT that includes not only ground-state solid configurations but also high-temperature, disordered, and liquid-like snapshots (e.g., via melt-quench or high-T MD). Use an active learning loop (similar to the Bayesian optimization in W4400700825) to iteratively add configurations where the potential's uncertainty is highest, specifically targeting the liquid phase space. Replace the thermodynamic integration step with a perturbation scheme (e.g., thermodynamic perturbation theory or free energy perturbation) using this MTP to calculate the free energy difference between solid and liquid states.",
+    "conditions": "Temperature range: 0.8 Tm to 1.5 Tm (covering solidus to liquidus); Pressure: 1 atm; Composition: Ta-based refractory BCC HEA (e.g., Ta-Nb-W-Mo-V system); Computational cost: Target < 1% of standard thermodynamic integration cost.",
+    "structural_mediator": "Moment Tensor Potentials (MTP) with explicit inclusion of high-temperature disorder and liquid-like atomic environments in the training set; active learning algorithm to select optimal configurations.",
+    "mechanism": "Derived from materials-science principles and the transferable concept of MTPs in refractory alloys (W4400700825, W4388632688). Standard EAM potentials fail in multi-component liquids due to the inability to capture the complex, short-range order and chemical fluctuations. MTPs, being higher-order descriptors, can model these complex interactions more accurately. By using active learning, the training set is minimized to only the most informative configurations (liquid-like states), bypassing the need for exhaustive thermodynamic integration over the full phase space. The 'failure mode' of TOR-TILD in multi-component spaces is the exponential scaling of the sampling required to converge free energy differences; the MTP perturbation scheme reduces this by providing a more accurate potential that converges faster with fewer samples, provided the training set covers the liquid structure. The mechanism relies on the MTP's ability to reproduce the DFT energy landscape for liquid configurations with high fidelity, as demonstrated for solid-state refractory alloys.",
+    "predicted_outcome": "The MTP-based perturbation scheme will predict the melting temperature (Tm) and free energy difference (ΔG) with an error < 50 K (or < 2 kJ/mol) compared to high-fidelity DFT benchmarks, while reducing the computational cost by a factor of 100-1000 compared to standard thermodynamic integration. The method will correctly identify the liquid structure's short-range order, avoiding the 'amorphization' artifacts seen in simpler potentials.",
+    "baseline": "Standard thermodynamic integration using EAM or DFT-based potentials, which requires extensive sampling and is computationally prohibitive for multi-component systems, often leading to inaccurate liquid structures and high uncertainty in Tm.",
+    "boundary": "The method is valid for refractory BCC HEAs where the liquid structure is dominated by chemical disorder rather than strong magnetic effects (unless magnetic MTPs are used as in W4388632688). It assumes the training set can be generated efficiently via constrained DFT or high-T MD. The method may fail if the liquid exhibits extreme short-range ordering not captured by the MTP's descriptor space or if the active learning loop fails to converge on the liquid basin.",
+    "uncertainty": "High uncertainty regarding the specific failure modes of TOR-TILD in multi-component spaces not explicitly documented in the provided evidence; the accuracy of the MTP in the liquid state depends heavily on the quality and diversity of the training set, which is difficult to predict a priori. The 'artifact' of the potential's training set (e.g., overfitting to solid-like configurations) could lead to false efficiency gains if the liquid structure is not adequately sampled.",
+    "supporting_evidence_ids": [
+      "node::W4400700825",
+      "node::W4388632688",
+      "node::W3023402054"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Perform a blind test on a Ta-based refractory HEA (e.g., TaNbWV) where the true melting temperature is known from high-fidelity DFT thermodynamic integration (or experimental data if available). Compare the Tm predicted by the MTP-based perturbation scheme against the baseline EAM/standard TOR-TILD. Specifically, generate a training set for the MTP that intentionally excludes liquid-like configurations (to test the 'artifact' hypothesis) and one that includes them. Run the perturbation scheme on both.",
+      "measurements": [
+        "Melting temperature (Tm) prediction error (K)",
+        "Free energy difference (ΔG) between solid and liquid (kJ/mol)",
+        "Liquid structure factor S(q) from MD simulations",
+        "Computational time per configuration",
+        "Convergence rate of the active learning loop"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the MTP-based scheme predicts a Tm within 50 K of the baseline but the liquid structure factor S(q) deviates significantly (>10%) from the DFT reference, indicating that the efficiency gain is an artifact of the potential's inability to capture the true liquid structure. Alternatively, if the active learning loop fails to converge on the liquid basin within a reasonable number of iterations, the efficiency gain is not real."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "packed_ids": [
+    "node::W3023402054",
+    "node::W1964522838",
+    "node::W4224129425",
+    "node::W4400700825",
+    "node::W4290852316",
+    "node::W2938633511",
+    "node::W4388632688",
+    "node::W2802652936",
+    "node::W2346941564"
+  ],
+  "packed_chars": 15770,
+  "packed_papers": 9,
+  "packed_with_citer_statements": 8,
+  "cited_ids": [
+    "node::W3023402054",
+    "node::W4388632688",
+    "node::W4400700825"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "node::W3023402054",
+      "paper_id": "W3023402054",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Machine-learning informed prediction of high-entropy solid solution formation: Beyond the Hume-Rothery rules (2020). Cited 111 times before the cutoff; 2 papers in this graph say something specific about it.\nWhat citing papers say about it:\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): found that molar volume, bulk modulus, and melting temperature are the factors that affect phase formation in HEAs [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): showed excellent accuracy in phase prediction while being computationally inexpensive [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): indicated that molar volume, bulk modulus, and melting temperature are the most influential features in HEAs' phase formation [system High entropy alloys (HEAs)]\n- finding (from \"Recent advances in computational design of structural multi-principal ...\", 2023): One of the applications is phase selection, where the ML model is designed to predict whether the MPEAs are in BCC, FCC, or HCP phase and if interme"
+    },
+    {
+      "record_id": "node::W4388632688",
+      "paper_id": "PMC10643701",
+      "publication_date": "2024-07-16",
+      "kind": "graph_node",
+      "text": "Paper node: Constrained DFT-based magnetic machine-learning potentials for magnetic alloys: a case study of Fe–Al (2023). Cited 1 times before the cutoff; 1 papers in this graph say something specific about it.\nOwn digest: Paper card. Question: How can machine-learning interatomic potentials be constructed to accurately predict properties of multi-component magnetic alloys by treating magnetic moments as degrees of freedom alongside atomic positions and lattice vectors?. System: bcc Fe–Al alloys with Al concentrations varying from 0 to 50%, including pure bcc-Al. Processing: Training set generation via constrained DFT (cDFT) with hard constraints using ABINIT (6×6×6 k-point mesh, 25 Hartree cutoff, PAW PBE method); 2012 configurations created from 23 parent structures involving geometric relaxation, lattice compression/extension (1%), random atomic displacements (-0.1 to 0.1 Å), and magnetic moment perturbations (up to 15% or 50% deviation); ensemble of five magnetic Moment Tensor Potentials (mMTPs) fitted with 415 parameters (Rmin=2.1 Å, Rcut=4.5 Å, MmaxAl=0.1 μB, MmaxFe=3.0 μB). Test conditions: Verification on 336 additional configurations and fivefold cross-validation on 2328 t"
+    },
+    {
+      "record_id": "node::W4400700825",
+      "paper_id": "PMC11275555",
+      "publication_date": "2024-07-16",
+      "kind": "graph_node",
+      "text": "Paper node: Ab initio framework for deciphering trade-off relationships in multi-component alloys (2024). Cited 1 times before the cutoff; 0 papers in this graph say something specific about it.\nOwn digest: Paper card. Question: How can a computationally efficient framework be developed to explore Pareto-optimal compositions and decipher trade-off relationships between strength and ductility in multi-component refractory alloys?. System: Refractory multi-principal element alloys (MPEAs) based on Mo, Nb, Ti, Ta, W, Cr, Zr, Hf, and V (specifically MoNbTi and MoNbTiTa systems). Processing: Integration of Coherent Potential Approximation (CPA) for elastic constants and misfit volumes, actively learned Moment Tensor Potentials (MTP) for surface and unstable stacking fault energies, and a Virtual Bond Approximation (VBA) analytical model within a Bayesian multi-objective optimization workflow using NSGA-II. Test conditions: Search space constrained to 0.0 ≤ ci ≤ 0.75 for most components (Ti ≤ 0.55); evaluation of properties at ambient conditions via first-principles calculations and analytical models. Findings: The strength of Pareto-optimal MoNbTi alloys ranges from ~50 MPa to ~260 MPa,"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "elapsed_seconds": 141.01,
+  "target_system": "Refractory BCC High-Entropy Alloy (Ta-based), liquid state, high-temperature thermodynamic integration",
+  "evidence_appraisal": [
+    {
+      "record_id": "node::W3023402054",
+      "record_system": "High entropy alloys (HEAs), solid solution formation",
+      "difference_from_target": "Focuses on solid-state phase prediction using static descriptors (molar volume, bulk modulus, melting temp) rather than liquid free energy or dynamic perturbation schemes; does not address computational cost of thermodynamic integration.",
+      "transfer": "partially",
+      "reason": "Relevant for identifying key features (melting temp, bulk modulus) that influence phase stability, but lacks specific mechanism for replacing thermodynamic integration with ML potentials in the liquid state."
+    },
+    {
+      "record_id": "node::W1964522838",
+      "record_system": "Equimolar multi-principal element alloys (3-6 elements), solid solution vs intermetallic",
+      "difference_from_target": "Uses CALPHAD for phase diagram calculation, not ML potentials for free energy perturbation; focuses on solidus temperature trends with N, not liquid structure accuracy.",
+      "transfer": "does_not_transfer",
+      "reason": "Methodology (CALPHAD) is fundamentally different from the proposed ML potential perturbation scheme; does not address the specific failure modes of TOR-TILD or liquid structure capture."
+    },
+    {
+      "record_id": "node::W4224129425",
+      "record_system": "Refractory Complex Concentrated Alloys (RHEAs: Nb, Mo, Ta, W, V), elastic properties",
+      "difference_from_target": "Predicts elastic constants (solid state) using ML, not liquid free energy or melting properties; does not discuss thermodynamic integration or liquid structure artifacts.",
+      "transfer": "does_not_transfer",
+      "reason": "Target property (elastic constants) and state (solid) differ from the target (liquid free energy); mechanism for efficiency gain in liquid state is not provided."
+    },
+    {
+      "record_id": "node::W4400700825",
+      "record_system": "Refractory MPEAs (Mo, Nb, Ti, Ta, W, Cr, Zr, Hf, V), strength/ductility trade-offs",
+      "difference_from_target": "Uses Moment Tensor Potentials (MTP) for surface and stacking fault energies (solid state) within a Bayesian optimization; does not address liquid state free energy integration or TOR-TILD failure modes.",
+      "transfer": "partially",
+      "reason": "Demonstrates the utility of MTPs for refractory alloys and the concept of active learning to reduce computational cost, but the application is to solid-state properties, not liquid thermodynamics."
+    },
+    {
+      "record_id": "node::W4290852316",
+      "record_system": "CrMnFeCoNi (Cantor) and CrFeCoNi, ballistic impact (dynamic response)",
+      "difference_from_target": "Uses 2NN MEAM potentials for high-strain-rate MD; focuses on deformation mechanisms and amorphization, not liquid free energy or thermodynamic integration efficiency.",
+      "transfer": "does_not_transfer",
+      "reason": "Potential type (MEAM) and application (dynamic impact) are distinct from the target (ML potentials for liquid free energy); does not address the specific trade-off in thermodynamic integration."
+    },
+    {
+      "record_id": "node::W2938633511",
+      "record_system": "General HEAs and CCAs, fundamental data gaps",
+      "difference_from_target": "Identifies the lack of datasets and thermodynamic models as a bottleneck; mentions CALPHAD limitations but does not propose ML potential solutions for liquid integration.",
+      "transfer": "does_not_transfer",
+      "reason": "General overview of the field's challenges; does not provide a specific mechanism or evidence for the proposed ML perturbation scheme."
+    },
+    {
+      "record_id": "node::W4388632688",
+      "record_system": "bcc Fe–Al alloys, magnetic properties",
+      "difference_from_target": "Develops constrained DFT-based magnetic MTPs for solid-state Fe-Al; addresses magnetic moments as degrees of freedom, not liquid structure or free energy integration.",
+      "transfer": "partially",
+      "reason": "Demonstrates the construction of high-fidelity MTPs for multi-component systems (Fe-Al) and the importance of including specific degrees of freedom (magnetic moments) for accuracy; the principle of using MTPs to replace expensive DFT is transferable, though the specific application (magnetic solid vs. liquid) differs."
+    },
+    {
+      "record_id": "node::W2802652936",
+      "record_system": "Multi-principal element alloys, phase selection",
+      "difference_from_target": "Uses ML to predict phase categories (BCC/FCC/IM) based on static descriptors; does not address liquid free energy or thermodynamic integration.",
+      "transfer": "does_not_transfer",
+      "reason": "Focuses on static phase prediction, not the dynamic free energy landscape required for melting property calculations."
+    },
+    {
+      "record_id": "node::W2346941564",
+      "record_system": "High-Entropy Alloys, W-phase formation",
+      "difference_from_target": "Discusses intermetallic precipitation and hardness; no relevance to liquid free energy or ML potential efficiency.",
+      "transfer": "does_not_transfer",
+      "reason": "Irrelevant to the specific computational problem of liquid free energy integration."
+    }
+  ]
+}

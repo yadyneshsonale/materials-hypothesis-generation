@@ -1,0 +1,227 @@
+{
+  "run_id": "PMC11606917__expert_context__graph_profiles_systemmatch__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "expert_context",
+  "arm": "graph_profiles_systemmatch",
+  "sample": 1,
+  "query": "Consider a TaVCrW refractory high-entropy alloy. The objective is to calculate its melting temperature and related thermodynamic properties using Density Functional Theory (DFT). The standard approach (TOR-TILD) relies on expensive thermodynamic integration. We hypothesize that substituting the reference potential (EAM) with a Machine Learning Interatomic Potential (MTP) and replacing thermodynamic integration with free energy perturbation (FEP) can achieve significant speedups while maintaining sub-meV accuracy, provided the MTP accurately reproduces the ab initio phase-space distribution even for complex liquids. Prior work suggests that electronic excitations (specifically the gap in the Density of States at the Fermi level) can shift the melting point by tens of Kelvin, and that Short-Range Order (SRO) in the solid phase can introduce a stabilization energy of ~2-3 meV/atom. However, there are limitations: (1) The empirical 'underbinding/overbinding' rules for GGA-PBE/LDA functionals do not hold for V and Cr at 0K, potentially propagating errors; (2) High-temperature magnetic fluctuations are typically neglected but may be relevant. The computational cost must be reduced by >80% compared to the baseline TOR-TILD method. Propose the specific structural mediator (the MTP's ability to reproduce phase-space distributions) that enables the substitution of TI with FEP. What is the boundary condition regarding the supercell size and temperature range (2000-2400 K) needed to validate the SRO contribution? Design a falsification experiment comparing the new method against the original TOR-TILD on a benchmark system (e.g., a simpler alloy) to ensure the free energy difference does not exceed 0.5 meV/atom.",
+  "publication_date": "2024-11-29",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "target_system": "TaVCrW refractory high-entropy alloy (RHEA), equimolar or near-equimolar composition, in solid and liquid states, targeted for melting temperature (Tm) and thermodynamic property calculation via DFT-based Machine Learning Interatomic Potentials (MTP) and Free Energy Perturbation (FEP).",
+    "evidence_appraisal": [
+      {
+        "record_id": "node::W4290852316",
+        "record_system": "CrMnFeCoNi (Cantor) and CrFeCoNi (Mn-free) HEAs; ballistic impact, MD with MEAM potential, strain rates 10^7-10^9 s^-1, temperatures 70-1000 K.",
+        "difference_from_target": "Different alloy system (Fe/Ni/Mn-based vs. Ta/V/Cr/W refractory); different test conditions (ballistic impact, low-to-moderate temperatures vs. high-temperature melting); different potential type (MEAM vs. MTP/DFT); no direct thermodynamic integration or FEP data.",
+        "transfer": "does_not_transfer",
+        "reason": "System composition and physics (magnetic elements, lower melting point, different deformation mechanisms) differ significantly from TaVCrW refractory system; no data on melting thermodynamics or FEP/TI comparison."
+      },
+      {
+        "record_id": "node::W1964522838",
+        "record_system": "Equimolar 3-6 element MPEAs (including Ta, W, V, Cr) screened via CALPHAD; phase diagrams 600-3600 °C.",
+        "difference_from_target": "CALPHAD-based screening vs. DFT/MTP/FEP; provides general trends (Tm decreases with N) but no specific Tm for TaVCrW, no MTP/FEP methodology, no sub-meV accuracy claims.",
+        "transfer": "partially",
+        "reason": "Shares the alloy system (Ta, V, Cr, W present in palette) and high-temperature regime, but the method (CALPHAD) and level of detail (phase fraction trends vs. free energy perturbation) differ; useful for baseline Tm expectations but not for the specific computational protocol."
+      },
+      {
+        "record_id": "node::W4210276750",
+        "record_system": "Sc-Hf-Nb-Ta-Ti-Zr refractory HEAs; arc-melted, superconductivity, XRD/SEM; 0.35-300 K electrical/magnetic tests.",
+        "difference_from_target": "Different refractory system (Sc/Hf/Nb/Ti/Zr vs. Ta/V/Cr/W); focuses on superconductivity and low-temperature properties; no melting thermodynamics or MTP/FEP.",
+        "transfer": "does_not_transfer",
+        "reason": "Different elemental composition and property focus (superconductivity vs. melting); no relevant computational methodology for free energy calculation."
+      },
+      {
+        "record_id": "node::W4281670974",
+        "record_system": "TaVCrW high entropy alloy; systematic ab initio study aided by machine learning potentials; thermodynamics up to melting point.",
+        "difference_from_target": "Identical target system (TaVCrW); uses MTP and thermodynamic integration (TI) to achieve ~4x speedup with <1 meV/atom error; directly addresses the hypothesis of replacing TI with FEP.",
+        "transfer": "transfers",
+        "reason": "Exact match in alloy system and computational context (ab initio + MTP for thermodynamics up to melting); provides the baseline performance (speedup, accuracy) and validates the MTP approach for this specific alloy."
+      },
+      {
+        "record_id": "node::W3023402054",
+        "record_system": "High-entropy solid solution formation; ML beyond Hume-Rothery rules; factors: molar volume, bulk modulus, melting temperature.",
+        "difference_from_target": "General HEA phase prediction; no specific TaVCrW data; no MTP/FEP methodology; focuses on phase selection rather than thermodynamic integration.",
+        "transfer": "partially",
+        "reason": "Confirms that melting temperature is a key feature for HEA phase prediction, supporting the relevance of accurate Tm calculation, but does not provide the specific computational mechanism (MTP/FEP) or validation data."
+      },
+      {
+        "record_id": "node::W4224129425",
+        "record_system": "Elastic properties of HEAs; ML model with 20 features (including itinerant electrons, work function, modulus mismatch); applied to Nb-Mo-Ta-W-V alloys.",
+        "difference_from_target": "Focus on elastic properties, not melting thermodynamics; different alloy system (Nb-Mo-Ta-W-V vs. TaVCrW); no FEP/TI comparison.",
+        "transfer": "does_not_transfer",
+        "reason": "Different property focus (elasticity vs. melting/free energy); different composition; no direct relevance to the FEP/TI substitution hypothesis."
+      },
+      {
+        "record_id": "node::W2168686241",
+        "record_system": "Bulk Metallic Glasses; atomic size difference, heat of mixing, periodicity; Miedema model.",
+        "difference_from_target": "Different material class (BMGs vs. crystalline HEAs); different thermodynamic descriptors; no MTP/FEP.",
+        "transfer": "does_not_transfer",
+        "reason": "BMG physics and descriptors (e.g., glass formation criteria) are not directly applicable to the melting thermodynamics of crystalline TaVCrW RHEAs."
+      },
+      {
+        "record_id": "node::W2039061417",
+        "record_system": "High-entropy alloys (general); Hume-Rothery rules, atomic size difference (δ), enthalpy of mixing (ΔHmix), configurational entropy.",
+        "difference_from_target": "General HEA principles; no specific TaVCrW data; no MTP/FEP methodology; focuses on phase formation criteria.",
+        "transfer": "partially",
+        "reason": "Provides general thermodynamic context (entropy, enthalpy) relevant to melting, but lacks the specific computational protocol and validation data for the MTP/FEP approach in TaVCrW."
+      },
+      {
+        "record_id": "node::W2903448849",
+        "record_system": "Database of 370 HEAs/CCAs; mechanical properties, density, Young's modulus; 27 refractory HEAs with temperature-dependent data.",
+        "difference_from_target": "Experimental database; no computational MTP/FEP data; TaVCrW may be included but no specific Tm or thermodynamic integration results provided.",
+        "transfer": "does_not_transfer",
+        "reason": "Experimental data source; does not provide the computational methodology or validation for the proposed MTP/FEP speedup."
+      }
+    ],
+    "hypothesis": "Substituting the EAM reference potential with a Machine Learning Interatomic Potential (MTP) trained on DFT data for TaVCrW, and replacing thermodynamic integration (TI) with free energy perturbation (FEP), will reduce computational cost by >80% while maintaining sub-meV/atom accuracy in melting temperature and thermodynamic properties, provided the MTP accurately reproduces the ab initio phase-space distribution for both solid and liquid states.",
+    "material_initial_state": "TaVCrW refractory high-entropy alloy, equimolar composition (25 at.% each of Ta, V, Cr, W), in both solid (BCC) and liquid states, at temperatures ranging from 2000 K to 2400 K.",
+    "intervention": "Train a Moment Tensor Potential (MTP) on DFT-calculated energies, forces, and virials for TaVCrW across a broad temperature range (including liquid state); replace thermodynamic integration (TI) with free energy perturbation (FEP) using the MTP to compute the free energy difference between solid and liquid phases.",
+    "conditions": "Temperature range: 2000-2400 K (covering expected Tm); Supercell size: ≥ 512 atoms (to capture Short-Range Order and minimize finite-size effects); Time step: 1 fs; FEP windows: 20-30 intermediate λ states; DFT reference: PBE functional with spin-polarization (to account for magnetic fluctuations in V/Cr); Electronic temperature: 0.1 eV (to handle smearing in liquid).",
+    "structural_mediator": "The MTP's ability to accurately reproduce the ab initio phase-space distribution (configurational and vibrational) for both solid and liquid TaVCrW, including the Short-Range Order (SRO) in the solid and the liquid structure factor, enabling the FEP method to converge with low variance.",
+    "mechanism": "Derived from materials-science principles and the transferred evidence (node::W4281670974): The MTP captures the complex many-body interactions and electronic effects (including magnetic fluctuations in V/Cr) that EAM misses, allowing FEP to compute free energy differences via alchemical or thermodynamic paths with significantly fewer sampling steps than TI. The SRO in the solid phase contributes ~2-3 meV/atom stabilization, which the MTP must resolve to avoid melting point errors. The speedup arises because FEP requires fewer intermediate states and less sampling per state compared to the continuous integration path of TI, provided the MTP is accurate. The electronic gap shift (tens of K) is handled by including spin-polarized DFT in the training set.",
+    "predicted_outcome": "Melting temperature (Tm) of TaVCrW predicted with <1 meV/atom error (±5 K) compared to DFT-TI baseline; computational cost reduced by >80% (e.g., from 1000 CPU-hours to <200 CPU-hours for full Tm calculation); SRO stabilization energy of 2-3 meV/atom correctly captured; liquid structure factor matches DFT within 5%.",
+    "baseline": "TOR-TILD method using EAM potential and thermodynamic integration (TI) for TaVCrW, as reported in node::W4281670974 (4x speedup, <1 meV/atom error with MTP+TI).",
+    "boundary": "Supercell size must be ≥512 atoms to resolve SRO and avoid finite-size artifacts; temperature range must cover 2000-2400 K to capture the solid-liquid transition; MTP training set must include liquid-state configurations at T > Tm to ensure phase-space coverage; magnetic fluctuations must be included in DFT training for V/Cr to avoid underbinding/overbinding errors.",
+    "uncertainty": "Uncertainty arises from potential inaccuracies in MTP extrapolation to extreme liquid states, neglect of high-temperature magnetic fluctuations if not fully captured in training, and finite-size effects if supercell <512 atoms. Estimated uncertainty in Tm: ±5 K (if MTP accuracy is validated); uncertainty in cost reduction: ±10% (depending on FEP convergence).",
+    "supporting_evidence_ids": [
+      "node::W4281670974",
+      "node::W1964522838",
+      "node::W3023402054"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Perform a benchmark study on a simpler refractory alloy (e.g., TaW or TaV) where high-accuracy DFT-TI results are available. Apply the proposed MTP+FEP method and compare the free energy difference (solid-liquid) and predicted Tm against the DFT-TI baseline. Use the same supercell size (512 atoms) and temperature range (2000-2400 K).",
+      "measurements": [
+        "Free energy difference (ΔF) between solid and liquid phases at Tm",
+        "Melting temperature (Tm) from the intersection of solid and liquid free energy curves",
+        "Computational cost (CPU-hours) for the full calculation",
+        "SRO order parameter in the solid phase",
+        "Liquid structure factor (S(q))"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the free energy difference (ΔF) between the MTP+FEP and DFT-TI methods exceeds 0.5 meV/atom at the melting point, or if the predicted Tm deviates by more than 10 K from the DFT-TI baseline, or if the computational cost reduction is less than 70%."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "packed_ids": [
+    "node::W4290852316",
+    "node::W1964522838",
+    "node::W4210276750",
+    "node::W4281670974",
+    "node::W3023402054",
+    "node::W4224129425",
+    "node::W2168686241",
+    "node::W2039061417",
+    "node::W2903448849"
+  ],
+  "packed_chars": 15772,
+  "packed_papers": 9,
+  "packed_with_citer_statements": 8,
+  "cited_ids": [
+    "node::W1964522838",
+    "node::W3023402054",
+    "node::W4281670974"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "node::W1964522838",
+      "paper_id": "PMC4366518",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Accelerated exploration of multi-principal element alloys with solid solution phases (2015). Cited 614 times before the cutoff; 2 papers in this graph say something specific about it.\nOwn digest: Paper card. Question: How does the number of principal elements (N) in equimolar multi-principal element alloys affect the probability of forming disordered solid solution (SS) phases versus intermetallic (IM) phases, and what are the implications for high-temperature structural applications?. System: Equimolar combinations of 3 to 6 elements from a palette of 26 metallic elements (including Al, Si, Mo, Ta, W, Nb, Ti, V, Re, Zr, Cr, Fe, Co, Ni, etc.). Processing: High-throughput computational screening using the CALPHAD method (Pandat v.8.1 software) to calculate phase diagrams for 134,547 equimolar alloy systems; results filtered for credibility where the fraction of fully assessed binary systems (fAB) equals 1.. Test conditions: Phase diagrams calculated between 600 °C and 3,600 °C; properties evaluated at the solidus temperature (Tm) and at 600 °C; maximum use temperature (Tuse) estimated as the lowest of 0.8Tm or the last first-order phase reaction temperature below Tm.. Fi"
+    },
+    {
+      "record_id": "node::W3023402054",
+      "paper_id": "W3023402054",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Machine-learning informed prediction of high-entropy solid solution formation: Beyond the Hume-Rothery rules (2020). Cited 111 times before the cutoff; 2 papers in this graph say something specific about it.\nWhat citing papers say about it:\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): found that molar volume, bulk modulus, and melting temperature are the factors that affect phase formation in HEAs [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): showed excellent accuracy in phase prediction while being computationally inexpensive [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): indicated that molar volume, bulk modulus, and melting temperature are the most influential features in HEAs' phase formation [system High entropy alloys (HEAs)]\n- finding (from \"Recent advances in computational design of structural multi-principal ...\", 2023): One of the applications is phase selection, where the ML model is designed to predict whether the MPEAs are in BCC, FCC, or HCP phase and if interme"
+    },
+    {
+      "record_id": "node::W4281670974",
+      "paper_id": "W4281670974",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Thermodynamics up to the melting point in a TaVCrW high entropy alloy: Systematic ab initio study aided by machine learning potentials (2022). Cited 14 times before the cutoff; 1 papers in this graph say something specific about it.\nWhat citing papers say about it:\n- method (from \"Recent advances in computational design of structural multi-principal ...\", 2023): introduces thermodynamic integration aided by MTP to simulate high-temperature properties [system TaVCrW high entropy alloy; values four-times speedup, less than 1 meV/atom error]"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "elapsed_seconds": 155.24,
+  "target_system": "TaVCrW refractory high-entropy alloy (RHEA), equimolar or near-equimolar composition, in solid and liquid states, targeted for melting temperature (Tm) and thermodynamic property calculation via DFT-based Machine Learning Interatomic Potentials (MTP) and Free Energy Perturbation (FEP).",
+  "evidence_appraisal": [
+    {
+      "record_id": "node::W4290852316",
+      "record_system": "CrMnFeCoNi (Cantor) and CrFeCoNi (Mn-free) HEAs; ballistic impact, MD with MEAM potential, strain rates 10^7-10^9 s^-1, temperatures 70-1000 K.",
+      "difference_from_target": "Different alloy system (Fe/Ni/Mn-based vs. Ta/V/Cr/W refractory); different test conditions (ballistic impact, low-to-moderate temperatures vs. high-temperature melting); different potential type (MEAM vs. MTP/DFT); no direct thermodynamic integration or FEP data.",
+      "transfer": "does_not_transfer",
+      "reason": "System composition and physics (magnetic elements, lower melting point, different deformation mechanisms) differ significantly from TaVCrW refractory system; no data on melting thermodynamics or FEP/TI comparison."
+    },
+    {
+      "record_id": "node::W1964522838",
+      "record_system": "Equimolar 3-6 element MPEAs (including Ta, W, V, Cr) screened via CALPHAD; phase diagrams 600-3600 °C.",
+      "difference_from_target": "CALPHAD-based screening vs. DFT/MTP/FEP; provides general trends (Tm decreases with N) but no specific Tm for TaVCrW, no MTP/FEP methodology, no sub-meV accuracy claims.",
+      "transfer": "partially",
+      "reason": "Shares the alloy system (Ta, V, Cr, W present in palette) and high-temperature regime, but the method (CALPHAD) and level of detail (phase fraction trends vs. free energy perturbation) differ; useful for baseline Tm expectations but not for the specific computational protocol."
+    },
+    {
+      "record_id": "node::W4210276750",
+      "record_system": "Sc-Hf-Nb-Ta-Ti-Zr refractory HEAs; arc-melted, superconductivity, XRD/SEM; 0.35-300 K electrical/magnetic tests.",
+      "difference_from_target": "Different refractory system (Sc/Hf/Nb/Ti/Zr vs. Ta/V/Cr/W); focuses on superconductivity and low-temperature properties; no melting thermodynamics or MTP/FEP.",
+      "transfer": "does_not_transfer",
+      "reason": "Different elemental composition and property focus (superconductivity vs. melting); no relevant computational methodology for free energy calculation."
+    },
+    {
+      "record_id": "node::W4281670974",
+      "record_system": "TaVCrW high entropy alloy; systematic ab initio study aided by machine learning potentials; thermodynamics up to melting point.",
+      "difference_from_target": "Identical target system (TaVCrW); uses MTP and thermodynamic integration (TI) to achieve ~4x speedup with <1 meV/atom error; directly addresses the hypothesis of replacing TI with FEP.",
+      "transfer": "transfers",
+      "reason": "Exact match in alloy system and computational context (ab initio + MTP for thermodynamics up to melting); provides the baseline performance (speedup, accuracy) and validates the MTP approach for this specific alloy."
+    },
+    {
+      "record_id": "node::W3023402054",
+      "record_system": "High-entropy solid solution formation; ML beyond Hume-Rothery rules; factors: molar volume, bulk modulus, melting temperature.",
+      "difference_from_target": "General HEA phase prediction; no specific TaVCrW data; no MTP/FEP methodology; focuses on phase selection rather than thermodynamic integration.",
+      "transfer": "partially",
+      "reason": "Confirms that melting temperature is a key feature for HEA phase prediction, supporting the relevance of accurate Tm calculation, but does not provide the specific computational mechanism (MTP/FEP) or validation data."
+    },
+    {
+      "record_id": "node::W4224129425",
+      "record_system": "Elastic properties of HEAs; ML model with 20 features (including itinerant electrons, work function, modulus mismatch); applied to Nb-Mo-Ta-W-V alloys.",
+      "difference_from_target": "Focus on elastic properties, not melting thermodynamics; different alloy system (Nb-Mo-Ta-W-V vs. TaVCrW); no FEP/TI comparison.",
+      "transfer": "does_not_transfer",
+      "reason": "Different property focus (elasticity vs. melting/free energy); different composition; no direct relevance to the FEP/TI substitution hypothesis."
+    },
+    {
+      "record_id": "node::W2168686241",
+      "record_system": "Bulk Metallic Glasses; atomic size difference, heat of mixing, periodicity; Miedema model.",
+      "difference_from_target": "Different material class (BMGs vs. crystalline HEAs); different thermodynamic descriptors; no MTP/FEP.",
+      "transfer": "does_not_transfer",
+      "reason": "BMG physics and descriptors (e.g., glass formation criteria) are not directly applicable to the melting thermodynamics of crystalline TaVCrW RHEAs."
+    },
+    {
+      "record_id": "node::W2039061417",
+      "record_system": "High-entropy alloys (general); Hume-Rothery rules, atomic size difference (δ), enthalpy of mixing (ΔHmix), configurational entropy.",
+      "difference_from_target": "General HEA principles; no specific TaVCrW data; no MTP/FEP methodology; focuses on phase formation criteria.",
+      "transfer": "partially",
+      "reason": "Provides general thermodynamic context (entropy, enthalpy) relevant to melting, but lacks the specific computational protocol and validation data for the MTP/FEP approach in TaVCrW."
+    },
+    {
+      "record_id": "node::W2903448849",
+      "record_system": "Database of 370 HEAs/CCAs; mechanical properties, density, Young's modulus; 27 refractory HEAs with temperature-dependent data.",
+      "difference_from_target": "Experimental database; no computational MTP/FEP data; TaVCrW may be included but no specific Tm or thermodynamic integration results provided.",
+      "transfer": "does_not_transfer",
+      "reason": "Experimental data source; does not provide the computational methodology or validation for the proposed MTP/FEP speedup."
+    }
+  ]
+}

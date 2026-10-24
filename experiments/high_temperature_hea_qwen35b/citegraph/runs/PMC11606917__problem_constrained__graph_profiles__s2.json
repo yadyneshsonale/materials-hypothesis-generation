@@ -1,0 +1,103 @@
+{
+  "run_id": "PMC11606917__problem_constrained__graph_profiles__s2",
+  "paper_id": "PMC11606917",
+  "query_level": "problem_constrained",
+  "arm": "graph_profiles",
+  "sample": 2,
+  "query": "We are analyzing a refractory BCC high-entropy alloy (Ta-based) where standard experimental measurements of melting properties are infeasible. Current ab initio free energy methods are prohibitively expensive due to the need for thermodynamic integration over the full phase space. Furthermore, existing empirical potentials (like EAM) often fail to capture the complex liquid structure in multi-component systems, while machine learning potentials are computationally demanding. I need a hypothesis for an intervention that replaces the expensive thermodynamic integration step with a more efficient perturbation scheme using a specific class of machine learning potentials. The solution must address the trade-off between computational cost (currently limiting throughput) and the accuracy required to resolve subtle free energy differences. What are the known failure modes of existing TOR-TILD or similar approaches in multi-component spaces, and what falsification experiment could distinguish a true efficiency gain from an artifact of the potential's training set?",
+  "publication_date": "2024-11-29",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Replacing full thermodynamic integration in Ta-based refractory BCC high-entropy alloys with a Moment Tensor Potential (MTP) trained on constrained DFT configurations including magnetic and lattice perturbations will yield melting temperature predictions within 5% of ab initio benchmarks while reducing computational cost by two orders of magnitude, provided the training set explicitly covers the high-entropy liquid structure via active learning of unstable stacking faults and surface energies.",
+    "material_initial_state": "Ta-based refractory BCC high-entropy alloy (e.g., MoNbTiTa or similar Ta-rich system) in a solid state with complex multi-component disorder, where standard experimental melting data is unavailable and ab initio free energy calculations are computationally prohibitive.",
+    "intervention": "Construct a Moment Tensor Potential (MTP) trained on a dataset generated via constrained DFT (cDFT) that includes geometric relaxations, lattice compression/extension, random atomic displacements, and magnetic moment perturbations, coupled with an active learning loop that samples unstable stacking faults and surface energies to capture liquid-like disorder.",
+    "conditions": "Simulations performed at temperatures approaching the solidus (Tm) and above, using molecular dynamics with the trained MTP to calculate free energy differences via a perturbation scheme (e.g., thermodynamic integration over a reduced order parameter or harmonic reference) rather than full phase space sampling.",
+    "structural_mediator": "The MTP's ability to accurately reproduce the formation energy trends and lattice parameters of multi-component magnetic alloys (as demonstrated in Fe-Al systems) and its capacity to model surface energy convergence and stacking fault energies, which are critical for nucleation and melting in refractory systems.",
+    "mechanism": "The MTP captures the complex local chemical environment and magnetic contributions (if applicable) that empirical potentials miss, while the active learning strategy ensures the potential is robust in the high-entropy liquid regime where standard training sets fail, allowing for efficient free energy estimation without full thermodynamic integration.",
+    "predicted_outcome": "The MTP-based perturbation scheme will predict the melting temperature of the Ta-based alloy with an error margin of <5% compared to high-fidelity benchmarks, while reducing the computational time required for free energy estimation by a factor of >100 compared to full ab initio thermodynamic integration.",
+    "baseline": "Current ab initio free energy methods requiring full thermodynamic integration (prohibitively expensive) and existing empirical potentials (EAM) which fail to capture the complex liquid structure in multi-component systems.",
+    "boundary": "The hypothesis holds for refractory BCC systems with high configurational entropy where magnetic effects are non-negligible or where surface/defect energies dominate the melting behavior; it may fail for systems with strong directional bonding or where the liquid structure is dominated by specific short-range ordering not captured by the training set.",
+    "uncertainty": "There is uncertainty regarding whether the specific class of MTPs trained on Fe-Al magnetic systems can generalize to Ta-based refractory alloys without explicit training on Ta-liquid configurations, as the electronic structure and bonding nature differ significantly. Additionally, the trade-off between the cost of generating the active learning dataset and the savings in free energy calculation is not fully quantified.",
+    "supporting_evidence_ids": [
+      "node::W4400700825",
+      "node::W4388632688",
+      "node::W2802652936",
+      "node::W1964522838"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Perform molecular dynamics simulations of a Ta-based refractory BCC alloy using the proposed MTP and a standard EAM potential. Calculate the melting temperature (Tm) using a perturbation scheme (e.g., heating/cooling cycles with free energy estimation via harmonic reference) for both potentials. Compare the MTP-predicted Tm against a high-fidelity ab initio benchmark (if computationally feasible for a small supercell) or experimental data from a similar Ta-based system. Additionally, test the MTP's ability to reproduce the liquid structure factor S(q) against known experimental or high-fidelity simulation data for the liquid phase.",
+      "measurements": [
+        "Melting temperature (Tm) from heating/cooling cycles",
+        "Liquid structure factor S(q) from radial distribution functions",
+        "Surface energy and unstable stacking fault energies",
+        "Computational time per free energy point"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the MTP-predicted Tm deviates by more than 5% from the benchmark/experimental value, or if the liquid structure factor S(q) shows significant deviations (e.g., peak position or height errors >10%) compared to the benchmark, indicating the potential fails to capture the complex liquid structure despite the training strategy."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "packed_ids": [
+    "node::W3023402054",
+    "node::W1964522838",
+    "node::W4224129425",
+    "node::W4400700825",
+    "node::W4290852316",
+    "node::W2938633511",
+    "node::W4388632688",
+    "node::W2802652936",
+    "node::W2346941564"
+  ],
+  "packed_chars": 15770,
+  "packed_papers": 9,
+  "packed_with_citer_statements": 8,
+  "cited_ids": [
+    "node::W1964522838",
+    "node::W2802652936",
+    "node::W4388632688",
+    "node::W4400700825"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "node::W1964522838",
+      "paper_id": "PMC4366518",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Accelerated exploration of multi-principal element alloys with solid solution phases (2015). Cited 614 times before the cutoff; 2 papers in this graph say something specific about it.\nOwn digest: Paper card. Question: How does the number of principal elements (N) in equimolar multi-principal element alloys affect the probability of forming disordered solid solution (SS) phases versus intermetallic (IM) phases, and what are the implications for high-temperature structural applications?. System: Equimolar combinations of 3 to 6 elements from a palette of 26 metallic elements (including Al, Si, Mo, Ta, W, Nb, Ti, V, Re, Zr, Cr, Fe, Co, Ni, etc.). Processing: High-throughput computational screening using the CALPHAD method (Pandat v.8.1 software) to calculate phase diagrams for 134,547 equimolar alloy systems; results filtered for credibility where the fraction of fully assessed binary systems (fAB) equals 1.. Test conditions: Phase diagrams calculated between 600 °C and 3,600 °C; properties evaluated at the solidus temperature (Tm) and at 600 °C; maximum use temperature (Tuse) estimated as the lowest of 0.8Tm or the last first-order phase reaction temperature below Tm.. Fi"
+    },
+    {
+      "record_id": "node::W2802652936",
+      "paper_id": "W2802652936",
+      "publication_date": "2023-01-13",
+      "kind": "graph_node",
+      "text": "Paper node: Machine learning for phase selection in multi-principal element alloys (2018). Cited 173 times before the cutoff; 3 papers in this graph say something specific about it.\nWhat citing papers say about it:\n- finding (from \"Predicting Elastic Constants of Refractory Complex Concentrated Alloys ...\", 2022): used 118 instances of data set with five descriptors (VEC, ΔSmix, ΔHmix, δ, and χ) to determine the phase in multi-principle element alloys [system multi-principle element alloys; values 118 instances, five descriptors]\n- finding (from \"Predicting Elastic Constants of Refractory Complex Concentrated Alloys ...\", 2022): used 118 instances and five features of the multi-principal element alloys dataset to forecast the alloy's structure [system multi-principal element alloys; values 118 instances, five features]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): showed the superiority of FFANN over other machine learning models in phase prediction [system High entropy alloys (HEAs)]\n- method (from \"High Entropy Alloys Mined From Binary Phase Diagrams\", 2019): Trained neural network models based on thermodynamic and atomistic parameters on"
+    },
+    {
+      "record_id": "node::W4388632688",
+      "paper_id": "PMC10643701",
+      "publication_date": "2024-07-16",
+      "kind": "graph_node",
+      "text": "Paper node: Constrained DFT-based magnetic machine-learning potentials for magnetic alloys: a case study of Fe–Al (2023). Cited 1 times before the cutoff; 1 papers in this graph say something specific about it.\nOwn digest: Paper card. Question: How can machine-learning interatomic potentials be constructed to accurately predict properties of multi-component magnetic alloys by treating magnetic moments as degrees of freedom alongside atomic positions and lattice vectors?. System: bcc Fe–Al alloys with Al concentrations varying from 0 to 50%, including pure bcc-Al. Processing: Training set generation via constrained DFT (cDFT) with hard constraints using ABINIT (6×6×6 k-point mesh, 25 Hartree cutoff, PAW PBE method); 2012 configurations created from 23 parent structures involving geometric relaxation, lattice compression/extension (1%), random atomic displacements (-0.1 to 0.1 Å), and magnetic moment perturbations (up to 15% or 50% deviation); ensemble of five magnetic Moment Tensor Potentials (mMTPs) fitted with 415 parameters (Rmin=2.1 Å, Rcut=4.5 Å, MmaxAl=0.1 μB, MmaxFe=3.0 μB). Test conditions: Verification on 336 additional configurations and fivefold cross-validation on 2328 t"
+    },
+    {
+      "record_id": "node::W4400700825",
+      "paper_id": "PMC11275555",
+      "publication_date": "2024-07-16",
+      "kind": "graph_node",
+      "text": "Paper node: Ab initio framework for deciphering trade-off relationships in multi-component alloys (2024). Cited 1 times before the cutoff; 0 papers in this graph say something specific about it.\nOwn digest: Paper card. Question: How can a computationally efficient framework be developed to explore Pareto-optimal compositions and decipher trade-off relationships between strength and ductility in multi-component refractory alloys?. System: Refractory multi-principal element alloys (MPEAs) based on Mo, Nb, Ti, Ta, W, Cr, Zr, Hf, and V (specifically MoNbTi and MoNbTiTa systems). Processing: Integration of Coherent Potential Approximation (CPA) for elastic constants and misfit volumes, actively learned Moment Tensor Potentials (MTP) for surface and unstable stacking fault energies, and a Virtual Bond Approximation (VBA) analytical model within a Bayesian multi-objective optimization workflow using NSGA-II. Test conditions: Search space constrained to 0.0 ≤ ci ≤ 0.75 for most components (Ti ≤ 0.55); evaluation of properties at ambient conditions via first-principles calculations and analytical models. Findings: The strength of Pareto-optimal MoNbTi alloys ranges from ~50 MPa to ~260 MPa,"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "elapsed_seconds": 48.3
+}

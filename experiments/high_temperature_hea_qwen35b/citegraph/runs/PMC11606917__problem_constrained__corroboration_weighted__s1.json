@@ -1,0 +1,112 @@
+{
+  "run_id": "PMC11606917__problem_constrained__corroboration_weighted__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "problem_constrained",
+  "arm": "corroboration_weighted",
+  "sample": 1,
+  "query": "We are analyzing a refractory BCC high-entropy alloy (Ta-based) where standard experimental measurements of melting properties are infeasible. Current ab initio free energy methods are prohibitively expensive due to the need for thermodynamic integration over the full phase space. Furthermore, existing empirical potentials (like EAM) often fail to capture the complex liquid structure in multi-component systems, while machine learning potentials are computationally demanding. I need a hypothesis for an intervention that replaces the expensive thermodynamic integration step with a more efficient perturbation scheme using a specific class of machine learning potentials. The solution must address the trade-off between computational cost (currently limiting throughput) and the accuracy required to resolve subtle free energy differences. What are the known failure modes of existing TOR-TILD or similar approaches in multi-component spaces, and what falsification experiment could distinguish a true efficiency gain from an artifact of the potential's training set?",
+  "publication_date": "2024-11-29",
+  "generator": "openai:Qwen3.5-35B-A3B-Q4_K_M.gguf",
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Replacing full thermodynamic integration in Ta-based refractory BCC high-entropy alloys with a perturbation scheme using a machine learning potential (MLP) trained specifically on liquid-phase local structural descriptors (e.g., radial distribution function moments and bond-orientational order parameters) will yield accurate free energy differences at a fraction of the computational cost, provided the MLP is constrained by the enthalpy of mixing (ΔHmix) and atomic size difference (δ) to prevent overfitting to solid-state configurations.",
+    "material_initial_state": "A Ta-based refractory BCC high-entropy alloy (e.g., Ta-Nb-Mo-W-V system) in a disordered solid solution state, approaching the melting point where liquid structure is complex and multi-component interactions dominate.",
+    "intervention": "Implement a perturbation-based free energy calculation (e.g., thermodynamic perturbation or Frenkel-Ladd variant adapted for liquids) using a Machine Learning Potential (MLP) trained on a dataset enriched with liquid-phase snapshots and constrained by thermodynamic descriptors (ΔHmix, δ) derived from Miedema's model and CALPHAD assessments.",
+    "conditions": "Temperature range spanning the solidus to the liquidus (approx. 2400 K to 3000 K for Ta-based systems), with the MLP trained on a subset of configurations that explicitly includes high-temperature liquid structures to capture the 'complex liquid structure' failure mode of standard EAM potentials.",
+    "structural_mediator": "The local coordination environment and bond-orientational order in the liquid phase, which serves as the critical structural feature distinguishing the liquid entropy from the solid entropy and is often missed by potentials trained only on crystalline data.",
+    "mechanism": "The MLP, by learning the complex many-body interactions in the liquid phase (which standard EAM fails to capture), allows for efficient sampling of the liquid phase space via perturbation rather than full integration. The inclusion of ΔHmix and δ as constraints ensures the potential respects the thermodynamic stability limits defined by the high number of binary interactions (N(N-1)/2) that drive intermetallic formation, preventing the artificial stabilization of solid phases in the liquid regime.",
+    "predicted_outcome": "The perturbation scheme using the constrained MLP will predict the melting temperature and free energy difference within 2% of the (hypothetical) accurate ab initio result, while reducing computational cost by >90% compared to full thermodynamic integration, successfully resolving the trade-off between cost and accuracy.",
+    "baseline": "Standard EAM potentials (which fail to capture complex liquid structure) or full ab initio thermodynamic integration (which is prohibitively expensive).",
+    "boundary": "The hypothesis holds for equimolar or near-equimolar multi-component systems (N=4-6) where configurational entropy is high but binary interaction complexity (as per node W1964522838) creates a dense landscape of potential intermetallic phases. It fails if the training set lacks sufficient liquid-phase diversity or if the system exhibits extreme liquid phase separation not captured by the training descriptors.",
+    "uncertainty": "There is uncertainty regarding whether the specific class of MLPs (e.g., GAP, SNAP, or DeepMD) can generalize the 'complex liquid structure' of refractory BCC HEAs without explicit training on liquid snapshots, as existing literature (node W2534691303, W2039061417) notes that refractory HEAs are under-investigated and liquid phase separation is a known phenomenon (node W2534691303) that standard models often miss. The 'failure mode' of TOR-TILD or similar approaches in multi-component spaces is the potential's inability to extrapolate to liquid configurations not present in the training set, leading to artifacts in free energy differences.",
+    "supporting_evidence_ids": [
+      "node::W2168686241",
+      "node::W2039061417",
+      "node::W1964522838",
+      "node::W3023402054"
+    ],
+    "conflicting_evidence_ids": [
+      "node::W2058085399"
+    ],
+    "falsification_experiment": {
+      "design": "Perform a blind test on a Ta-based refractory HEA (e.g., TaNbMoWV) where the MLP is trained *only* on solid-state BCC configurations and liquid configurations are generated via high-temperature MD. Compare the free energy of fusion calculated via the perturbation scheme against a small-scale, high-accuracy ab initio thermodynamic integration (using a reduced supercell) for the same system.",
+      "measurements": [
+        "Free energy difference (ΔG) between solid and liquid phases",
+        "Radial distribution function (RDF) of the liquid phase generated by the MLP",
+        "Computational time per free energy point",
+        "Presence of artificial intermetallic ordering in the liquid phase (artifact detection)"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the perturbation scheme using the MLP (trained on solid data) yields a ΔG error >5% compared to the ab initio baseline, or if the liquid phase RDF shows structural artifacts (e.g., spurious ordering) indicating the potential failed to capture the complex liquid structure, despite the computational speedup."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "packed_ids": [
+    "node::W2534691303",
+    "node::W2168686241",
+    "node::W2039061417",
+    "node::W3023402054",
+    "node::W2802652936",
+    "node::W1964522838",
+    "node::W4224129425",
+    "node::W2058085399"
+  ],
+  "packed_chars": 15813,
+  "packed_papers": 8,
+  "packed_with_citer_statements": 8,
+  "cited_ids": [
+    "node::W1964522838",
+    "node::W2039061417",
+    "node::W2058085399",
+    "node::W2168686241",
+    "node::W3023402054"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "node::W1964522838",
+      "paper_id": "PMC4366518",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Accelerated exploration of multi-principal element alloys with solid solution phases (2015). Cited 614 times before the cutoff; 2 papers in this graph say something specific about it.\nCorroboration: 2 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nOwn digest: Paper card. Question: How does the number of principal elements (N) in equimolar multi-principal element alloys affect the probability of forming disordered solid solution (SS) phases versus intermetallic (IM) phases, and what are the implications for high-temperature structural applications?. System: Equimolar combinations of 3 to 6 elements from a palette of 26 metallic elements (including Al, Si, Mo, Ta, W, Nb, Ti, V, Re, Zr, Cr, Fe, Co, Ni, etc.). Processing: High-throughput computational screening using the CALPHAD method (Pandat v.8.1 software) to calculate phase diagrams for 134,547 equimolar alloy systems; results filtered for credibility where the fraction of fully assessed binary systems (fAB) equals 1.. Test conditions: Phase diagrams calculated between 600 °C and 3,600 °C; properties evaluated at the solidus temperature (Tm) and at 600 °C; maximum use temperature (Tuse"
+    },
+    {
+      "record_id": "node::W2039061417",
+      "paper_id": "W2039061417",
+      "publication_date": "2022-07-18",
+      "kind": "graph_node",
+      "text": "Paper node: Microstructures and properties of high-entropy alloys (2013). Cited 4731 times before the cutoff; 6 papers in this graph say something specific about it.\nCorroboration: 6 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- finding (from \"High-Entropy Metal Diborides: A New Class of High-Entropy ...\", 2016): five or more elements can be mixed in a HEA in equimolar concentrations to produce a maximum molar configurational entropy of ΔSmix = RlnN [system high-entropy alloys (HEA); values ΔSmix = RlnN, N is the number of equimolar components]\n- finding (from \"High-Entropy Metal Diborides: A New Class of High-Entropy ...\", 2016): suggested that a necessary (but not sufficient) criterion for forming a single-phase (disordered) HEA is that the computed δ of the solid solution should be sufficiently small: δ ≤ δmax ≈ 4% [system single-phase (disordered) HEA; values δ ≤ δmax ≈ 4%]\n- finding (from \"Predicting Elastic Constants of Refractory Complex Concentrated Alloys ...\", 2022): Ω is defined as ΔSmix divided by the ΔHmix and multiplied by alloys' average melting temperature (MT) [system high-entropy alloys]\n- find"
+    },
+    {
+      "record_id": "node::W2058085399",
+      "paper_id": "W2058085399",
+      "publication_date": "2021-06-04",
+      "kind": "graph_node",
+      "text": "Paper node: Nanostructured High‐Entropy Alloys with Multiple Principal Elements: Novel Alloy Design Concepts and Outcomes (2004). Cited 9019 times before the cutoff; 6 papers in this graph say something specific about it.\nCorroboration: 6 independent citing papers; 0 supporting, 2 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- contradicts (from \"Accelerated exploration of multi-principal element alloys with solid ...\", 2015): proposed that increasing the number of constituents increases configurational entropy and stabilizes SS phases relative to ordered IM phases [system High Entropy Alloys; applied to SS alloys]\n- contradicts (from \"Accelerated exploration of multi-principal element alloys with solid ...\", 2015): proposed that increasing N improves the stability of disordered SSs by increasing the configurational entropy of the alloy [system High Entropy Alloys; applied to disordered SSs]\n- finding (from \"Liquid Phase Separation in High-Entropy Alloys—A Review\", 2018): studied nanostructured High-Entropy Alloys with multiple principal elements [system CoCrCuFeNi]\n- finding (from \"High entropy alloys as a bold step forward ...\", 2019): HEAs were original"
+    },
+    {
+      "record_id": "node::W2168686241",
+      "paper_id": "W2168686241",
+      "publication_date": "2022-07-18",
+      "kind": "graph_node",
+      "text": "Paper node: Classification of Bulk Metallic Glasses by Atomic Size Difference, Heat of Mixing and Period of Constituent Elements and Its Application to Characterization of the Main Alloying Element (2005). Cited 3195 times before the cutoff; 6 papers in this graph say something specific about it.\nCorroboration: 6 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- finding (from \"Predicting Elastic Constants of Refractory Complex Concentrated Alloys ...\", 2022): enthalpy of mixing (ΔHmix) is a descriptor for RCCAs [system bulk metallic glasses; applied to RCCAs]\n- method (from \"Accelerated exploration of multi-principal element alloys with solid ...\", 2015): estimated Hmix for a wide range of atom pairs [system Bulk Metallic Glasses]\n- method (from \"Liquid Phase Separation in High-Entropy Alloys—A Review\", 2018): used the Miedema model for the classification of bulk metallic glasses by atomic size difference and heat of mixing [system bulk metallic glasses]\n- method (from \"WxNbMoTa Refractory High-Entropy Alloys Fabricated by Laser Cladding ...\", 2019): calculated the enthalpy change of the binary liquid alloy composed"
+    },
+    {
+      "record_id": "node::W3023402054",
+      "paper_id": "W3023402054",
+      "publication_date": "2023-08-28",
+      "kind": "graph_node",
+      "text": "Paper node: Machine-learning informed prediction of high-entropy solid solution formation: Beyond the Hume-Rothery rules (2020). Cited 111 times before the cutoff; 2 papers in this graph say something specific about it.\nCorroboration: 2 independent citing papers; 0 supporting, 0 contradicting, 0 extending statements.\nWhat citing papers say about it:\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): found that molar volume, bulk modulus, and melting temperature are the factors that affect phase formation in HEAs [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): showed excellent accuracy in phase prediction while being computationally inexpensive [system High entropy alloys (HEAs)]\n- finding (from \"A machine learning framework for discovering high entropy ...\", 2023): indicated that molar volume, bulk modulus, and melting temperature are the most influential features in HEAs' phase formation [system High entropy alloys (HEAs)]\n- finding (from \"Recent advances in computational design of structural multi-principal ...\", 2023): One of the applications is phase selection, where"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "elapsed_seconds": 53.43
+}
