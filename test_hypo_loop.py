@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import tempfile
 import unittest
+from pathlib import Path
 from unittest.mock import patch
 
 import hypo_loop as H
+import loop_final as LF
 import loop_methods as LM
 
 CASE = {"paper_id": "PMCT", "publication_date": "2024-06-01", "split": "validation",
@@ -73,6 +76,35 @@ class DeterministicCheckTests(unittest.TestCase):
         self.assertEqual(LM.deterministic_problems({"predicted_outcome": "+20% elongation", "baseline": "as-cast",
                                                     "falsification_experiment": {"falsification_rule": "< 5% gain"}},
                                                    {}), [])
+
+
+def _row(method: str, split: str, paper: str, level: str, score: int) -> dict:
+    run = {"method": method, "split": split, "paper_id": paper, "query_level": level, "status": "ok",
+           "generation": {"hypothesis": "h", "predicted_outcome": "o"}, "llm_calls": 1, "chars_in": 10,
+           "elapsed_seconds": 1.0, "models": {"writer": "trapi:x"}, "run_id": f"{paper}__{level}__{method}"}
+    return {"run": run, "gpt": {"scores": {d: score for d in H.ALL_DIMENSIONS}}, "deep": None, "audit": None,
+            "label": None}
+
+
+class ReportTests(unittest.TestCase):
+    def test_test_and_all_reports_only_include_methods_run_on_those_splits(self) -> None:
+        rows = [_row("closed_book", s, p, "broad", 1) for s, p in (("dev", "D1"), ("test", "T1"))]
+        rows += [_row("dev_only_method", "dev", "D1", "broad", 2)]
+        with tempfile.TemporaryDirectory() as tmp, patch.object(H, "OUT", Path(tmp)), \
+                patch.object(H, "load_scored", return_value=rows):
+            self.assertEqual(set(H.report("dev")["table"]), {"closed_book", "dev_only_method"})
+            self.assertEqual(set(H.report("test")["table"]), {"closed_book"})
+            self.assertEqual(set(H.report("all")["table"]), {"closed_book"})
+
+
+class SpearmanTests(unittest.TestCase):
+    def test_ranks_average_ties(self) -> None:
+        self.assertEqual(LF._ranks([1.0, 2.0, 2.0, 3.0]), [1.0, 2.5, 2.5, 4.0])
+
+    def test_monotone_reversed_and_constant(self) -> None:
+        self.assertEqual(LF.spearman([1, 2, 3, 4], [10, 20, 30, 40]), 1.0)
+        self.assertEqual(LF.spearman([1, 2, 3, 4], [4, 3, 2, 1]), -1.0)
+        self.assertIsNone(LF.spearman([1, 2, 3], [5, 5, 5]))
 
 
 if __name__ == "__main__":

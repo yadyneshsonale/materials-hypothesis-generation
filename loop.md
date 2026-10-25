@@ -2,18 +2,21 @@
 
 Started 2026-10-25. Everything here follows [must_obey.md](./must_obey.md). Every run is checked by
 `must_obey_check.py --loop`, and every number below is on the **dev split** (8 papers × 3 levels = 24 units, 2 samples
-each) unless a section says *test*. The test split (4 papers) is touched only by the pre-registered final runs in
-section 6.
+each) unless a section says *test*. The test split (4 papers) is touched only by the pre-registered final runs of
+section 6, reported in section 7. Section 8 summarises what made a difference and why.
 
 **Code.**
 - [hypo_loop.py](./hypo_loop.py): the harness, with rule enforcement, logging and evaluation.
 - [loop_methods.py](./loop_methods.py): the methods.
+- [loop_analysis.py](./loop_analysis.py): decision diagnostics (section 5).
+- [loop_final.py](./loop_final.py): the pre-registered test analysis and the style checks (section 7).
 - [test_hypo_loop.py](./test_hypo_loop.py): tests.
 - [failure_clean.py](./failure_clean.py): the failure analysis.
 - [query_builder_v3_1.py](./query_builder_v3_1.py): the benchmark fix.
 
 **Outputs.** `experiments/high_temperature_hea_qwen35b/loop/<method>/` holds `runs/`, `judgments/{gpt56,deepseek}/`,
-`audit/` and `labels/`. The reports are `report_dev.md` and `report_test.md`.
+`audit/` and `labels/`. The reports are `report_dev.md`, `report_test.md` and `report_all.md`. The pre-registered
+analysis is `final_{dev,test,all}.json`, and the style checks and per-paper scores are `final_robustness.json`.
 
 ---
 
@@ -114,7 +117,13 @@ Benchmark-construction sources (MatDesign, SciMON, MOOSE-Chem, ResearchBench, Id
 
 The same code path as experiment 21 (`generate_with_citation_repair`), re-run on v3.1 inside the harness.
 
-_Filled in section 7 (summary table)._
+| Baseline | GPT-5.6 | DeepSeek | core GPT | intervention | condition | mechanism | outcome |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `closed_book` | 0.51 | 0.32 | 0.43 | 0.33 | 0.50 | 0.52 | 0.69 |
+| `text_chunks` | 0.43 | 0.26 | 0.32 | 0.17 | 0.48 | 0.48 | 0.58 |
+
+Every Δ in sections 5 and 7 is against `closed_book` unless stated. The test-split and all-12 baselines are in
+section 7.
 
 ---
 
@@ -138,6 +147,390 @@ _Filled in section 7 (summary table)._
     understanding questions because their introductions state an understanding gap; this is a recorded caveat, not
     a tuned exception.
 
-### Iteration 1: harness-controlled reasoning with a fixed weak model
+### Iteration 1: harness-controlled reasoning with a fixed weak model (Llama-3.3)
 
-_Results pending; see section 7._
+The model stays fixed (A6, H2). Each method is a code-controlled workflow (B3, B4): the harness decides the steps,
+the model fills them, and every call is guarded and logged.
+
+| Method | Failures targeted | Design (what is new here) | Sources |
+|---|---|---|---|
+| `writer_only` (L0, control) | none (control) | The method writer prompt alone, closed-book. It demands named parameters, quantified outcome and a numeric falsification threshold. | control for the writer prompt |
+| `frame_decide` (L1) | F1, F1b, F8 | (1) A problem frame: system, goal, limitation, root-cause cues, constraints, regime, earlier attempts, gap type. (2) A family map: every family of answers for that gap type gets its governing principle, cues for and against, and a fit score 0–5 from the cues only ("alloying is not a default"). (3) **Code** picks the top family; no model discretion. (4) The writer must use the chosen family and lever. | C9 step-back; B4 chaining and routing; B3 control flow; C3 coarse first |
+| `breadth_tournament` (L2) | F4 (coverage), F1 | One candidate per top-4 family, each written in a clean context. A round-robin of pairwise judgments in **both orders**; a pair point counts only if the two orders agree. The judge's criterion is a forecasting framing: what a competent group would most plausibly pursue and succeed with. | C1 co-scientist tournament; C3 order control; B5 clean contexts; C12 forecasting |
+| `precedent_decide` (L3) | F1, F3 | Earlier papers' cards (temporally filtered) are read into a precedent table (problem → family → lever → outcome). The table is a prior in the family map; the question's cues still decide. | C2 MOOSE-Chem inspirations; C4 SciMON neighbours; C10 retrieved, not self-generated, exemplars for a weak model |
+| `frame_decide_verify` (L4) | F6 | L1, then **computational sensors** (numbers in the outcome, a numeric threshold, a named baseline) and a separate inferential verifier that sees only the question and the draft. One repair pass. | A4 guides and sensors; A3 separate evaluator; B4 evaluator-optimizer; B10 reviewer without generator context |
+| `decide_then_ground` (L7) | F5 | Decide first (L1), then retrieve raw text aimed at the chosen family, lever and principle, then write with citations. | C11 HyDE; C9 abstraction as retrieval query; B5 just-in-time retrieval; A5 retrieval as a code step |
+
+### Iteration 2: fix the writer, then search and select inside the harness (Llama-3.3)
+
+Lesson from iteration 1 (the ratchet, H2). The method writer's demand for quantified outcomes lowers outcome
+agreement (0.69 → 0.42), because the judge penalises invented exact numbers that differ from the paper. Every
+iteration-2 method therefore uses `WRITER_B`: the baseline's conservative style ("state the uncertainty instead of
+inventing support or precise values") plus the notes. `writer_only_b` is its control.
+
+| Method | Failures targeted | Design | Sources |
+|---|---|---|---|
+| `writer_only_b` (control) | | WRITER_B alone | |
+| `frame_decide_b` | F1, F8 | L1 with WRITER_B | as L1 |
+| `trend_chain` | F1, F3 | Frame → earlier papers' cards in **chronological order** → state the trend, what is unsolved, and forecast the most plausible next step (family and lever) → write | C6 Chain of Ideas; C12 forecasting |
+| `coarse_to_fine` | F3 | Lock the family (L1), list 4 distinct levers inside it, then score each lever **independently**: root cause, constraints, physics, next step; 3 samples, trimmed mean. Write the best. | C3 coarse to fine; C5 narrow criteria; C12 trimmed mean; A3 per-criterion scoring |
+| `family_scored` | F4, F1 | One candidate per top-4 family, selected by independent absolute scoring (trimmed mean) instead of a pairwise tournament | C12; A3; C7 (selection after coverage) |
+
+### Iteration 3: change the model, keep the harness (pre-cutoff models only)
+
+"A decent model with a great harness beats a great model with a bad harness" (H2). Here we measure the other axis:
+o3-mini and gpt-4o-mini (both cutoff 2023-10-01, memorisation probe clean) in closed-book, writer-only-B and
+frame-decide-B.
+
+### Iteration 4: harness pieces on top of the best model, and combinations
+
+Recursive step from iteration 3: on o3-mini the frame/decide step no longer helped, so the question becomes which
+harness pieces still add value to a stronger model. Tested on o3-mini and on Llama:
+- `trend_chain`: forecast from the chronological chain.
+- `decide_then_ground_b`: decide, then ground the chosen lever (WRITER_B).
+- `trend_ground_b`: forecast, then ground.
+- `scaffold_ensemble`: one candidate each from closed-book, frame-decide and trend-chain, selected by independent
+  trimmed-mean scoring (C12, A3).
+- `coarse_to_fine` (o3-mini).
+
+---
+
+## 5. Results on dev (24 units × 2 samples; GPT-5.6 primary, DeepSeek cross-judge)
+
+The full table, with all 10 dimensions, lever labels, hedges and novelty, is in
+`experiments/high_temperature_hea_qwen35b/loop/report_dev.md`. Δ is the paired difference against the Llama-3.3
+`closed_book` baseline (paper-clustered bootstrap).
+
+| Method | GPT-5.6 | Δ vs closed_book [95% CI] | DeepSeek | Δ DeepSeek [95% CI] | core GPT | intervention | mechanism | outcome | specificity (audit) | calls/run |
+|---|---:|---|---:|---|---:|---:|---:|---:|---:|---:|
+| **Baselines (Llama-3.3)** | | | | | | | | | | |
+| `closed_book` | 0.51 | – | 0.32 | – | 0.43 | 0.33 | 0.52 | 0.69 | 0.26 | 1.00 |
+| `text_chunks` | 0.43 | -0.08 [-0.34, +0.15] | 0.26 | -0.06 [-0.23, +0.10] | 0.32 | 0.17 | 0.48 | 0.58 | 0.19 | 1.00 |
+| **Iteration 1 (Llama, method writer)** | | | | | | | | | | |
+| `writer_only` | 0.44 | -0.07 [-0.14, +0.01] | 0.20 | -0.12 [-0.22, -0.01] | 0.41 | 0.29 | 0.52 | 0.42 | 0.68 | 1.04 |
+| `frame_decide` | 0.47 | -0.04 [-0.18, +0.09] | 0.31 | -0.01 [-0.18, +0.16] | 0.36 | 0.23 | 0.50 | 0.50 | 0.67 | 3.00 |
+| `breadth_tournament` | 0.46 | -0.05 [-0.14, +0.05] | 0.30 | -0.02 [-0.08, +0.05] | 0.41 | 0.29 | 0.52 | 0.50 | 0.66 | 18.00 |
+| `precedent_decide` | 0.45 | -0.06 [-0.15, +0.04] | 0.29 | -0.03 [-0.14, +0.08] | 0.35 | 0.29 | 0.42 | 0.50 | 0.64 | 4.00 |
+| `frame_decide_verify` | 0.44 | -0.07 [-0.22, +0.06] | 0.27 | -0.05 [-0.19, +0.07] | 0.41 | 0.27 | 0.54 | 0.40 | 0.71 | 5.00 |
+| `decide_then_ground` | 0.56 | +0.05 [-0.14, +0.20] | 0.23 | -0.09 [-0.19, +0.01] | 0.48 | 0.38 | 0.58 | 0.71 | 0.43 | 3.73 |
+| **Iteration 2 (Llama, conservative writer)** | | | | | | | | | | |
+| `writer_only_b` | 0.59 | +0.08 [-0.03, +0.20] | 0.35 | +0.03 [-0.09, +0.16] | 0.47 | 0.35 | 0.58 | 0.75 | 0.33 | 1.00 |
+| `frame_decide_b` | 0.59 | +0.08 [-0.03, +0.17] | 0.36 | +0.04 [-0.08, +0.18] | 0.52 | 0.42 | 0.62 | 0.69 | 0.20 | 3.00 |
+| `trend_chain` | 0.57 | +0.06 [-0.04, +0.16] | 0.35 | +0.03 [-0.06, +0.12] | 0.47 | 0.46 | 0.48 | 0.71 | 0.24 | 3.08 |
+| `coarse_to_fine` | 0.53 | +0.02 [-0.11, +0.16] | 0.28 | -0.04 [-0.16, +0.09] | 0.40 | 0.31 | 0.48 | 0.77 | 0.37 | 16.00 |
+| `family_scored` | 0.48 | -0.03 [-0.24, +0.15] | 0.29 | -0.03 [-0.14, +0.07] | 0.34 | 0.19 | 0.50 | 0.62 | 0.30 | 18.00 |
+| **Iteration 3 (model swap)** | | | | | | | | | | |
+| `closed_book_4omini` | 0.61 | +0.10 [-0.08, +0.26] | 0.28 | -0.04 [-0.14, +0.06] | 0.47 | 0.40 | 0.54 | 0.85 | 0.22 | 1.00 |
+| `writer_only_b_4omini` | 0.52 | +0.01 [-0.18, +0.18] | 0.30 | -0.02 [-0.16, +0.11] | 0.40 | 0.31 | 0.48 | 0.75 | 0.41 | 1.00 |
+| `frame_decide_b_4omini` | 0.54 | +0.03 [-0.12, +0.19] | 0.23 | -0.09 [-0.24, +0.04] | 0.38 | 0.25 | 0.50 | 0.77 | 0.24 | 3.00 |
+| `closed_book_o3mini` | 0.63 | +0.12 [+0.01, +0.23] | 0.53 | +0.21 [+0.08, +0.33] | 0.47 | 0.31 | 0.62 | 0.90 | 0.37 | 1.02 |
+| `writer_only_b_o3mini` | 0.67 | +0.16 [+0.05, +0.24] | 0.59 | +0.27 [+0.12, +0.45] | 0.52 | 0.33 | 0.71 | 0.92 | 0.38 | 1.00 |
+| `frame_decide_b_o3mini` | 0.63 | +0.12 [+0.05, +0.20] | 0.58 | +0.27 [+0.04, +0.51] | 0.46 | 0.29 | 0.62 | 0.81 | 0.35 | 3.04 |
+| **Iteration 4 (harness pieces and combinations)** | | | | | | | | | | |
+| `trend_chain_o3mini` | 0.62 | +0.11 [-0.06, +0.27] | 0.60 | +0.28 [+0.03, +0.54] | 0.46 | 0.25 | 0.67 | 0.88 | 0.33 | 3.48 |
+| `decide_then_ground_b_o3mini` | 0.69 | +0.18 [+0.08, +0.30] | 0.68 | +0.36 [+0.22, +0.50] | 0.54 | 0.25 | 0.83 | 0.94 | 0.38 | 3.19 |
+| `trend_ground_b_o3mini` | 0.73 | +0.22 [+0.12, +0.31] | 0.64 | +0.32 [+0.11, +0.49] | 0.59 | 0.38 | 0.81 | 0.94 | 0.39 | 3.12 |
+| `scaffold_ensemble_o3mini` | 0.66 | +0.15 [+0.05, +0.23] | 0.52 | +0.20 [-0.03, +0.40] | 0.53 | 0.25 | 0.81 | 0.88 | 0.33 | 16.44 |
+| `coarse_to_fine_o3mini` | 0.61 | +0.10 [-0.05, +0.24] | 0.55 | +0.23 [-0.04, +0.55] | 0.43 | 0.21 | 0.65 | 0.85 | 0.56 | 16.04 |
+| `decide_then_ground_b` | 0.54 | +0.03 [-0.09, +0.16] | 0.31 | -0.01 [-0.08, +0.07] | 0.48 | 0.46 | 0.50 | 0.69 | 0.12 | 3.10 |
+| `trend_ground_b` | 0.51 | -0.00 [-0.19, +0.14] | 0.29 | -0.03 [-0.17, +0.10] | 0.46 | 0.35 | 0.56 | 0.65 | 0.14 | 3.12 |
+| `scaffold_ensemble` | 0.61 | +0.10 [-0.01, +0.22] | 0.33 | +0.01 [-0.03, +0.05] | 0.56 | 0.40 | 0.73 | 0.79 | 0.25 | 16.02 |
+
+### What each iteration taught (the loop)
+
+**Iteration 1: the writer prompt dominates and the decision step helps a little.**
+- `writer_only` scores 0.07 below `closed_book` (DeepSeek −0.12, CI −0.22 to −0.005). Its quantified outcomes cut
+  outcome agreement from 0.69 to 0.42, because the judge penalises invented exact numbers.
+- Within the same writer, `frame_decide` adds +0.03 over `writer_only`, and grounding the decided lever
+  (`decide_then_ground`) adds +0.12, since evidence anchors the numbers (outcome 0.71).
+- The tournament, precedents and the verifier did not help Llama:
+  - the Llama tournament judge did not move coverage (same class 0.38);
+  - precedents pulled in other systems' mechanisms (mechanism 0.42; the cross-system transfer failure of
+    experiment 15);
+  - the verifier demanded more numbers (specificity 0.71, outcome 0.40).
+- **Rule added (ratchet):** a conservative writer (WRITER_B) for every later method.
+
+**Iteration 2: with the writer fixed, a cue-based family decision adds to the core.**
+- `writer_only_b` scores 0.59 (+0.08); most of the gain is outcome agreement.
+- `frame_decide_b` has the best Llama core (0.52, intervention 0.42), and `trend_chain` the best Llama intervention
+  (0.46).
+- Lever search (`coarse_to_fine`) and independent selection across families (`family_scored`) did not help with
+  Llama as scorer.
+
+**Iteration 3: the model is the biggest single lever, and both judges agree.**
+- o3-mini closed-book: +0.12 (CI 0.01 to 0.23); DeepSeek +0.21 (CI 0.08 to 0.33).
+- o3-mini with the conservative writer: +0.16 (CI 0.05 to 0.25); DeepSeek +0.27 (CI 0.12 to 0.45).
+- gpt-4o-mini looks good on GPT-5.6 (0.61) but not on DeepSeek (0.28, Llama level). It is not robust and was dropped.
+- On o3-mini, forcing a family (`frame_decide_b_o3mini`, 0.63) is *below* the plain writer (0.67). The scaffold that
+  helped the weak model constrains the stronger one (H2, C10).
+
+**Iteration 4: on the strong model, retrieval aimed at a decided lever is what helps.**
+- `trend_ground_b_o3mini`: chronological chain → forecast the next step → retrieve for that lever → conservative
+  writer. GPT-5.6 0.73 (+0.22, CI 0.12 to 0.31); DeepSeek 0.64 (+0.32, CI 0.11 to 0.49); core 0.59; mechanism 0.81.
+- `decide_then_ground_b_o3mini` scores 0.69 and has the best DeepSeek score (0.68, +0.37, CI 0.22 to 0.50).
+- The same aimed retrieval is neutral for Llama (`trend_ground_b` 0.51, `decide_then_ground_b` 0.54). Evidence helps
+  only a model that can use it, which reverses failure F5 for o3-mini.
+- Ensembles: `scaffold_ensemble` is the best Llama core (0.56). On o3-mini (0.66) it beats each of its ungrounded
+  parts (0.62–0.63) but not the grounded methods.
+- Quality check (must_obey.md 6.8): the leader is *more* specific than the baseline in the target-free audit (0.39 vs
+  0.26), with a low hedge rate and higher novelty (1.94 vs 1.06). The gain is not vagueness.
+
+**Iteration 5: both ratchet rules from the iteration-4 failure analysis fail to raise the score (negative result,
+kept).**
+
+| Method | GPT-5.6 | Δ vs `trend_ground_b_o3mini` | DeepSeek | Δ DeepSeek | core GPT | lever ≥ 2 | calls/run |
+|---|---:|---|---:|---|---:|---:|---:|
+| `decide_then_ground_v2_o3mini` (cue rule; compare with `decide_then_ground_b_o3mini` 0.69) | 0.68 | −0.02 vs v1 (CI −0.08 to +0.04) | 0.64 | −0.05 vs v1 (CI −0.10 to +0.01) | 0.54 | 0.19 (v1 0.15) | 3.2 |
+| `multi_decision_ground_o3mini` (trend + top-2 families, each grounded, selected by o3-mini scoring) | 0.69 | −0.04 (CI −0.10 to +0.02) | 0.53 | −0.11 (CI −0.27 to +0.05) | 0.52 | 0.19 | 15.5 |
+
+- The cue rule changed the decisions as intended. On the in situ STEM case, 5 of 6 decisions are now in situ
+  characterization and lever hits rose from 2/6 to 4/6. Reconstruction did not follow (0.67 → 0.67), and the MD case
+  barely moved.
+- Coverage then selection costs 5× more calls and loses to the single forecast-and-ground decision. o3-mini's own
+  independent scoring does not pick the best candidate, the result Large Language Monkeys (C7) predicts for
+  domains without a verifier.
+- The loop therefore stops at iteration 4's `trend_ground_b_o3mini`.
+
+**Iteration-4 failure analysis (decision diagnostics, [loop_analysis.py](./loop_analysis.py)).**
+- Every decision method picks the target's kind of answer only 35–38% of the time. When it does, reconstruction is
+  much higher (`trend_ground_b_o3mini` 0.82 vs 0.68).
+- For understanding gaps whose question says the mechanism is hard to observe, the planner chose ordinary controlled
+  experiments 11 of 12 times (target: MD simulation) and 8 of 12 times (target: in situ STEM).
+- Ambiguous design cases split across 2–3 plausible families.
+- Iteration 5 adds two rules from these dev-only observations: a cue rule in the family map, and keeping the top
+  decisions (trend + top-2 families), each grounded, then selecting.
+- **Dev/test discipline note:** experiment 22's example of the composition default (CoCrFeNiTi) is a test-split
+  case. No rule was derived from it.
+
+---
+
+## 6. Pre-registration for the test split (written 2026-10-25 01:40, before any test-split run of a loop method)
+
+The test split (PMC12029629, PMC12298864, PMC12806431, PMC12941549; 12 units) is run once, with `--final`, for the
+configurations fixed by these rules:
+
+1. **Finalists (chosen by rule, not by hand).**
+   - F-best: the dev method with the highest GPT-5.6 reconstruction among all methods of iterations 1–5. Ties within
+     0.01 are broken by DeepSeek.
+   - F-llama: the best Llama-3.3 method by the same rule (does the harness effect on a weak model replicate?).
+2. **Controls.**
+   - `closed_book` (Llama): the primary baseline, the same as experiment 21.
+   - `text_chunks` (Llama).
+   - `closed_book_o3mini`: model only.
+   - `writer_only_b_o3mini`: model plus the conservative writer, with no harness.
+3. **Primary hypothesis (one test, no multiplicity).** F-best − closed_book > 0 on GPT-5.6 reconstruction. Paired
+   over the 12 test units (2 samples each), with a paper-clustered bootstrap 95% CI and a sign test over 4 papers.
+   With 4 papers the sign test cannot reach p < 0.05, so the CI is the primary evidence.
+4. **Secondary comparisons.** Holm across the set:
+   - F-best − closed_book_o3mini (harness on top of the model);
+   - F-best − writer_only_b_o3mini;
+   - F-llama − closed_book;
+   - the same comparisons on DeepSeek and on the core metric.
+5. **Reporting.** Dev, test and all 12 cases. Test results are reported whatever they show. No further method change
+   is made after the test run.
+
+**Finalists, fixed by the rule above on 2026-10-25 02:20, before any test-split run.** 29 configurations were tried
+on dev.
+
+| Role | Configuration | Dev GPT-5.6 / DeepSeek |
+|---|---|---|
+| F-best | `trend_ground_b_o3mini` | 0.729 / 0.635 (next best 0.693) |
+| F-llama | `scaffold_ensemble` (Llama-3.3) | 0.615 / 0.328 |
+| Controls | `closed_book` (Llama, primary baseline), `text_chunks` (Llama), `closed_book_o3mini`, `writer_only_b_o3mini` | |
+
+---
+
+## 7. Test results (pre-registered, run once on 2026-10-25)
+
+**Integrity.**
+- 6 configurations × 12 test units × 2 samples = 144 runs, all generated with `--final`, 0 failures. Every run is
+  judged by GPT-5.6 and DeepSeek, audited and labelled.
+- `must_obey_check.py --loop` passes on all six directories (72 runs each: 48 dev + 24 test). Test runs are marked
+  `final` and `target_free_asserted`. The only warning is the known PMC10759803 margin (a dev case) for the Llama
+  arms.
+- No method, prompt, query or analysis rule was changed after the test run. The only later code changes are
+  reporting: test and all-12 tables omit dev-only methods, and the style checks below were added. Neither changes
+  any score.
+
+**Test split (4 papers × 3 levels, 2 samples; GPT-5.6 is primary).**
+
+| Configuration | GPT-5.6 | DeepSeek | core GPT | core DS | intervention | condition | mechanism | outcome | lever ≥ 2 | specificity | calls/run |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `closed_book` (Llama, primary baseline) | 0.52 | 0.35 | 0.58 | 0.25 | 0.46 | 0.21 | 0.71 | 0.71 | 0.21 | 0.28 | 1.0 |
+| `text_chunks` (Llama) | 0.36 | 0.26 | 0.44 | 0.25 | 0.25 | 0.17 | 0.62 | 0.42 | 0.12 | 0.14 | 1.0 |
+| `closed_book_o3mini` | 0.47 | 0.53 | 0.46 | 0.54 | 0.46 | 0.29 | 0.46 | 0.67 | 0.08 | 0.17 | 1.0 |
+| `writer_only_b_o3mini` | 0.52 | 0.69 | 0.58 | 0.65 | 0.46 | 0.21 | 0.71 | 0.71 | 0.12 | 0.19 | 1.0 |
+| **`trend_ground_b_o3mini` (F-best)** | **0.65** | **0.88** | 0.60 | **0.85** | 0.38 | **0.50** | **0.83** | **0.88** | 0.17 | 0.24 | 3.1 |
+| `scaffold_ensemble` (F-llama) | 0.43 | 0.40 | 0.52 | 0.35 | 0.29 | 0.08 | 0.75 | 0.58 | 0.21 | 0.30 | 16.0 |
+
+**Pre-registered comparisons.** Each cell is the paired difference over units, with its paper-clustered bootstrap
+95% CI and papers up/down. Holm runs across the three secondaries within each judge and metric. With 4 papers the
+smallest possible two-sided sign-test p is 0.125, so on test the CI is the evidence, as pre-registered.
+
+| Comparison | Dev (8 papers) | **Test (4 papers)** | All 12 papers |
+|---|---|---|---|
+| **Primary:** F-best − `closed_book`, GPT-5.6 | +0.22 [+0.12, +0.31], 7/1 | **+0.125 [+0.04, +0.23], 4/0** | +0.19 [+0.11, +0.27], 11/1, p = 0.006 |
+| same, DeepSeek | +0.32 [+0.11, +0.49], 7/1 | **+0.52 [+0.30, +0.84], 4/0** | +0.39 [+0.22, +0.55], 11/1, p = 0.006 |
+| same, core GPT-5.6 | +0.17 [+0.02, +0.30], 7/1 | +0.02 [−0.17, +0.21], 2/2 | +0.12 [−0.01, +0.24], 9/3 |
+| same, core DeepSeek | +0.33 [+0.07, +0.56], 7/1 | +0.60 [+0.33, +0.92], 4/0 | +0.42 [+0.22, +0.62], 11/1, p = 0.006 |
+| F-best − `closed_book_o3mini` (harness over the model), GPT-5.6 | +0.10 [+0.03, +0.17], 6/2 | +0.18 [+0.06, +0.29], 4/0, Holm 0.38 | +0.125 [+0.06, +0.19], 10/2, Holm 0.12 |
+| same, DeepSeek | +0.10 [−0.03, +0.22], 5/3 | +0.34 [+0.21, +0.48], 4/0, Holm 0.38 | +0.18 [+0.07, +0.30], 9/3, Holm 0.44 |
+| F-best − `writer_only_b_o3mini` (same model and writer: isolates forecast + grounding), GPT-5.6 | +0.06 [−0.03, +0.16], 4/4 | +0.125 [−0.02, +0.27], 2/1, Holm 1.0 | +0.08 [+0.01, +0.16], 6/5, Holm 1.0 |
+| same, DeepSeek | +0.05 [−0.09, +0.19], 4/4 | +0.19 [+0.08, +0.29], 4/0, Holm 0.38 | +0.09 [−0.01, +0.20], 8/4, Holm 0.78 |
+| F-llama − `closed_book`, GPT-5.6 | +0.10 [−0.01, +0.22], 5/2 | **−0.09 [−0.18, −0.00], 1/3** | +0.04 [−0.05, +0.14], 6/5 |
+| same, DeepSeek | +0.01 [−0.03, +0.05], 3/2 | +0.04 [−0.10, +0.17], 3/1 | +0.02 [−0.03, +0.07], 6/3 |
+
+**Verdict.**
+1. **The primary hypothesis replicates.** On test, F-best beats the Llama closed-book baseline on both judges.
+   Both CIs are above zero and every test paper is up on both judges. The GPT-5.6 effect is smaller than on dev
+   (+0.125 vs +0.22), as expected after picking the best of 29 configurations (winner's curse). Over all 12 papers it
+   is +0.19 (CI +0.11 to +0.27; 11 of 12 papers up; sign p = 0.006).
+2. **The harness adds to the model.**
+   - Against o3-mini closed-book, F-best is up on test on both judges (GPT-5.6 +0.18, DeepSeek +0.34; CIs above
+     zero; Holm 0.38 with 4 papers).
+   - Against the same model with the same writer, the forecast-and-ground step adds +0.125 on GPT-5.6 (CI crosses
+     zero) and +0.19 on DeepSeek (CI above zero).
+3. **The gain is not in the intervention.** On test, core GPT-5.6 (intervention + mechanism) is flat (+0.02), and
+   intervention agreement is below the baseline (0.38 vs 0.46).
+   - The test gain decomposes into condition +0.29, outcome +0.17, mechanism +0.125 and intervention −0.08.
+   - The dev core gain (+0.17) does not replicate on GPT-5.6; it does on DeepSeek (+0.60).
+4. **The Llama harness result does not replicate.** `scaffold_ensemble` was +0.10 on dev and is −0.09 on test (CI
+   −0.18 to 0.00). The Llama gains of iterations 1–2 should be read as dev noise.
+5. **The model-only effect depends on the judge.**
+   - On test, o3-mini closed-book is below Llama closed-book on GPT-5.6 (−0.05, CI −0.19 to +0.03) and above it on
+     DeepSeek (+0.18, CI −0.13 to +0.52).
+   - With the conservative writer, o3-mini ties Llama on GPT-5.6 (0.00) and is +0.33 on DeepSeek (CI +0.13 to
+     +0.59).
+
+**Is the gain style rather than content?** These are the must_obey.md 6.8 checks, written to
+`final_robustness.json`. They cover 432 judged runs of the six finalists over all 12 papers.
+- **Length.** F-best's hypotheses are 2.3–2.7 times longer than the baseline's (1,171 vs 500 characters over the
+  main fields).
+  - GPT-5.6 does not reward length. Overall, ρ(length, score) = 0.05, and within every configuration longer outputs
+    score *lower* (ρ −0.17 to −0.36).
+  - DeepSeek partly does: ρ = 0.25 overall and 0.23 within F-best. Its larger margins should be discounted, and
+    the GPT-5.6 result is the primary evidence.
+- **Conditions.** Most of the test gain is condition agreement, so I checked whether listing more conditions wins by
+  coverage. It does not.
+  - The o3-mini controls write equally long condition fields (226–237 vs 233 characters) but score 0.21–0.29,
+    against F-best's 0.50.
+  - Within each configuration, ρ(condition length, condition score) is about 0.
+  - The retrieved evidence supplies the test regimes (temperatures, loading modes) that the target paper used.
+- **Hedging.** Hedges are rare (0.11 per output for F-best and 0.01 for the baseline). They track score weakly,
+  with ρ ≤ 0.24 within configurations.
+- **Specificity.** The target-free audit's specificity does not track score (|ρ| ≤ 0.13). F-best is more specific
+  than the baseline on dev (0.39 vs 0.26) and similar on test (0.24 vs 0.28).
+
+**Per paper (test; GPT-5.6 / DeepSeek, mean of the 3 levels).**
+
+| Paper (all are understanding questions under v3.1) | `closed_book` | `closed_book_o3mini` | `writer_only_b_o3mini` | F-best | F-llama |
+|---|---|---|---|---|---|
+| PMC12029629 | 0.46 / 0.71 | 0.50 / 0.50 | 0.62 / 0.83 | 0.58 / 0.96 | 0.50 / 0.79 |
+| PMC12298864 (processing-route target) | 0.42 / 0.17 | 0.42 / 0.42 | 0.46 / 0.50 | 0.71 / 0.54 | 0.33 / 0.21 |
+| PMC12806431 | 0.54 / 0.38 | 0.29 / 0.33 | 0.29 / 0.50 | 0.58 / 0.83 | 0.33 / 0.21 |
+| PMC12941549 (processing-route target) | 0.67 / 0.17 | 0.67 / 0.88 | 0.71 / 0.92 | 0.71 / 1.17 | 0.54 / 0.38 |
+
+F-best is above the baseline on all four papers on both judges. The largest GPT-5.6 gain is on PMC12298864, one of
+the two processing-route targets that carry understanding questions under v3.1 (the recorded caveat). The gain is
+not confined to those two papers.
+
+**Caveats.**
+- 4 test papers (12 units) show the direction and a CI, not a precise effect size.
+- All four test cases are understanding questions under v3.1, and two have processing-route targets.
+- 29 configurations were tried on dev, so the finalists' dev numbers are optimistic; the test is the evidence.
+- The judges disagree (ρ = 0.39 in experiment 22), and DeepSeek partly rewards length.
+- The judge is not calibrated against experts. It rewards closeness to one paper, not truth.
+- The query writer (GPT-5.6) is post-cutoff, a residual risk under must_obey.md 2.4.
+- o3-mini's memorisation probe gave 17% specific recall against Llama's 8%. Every hit was inferable from the
+  title.
+
+---
+
+## 8. Summary: from failure analysis to the final method
+
+**Where we started.**
+- On leak-free queries with a pre-cutoff generator, every experiment-21 arm scored 0.35–0.60 of 4, and no arm beat
+  raw text after Holm.
+- The failure analysis (section 1) found that generators propose the wrong kind of intervention (79%), default to
+  composition changes and ignore the cues in the question.
+- Coverage, not selection, limits them.
+- 4 of 12 questions asked for the wrong kind of contribution.
+
+**What each change did.** Dev effects are the GPT-5.6 Δ against Llama `closed_book` unless stated. Test effects
+(GPT-5.6 / DeepSeek) exist only for the pre-registered configurations.
+
+| # | Change | Inspired by (section 2) | Failure targeted | Dev effect | Test effect | Kept? Why |
+|---|---|---|---|---|---|---|
+| 0 | Benchmark v3.1: question type from the introduction's gap | C2 (MOOSE-Chem question rules) | F2 | Construction fix; every arm re-run | – | Yes. A rule-level fix, applied blind |
+| 1 | Method writer that demands quantified outcomes | H4 (deterministic checks) | F6 | −0.07 | – | No. The judge penalises invented numbers (outcome 0.69 → 0.42) |
+| 2 | Frame → family map → family chosen by code | C9, B3, B4, C3 | F1, F1b, F8 | −0.04; +0.08 with the conservative writer | – | Llama only. On o3-mini it constrains the model (0.63 vs 0.67) |
+| 3 | Both-order pairwise tournament across families | C1, C3, B5, C12 | F4 | −0.05 | – | No. A pre-cutoff judge does not pick the right family (C7) |
+| 4 | Precedent table from earlier papers | C2, C4, C10 | F1, F3 | −0.06 | – | No. It pulls in other alloy systems' mechanisms |
+| 5 | Computational sensors plus a separate verifier | A3, A4, B4, B10 | F6 | −0.07 | – | No. It pushes invented numbers |
+| 6 | Conservative writer (`WRITER_B`): the ratchet rule | H1, H2 (each failure becomes a harness rule) | Iteration 1 | +0.08 (Llama); +0.04 over o3-mini closed-book | +0.05 / +0.16 over o3-mini closed-book | Yes |
+| 7 | Chronological chain → forecast of the next step | C6, C12 | F1, F3 | +0.06 (Llama; best Llama intervention, 0.46); alone on o3-mini −0.05 vs #6 + #9 (0.62 vs 0.67) | – | Only with retrieval, as part of #11 |
+| 8 | Coarse-to-fine lever search; independent family scoring | C3, C5, C12, A3 | F3, F4 | +0.02 / −0.03 | – | No. Self-scoring does not select well |
+| 9 | Stronger pre-cutoff model (o3-mini, cutoff 2023-10-01) | H2, A6 | All | +0.12 (closed-book) | −0.05 / +0.18 | Only with #6 and #10; alone it depends on the judge |
+| 10 | Retrieval aimed at the decided or forecast step | C11, C9, B5, A5 | F5 | On o3-mini, +0.11 [−0.03, +0.26] over the same chain without retrieval (0.62 → 0.73; DeepSeek +0.04); neutral for Llama | #7 + #10 together: +0.125 / +0.19 over #6 + #9 | Yes. It grounds conditions, mechanism and outcome |
+| 11 | **#6 + #7 + #9 + #10 = `trend_ground_b_o3mini`** | combination | F1, F5, F6 | **+0.22** | **+0.125 / +0.52** | **Final method** |
+| 12 | Ensemble of three scaffolds with trimmed-mean selection (Llama) | C12, A3 | F4 | +0.10 | −0.09 / +0.04 | No. It did not replicate |
+| 13 | Cue rule for understanding gaps; multi-decision with selection | Iteration-4 failure analysis, C7 | Family hit rate 35–38% | −0.02 / −0.04 vs their parents | – | No. The decisions changed, the scores did not |
+
+**Bottom line.**
+- **Best method: `trend_ground_b_o3mini`**, at 3.1 calls per run. With o3-mini (cutoff 2023-10-01), it:
+  1. frames the question;
+  2. orders the earlier papers chronologically and forecasts the next step;
+  3. retrieves raw text aimed at that step;
+  4. writes conservatively.
+- **Results.**
+  - Over all 12 papers: GPT-5.6 0.70 vs 0.51 (+0.19, CI +0.11 to +0.27, 11 of 12 papers up) and DeepSeek 0.72 vs
+    0.33 (+0.39, CI +0.22 to +0.55).
+  - The pre-registered test replicates the direction on both judges, with a smaller GPT-5.6 effect (+0.125).
+- **What made the difference, and why.**
+  1. A stronger pre-cutoff model that can use evidence. With Llama the same pipeline is neutral.
+  2. A writer that states uncertainty instead of inventing numbers, which the judge penalises.
+  3. Deciding *what to look for* before retrieving: forecast the next step from the chronological chain of earlier
+     work, then retrieve evidence aimed at it. This reverses F5 (unaimed evidence distracts) and mainly improves
+     conditions, mechanism and outcome.
+- **What did not work.**
+  - Selection: tournaments, self-scoring and multi-decision.
+  - Verifiers that demand numbers.
+  - Precedents from other alloy systems.
+  - Scaffolds that force a solution family on the stronger model.
+  - The Llama harness gains did not replicate on test.
+- **Still unsolved: choosing the paper's actual intervention.**
+  - Intervention agreement stays about 0.4 of 4 for every configuration.
+  - The lever hit rate is at most 0.24.
+  - The decision step picks the target's kind of answer only 35–38% of the time.
+  - Absolute scores remain low (0.70 of 4). The method is better at *how and under which conditions* than at *what
+    to do*.
+
+**Next steps (not run).**
+- Run a stronger pre-cutoff model (o1, cutoff 2023-10-01) in the same pipeline once quota allows.
+- Add more held-out post-cutoff papers; 12 give wide intervals.
+- Calibrate the judge: the materials expert scores a blind sample of F-best and baseline outputs.
+- Add a non-LLM verifier for the coverage problem (for example phase-stability or CALPHAD checks of candidate
+  interventions), since LLM self-selection does not work here (C7).
+
+---
+
+## 9. must_obey.md checklist (section 9) for this loop
+
+- [x] Query-facing models are all pre-cutoff: Llama-3.3-70B (December 2023), o3-mini and gpt-4o-mini (2023-10-01).
+  Every new generator had a memorisation probe (section 0).
+- [x] Queries are benchmark v3.1, hash-checked by `must_obey_check.py`. No query was edited after seeing results;
+  v3.1 was built from the experiment-22 construction error before any method ran.
+- [x] Evidence: the same temporally filtered, family-excluded pools as experiment 21, with no web or live API
+  tools. The extractions were audited in experiment 21.
+- [x] Payloads are target-free: `Harness.guard` checks every call and every run records `target_free_asserted`.
+  Judging is blinded, and tournament pairs run in both orders.
+- [x] Development used dev only (29 configurations). Test was used only for the six pre-registered configurations,
+  run once.
+- [x] Same evidence budget, temperature, output cap and samples as the baselines. Declared differences: the
+  generator model (iterations 3–5, an explicit factor) and calls per run (shown in every table).
+- [x] GPT-5.6 judge, DeepSeek cross-judge and target-free audit done for every run. The integrity gate passes with
+  0 failed runs, and the Llama arms carry the PMC10759803 margin flag.
+- [x] Paired statistics with clustered-bootstrap CIs and Holm. Negative results are recorded: iterations 1 and 5,
+  F-llama on test, and core on test.
+- [x] Experiment log (experiments 22–24) and loop.md updated; `must_obey_check.py --loop` passes on every method
+  directory.

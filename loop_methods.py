@@ -447,3 +447,144 @@ for _model in ("o3mini", "4omini"):
     register(f"frame_decide_b_{_model}")(lambda h, _m=_model: m_frame_decide_b(h, _m))
     register(f"coarse_to_fine_{_model}")(lambda h, _m=_model: m_coarse_to_fine(h, _m))
     register(f"trend_chain_{_model}")(lambda h, _m=_model: m_trend_chain(h, _m))
+
+
+# ================================================================ iteration 4: combinations
+
+def _ground(h: Harness, notes: dict[str, Any]) -> list[Any]:
+    search = " ".join([h.query, str(notes.get("chosen_family", "")).replace("_", " "), str(notes.get("lever", "")),
+                       str(notes.get("principle", notes.get("why", "")))])
+    h.notes["grounding_query"] = search[:600]
+    return h.pack(search, "text_chunks")
+
+
+@register("decide_then_ground_b")
+def m_decide_then_ground_b(h: Harness, model: str = GEN) -> dict[str, Any]:
+    fr = frame(h, model)
+    fams = family_map(h, fr, model)
+    notes = {"frame": fr, **chosen(fams[0])}
+    h.notes["decision"] = notes
+    return write(h, notes, model, records=_ground(h, notes), system=WRITER_B)
+
+
+def _trend_notes(h: Harness, model: str) -> dict[str, Any]:
+    fr = frame(h, model)
+    search = " ".join([h.query, str(fr.get("system", "")), str(fr.get("limitation", ""))])
+    records = h.pack(search, "card", cap=1600)[:10]
+    records.sort(key=lambda r: (r.publication_date, r.record_id))
+    payload = {"question": h.query, "knowledge_cutoff": h.cutoff, "frame": fr,
+               "candidate_families": list(FAMILIES[fr["gap_type"]]),
+               "earlier_papers_chronological": h.evidence_payload(records, 1600)}
+    raw = h.ask("trend_forecaster", model, TREND_SYSTEM, payload, max_out=5000)
+    raw = raw if isinstance(raw, dict) else {}
+    nxt = raw.get("next_step") if isinstance(raw.get("next_step"), dict) else {}
+    notes = {"frame": fr, "trend": raw.get("trend", ""), "unsolved": raw.get("unsolved", ""),
+             "chosen_family": nxt.get("family", ""), "lever": nxt.get("lever", ""), "why": nxt.get("why", "")}
+    h.notes["decision"] = notes
+    return notes
+
+
+@register("trend_ground_b")
+def m_trend_ground_b(h: Harness, model: str = GEN) -> dict[str, Any]:
+    notes = _trend_notes(h, model)
+    return write(h, notes, model, records=_ground(h, notes), system=WRITER_B)
+
+
+@register("scaffold_ensemble")
+def m_scaffold_ensemble(h: Harness, model: str = GEN, scorer: str | None = None) -> dict[str, Any]:
+    """Candidates from distinct reasoning scaffolds, selected by independent absolute scoring (trimmed mean)."""
+    from temporal_hypothesis_benchmark import _GENERATE_SYSTEM
+    candidates = {}
+    candidates["closed_book"] = h.generate_final("candidate_closed_book", model, _GENERATE_SYSTEM,
+                                                 {"query": h.query, "knowledge_cutoff": h.cutoff,
+                                                  "eligible_evidence": []}, set())
+    fr = frame(h, model)
+    fams = family_map(h, fr, model)
+    decision = {"frame": fr, **chosen(fams[0])}
+    candidates["frame_decide"] = write(h, decision, model, role="candidate_frame", system=WRITER_B)
+    trend = _trend_notes(h, model)
+    candidates["trend_chain"] = write(h, trend, model, role="candidate_trend", system=WRITER_B)
+    h.notes["decision"] = trend
+    names = list(candidates)
+    order = list(range(len(names)))
+    h.rng.shuffle(order)  # scoring is independent per candidate, but keep call order neutral too
+    scores = {}
+    for i in order:
+        scores[names[i]] = independent_score(h, hypothesis_fields(candidates[names[i]]), scorer or model)
+    best = max(names, key=lambda n: (scores[n], -names.index(n)))
+    h.notes["selection"] = [{"scaffold": n, "score": round(scores[n], 3)} for n in names]
+    h.notes["selected_scaffold"] = best
+    return candidates[best]
+
+
+for _model in ("o3mini",):
+    register(f"decide_then_ground_b_{_model}")(lambda h, _m=_model: m_decide_then_ground_b(h, _m))
+    register(f"trend_ground_b_{_model}")(lambda h, _m=_model: m_trend_ground_b(h, _m))
+    register(f"scaffold_ensemble_{_model}")(lambda h, _m=_model: m_scaffold_ensemble(h, _m))
+
+
+# ================================================================ iteration 5: ratchet rules from iteration-4 failures
+
+# Dev-only failure (loop.md iteration 5): for understanding gaps whose question says the mechanism is hard to observe,
+# the planner chose ordinary controlled experiments 11/12 (target: simulation) and 8/12 (target: in situ microscopy).
+FAMILY_SYSTEM_V2 = FAMILY_SYSTEM + (
+    " Cue rule: if the question says that a behaviour or mechanism is hard to observe or measure experimentally, is "
+    "atomic-scale or transient, or occurs under conditions that are hard to reach in a laboratory, then simulation "
+    "or in situ characterization families fit better than ordinary controlled experiments."
+)
+
+
+def family_map_v2(h: Harness, fr: dict[str, Any], model: str) -> list[dict[str, Any]]:
+    payload: dict[str, Any] = {"question": h.query, "knowledge_cutoff": h.cutoff, "frame": fr,
+                               "candidate_families": list(FAMILIES[fr["gap_type"]])}
+    raw = h.ask("family_mapper", model, FAMILY_SYSTEM_V2, payload, max_out=6000)
+    items = [f for f in (raw.get("families", []) if isinstance(raw, dict) else []) if isinstance(f, dict)]
+    allowed = FAMILIES[fr["gap_type"]]
+    ranked = []
+    for order, item in enumerate(items):
+        if str(item.get("family")) not in allowed:
+            continue
+        try:
+            fit = max(0, min(5, int(item.get("fit", 0))))
+        except (TypeError, ValueError):
+            fit = 0
+        ranked.append({**item, "fit": fit, "order": order})
+    if not ranked:
+        ranked = [{"family": allowed[0], "fit": 0, "order": 0, "best_lever": "", "principle": ""}]
+    ranked.sort(key=lambda f: (-f["fit"], f["order"]))
+    h.notes["families"] = ranked
+    return ranked
+
+
+@register("decide_then_ground_v2_o3mini")
+def m_decide_then_ground_v2(h: Harness, model: str = "o3mini") -> dict[str, Any]:
+    fr = frame(h, model)
+    fams = family_map_v2(h, fr, model)
+    notes = {"frame": fr, **chosen(fams[0])}
+    h.notes["decision"] = notes
+    return write(h, notes, model, records=_ground(h, notes), system=WRITER_B)
+
+
+@register("multi_decision_ground_o3mini")
+def m_multi_decision_ground(h: Harness, model: str = "o3mini") -> dict[str, Any]:
+    """Coverage then selection: trend forecast + top-2 families (v2 map), each grounded and written, then picked by
+    independent trimmed-mean scoring."""
+    trend = _trend_notes(h, model)
+    fr = trend["frame"]
+    fams = family_map_v2(h, fr, model)
+    decisions = [("trend", trend)]
+    seen_families = {str(trend.get("chosen_family"))}
+    for fam in fams:
+        if fam["family"] not in seen_families and len(decisions) < 3:
+            decisions.append((f"family:{fam['family']}", {"frame": fr, **chosen(fam)}))
+            seen_families.add(fam["family"])
+    candidates = []
+    for name, notes in decisions:
+        candidates.append((name, notes, write(h, notes, model, records=_ground(h, notes), role="candidate_writer",
+                                              system=WRITER_B)))
+    scores = [independent_score(h, hypothesis_fields(c), model) for _, _, c in candidates]
+    best = max(range(len(candidates)), key=lambda i: (scores[i], -i))
+    h.notes["decision"] = candidates[best][1]
+    h.notes["selection"] = [{"decision": n, "family": d.get("chosen_family"), "score": round(s, 3)}
+                            for (n, d, _), s in zip(candidates, scores)]
+    return candidates[best][2]

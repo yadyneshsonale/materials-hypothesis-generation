@@ -5,7 +5,7 @@ If a rule cannot be met, stop, write down why, and do not report the result as c
 rules is [must_obey_check.py](./must_obey_check.py); it must pass before results are reported. Every experiment
 README and every [loop.md](./loop.md) entry carries the checklist in section 9.
 
-Last updated: 2026-10-24 (see the change log at the end).
+Last updated: 2026-10-25 (see the change log at the end).
 
 ---
 
@@ -220,3 +220,7 @@ Ablate before combining. Combine only components that helped or that address dif
   applied blind and not adjusted after seeing which cases changed. Two processing-route targets (PMC12298864,
   PMC12941549) now carry understanding questions because their introductions state an understanding gap; this is
   recorded as a caveat.
+- 2026-10-25: the six pre-registered loop configurations ran once on test under these rules (loop.md section 7).
+  No rule changed. Lesson recorded for future loops: a dev gain from a harness on a weak model (Llama
+  `scaffold_ensemble`, +0.10) did not replicate on test (−0.09). Report the core metric (intervention + mechanism)
+  next to reconstruction, because the test gain was in conditions and outcome, not the intervention.

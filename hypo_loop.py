@@ -132,6 +132,8 @@ class Harness:
         user = json.dumps(payload, ensure_ascii=False)
         started = time.time()
         cap = max_out or spec["max_out"]
+        if spec["temperature"] is None:  # o-series: hidden reasoning tokens count against the output cap
+            cap = max(cap, 12000)
         try:
             raw = lc.trapi_chat_json(spec["deployment"], system, user, max_tokens=cap, token_field=spec["token_field"],
                                      temperature=spec["temperature"], retries=8)
@@ -390,6 +392,14 @@ def recon(scores: dict[str, int]) -> float:
     return statistics.fmean(scores[d] for d in PRIMARY_DIMENSIONS)
 
 
+CORE_DIMENSIONS = ("intervention_reconstruction", "mechanism_agreement")
+
+
+def core(scores: dict[str, int]) -> float:
+    """Scientific core: intervention and mechanism agreement; hedged outcome wording cannot raise it."""
+    return statistics.fmean(scores[d] for d in CORE_DIMENSIONS)
+
+
 def mean(values: list[Any]) -> float | None:
     values = [v for v in values if v is not None]
     return round(statistics.fmean(values), 3) if values else None
@@ -409,12 +419,13 @@ def load_scored() -> list[dict[str, Any]]:
     return rows
 
 
-def unit_scores(rows: list[dict[str, Any]], method: str, judge: str, split: str) -> dict[tuple[str, str], float]:
+def unit_scores(rows: list[dict[str, Any]], method: str, judge: str, split: str,
+                metric: Callable[[dict[str, int]], float] = recon) -> dict[tuple[str, str], float]:
     per: dict[tuple[str, str], list[float]] = defaultdict(list)
     for r in rows:
         run = r["run"]
         if run["method"] == method and r.get(judge) and (split == "all" or run["split"] == split):
-            per[(run["paper_id"], run["query_level"])].append(recon(r[judge]["scores"]))
+            per[(run["paper_id"], run["query_level"])].append(metric(r[judge]["scores"]))
     return {k: statistics.fmean(v) for k, v in sorted(per.items())}
 
 
@@ -440,6 +451,8 @@ def summarise(rows: list[dict[str, Any]], method: str, split: str) -> dict[str, 
     return {
         "runs": len(rs), "failed": len(rs) - len(ok), "judged": len(judged),
         "recon_gpt56": mean(list(gpt.values())), "recon_deepseek": mean(list(deep.values())),
+        "core_gpt56": mean(list(unit_scores(rows, method, "gpt", split, core).values())),
+        "core_deepseek": mean(list(unit_scores(rows, method, "deep", split, core).values())),
         "by_level": {lvl: mean([v for k, v in gpt.items() if k[1] == lvl]) for lvl in QUERY_LEVELS},
         **{d: mean([r["gpt"]["scores"][d] for r in judged]) for d in ALL_DIMENSIONS},
         "lever_ge2": mean([1.0 if r["label"]["lever_match"] >= 2 else 0.0 for r in judged if r["label"]]),
@@ -456,18 +469,25 @@ def summarise(rows: list[dict[str, Any]], method: str, split: str) -> dict[str, 
 
 def report(split: str = "dev") -> dict[str, Any]:
     rows = load_scored()
-    methods = sorted({r["run"]["method"] for r in rows})
+    needed = {"dev", "test"} if split == "all" else {split}
+    splits_by_method: dict[str, set[str]] = defaultdict(set)
+    for r in rows:
+        splits_by_method[r["run"]["method"]].add(r["run"]["split"])
+    # Only methods run on every split the report covers (dev-only methods are not part of a test or all-12 report).
+    methods = sorted(m for m, s in splits_by_method.items() if needed <= s)
     table = {m: summarise(rows, m, split) for m in methods}
     comparisons: dict[str, Any] = {}
     for judge in ("gpt", "deep"):
-        comparisons[judge] = {}
-        for base in BASELINES:
-            b = unit_scores(rows, base, judge, split)
-            items = [{"method": m, "vs": base, **paired(unit_scores(rows, m, judge, split), b)}
-                     for m in methods if m != base]
-            for item, adj in zip(items, holm_adjust([i.get("p", 1.0) for i in items])):
-                item["holm_p"] = round(adj, 4)
-            comparisons[judge][base] = items
+        for metric_name, metric in (("recon", recon), ("core", core)):
+            key = judge if metric_name == "recon" else f"{judge}_core"
+            comparisons[key] = {}
+            for base in BASELINES:
+                b = unit_scores(rows, base, judge, split, metric)
+                items = [{"method": m, "vs": base, **paired(unit_scores(rows, m, judge, split, metric), b)}
+                         for m in methods if m != base]
+                for item, adj in zip(items, holm_adjust([i.get("p", 1.0) for i in items])):
+                    item["holm_p"] = round(adj, 4)
+                comparisons[key][base] = items
     analysis = {"split": split, "table": table, "comparisons": comparisons}
     atomic_json(OUT / f"report_{split}.json", analysis)
     (OUT / f"report_{split}.md").write_text(render(analysis))
@@ -480,16 +500,19 @@ def _f(x: Any) -> str:
 
 def render(a: dict[str, Any]) -> str:
     lines = [f"# Loop results ({a['split']})", "",
-             "| method | runs | failed | GPT-5.6 | DeepSeek | broad / problem / expert | intervention | mechanism | "
-             "outcome | problem align | lever>=2 | same class | specificity | novelty | calls/run |",
-             "|---|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+             "| method | runs | failed | GPT-5.6 | DeepSeek | core GPT | core DS | broad / problem / expert | intervention | "
+             "mechanism | outcome | problem align | lever>=2 | same class | specificity | hedges | novelty | calls/run |",
+             "|---|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for m, s in a["table"].items():
         lines.append(f"| {m} | {s['runs']} | {s['failed']} | {_f(s['recon_gpt56'])} | {_f(s['recon_deepseek'])} | "
+                     f"{_f(s['core_gpt56'])} | {_f(s['core_deepseek'])} | "
                      + " / ".join(_f(s["by_level"][l]) for l in QUERY_LEVELS)
                      + f" | {_f(s['intervention_reconstruction'])} | {_f(s['mechanism_agreement'])} | "
                      f"{_f(s['outcome_agreement'])} | {_f(s['problem_alignment'])} | {_f(s['lever_ge2'])} | "
-                     f"{_f(s['same_class'])} | {_f(s['specificity'])} | {_f(s['novelty'])} | {_f(s['llm_calls'])} |")
-    for judge, label in (("gpt", "GPT-5.6"), ("deep", "DeepSeek")):
+                     f"{_f(s['same_class'])} | {_f(s['specificity'])} | {_f(s['hedges'])} | {_f(s['novelty'])} | "
+                     f"{_f(s['llm_calls'])} |")
+    for judge, label in (("gpt", "GPT-5.6"), ("deep", "DeepSeek"), ("gpt_core", "GPT-5.6, core"),
+                         ("deep_core", "DeepSeek, core")):
         for base, items in a["comparisons"][judge].items():
             lines += ["", f"## vs {base} ({label})", "", "| method | units | diff | 95% CI | up | down | p | Holm p |",
                       "|---|---:|---:|---|---:|---:|---:|---:|"]

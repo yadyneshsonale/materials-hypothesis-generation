@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 21)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 24)
 
 Related work (9 hypothesis-generation and materials-KG papers, with how each separates input from answer):
 [RELATED_WORK.md](./RELATED_WORK.md).
@@ -10,8 +10,11 @@ and they supersede section 8 ("MatKG, planned, blocked") of that log. The commit
 because its working-tree copy has uncommitted changes from another session (it is empty in the working tree).
 Once that is resolved, this document can be merged into the log.
 
-Last updated 2026-10-24. Adds experiments 17–18 (citation-graph variants and their failure analysis), 19 (the
-benchmark queries leak the answer), 20 (leak-free benchmark v3) and 21 (every evaluation rerun on it with a
+Last updated 2026-10-25. Adds experiments 22 (failure analysis of the clean rerun), 23 (benchmark v3.1, the
+[must_obey.md](../../must_obey.md) rules and model clearance) and 24 (a harness-engineered method loop with a
+pre-registered test; full write-up in [loop.md](../../loop.md)). **All work from experiment 23 on follows
+must_obey.md.** The 2026-10-24 update added experiments 17–18 (citation-graph variants and their failure analysis),
+19 (the benchmark queries leak the answer), 20 (leak-free benchmark v3) and 21 (every evaluation rerun on it with a
 pre-cutoff generator). **Read experiments 19 to 21 before using any absolute score or query-level effect from
 experiments 3 to 18.**
 
@@ -43,6 +46,9 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 19 | 2026-10-23 | Audit of answer leakage in the benchmark queries (roles used to write each query, answer-word overlap, correlation with scores) | 36 queries; 7 methods | none | none | Complete (analysis only); affects experiments 3 to 18 | [query_leakage/](./query_leakage/) |
 | 20 | 2026-10-23 | Leak-free benchmark v3 (introduction-only queries, writer never sees the answer, separate checker, lexical gate) and generator memorisation probe | 12 cases × 3 levels; 48 probes | GPT-5.6 (writer, checker) | GPT-5.6 | Complete; 34/36 queries pass the gate | [benchmark_v3/](./benchmark_v3/) |
 | 21 | 2026-10-23 to 2026-10-24 | All evaluations (experiments 7, 9, 11, 14, 16, 17) rerun on benchmark v3 with a pre-cutoff generator, plus a generator × queries factorial | 1,512 generation runs + 72 selections + 288 factorial runs | Llama-3.3-70B (cutoff 2023-12) | GPT-5.6, DeepSeek-V4-Pro | Complete; verified except 1 critique resample run | [rerun_v3/](./rerun_v3/) |
+| 22 | 2026-10-24 to 2026-10-25 | Failure analysis of the clean rerun (lever match, question fit, coverage, error mix, judge agreement) | 1,476 hypotheses, 26 arms | none | GPT-5.6 (labeller, coder) | Complete (analysis only) | [rerun_v3/failure/](./rerun_v3/failure/) |
+| 23 | 2026-10-25 | Benchmark v3.1 (question type from the introduction's gap), must_obey.md rules and checker, memorisation probes of o3-mini and gpt-4o-mini | 12 cases × 3 levels; 48 probes | GPT-5.6 (classifier, writer, checker) | GPT-5.6 | Complete; 34/36 levels pass the gate | [benchmark_v3_1/](./benchmark_v3_1/) |
+| 24 | 2026-10-25 | Harness-engineered method loop (5 iterations, 29 configurations on dev) and a pre-registered test of 6 configurations | 1,392 dev runs + 144 test runs | Llama-3.3-70B, o3-mini, gpt-4o-mini (all pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete, verified (`must_obey_check.py --loop` passes on all 29 configurations) | [loop/](./loop/), [loop.md](../../loop.md) |
 
 ## Correction to section 8 (MatKG)
 
@@ -123,15 +129,15 @@ papers before the cutoff year) improve reconstruction of held-out HEA papers?
 
 **Method.**
 
-1. Index: [matkg_index.py](../../../matkg_index.py) streams `ENTPTNERDOI.csv.tar.gz` into SQLite
+1. Index: [matkg_index.py](../../matkg_index.py) streams `ENTPTNERDOI.csv.tar.gz` into SQLite
    (84.1 M rows, 4.14 M DOIs, years 1885 to 2023, built 2026-10-22 00:15 to 00:26 PDT).
 2. Tool: `kg_lookup(topic)` returns neighbours of query terms, ranked by association, from papers with
    `Year < cutoff year`, excluding the held-out DOI and its work family. Each fact is a readable record, so
    the read-before-cite rule still applies.
-3. Evaluation: [temporal_eval_kg.py](../../../temporal_eval_kg.py), with the same generator, budget (12
+3. Evaluation: [temporal_eval_kg.py](../../temporal_eval_kg.py), with the same generator, budget (12
    calls), temperature (0.2), blinding, judge (GPT-5.6) and statistics as v3. Baseline runs and absolute
    judgments are copied from v3 ([eval_v4_matkg/](./eval_v4_matkg/)).
-4. Pipeline: [run_eval_kg.sh](../../../run_eval_kg.sh), in tmux session `mathg-eval-kg`. Generation ran
+4. Pipeline: [run_eval_kg.sh](../../run_eval_kg.sh), in tmux session `mathg-eval-kg`. Generation ran
    2026-10-22 00:30 to 00:59 PDT and judging 00:59 to 01:20 PDT. A bug in the analysis
    (`NameError` in case loading) was fixed and the analysis re-run at 01:21.
 
@@ -165,7 +171,7 @@ reference lists for the 50 corpus papers, an in-corpus citation graph with PageR
 cite the top 10 seeds. Candidates must be open-access alloy articles (not reviews, not catalysis or battery
 work) and must have PMC full text, checked in Europe PMC. Three scores are compared against the current
 selection: citation count per year, bibliographic coupling with the corpus, and a combination of the two.
-See [citation_graph/README.md](./citation_graph/README.md) and [citation_graph.py](../../../citation_graph.py).
+See [citation_graph/README.md](./citation_graph/README.md) and [citation_graph.py](../../citation_graph.py).
 
 **Results.**
 
@@ -1053,7 +1059,93 @@ its recollection against the target.
 - Rerun the agent arms with a pre-cutoff model that uses tools (gpt-4o when its quota allows).
 - Consider removing exact values from the targets (IdeaBench's paraphrase).
 
-## Comparability and limits, experiments 8 to 21
+## Experiment 22: failure analysis of the clean rerun
+
+**Why.** On leak-free queries every arm scored 0.35–0.60 of 4, and no method beat raw text. Before designing new
+methods, find what breaks.
+
+**Setup.** [failure_clean.py](../../failure_clean.py) covers all 1,476 judged hypotheses of experiment 21 (26 arms).
+- GPT-5.6, which sees the target, labels each hypothesis's lever match (0 different kind … 3 the target's
+  intervention) and each target's type. This is analysis only.
+- It also covers fatal-error coding, pass@k, question fit, levels and judge agreement.
+- Details: [rerun_v3/failure/README.md](./rerun_v3/failure/README.md).
+
+**Results** (F1–F8 in [loop.md](../../loop.md) section 1).
+- Intervention reconstruction is 0.16 of 4. 79% of hypotheses propose a different kind of intervention, and 0% the
+  target's. There is a strong default to composition changes.
+- 4 of 12 targets are studies, but every question asked for an intervention, so those cases were unreachable.
+- Coverage is the bottleneck, not selection: pass@10 = 0.21, and 25 of 36 units have no lever hit in 41
+  hypotheses.
+- Evidence lowers problem alignment; 25% of fatal errors are vague claims; GPT-5.6 vs DeepSeek ρ = 0.39; query
+  levels are flat.
+
+## Experiment 23: benchmark v3.1, must_obey.md and model clearance
+
+**Rules.** [must_obey.md](../../must_obey.md) collects every rule learned so far:
+- splits;
+- sourced model cutoffs;
+- query, evidence and payload leakage rules;
+- statistics;
+- dev/test discipline;
+- a checklist.
+
+It is enforced by [must_obey_check.py](../../must_obey_check.py) (model whitelist, frozen-query hashes, leakage
+counters, judged and audited runs, test runs marked final) and pointed to by `AGENTS.md` and
+`.github/copilot-instructions.md`.
+
+**Benchmark v3.1** ([benchmark_v3_1/README.md](./benchmark_v3_1/README.md)) fixes experiment 22's construction
+error.
+- A gap classifier sees only the redacted introduction and labels each case design, understanding or method.
+- Design cases keep their v3 queries; the others are rewritten with the v3 writer, checker and gate.
+- 8 cases are rewritten (all 4 test cases as understanding). 34 of 36 levels pass the gate.
+- Two processing-route test targets now carry understanding questions; this is a recorded caveat.
+
+**Model clearance.**
+- Knowledge cutoffs come from vendor documentation.
+- Memorisation probe (specific recall): o3-mini 17% (every hit inferable from the title), gpt-4o-mini 0%, Llama-3.3
+  8%, Qwen3.5 33%.
+- o3-mini and gpt-4o-mini (cutoff 2023-10-01) are cleared as generators.
+
+## Experiment 24: harness-engineered method loop and pre-registered test
+
+**Setup** ([loop.md](../../loop.md), [loop/README.md](./loop/README.md)).
+- The code-controlled harness is [hypo_loop.py](../../hypo_loop.py). It guards every payload against target text,
+  logs every call with its role and model, and only allows pre-cutoff models.
+- There are 5 iterations of methods ([loop_methods.py](../../loop_methods.py)). Each is tied to a failure from
+  experiment 22 and to a cited article or paper on harness engineering, loop engineering or hypothesis generation
+  (30+ sources, loop.md section 2).
+- Dev only: 29 configurations, 1,392 runs.
+- Six configurations were pre-registered and then run once on test (144 runs).
+
+**Results** (GPT-5.6 reconstruction, 0–4; Δ against Llama closed-book).
+
+| Configuration | Dev | Test | All 12 |
+|---|---:|---:|---:|
+| `closed_book` (Llama-3.3, baseline) | 0.51 | 0.52 | 0.51 |
+| `closed_book_o3mini` | 0.63 | 0.47 | 0.58 |
+| `writer_only_b_o3mini` (conservative writer) | 0.67 | 0.52 | 0.62 |
+| **`trend_ground_b_o3mini`** (chronological chain → forecast → aimed retrieval → conservative writer) | **0.73** | **0.65** | **0.70** |
+| `scaffold_ensemble` (best Llama harness) | 0.61 | 0.43 | 0.55 |
+
+- **Primary pre-registered test:** `trend_ground_b_o3mini` − closed_book.
+  - GPT-5.6: +0.125 (CI +0.04 to +0.23), all 4 test papers up.
+  - DeepSeek: +0.52 (CI +0.30 to +0.84).
+  - All 12 papers: +0.19 (CI +0.11 to +0.27), 11 of 12 up, sign p = 0.006.
+- **What helped:** a stronger pre-cutoff model, a writer that does not invent numbers, and retrieval aimed at a
+  forecast next step.
+- **What did not:** tournaments, self-scoring selection, verifiers, precedents from other systems, forcing a
+  solution family on the stronger model, and a cue rule. The Llama harness gain (+0.10 on dev) did not replicate
+  (−0.09 on test).
+- **What remains unsolved:** the intervention itself. Core (intervention + mechanism) is flat on test (+0.02); the
+  gain is in condition, mechanism and outcome.
+- **Style check:** GPT-5.6 does not reward length (within-configuration ρ −0.17 to −0.36); DeepSeek partly does.
+
+**Integrity.**
+- `must_obey_check.py --loop` passes on all 29 configurations.
+- 0 failed runs; leakage counters are zero; test runs are marked final.
+- PMC10759803 is flagged for the Llama arms (2 days after the cutoff).
+
+## Comparability and limits, experiments 8 to 24
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -1079,3 +1171,6 @@ its recollection against the target.
   ability. Only within-unit comparisons between methods are fair.
 - Experiments 20 and 21 replace the queries and the generator. Rerun scores are comparable with one another, and
   with the original runs only through the experiment-7 factorial. The hidden targets and judges are unchanged.
+- Experiment 24 uses benchmark v3.1, so its scores are not directly comparable with experiment 21 (v3). Its
+  baselines were re-run on v3.1 inside the harness. Only 4 test papers were held back, and 29 configurations were
+  tried on dev, so its dev numbers are optimistic and its test intervals are wide.
