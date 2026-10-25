@@ -48,6 +48,8 @@ MODELS = {
                 "temperature": None, "max_tokens": 8000},
     "gpt-4o-mini": {"kind": "trapi", "deployment": "gpt-4o-mini_2024-07-18", "token_field": "max_completion_tokens",
                     "temperature": 0.2, "max_tokens": 1500},
+    "o1": {"kind": "trapi", "deployment": "o1_2024-12-17", "token_field": "max_completion_tokens",
+           "temperature": None, "max_tokens": 12000},
 }
 ACTIVE = tuple(os.environ.get("PROBE_MODELS", ",".join(MODELS)).split(","))
 

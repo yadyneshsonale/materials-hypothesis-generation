@@ -24,6 +24,10 @@ Last updated: 2026-10-25 (see the change log at the end).
   |---|---|
   | **dev** (8, used for method development) | PMC10759803 (2024-01-02), PMC11077685 (2024-02-28), PMC11087546 (2024-05-10), PMC11355469 (2024-08-07), PMC11375712 (2024-08-22), PMC11375216 (2024-09-04), PMC11775865 (2024-11-21), PMC11606917 (2024-11-29) |
   | **test** (4, used once per pre-registered final configuration) | PMC12029629 (2025-04-19), PMC12298864 (2025-07-09), PMC12806431 (2025-10-27), PMC12941549 (2026-02-16) |
+  | **test2** (12, fresh held-out set, used once for the round-2 pre-registered finals) | 12 open-access papers dated 2025-07-01 to 2026-07-01, not in the corpus; 5 are after GPT-5.6's cutoff. Built by [benchmark_test2.py](./benchmark_test2.py) under the rule in [loop.md](./loop.md) section 10.1; cases in `experiments/high_temperature_hea_qwen35b/benchmark_test2/cases` |
+
+  test2 papers are not evidence for any case. Their evidence pool is the 50-paper corpus filtered by date, and
+  "all" still means the original 12 cases.
 
 - **Queries.** `experiments/high_temperature_hea_qwen35b/benchmark_v3_1/cases` is the current frozen version
   (section 3).
@@ -56,7 +60,9 @@ be used as a generator.
 - target-free auditors of finished outputs;
 - the benchmark query writer and leakage checker, under section 3 (the writer sees only the redacted
   introduction);
-- extractors of pre-cutoff papers, which never see a query or target and are audited (section 4.5).
+- extractors of pre-cutoff papers, which never see a query or target and are audited (section 4.5);
+- extractors of a held-out paper's answer key (hidden target) from its non-Introduction sections, which never see
+  a query or a generation (test2, loop.md 10.1).
 
 A pre-cutoff model is preferred even in these roles whenever one is good enough.
 
@@ -72,7 +78,7 @@ paper is 2024-01-02.
 | gcr-llama-31-8b-instruct | December 2023 ([Meta model card](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct)) | allowed (flag PMC10759803) |
 | gpt-4o_2024-11-20 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/gpt-4o)) | allowed (often rate-limited) |
 | gpt-4o-mini_2024-07-18 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/gpt-4o-mini)) | allowed |
-| o1_2024-12-17 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/o1)) | allowed |
+| o1_2024-12-17 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/o1)) | allowed (probe: 21% specific recall, all inferable from titles; loop.md 10.4) |
 | o3-mini_2025-01-31 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/o3-mini)) | allowed |
 | o3, o4-mini, gpt-4.1 family, gpt-oss-120b, codex-mini | 2024-06-01 (OpenAI model pages) | forbidden |
 | gpt-5, gpt-5.1 / gpt-5-mini, gpt-5-nano | 2024-09-30 / 2024-05-31 (OpenAI) | forbidden |
@@ -153,6 +159,11 @@ preferred future option.
    - Pre-register the final configurations in [loop.md](./loop.md) before running them on test, and run test once.
    - Report dev, test and all 12 cases.
    - Count every variant tried; this is the garden of forking paths.
+   - A held-out split stops being blind once its titles, queries or targets have been seen during development
+     (for example printed by an analysis script). New claims then need a fresh held-out set (test2). Scripts must
+     not print the content of unused held-out cases.
+   - Compare new variants with a fresh-sample replicate of the incumbent, not with its selected dev score (winner's
+     curse).
 6. **Failures.** Never drop failed runs. Retry once, keep the first attempt in `failed_attempts/`, and report
    failures per arm.
 7. **Integrity gate.** Expected runs are present, judged and audited; leakage counts are zero; one generator
@@ -224,3 +235,12 @@ Ablate before combining. Combine only components that helped or that address dif
   No rule changed. Lesson recorded for future loops: a dev gain from a harness on a weak model (Llama
   `scaffold_ensemble`, +0.10) did not replicate on test (−0.09). Report the core metric (intervention + mechanism)
   next to reconstruction, because the test gain was in conditions and outcome, not the intervention.
+- 2026-10-25 (round 2):
+  - The test split's titles were printed by a probe analysis and one target was quoted in experiment 22, so test
+    is no longer blind. A fresh held-out set, test2, was added under a rule pre-registered before any search
+    (loop.md 10.1).
+  - New allowed role: answer-key extraction by a post-cutoff model.
+  - New discipline rules: do not print unused held-out content; compare with a fresh-sample replicate of the
+    incumbent.
+  - o1 cleared by its memorisation probe.
+  - `must_obey_check.py` freezes test2 queries and requires test2 runs to be final.

@@ -5,6 +5,10 @@ Started 2026-10-25. Everything here follows [must_obey.md](./must_obey.md). Ever
 each) unless a section says *test*. The test split (4 papers) is touched only by the pre-registered final runs of
 section 6, reported in section 7. Section 8 summarises what made a difference and why.
 
+Round 2 is section 10: a failure analysis of the round-1 best, iterations 6–8, and a fresh held-out set (test2,
+12 papers) with its pre-registered results. Its summary is section 10.7. **On fresh papers the best-supported
+configuration is o3-mini with the conservative writer (one call per hypothesis).**
+
 **Code.**
 - [hypo_loop.py](./hypo_loop.py): the harness, with rule enforcement, logging and evaluation.
 - [loop_methods.py](./loop_methods.py): the methods.
@@ -534,3 +538,364 @@ not confined to those two papers.
   F-llama on test, and core on test.
 - [x] Experiment log (experiments 22–24) and loop.md updated; `must_obey_check.py --loop` passes on every method
   directory.
+
+---
+
+## 10. Second round ("get better results"): iterations 6–7 and a fresh test set
+
+### 10.1 Pre-registered construction rule for a fresh test set (test2), written 2026-10-25 04:20, before any search
+
+**Why a new test set.** The 4-paper test split was used once (section 7). Since then, its paper titles were printed
+by the memorisation probe and one of its targets was quoted in experiment 22, so a second look would not be blind
+to rules that favour study-type answers. All conclusions of this round therefore come from a new held-out set
+whose titles, queries and targets I do not read before the final runs. Only automated summaries are inspected
+(counts, gate pass rates, gap types, dates).
+
+**Rule.**
+1. **Search.** The corpus query of `data/corpus/README.md` (same topic terms, `OPEN_ACCESS:Y AND HAS_FT:Y`,
+   `sort_cited:y`), restricted to `FIRST_PDATE:[2026-02-17 TO 2026-10-15]`. That date is after the cutoff of every
+   model used to build or judge cases (GPT-5.6, 2026-02-16). So, unlike the 12 original cases, no query writer,
+   checker or judge can know these papers. If fewer than 12 papers qualify, the window is extended back one month
+   at a time (never before 2024-02-01). Papers dated before 2026-02-17 are then flagged.
+2. **Eligibility.** The same as the corpus:
+   - a research article, not a review, correction or retraction (`import_jats_corpus.validate_primary_research`);
+   - open-access JATS XML;
+   - methods/results-style sections;
+   - the topic rule ("directly studies elevated-temperature, refractory/extreme-environment, creep, oxidation,
+     hot-corrosion, melting, thermal/phase-stability or temperature-dependent behaviour of a high-entropy alloy"),
+     checked by GPT-5.6 on the title and abstract only.
+
+   Further, a test2 paper:
+   - is not in the 50-paper corpus and is not a near-duplicate of one (title token Jaccard ≥ 0.8);
+   - has an Introduction whose redacted text (v3 rule) is at least 1,000 characters.
+3. **Ranking.** Europe PMC `citedByCount`, then Europe PMC order. The first 12 eligible papers are taken.
+4. **Construction.** No step is changed after seeing any output:
+   - The hidden target comes from the paper's abstract, methods, results, discussion and conclusions, never the
+     Introduction. GPT-5.6 extracts it into the 10-field schema of experiment 3, with the experiment-3 instruction
+     to "preserve uncertainty rather than filling absent details". The target is never shown to a query-facing
+     model.
+   - Queries are written from the redacted Introduction by the v3 writer, then checked by the v3 checker and
+     lexical gate, with up to 4 rounds.
+   - The v3.1 gap classifier then labels the gap. Non-design gaps are rewritten with the v3.1 templates.
+   - Failing levels are flagged and kept.
+5. **Evidence.** The 50-paper corpus filtered by date (all 50 predate the window), with the same exclusions.
+6. **Use.** test2 is used once, for configurations pre-registered at the end of iteration 7 plus the baselines
+   (`closed_book`, `text_chunks`) and the round-1 final method (`trend_ground_b_o3mini`).
+
+### 10.2 Failure analysis of the round-1 best method on dev (before iteration 6)
+
+Dev only (`trend_ground_b_o3mini` and all 10 o3-mini configurations; GPT-5.6 labels; analysis only).
+
+| Finding | Number | What it implies |
+|---|---|---|
+| **F9** Decision errors are systematic, not random | Class hit: a single hypothesis 0.33; the majority class over the 20 o3-mini hypotheses of a unit 0.375. 4 of 8 dev cases have 0–1 class hits in 60 hypotheses: both simulation studies and both processing-route targets | Voting (self-consistency, S4) cannot fix this; the reasoning frame must change |
+| **F10** Coverage is better with o3-mini | Lever ≥ 2 in any of 20 hypotheses: 42% of units; in one hypothesis: 17% | Headroom exists, but self-scoring selection already failed (iteration 5) |
+| **F11** The question's niche is ignored | e.g. "earlier studies … addressed a limited thermal regime rather than … across different temperatures" (target: a temperature series), "simulations generally represented perfect, defect-free bulk crystals" (target: simulated short-range order), "FeCoNiPd and FeCoNiPt exhibited soft ferromagnetism" (target: a dual-phase alloy). The forecaster proposed oxidation treatments, ML models and annealing | Reconstruct move 3 of the introduction from its move 2 (S1, S2) |
+| **F12** The intervention is not in the evidence | Experiment-18 evidence ceiling: with the top-20 records retrieved *by the target text*, every case is reconstructible only 1–2 of 4 | Retrieval cannot supply the intervention; it has to be forecast |
+| **F13** The write-up drifts from the decision | The final hypothesis is in the decided class 65–69% of the time. Drift turns study decisions into material treatments; net cost 1–4 class hits of 48 | Minor; the decision itself is the problem |
+| **F14** The gap type is right; the family inside it is not | The framer's gap type matches benchmark v3.1 in 48/48 runs. Understanding questions: `controlled_variable_experiment` chosen 10/12 and filled with material changes. Method questions: ML models chosen 8/12 | Decide from the niche, not from the question's wording ("controlled change") |
+
+### 10.3 What I read for iterations 6–7, what I understood, what I integrated
+
+| ID | Source | What I understood | What we integrate (where) |
+|---|---|---|---|
+| S1 | **Genre Analysis: English in Academic and Research Settings**, John M. Swales, Cambridge University Press, 1990 (CARS model; read through the Purdue OWL summary, https://owl.purdue.edu/owl/general_writing/the_writing_process/organization_CARS_Model.html) | Research introductions make three moves: establish a territory (importance, generalisations, earlier research), establish a niche (counter-claim, gap, question, continuing a tradition), occupy the niche (purposes, present research, findings). | Our queries are moves 1–2 of a held-out introduction, with move 3 removed by construction. `niche_*` methods quote the niche statements and invert each one into the move that would occupy it (F11). |
+| S2 | **Summarizing scientific articles: experiments with relevance and rhetorical status**, Simone Teufel and Marc Moens, Computational Linguistics 28(4):409–445, 2002. https://aclanthology.org/J02-4002/ | Argumentative zoning: sentences of scientific articles can be classified by rhetorical status (aim, basis, contrast with earlier work, …), and the zones carry the paper's argument. | The niche extractor is a two-zone classifier (territory vs niche) restricted to verbatim quotes, checked in code. |
+| S3 | **OpenAI o1 System Card**, OpenAI, Dec 2024. https://arxiv.org/abs/2412.16720 (knowledge cutoff 2023-10-01 per the OpenAI model page in must_obey.md) | o1 is trained with reinforcement learning to reason with a long private chain of thought before answering. | The model axis of iteration 3, repeated with a stronger pre-cutoff reasoner. It has its own memorisation probe (section 10.4). |
+| S4 | **Self-consistency improves chain of thought reasoning in language models**, Xuezhi Wang et al., ICLR 2023. https://arxiv.org/abs/2203.11171 | Sample diverse reasoning paths and take the most consistent answer. It helps when errors are independent across samples. | Tested offline first (F9): the majority class over 20 o3-mini hypotheses beats a single one only 0.375 vs 0.33. Errors are shared across samples, so voting was **not** built. |
+| S5 | **Plan-and-solve prompting**, Lei Wang et al., ACL 2023. https://arxiv.org/abs/2305.04091 | Make a plan, then carry it out step by step. Failures split into planning errors and execution errors. | Measured plan-to-execution fidelity (F13). Execution drift is minor, so the work targets the plan (decision). |
+| A4 | Böckeler, harness engineering (section 2) | Computational sensors between inferential steps. | Niche quotes that are not verbatim in the question are dropped in code before the next call (`verified_niches`); a hallucinated niche never reaches the planner. |
+
+### 10.4 Iteration 6 (dev): niche occupation and a stronger reasoner
+
+**o1 memorisation probe** (must_obey.md 2.3; same protocol as section 0):
+- o1 claims to remember none of the papers. Specific recall is 21% (5/24), against Llama-3.3 8% and o3-mini 17%;
+  quantitative recall is 0.04 (Llama 0.04).
+- All 5 hits are inferable from the title or are textbook facts: the BCC structure of TaVCrW, the FCC structure of
+  FeNiCrMn, an SRO mechanism stated in the title, and milling refinement in a title that names mechanical
+  alloying.
+- o1 is allowed, under the same reasoning as o3-mini.
+
+| Method | Failure targeted | Design | Sources |
+|---|---|---|---|
+| `niche_ground_b_o3mini` | F11, F14 | Each step is a separate call:<br>1. The niche extractor quotes every niche statement verbatim.<br>2. Code keeps only quotes found in the question; if none survive, the whole question is the niche.<br>3. The niche mover inverts each niche into an occupying move (contribution type, lever, technique, conditions) and chooses the most specific one, "from the niche, not from the wording".<br>4. Retrieval is aimed at that move, then WRITER_B writes. | S1, S2, A4, C11 |
+| `trend_niche_ground_b_o3mini` | F11 + F1 | Steps 1–3 above, then the chronological chain of iteration 4. The forecaster must pick a next step that occupies one of the verified niches. Then aimed retrieval and WRITER_B. | S1, C6, C12 |
+| `writer_only_b_o1` | model control | o1 with the conservative writer, closed-book (compare with `writer_only_b_o3mini`) | S3 |
+| `trend_ground_b_o1` | model × harness | The round-1 best pipeline with o1 | S3, C6, C11 |
+| `niche_ground_b_o1` | model × niche | `niche_ground_b` with o1 | S1, S3 |
+
+**Two more sources, read for iteration 7.**
+
+| ID | Source | What I understood | What we integrate (where) |
+|---|---|---|---|
+| S6 | **The probabilistic relevance framework: BM25 and beyond**, Stephen Robertson and Hugo Zaragoza, Foundations and Trends in Information Retrieval, 2009. https://doi.org/10.1561/1500000019 | BM25 ranks documents by term frequency with saturation (k1), length normalisation (b) and inverse document frequency, so rare, distinctive terms count more than common ones. | Our shared retriever scores raw token overlap without IDF, so words such as "alloy", "temperature" and "entropy" decide what is retrieved. `trend_ground_bm25_b_o3mini` ranks the same pool with BM25; budget and record cap are unchanged (iteration 7a). |
+| S7 | **Wisdom of the silicon crowd: LLM ensemble prediction capabilities rival human crowd accuracy**, Philipp Schoenegger, Indre Tuminauskaite, Peter S. Park and Philip E. Tetlock, 2024. https://arxiv.org/abs/2402.19379 | Aggregating forecasts from several *different* LLMs can match a human crowd. Diversity across models matters more than repeated samples of one model. | Tested offline before building, on dev decisions (F9). The majority of the *decided* families across Llama and o3-mini is right 42% of the time, against 41% for a single Llama decision. Restricted to the trend forecasters, voting is level with a single decision (37.5% vs 38%). Errors are shared across models too, so a crowd-decision method was **not** built (negative result, no runs). |
+
+**Iteration 7a (dev), designed before iteration-6 results.** `trend_ground_bm25_b_o3mini` is the round-1 best
+pipeline with BM25 grounding (S6). It isolates retrieval quality (F5, F12: grounding is where round 1's condition,
+mechanism and outcome gains came from).
+
+### 10.5 Round-2 finalist rule (written 2026-10-25 04:45, before the iteration-7b results)
+
+1. **Unbiased reference.** The round-1 best's dev score (0.729) is the maximum of 29 configurations. Round-2
+   configurations are therefore compared on dev with `trend_ground_b_o3mini_r2`: the same code with fresh samples.
+2. **F2.** Among the round-2 configurations (iterations 6–7), F2 is the one with the highest dev GPT-5.6
+   reconstruction, provided it is at least the replicate's score. Ties within 0.01 are broken by DeepSeek.
+   Otherwise there is no F2, and round 1's method is the round-2 final.
+3. **test2 runs (once, `--final`).**
+   - Baselines: `closed_book` and `text_chunks` (Llama-3.3).
+   - Model controls: `closed_book_o3mini` and `writer_only_b_o3mini`.
+   - The round-1 best: `trend_ground_b_o3mini`.
+   - F2, if it exists, plus the writer-only control for F2's model if that model is not o3-mini.
+4. **Primary hypothesis on test2** (GPT-5.6 reconstruction, 12 papers × 3 levels, paper-clustered bootstrap, sign
+   test over 12 papers):
+   - If F2 exists: F2 − `trend_ground_b_o3mini` > 0 (does round 2 improve on round 1?).
+   - Otherwise: `trend_ground_b_o3mini` − `closed_book` > 0, a replication of round 1 on fresh papers.
+5. **Secondary (Holm within each judge and metric).**
+   - `trend_ground_b_o3mini` − `closed_book` (when it is not the primary).
+   - F2 − `closed_book`.
+   - `writer_only_b_o3mini` − `closed_book` and `closed_book_o3mini` − `closed_book`.
+   - The same comparisons on DeepSeek and on core.
+   - The 5 test2 papers dated after GPT-5.6's cutoff are reported separately.
+
+**Iteration 7b–7c designs (written before their results).**
+
+| Method | Failure targeted | Design | Sources |
+|---|---|---|---|
+| `trend_ground_b_o3mini_r2` | winner's curse | The round-1 best, unchanged, with fresh samples: the unbiased dev reference of 10.5 | must_obey.md 6.5 |
+| `trend_o1_ground_b_o3mini` | F1 (decision) without o1's outcome cost | Planner/executor split: o1 frames and forecasts (it had the best intervention score in iteration 6); o3-mini grounds and writes (best outcome agreement) | H2 (split planner from executor), S3 |
+| `trend_ground_iter_b_o3mini` | F5 (grounding of mechanism and conditions) | Trend forecast → grounded draft → a second retrieval aimed at the draft's intervention, mediator, mechanism and conditions → revision that may change mechanism, conditions and outcome only where the new evidence supports it. Declared difference: two retrievals | S8: **Enhancing retrieval-augmented large language models with iterative retrieval-generation synergy** (ITER-RETGEN), Zhihong Shao et al., Findings of EMNLP 2023, https://arxiv.org/abs/2305.15294. A model's own output is a better query for the knowledge it needs next than the original question. |
+
+**Consensus selection, tested offline instead of built.** S9: **It's MBR all the way down: modern generation
+techniques through the lens of minimum Bayes risk**, Amanda Bertsch et al., 2023, https://arxiv.org/abs/2310.01387.
+Choose the candidate most similar to the others (the medoid), which approximates the minimum-risk output.
+- On dev, the medoid by content-word Jaccard among a unit's 24 o3-mini hypotheses scores 0.719. That is above a
+  random member of the pool (0.651) but below the round-1 best's own mean (0.729).
+- Among grounded methods only, the medoid scores 0.708 against a mean of 0.698.
+- Not built: consensus favours the systematic default (F9). The oracle best-of-pool is 1.10, so the headroom is in
+  selection, but no available signal finds it.
+
+**Iteration 6 and 7a results (dev, 24 units × 2 samples).** Δ is against the fresh-sample replicate of the round-1
+best (`trend_ground_b_o3mini_r2`, 10.5).
+
+| Method | GPT-5.6 | Δ vs replicate [95% CI] | DeepSeek | Δ DeepSeek [95% CI] | core GPT | intervention | mechanism | outcome | lever ≥ 2 | calls/run |
+|---|---:|---|---:|---|---:|---:|---:|---:|---:|---:|
+| `trend_ground_b_o3mini` (round 1, original samples) | 0.73 | +0.01 [−0.09, +0.12] | 0.64 | −0.03 [−0.10, +0.05] | 0.59 | 0.38 | 0.81 | 0.94 | 0.19 | 3.1 |
+| `trend_ground_b_o3mini_r2` (same code, fresh samples) | 0.72 | – | 0.66 | – | 0.57 | 0.31 | 0.83 | 0.96 | 0.15 | 3.2 |
+| `niche_ground_b_o3mini` | 0.56 | −0.16 [−0.28, −0.06] | 0.64 | −0.03 [−0.12, +0.09] | 0.40 | 0.21 | 0.58 | 0.83 | 0.21 | 3.1 |
+| `trend_niche_ground_b_o3mini` | 0.65 | −0.07 [−0.14, +0.01] | 0.59 | −0.07 [−0.15, +0.01] | 0.49 | 0.23 | 0.75 | 0.90 | 0.15 | 5.2 |
+| `writer_only_b_o1` | 0.63 | −0.09 [−0.26, +0.06] | 0.51 | −0.15 [−0.38, +0.08] | 0.45 | 0.25 | 0.65 | 0.79 | 0.17 | 1.0 |
+| `trend_ground_b_o1` | 0.67 | −0.05 [−0.20, +0.10] | 0.57 | −0.09 [−0.26, +0.06] | 0.56 | 0.42 | 0.71 | 0.79 | 0.15 | 3.0 |
+| `niche_ground_b_o1` | 0.56 | −0.16 [−0.30, −0.04] | 0.57 | −0.09 [−0.22, +0.05] | 0.42 | 0.25 | 0.58 | 0.77 | 0.25 | 3.0 |
+| `trend_ground_bm25_b_o3mini` (7a) | 0.65 | −0.07 [−0.16, +0.02] | 0.62 | −0.04 [−0.18, +0.11] | 0.45 | 0.21 | 0.69 | 0.96 | 0.10 | 3.0 |
+
+**What iteration 6 and 7a taught.**
+- **The winner's curse on dev was small.** Fresh samples of the round-1 best score 0.72 against 0.73, so it is a
+  genuinely strong reference.
+- **Niche occupation fails (S1, S2).** Quote verification works: hallucinated niches are dropped, and on the
+  wear-coating question the expert level quotes exactly the niche the paper fills ("limited thermal regime rather
+  than … across different temperatures"). But the decision does not follow the niche: o3-mini still chose
+  pre-oxidation treatments there, and ML or DFT frameworks for the short-range-order question.
+  - The niche methods hit the target's lever *more* often (lever ≥ 2: 0.21–0.25 vs 0.15–0.19), yet reconstruction
+    falls. Mechanism drops from about 0.8 to 0.58, because removing the chronological chain removes the earlier
+    papers that anchored the mechanism.
+  - Adding the niche to the trend chain costs 0.07.
+- **A stronger reasoner does not help (S3).** o1 decides slightly better (intervention 0.42, the best of any
+  configuration) but has lower outcome agreement (0.79 vs 0.94–0.96).
+  - The target-free audit shows o1 quantifies outcomes and process parameters more often (outcomes 0.71–0.73 vs
+    0.38–0.52; process parameters 0.62–0.81 vs 0.33–0.35).
+  - That does not explain the outcome deficit: within o1, quantified outcomes score *higher* than unquantified
+    ones (0.85–0.94 vs 0.38–0.64). The cause is not identified.
+  - With the writer only, o1 is below o3-mini (0.63 vs 0.67). Iteration 7b therefore tests o1 as planner only.
+- **BM25 grounding hurts (S6).** Mechanism falls from 0.83 to 0.69 and intervention from 0.31 to 0.21; outcome is
+  unchanged. A likely cause, not verified: IDF weighting favours chunks that share rare tokens (specific element
+  or technique names) over chunks that cover the whole problem, which the coverage term of the shared retriever
+  rewards. Negative result.
+
+**Iteration 7b–7c results (dev; Δ against the replicate).**
+
+| Method | GPT-5.6 | Δ [95% CI] | DeepSeek | Δ DeepSeek [95% CI] | core | intervention | condition | mechanism | outcome |
+|---|---:|---|---:|---|---:|---:|---:|---:|---:|
+| `trend_o1_ground_b_o3mini` (o1 plans, o3-mini writes) | 0.65 | −0.07 [−0.17, +0.02] | 0.54 | −0.13 [−0.21, −0.02] | 0.56 | 0.35 | 0.65 | 0.77 | 0.81 |
+| `trend_ground_iter_b_o3mini` (second, draft-aimed retrieval) | 0.66 | −0.06 [−0.18, +0.07] | 0.58 | −0.08 [−0.23, +0.08] | 0.47 | 0.26 | 0.74 | 0.70 | 0.94 |
+
+- The planner/executor split does not recover o1's better decisions: intervention is 0.35, and conditions (0.65)
+  and outcome (0.81) are lower than the replicate's. The cause was not analysed.
+- A second retrieval aimed at the draft lowers mechanism (0.83 → 0.70) and intervention (0.31 → 0.26). A likely
+  cause, not verified: evidence retrieved for the draft's own claims pulls the revision toward other systems, as
+  precedents did in iteration 1.
+
+**F2 decision (rule 10.5, recorded 2026-10-25 05:06, before any test2 result was seen).** No round-2 configuration
+reaches the replicate (0.719). The best is `trend_ground_b_o1` at 0.672. So there is **no F2**: the round-2 final
+is the round-1 method. test2 runs only the five configurations fixed by rule 3, and the primary hypothesis is
+`trend_ground_b_o3mini` − `closed_book` > 0 on test2 (replication on 12 fresh papers).
+
+**Iteration 8 (exploratory, dev only; designed after the F2 decision, so it cannot enter the test2 evaluation).**
+
+| Method | Failure targeted | Design | Source |
+|---|---|---|---|
+| `trend_focus_ground_b_o3mini` | F5, F12 (grounding relevance) | The trend forecaster already names the earlier papers that address the same problem, but grounding ignored that list and searched the whole pool lexically. Grounding now fills the budget first from those papers' chunks, ranked by the usual retriever, then tops up from the rest; same budget and cap | S10: **Corrective retrieval augmented generation**, Shi-Qi Yan, Jia-Chen Gu, Yun Zhu and Zhen-Hua Ling, 2024, https://arxiv.org/abs/2401.15884. Evaluate the relevance of retrieved documents before generating and act on it. Here the relevance judgement comes from the forecaster that already read the earlier papers. |
+
+**Iteration 8 result (dev, exploratory).**
+
+| Method | GPT-5.6 | Δ vs replicate [95% CI] | DeepSeek | Δ DeepSeek [95% CI] | core | intervention | condition | mechanism | outcome |
+|---|---:|---|---:|---|---:|---:|---:|---:|---:|
+| `trend_focus_ground_b_o3mini` | 0.65 | −0.07 [−0.17, +0.02] | 0.71 | +0.05 [−0.07, +0.19] | 0.52 | 0.23 | 0.71 | 0.81 | 0.83 |
+
+- Not an improvement, and the judges disagree. The method also did not work as designed: the forecaster names a
+  valid relevant earlier paper only 0.5 times per run, so grounding changed little (on average 2.8 grounding
+  records per run come from those papers).
+- All 10 round-2 dev directories pass `must_obey_check.py --loop` (480 runs, 0 failed).
+
+### 10.6 test2 results (pre-registered in 10.5; run once on 2026-10-25)
+
+**Integrity.** 5 configurations × 36 units × 2 samples = 360 runs, all `--final`, 0 failures. Every run is judged by
+GPT-5.6 and DeepSeek. Audits, labels and the `must_obey_check.py --loop` result are in 10.6b. I did not read any
+test2 title, query or target before these runs; only automated summaries were inspected.
+
+**test2, 12 fresh papers (GPT-5.6 is primary).**
+
+| Configuration | GPT-5.6 | DeepSeek | core GPT | core DS | intervention | condition | mechanism | outcome | broad / problem / expert | calls/run |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|
+| `closed_book` (Llama-3.3, baseline) | 0.46 | 0.30 | 0.40 | 0.21 | 0.21 | 0.38 | 0.60 | 0.67 | 0.40 / 0.50 / 0.49 | 1 |
+| `text_chunks` (Llama-3.3) | 0.40 | 0.25 | 0.31 | 0.15 | 0.22 | 0.33 | 0.39 | 0.65 | 0.38 / 0.44 / 0.39 | 1 |
+| `closed_book_o3mini` | 0.57 | 0.55 | 0.50 | 0.49 | 0.38 | 0.51 | 0.62 | 0.78 | 0.56 / 0.52 / 0.64 | 1 |
+| **`writer_only_b_o3mini`** (o3-mini, conservative writer) | **0.65** | **0.64** | **0.62** | **0.60** | **0.43** | **0.53** | **0.81** | **0.82** | 0.65 / 0.66 / 0.64 | 1 |
+| `trend_ground_b_o3mini` (round-1 final) | 0.57 | 0.52 | 0.52 | 0.47 | 0.36 | 0.51 | 0.68 | 0.72 | 0.74 / 0.46 / 0.51 | 3.1 |
+
+**Pre-registered comparisons on test2.** Each cell is the paired difference, its paper-clustered bootstrap 95% CI
+and papers up/down. Holm runs across the two secondaries.
+
+| Comparison | GPT-5.6 | DeepSeek | core GPT | core DS |
+|---|---|---|---|---|
+| **Primary:** `trend_ground_b_o3mini` − `closed_book` | **+0.11 [+0.01, +0.22]**, 8/3, p = 0.23 | +0.23 [+0.06, +0.41], 7/5 | +0.12 [−0.06, +0.33] | +0.26 [+0.09, +0.44], 8/1, p = 0.04 |
+| Secondary: `writer_only_b_o3mini` − `closed_book` | **+0.18 [+0.07, +0.31], 9/1, Holm p = 0.043** | +0.34 [+0.15, +0.56] | +0.22 [+0.06, +0.41] | +0.40 [+0.19, +0.61], Holm p = 0.008 |
+| Secondary: `closed_book_o3mini` − `closed_book` | +0.11 [0.00, +0.22], 9/3 | +0.26 [+0.09, +0.45] | +0.10 [−0.06, +0.27] | +0.29 [+0.11, +0.49], Holm p = 0.008 |
+| Exploratory: `trend_ground_b_o3mini` − `closed_book_o3mini` | −0.003 [−0.10, +0.10], 5/5 | −0.03 [−0.17, +0.09] | +0.02 [−0.13, +0.17] | −0.02 [−0.17, +0.10] |
+| Exploratory: `trend_ground_b_o3mini` − `writer_only_b_o3mini` | −0.08 [−0.20, +0.05], 4/8 | −0.12 [−0.25, +0.03] | −0.10 [−0.25, +0.05] | −0.13 [−0.27, 0.00] |
+| Exploratory: `text_chunks` − `closed_book` | −0.06 [−0.13, +0.01], 3/9 | −0.04 [−0.13, +0.05] | −0.10 [−0.19, 0.00] | −0.06 [−0.15, +0.04] |
+
+**The 5 test2 papers dated after GPT-5.6's cutoff** (no model used to build, run or judge them can know them;
+pre-registered separate report):
+
+| Configuration | GPT-5.6 | DeepSeek |
+|---|---:|---:|
+| `closed_book` | 0.41 | 0.29 |
+| `closed_book_o3mini` | 0.65 | 0.78 |
+| `writer_only_b_o3mini` | **0.76** | **0.87** |
+| `trend_ground_b_o3mini` | 0.55 | 0.66 |
+
+On this subset, `writer_only_b_o3mini` − `closed_book` is +0.35 [+0.18, +0.53] and `trend_ground_b_o3mini` −
+`writer_only_b_o3mini` is −0.21 [−0.38, −0.05]; 5 papers, exploratory.
+
+**All 16 held-out papers** (test + test2, exploratory; the two sets' targets were built by different extractors).
+
+| Comparison | GPT-5.6 | DeepSeek |
+|---|---|---|
+| `writer_only_b_o3mini` − `closed_book` | +0.14 [+0.04, +0.25], 12/2, p = 0.013 | +0.34 [+0.19, +0.52], 13/2, p = 0.007 |
+| `trend_ground_b_o3mini` − `closed_book` | +0.11 [+0.03, +0.20], 12/3, p = 0.035 | +0.30 [+0.15, +0.47], 11/5 |
+| `trend_ground_b_o3mini` − `writer_only_b_o3mini` | −0.03 [−0.14, +0.08], 6/9 | −0.04 [−0.17, +0.09], 8/7 |
+
+Means over the 16 papers (GPT-5.6 / DeepSeek):
+
+| Configuration | GPT-5.6 | DeepSeek |
+|---|---:|---:|
+| `closed_book` | 0.48 | 0.31 |
+| `closed_book_o3mini` | 0.55 | 0.55 |
+| `writer_only_b_o3mini` | **0.62** | **0.65** |
+| `trend_ground_b_o3mini` | 0.59 | 0.61 |
+
+**Verdict.**
+1. **The primary hypothesis replicates on fresh papers, more weakly.** The round-1 method beats the Llama baseline
+   on test2 on both judges (CIs above zero), with a smaller effect than on the original split (+0.11 vs +0.19 over
+   all 12 original papers).
+2. **The harness does not add to the model on fresh papers.** On test2 the round-1 method is level with o3-mini
+   closed-book and below o3-mini with the conservative writer alone. The difference comes from understanding
+   questions (writer-only 0.82 vs 0.67) and is largest on the 5 papers after GPT-5.6's cutoff. Design questions
+   are level (0.57 vs 0.56).
+   - The labels show why. The trend forecast puts the hypothesis in the target's class less often than o3-mini
+     alone: lever match ≥ 1 is 0.35 vs 0.53 (writer-only) and 0.56 (closed-book).
+   - On dev, where the forecaster was selected, it was slightly *more* often right (0.38 vs 0.31). The
+     dev-selected decision step does not generalise.
+   - Problem alignment is not the cause. The harness trails the writer by the same 0.14 on dev and on test2.
+   - Over all 16 held-out papers the two are indistinguishable (−0.03).
+3. **The best-supported configuration is the simplest.** o3-mini with the conservative writer, one call:
+   - It is the only Holm-significant pre-registered result on test2: +0.18, 9 of 10 papers with a difference up.
+   - It is the highest-scoring configuration on test2, on its post-cutoff subset and over all 16 held-out papers,
+     on both judges.
+   - It is chosen by parsimony, not by a significant win over the harness; that difference is not claimed.
+4. **Evidence still hurts the weak model.** `text_chunks` is below closed-book on test2 (−0.06, 9 of 12 papers
+   down), as in experiment 21.
+
+#### 10.6b test2 integrity and style checks
+
+- **Integrity.** `must_obey_check.py --loop` passes on all five configurations: 144 runs each (48 dev, 24 test, 72
+  test2), 0 failed, zero leakage counters, every test2 run marked final and target-free asserted. The only warning
+  is the known PMC10759803 margin (a dev case) for the Llama arms.
+- **Style (must_obey.md 6.8, 360 test2 runs).**
+
+  | Configuration | length (characters) | hedges | specificity (audit) |
+  |---|---:|---:|---:|
+  | `closed_book` (Llama) | 530 | 0.10 | 0.32 |
+  | `closed_book_o3mini` | 1,166 | 0.07 | 0.30 |
+  | `writer_only_b_o3mini` | 1,197 | 0.14 | 0.31 |
+  | `trend_ground_b_o3mini` | 1,239 | 0.17 | 0.31 |
+
+  - Among the o3-mini configurations, the best one is neither the longest nor the most hedged, and specificity is
+    the same. Its advantage over the other o3-mini configurations is not a style effect.
+  - Within configurations, GPT-5.6 scores do not track length for the o3-mini arms (ρ −0.06 to +0.06), and more
+    specific hypotheses score slightly *lower* (ρ −0.08 to −0.22).
+  - DeepSeek rewards length within configurations (ρ +0.05 to +0.29), so its larger margins over the shorter Llama
+    baseline should be discounted. The GPT-5.6 result is primary.
+
+### 10.7 Summary of round 2: what was tried, what made a difference, and why
+
+| # | Change | Inspired by | Failure targeted | Dev effect (vs fresh replicate) | Held-out effect | Kept? Why |
+|---|---|---|---|---|---|---|
+| 14 | Majority vote over decisions, across samples or across models (offline) | S4, S7 | F9 | Class hit 0.38 → 0.42 at best; level with single decisions for trend forecasters | – | No. Errors are shared, not independent |
+| 15 | Niche occupation (CARS), verified quotes | S1, S2, A4 | F11, F14 | −0.16 (o3-mini), −0.16 (o1); with the trend chain −0.07 | – | No. Decisions do not follow the niche, and mechanism falls |
+| 16 | Stronger pre-cutoff reasoner (o1) | S3 | F1 | −0.05 (with the harness), −0.09 (writer only) | – | No. Better intervention (0.42), worse outcome |
+| 17 | BM25 grounding | S6 | F5, F12 | −0.07 | – | No. Mechanism 0.83 → 0.69 |
+| 18 | Planner/executor split (o1 plans, o3-mini writes) | H2, S3 | F1 | −0.07 (DeepSeek −0.13) | – | No |
+| 19 | Second retrieval aimed at the draft (ITER-RETGEN) | S8 | F5 | −0.06 | – | No. Mechanism 0.83 → 0.70 |
+| 20 | Consensus (MBR) selection (offline) | S9 | F10 | Medoid 0.72 vs incumbent 0.73 | – | No. Consensus favours the systematic default |
+| 21 | Grounding focused on the forecaster's relevant papers | S10 | F5 | −0.07 (DeepSeek +0.05) | – | No. The relevance list is mostly empty |
+| 22 | Fresh-sample replicate of the incumbent | must_obey 6.5 | winner's curse | 0.72 vs 0.73 | – | Yes, as the reference |
+| 23 | **Fresh held-out set (test2)** | must_obey 6.5, 2.1 | non-blind test split | – | 12 papers; 5 unknowable to every model involved | **Yes** |
+| 24 | **o3-mini with the conservative writer, one call** (round-1 control) | rounds 1–2 | – | 0.67 (round 1) | **test2 +0.18 over the baseline (Holm p = 0.043); best on test2, on its post-cutoff subset and over all 16 held-out papers** | **Yes: the recommended configuration (parsimony)** |
+
+**Bottom line of round 2.**
+- **The better result is a simpler method that holds up on fresh papers.** On 12 papers that no model saw, o3-mini
+  with the conservative writer scores 0.65 against 0.46 for the Llama baseline (DeepSeek 0.64 vs 0.30). On the 5
+  papers that no model involved could know, it scores 0.76 against 0.41. It needs one call per hypothesis instead
+  of 3.1.
+- **Why:** the two changes that generalise are the model (a pre-cutoff reasoning model) and the writer (state
+  uncertainty instead of inventing numbers). The harness steps that won on dev do not transfer:
+  - the trend forecast and grounding are level with o3-mini closed-book on test2;
+  - the dev-selected forecast picks the target's class less often on fresh papers (0.35 vs 0.53 for the writer
+    alone).
+- **What does not help, measured:** prompting the decision (frames, niches, cue rules), stronger reasoning (o1),
+  voting, consensus and self-scoring selection, alternative retrievers and iterative retrieval. In both rounds,
+  every attempt to steer which kind of contribution the model proposes failed. The decision bottleneck (F1, F9)
+  remains: intervention agreement stays below 0.5 of 4 for every configuration on every split.
+- **Next:**
+  - a verifier that is not an LLM (phase stability, CALPHAD or simulation checks) to break the shared prior;
+  - test3 (2024-02 to 2025-07 papers) to test any new method;
+  - expert calibration of the judge.
+
+### 10.8 must_obey.md checklist for round 2
+
+- [x] Query-facing models are all pre-cutoff (o3-mini, o1, Llama-3.3). o1 was probed first (10.4).
+- [x] Queries are frozen: v3.1 for dev, and test2 built once by a pre-registered rule. `must_obey_check.py` checks
+  both.
+- [x] Evidence: the same date-filtered corpus pools, with no web or live API tools in any method. BM25 and focused
+  grounding keep the pool, budget and cap. ITER-RETGEN's second retrieval is declared.
+- [x] Payloads are target-free (`Harness.guard`); niche quotes are verified in code.
+- [x] Dev only during development (10 configurations, 480 runs). test2 was used once, for configurations fixed by
+  the rule in 10.5 before any test2 result was seen. The old test split was not reused.
+- [x] Comparisons use a fresh-sample replicate of the incumbent.
+- [x] GPT-5.6 judge, DeepSeek cross-judge, target-free audit and labels for every run; the integrity gate passes
+  with 0 failed runs (10.6b).
+- [x] Paired statistics with clustered-bootstrap CIs and Holm. Negative results are recorded (iterations 6–8, two
+  offline negatives).
+- [x] Experiment log (experiments 25–26), READMEs and loop.md updated.

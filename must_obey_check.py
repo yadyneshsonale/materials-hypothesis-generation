@@ -5,10 +5,11 @@
 A run directory has `runs/*.json` (any of this repository's run formats) and, optionally, `judgments/` and
 `audit/`. The check fails (exit code 1) when a rule is broken. It warns on flags that need reporting:
 - query-facing model not on the pre-cutoff list, or its cutoff not before the case date (section 2);
-- query text differs from the frozen benchmark_v3 query (section 3);
+- query text differs from the frozen benchmark query (v3.1 by default; test2 cases are checked with v3.1) (section 3);
 - non-zero leakage counters in a run's audit (section 4);
 - missing GPT-5.6 / DeepSeek judgments or target-free audits for successful runs (section 6);
-- with --loop: test-split runs not marked final, or no proof that the payload was asserted target-free (5, 6.5).
+- with --loop: held-out (test or test2) runs not marked final, or no proof that the payload was asserted target-free
+  (5, 6.5).
 """
 
 from __future__ import annotations
@@ -24,6 +25,9 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent
 BENCHMARKS = {"v3": ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_v3" / "cases",
               "v3.1": ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_v3_1" / "cases"}
+# Held-out sets built by the same procedure as a benchmark version and checked with it (loop.md section 10.1).
+EXTRA_CASES = {"v3.1": (ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_test2" / "cases",)}
+HELD_OUT_SPLITS = ("test", "test2")
 CURRENT = "v3.1"
 CASES = BENCHMARKS[CURRENT]
 
@@ -46,14 +50,16 @@ def deployment(identity: str) -> str:
     return str(identity).split(":", 1)[-1].strip()
 
 
-def frozen_queries(cases_dir: Path = CASES) -> dict[tuple[str, str], dict[str, Any]]:
+def frozen_queries(cases_dir: Path = CASES, extra: tuple[Path, ...] = ()) -> dict[tuple[str, str], dict[str, Any]]:
     out = {}
-    for path in sorted(cases_dir.glob("PMC*.json")):
-        case = json.loads(path.read_text())
-        for level, query in case["queries"].items():
-            out[(case["paper_id"], level)] = {
-                "sha256": hashlib.sha256(query["text"].encode("utf-8")).hexdigest(), "date": case["publication_date"],
-                "split": "test" if case["split"] == "test" else "dev"}
+    for directory in (cases_dir, *extra):
+        for path in sorted(directory.glob("PMC*.json")):
+            case = json.loads(path.read_text())
+            for level, query in case["queries"].items():
+                out[(case["paper_id"], level)] = {
+                    "sha256": hashlib.sha256(query["text"].encode("utf-8")).hexdigest(),
+                    "date": case["publication_date"],
+                    "split": case["split"] if case["split"] in HELD_OUT_SPLITS else "dev"}
     return out
 
 
@@ -72,7 +78,7 @@ def judged(run_dir: Path, run_id: str) -> dict[str, bool]:
 
 
 def check(run_dir: Path, loop: bool = False, require_cross: bool = True, bench: str = CURRENT) -> dict[str, Any]:
-    queries = frozen_queries(BENCHMARKS[bench])
+    queries = frozen_queries(BENCHMARKS[bench], EXTRA_CASES.get(bench, ()))
     failures: list[str] = []
     warnings: list[str] = []
     counts = {"runs": 0, "ok": 0, "failed": 0}
@@ -105,8 +111,8 @@ def check(run_dir: Path, loop: bool = False, require_cross: bool = True, bench: 
             if int(audit.get(counter, 0) or 0) != 0:
                 failures.append(f"{rid}: audit.{counter} = {audit[counter]}")
         if loop:
-            if frozen["split"] == "test" and not run.get("final"):
-                failures.append(f"{rid}: test-split run not marked final (pre-register finals in loop.md)")
+            if frozen["split"] in HELD_OUT_SPLITS and not run.get("final"):
+                failures.append(f"{rid}: held-out ({frozen['split']}) run not marked final (pre-register in loop.md)")
             if run.get("status") == "ok" and run.get("target_free_asserted") is not True:
                 failures.append(f"{rid}: no proof that query-facing payloads were asserted target-free")
         if run.get("status") == "ok":

@@ -588,3 +588,268 @@ def m_multi_decision_ground(h: Harness, model: str = "o3mini") -> dict[str, Any]
     h.notes["selection"] = [{"decision": n, "family": d.get("chosen_family"), "score": round(s, 3)}
                             for (n, d, _), s in zip(candidates, scores)]
     return candidates[best][2]
+
+
+# ================================================================ iteration 6: niche occupation (CARS) and o1
+
+# Dev failure analysis (loop.md iteration 6): decision errors are systematic, not random. Four of eight dev cases have
+# almost no class hits among 60 o3-mini hypotheses, so voting cannot fix them. The questions state niches (untested
+# conditions, model assumptions, failed earlier routes) that the forecaster ignores. Swales' CARS model: an
+# introduction establishes a territory (move 1) and a niche (move 2); the removed move 3 occupies the niche.
+ALL_FAMILIES = tuple(dict.fromkeys(f for fams in FAMILIES.values() for f in fams))
+NICHE_KINDS = ("untested_condition", "method_limitation", "unexplained_behaviour", "performance_limitation",
+               "conflicting_results", "open_question")
+NICHE_EXTRACT_SYSTEM = (
+    "You analyse the rhetoric of a research question that was written from the introduction of an unpublished "
+    "materials-science paper, with the paper's own contribution removed. Research introductions follow the "
+    "Create-A-Research-Space pattern: move 1 establishes the territory (what is known) and move 2 establishes a niche "
+    "(a gap, a limitation or simplifying assumption of earlier work, a condition or regime earlier work did not cover, "
+    "an unexplained behaviour, a property that falls short, or conflicting results). List the niche statements of the "
+    "question. Copy each one verbatim: an exact, contiguous quote of 5 to 40 words from the question. Do not "
+    "paraphrase and do not add niches the question does not state. If the question states no explicit niche, quote "
+    "its central open problem and use the kind open_question. Kinds: " + ", ".join(NICHE_KINDS) + ". Return JSON "
+    "{\"niches\": [{\"quote\": str, \"kind\": str}]}."
+)
+NICHE_MOVE_SYSTEM = (
+    "You reconstruct move 3 of a materials-science introduction: the contribution that occupies the niche. Input: the "
+    "research question and its niche statements (verified quotes). Use only these and materials-science knowledge "
+    "from before the knowledge cutoff. (1) For each niche, give the occupying move: the contribution that fills "
+    "exactly that niche, found by inverting it (if earlier work covered only some conditions, cover the missing ones; "
+    "if earlier models or measurements relied on a simplification, remove it; if a property is limited by a cause, "
+    "act on that cause; if a behaviour is unexplained, make the measurement or simulation that resolves its "
+    "mechanism). Give its contribution_type (material_or_process_intervention, experimental_study, simulation_study, "
+    "combined_study, new_method), the lever or controlled variable, the technique and the conditions. (2) Choose the "
+    "single move a research group most plausibly published: prefer the niche the question establishes most "
+    "specifically, and the move that fills it most directly with standard techniques of the field. Words such as "
+    "'intervention' or 'controlled change' in the question may mean a change of material, processing, test condition "
+    "or simulation setting; decide from the niche, not from that wording. The family must be one of the candidate "
+    "families. Return JSON {\"occupying_moves\": [{\"niche\": int, \"contribution_type\": str, \"lever\": str, "
+    "\"technique\": str, \"conditions\": str}], \"chosen\": {\"niche\": int, \"contribution_type\": str, \"family\": "
+    "str, \"lever\": str, \"technique\": str, \"conditions\": str, \"why\": str}}."
+)
+TREND_NICHE_SYSTEM = TREND_SYSTEM + (
+    " You also receive the question's niche statements (verified quotes) and the move that would occupy each. The "
+    "next step must occupy one of these niches; use the trend of the earlier papers to decide which niche and how "
+    "(lever, technique and conditions)."
+)
+_QUOTE_NORMALISE = str.maketrans({"\u2010": "-", "\u2011": "-", "\u2012": "-", "\u2013": "-", "\u2014": "-",
+                                  "\u2212": "-", "\u2018": "'", "\u2019": "'", "\u201c": '"', "\u201d": '"'})
+
+
+def _norm(text: str) -> str:
+    return " ".join(str(text).translate(_QUOTE_NORMALISE).casefold().split()).strip(" .,;:")
+
+
+def verified_niches(question: str, raw: Any) -> list[dict[str, str]]:
+    """Computational sensor between steps: keep only niches quoted verbatim from the question."""
+    q = _norm(question)
+    kept: list[dict[str, str]] = []
+    for item in raw.get("niches", []) if isinstance(raw, dict) else []:
+        if not isinstance(item, dict):
+            continue
+        quote = _norm(item.get("quote", ""))
+        if len(quote.split()) >= 4 and quote in q and quote not in {k["quote"] for k in kept}:
+            kind = str(item.get("kind", ""))
+            kept.append({"quote": quote, "kind": kind if kind in NICHE_KINDS else "open_question"})
+    return kept[:8] or [{"quote": _norm(question), "kind": "open_question"}]
+
+
+def _niche_notes(h: Harness, model: str) -> dict[str, Any]:
+    raw = h.ask("niche_extractor", model, NICHE_EXTRACT_SYSTEM, {"question": h.query}, max_out=4000)
+    niches = verified_niches(h.query, raw)
+    moves = h.ask("niche_mover", model, NICHE_MOVE_SYSTEM, {"question": h.query, "knowledge_cutoff": h.cutoff,
+                                                            "niches": niches,
+                                                            "candidate_families": list(ALL_FAMILIES)}, max_out=6000)
+    moves = moves if isinstance(moves, dict) else {}
+    ch = moves.get("chosen") if isinstance(moves.get("chosen"), dict) else {}
+    family = str(ch.get("family", ""))
+    notes = {"niches": niches,
+             "occupying_moves": [m for m in moves.get("occupying_moves", []) if isinstance(m, dict)][:8]
+             if isinstance(moves.get("occupying_moves"), list) else [],
+             "contribution_type": str(ch.get("contribution_type", "")),
+             "chosen_family": family if family in ALL_FAMILIES else "",
+             "lever": "; ".join(str(ch[k]) for k in ("lever", "technique", "conditions") if ch.get(k)),
+             "why": str(ch.get("why", ""))}
+    h.notes["niche"] = {"extracted": raw, "verified": niches, "moves": moves}
+    h.notes["decision"] = notes
+    return notes
+
+
+@register("niche_ground_b_o3mini")
+def m_niche_ground_b(h: Harness, model: str = "o3mini") -> dict[str, Any]:
+    notes = _niche_notes(h, model)
+    return write(h, notes, model, records=_ground(h, notes), system=WRITER_B)
+
+
+def _trend_niche_notes(h: Harness, model: str) -> dict[str, Any]:
+    niche = _niche_notes(h, model)
+    fr = frame(h, model)
+    search = " ".join([h.query, str(fr.get("system", "")), str(fr.get("limitation", ""))])
+    records = h.pack(search, "card", cap=1600)[:10]
+    records.sort(key=lambda r: (r.publication_date, r.record_id))
+    payload = {"question": h.query, "knowledge_cutoff": h.cutoff, "frame": fr,
+               "candidate_families": list(FAMILIES[fr["gap_type"]]),
+               "niche_analysis": {"niches": niche["niches"], "occupying_moves": niche["occupying_moves"]},
+               "earlier_papers_chronological": h.evidence_payload(records, 1600)}
+    raw = h.ask("trend_forecaster", model, TREND_NICHE_SYSTEM, payload, max_out=5000)
+    raw = raw if isinstance(raw, dict) else {}
+    nxt = raw.get("next_step") if isinstance(raw.get("next_step"), dict) else {}
+    notes = {"frame": fr, "niches": niche["niches"], "trend": raw.get("trend", ""), "unsolved": raw.get("unsolved", ""),
+             "chosen_family": nxt.get("family", ""), "lever": nxt.get("lever", ""), "why": nxt.get("why", "")}
+    h.notes["decision"] = notes
+    return notes
+
+
+@register("trend_niche_ground_b_o3mini")
+def m_trend_niche_ground_b(h: Harness, model: str = "o3mini") -> dict[str, Any]:
+    notes = _trend_niche_notes(h, model)
+    return write(h, notes, model, records=_ground(h, notes), system=WRITER_B)
+
+
+for _model in ("o1",):
+    register(f"writer_only_b_{_model}")(lambda h, _m=_model: m_writer_only_b(h, _m))
+    register(f"trend_ground_b_{_model}")(lambda h, _m=_model: m_trend_ground_b(h, _m))
+    register(f"niche_ground_b_{_model}")(lambda h, _m=_model: m_niche_ground_b(h, _m))
+
+
+# ================================================================ iteration 7: retrieval quality, combinations
+
+# The shared retriever (temporal_hypothesis_benchmark.retrieve) scores raw token overlap without IDF, so frequent
+# domain words ("alloy", "temperature", "entropy") decide what is retrieved. BM25 (Robertson and Zaragoza 2009)
+# weights distinctive terms. Same pool, budget and record cap as rx.pack; only the ranking differs.
+from citegraph import bm25, content_terms  # noqa: E402
+
+_BM25_DOCS: dict[str, dict[str, list[str]]] = {}
+
+
+def pack_bm25(h: Harness, query: str, representation: str = "text_chunks") -> list[Any]:
+    pool = h.pool(representation)
+    key = f"{h.case['paper_id']}:{representation}"
+    if key not in _BM25_DOCS:
+        _BM25_DOCS[key] = {r.record_id: content_terms(r.text) for r in pool}
+    scores = bm25(content_terms(query), _BM25_DOCS[key])
+    ranked = sorted(pool, key=lambda r: (-scores.get(r.record_id, 0.0), r.publication_date, r.record_id))
+    cap = rx.record_cap(representation)
+    packed: list[Any] = []
+    used = 0
+    for record in ranked:
+        if scores.get(record.record_id, 0.0) <= 0:
+            break
+        size = min(len(record.text), cap)
+        if used + size > rx.EVIDENCE_BUDGET_CHARS:
+            continue
+        packed.append(record)
+        used += size
+        if len(packed) >= rx.MAX_RECORDS or used >= rx.EVIDENCE_BUDGET_CHARS - 200:
+            break
+    for record in packed:
+        h.seen[record.record_id] = record
+    return packed
+
+
+def _ground_bm25(h: Harness, notes: dict[str, Any]) -> list[Any]:
+    search = " ".join([h.query, str(notes.get("chosen_family", "")).replace("_", " "), str(notes.get("lever", "")),
+                       str(notes.get("principle", notes.get("why", "")))])
+    h.notes["grounding_query"] = search[:600]
+    h.notes["retriever"] = "bm25"
+    return pack_bm25(h, search)
+
+
+@register("trend_ground_bm25_b_o3mini")
+def m_trend_ground_bm25_b(h: Harness, model: str = "o3mini") -> dict[str, Any]:
+    notes = _trend_notes(h, model)
+    return write(h, notes, model, records=_ground_bm25(h, notes), system=WRITER_B)
+
+
+# Iteration 7b. (1) A fresh-sample replicate of the round-1 best: its dev score is the maximum of 29 configurations
+# (winner's curse), so new variants are compared with an unbiased estimate of the same code.
+register("trend_ground_b_o3mini_r2")(lambda h: m_trend_ground_b(h, "o3mini"))
+
+
+# (2) Planner/executor split (H2: split the planner from the executor). Iteration 6 on dev: o1 decided better
+# (intervention 0.42 vs 0.38) but wrote worse outcomes (0.79 vs 0.94); o3-mini writes better. o1 frames and forecasts,
+# o3-mini grounds and writes.
+@register("trend_o1_ground_b_o3mini")
+def m_trend_o1_ground_b_o3mini(h: Harness) -> dict[str, Any]:
+    notes = _trend_notes(h, "o1")
+    return write(h, notes, "o3mini", records=_ground(h, notes), system=WRITER_B)
+
+
+# Iteration 7c. Iterative retrieval-generation (ITER-RETGEN, Shao et al. 2023): the draft hypothesis is a better
+# retrieval query for its own mechanism and conditions than the question. Grounding is where round 1 gained
+# (mechanism 0.62 -> 0.81), so a second, draft-aimed retrieval targets mechanism, conditions and outcome. Declared
+# difference: two retrievals (each payload within the 16,000-character budget).
+REVISE_B = WRITER_B + (
+    "\nThe notes also contain your earlier draft. The supplied evidence was retrieved for that draft's mechanism and "
+    "conditions. Revise the draft only where this evidence supports a change (mechanism, conditions, predicted "
+    "direction and size, boundary); keep the decided intervention unless the evidence contradicts it."
+)
+
+
+@register("trend_ground_iter_b_o3mini")
+def m_trend_ground_iter_b(h: Harness, model: str = "o3mini") -> dict[str, Any]:
+    notes = _trend_notes(h, model)
+    draft = write(h, notes, model, records=_ground(h, notes), role="drafter", system=WRITER_B)
+    search = " ".join([h.query] + [str(draft.get(k, "")) for k in ("intervention", "structural_mediator", "mechanism",
+                                                                   "conditions")])
+    h.notes["second_retrieval_query"] = search[:600]
+    return write(h, {**notes, "draft": hypothesis_fields(draft)}, model, records=h.pack(search, "text_chunks"),
+                 system=REVISE_B)
+
+
+# Iteration 8 (exploratory, dev only; after the round-2 finals were fixed). The trend forecaster already judges which
+# earlier papers address the same problem ("relevant"), but grounding ignored that and searched the whole pool
+# lexically. Corrective RAG (Yan et al. 2024): evaluate relevance before generating. Grounding fills the budget first
+# from the papers the forecaster judged relevant, then tops up from the usual ranking. Same budget and record cap.
+from temporal_hypothesis_benchmark import retrieve  # noqa: E402
+
+
+def _trend_notes_relevant(h: Harness, model: str) -> dict[str, Any]:
+    fr = frame(h, model)
+    search = " ".join([h.query, str(fr.get("system", "")), str(fr.get("limitation", ""))])
+    records = h.pack(search, "card", cap=1600)[:10]
+    records.sort(key=lambda r: (r.publication_date, r.record_id))
+    payload = {"question": h.query, "knowledge_cutoff": h.cutoff, "frame": fr,
+               "candidate_families": list(FAMILIES[fr["gap_type"]]),
+               "earlier_papers_chronological": h.evidence_payload(records, 1600)}
+    raw = h.ask("trend_forecaster", model, TREND_SYSTEM, payload, max_out=5000)
+    raw = raw if isinstance(raw, dict) else {}
+    nxt = raw.get("next_step") if isinstance(raw.get("next_step"), dict) else {}
+    by_id = {r.record_id: r.paper_id for r in records}
+    relevant = sorted({by_id[str(i)] for i in (raw.get("relevant") or []) if str(i) in by_id})
+    notes = {"frame": fr, "trend": raw.get("trend", ""), "unsolved": raw.get("unsolved", ""),
+             "chosen_family": nxt.get("family", ""), "lever": nxt.get("lever", ""), "why": nxt.get("why", ""),
+             "relevant_papers": relevant}
+    h.notes["decision"] = notes
+    return notes
+
+
+def _ground_focused(h: Harness, notes: dict[str, Any]) -> list[Any]:
+    search = " ".join([h.query, str(notes.get("chosen_family", "")).replace("_", " "), str(notes.get("lever", "")),
+                       str(notes.get("principle", notes.get("why", "")))])
+    h.notes["grounding_query"] = search[:600]
+    pool = h.pool("text_chunks")
+    focus = set(notes.get("relevant_papers") or [])
+    ordered = (retrieve(search, [r for r in pool if r.paper_id in focus], limit=len(pool))
+               + retrieve(search, [r for r in pool if r.paper_id not in focus], limit=len(pool)))
+    cap = rx.record_cap("text_chunks")
+    packed: list[Any] = []
+    used = 0
+    for record in ordered:
+        size = min(len(record.text), cap)
+        if used + size > rx.EVIDENCE_BUDGET_CHARS:
+            continue
+        packed.append(record)
+        used += size
+        if len(packed) >= rx.MAX_RECORDS or used >= rx.EVIDENCE_BUDGET_CHARS - 200:
+            break
+    for record in packed:
+        h.seen[record.record_id] = record
+    h.notes["focused_records"] = sum(r.paper_id in focus for r in packed)
+    return packed
+
+
+@register("trend_focus_ground_b_o3mini")
+def m_trend_focus_ground_b(h: Harness, model: str = "o3mini") -> dict[str, Any]:
+    notes = _trend_notes_relevant(h, model)
+    return write(h, notes, model, records=_ground_focused(h, notes), system=WRITER_B)

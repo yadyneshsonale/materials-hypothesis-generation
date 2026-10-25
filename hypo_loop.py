@@ -72,16 +72,35 @@ for _spec in MODELS.values():
 
 # ---------------------------------------------------------------- cases and splits
 
+TEST2_DIR = EXPERIMENT_DIR / "benchmark_test2"  # fresh held-out set (loop.md section 10.1)
+SPLITS = {"dev": {"dev"}, "test": {"test"}, "test2": {"test2"}, "all": {"dev", "test"}}  # "all" = the original 12
+HELD_OUT = ("test", "test2")
+
+
 def cases() -> dict[str, dict[str, Any]]:
-    return rx.cases()
+    """Benchmark v3.1 cases plus test2 cases. test2 papers get corpus-style metadata rows so that the evidence pool,
+    temporal filter and family exclusion apply unchanged; they have no evidence records themselves."""
+    if "loop_cases" not in rx._cache:
+        merged = dict(rx.cases())
+        if (TEST2_DIR / "cases").exists():
+            meta = rx.metadata()
+            rows = _read_json(TEST2_DIR / "metadata.json") if (TEST2_DIR / "metadata.json").exists() else {}
+            for path in sorted((TEST2_DIR / "cases").glob("PMC*.json")):
+                case = _read_json(path)
+                merged[case["paper_id"]] = case
+                meta.setdefault(case["paper_id"], rows.get(case["paper_id"]) or {
+                    "paper_id": case["paper_id"], "earliest_public_date": case["publication_date"],
+                    "work_family_id": case["paper_id"]})
+        rx._cache["loop_cases"] = merged
+    return rx._cache["loop_cases"]
 
 
 def split_of(case: dict[str, Any]) -> str:
-    return "test" if case["split"] == "test" else "dev"
+    return case["split"] if case["split"] in HELD_OUT else "dev"
 
 
 def units(split: str) -> list[tuple[dict[str, Any], str]]:
-    return [(c, lvl) for c in cases().values() if split in ("all", split_of(c)) for lvl in QUERY_LEVELS]
+    return [(c, lvl) for c in cases().values() if split_of(c) in SPLITS[split] for lvl in QUERY_LEVELS]
 
 
 def run_id(paper: str, level: str, method: str, sample: int) -> str:
@@ -249,7 +268,8 @@ def generate_one(method: str, case: dict[str, Any], level: str, sample: int, fin
     path = OUT / method / "runs" / f"{rid}.json"
     atomic_json(path, {
         "run_id": rid, "paper_id": case["paper_id"], "query_level": level, "method": method, "sample": sample,
-        "split": split_of(case), "final": final, "benchmark": "v3.1", "query": h.query,
+        "split": split_of(case), "final": final, "benchmark": "test2" if split_of(case) == "test2" else "v3.1",
+        "query": h.query,
         "publication_date": h.cutoff, "models": h.models, "status": status, "error": error,
         "generation": generation, "seen_ids": sorted(h.seen), "cited_ids": cited,
         "cited_evidence": [{"record_id": c, "paper_id": h.seen[c].paper_id,
@@ -262,8 +282,8 @@ def generate_one(method: str, case: dict[str, Any], level: str, sample: int, fin
 
 
 def generate_stage(method: str, split: str, workers: int, final: bool) -> dict[str, int]:
-    if split in ("test", "all") and not final:
-        raise SystemExit("test-split runs must be pre-registered finals: pass --final (must_obey.md 6.5)")
+    if split != "dev" and not final:
+        raise SystemExit("held-out runs must be pre-registered finals: pass --final (must_obey.md 6.5)")
     jobs = []
     for case, level in units(split):
         for sample in SAMPLES:
@@ -424,7 +444,7 @@ def unit_scores(rows: list[dict[str, Any]], method: str, judge: str, split: str,
     per: dict[tuple[str, str], list[float]] = defaultdict(list)
     for r in rows:
         run = r["run"]
-        if run["method"] == method and r.get(judge) and (split == "all" or run["split"] == split):
+        if run["method"] == method and r.get(judge) and run["split"] in SPLITS[split]:
             per[(run["paper_id"], run["query_level"])].append(metric(r[judge]["scores"]))
     return {k: statistics.fmean(v) for k, v in sorted(per.items())}
 
@@ -442,7 +462,7 @@ def paired(a: dict, b: dict) -> dict[str, Any]:
 
 
 def summarise(rows: list[dict[str, Any]], method: str, split: str) -> dict[str, Any]:
-    rs = [r for r in rows if r["run"]["method"] == method and (split == "all" or r["run"]["split"] == split)]
+    rs = [r for r in rows if r["run"]["method"] == method and r["run"]["split"] in SPLITS[split]]
     ok = [r for r in rs if r["run"]["status"] == "ok"]
     judged = [r for r in ok if r["gpt"]]
     gpt = unit_scores(rows, method, "gpt", split)
@@ -469,7 +489,7 @@ def summarise(rows: list[dict[str, Any]], method: str, split: str) -> dict[str, 
 
 def report(split: str = "dev") -> dict[str, Any]:
     rows = load_scored()
-    needed = {"dev", "test"} if split == "all" else {split}
+    needed = SPLITS[split]
     splits_by_method: dict[str, set[str]] = defaultdict(set)
     for r in rows:
         splits_by_method[r["run"]["method"]].add(r["run"]["split"])
@@ -527,7 +547,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("stage", choices=("generate", "judge", "cross_judge", "audit", "label", "evaluate", "report"))
     parser.add_argument("--method", action="append")
-    parser.add_argument("--split", default="dev", choices=("dev", "test", "all"))
+    parser.add_argument("--split", default="dev", choices=tuple(SPLITS))
     parser.add_argument("--final", action="store_true")
     parser.add_argument("--workers", type=int, default=6)
     args = parser.parse_args()

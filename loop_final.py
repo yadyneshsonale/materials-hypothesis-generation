@@ -15,27 +15,51 @@ import hypo_loop as H
 from hypothesis_evidence_v2 import atomic_json
 from temporal_eval_v3 import holm_adjust
 
-FINAL = ("trend_ground_b_o3mini", "scaffold_ensemble", "closed_book", "text_chunks", "closed_book_o3mini",
-         "writer_only_b_o3mini")
-PRIMARY = ("trend_ground_b_o3mini", "closed_book")
-SECONDARY = (("trend_ground_b_o3mini", "closed_book_o3mini"), ("trend_ground_b_o3mini", "writer_only_b_o3mini"),
-             ("scaffold_ensemble", "closed_book"))
+ROUNDS: dict[str, dict[str, Any]] = {
+    # Round 1 (loop.md section 6): run once on the 4-paper test split.
+    "round1": {"final": ("trend_ground_b_o3mini", "scaffold_ensemble", "closed_book", "text_chunks",
+                         "closed_book_o3mini", "writer_only_b_o3mini"),
+               "primary": ("trend_ground_b_o3mini", "closed_book"),
+               "secondary": (("trend_ground_b_o3mini", "closed_book_o3mini"),
+                             ("trend_ground_b_o3mini", "writer_only_b_o3mini"), ("scaffold_ensemble", "closed_book")),
+               "splits": ("test", "dev", "all"), "prefix": "final"},
+    # Round 2 (loop.md sections 10.1 and 10.5): no F2 qualified on dev, so the primary is the round-1 method
+    # against closed_book on the fresh test2 set; run once.
+    "round2": {"final": ("trend_ground_b_o3mini", "closed_book", "text_chunks", "closed_book_o3mini",
+                         "writer_only_b_o3mini"),
+               "primary": ("trend_ground_b_o3mini", "closed_book"),
+               "secondary": (("writer_only_b_o3mini", "closed_book"), ("closed_book_o3mini", "closed_book")),
+               "exploratory": (("trend_ground_b_o3mini", "closed_book_o3mini"),
+                               ("trend_ground_b_o3mini", "writer_only_b_o3mini"), ("text_chunks", "closed_book")),
+               "splits": ("test2",), "prefix": "final2"},
+}
+FINAL = ROUNDS["round1"]["final"]
+PRIMARY = ROUNDS["round1"]["primary"]
+SECONDARY = ROUNDS["round1"]["secondary"]
 
 
-def analyse(split: str) -> dict:
-    rows = [r for r in H.load_scored() if r["run"]["method"] in FINAL]
-    table = {m: H.summarise(rows, m, split) for m in FINAL}
+def analyse(split: str, round_: str = "round1", papers: set[str] | None = None, tag: str = "") -> dict:
+    cfg = ROUNDS[round_]
+    final, primary_pair, secondary_pairs = cfg["final"], cfg["primary"], cfg["secondary"]
+    rows = [r for r in H.load_scored() if r["run"]["method"] in final
+            and (papers is None or r["run"]["paper_id"] in papers)]
+    table = {m: H.summarise(rows, m, split) for m in final}
     out = {"split": split, "table": table, "comparisons": {}}
+    if papers is not None:
+        out["papers"] = sorted(papers)
     for judge in ("gpt", "deep"):
         for metric_name, metric in (("recon", H.recon), ("core", H.core)):
             key = f"{judge}_{metric_name}"
-            u = {m: H.unit_scores(rows, m, judge, split, metric) for m in FINAL}
-            primary = {"a": PRIMARY[0], "b": PRIMARY[1], **H.paired(u[PRIMARY[0]], u[PRIMARY[1]])}
-            secondary = [{"a": a, "b": b, **H.paired(u[a], u[b])} for a, b in SECONDARY]
+            u = {m: H.unit_scores(rows, m, judge, split, metric) for m in final}
+            primary = {"a": primary_pair[0], "b": primary_pair[1], **H.paired(u[primary_pair[0]], u[primary_pair[1]])}
+            secondary = [{"a": a, "b": b, **H.paired(u[a], u[b])} for a, b in secondary_pairs]
             for item, adj in zip(secondary, holm_adjust([i.get("p", 1.0) for i in secondary])):
                 item["holm_p"] = round(adj, 4)
             out["comparisons"][key] = {"primary": primary, "secondary": secondary}
-    atomic_json(H.OUT / f"final_{split}.json", out)
+            if cfg.get("exploratory"):
+                out["comparisons"][key]["exploratory"] = [{"a": a, "b": b, **H.paired(u[a], u[b])}
+                                                          for a, b in cfg["exploratory"]]
+    atomic_json(H.OUT / f"{cfg['prefix']}_{split}{tag}.json", out)
     return out
 
 
@@ -72,8 +96,11 @@ def style_features(row: dict[str, Any]) -> dict[str, float]:
             "specificity": statistics.fmean(1.0 if v else 0.0 for v in spec.values()) if spec else float("nan")}
 
 
-def robustness() -> dict[str, Any]:
-    rows = [r for r in H.load_scored() if r["run"]["method"] in FINAL and r["gpt"] and r["run"]["status"] == "ok"]
+def robustness(round_: str = "round1") -> dict[str, Any]:
+    cfg = ROUNDS[round_]
+    final, primary_pair = cfg["final"], cfg["primary"]
+    rows = [r for r in H.load_scored() if r["run"]["method"] in final and r["gpt"] and r["run"]["status"] == "ok"
+            and any(r["run"]["split"] in H.SPLITS[s] for s in cfg["splits"])]
     out: dict[str, Any] = {"style_vs_score": {}, "primary_style_diffs": {}, "per_paper": {}}
     for judge in ("gpt", "deep"):
         scored = [r for r in rows if r[judge]]
@@ -83,27 +110,29 @@ def robustness() -> dict[str, Any]:
         for f in ("length_chars", "hedges", "specificity"):
             pairs = [(x[f], s) for x, s in zip(feats, scores) if x[f] == x[f]]
             within = {}
-            for m in FINAL:
+            for m in final:
                 mp = [(x[f], s) for x, s, r in zip(feats, scores, scored) if r["run"]["method"] == m and x[f] == x[f]]
                 within[m] = spearman([a for a, _ in mp], [b for _, b in mp])
             block[f] = {"pooled_rho": spearman([a for a, _ in pairs], [b for _, b in pairs]), "n": len(pairs),
                         "within_method_rho": within}
         out["style_vs_score"][judge] = block
-    for split in ("dev", "test", "all"):
-        per_unit: dict[str, dict[tuple[str, str], list[dict[str, float]]]] = {m: defaultdict(list) for m in PRIMARY}
+    for split in sorted(cfg["splits"], key=("dev", "test", "all", "test2").index):
+        per_unit: dict[str, dict[tuple[str, str], list[dict[str, float]]]] = {m: defaultdict(list) for m in primary_pair}
         for r in rows:
-            if r["run"]["method"] in PRIMARY and (split == "all" or r["run"]["split"] == split):
+            if r["run"]["method"] in primary_pair and r["run"]["split"] in H.SPLITS[split]:
                 per_unit[r["run"]["method"]][(r["run"]["paper_id"], r["run"]["query_level"])].append(style_features(r))
         diffs = {}
         for f in ("length_chars", "hedges", "specificity"):
-            a = {k: statistics.fmean(x[f] for x in v) for k, v in per_unit[PRIMARY[0]].items()}
-            b = {k: statistics.fmean(x[f] for x in v) for k, v in per_unit[PRIMARY[1]].items()}
+            a = {k: statistics.fmean(x[f] for x in v) for k, v in per_unit[primary_pair[0]].items()}
+            b = {k: statistics.fmean(x[f] for x in v) for k, v in per_unit[primary_pair[1]].items()}
+            if not a or not b:
+                continue
             diffs[f] = {"a_mean": round(statistics.fmean(a.values()), 3), "b_mean": round(statistics.fmean(b.values()), 3),
                         **H.paired(a, b)}
         out["primary_style_diffs"][split] = diffs
         papers: dict[str, dict[str, Any]] = {}
         for judge in ("gpt", "deep"):
-            for m in FINAL:
+            for m in final:
                 u = H.unit_scores(rows, m, judge, split)
                 by_paper: dict[str, list[float]] = defaultdict(list)
                 for (pid, _level), v in u.items():
@@ -111,26 +140,46 @@ def robustness() -> dict[str, Any]:
                 for pid, v in sorted(by_paper.items()):
                     papers.setdefault(pid, {}).setdefault(judge, {})[m] = round(statistics.fmean(v), 3)
         out["per_paper"][split] = dict(sorted(papers.items()))
-    atomic_json(H.OUT / "final_robustness.json", out)
+    name = "final_robustness.json" if round_ == "round1" else f"{cfg['prefix']}_robustness.json"
+    atomic_json(H.OUT / name, out)
     return out
 
 
-if __name__ == "__main__":
-    rb = robustness()
+def main() -> None:
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    parser.add_argument("--round", default="round1", choices=tuple(ROUNDS))
+    args = parser.parse_args()
+    rb = robustness(args.round)
     for judge, block in rb["style_vs_score"].items():
         for f, v in block.items():
             print(f"style[{judge}] {f}: pooled rho={v['pooled_rho']} n={v['n']} within={v['within_method_rho']}")
     for split, diffs in rb["primary_style_diffs"].items():
         print(f"primary style diffs ({split}):", {f: (d['a_mean'], d['b_mean'], d.get('diff'), d.get('ci95'))
                                                    for f, d in diffs.items()})
-    for split in ("test", "dev", "all"):
-        a = analyse(split)
-        print(f"== {split}")
-        for m, s in a["table"].items():
-            print(f"  {m:24s} runs={s['runs']:2d} judged={s['judged']:2d} GPT={s['recon_gpt56']} DS={s['recon_deepseek']} "
-                  f"coreG={s['core_gpt56']} coreD={s['core_deepseek']}")
-        for key, c in a["comparisons"].items():
-            p = c["primary"]
-            print(f"  [{key}] primary {p['a']} - {p['b']}: {p.get('diff')} {p.get('ci95')} p={p.get('p')}")
-            for sc in c["secondary"]:
-                print(f"     secondary {sc['a']} - {sc['b']}: {sc.get('diff')} {sc.get('ci95')} Holm p={sc.get('holm_p')}")
+    for split in ROUNDS[args.round]["splits"]:
+        a = analyse(split, args.round)
+        _print(split, a)
+    if args.round == "round2":  # pre-registered separate report: papers after GPT-5.6's cutoff (loop.md 10.5)
+        late = {pid for pid, c in H.cases().items() if c["split"] == "test2" and c["publication_date"] >= "2026-02-17"}
+        _print(f"test2, {len(late)} papers after 2026-02-16", analyse("test2", "round2", papers=late,
+                                                                       tag="_after_gpt56_cutoff"))
+
+
+def _print(label: str, a: dict) -> None:
+    print(f"== {label}")
+    for m, s in a["table"].items():
+        print(f"  {m:28s} runs={s['runs']:2d} judged={s['judged']:2d} GPT={s['recon_gpt56']} DS={s['recon_deepseek']} "
+              f"coreG={s['core_gpt56']} coreD={s['core_deepseek']}")
+    for key, c in a["comparisons"].items():
+        p = c["primary"]
+        print(f"  [{key}] primary {p['a']} - {p['b']}: {p.get('diff')} {p.get('ci95')} "
+              f"up/down={p.get('papers_up')}/{p.get('papers_down')} p={p.get('p')}")
+        for sc in c["secondary"]:
+            print(f"     secondary {sc['a']} - {sc['b']}: {sc.get('diff')} {sc.get('ci95')} Holm p={sc.get('holm_p')}")
+        for sc in c.get("exploratory", []):
+            print(f"     exploratory {sc['a']} - {sc['b']}: {sc.get('diff')} {sc.get('ci95')} p={sc.get('p')}")
+
+
+if __name__ == "__main__":
+    main()

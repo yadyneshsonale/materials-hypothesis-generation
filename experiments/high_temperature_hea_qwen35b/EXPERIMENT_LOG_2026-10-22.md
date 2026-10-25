@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 24)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 26)
 
 Related work (9 hypothesis-generation and materials-KG papers, with how each separates input from answer):
 [RELATED_WORK.md](./RELATED_WORK.md).
@@ -10,10 +10,13 @@ and they supersede section 8 ("MatKG, planned, blocked") of that log. The commit
 because its working-tree copy has uncommitted changes from another session (it is empty in the working tree).
 Once that is resolved, this document can be merged into the log.
 
-Last updated 2026-10-25. Adds experiments 22 (failure analysis of the clean rerun), 23 (benchmark v3.1, the
-[must_obey.md](../../must_obey.md) rules and model clearance) and 24 (a harness-engineered method loop with a
-pre-registered test; full write-up in [loop.md](../../loop.md)). **All work from experiment 23 on follows
-must_obey.md.** The 2026-10-24 update added experiments 17–18 (citation-graph variants and their failure analysis),
+Last updated 2026-10-25. Round 2 adds experiments 25 (test2: 12 fresh held-out papers, 5 of them after every
+model's cutoff) and 26 (method iterations 6–8 and the pre-registered test2 evaluation). **On fresh papers the
+best-supported configuration is o3-mini with the conservative writer (one call); the round-1 harness beats the
+baseline but adds nothing over that model.** The previous update added experiments 22 (failure analysis of the
+clean rerun), 23 (benchmark v3.1, the [must_obey.md](../../must_obey.md) rules and model clearance) and 24 (a
+harness-engineered method loop with a pre-registered test; full write-up in [loop.md](../../loop.md)). **All work
+from experiment 23 on follows must_obey.md.** The 2026-10-24 update added experiments 17–18 (citation-graph variants and their failure analysis),
 19 (the benchmark queries leak the answer), 20 (leak-free benchmark v3) and 21 (every evaluation rerun on it with a
 pre-cutoff generator). **Read experiments 19 to 21 before using any absolute score or query-level effect from
 experiments 3 to 18.**
@@ -49,6 +52,8 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 22 | 2026-10-24 to 2026-10-25 | Failure analysis of the clean rerun (lever match, question fit, coverage, error mix, judge agreement) | 1,476 hypotheses, 26 arms | none | GPT-5.6 (labeller, coder) | Complete (analysis only) | [rerun_v3/failure/](./rerun_v3/failure/) |
 | 23 | 2026-10-25 | Benchmark v3.1 (question type from the introduction's gap), must_obey.md rules and checker, memorisation probes of o3-mini and gpt-4o-mini | 12 cases × 3 levels; 48 probes | GPT-5.6 (classifier, writer, checker) | GPT-5.6 | Complete; 34/36 levels pass the gate | [benchmark_v3_1/](./benchmark_v3_1/) |
 | 24 | 2026-10-25 | Harness-engineered method loop (5 iterations, 29 configurations on dev) and a pre-registered test of 6 configurations | 1,392 dev runs + 144 test runs | Llama-3.3-70B, o3-mini, gpt-4o-mini (all pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete, verified (`must_obey_check.py --loop` passes on all 29 configurations) | [loop/](./loop/), [loop.md](../../loop.md) |
+| 25 | 2026-10-25 | Fresh held-out test set (test2) by a rule pre-registered before any search: 12 open-access papers, 2025-07 to 2026-07, 5 after GPT-5.6's cutoff | 41 screened, 12 cases × 3 levels | GPT-5.6 (screen, target extractor, writer, checker) | none | Complete; 34/36 levels pass the gate | [benchmark_test2/](./benchmark_test2/) |
+| 26 | 2026-10-25 | Method loop round 2 (iterations 6–8: niche occupation, o1, BM25, planner/executor, iterative retrieval, relevance-focused grounding; offline voting and consensus checks) and the pre-registered test2 evaluation | 480 dev runs + 360 test2 runs | o3-mini, o1, Llama-3.3-70B (all pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete, verified | [loop/](./loop/), [loop.md](../../loop.md) section 10 |
 
 ## Correction to section 8 (MatKG)
 
@@ -1145,7 +1150,69 @@ error.
 - 0 failed runs; leakage counters are zero; test runs are marked final.
 - PMC10759803 is flagged for the Llama arms (2 days after the cutoff).
 
-## Comparability and limits, experiments 8 to 24
+## Experiment 25: fresh held-out test set (test2)
+
+**Why.** The 4-paper test split had been used once, and its titles were later printed during a probe analysis. A
+second look would not be blind, and 4 papers give wide intervals.
+
+**Construction** ([benchmark_test2/README.md](./benchmark_test2/README.md), [benchmark_test2.py](../../benchmark_test2.py)).
+The rule was pre-registered in loop.md 10.1 before any search.
+- The corpus query, restricted to papers after GPT-5.6's cutoff and extended back by month to reach 12.
+- The corpus eligibility rules, plus a GPT-5.6 topic screen on the title and abstract.
+- The hidden target is extracted from non-Introduction sections. Queries are built by the v3 writer, checker and
+  gate, then the v3.1 gap templates.
+
+**Result.**
+- 12 papers (2025-07 to 2026-07). 5 are dated after every model's cutoff; 7 are flagged, because the query writer
+  could know them.
+- Gap types: 6 understanding, 5 design, 1 method.
+- 34/36 levels pass the gate; mean answer-word overlap is 2.0–4.9%.
+- Evidence pools: 0 late or self records.
+- The designer read no title, query or target before the final runs.
+
+**Limits.**
+- Recent papers have no citations to rank by, and 8 of 12 are from one MDPI journal.
+- The targets come from a different extractor than the original 12, so test2 scores are compared within test2.
+
+## Experiment 26: method loop round 2 and the pre-registered test2 evaluation
+
+**Setup** ([loop.md](../../loop.md) section 10).
+- A dev failure analysis of the round-1 best (F9–F14): systematic decision errors that voting cannot fix, and
+  niches in the question that the forecaster ignores.
+- Iterations 6–8 on dev: 10 configurations, 480 runs. They covered CARS niche occupation (Swales), o1, BM25
+  grounding, planner/executor, ITER-RETGEN and relevance-focused grounding.
+- Two ideas were tested offline instead of built: cross-model voting and MBR consensus selection.
+- A fresh-sample replicate of the incumbent removed the winner's-curse bias from dev comparisons.
+- The finalist rule was pre-registered (10.5). No round-2 configuration reached the replicate (0.719), so the
+  round-1 method was the round-2 final. 5 configurations were run once on test2 (360 runs).
+
+**Results** (GPT-5.6 reconstruction, test2, 12 fresh papers).
+
+| Configuration | test2 | Δ vs `closed_book` [95% CI] |
+|---|---:|---|
+| `closed_book` (Llama-3.3, baseline) | 0.46 | – |
+| `text_chunks` (Llama-3.3) | 0.40 | −0.06 [−0.13, +0.01] |
+| `closed_book_o3mini` | 0.57 | +0.11 [0.00, +0.22] |
+| **`writer_only_b_o3mini`** | **0.65** | **+0.18 [+0.07, +0.31], Holm p = 0.043** |
+| `trend_ground_b_o3mini` (round-1 final, primary) | 0.57 | +0.11 [+0.01, +0.22] |
+
+- **The primary replicates** on fresh papers on both judges (DeepSeek +0.23), with a smaller effect than before.
+- **The harness adds nothing over the model** on test2: −0.003 vs o3-mini closed-book and −0.08 vs the
+  conservative writer alone. The difference comes from understanding questions. The trend forecast lands in the
+  target's class less often than o3-mini alone (0.35 vs 0.53), although it was slightly more often right on dev,
+  where it was selected.
+- **On the 5 papers after every cutoff:** writer-only 0.76, harness 0.55, baseline 0.41.
+- **Over all 16 held-out papers:** writer-only +0.14 vs the baseline (p = 0.013); harness +0.11; harness −
+  writer-only −0.03.
+- **Recommended configuration:** o3-mini with the conservative writer, chosen by parsimony; no significant win
+  over the harness is claimed.
+- **All round-2 dev methods were negative** against the replicate (−0.05 to −0.16).
+
+**Integrity.**
+- `must_obey_check.py --loop` passes on all round-2 directories and on the 5 test2 configurations.
+- 0 failed runs; leakage counters are zero; test2 runs are final.
+
+## Comparability and limits, experiments 8 to 26
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -1174,3 +1241,6 @@ error.
 - Experiment 24 uses benchmark v3.1, so its scores are not directly comparable with experiment 21 (v3). Its
   baselines were re-run on v3.1 inside the harness. Only 4 test papers were held back, and 29 configurations were
   tried on dev, so its dev numbers are optimistic and its test intervals are wide.
+- Experiments 25–26 add test2. Its targets were extracted by GPT-5.6 rather than by experiment 3's Qwen pipeline,
+  so test2 scores are compared within test2. The pooled 16-paper analysis is exploratory. 39 configurations were
+  tried on dev across both rounds; the claims rest on the pre-registered held-out comparisons.

@@ -55,3 +55,21 @@
 - The query writer is post-cutoff.
 - All test questions are understanding questions under v3.1.
 - 29 configurations were tried on dev, so dev numbers are optimistic.
+
+## Round 2 (experiment 26; loop.md section 10)
+
+- **Dev.** 10 new configurations (480 runs), all compared with a fresh-sample replicate of the round-1 best
+  (`trend_ground_b_o3mini_r2`, 0.719 vs the original 0.729):
+  - niche occupation (`niche_ground_b_*`, `trend_niche_ground_b_o3mini`);
+  - o1 (`*_o1`, `trend_o1_ground_b_o3mini`);
+  - BM25 grounding (`trend_ground_bm25_b_o3mini`);
+  - iterative retrieval (`trend_ground_iter_b_o3mini`);
+  - relevance-focused grounding (`trend_focus_ground_b_o3mini`).
+
+  All are lower (−0.05 to −0.16), so the pre-registered rule selected no new finalist.
+- **test2** (12 fresh papers, `../benchmark_test2/`). [run_final2.sh](./run_final2.sh) ran 5 configurations once
+  (360 runs). Analysis: `final2_test2.json`, `final2_test2_after_gpt56_cutoff.json`, `final2_robustness.json` and
+  `final2_heldout16_exploratory.json` (`loop_final.py --round round2`).
+- **Result.** The round-1 method beats the Llama baseline on test2 (+0.11 [+0.01, +0.22]), but o3-mini with the
+  conservative writer alone is the best configuration: 0.65 vs 0.46 baseline, Holm p = 0.043. On the 5 papers
+  after every model's cutoff it scores 0.76 vs 0.41.
