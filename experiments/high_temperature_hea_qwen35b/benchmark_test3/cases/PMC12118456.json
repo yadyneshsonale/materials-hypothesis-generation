@@ -1,0 +1,64 @@
+{
+  "schema_version": "benchmark-test3-1.0",
+  "paper_id": "PMC12118456",
+  "publication_date": "2025-05-01",
+  "split": "test3",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "introduction_without_own_contribution",
+  "query_writer": "trapi:gpt-5.6-sol_2026-07-09",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "gap": {
+    "gap_type": "understanding",
+    "evidence": "chemical complexity is a relevant factor that seems to influence thermal behavior in HEA NPs, however, theoretical understanding is still limited",
+    "reason": "The introduction identifies insufficient knowledge of how chemical complexity, size, and atomistic processes govern melting and premelting in high-entropy-alloy nanoparticles.",
+    "classifier": "gpt-5.6-sol_2026-07-09"
+  },
+  "v3_1_change": "queries rewritten for a understanding gap",
+  "queries": {
+    "broad": {
+      "text": "For high-entropy-alloy nanoparticles intended for catalysis, sensing, energy storage, corrosion-related uses, and other applications requiring thermal stability, what single testable mechanistic hypothesis could explain what governs their premelting and melting behavior and why? Specify a controlled comparison that would reveal the governing factor, the observations expected relative to a baseline, the range over which the hypothesis should hold, prior evidence that supports it, and an outcome that would falsify it.",
+      "passed_gate": true,
+      "overlap": 0.024,
+      "raw_overlap_exp19_metric": 0.045,
+      "source_role_refs": []
+    },
+    "problem_constrained": {
+      "text": "For initially solid FeNiCrCoCu high-entropy-alloy nanoparticles exposed to the premelting and melting regime, the limited understanding of their thermal response prevents clear definition of their usable temperature range and behavior during high-temperature synthesis. What single testable mechanistic hypothesis could explain what governs the onset and progression of their phase transition and why? Specify a controlled comparison, predicted observations relative to the starting baseline, relevant boundary conditions, supporting evidence from prior nanoparticle studies, and a result that would falsify the hypothesis.",
+      "passed_gate": true,
+      "overlap": 0.024,
+      "raw_overlap_exp19_metric": 0.067,
+      "source_role_refs": []
+    },
+    "expert_context": {
+      "text": "For initially solid iron–nickel–chromium–cobalt–copper high-entropy-alloy nanoparticles examined across the premelting and melting regime, limited understanding of their thermal response constrains interpretation of application limits and high-temperature synthesis, where cooling must consolidate the solid solution. Prior studies of Ag, Au, Al, and Pd nanoparticles established that nanoscale phase-transition behavior can differ markedly among particle systems, but findings from single-metal particles do not resolve the response of chemically complex nanoparticles. Work on bimetallic particles further demonstrated that chemical complexity can produce varied configurations, while research on high-entropy-alloy nanoparticles remains sparse and has not established the governing physics for this composition. What single testable mechanistic hypothesis could explain what governs its premelting and melting behavior and why? Define a controlled comparison, predicted observations relative to a baseline particle, the limits within which the hypothesis should apply, prior findings that support it, and an observation that would decisively falsify it.",
+      "passed_gate": true,
+      "overlap": 0.024,
+      "raw_overlap_exp19_metric": 0.056,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "Spherical, initially solid Fe–Ni–Cr–Co–Cu high-entropy-alloy nanoparticles cut from a random equiatomic (20% each element) FCC lattice with a 3.52 Å lattice parameter, then energy-minimized and thermally relaxed to 300 K.",
+    "intervention": "Classical molecular-dynamics simulations (LAMMPS, embedded-atom-method potential) were used to heat FeNiCrCoCu nanoparticles as a function of radius. Constructed radii were reported as 7.5, 10, 15, 20, 25, 30, 35, and 40 Å, although the Results also analyze a 5 Å particle.",
+    "conditions": "After FIRE minimization, particles were heated from 0 to 300 K over 0.2 ns in NVE with velocity rescaling and a 1 fs timestep. The thermal load increased temperature from 300 to 2500 K in 20 K increments, holding each increment for 200 ps (100 ps equilibration and 100 ps averaging), while removing net angular and linear momentum.",
+    "structural_mediator": "Preferential early mobility of Fe and Cu within the chemically disordered FCC nanoparticle, associated with element-dependent local energetic environments; Fe had a potential energy at least about 0.5 eV above the other species. High-displacement/high-strain surface atoms occupied only about 2–3 atomic layers near 900 K, rather than forming a substantial liquid shell, and mobility later propagated into the core.",
+    "mechanism": "Melting proceeds through competition between solid and liquid phases and enhanced element-specific diffusion from both the nanoparticle core and surface, rather than through a stable surface-liquid-shell mechanism. Fe mobility is attributed to its elevated local potential energy/local pressure in the multielement FCC environment, while Cu diffuses early consistently with its relatively low elemental melting point. Enhanced diffusion does not produce persistent elemental clusters or precipitates during the heating ramp.",
+    "predicted_outcome": "Relative to smaller nanoparticles, increasing particle radius raises the melting temperature toward the bulk limit. Relative to a liquid-shell/surface-premelting explanation, the nanoparticles are predicted to follow an approximately inverse-radius two-phase melting relation with no appreciable liquid-shell contribution; Fe and Cu should become mobile first, but the initially random elemental distribution should remain largely unclustered.",
+    "baseline": "The principal baselines were the fitted bulk melting limit of 2184 K, the initially random equiatomic FCC distribution, and conventional surface-melting/liquid-shell models in which unbound surface atoms dominate nanoparticle melting.",
+    "boundary": "The reported behavior holds across the simulated ultrasmall FeNiCrCoCu nanoparticles, nominally about 5–40 Å in radius, under the specified gradual thermal ramp. Preferential Fe/Cu mobility was nearly negligible at R = 5 Å and became clearer with increasing size. Slight short-range CuNi/CuCo clustering and CuCr repulsion appeared at R = 7.5–10 Å, but diminished for larger particles; the conclusions are limited to the employed interatomic potential, composition, sizes, and heating protocol.",
+    "discriminating_measurement": "Melting was identified from potential-energy-versus-temperature curves and fitted against radius and reciprocal radius. Element-resolved mean-square displacement tested preferential mobility; pair-correlation functions, Warren–Cowley parameters, atomic visualizations, common-neighbor analysis, and polyhedral-template matching tested clustering or crystalline subdomains; element-resolved potential energy and local von Mises shear strain tested the proposed energetic and spatial origin of premelting.",
+    "actual_result": "Melting temperature increased strongly with particle size and approached saturation near R = 40 Å. The size fit gave an exponent c = -0.978, close to the classical -1 inverse-radius dependence, with a fitted bulk melting point T0 = 2184 K; the reciprocal-radius fit was consistent with C = 1. Fe and Cu exhibited enhanced low-temperature mobility, with Fe showing an abrupt potential-energy/MSD increase around 1000 K. Only a few high-strain surface layers were present near 900 K, providing no evidence for a substantial liquid shell. Pair correlations showed no new peaks during heating, Warren–Cowley values were generally near zero, and structural analyses found no stable elemental clusters, precipitation, or mono-element crystalline domains, essentially independent of nanoparticle size."
+  },
+  "hidden_target_source": "extracted by trapi:gpt-5.6-sol_2026-07-09 from the abstract and non-Introduction sections (loop.md section 11.1)",
+  "rounds": 4,
+  "source": {
+    "kept_chars": 5610,
+    "removed_sentences": 0,
+    "removed_preview": []
+  },
+  "v3_queries": {
+    "broad": "For high-entropy-alloy nanoparticles, what intervention could improve resistance to premature melting and thereby extend thermal applicability? Formulate one hypothesis that identifies the intervention, explains its atomistic mechanism, predicts the change in premelting and melting behavior relative to an otherwise comparable baseline, defines the conditions under which the effect should hold, cites supporting prior evidence, and proposes an experiment that could falsify the hypothesis.",
+    "problem_constrained": "For initially solid FeNiCrCoCu high-entropy-alloy nanoparticles subjected to heating through the premelting and melting regime, what intervention could overcome susceptibility to thermally induced loss of structural stability? Formulate one hypothesis that specifies the intervention and mechanism, predicts the premelting onset and melting response relative to untreated FeNiCrCoCu nanoparticles, states the relevant particle-size and temperature boundaries, identifies supporting evidence from prior nanoparticle studies, and describes a falsification experiment.",
+    "expert_context": "Metallic-nanoparticle studies found surface premelting in Ag and Au and corner-origin melting in cuboctahedral Pd, attributed to surface stress from high-index facets. Experimental synthesis has produced high-entropy nanoparticles with diverse compositions, but their thermal behavior remains poorly understood. For initially crystalline nanoparticles composed of iron, nickel, chromium, cobalt, and copper under a temperature ramp spanning premelting and melting, what intervention could reduce thermally induced structural instability? Formulate one hypothesis that specifies the intervention, explains its atomistic mechanism, predicts the response relative to an unchanged baseline, defines its applicability limits, cites supporting prior evidence, and proposes a decisive falsification experiment."
+  }
+}

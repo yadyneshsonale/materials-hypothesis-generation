@@ -25,9 +25,13 @@ Last updated: 2026-10-25 (see the change log at the end).
   | **dev** (8, used for method development) | PMC10759803 (2024-01-02), PMC11077685 (2024-02-28), PMC11087546 (2024-05-10), PMC11355469 (2024-08-07), PMC11375712 (2024-08-22), PMC11375216 (2024-09-04), PMC11775865 (2024-11-21), PMC11606917 (2024-11-29) |
   | **test** (4, used once per pre-registered final configuration) | PMC12029629 (2025-04-19), PMC12298864 (2025-07-09), PMC12806431 (2025-10-27), PMC12941549 (2026-02-16) |
   | **test2** (12, fresh held-out set, used once for the round-2 pre-registered finals) | 12 open-access papers dated 2025-07-01 to 2026-07-01, not in the corpus; 5 are after GPT-5.6's cutoff. Built by [benchmark_test2.py](./benchmark_test2.py) under the rule in [loop.md](./loop.md) section 10.1; cases in `experiments/high_temperature_hea_qwen35b/benchmark_test2/cases` |
+  | **test3** (12, fresh held-out set for round 3) | 12 open-access papers dated 2024-01-01 to 2025-06-01, not in the corpus or test2; all precede GPT-5.6's cutoff (flagged). Built by `benchmark_test2.py --set test3` under loop.md 11.1; cases in `experiments/high_temperature_hea_qwen35b/benchmark_test3/cases` |
 
-  test2 papers are not evidence for any case. Their evidence pool is the 50-paper corpus filtered by date, and
-  "all" still means the original 12 cases.
+  test2 and test3 papers are not evidence for any case. Their evidence pool is the 50-paper corpus filtered by date,
+  and "all" still means the original 12 cases.
+  - **Spent splits.** A held-out split used once for its pre-registered finals is *spent*. It becomes development
+    data, and no later claim rests on it.
+  - From round 3, development uses **dev3** = dev + test + test2 (24 papers). Claims rest on test3 (loop.md 11.1).
 
 - **Queries.** `experiments/high_temperature_hea_qwen35b/benchmark_v3_1/cases` is the current frozen version
   (section 3).
@@ -76,7 +80,7 @@ paper is 2024-01-02.
 |---|---|---|
 | Llama-3.3-70B-Instruct_5 | December 2023 ([Meta model card](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct)) | allowed (flag PMC10759803) |
 | gcr-llama-31-8b-instruct | December 2023 ([Meta model card](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct)) | allowed (flag PMC10759803) |
-| gpt-4o_2024-11-20 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/gpt-4o)) | allowed (often rate-limited) |
+| gpt-4o_2024-11-20 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/gpt-4o)) | allowed after a probe; its probe could not complete (rate limited, 0/24 calls on 2026-10-25), so it is not used |
 | gpt-4o-mini_2024-07-18 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/gpt-4o-mini)) | allowed |
 | o1_2024-12-17 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/o1)) | allowed (probe: 21% specific recall, all inferable from titles; loop.md 10.4) |
 | o3-mini_2025-01-31 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/o3-mini)) | allowed |
@@ -131,6 +135,8 @@ preferred future option.
 
 1. **No target in payloads.** No hidden-target field or result-derived text may enter any query-facing payload.
    Enforce this in code with `stage_metrics.assert_target_free`, and test it.
+   - The judge sees every field of a generation, so a final hypothesis keeps only the shared schema fields
+     (`hypo_loop._schema_only`). A method cannot add extra judged content, such as recalled precedents or notes.
 2. **Blinding.** Judges see neutral evidence labels. Selectors and rankers see shuffled candidates with neutral
    labels. Never pass arm names, model names or the held-out paper's ID or title.
 3. **Pairwise judgments.** Run every pairwise judgment in both orders, and resolve ties and conflicts by a written
@@ -164,6 +170,8 @@ preferred future option.
      not print the content of unused held-out cases.
    - Compare new variants with a fresh-sample replicate of the incumbent, not with its selected dev score (winner's
      curse).
+   - Spend a fresh held-out set only on a dev gain over the incumbent whose CI excludes zero. Otherwise report "no
+     improvement found". Two dev winners whose CIs crossed zero (loop.md 7, 11.7) failed on fresh papers.
 6. **Failures.** Never drop failed runs. Retry once, keep the first attempt in `failed_attempts/`, and report
    failures per arm.
 7. **Integrity gate.** Expected runs are present, judged and audited; leakage counts are zero; one generator
@@ -244,3 +252,9 @@ Ablate before combining. Combine only components that helped or that address dif
     incumbent.
   - o1 cleared by its memorisation probe.
   - `must_obey_check.py` freezes test2 queries and requires test2 runs to be final.
+- 2026-10-25 (round 3):
+  - test and test2 are spent and form the development set dev3 with dev (24 papers).
+  - test3, 12 fresh papers from 2024-01 to 2025-06, was built under a rule pre-registered before any search
+    (loop.md 11.1). `must_obey_check.py` requires final runs only on unspent held-out splits (test3).
+  - Final hypotheses are restricted to the schema fields.
+  - gpt-4o is not used: its memorisation probe could not complete because of rate limits.

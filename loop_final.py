@@ -32,10 +32,43 @@ ROUNDS: dict[str, dict[str, Any]] = {
                "exploratory": (("trend_ground_b_o3mini", "closed_book_o3mini"),
                                ("trend_ground_b_o3mini", "writer_only_b_o3mini"), ("text_chunks", "closed_book")),
                "splits": ("test2",), "prefix": "final2"},
+    # Round 3 (loop.md sections 11.1 and 11.6): F3 chosen on dev3 by rule; run once on the fresh test3 set.
+    "round3": {"final": ("text_chunks_mbr_b_o3mini", "writer_only_b_o3mini", "trend_ground_b_o3mini", "closed_book"),
+               "primary": ("text_chunks_mbr_b_o3mini", "writer_only_b_o3mini"),
+               "secondary": (("text_chunks_mbr_b_o3mini", "closed_book"), ("writer_only_b_o3mini", "closed_book"),
+                             ("trend_ground_b_o3mini", "closed_book")),
+               "exploratory": (("text_chunks_mbr_b_o3mini", "trend_ground_b_o3mini"),),
+               "splits": ("test3",), "prefix": "final3"},
 }
 FINAL = ROUNDS["round1"]["final"]
 PRIMARY = ROUNDS["round1"]["primary"]
 SECONDARY = ROUNDS["round1"]["secondary"]
+
+# Round 3 (loop.md section 11): development on dev3 against the incumbent's fresh-sample replicate.
+ROUND3_REFERENCE = "writer_only_b_o3mini_r3"
+ROUND3_CANDIDATES = ("writer_only_b_o3mini", "forecast_writer_b_o3mini", "analogy_writer_b_o3mini",
+                     "writer_only_b_o3mini_high", "writer_mbr_b_o3mini", "text_chunks_b_o3mini", "text_chunks_mbr_b_o3mini",
+                     "trend_ground_b_o3mini", "closed_book_o3mini", "closed_book")
+
+
+def dev3_compare(candidates: tuple[str, ...] = ROUND3_CANDIDATES, reference: str = ROUND3_REFERENCE) -> dict:
+    """Every candidate against the reference on dev3 (24 papers), both judges, reconstruction and core."""
+    rows = H.load_scored()
+    out: dict[str, Any] = {"reference": reference, "split": "dev3", "methods": {}}
+    for m in (reference, *candidates):
+        rs = [r for r in rows if r["run"]["method"] == m and r["run"]["split"] in H.SPLITS["dev3"]]
+        entry: dict[str, Any] = {"runs": len(rs), "judged_gpt": sum(1 for r in rs if r["gpt"]),
+                                 "judged_deep": sum(1 for r in rs if r["deep"])}
+        for judge in ("gpt", "deep"):
+            for name, metric in (("recon", H.recon), ("core", H.core)):
+                u = H.unit_scores(rows, m, judge, "dev3", metric)
+                entry[f"{judge}_{name}"] = round(statistics.fmean(u.values()), 3) if u else None
+                if m != reference:
+                    entry[f"{judge}_{name}_vs_reference"] = H.paired(u, H.unit_scores(rows, reference, judge, "dev3",
+                                                                                      metric))
+        out["methods"][m] = entry
+    atomic_json(H.OUT / "round3_dev3.json", out)
+    return out
 
 
 def analyse(split: str, round_: str = "round1", papers: set[str] | None = None, tag: str = "") -> dict:
@@ -116,7 +149,7 @@ def robustness(round_: str = "round1") -> dict[str, Any]:
             block[f] = {"pooled_rho": spearman([a for a, _ in pairs], [b for _, b in pairs]), "n": len(pairs),
                         "within_method_rho": within}
         out["style_vs_score"][judge] = block
-    for split in sorted(cfg["splits"], key=("dev", "test", "all", "test2").index):
+    for split in sorted(cfg["splits"], key=("dev", "test", "all", "test2", "test3", "dev3").index):
         per_unit: dict[str, dict[tuple[str, str], list[dict[str, float]]]] = {m: defaultdict(list) for m in primary_pair}
         for r in rows:
             if r["run"]["method"] in primary_pair and r["run"]["split"] in H.SPLITS[split]:

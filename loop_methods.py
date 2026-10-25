@@ -853,3 +853,94 @@ def _ground_focused(h: Harness, notes: dict[str, Any]) -> list[Any]:
 def m_trend_focus_ground_b(h: Harness, model: str = "o3mini") -> dict[str, Any]:
     notes = _trend_notes_relevant(h, model)
     return write(h, notes, model, records=_ground_focused(h, notes), system=WRITER_B)
+
+
+# ================================================================ round 3 (loop.md section 11): writer-level methods
+# Round 2 on fresh papers: only the model and the writer generalised; the dev-selected harness steps did not. Round 3
+# therefore varies the single writer call of the incumbent (`writer_only_b_o3mini`) and is developed on dev3 (24
+# papers). Each final hypothesis keeps only the shared schema fields (Harness.generate_final).
+
+register("writer_only_b_o3mini_r3")(lambda h: m_writer_only_b(h, "o3mini"))  # fresh-sample replicate (11.1)
+
+# R1. Forecasting framing (Luo et al. 2024, BrainBench; Halawi et al. 2024): the task is to predict a result that
+# already exists, so ask for the study the authors most plausibly ran with standard methods, not the most novel idea.
+WRITER_FORECAST = WRITER_B + (
+    "\nThe question was written from the introduction of a paper you have not seen; its result already exists. "
+    "Forecast it: write the hypothesis the authors most plausibly tested and supported, that is the study or "
+    "intervention a competent group in this field would most likely carry out next to address exactly the stated gap "
+    "with standard methods, and the result they most likely observed. Prefer the most probable over the most novel."
+)
+
+
+@register("forecast_writer_b_o3mini")
+def m_forecast_writer_b(h: Harness, model: str = "o3mini") -> dict[str, Any]:
+    return write(h, {}, model, system=WRITER_FORECAST)
+
+
+# R2. Self-generated analogies (Yasunaga et al. 2024, C10): strong models benefit from recalling their own relevant
+# exemplars before solving. Two calls, so the recalled studies never enter the judged hypothesis.
+RECALL_SYSTEM = (
+    "Before anyone answers a materials-science research question, recall up to three earlier published studies "
+    "(before the knowledge cutoff) that addressed the same kind of gap in the same or closely related materials: "
+    "what they studied or changed, how (technique, conditions), and what they found. Include only studies you are "
+    "confident exist; if unsure, describe the general approach the field used instead of naming a study. Return JSON "
+    "{\"precedents\": [{\"study\": str, \"approach\": str, \"finding\": str}]}."
+)
+
+
+@register("analogy_writer_b_o3mini")
+def m_analogy_writer_b(h: Harness, model: str = "o3mini") -> dict[str, Any]:
+    raw = h.ask("recaller", model, RECALL_SYSTEM, {"question": h.query, "knowledge_cutoff": h.cutoff}, max_out=4000)
+    precedents = [p for p in (raw.get("precedents", []) if isinstance(raw, dict) else []) if isinstance(p, dict)][:3]
+    h.notes["recalled_precedents"] = precedents
+    return write(h, {"recalled_precedents": precedents}, model, system=WRITER_B)
+
+
+# R3. More test-time reasoning (OpenAI o3-mini reasoning_effort="high"; Snell et al. 2024): same writer, same model.
+register("writer_only_b_o3mini_high")(lambda h: m_writer_only_b(h, "o3mini_high"))
+
+
+# R4. Minimum-Bayes-risk selection (S9) among five independent writer samples: keep the medoid by content-word
+# Jaccard similarity of the core fields. Target-free and model-free selection.
+_STOP_R3 = set("the and for with from that this into within between than their which while where when what given are "
+               "was were been has have how does one two new also such both each more less can could would should may "
+               "might will its not via based under over using use".split())
+
+
+def _core_words(g: dict[str, Any]) -> set[str]:
+    text = " ".join(str(g.get(k, "")) for k in ("hypothesis", "intervention", "mechanism", "conditions",
+                                                "predicted_outcome"))
+    return {w for w in re.findall(r"[a-z0-9][a-z0-9\-]+", text.lower()) if len(w) > 2 and w not in _STOP_R3}
+
+
+def medoid(candidates: list[dict[str, Any]]) -> int:
+    words = [_core_words(c) for c in candidates]
+    sims = [sum(len(words[i] & words[j]) / max(1, len(words[i] | words[j])) for j in range(len(words)) if j != i)
+            for i in range(len(words))]
+    return max(range(len(candidates)), key=lambda i: (sims[i], -i))
+
+
+@register("writer_mbr_b_o3mini")
+def m_writer_mbr_b(h: Harness, model: str = "o3mini", k: int = 5) -> dict[str, Any]:
+    candidates = [write(h, {}, model, role="candidate_writer", system=WRITER_B) for _ in range(k)]
+    best = medoid(candidates)
+    h.notes["mbr"] = {"k": k, "selected": best}
+    return candidates[best]
+
+
+# R5. Evidence without a forecast: question-retrieved text chunks with the incumbent's writer and model. Isolates the
+# evidence effect for o3-mini (round 1 only had it with a decision or forecast step).
+@register("text_chunks_b_o3mini")
+def m_text_chunks_b(h: Harness, model: str = "o3mini") -> dict[str, Any]:
+    return write(h, {}, model, records=h.pack(h.query, "text_chunks"), system=WRITER_B)
+
+
+# R6 (combination, loop.md 11.5): R5's question-retrieved evidence and R4's medoid of five samples address different
+# failures (F17 conditions and unsupported claims; sample variance). Same evidence pack for all five samples.
+@register("text_chunks_mbr_b_o3mini")
+def m_text_chunks_mbr_b(h: Harness, model: str = "o3mini", k: int = 5) -> dict[str, Any]:
+    records = h.pack(h.query, "text_chunks")
+    candidates = [write(h, {}, model, records=records, role="candidate_writer", system=WRITER_B) for _ in range(k)]
+    best = medoid(candidates)
+    h.notes["mbr"] = {"k": k, "selected": best}
+    return candidates[best]

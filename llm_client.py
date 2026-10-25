@@ -143,11 +143,12 @@ def judge_info() -> str:
 
 def trapi_chat_json(deployment: str, system: str, user: str, *, max_tokens: int,
                     token_field: str = "max_completion_tokens", temperature: float | None = None,
-                    retries: int = 6) -> Any:
+                    retries: int = 6, reasoning_effort: str | None = None) -> Any:
     """JSON chat call to a named TRAPI deployment.
 
     token_field follows the deployment's API: OpenAI reasoning and recent models take max_completion_tokens,
     while some open models take max_tokens. temperature is omitted when None (required for o-series models).
+    reasoning_effort ("low", "medium", "high") is sent only when given (o-series models only).
     Rate limits (HTTP 429) are retried after the wait TRAPI reports; other transient failures are retried
     with exponential backoff. Truncated responses raise TruncatedError.
     """
@@ -160,6 +161,9 @@ def trapi_chat_json(deployment: str, system: str, user: str, *, max_tokens: int,
     }
     if temperature is not None:
         payload["temperature"] = temperature
+    if reasoning_effort is not None:
+        payload["reasoning_effort"] = reasoning_effort
+    retries = max(retries, int(os.environ.get("MATHG_MIN_RETRIES", "0")))  # resilience under shared rate limits
     timeout = float(os.environ.get("MATHG_REQUEST_TIMEOUT", "240"))
     last_err: Exception | None = None
     for attempt in range(retries):

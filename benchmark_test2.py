@@ -45,6 +45,38 @@ TOPIC = ('TITLE_ABS:("high entropy alloy" OR "high-entropy alloy") AND TITLE_ABS
          'AND OPEN_ACCESS:Y AND HAS_FT:Y')
 WINDOW = ("2026-02-17", "2026-10-15")
 FLOOR = "2024-02-01"
+EXTEND = True
+SPLIT = "test2"
+RULE = "loop.md section 10.1"
+EXCLUDE_SETS: tuple[str, ...] = ()
+# Held-out sets built by this procedure. test2: loop.md 10.1 (window extended back by month until 12 qualify).
+# test3: loop.md 11.1 (the window before test2, ranked by citations, never extended; excludes test2 papers).
+SETS: dict[str, dict[str, Any]] = {
+    "test2": {"out": "benchmark_test2", "window": ("2026-02-17", "2026-10-15"), "extend": True, "split": "test2",
+              "rule": "loop.md section 10.1", "exclude_sets": ()},
+    "test3": {"out": "benchmark_test3", "window": ("2024-02-01", "2025-07-16"), "extend": False, "split": "test3",
+              "rule": "loop.md section 11.1", "exclude_sets": ("test2",)},
+}
+
+
+def configure(name: str) -> None:
+    global OUT, PAPERS, CASES_OUT, WINDOW, EXTEND, SPLIT, RULE, EXCLUDE_SETS
+    cfg = SETS[name]
+    OUT = EXPERIMENT_DIR / cfg["out"]
+    PAPERS, CASES_OUT = OUT / "papers", OUT / "cases"
+    WINDOW, EXTEND, SPLIT, RULE, EXCLUDE_SETS = cfg["window"], cfg["extend"], cfg["split"], cfg["rule"], \
+        cfg["exclude_sets"]
+
+
+def excluded_rows() -> list[dict[str, Any]]:
+    """Corpus papers plus the papers of earlier held-out sets (title and ID), for exclusion and near-duplicates."""
+    rows = [{"paper_id": c["paper_id"], "title": c.get("title", "")} for c in corpus()]
+    for name in EXCLUDE_SETS:
+        path = EXPERIMENT_DIR / SETS[name]["out"] / "selected.json"
+        rows += [{"paper_id": p["pmcid"], "title": p.get("title", "")} for p in _read_json(path)]
+    return rows
+
+
 N_CASES = 12
 MIN_INTRO_CHARS = 1000
 NEAR_DUPLICATE = 0.8
@@ -150,10 +182,10 @@ def screen_one(row: dict[str, Any], corpus_rows: list[dict[str, Any]]) -> dict[s
     if not pmcid:
         return {**decision, "eligible": False, "reason": "no PMCID"}
     if pmcid in {c["paper_id"] for c in corpus_rows}:
-        return {**decision, "eligible": False, "reason": "in corpus"}
+        return {**decision, "eligible": False, "reason": "in corpus or an earlier held-out set"}
     near = max((jaccard(row.get("title", ""), c.get("title", "")) for c in corpus_rows), default=0.0)
     if near >= NEAR_DUPLICATE:
-        return {**decision, "eligible": False, "reason": f"near-duplicate of a corpus title ({near:.2f})"}
+        return {**decision, "eligible": False, "reason": f"near-duplicate of an excluded title ({near:.2f})"}
     date, source = earliest_date(row)
     decision.update({"earliest_public_date": date, "date_source": source})
     path = PAPERS / pmcid / "input" / "article.xml"
@@ -183,7 +215,7 @@ def screen_one(row: dict[str, Any], corpus_rows: list[dict[str, Any]]) -> dict[s
 
 
 def screen_stage() -> dict[str, Any]:
-    corpus_rows = corpus()
+    corpus_rows = excluded_rows()
     start, rounds, decisions, eligible = WINDOW[0], [], [], []
     seen: set[str] = set()
     while True:
@@ -204,11 +236,11 @@ def screen_stage() -> dict[str, Any]:
                                  "abstract": row.get("abstractText", "")})
                 if len(eligible) >= N_CASES:
                     break
-        if len(eligible) >= N_CASES or start <= FLOOR:
+        if len(eligible) >= N_CASES or start <= FLOOR or not EXTEND:
             break
         start = max(_month_back(start), FLOOR)
         seen = {d["pmcid"] for d in decisions}
-    summary = {"rule": "loop.md section 10.1", "rounds": rounds, "screened": len(decisions),
+    summary = {"rule": RULE, "rounds": rounds, "screened": len(decisions),
                "eligible": len(eligible), "reasons": dict(Counter(d["reason"].split(":")[0].split(" (")[0]
                                                                   for d in decisions)),
                "selected": [e["pmcid"] for e in eligible]}
@@ -313,8 +345,8 @@ def build_case(paper: dict[str, Any]) -> dict[str, Any]:
         history += [{**h, "pass": "v3.1"} for h in history2]
         change = f"queries rewritten for a {gap['gap_type']} gap"
     case = {
-        "schema_version": "benchmark-test2-1.0", "paper_id": pid, "publication_date": paper["earliest_public_date"],
-        "split": "test2", "benchmark_claim": "retrospective_temporal_reconstruction",
+        "schema_version": f"benchmark-{SPLIT}-1.0", "paper_id": pid, "publication_date": paper["earliest_public_date"],
+        "split": SPLIT, "benchmark_claim": "retrospective_temporal_reconstruction",
         "query_source": "introduction_without_own_contribution", "query_writer": f"trapi:{v3.WRITER}",
         "leakage_checker": f"trapi:{v3.CHECKER}", "gap": gap, "v3_1_change": change,
         "queries": {level: {"text": queries.get(level, ""), "passed_gate": results.get(level, {}).get("passed", False),
@@ -322,7 +354,7 @@ def build_case(paper: dict[str, Any]) -> dict[str, Any]:
                             "raw_overlap_exp19_metric": round(v3.raw_overlap(queries.get(level, ""), target), 3),
                             "source_role_refs": []} for level in QUERY_LEVELS},
         "hidden_target": target, "hidden_target_source": f"extracted by trapi:{BUILDER} from the abstract and "
-                                                           "non-Introduction sections (loop.md 10.1)",
+                                                           f"non-Introduction sections ({RULE})",
         "rounds": len(history), "source": {k: v for k, v in source.items() if k != "text"},
         "v3_queries": v3_queries,
     }
@@ -347,14 +379,14 @@ def queries_stage(workers: int = 6) -> list[dict[str, Any]]:
 
 
 def metadata_stage() -> dict[str, Any]:
-    """Metadata rows in the corpus format, so the harness can date and exclude test2 cases."""
+    """Metadata rows in the corpus format, so the harness can date and exclude the held-out cases."""
     rows = {}
     for paper in _read_json(OUT / "selected.json"):
         rows[paper["pmcid"]] = {"paper_id": paper["pmcid"], "title": paper["title"], "doi": paper["doi"],
                                 "earliest_public_date": paper["earliest_public_date"],
                                 "earliest_public_date_source": paper["date_source"],
                                 "work_family_id": f"doi:{paper['doi']}" if paper["doi"] else paper["pmcid"],
-                                "journal": paper["journal"], "cited_by": paper["cited_by"], "split": "test2"}
+                                "journal": paper["journal"], "cited_by": paper["cited_by"], "split": SPLIT}
     atomic_json(OUT / "metadata.json", rows)
     return {"papers": len(rows), "dates": sorted(r["earliest_public_date"] for r in rows.values())}
 
@@ -362,14 +394,25 @@ def metadata_stage() -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("stage", choices=("screen", "target", "queries", "metadata", "all"))
+    parser.add_argument("--set", default="test2", choices=tuple(SETS), help="which held-out set to build")
+    parser.add_argument("--workers", type=int, default=6)
+    parser.add_argument("--retries", type=int, default=6, help="TRAPI retries per call (rate limits)")
     args = parser.parse_args()
+    configure(args.set)
+    if args.retries != 6:  # resilience only: more retries of the same call, no change to any prompt or rule
+        _call = lc.trapi_chat_json
+
+        def _patient(*a: Any, **kw: Any) -> Any:
+            kw.setdefault("retries", args.retries)
+            return _call(*a, **kw)
+        lc.trapi_chat_json = _patient
     if args.stage in ("screen", "all"):
         if not (OUT / "selected.json").exists():
             print(json.dumps(screen_stage(), indent=1))
     if args.stage in ("target", "all"):
         print(target_stage())
     if args.stage in ("queries", "all"):
-        for row in queries_stage():
+        for row in queries_stage(args.workers):
             print(json.dumps(row))
     if args.stage in ("metadata", "all"):
         print(metadata_stage())

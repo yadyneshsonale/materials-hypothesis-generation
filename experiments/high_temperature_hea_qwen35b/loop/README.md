@@ -73,3 +73,27 @@
 - **Result.** The round-1 method beats the Llama baseline on test2 (+0.11 [+0.01, +0.22]), but o3-mini with the
   conservative writer alone is the best configuration: 0.65 vs 0.46 baseline, Holm p = 0.043. On the 5 papers
   after every model's cutoff it scores 0.76 vs 0.41.
+
+## Round 3 (experiment 28; loop.md section 11)
+
+- **Development set dev3.** dev plus the spent test and test2 splits: 24 papers, 72 units. The reference is a
+  fresh-sample replicate of the incumbent (`writer_only_b_o3mini_r3`, 0.642).
+- **Runs.** [run_batch3.sh](./run_batch3.sh) ran 7 configurations on dev3 (1,008 runs); comparison in
+  `round3_dev3.json`:
+  - `forecast_writer_b_o3mini`;
+  - `analogy_writer_b_o3mini`;
+  - `writer_only_b_o3mini_high`;
+  - `writer_mbr_b_o3mini`;
+  - `text_chunks_b_o3mini`;
+  - `text_chunks_mbr_b_o3mini`;
+  - the replicate itself.
+- **Failure analysis.** `failure_r3.json` (with `failure_r3_codes.json`).
+- **test3** (12 fresh papers, `../benchmark_test3/`). [run_final3.sh](./run_final3.sh) ran 4 configurations once
+  (288 runs). Analysis: `final3_test3.json`, `final3_robustness.json` and `final3_heldout28_exploratory.json`
+  (`loop_final.py --round round3`).
+- **Result.**
+  - The dev3 winner (evidence + MBR, +0.045) is −0.045 against the incumbent on test3.
+  - Over 28 fresh papers, the incumbent (o3-mini with the conservative writer) is the best configuration: 0.60 vs
+    0.49 baseline (GPT-5.6, p = 0.009).
+- **Exception.** dev3 runs are judged by both judges, but only F3's are audited, and none are labelled (GPT-5.6 rate
+  limits).

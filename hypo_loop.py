@@ -63,6 +63,8 @@ MODELS = {  # query-facing deployments (all pre-cutoff, see must_obey.md section
                "max_out": 8000},
     "o3mini": {"deployment": "o3-mini_2025-01-31", "token_field": "max_completion_tokens", "temperature": None,
                "max_out": 20000},
+    "o3mini_high": {"deployment": "o3-mini_2025-01-31", "token_field": "max_completion_tokens", "temperature": None,
+                    "max_out": 40000, "reasoning_effort": "high"},
     "o1": {"deployment": "o1_2024-12-17", "token_field": "max_completion_tokens", "temperature": None,
            "max_out": 20000},
 }
@@ -73,19 +75,25 @@ for _spec in MODELS.values():
 # ---------------------------------------------------------------- cases and splits
 
 TEST2_DIR = EXPERIMENT_DIR / "benchmark_test2"  # fresh held-out set (loop.md section 10.1)
-SPLITS = {"dev": {"dev"}, "test": {"test"}, "test2": {"test2"}, "all": {"dev", "test"}}  # "all" = the original 12
-HELD_OUT = ("test", "test2")
+HELD_OUT_DIRS = (TEST2_DIR, EXPERIMENT_DIR / "benchmark_test3")  # test3: loop.md section 11.1
+# "all" = the original 12. dev3 = development set of round 3 (loop.md 11.1): dev plus the spent test and test2 splits.
+SPLITS = {"dev": {"dev"}, "test": {"test"}, "test2": {"test2"}, "test3": {"test3"}, "all": {"dev", "test"},
+          "dev3": {"dev", "test", "test2"}}
+HELD_OUT = ("test", "test2", "test3")
+SPENT = ("test", "test2")  # each used once for its pre-registered finals; development data from round 3 on
 
 
 def cases() -> dict[str, dict[str, Any]]:
-    """Benchmark v3.1 cases plus test2 cases. test2 papers get corpus-style metadata rows so that the evidence pool,
-    temporal filter and family exclusion apply unchanged; they have no evidence records themselves."""
+    """Benchmark v3.1 cases plus the later held-out sets. Their papers get corpus-style metadata rows so that the
+    evidence pool, temporal filter and family exclusion apply unchanged; they have no evidence records themselves."""
     if "loop_cases" not in rx._cache:
         merged = dict(rx.cases())
-        if (TEST2_DIR / "cases").exists():
+        for directory in HELD_OUT_DIRS:
+            if not (directory / "cases").exists():
+                continue
             meta = rx.metadata()
-            rows = _read_json(TEST2_DIR / "metadata.json") if (TEST2_DIR / "metadata.json").exists() else {}
-            for path in sorted((TEST2_DIR / "cases").glob("PMC*.json")):
+            rows = _read_json(directory / "metadata.json") if (directory / "metadata.json").exists() else {}
+            for path in sorted((directory / "cases").glob("PMC*.json")):
                 case = _read_json(path)
                 merged[case["paper_id"]] = case
                 meta.setdefault(case["paper_id"], rows.get(case["paper_id"]) or {
@@ -111,6 +119,12 @@ def run_id(paper: str, level: str, method: str, sample: int) -> str:
 
 class TargetLeak(RuntimeError):
     pass
+
+
+def _schema_only(generation: dict[str, Any]) -> dict[str, Any]:
+    """The judge sees every field of a generation, so a final hypothesis keeps only the shared schema fields; a method
+    cannot hand the judge extra content (none of the 2,376 runs before round 3 had extra fields)."""
+    return {k: v for k, v in generation.items() if k in HYPOTHESIS_FIELDS}
 
 
 class Harness:
@@ -155,16 +169,19 @@ class Harness:
             cap = max(cap, 12000)
         try:
             raw = lc.trapi_chat_json(spec["deployment"], system, user, max_tokens=cap, token_field=spec["token_field"],
-                                     temperature=spec["temperature"], retries=8)
+                                     temperature=spec["temperature"], retries=8,
+                                     reasoning_effort=spec.get("reasoning_effort"))
         except lc.TruncatedError:
             # A truncated JSON answer is retried once with double the cap (the ratchet: a seen failure becomes a rule).
             self.trace.append({"role": role, "model": spec["deployment"], "event": "truncated", "cap": cap})
             raw = lc.trapi_chat_json(spec["deployment"], system, user, max_tokens=cap * 2,
-                                     token_field=spec["token_field"], temperature=spec["temperature"], retries=8)
+                                     token_field=spec["token_field"], temperature=spec["temperature"], retries=8,
+                                     reasoning_effort=spec.get("reasoning_effort"))
         self.models.setdefault(role, f"trapi:{spec['deployment']}")
         self.trace.append({"role": role, "model": spec["deployment"], "chars_in": len(system) + len(user),
                            "chars_out": len(json.dumps(raw, ensure_ascii=False)),
-                           "seconds": round(time.time() - started, 2)})
+                           "seconds": round(time.time() - started, 2),
+                           **({"reasoning_effort": spec["reasoning_effort"]} if spec.get("reasoning_effort") else {})})
         return raw
 
     def generate_final(self, role: str, model: str, system: str, payload: dict[str, Any],
@@ -172,7 +189,7 @@ class Harness:
         """Final hypothesis with the same validation and one repair call as the baselines."""
         raw = self.ask(role, model, system, payload)
         try:
-            out = _validate_generation(raw, allowed)
+            out = _schema_only(_validate_generation(raw, allowed))
             out["citation_validation"] = {"status": "valid", "removed_unknown_ids": []}
             return out
         except ValueError as error:
@@ -181,7 +198,7 @@ class Harness:
                                             "statement, and evidence ID arrays may contain only exact IDs from "
                                             "allowed_evidence_ids."}
             raw = self.ask(f"{role}_repair", model, system, repair)
-            out = _validate_generation(raw, allowed)
+            out = _schema_only(_validate_generation(raw, allowed))
             out["citation_validation"] = {"status": "valid_after_regeneration", "initial_error": str(error)}
             return out
 
@@ -268,7 +285,8 @@ def generate_one(method: str, case: dict[str, Any], level: str, sample: int, fin
     path = OUT / method / "runs" / f"{rid}.json"
     atomic_json(path, {
         "run_id": rid, "paper_id": case["paper_id"], "query_level": level, "method": method, "sample": sample,
-        "split": split_of(case), "final": final, "benchmark": "test2" if split_of(case) == "test2" else "v3.1",
+        "split": split_of(case), "final": final,
+        "benchmark": split_of(case) if split_of(case) in ("test2", "test3") else "v3.1",
         "query": h.query,
         "publication_date": h.cutoff, "models": h.models, "status": status, "error": error,
         "generation": generation, "seen_ids": sorted(h.seen), "cited_ids": cited,
@@ -282,7 +300,7 @@ def generate_one(method: str, case: dict[str, Any], level: str, sample: int, fin
 
 
 def generate_stage(method: str, split: str, workers: int, final: bool) -> dict[str, int]:
-    if split != "dev" and not final:
+    if SPLITS[split] & (set(HELD_OUT) - set(SPENT)) and not final:
         raise SystemExit("held-out runs must be pre-registered finals: pass --final (must_obey.md 6.5)")
     jobs = []
     for case, level in units(split):

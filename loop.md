@@ -9,6 +9,11 @@ Round 2 is section 10: a failure analysis of the round-1 best, iterations 6–8,
 12 papers) with its pre-registered results. Its summary is section 10.7. **On fresh papers the best-supported
 configuration is o3-mini with the conservative writer (one call per hypothesis).**
 
+Round 3 is section 11: a 24-paper development set, writer-level methods, and a third fresh set (test3). Its
+summary is section 11.8. **No further increase was found.** The round-3 dev winner failed on test3. Over all 28
+fresh held-out papers the same one-call configuration scores 0.60 against 0.49 for the Llama baseline (GPT-5.6,
+sign p = 0.009).
+
 **Code.**
 - [hypo_loop.py](./hypo_loop.py): the harness, with rule enforcement, logging and evaluation.
 - [loop_methods.py](./loop_methods.py): the methods.
@@ -899,3 +904,256 @@ Means over the 16 papers (GPT-5.6 / DeepSeek):
 - [x] Paired statistics with clustered-bootstrap CIs and Holm. Negative results are recorded (iterations 6–8, two
   offline negatives).
 - [x] Experiment log (experiments 25–26), READMEs and loop.md updated.
+
+---
+
+## 11. Round 3 ("increase it more"): a larger development set, writer-level methods and a fresh test3
+
+### 11.1 Protocol and pre-registered test3 rule (written 2026-10-25 09:31, before any test3 search or round-3 result)
+
+1. **Development set dev3 = dev (8) + test (4) + test2 (12) = 24 papers, 72 units.**
+   - test and test2 are spent: each was used once for its pre-registered finals. They become development data, and
+     no further claim rests on them.
+   - Reason: round 2 showed that a method selected on 8 papers does not generalise (the trend forecaster: class
+     hit 0.38 on dev, 0.35 on test2 vs 0.53 for the plain writer).
+2. **Incumbent.** `writer_only_b_o3mini`, the round-2 recommendation. Its fresh-sample replicate on dev3
+   (`writer_only_b_o3mini_r3`) is the reference for every round-3 comparison (must_obey.md 6.5).
+3. **test3: built like test2** (`benchmark_test2.py`, set `test3`).
+   - The corpus query restricted to `FIRST_PDATE:[2024-02-01 TO 2025-07-16]`: the window just before test2, and
+     at least one month after every generator's cutoff.
+   - Ranked by Europe PMC `citedByCount`, which is meaningful here because these papers have had time to be cited.
+   - Excludes corpus papers (including the 12 original cases), test2 papers and near-duplicates.
+   - The same topic rule and Introduction rule; the first 12 eligible papers are taken.
+   - All test3 papers precede GPT-5.6's cutoff, so the query writer could know them. They are flagged, which is the
+     same residual risk as the original 12.
+   - Targets from the non-Introduction sections; queries from the v3 writer, checker and gate, then the v3.1 gap
+     templates.
+   - Nobody reads test3 titles, queries or targets before the final runs.
+4. **Finalist rule.** F3 is the dev3 configuration with the highest GPT-5.6 reconstruction, provided it is above
+   the incumbent's replicate. Ties within 0.01 are broken by DeepSeek.
+   - test3 is run once with `closed_book`, `writer_only_b_o3mini`, `trend_ground_b_o3mini`, F3, and F3's
+     model-only control if F3 uses another model.
+   - **Primary:** F3 − `writer_only_b_o3mini` on test3, if F3 exists; otherwise `writer_only_b_o3mini` −
+     `closed_book`.
+   - **Secondary (Holm):** F3 − `closed_book`, `writer_only_b_o3mini` − `closed_book` and `trend_ground_b_o3mini`
+     − `closed_book`, on GPT-5.6, DeepSeek and core.
+
+### 11.2 Failure analysis of the incumbent on dev3 (before any round-3 result)
+
+[failure_r3.py](./failure_r3.py) covers `writer_only_b_o3mini`, 144 runs on 24 papers (GPT-5.6 labels and the
+experiment-12 error coder; analysis only). Output: `loop/failure_r3.json`.
+
+| Finding | Number | What it implies |
+|---|---|---|
+| **F15** Design questions: right class, wrong specifics | Class hit 0.46, yet intervention agreement 0.13/4; outcome is the strongest dimension (1.15) | Push toward the lever a typical group would use |
+| **F16** Method questions are the weakest | Reconstruction 0.43, outcome 0.22, class hit 0.28 | As F15 |
+| **F17** Understanding questions lose on conditions | Conditions 0.46 (intervention 0.61, mechanism 0.83) | Evidence on typical regimes and techniques may help |
+| **F18** Even a class hit gives few intervention points | Intervention 0.70/4 given a hit vs 0.21 given a miss; mechanism 0.91 vs 0.66 | The specific lever and parameters are the gap |
+| **Regime anchoring is not the problem** | 87% of hypotheses already repeat a quantity the question states, and those do not score higher on conditions (0.96 vs 1.25, n = 4 not anchored) | No regime-anchoring method |
+| **Error mix** (4.3 fatal errors per run) | Unsupported claims 24%, wrong intervention 19%, wrong mechanism 19%, wrong conditions 11%, wrong outcome 9%, wrong baseline 8%, vague 8% | Evidence could address unsupported claims |
+
+**gpt-4o was not used.** Its memorisation probe (must_obey.md 2.3) could not run: 0 of 24 calls completed because of
+rate limits. A generator that cannot finish its probe, a 144-run dev3 batch and a test3 evaluation is not usable.
+
+### 11.3 What I read for round 3, and what I integrated
+
+| ID | Source | What I understood | What we integrate (where) |
+|---|---|---|---|
+| S11 | **Large language models surpass human experts in predicting neuroscience results**, Xiaoliang Luo et al., Nature Human Behaviour 2024. https://arxiv.org/abs/2403.03230 | LLMs predict which of two versions of a published result is the real one better than experts. Prediction of an existing result is a different task from proposing a novel idea. | R1: the writer is told the result already exists and is asked for the most probable study and outcome, not the most novel (F15, F16, F18). |
+| C10 | **Large language models as analogical reasoners**, Yasunaga et al., ICLR 2024 (section 2) | Self-generated exemplars help strong models. | R2: o3-mini first recalls up to three earlier studies on the same kind of gap. The recall is a separate call, so it never enters the judged hypothesis. |
+| S12 | **Scaling LLM test-time compute optimally can be more effective than scaling model parameters**, Charlie Snell et al., 2024. https://arxiv.org/abs/2408.03314 | More inference-time computation helps when it is allocated to the problem's difficulty. A reasoning model's effort setting is one such knob. | R3: the same writer and model with `reasoning_effort="high"`. o1 (a bigger model) did not help in round 2; this tests more thinking with the same model. |
+| S9 | MBR (Bertsch et al. 2023; section 10.5) | The candidate closest to the others approximates the minimum-risk output. | R4: medoid of five independent writer samples (content-word Jaccard). Offline in round 2 it was +0.01 over a pool mean; here it is the incumbent's own samples. |
+
+### 11.4 Round-3 designs (dev3: 24 papers × 3 levels × 2 samples = 144 runs each)
+
+| Method | Failure targeted | Design | Calls |
+|---|---|---|---:|
+| `writer_only_b_o3mini_r3` | reference | The incumbent with fresh samples (11.1) | 1 |
+| `forecast_writer_b_o3mini` (R1) | F15, F16, F18 | WRITER_B plus the forecasting framing (S11) | 1 |
+| `analogy_writer_b_o3mini` (R2) | F15, F18 | Recall up to three precedent studies, then WRITER_B with them as notes (C10) | 2 |
+| `writer_only_b_o3mini_high` (R3) | all | WRITER_B with `reasoning_effort="high"` (S12) | 1 |
+| `writer_mbr_b_o3mini` (R4) | F10 (variance) | Five WRITER_B samples, keep the medoid (S9) | 5 |
+| `text_chunks_b_o3mini` (R5) | F17, unsupported claims | WRITER_B with question-retrieved chunks and no forecast step; isolates evidence for o3-mini | 1 |
+
+Harness change before these runs: a final hypothesis keeps only the shared schema fields, so no method can hand the
+judge extra content. None of the 2,376 earlier runs had an extra field, so earlier results are unaffected.
+
+### 11.5 Combination R6 (designed before its results and before the replicate's judgments)
+
+- **Preliminary signal.** On GPT-5.6 against the incumbent's *original* dev3 runs (the replicate was still being
+  judged), R5 evidence (+0.03 [−0.04, +0.10]) and R4 MBR (+0.03 [−0.03, +0.09]) are the two slightly positive
+  pieces. They address different failures: F17 conditions and unsupported claims for R5, sample variance for R4.
+- **Design.** `text_chunks_mbr_b_o3mini`: one question-retrieved evidence pack, five WRITER_B samples with that
+  pack, and the medoid is kept (5 calls). It enters the 11.1 finalist rule like every other round-3 configuration.
+
+**Two offline checks on dev3 (no runs).**
+- **Consensus over a mixed pool does not help.** Pooling the original writer, forecast, analogy and evidence
+  variants gives 8 candidates per unit. Their medoid scores 0.625 against a pool mean of 0.637 (vs the incumbent
+  −0.007 [−0.07, +0.06]). The best candidate in each pool averages 0.99, so the headroom is in selection.
+- **No cheap, target-free feature finds that best candidate.** Within units of 7 o3-mini variants, the mean
+  Spearman ρ between score and query overlap is +0.02, length −0.03, number count −0.01, consensus +0.03 and hedges
+  +0.03. Without a verifier, selection among similar candidates is close to random (C7).
+
+### 11.6 Round-3 results on dev3 and the F3 decision
+
+**dev3 (24 papers × 3 levels × 2 samples).** Δ is against the incumbent's fresh-sample replicate
+(`writer_only_b_o3mini_r3`; GPT-5.6 0.642, DeepSeek 0.632).
+
+| Method | GPT-5.6 | Δ [95% CI], papers up/down | DeepSeek | Δ DeepSeek [95% CI] | core GPT | Δ core GPT | calls/run |
+|---|---:|---|---:|---|---:|---:|---:|
+| `writer_only_b_o3mini` (incumbent, original samples) | 0.632 | −0.010 [−0.06, +0.04], 13/8 | 0.630 | −0.002 [−0.07, +0.06] | 0.580 | +0.007 | 1 |
+| `forecast_writer_b_o3mini` (R1) | 0.616 | −0.026 [−0.09, +0.03], 7/11 | 0.644 | +0.012 [−0.07, +0.10] | 0.517 | −0.056 | 1 |
+| `analogy_writer_b_o3mini` (R2) | 0.641 | −0.002 [−0.06, +0.06], 8/11 | 0.637 | +0.005 [−0.07, +0.09] | 0.552 | −0.021 | 2 |
+| `writer_only_b_o3mini_high` (R3) | 0.641 | −0.002 [−0.06, +0.06], 10/12 | 0.648 | +0.016 [−0.06, +0.09] | 0.562 | −0.010 | 1 |
+| `writer_mbr_b_o3mini` (R4) | 0.644 | +0.002 [−0.05, +0.05], 11/10 | 0.615 | −0.017 [−0.07, +0.04] | 0.538 | −0.035 | 5 |
+| `text_chunks_b_o3mini` (R5) | 0.658 | +0.016 [−0.05, +0.09], 10/12 | **0.705** | **+0.073** [−0.04, +0.18] | 0.542 | −0.031 | 1 |
+| **`text_chunks_mbr_b_o3mini` (R6)** | **0.688** | **+0.045 [−0.01, +0.10], 16/8** | 0.649 | +0.017 [−0.11, +0.14] | **0.611** | **+0.038** | 5 |
+| `trend_ground_b_o3mini` (round 1) | 0.635 | −0.007 [−0.08, +0.06], 6/8 | 0.620 | −0.012 [−0.11, +0.09] | 0.559 | −0.014 | 3.1 |
+| `closed_book_o3mini` | 0.575 | −0.068 [−0.13, −0.01], 6/17 | 0.542 | −0.090 [−0.16, −0.02] | 0.483 | −0.090 | 1 |
+| `closed_book` (Llama) | 0.488 | −0.155 [−0.22, −0.10], 2/21 | 0.312 | −0.319 [−0.46, −0.19] | 0.441 | −0.132 | 1 |
+
+**What round 3 shows on dev3.**
+- **On their own, the writer-level changes do nothing.** Forecasting framing, recalled analogies, high reasoning
+  effort and MBR alone are all within ±0.03 of the replicate.
+- **Evidence without a forecast step (R5) is the only single change ahead on both judges.** DeepSeek +0.07, GPT-5.6
+  +0.02, neither significant.
+- **Combining evidence with MBR (R6) is the best on GPT-5.6 and core.** GPT-5.6 +0.045, core +0.038, 16 of 24
+  papers up. It is not significant, and DeepSeek is only +0.02.
+- **The replicate reproduces the incumbent:** 0.642 vs 0.632.
+
+**F3 decision (rule 11.1, recorded 2026-10-25 11:51, before any test3 result was seen).**
+- F3 = `text_chunks_mbr_b_o3mini`: the highest dev3 GPT-5.6 score (0.688), above the replicate (0.642). No other
+  configuration is within 0.01.
+- F3 uses o3-mini like the incumbent, so no extra model control is needed.
+- test3 runs: `closed_book`, `writer_only_b_o3mini`, `trend_ground_b_o3mini` and F3.
+- **Primary:** F3 − `writer_only_b_o3mini` on test3.
+- **Secondary (Holm):** F3 − `closed_book`, `writer_only_b_o3mini` − `closed_book`, `trend_ground_b_o3mini` −
+  `closed_book`.
+
+### 11.7 test3 results (pre-registered in 11.1 and 11.6; run once on 2026-10-25)
+
+**Integrity.** 4 configurations × 36 units × 2 samples = 288 runs, all `--final`, 0 failures. All are judged by
+GPT-5.6 and DeepSeek; the audits and the gate are in 11.9. No test3 title, query or target was read before these
+runs.
+
+**test3, 12 fresh papers (GPT-5.6 primary).**
+
+| Configuration | GPT-5.6 | DeepSeek | core GPT | core DS | intervention | condition | mechanism | outcome | design / understanding | calls/run |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|
+| `closed_book` (Llama-3.3, baseline) | 0.50 | 0.33 | 0.45 | 0.29 | 0.33 | 0.38 | 0.57 | 0.72 | 0.51 / 0.49 | 1 |
+| **`writer_only_b_o3mini`** (incumbent) | **0.58** | **0.51** | **0.49** | **0.47** | 0.29 | 0.63 | **0.68** | 0.72 | 0.50 / **0.62** | 1 |
+| `trend_ground_b_o3mini` (round 1) | 0.51 | 0.40 | 0.38 | 0.33 | 0.19 | 0.50 | 0.56 | 0.78 | 0.46 / 0.53 | 3.2 |
+| `text_chunks_mbr_b_o3mini` (F3) | 0.54 | 0.44 | 0.40 | 0.39 | 0.26 | 0.64 | 0.53 | 0.71 | 0.48 / 0.56 | 5.4 |
+
+**Pre-registered comparisons (test3).** Each cell is the paired difference, its 95% CI and papers up/down; Holm
+runs across the three secondaries.
+
+| Comparison | GPT-5.6 | DeepSeek | core GPT | core DS |
+|---|---|---|---|---|
+| **Primary: F3 − `writer_only_b_o3mini`** | **−0.045 [−0.15, +0.06]**, 5/6, p = 1.0 | −0.08 [−0.18, +0.04], 3/8 | −0.09 [−0.19, +0.01], 3/7 | −0.08 [−0.17, +0.01] |
+| F3 − `closed_book` | +0.04 [−0.09, +0.18] | +0.10 [−0.02, +0.24] | −0.06 [−0.21, +0.13] | +0.10 [−0.04, +0.27] |
+| `writer_only_b_o3mini` − `closed_book` | +0.08 [−0.01, +0.17], Holm 1.0 | +0.18 [+0.08, +0.29], Holm 0.12 | +0.04 [−0.08, +0.16] | +0.18 [+0.07, +0.31] |
+| `trend_ground_b_o3mini` − `closed_book` | +0.01 [−0.09, +0.11] | +0.07 [0.00, +0.14] | −0.08 [−0.22, +0.06] | +0.04 [−0.06, +0.13] |
+
+**Verdict.**
+- **The round-3 improvement does not replicate.** F3 was +0.045 on dev3 (24 papers) and is −0.045 on test3, below
+  the incumbent on both judges and on core.
+  - Its mechanism agreement is 0.53, against the incumbent's 0.68. A likely cause, not verified: corpus evidence
+    pulls the hypothesis toward what earlier papers did.
+  - The incumbent is again the best configuration on fresh papers, on both judges.
+- **Three fresh held-out sets now agree.** 28 papers in total: test 4, test2 12, test3 12. This analysis is
+  exploratory, with different target extractors (`final3_heldout28_exploratory.json`).
+
+  | Comparison | GPT-5.6 | DeepSeek |
+  |---|---|---|
+  | `writer_only_b_o3mini` − `closed_book` | **+0.11 [+0.05, +0.19]**, 20 of 26 papers with a difference up, sign p = 0.009 | **+0.27 [+0.17, +0.39]**, 23/4, p = 0.0003 |
+  | `trend_ground_b_o3mini` − `closed_book` | +0.07 [0.00, +0.14] | +0.20 [+0.10, +0.31] |
+  | `trend_ground_b_o3mini` − `writer_only_b_o3mini` | −0.05 [−0.12, +0.03] | −0.07 [−0.16, +0.02] |
+
+  Means over the 28 papers (GPT-5.6 / DeepSeek):
+
+  | Configuration | GPT-5.6 | DeepSeek |
+  |---|---:|---:|
+  | Llama baseline | 0.49 | 0.32 |
+  | **o3-mini + conservative writer** | **0.60** | **0.59** |
+  | Round-1 harness | 0.55 | 0.52 |
+
+### 11.8 Summary of round 3: could it be increased further?
+
+| # | Change | Inspired by | Failure targeted | dev3 effect (vs replicate) | Held-out effect | Kept? Why |
+|---|---|---|---|---|---|---|
+| 25 | Development on 24 papers instead of 8 (spent test + test2) | round-2 lesson | dev overfitting | – | – | Yes: tighter dev intervals, though still not enough (see #31) |
+| 26 | Forecasting framing (R1) | S11, C12 | F15, F16, F18 | −0.03 | – | No |
+| 27 | Self-recalled analogies (R2) | C10 | F15, F18 | −0.00 | – | No |
+| 28 | High reasoning effort (R3) | S12 | all | −0.00 | – | No |
+| 29 | Medoid of 5 samples, alone (R4) or over mixed prompts (offline) | S9 | variance | +0.00; offline −0.01 | – | No |
+| 30 | Question-retrieved evidence without a forecast (R5) | C11, B5 | F17 | +0.02 (DeepSeek +0.07) | – | Only as part of #31 |
+| 31 | **Evidence + medoid of 5 (R6, F3)** | combination | F17 + variance | **+0.045**, 16/8 papers | **test3 −0.045** vs incumbent | **No.** It did not replicate |
+| 32 | Target-free selectors (offline: query overlap, length, numbers, consensus, hedging) | C7 | selection headroom (oracle 0.99 vs mean 0.64) | within-unit ρ −0.03 to +0.03 | – | No signal to build on |
+
+**Bottom line of round 3.**
+- **No further increase was found.** Seven new configurations, two offline checks and a dev set three times
+  larger produced one dev winner (+0.045, not significant). That winner fell below the incumbent on 12 fresh
+  papers.
+- **The best-supported method is still o3-mini with the conservative writer, one call per hypothesis.** Across 28
+  fresh held-out papers it scores 0.60 against 0.49 for the Llama baseline (GPT-5.6, p = 0.009) and 0.59 against
+  0.32 on DeepSeek. Every added step (forecasting, grounding, decision rules, selection) helps on dev at most and
+  fails on fresh papers.
+- **Why it plateaus.** Points are lost on the specific intervention (below 0.5 of 4 everywhere), and the right
+  answer is often among the candidates (oracle 0.99). But no target-free signal identifies it, and corpus evidence
+  biases hypotheses toward what earlier papers did rather than what new papers do.
+- **What would be needed:**
+  - a real verifier: experiments, or simulations such as CALPHAD or DFT checks on candidate interventions;
+  - a better pre-cutoff model: none available beyond o1 and o3-mini, and gpt-4o is rate limited;
+  - a judge calibrated against experts, which might change what "better" means.
+- **Process lesson** (added to must_obey.md 6.5): spend a fresh held-out set only on a dev gain over the
+  *incumbent* whose CI excludes zero. Both dev winners that failed on fresh papers had CIs against the simpler
+  incumbent crossing zero: round 1 vs the plain writer +0.06 [−0.03, +0.16], round 3 +0.045 [−0.01, +0.10].
+
+### 11.9 Integrity, style and the must_obey.md checklist for round 3
+
+- **Integrity.** `must_obey_check.py --loop` passes on all 10 directories involved:
+  - the 7 round-3 configurations;
+  - the 4 test3 configurations, 216 runs each (dev3 144 + test3 72; `closed_book` also has its 72 original-split
+    runs).
+
+  All have 0 failed runs and zero leakage counters, and every test3 run is final. Two warnings are the known
+  one-month margin cases for Llama-3.3: PMC10759803 (dev) and PMC11302478 (test3, 1 day).
+- **Exception (must_obey.md 6.7, not met in full).** The 1,008 round-3 dev3 runs all have GPT-5.6 and DeepSeek
+  judgments. Only F3's 144 are audited, and none are labelled.
+  - GPT-5.6 throughput fell to 2–37 calls a minute under shared rate limits, so the remaining roughly 1,700 calls
+    were not made.
+  - Selection used only the two judges; audits and labels are descriptive.
+  - All 288 test3 runs are audited. The round-3 dev3 results are therefore not "clean" under 6.7, and the round-3
+    claims rest on test3.
+- **Style (test3).**
+
+  | Configuration | length (characters) | hedges | specificity |
+  |---|---:|---:|---:|
+  | `closed_book` | 512 | 0.01 | 0.19 |
+  | `writer_only_b_o3mini` | 1,150 | 0.07 | 0.24 |
+  | `trend_ground_b_o3mini` | 1,206 | 0.12 | 0.22 |
+  | F3 | 1,240 | 0.15 | 0.28 |
+
+  - F3 is longer, slightly more hedged and more specific than the incumbent, yet scores lower. The incumbent's lead
+    is not a style effect.
+  - On test3, GPT-5.6 rewards length somewhat within configurations (ρ +0.10 to +0.26), unlike on test2. Since
+    the shorter incumbent wins, this works against it rather than for it.
+  - Its margin over the Llama baseline (about 640 characters shorter) should be read with that in mind; the
+    DeepSeek margin is larger still.
+
+**Checklist.**
+- [x] Query-facing models are pre-cutoff (o3-mini, Llama-3.3). gpt-4o was not used because its probe could not run.
+- [x] Queries are frozen: v3.1 for dev, test2 and test3 built once by pre-registered rules, all hash-checked.
+- [x] Evidence: date-filtered corpus pools only; no web or live API tools in any method.
+- [x] Payloads are target-free. Final hypotheses are restricted to schema fields (new); the recalled analogies
+  never reach the judge.
+- [x] Development on dev3 only, with test and test2 spent and declared. test3 was used once for configurations
+  fixed before any test3 result was seen.
+- [x] Same budgets and samples as the baselines. Declared differences: calls per run (MBR 5) and reasoning effort
+  (R3).
+- [~] Both judges on every run; audits on all test3 runs and F3's dev3 runs only (exception above); integrity gate
+  passes.
+- [x] Paired statistics with clustered-bootstrap CIs and Holm. Negative results are recorded: R1–R4, F3 on test3,
+  and two offline checks.
+- [x] Experiment log (experiments 27–28), READMEs and loop.md updated.

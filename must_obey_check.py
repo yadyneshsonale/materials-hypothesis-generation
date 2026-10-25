@@ -25,9 +25,13 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent
 BENCHMARKS = {"v3": ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_v3" / "cases",
               "v3.1": ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_v3_1" / "cases"}
-# Held-out sets built by the same procedure as a benchmark version and checked with it (loop.md section 10.1).
-EXTRA_CASES = {"v3.1": (ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_test2" / "cases",)}
-HELD_OUT_SPLITS = ("test", "test2")
+# Held-out sets built by the same procedure as a benchmark version and checked with it (loop.md sections 10.1, 11.1).
+EXTRA_CASES = {"v3.1": (ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_test2" / "cases",
+                        ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_test3" / "cases")}
+HELD_OUT_SPLITS = ("test", "test2", "test3")
+# Spent held-out splits were each used once for their pre-registered finals and are development data afterwards
+# (loop.md 11.1); the final-run rule applies only to unspent held-out splits.
+SPENT_SPLITS = ("test", "test2")
 CURRENT = "v3.1"
 CASES = BENCHMARKS[CURRENT]
 
@@ -111,7 +115,7 @@ def check(run_dir: Path, loop: bool = False, require_cross: bool = True, bench: 
             if int(audit.get(counter, 0) or 0) != 0:
                 failures.append(f"{rid}: audit.{counter} = {audit[counter]}")
         if loop:
-            if frozen["split"] in HELD_OUT_SPLITS and not run.get("final"):
+            if frozen["split"] in HELD_OUT_SPLITS and frozen["split"] not in SPENT_SPLITS and not run.get("final"):
                 failures.append(f"{rid}: held-out ({frozen['split']}) run not marked final (pre-register in loop.md)")
             if run.get("status") == "ok" and run.get("target_free_asserted") is not True:
                 failures.append(f"{rid}: no proof that query-facing payloads were asserted target-free")
