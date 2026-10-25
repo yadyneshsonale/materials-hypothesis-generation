@@ -999,6 +999,17 @@ its recollection against the target.
 - 1,512 generation runs and 72 selections.
 - Every rerun experiment is verified except one critique resample run, which twice ended without a submission.
 - Zero temporal, family, target and citation leaks.
+- One critique revision crashed on a null citation list from Llama and succeeded on retry. The cause is fixed at
+  the source: `_validate_generation` now normalises null or string ID lists (regression test).
+- The factorial bootstrap is now deterministic: its papers are sorted, so the CIs no longer depend on Python's hash
+  seed. CIs moved by at most 0.007.
+- **Extractor leakage measured, not assumed** ([extractor_leakage_audit.py](../../extractor_leakage_audit.py)).
+  - The rerun reads Qwen-made extractions of pre-cutoff papers: v2 units, rubric records, citation-graph cards and
+    citer statements.
+  - Records containing an answer word absent from their own source paper occur at 0.00–3.8% per representation.
+  - That is no more often than for other cases' answer words (ratio ≤ 0.96). The exception is citation-graph cards
+    (1.42; 14 versus about 9 expected records), and all 14 hits are generic words (enable, hour, pinning…).
+  - There is no evidence of later-paper knowledge in the extractions.
 
 **Results** (GPT-5.6 reconstruction, 0–4; full table in [rerun_v3/README.md](./rerun_v3/README.md)).
 
@@ -1012,7 +1023,7 @@ its recollection against the target.
 | Qwen3.5 (post-cutoff) | 1.56 | 0.50 |
 | Llama-3.3 (pre-cutoff) | 1.40 | 0.45 |
 
-  - Query effect: −1.07 [−1.37, −0.76] with Qwen and −0.94 with Llama.
+  - Query effect: −1.07 [−1.37, −0.77] with Qwen and −0.94 with Llama.
   - Generator effect: −0.16 on leaky queries and −0.04 on clean queries.
   - The leakage, not memorisation, inflated the original scores.
 - **Rerun ranking.**

@@ -537,10 +537,19 @@ def compact_evidence_payload(
 def _validate_generation(payload: Any, allowed_ids: set[str]) -> dict[str, Any]:
     if not isinstance(payload, dict) or not str(payload.get("hypothesis", "")).strip():
         raise ValueError("hypothesis generation response is invalid")
+    # Some generators return null or a single string instead of a list; downstream code concatenates these lists.
+    for key in ("supporting_evidence_ids", "conflicting_evidence_ids"):
+        value = payload.get(key)
+        if value is None:
+            payload[key] = []
+        elif isinstance(value, str):
+            payload[key] = [value] if value.strip() else []
+        elif not isinstance(value, list):
+            payload[key] = list(value) if isinstance(value, (tuple, set)) else [value]
     cited = {
         str(item)
         for key in ("supporting_evidence_ids", "conflicting_evidence_ids")
-        for item in payload.get(key, [])
+        for item in payload[key]
     }
     unknown = cited - allowed_ids
     if unknown:

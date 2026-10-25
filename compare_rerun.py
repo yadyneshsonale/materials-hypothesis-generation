@@ -1,4 +1,4 @@
-"""Experiment 20: every evaluation rerun on leak-free queries with a pre-cutoff generator, compared with the original.
+"""Experiment 21: every evaluation rerun on leak-free queries with a pre-cutoff generator, compared with the original.
 
 Original (experiments 7, 9, 11, 14, 16, 17): experiment-3 queries (written from the held-out paper's results) and
 generator Qwen3.5-35B-A3B (released February 2026, after the held-out papers).
@@ -188,7 +188,9 @@ def factorial() -> dict[str, Any]:
 
     def effect(a: tuple[str, str], b: tuple[str, str]) -> dict[str, Any]:
         per_paper: dict[str, list[float]] = defaultdict(list)
-        for key in set(unit_scores[a]) & set(unit_scores[b]):
+        # Sorted so the seeded bootstrap sees papers in the same order in every process (set order depends on
+        # string hash randomisation).
+        for key in sorted(set(unit_scores[a]) & set(unit_scores[b])):
             per_paper[key[0]].append(unit_scores[a][key] - unit_scores[b][key])
         point, low, high = cluster_bootstrap(per_paper)
         p_value, pos, neg = exact_sign_test([statistics.fmean(v) for v in per_paper.values()])

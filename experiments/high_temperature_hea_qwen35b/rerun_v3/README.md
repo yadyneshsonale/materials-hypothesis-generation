@@ -1,4 +1,4 @@
-# Experiment 20: all evaluations rerun on leak-free queries with a pre-cutoff generator
+# Experiment 21: all evaluations rerun on leak-free queries with a pre-cutoff generator
 
 Run 2026-10-23/24. Runner: [run_clean_rerun.sh](../../../run_clean_rerun.sh); factorial:
 [run_factorial.sh](../../../run_factorial.sh); comparison: [compare_rerun.py](../../../compare_rerun.py)
@@ -27,10 +27,30 @@ Run 2026-10-23/24. Runner: [run_clean_rerun.sh](../../../run_clean_rerun.sh); fa
   post-cutoff Qwen wrote them from the leaky query.
 - **Ensemble selection, knowledge-first refinement and the critique reviser** also run on the pre-cutoff
   generator. The critics were already pre-cutoff.
-- **Extractions of pre-cutoff papers** (rubric cards, citation-graph cards and citer statements) are reused, and new
-  citation-graph papers are extracted with the same Qwen extractor. The extractor never sees a query or a target.
-  Its records are quote-validated against the source paper, so it cannot add knowledge of later papers to them
-  except through free-text fields. This residual risk is low and is documented, not removed.
+- **Extractions of pre-cutoff papers** (v2 evidence units, rubric records, citation-graph cards and citer
+  statements) are reused, and new citation-graph papers are extracted with the same Qwen extractor. The extractor
+  never sees a query or a target, so it could leak only by writing knowledge of a later paper into an earlier
+  paper's record. This was measured with [extractor_leakage_audit.py](../../../extractor_leakage_audit.py)
+  (`extractor_leakage/analysis.json`), and there is no sign of it:
+
+  | Records (case × record pairs) | With an answer word not in their own source | Control: other cases' answer words | Ratio |
+  |---|---:|---:|---:|
+  | v2 evidence units (2,999) | 0.76% | 0.93% | 0.81 |
+  | Rubric cards (556) | 2.09% | 2.84% | 0.74 |
+  | Rubric effects (6,098) | 0.41% | 0.58% | 0.72 |
+  | Rubric mechanisms (4,287) | 1.11% | 1.18% | 0.94 |
+  | Rubric gaps (4,349) | 0.53% | 0.55% | 0.96 |
+  | Citation-graph cards (354) | 3.75% | 2.64% | 1.42 |
+  | Citer statements (12,633) | 0.00% | 0.01% | 0.00 |
+
+  - An "answer word" is a stem of the hidden target's intervention, mediator, mechanism or outcome. Stems of its
+    starting material, conditions and baseline, of the v3 query, and those found in more than 20% of corpus
+    papers are removed.
+  - A memorising extractor would inject the true case's answer words more often than other cases' words. The
+    ratios are at or below 1, except citation-graph cards (14 versus about 9 expected records).
+  - All 14 of those hits are generic words (arise, converge, double, drive, enable, hour, negligible, pinning,
+    relieve, sensitive, variant); none carries the answer's specific content.
+  - Word variants are matched by a suffix stemmer, so reticulated, reticulation and reticulate count as one word.
 - Temporal, test-paper, work-family, target DOI/title and invalid-citation audits are all zero in every rerun.
 
 ## Integrity
@@ -39,7 +59,7 @@ Run 2026-10-23/24. Runner: [run_clean_rerun.sh](../../../run_clean_rerun.sh); fa
 |---|---|---|---|
 | 7 eval_v3 | 144/144 | 144 absolute, 108 pairwise | verified |
 | 9 MatKG | 36/36 KG runs (+144 copied baselines) | 180 absolute, 144 pairwise | verified |
-| 11 critique | 72/72 revisions; resample control 35/36 | 36/36/36/35 | One resample run (PMC12298864 expert) ended without a valid submission after 16 turns, twice, and stays failed. One revision crashed on a null citation list and succeeded on retry. |
+| 11 critique | 72/72 revisions; resample control 35/36 | 36/36/36/35 | One resample run (PMC12298864 expert) ended without a valid submission after 16 turns, twice, and stays failed. One revision crashed on a null citation list and succeeded on retry; the cause is fixed at the source (`_validate_generation` now normalises null or string ID lists, with a regression test). |
 | 14 rubrics | 576/576 | 576 GPT-5.6, 576 DeepSeek, 576 audits, 84 ceilings | verified |
 | 16 improvements | 288/288 + 72 selections | 288 / 288 / 288 | verified |
 | 17 citation graph | 360/360 (12 graphs rebuilt from the clean queries; 248 full-text papers, 119 newly extracted) | 360 / 360 / 360 | verified |
@@ -94,10 +114,10 @@ Run 2026-10-23/24. Runner: [run_clean_rerun.sh](../../../run_clean_rerun.sh); fa
 
 | Effect | Difference | 95% CI |
 |---|---:|---|
-| Queries, with Qwen (clean − leaky) | −1.07 | [−1.37, −0.76] |
-| Queries, with Llama | −0.94 | [−1.19, −0.69] |
-| Generator, on leaky queries (Llama − Qwen) | −0.16 | [−0.32, −0.01] |
-| Generator, on clean queries | −0.04 | [−0.12, 0.03] |
+| Queries, with Qwen (clean − leaky) | −1.07 | [−1.37, −0.77] |
+| Queries, with Llama | −0.94 | [−1.18, −0.69] |
+| Generator, on leaky queries (Llama − Qwen) | −0.16 | [−0.32, −0.005] |
+| Generator, on clean queries | −0.04 | [−0.13, 0.03] |
 
 About 90% of the original scores' advantage came from the answer being in the query. Generator contamination adds
 at most about 0.1 (the Qwen advantage), which matches the weak memorisation-probe signal.
@@ -164,3 +184,4 @@ in either direction is significant.
   structure as the original experiments.
 - `factorial/llama_oldq/`, `factorial/qwen_newq/`: the off-diagonal cells.
 - `comparison/`: the tables and analysis above.
+- `extractor_leakage/`: the extractor leakage audit (summary, every flagged record with its injected word stems).

@@ -79,5 +79,20 @@ class SingleToolAdapterTests(unittest.TestCase):
         self.assertEqual(json.loads(back["tool_calls"][0]["function"]["arguments"])["hypothesis"]["hypothesis"], "h")
 
 
+
+class GenerationValidationTests(unittest.TestCase):
+    def test_null_or_string_evidence_lists_are_normalised(self) -> None:
+        from temporal_hypothesis_benchmark import _validate_generation
+        payload = {"hypothesis": "Add Cr.", "supporting_evidence_ids": None, "conflicting_evidence_ids": "R1"}
+        validated = _validate_generation(payload, {"R1"})
+        self.assertEqual(validated["supporting_evidence_ids"], [])
+        self.assertEqual(validated["conflicting_evidence_ids"], ["R1"])
+
+    def test_unknown_ids_still_rejected(self) -> None:
+        from temporal_hypothesis_benchmark import _validate_generation
+        with self.assertRaises(ValueError):
+            _validate_generation({"hypothesis": "h", "supporting_evidence_ids": ["X9"]}, {"R1"})
+
+
 if __name__ == "__main__":
     unittest.main()

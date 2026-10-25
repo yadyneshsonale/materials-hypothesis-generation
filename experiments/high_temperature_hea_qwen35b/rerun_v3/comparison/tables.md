@@ -17,10 +17,10 @@
 
 | effect | diff | 95% CI | sign-test p |
 |---|---:|---|---:|
-| query_effect_qwen (clean - leaky) | -1.07 | [-1.365, -0.762] | 0.00 |
-| query_effect_llama (clean - leaky) | -0.94 | [-1.189, -0.691] | 0.00 |
-| generator_effect_leaky (llama - qwen) | -0.16 | [-0.323, -0.006] | 0.39 |
-| generator_effect_clean (llama - qwen) | -0.04 | [-0.123, 0.031] | 0.77 |
+| query_effect_qwen (clean - leaky) | -1.07 | [-1.366, -0.769] | 0.00 |
+| query_effect_llama (clean - leaky) | -0.94 | [-1.182, -0.694] | 0.00 |
+| generator_effect_leaky (llama - qwen) | -0.16 | [-0.322, -0.005] | 0.39 |
+| generator_effect_clean (llama - qwen) | -0.04 | [-0.125, 0.031] | 0.77 |
 
 ## Agent tool use
 
