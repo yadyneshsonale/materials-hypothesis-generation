@@ -44,13 +44,21 @@ SCORE_SYSTEM = (
 MODELS = {
     "qwen3.5-35b-a3b": {"kind": "local"},
     "llama-3.3-70b": {"kind": "trapi", "deployment": "Llama-3.3-70B-Instruct_5"},
+    "o3-mini": {"kind": "trapi", "deployment": "o3-mini_2025-01-31", "token_field": "max_completion_tokens",
+                "temperature": None, "max_tokens": 8000},
+    "gpt-4o-mini": {"kind": "trapi", "deployment": "gpt-4o-mini_2024-07-18", "token_field": "max_completion_tokens",
+                    "temperature": 0.2, "max_tokens": 1500},
 }
+ACTIVE = tuple(os.environ.get("PROBE_MODELS", ",".join(MODELS)).split(","))
 
 
 def ask(model: str, title: str, year: str) -> dict[str, Any]:
     user = json.dumps({"title": title, "year": year}, ensure_ascii=False)
     if MODELS[model]["kind"] == "trapi":
-        return lc.trapi_chat_json(MODELS[model]["deployment"], PROBE_SYSTEM, user, max_tokens=1500, temperature=0.2)
+        spec = MODELS[model]
+        return lc.trapi_chat_json(spec["deployment"], PROBE_SYSTEM, user, max_tokens=spec.get("max_tokens", 1500),
+                                  token_field=spec.get("token_field", "max_completion_tokens"),
+                                  temperature=spec.get("temperature", 0.2))
     body = {"model": "Qwen3.5-35B-A3B-Q4_K_M.gguf", "max_tokens": 1500, "temperature": 0.2,
             "messages": [{"role": "system", "content": PROBE_SYSTEM}, {"role": "user", "content": user}],
             "response_format": {"type": "json_object"}, "chat_template_kwargs": {"enable_thinking": False}}
@@ -79,12 +87,12 @@ def probe_one(paper_id: str, model: str, sample: int) -> dict[str, Any]:
 
 
 def main() -> None:
-    jobs = [(pid, m, s) for pid in sorted(rx.cases()) for m in MODELS for s in SAMPLES]
+    jobs = [(pid, m, s) for pid in sorted(rx.cases()) for m in ACTIVE for s in SAMPLES]
     with ThreadPoolExecutor(6) as pool:
         records = list(pool.map(lambda j: probe_one(*j), jobs))
     dims = ("intervention", "structure", "mechanism", "quantitative_results")
     summary = {}
-    for model in MODELS:
+    for model in ACTIVE:
         rs = [r for r in records if r["model"] == model]
         summary[model] = {
             "claims_to_remember": round(statistics.fmean(bool(r["recollection"].get("remembers")) for r in rs), 3),

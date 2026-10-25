@@ -1,0 +1,72 @@
+{
+  "schema_version": "benchmark-v3.1-1.0",
+  "paper_id": "PMC11775865",
+  "publication_date": "2024-11-21",
+  "split": "validation",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "introduction_without_own_contribution",
+  "query_writer": "trapi:gpt-5.6-sol_2026-07-09",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "queries": {
+    "broad": {
+      "text": "For high-entropy nanoalloys in high-temperature applications, what governs structural and chemical stability, and why? Formulate one testable mechanistic hypothesis, propose a controlled comparison that would distinguish it from alternatives, predict observations relative to a baseline, define the boundaries of the prediction, identify supporting evidence from the background, and state a falsifying outcome.",
+      "passed_gate": true,
+      "overlap": 0.023,
+      "raw_overlap_exp19_metric": 0.02,
+      "source_role_refs": []
+    },
+    "problem_constrained": {
+      "text": "For nanoparticles composed of five or more metals in equal or near-equal atomic ratios and initially crystallized as a solid solution, what governs whether structural and chemical stability is maintained across catalytic and thermoelectric operating ranges of 473–1923 K? Formulate one testable mechanistic hypothesis, specify a controlled comparison, predict observations relative to the initial baseline, define the conditions under which the prediction should hold, identify supporting evidence, and state a result that would falsify the hypothesis.",
+      "passed_gate": true,
+      "overlap": 0.047,
+      "raw_overlap_exp19_metric": 0.06,
+      "source_role_refs": []
+    },
+    "expert_context": {
+      "text": "Many physical and chemical fabrication approaches have produced multi-element, near-equiatomic solid-solution nanoparticles, yet their synthesis–structure–property relationships remain poorly established. This limits evaluation of their suitability for catalytic operation at 773–1173 K and thermoelectric use at 473–1923 K, including catalytic settings where low noble-metal content is desirable. What governs whether these nanoparticles preserve structural and chemical stability under such service regimes, and why? Formulate one testable mechanistic hypothesis, specify a controlled intervention that separates it from competing explanations, predict observations relative to a baseline, define its boundary conditions, connect it to the prior evidence summarized above, and provide a clear falsification test.",
+      "passed_gate": true,
+      "overlap": 0.047,
+      "raw_overlap_exp19_metric": 0.06,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "Equiatomic AuCoCuNiPt high-entropy alloy (HENA) nanoparticles (sub-10 nm), initially in an FCC multi-twinned/icosahedral structure, synthesized via pulsed laser deposition (PLD) at 873 K on a silicon nitride membrane.",
+    "intervention": "In situ heating from 298 K to 973 K at a rate of 1 K/s under vacuum, followed by analysis via aberration-corrected STEM and atomistic molecular dynamics simulations.",
+    "conditions": "Vacuum environment, heating steps at 473, 673, 773, 873, and 973 K; analysis limited to 45 min per step to mitigate IR radiation effects on EDS.",
+    "structural_mediator": "Active atomic diffusion (non-sluggish) driven by surface energy minimization, leading to the segregation of low surface energy elements (Au, Cu) to the nanoparticle surface and subsequent melting/evaporation.",
+    "mechanism": "Surface energy differences drive the segregation of Au and Cu to the surface; this segregation is enhanced by the reshaping of nanoparticles (e.g., coalescence or elliptical-to-spherical transition) which boosts local atomic diffusion. The process is kinetically controlled rather than thermodynamically stabilized by high entropy.",
+    "predicted_outcome": "Progressive loss of the smallest nanoparticles (2-4 nm), widening of the size distribution, reduction in average particle size due to evaporation of Au/Cu, and a transition from elliptical to spherical shapes with increasing temperature.",
+    "baseline": "Theoretical expectation that HENA exhibit sluggish diffusion and high thermal stability due to entropy stabilization, preserving the initial size and structure up to higher temperatures.",
+    "boundary": "The stability of HENA is compromised above ~673 K where diffusion becomes active enough to cause significant surface segregation and evaporation; the mechanism is shape-dependent (icosahedral vs. truncated octahedron) and size-dependent (sub-10 nm).",
+    "discriminating_measurement": "Simultaneous observation of self-diffusivity of Au atoms (increasing linearly with T until phase transition) and the correlation between surface Au/Cu concentration and particle shape evolution via in situ STEM-EDS.",
+    "actual_result": "Experiments and simulations revealed poor structural stability; Au and Cu segregate to the surface, forming a shell that melts and evaporates at 973 K, leading to a 22% size reduction and confirming that diffusion is not sluggish and the structure is kinetically, not entropically, governed."
+  },
+  "hidden_target_source": "copied from the experiment-3 case (unchanged answer key)",
+  "rounds": 3,
+  "source": {
+    "kept_chars": 2355,
+    "removed_sentences": 2,
+    "removed_preview": [
+      "In the present work, we used in situ scanning transmission electron microscopy (STEM), corroborated with atomistic simulations, to study in real‐time and at the atomic scale the structural and composi",
+      "These in situ insights into the thermodynamic properties of AuCoCuNiPt HENA reveal their poor structural stability at high temperature due to atomic diffusion that cannot be considered as sluggish."
+    ]
+  },
+  "old_queries": {
+    "broad": "I am interested in the thermal stability and atomic diffusion behavior of nearly equiatomic high-entropy alloy nanoparticles (HENA) composed of five transition metals. What are the fundamental factors governing their structural evolution at elevated temperatures, and how does their behavior compare to traditional alloying concepts? Please propose a hypothesis for their stability, identify relevant prior theoretical constraints, define the boundary conditions where these models might fail, and suggest an experiment to falsify the assumption of intrinsic stability.",
+    "problem_constrained": "Consider a system of sub-10 nm equiatomic nanoparticles of Au, Co, Cu, Ni, and Pt. Prior theoretical models suggest that high entropy effects and sluggish atomic diffusion should provide exceptional thermal stability. However, recent observations suggest that kinetic effects may dominate over thermodynamic stabilization during fabrication and heating. Specifically, there is uncertainty regarding whether these alloys exhibit the hypothesized sluggish diffusion or if they undergo rapid phase separation. If we heat these particles in a vacuum from room temperature up to 1000 K, what mechanism drives their structural evolution? Propose a hypothesis that accounts for the observed loss of the smallest particles and changes in shape. Define the operating regime where the 'sluggish diffusion' assumption breaks down, and design a discriminating measurement to distinguish between entropy-stabilized kinetics and surface-energy-driven segregation.",
+    "expert_context": "We are investigating the atomic-scale thermal behavior of AuCoCuNiPt high-entropy alloy (HENA) nanoparticles synthesized via pulsed laser deposition on a silicon nitride membrane. The prevailing hypothesis is that high entropy and sluggish diffusion stabilize the FCC structure against coalescence and segregation. However, in situ heating experiments reveal a progressive loss of sub-5 nm particles and a widening of the size distribution, alongside a reshaping from elliptical to spherical geometries. Theoretical models based on Gibbs free energy often neglect surface energy terms critical for sub-10 nm systems. It has been observed that the FCC structure in these PLD-grown NPs may be governed by kinetic effects rather than entropy. Propose a mechanism explaining why atomic diffusion is surprisingly active in this quinary system, leading to the segregation of specific elements (like Au and Cu) to the surface and subsequent evaporation. Identify the critical temperature threshold where this mechanism becomes dominant, establish the boundary conditions regarding the initial nanoparticle shape (icosahedral vs. truncated octahedron), and formulate a falsification experiment involving simultaneous in situ STEM and atomistic simulations to test if surface energy gradients alone can explain the observed phase separation without invoking sluggish diffusion."
+  },
+  "gap": {
+    "gap_type": "understanding",
+    "evidence": "our current state of knowledge on atomic diffusion in HENA is still far from complete, and experimental evidence of the existence of sluggish diffusion in HENA is lacking",
+    "reason": "The introduction identifies an unresolved mechanistic and stability question: how atoms diffuse in high-entropy nanoalloys and whether the proposed sluggish-diffusion behavior actually occurs.",
+    "classifier": "gpt-5.6-sol_2026-07-09"
+  },
+  "v3_1_change": "queries rewritten for a understanding gap",
+  "v3_queries": {
+    "broad": "For high-entropy nanoalloys intended for high-temperature applications, what single intervention could improve structural and chemical stability? Formulate one hypothesis specifying the intervention, its mechanism, the predicted improvement relative to an otherwise comparable baseline, the conditions under which it should hold, prior evidence supporting it, and an experiment whose result would falsify the hypothesis.",
+    "problem_constrained": "Starting from crystalline, near-equiatomic solid-solution nanoparticles composed of five or more metals, what single intervention could overcome the unresolved risk of structural or chemical instability during operation in the 773–1173 K catalytic regime? Formulate one hypothesis specifying the intervention, the mechanism by which it would preserve stability, the predicted outcome relative to the same nanoparticles without the intervention, relevant temperature, time, and compositional boundary conditions, supporting prior evidence, and a thermal-exposure experiment with measurements and failure criteria that could falsify the hypothesis.",
+    "expert_context": "Starting from crystalline, near-equiatomic solid-solution nanoparticles composed of five or more metals, what single intervention could overcome the unresolved risk of instability during operation in the 773–1173 K catalytic regime? Although many physical and chemical fabrication methods have been developed, synthesis–structure–property relationships remain poorly understood, limiting assessment of these materials for high-temperature applications. The hypothesis should remain compatible with a multielement solid solution and the potential for catalytic performance at low noble-metal content. Specify the intervention, its mechanism, the predicted outcome relative to untreated nanoparticles, the application and compositional boundary conditions, supporting prior evidence, and a falsification experiment with a clear failure criterion."
+  }
+}
