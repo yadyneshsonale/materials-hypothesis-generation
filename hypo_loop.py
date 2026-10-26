@@ -80,9 +80,11 @@ TEST2_DIR = EXPERIMENT_DIR / "benchmark_test2"  # fresh held-out set (loop.md se
 HELD_OUT_DIRS = (TEST2_DIR, EXPERIMENT_DIR / "benchmark_test3")  # test3: loop.md section 11.1
 # "all" = the original 12. dev3 = development set of round 3 (loop.md 11.1): dev plus the spent test and test2 splits.
 SPLITS = {"dev": {"dev"}, "test": {"test"}, "test2": {"test2"}, "test3": {"test3"}, "all": {"dev", "test"},
-          "dev3": {"dev", "test", "test2"}}
+          "dev3": {"dev", "test", "test2"}, "all36": {"dev", "test", "test2", "test3"}}
 HELD_OUT = ("test", "test2", "test3")
-SPENT = ("test", "test2")  # each used once for its pre-registered finals; development data from round 3 on
+SPENT = ("test", "test2", "test3")  # each used once for its pre-registered finals (test3: round 3, loop.md 11.7)
+# Query levels: the three v3/v3.1 levels by default; benchmark v4 (SciMON-style) has one input per paper.
+LEVELS = tuple(os.environ.get("MATHG_LEVELS", ",".join(QUERY_LEVELS)).split(","))
 
 
 def cases() -> dict[str, dict[str, Any]]:
@@ -97,7 +99,7 @@ def cases() -> dict[str, dict[str, Any]]:
             rows = _read_json(directory / "metadata.json") if (directory / "metadata.json").exists() else {}
             for path in sorted((directory / "cases").glob("PMC*.json")):
                 case = _read_json(path)
-                merged[case["paper_id"]] = case
+                merged.setdefault(case["paper_id"], case)  # never override a case of the loaded benchmark
                 meta.setdefault(case["paper_id"], rows.get(case["paper_id"]) or {
                     "paper_id": case["paper_id"], "earliest_public_date": case["publication_date"],
                     "work_family_id": case["paper_id"]})
@@ -110,7 +112,7 @@ def split_of(case: dict[str, Any]) -> str:
 
 
 def units(split: str) -> list[tuple[dict[str, Any], str]]:
-    return [(c, lvl) for c in cases().values() if split_of(c) in SPLITS[split] for lvl in QUERY_LEVELS]
+    return [(c, lvl) for c in cases().values() if split_of(c) in SPLITS[split] for lvl in LEVELS]
 
 
 def run_id(paper: str, level: str, method: str, sample: int) -> str:
@@ -288,7 +290,8 @@ def generate_one(method: str, case: dict[str, Any], level: str, sample: int, fin
     atomic_json(path, {
         "run_id": rid, "paper_id": case["paper_id"], "query_level": level, "method": method, "sample": sample,
         "split": split_of(case), "final": final,
-        "benchmark": split_of(case) if split_of(case) in ("test2", "test3") else "v3.1",
+        "benchmark": case.get("benchmark_version") or (split_of(case) if split_of(case) in ("test2", "test3")
+                                                       else "v3.1"),
         "query": h.query,
         "publication_date": h.cutoff, "models": h.models, "status": status, "error": error,
         "generation": generation, "seen_ids": sorted(h.seen), "cited_ids": cited,
@@ -493,7 +496,7 @@ def summarise(rows: list[dict[str, Any]], method: str, split: str) -> dict[str, 
         "recon_gpt56": mean(list(gpt.values())), "recon_deepseek": mean(list(deep.values())),
         "core_gpt56": mean(list(unit_scores(rows, method, "gpt", split, core).values())),
         "core_deepseek": mean(list(unit_scores(rows, method, "deep", split, core).values())),
-        "by_level": {lvl: mean([v for k, v in gpt.items() if k[1] == lvl]) for lvl in QUERY_LEVELS},
+        "by_level": {lvl: mean([v for k, v in gpt.items() if k[1] == lvl]) for lvl in LEVELS},
         **{d: mean([r["gpt"]["scores"][d] for r in judged]) for d in ALL_DIMENSIONS},
         "lever_ge2": mean([1.0 if r["label"]["lever_match"] >= 2 else 0.0 for r in judged if r["label"]]),
         "same_class": mean([1.0 if r["label"]["lever_match"] >= 1 else 0.0 for r in judged if r["label"]]),
@@ -546,7 +549,7 @@ def render(a: dict[str, Any]) -> str:
     for m, s in a["table"].items():
         lines.append(f"| {m} | {s['runs']} | {s['failed']} | {_f(s['recon_gpt56'])} | {_f(s['recon_deepseek'])} | "
                      f"{_f(s['core_gpt56'])} | {_f(s['core_deepseek'])} | "
-                     + " / ".join(_f(s["by_level"][l]) for l in QUERY_LEVELS)
+                     + " / ".join(_f(s["by_level"][l]) for l in LEVELS)
                      + f" | {_f(s['intervention_reconstruction'])} | {_f(s['mechanism_agreement'])} | "
                      f"{_f(s['outcome_agreement'])} | {_f(s['problem_alignment'])} | {_f(s['lever_ge2'])} | "
                      f"{_f(s['same_class'])} | {_f(s['specificity'])} | {_f(s['hedges'])} | {_f(s['novelty'])} | "

@@ -1424,3 +1424,273 @@ sense. A human calibration is the most valuable next step. The package for the e
   0.61 and 0.66. Llama baseline: 0.49 and 0.29.
 - **Blinding check.** It passes: no model or source names anywhere; no paper identifiers in Part 1 or the sheet.
 - **Status.** Awaiting the expert's ratings. Analyse them with `expert_eval_analysis.py <returned sheet>`.
+
+---
+
+## 14. SciMON-style user input (benchmark v4, experiment 31)
+
+### 14.1 Pre-registered design (written 2026-10-26 05:34, before any v4 input was built)
+
+**Request.** Build the user input the way SciMON does: Qingyun Wang, Doug Downey, Heng Ji and Tom Hope, *SciMON:
+Scientific Inspiration Machines Optimized for Novelty*, ACL 2024, https://aclanthology.org/2024.acl-long.18.pdf (read
+in full; sections 2.1–2.2 and appendices B.2 and C).
+
+**What SciMON does (from the paper).**
+- **Background context M** (§2.2): a scientific sentence classifier (Cohan et al. 2019) labels the sentences of the
+  paper's *abstract*. The Background sentences become M; the remaining Method and Objective sentences are the target
+  sentences T.
+- **Seed term v** (§2.2): a scientific information-extraction system (Ye et al. 2022) is run on T to find
+  `[method, used-for, task]` relations, and one entity of the relation is the seed. The other entity, the target
+  term, stays hidden. The paper's running example uses the task as the seed ("knowledge acquisition") and asks for
+  the method.
+- **Prompt** (appendix B.2.1, GPT-4): "Consider the following context: M In that context, which p can be used for v,
+  and why?", where p is the type of the hidden entity (Method, Material, Task or Metric). There are no levels: one
+  input per paper.
+- **Gold test filter** (§2.2, appendix C):
+  - drop instances whose background overlaps the ground truth (lowest-similarity tenth only);
+  - drop cases with irrelevant background;
+  - keep only instances whose target relation is salient to the paper's idea.
+
+**Our v4 builder** (`query_builder_v4_scimon.py`), applied to all 36 case papers. All are spent (test3 was used for
+the round-3 finals), so this is a comparison of input formats, not a method claim.
+1. **M.** The abstract is split into sentences. o3-mini (pre-cutoff) labels each one Background, Objective, Method,
+   Result or Other. M is the Background sentences, verbatim and in order. Code verifies that each is an exact
+   abstract sentence.
+2. **Seed.** From the non-background sentences T, o3-mini lists `[head, used-for, tail]` relations with entity types
+   and ranks them by salience to the paper's main contribution. For the most salient relation:
+   - the seed v is the **tail (task) entity**;
+   - p is the head's type (Method or Material);
+   - the head (method or material) stays hidden.
+
+   This is the direction of SciMON's own example. The other direction would hand the model the intervention our
+   judge scores. Code verifies that v is an exact span of T.
+3. **Input.** "Consider the following context: {M} In that context, which {p} can be used for {v}, and why?"
+   (SciMON's template, verbatim).
+4. **Gold filter, our analogue.** The v3 leakage checker (GPT-5.6, sees the hidden target) and the lexical gate
+   (answer-word overlap ≤ 10%) check the composed input.
+   - If it fails, the next relation in salience order is tried, up to 3.
+   - Text is never rewritten, because SciMON uses verbatim context.
+   - A paper whose abstract has no Background sentence, or that fails all 3 tries, is **flagged**. Results are
+     reported with and without flagged cases.
+5. **Unchanged.** The hidden targets (must_obey.md 3.5), the generators' system prompts and output schema, and the
+   judges. Only the user input changes, so v4 scores are comparable with v3.1 on the same papers.
+
+**Runs.** 36 papers × 1 input × 2 samples with 4 configurations (288 runs, new root `loop_v4_scimon/`):
+- `closed_book` (Llama-3.3 baseline);
+- `closed_book_o3mini`;
+- `writer_only_b_o3mini` (the recommended configuration);
+- `text_chunks_b_o3mini` (question-retrieved evidence, the retrieval side of SciMON).
+
+**Analysis, fixed now.**
+- **Primary.** For each configuration, v4 − v3.1 GPT-5.6 reconstruction per paper, with v3.1 as the mean of its
+  three levels. Paired over the 36 papers with a paper-clustered bootstrap CI and sign test; Holm across the 4
+  configurations.
+- **Secondary.**
+  - v4 against each v3.1 level separately.
+  - Ranking of configurations on v4 (o3-mini writer − Llama, and so on).
+  - DeepSeek and core.
+  - Leakage audit: answer-word overlap of v4 inputs against the v3.1 levels, and ρ(overlap, score) on v4
+    (must_obey.md 3.6).
+  - Results without flagged cases.
+- **Interpretation rule.** If v4 scores rise, check the leakage audit before attributing the rise to the format.
+
+### 14.2 Construction (2026-10-26)
+
+Builder: [query_builder_v4_scimon.py](./query_builder_v4_scimon.py). Frozen inputs, with a README covering the
+construction rule, flags and examples: [benchmark_v4_scimon/](./experiments/high_temperature_hea_qwen35b/benchmark_v4_scimon/README.md).
+
+| | Count (of 36 papers) |
+|---|---:|
+| Clean (no flag) | **9** (dev 3, test 0, test2 4, test3 2) |
+| `no_background`: no Background sentence in the abstract, so the input is the bare question | 14 (13 alone, 1 also `failed_gate`) |
+| `failed_gate`: all tried inputs fail the leakage gate | 13 (11 steer toward the answer, 2 contain answer phrases) |
+| `no_relation`: no usable relation, so the seed is "the stated problem" (passed the gate) | 1 |
+| Pass the gate (including flagged inputs) | 23 |
+| Relation used: most salient / second / none | 33 / 2 / 1 |
+| Hidden side: method / material / none | 18 / 17 / 1 |
+| Mean answer-word overlap (v3 gate metric) | 2.3% (v3.1 on the same papers: broad 1.9%, problem 3.5%, expert 4.4%) |
+
+*Correction, made after the runs:*
+- The builder flagged the `no_relation` case (PMC12029629) `failed_gate` although its fallback input passed the gate.
+  The flag logic is fixed and has a regression test.
+- The case's flags were corrected; its input text, hash and runs are unchanged.
+- The case was flagged either way, so the clean subset and the pre-registered analyses are unaffected. Only the
+  exploratory flag groups (14.4) moved by one paper.
+
+Two problems show up in HEA abstracts.
+- **No background.** Many abstracts open with the paper's own work ("In this work, …"), so M is empty. The input
+  becomes a one-line question such as "Which material can be used for ductility, and why?", the kind of question
+  the expert earlier said does not make sense.
+- **The seed names the study.** The salient task phrase comes from the paper's own objective sentence, so it often
+  states the study design. Example: "… which method can be used for the effects of changing the percentage of
+  elements of HfNbTaTiZr-HEA on the mechanical properties, and why?"
+
+SciMON hit the same problem at scale: its gold filter kept 194 of 5,309 test instances (3.7%). Here 9 of 36 papers
+(25%) give a clean input.
+
+### 14.3 Results, pre-registered analysis (288 runs, 0 failed; both judges on every run)
+
+Scores are mean reconstruction on the 0–4 scale, paired per paper. v3.1 is the mean of its three levels, on the
+same papers. `closed_book_o3mini` and `text_chunks_b_o3mini` have v3.1 runs on 24 papers only (no test3).
+Script: [v4_scimon_analysis.py](./v4_scimon_analysis.py); output
+`experiments/high_temperature_hea_qwen35b/loop_v4_scimon/analysis.json`.
+
+**Primary: v4 − v3.1 (GPT-5.6), with DeepSeek alongside.**
+
+| Configuration | Papers | v4 | v3.1 | Δ GPT-5.6 [95% CI] | up/down | Holm p | Δ DeepSeek [95% CI] | Holm p |
+|---|---:|---:|---:|---|---:|---:|---|---:|
+| `closed_book` (Llama) | 36 | 0.47 | 0.49 | −0.02 [−0.14, +0.10] | 14/20 | 1.0 | **−0.13 [−0.24, −0.02]** | **0.045** |
+| `closed_book_o3mini` | 24 | 0.70 | 0.58 | +0.12 [−0.07, +0.34] | 13/10 | 1.0 | −0.26 [−0.45, −0.07] | 0.11 |
+| `writer_only_b_o3mini` | 36 | 0.69 | 0.62 | +0.08 [−0.09, +0.26] | 17/17 | 1.0 | −0.17 [−0.33, +0.01] | 0.11 |
+| `text_chunks_b_o3mini` | 24 | 0.59 | 0.66 | −0.07 [−0.22, +0.09] | 8/15 | 0.84 | −0.33 [−0.50, −0.14] | 0.10 |
+
+- **GPT-5.6: no significant change in any configuration.** Up and down papers are roughly balanced; the writer is
+  17/17.
+- **DeepSeek: v4 is lower in all four configurations.** The drop is significant after Holm for the Llama baseline,
+  and on the core metric for `closed_book_o3mini` (−0.26 [−0.44, −0.08], Holm p = 0.010).
+- **Core metric, GPT-5.6:** −0.01 to +0.14, none significant.
+- **Without flagged cases** (9 papers; 7 for the 24-paper configurations):
+  - GPT-5.6: +0.005, −0.06, −0.12, −0.10;
+  - DeepSeek: −0.03, −0.33, −0.06, −0.39.
+
+  There is no gain on clean inputs.
+- **Against each v3.1 level** (GPT-5.6, writer): +0.12 vs broad, +0.07 vs problem, +0.06 vs expert, none
+  significant. DeepSeek: −0.14, −0.15, −0.22.
+- **Ranking on v4.** The input format does not change the ranking.
+
+  | Comparison | GPT-5.6 | DeepSeek |
+  |---|---|---|
+  | o3-mini writer − Llama | +0.22 [+0.08, +0.38] | +0.23 [+0.10, +0.39] |
+  | o3-mini closed-book − Llama | +0.18 [+0.05, +0.32] | +0.12 [−0.01, +0.26] |
+  | writer − o3-mini closed-book | +0.04 [−0.07, +0.16] | +0.12 [−0.02, +0.26] |
+  | evidence (`text_chunks`) − writer | −0.10 [−0.27, +0.06] | +0.02 [−0.17, +0.20] |
+
+- **Leakage audit** (must_obey.md 3.6).
+  - Answer-word overlap of v4 inputs is 2.3%, between v3.1 broad and problem.
+  - ρ(overlap, v4 score) = 0.18, 0.26, 0.16, −0.05 for the four configurations: weak.
+  - Lexical overlap misses the main leak, which is semantic (14.4).
+
+### 14.4 Applying the interpretation rule: where the GPT-5.6 gains come from (exploratory, added after the results)
+
+The pre-registered rule says to check leakage before crediting the format. Here v4 − v3.1 is split by the leakage
+checker's verdict on the v4 input, by flag group, and by judge dimension. This split was not pre-registered; it is
+in `analysis.json` under `exploratory_not_preregistered`.
+
+**By checker verdict** (steers toward the answer: 11 papers; does not: 25. For the 24-paper configurations, 8 and
+16.)
+
+| Configuration | GPT-5.6, steers | GPT-5.6, does not steer | DeepSeek, steers | DeepSeek, does not steer |
+|---|---|---|---|---|
+| `closed_book` (Llama) | **+0.23 [+0.07, +0.40]** | −0.13 [−0.26, +0.01] | −0.08 | −0.15 [−0.29, −0.01] |
+| `closed_book_o3mini` | +0.27 [−0.12, +0.68] | +0.05 | −0.10 | −0.34 [−0.54, −0.14] |
+| `writer_only_b_o3mini` | **+0.29 [+0.03, +0.59]** | −0.01 | −0.02 | −0.24 [−0.43, −0.03] |
+| `text_chunks_b_o3mini` | −0.06 | −0.07 | −0.20 | −0.39 [−0.60, −0.15] |
+
+**By gate result, GPT-5.6 / DeepSeek.** Groups: clean (9 papers); flagged but passed the gate, i.e. no background
+or no relation (14); failed the gate (13). For the 24-paper configurations, 7 / 8 / 9.
+- **Clean:** GPT-5.6 +0.005 to −0.12.
+- **Failed the gate:**
+  - GPT-5.6 +0.16 to +0.21 for the three configurations without retrieval; Llama +0.21 [+0.03, +0.38].
+  - DeepSeek −0.04 to −0.23.
+- **Flagged but passed:**
+  - GPT-5.6: Llama −0.24 [−0.39, −0.10]; o3-mini +0.13 to +0.22; retrieval −0.03.
+  - DeepSeek −0.25 to −0.38.
+
+**Condition agreement drops with both judges** (dimension score v4 vs v3.1).
+
+| Configuration | GPT-5.6 | DeepSeek |
+|---|---|---|
+| `closed_book` (Llama) | 0.22 vs 0.38 (−0.16 [−0.30, −0.02]) | 0.06 vs 0.33 (−0.28 [−0.40, −0.16]) |
+| `closed_book_o3mini` | 0.52 vs 0.54 | 0.19 vs 0.65 (−0.46 [−0.66, −0.24]) |
+| `writer_only_b_o3mini` | 0.50 vs 0.57 | 0.36 vs 0.66 (−0.30 [−0.47, −0.13]) |
+| `text_chunks_b_o3mini` | 0.44 vs 0.65 (−0.21 [−0.40, −0.01]) | 0.33 vs 0.83 (−0.49 [−0.65, −0.34]) |
+
+On intervention, GPT-5.6 is +0.04 to +0.16 (none significant); DeepSeek is −0.02 to −0.35.
+
+**Reading.**
+1. **The only significant GPT-5.6 gains are on leaky inputs.** Llama and the writer gain on inputs whose seed
+   carries the study's own objective (steering: +0.23 and +0.29, CIs above zero). Both judges rate steering inputs
+   higher relative to non-steering ones.
+   - On clean inputs, v4 is level with or below v3.1.
+   - On flagged inputs that passed the gate, GPT-5.6 has o3-mini higher (+0.13 to +0.22, CIs cross zero). DeepSeek
+     has them lower (−0.25 to −0.28), so that part is within noise.
+2. **SciMON's context drops the operating conditions.** Abstract background sentences rarely give temperature,
+   atmosphere or exposure time; v3.1's problem and expert levels do. For high-temperature alloys the conditions are
+   part of the answer, so both judges mark condition agreement down.
+3. **The judges disagree on the overall level** (GPT-5.6 flat, DeepSeek lower). This matches their weak agreement
+   (ρ ≈ 0.39, section 13), and the expert ratings remain the arbiter.
+
+### 14.5 Answer: is a SciMON-style input better for this task?
+
+No. Applied to these 36 high-temperature HEA papers:
+- **Coverage.** Only 9 papers give a clean input. 14 abstracts have no background, so the input is a bare one-line
+  question. In 13 the input fails the leakage gate: 11 steer toward the answer, and 2 contain answer phrases.
+- **Scores.** GPT-5.6 shows no significant change in any configuration, and DeepSeek scores v4 lower in all four.
+  The only significant GPT-5.6 gains are on inputs that steer toward the answer.
+- **Content.** The input loses the operating conditions, which matter for this topic.
+- **Robustness.** The earlier conclusions do not depend on the v3.1 input format: o3-mini (writer or closed-book)
+  beats the Llama baseline on v4 by the same margin or more, and retrieval still does not help.
+
+**Decision.**
+- v3.1 stays the main benchmark input.
+- v4 is kept frozen as a SciMON-comparable variant. Its only leak-free subset is the 9 unflagged cases, too few for a
+  claim on their own.
+
+**What a SciMON-style input would need here** (not run):
+- a background drawn from the introduction, not only the abstract;
+- a seed taken from the problem statement rather than the paper's own objective sentence;
+- a conditions slot.
+
+Each moves it toward v3.1's problem-constrained level, which is what v3.1 already does with the checker.
+
+### 14.6 Integrity, style and checklist (experiment 31)
+
+- **Pre-registration.** Design and analysis were written (14.1) before any v4 input was built. The exploratory
+  split (14.4) is labelled.
+- **Models.** Query-facing models are pre-cutoff: o3-mini for sentence labels, relations and generation, and
+  Llama-3.3. GPT-5.6 only checks inputs and judges, and never feeds a generator.
+- **Inputs.** Inputs are frozen and hash-checked: `must_obey_check.py` maps each run's `benchmark` field
+  (`v4_scimon`) to its query set.
+- **Hidden targets.** Unchanged (tested in [test_v4_scimon.py](./test_v4_scimon.py)).
+- **Runs and judging.** 288 runs, 0 failed. GPT-5.6 and DeepSeek judged all 288. Every run has a target-free audit
+  and a lever label.
+- **Integrity gate.** `must_obey_check.py --loop` passes on all 4 directories (72 runs each, 0 failed). The only
+  warnings are the known one-month margin cases for Llama-3.3: PMC10759803 (2 days) and PMC11302478 (1 day), as in
+  11.9.
+- **Style (must_obey.md 6.8).** v4 hypotheses are shorter and less specific than v3.1 ones in every configuration.
+
+  | Configuration | Length, v4 vs v3.1 (characters) | Audited specificity, v4 vs v3.1 | ρ(length, GPT-5.6) on v4 |
+  |---|---|---|---:|
+  | `closed_book` (Llama) | 265 vs 514 | 0.07 vs 0.26 | 0.39 |
+  | `closed_book_o3mini` | 732 vs 1,120 | 0.11 vs 0.30 | 0.15 |
+  | `writer_only_b_o3mini` | 845 vs 1,168 | 0.13 vs 0.29 | 0.04 |
+  | `text_chunks_b_o3mini` | 971 vs 1,241 | 0.21 vs (8 audited v3.1 runs only) | −0.02 |
+
+  Length is hypothesis + intervention + mechanism + predicted outcome, as in `loop_final.style_features`.
+  - **Generic inputs, generic hypotheses.** The short background gives fewer alloy systems, temperatures and
+    environments to build on, so hypotheses name fewer of them. This matches the drop in condition agreement
+    (14.4).
+  - **Not a length effect.** The GPT-5.6 rise for o3-mini comes despite shorter outputs, and for the recommended
+    writer length does not predict the score (ρ = 0.04).
+  - **Hedges.** Rare in both (0.01–0.13 per run).
+  - **One abstention.** On the bare no-background input "Which method can be used for oxidation resistance, and
+    why?", one Llama run answered that the method is unknown for lack of evidence and scored 0. It is counted, not
+    dropped.
+- **Splits.** All splits are spent (test3 in round 3), so this is a comparison of input formats on the same papers,
+  not a method claim. A new method claim needs a fresh test4 (must_obey.md section 1).
+- **Deviations from SciMON** (declared in 14.1 and the benchmark README):
+  - task-side seed only;
+  - an LLM labeller and extractor with verified spans, instead of trained models;
+  - our leakage gate instead of a cosine filter;
+  - flagged cases kept and reported;
+  - lower-case p.
+- Checklist:
+  - [x] pre-registered;
+  - [x] pre-cutoff query-facing models;
+  - [x] leakage gate and audit, with ρ reported;
+  - [x] both judges, a target-free audit and a lever label on every run; integrity gate passes;
+  - [x] style check (length, hedges, specificity) reported;
+  - [x] frozen, hash-checked inputs;
+  - [x] results with and without flagged cases;
+  - [x] exploratory analysis labelled;
+  - [x] recorded in loop.md, the experiment log (experiment 31) and the READMEs.

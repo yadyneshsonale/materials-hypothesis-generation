@@ -1,0 +1,49 @@
+{
+  "schema_version": "benchmark-v4-scimon-1.0",
+  "benchmark_version": "v4_scimon",
+  "paper_id": "PMC12029629",
+  "publication_date": "2025-04-19",
+  "split": "test",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "SciMON-style: abstract Background sentences + task-side seed term (loop.md 14.1)",
+  "query_writer": "trapi:o3-mini_2025-01-31 (sentence labels, relations; verbatim spans only)",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "queries": {
+    "scimon": {
+      "text": "Consider the following context: High-entropy alloys (HEAs) exhibit excellent properties such as high strength, good ductility, superior corrosion resistance, and thermal stability, making them highly promising for applications in the aerospace, energy, and automotive industries. Among them, the FeNiCrMn HEA demonstrates outstanding corrosion resistance while eliminating the expensive Co element present in the “Cantor” alloy, significantly reducing costs. However, current research on the FeNiCrMn HEA has primarily focused on its corrosion resistance, with relatively limited studies on its mechanical properties. In that context, which method can be used for the stated problem, and why?",
+      "passed_gate": true,
+      "overlap": 0.026,
+      "raw_overlap_exp19_metric": 0.036,
+      "steers_to_answer": false,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "Single crystal equiatomic FeNiCrMn High-Entropy Alloy in an FCC structure, constructed as a bulk model (~180,000 atoms) with periodic boundary conditions.",
+    "intervention": "Uniaxial tensile loading applied along specific crystallographic directions (<110>, <1-12>, <-111>) at varied temperatures (10 K, 300 K, 600 K) and strain rates (10^8 s^-1, 10^9 s^-1, 10^10 s^-1) via molecular dynamics simulation.",
+    "conditions": "Vacuum environment (implied), Nose-Hoover thermostat for thermal control, 1 fs time step, annealing history (heated to 1000 K, held, cooled to 300 K).",
+    "structural_mediator": "Dislocation nucleation initiates at vacancy clusters/disordered atoms; plastic flow is mediated by Shockley partial dislocations (1/6<112>) generating intrinsic stacking faults (ISF) and extrinsic stacking faults (ESF), forming HCP-like regions locally without bulk phase change.",
+    "mechanism": "Yielding is triggered by a sudden stress drop associated with the nucleation of dislocations at vacancy sites. Elevated temperatures reduce yield strength by intensifying atomic thermal vibrations, facilitating dislocation nucleation and reducing critical resolved shear stress. Higher strain rates increase dislocation density and flow stress due to kinetic limitations on annihilation, but yield strength remains insensitive to strain rate within the simulated range.",
+    "predicted_outcome": "Maximum yield stress observed along the <-111> orientation; yield strength decreases with temperature; yield strength shows negligible sensitivity to strain rate; dislocation density increases with strain rate; no FCC-to-BCC transformation or twinning observed.",
+    "baseline": "Equiatomic FeNiCrMn HEA under reference conditions (300 K, 10^9 s^-1) compared against variations in temperature, strain rate, and crystal orientation.",
+    "boundary": "The observed strain rate insensitivity of yield strength is bounded by the specific range of 10^8-10^10 s^-1 and the single-crystal nature of the model; the mechanism of deformation is bounded to partial dislocation slip without bulk phase transformation.",
+    "discriminating_measurement": "Use Dislocation Extraction Algorithm (DXA) and Common Neighbor Analysis (CNA) to distinguish between true BCC phase transformation and stacking fault-induced HCP-like regions; analyze stress-strain curves for the sudden drop signature of dislocation nucleation vs. smooth phase transformation curves.",
+    "actual_result": "Simulation confirmed significant anisotropy (max yield at <-111>), temperature-dependent yield softening (thermal vibration facilitation), and strain rate insensitivity of yield strength despite increased dislocation density and flow stress at higher rates. Deformation was confirmed to be mediated by Shockley partials and stacking faults, with no BCC phase or twinning observed."
+  },
+  "hidden_target_source": "copied from the experiment-3 case (unchanged answer key)",
+  "flags": [
+    "no_relation"
+  ],
+  "scimon": {
+    "background_sentences": [
+      "High-entropy alloys (HEAs) exhibit excellent properties such as high strength, good ductility, superior corrosion resistance, and thermal stability, making them highly promising for applications in the aerospace, energy, and automotive industries.",
+      "Among them, the FeNiCrMn HEA demonstrates outstanding corrosion resistance while eliminating the expensive Co element present in the “Cantor” alloy, significantly reducing costs.",
+      "However, current research on the FeNiCrMn HEA has primarily focused on its corrosion resistance, with relatively limited studies on its mechanical properties."
+    ],
+    "dropped_self_reference": [],
+    "seed": null,
+    "target_type": null,
+    "tries_used": 1,
+    "relation_rank": 1
+  }
+}

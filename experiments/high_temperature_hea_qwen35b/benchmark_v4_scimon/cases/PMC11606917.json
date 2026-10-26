@@ -1,0 +1,50 @@
+{
+  "schema_version": "benchmark-v4-scimon-1.0",
+  "benchmark_version": "v4_scimon",
+  "paper_id": "PMC11606917",
+  "publication_date": "2024-11-29",
+  "split": "validation",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "SciMON-style: abstract Background sentences + task-side seed term (loop.md 14.1)",
+  "query_writer": "trapi:o3-mini_2025-01-31 (sentence labels, relations; verbatim spans only)",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "queries": {
+    "scimon": {
+      "text": "Consider the following context: Melting properties are critical for designing novel materials, especially for discovering high-performance, high-melting refractory materials. Experimental measurements of these properties are extremely challenging due to their high melting temperatures. Complementary theoretical predictions are, therefore, indispensable. One of the most accurate approaches for this purpose is the ab initio free-energy approach based on density functional theory (DFT). However, it generally involves expensive thermodynamic integration using ab initio molecular dynamic simulations. The high computational cost makes high-throughput calculations infeasible. In that context, which method can be used for calculate its melting properties, including the melting temperature, entropy and enthalpy of fusion, and volume change at the melting point, and why?",
+      "passed_gate": true,
+      "overlap": 0.082,
+      "raw_overlap_exp19_metric": 0.127,
+      "steers_to_answer": false,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "BCC refractory high-entropy alloy with nominal composition TaVCrW (disordered solid state)",
+    "intervention": "Substitution of the empirical Embedded Atom Method (EAM) potential with a Machine Learning Interatomic Potential (MTP) for the liquid phase, and replacement of expensive thermodynamic integration (TI) calculations with free energy perturbation (FEP) calculations.",
+    "conditions": "DFT-based free energy approach; Temperature range 2000–2400 K for SRO analysis; Supercell size 12x12x12 (3456 atoms) for MTP training/MD; Exchange-correlation functionals GGA-PBE and LDA; 0 GPa pressure.",
+    "structural_mediator": "High-fidelity MTP capable of closely reproducing the ab initio phase-space distribution for multi-component alloys, with training errors < 1 meV/atom.",
+    "mechanism": "The MTP enables efficient sampling for FEP, avoiding the slow convergence of TI. The electronic Gibbs energy difference (arising from a DOS gap at the Fermi level) and Solid-state Short-Range Order (SRO) stabilization (~2.4 meV/atom) act as critical physical contributions shifting the melting temperature. The FEP method leverages the small variance in energy differences between MTP and DFT to converge free energy rapidly.",
+    "predicted_outcome": "Computational resource savings of 80% (or ~20x speedup) compared to the original TOR-TILD method, with free energy differences between the new method and TI < 0.5 meV/atom, and melting points shifting by 48–57 K due to electronic excitations.",
+    "baseline": "Original TOR-TILD methodology using two EAM potentials and computationally expensive thermodynamic integration based on ab initio MD.",
+    "boundary": "The method is limited by the quality of the MTP training set; magnetic fluctuations at high temperatures are treated as having negligible impact (based on test calculations); SRO contribution is small but non-negligible (~25 K shift); the empirical rules for GGA/LDA under/overbinding do not hold for V/Cr, introducing uncertainty relative to CALPHAD data.",
+    "discriminating_measurement": "Comparison of free energy results between FEP (MTP) and TI (EAM) on a benchmark system (e.g., VW system) showing agreement within 0.5 meV/atom, and the specific energy difference attributed to electronic excitations (48 K shift for GGA-PBE).",
+    "actual_result": "The proposed method achieved 80% computational savings and predicted melting points 193 K (GGA-PBE) and 160 K (LDA) below the extrapolated CALPHAD value. Electronic excitations contributed a 48 K (GGA-PBE) and 57 K (LDA) shift, and SRO stabilized the solid phase by 2.4 meV/atom. The method agreed reasonably with CALPHAD values within the estimated uncertainty of the CALPHAD database."
+  },
+  "hidden_target_source": "copied from the experiment-3 case (unchanged answer key)",
+  "flags": [],
+  "scimon": {
+    "background_sentences": [
+      "Melting properties are critical for designing novel materials, especially for discovering high-performance, high-melting refractory materials.",
+      "Experimental measurements of these properties are extremely challenging due to their high melting temperatures.",
+      "Complementary theoretical predictions are, therefore, indispensable.",
+      "One of the most accurate approaches for this purpose is the ab initio free-energy approach based on density functional theory (DFT).",
+      "However, it generally involves expensive thermodynamic integration using ab initio molecular dynamic simulations.",
+      "The high computational cost makes high-throughput calculations infeasible."
+    ],
+    "dropped_self_reference": [],
+    "seed": "calculate its melting properties, including the melting temperature, entropy and enthalpy of fusion, and volume change at the melting point",
+    "target_type": "Method",
+    "tries_used": 1,
+    "relation_rank": 1
+  }
+}

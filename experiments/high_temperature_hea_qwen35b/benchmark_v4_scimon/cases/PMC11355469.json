@@ -1,0 +1,45 @@
+{
+  "schema_version": "benchmark-v4-scimon-1.0",
+  "benchmark_version": "v4_scimon",
+  "paper_id": "PMC11355469",
+  "publication_date": "2024-08-07",
+  "split": "validation",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "SciMON-style: abstract Background sentences + task-side seed term (loop.md 14.1)",
+  "query_writer": "trapi:o3-mini_2025-01-31 (sentence labels, relations; verbatim spans only)",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "queries": {
+    "scimon": {
+      "text": "Consider the following context: High entropy alloys have excellent wear resistance, so they have great application prospects in the fields of wear resistance and surface protection. In that context, which material can be used for adhere to the surface of a Cu matrix, and why?",
+      "passed_gate": true,
+      "overlap": 0.0,
+      "raw_overlap_exp19_metric": 0.0,
+      "steers_to_answer": false,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "FeNiCrCoCu high entropy alloy coating (21 Å thick) adhered to a single-crystal Cu matrix (100 Å × 100 Å × 55 Å), both with FCC lattice structure and orientation [100], [010], [001].",
+    "intervention": "Nanoindentation and friction simulation using a virtual indenter pressed at 10 m/s to a depth of 30 Å (loading 300 ps) followed by unloading at the same speed (300 ps), conducted at controlled ambient temperatures of 300 K, 600 K, 900 K, and 1200 K.",
+    "conditions": "Periodic boundary conditions in X and Y; contractive boundary in Z; NVE ensemble for bulk; Langevin thermostat for constant temperature layer; lattice constant fixed at 3.56 Å.",
+    "structural_mediator": "Evolution of lattice disorder and dislocation density: ordered lattice with stable dislocation density at 300-600 K; rapid lattice disorder and significant dislocation density reduction at 900-1200 K; increased HCP atom fraction with temperature.",
+    "mechanism": "At 600 K, reduced dislocation density increases elastic modulus. At >900 K, rapid lattice softening and disorder cause a sharp decrease in hardness and elastic modulus, shifting the deformation mechanism from stacking faults to lattice disorder, leading to increased tangential force and friction coefficient.",
+    "predicted_outcome": "Wear resistance and hardness remain relatively stable up to 600 K, then decrease sharply above 900 K; friction coefficient and tangential force increase with temperature, with significant fluctuations above 900 K.",
+    "baseline": "Room temperature (300 K) performance with ordered lattice structure and higher dislocation density.",
+    "boundary": "Critical temperature threshold of 900 K, above which wear resistance decreases sharply due to onset of rapid lattice disorder.",
+    "discriminating_measurement": "Correlation between the number of HCP atoms, dislocation line length, and the friction coefficient/elastic modulus values across the temperature range.",
+    "actual_result": "Hardness drops from ~17.4 GPa at 300/600 K to ~10.2 GPa at 900 K and ~8.6 GPa at 1200 K; Elastic modulus increases from 173 GPa to 219 GPa at 600 K then declines; Wear resistance decreases sharply at 900 K; Friction coefficient fluctuates intensely above 900 K."
+  },
+  "hidden_target_source": "copied from the experiment-3 case (unchanged answer key)",
+  "flags": [],
+  "scimon": {
+    "background_sentences": [
+      "High entropy alloys have excellent wear resistance, so they have great application prospects in the fields of wear resistance and surface protection."
+    ],
+    "dropped_self_reference": [],
+    "seed": "adhere to the surface of a Cu matrix",
+    "target_type": "Material",
+    "tries_used": 1,
+    "relation_rank": 1
+  }
+}

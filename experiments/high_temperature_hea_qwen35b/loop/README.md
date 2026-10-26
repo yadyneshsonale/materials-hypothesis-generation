@@ -111,3 +111,14 @@
 - **Result.** A few papers as context lower the score (−0.10 GPT-5.6, −0.24 DeepSeek over 36 papers), and 30 papers
   return toward the no-paper level. Raw text, relevance, reasoning effort and question detail have no significant
   effect.
+
+## Experiment 31: SciMON-style input (loop.md section 14)
+
+- **Runs.** [run_v4_scimon.sh](./run_v4_scimon.sh) ran `closed_book`, `closed_book_o3mini`, `writer_only_b_o3mini`
+  and `text_chunks_b_o3mini` on benchmark v4 ([../benchmark_v4_scimon/](../benchmark_v4_scimon/README.md)) for all
+  36 papers: 288 runs in a separate root, [../loop_v4_scimon/](../loop_v4_scimon/README.md). The runs in this folder
+  are untouched.
+- **Analysis.** [v4_scimon_analysis.py](../../../v4_scimon_analysis.py) writes `../loop_v4_scimon/analysis.json`.
+- **Result.** No GPT-5.6 change against v3.1 is significant, and DeepSeek scores v4 lower. The only significant
+  GPT-5.6 gains are on inputs that steer toward the answer. The ranking is unchanged: writer − Llama +0.22 (GPT-5.6)
+  / +0.23 (DeepSeek).

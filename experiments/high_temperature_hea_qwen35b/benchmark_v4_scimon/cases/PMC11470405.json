@@ -1,0 +1,47 @@
+{
+  "schema_version": "benchmark-v4-scimon-1.0",
+  "benchmark_version": "v4_scimon",
+  "paper_id": "PMC11470405",
+  "publication_date": "2024-09-24",
+  "split": "test3",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "SciMON-style: abstract Background sentences + task-side seed term (loop.md 14.1)",
+  "query_writer": "trapi:o3-mini_2025-01-31 (sentence labels, relations; verbatim spans only)",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "queries": {
+    "scimon": {
+      "text": "Consider the following context: The recent trend of high-entropy alloys (HEAs) was studied extensively for their promising mechanical properties, but individual constituents' effects have remained unexplored. In that context, which method can be used for the effects of changing the percentage of elements of HfNbTaTiZr-HEA on the mechanical properties, and why?",
+      "passed_gate": false,
+      "overlap": 0.0,
+      "raw_overlap_exp19_metric": 0.0,
+      "steers_to_answer": true,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "A defect-minimized, equilibrated BCC HfNbTaTiZr high-entropy-alloy crystal with lattice constant 3.403 Å; the equimolar Hf0.2Nb0.2Ta0.2Ti0.2Zr0.2 alloy served as the main base composition. Each atomistic model contained 40,000 atoms in a 20a × 20a × 50a periodic cell.",
+    "intervention": "Molecular-dynamics simulations varied Nb, Ta, Ti, or Zr individually among 0, 10, 20, and 30 at.%, with the compositional difference assigned to Hf, producing 13 unique alloys. The study calculated tensile strength, elastic modulus, elongation, fracture evolution, and optimized-composition thermal behavior; Nb10, Ta10, and Ti0 were subsequently tested from 300 to 1200 K, and their thermal expansion was calculated during heating.",
+    "conditions": "LAMMPS simulations used a validated modified embedded-atom-method potential, periodic boundaries in all directions, an NPT ensemble, a 1 fs time step, energy minimization, and 30 ps equilibration. Uniaxial tension was applied along z at 1 × 10^8 s^-1, primarily at 300 K. Thermal tests covered 300–1200 K in 300 K increments; thermal-expansion simulations used a heating rate of 0.02 K/fs.",
+    "structural_mediator": "At low Nb or Ta addition, substitutional solutes disrupt the lattice and form a strengthening solid solution that impedes dislocation motion. The authors propose that larger Nb or Ta contents increase atomic-size/crystal-structure mismatch and may inhibit a homogeneous solid solution. For Ti and Zr, initial substitution produces lattice strain and possible defects, while greater additions may permit atomic rearrangement into a more ordered/accommodated structure. These structural interpretations were proposed rather than directly quantified.",
+    "mechanism": "Low concentrations of Nb or Ta strengthen the alloy through solid-solution strengthening and reduced dislocation mobility; excessive concentrations weaken it, plausibly because compositional and structural mismatch prevents homogeneous solid-solution development. Elevated temperature increases lattice vibrations and facilitates dislocation migration, reducing strength and stiffness. Tensile failure proceeds by bond breaking and shear localization near 45° to the loading direction, producing cup-and-cone-type ductile fracture.",
+    "predicted_outcome": "Relative to the equimolar alloy, reducing Nb or Ta from 20% to 10% is expected to increase ultimate tensile strength and elastic modulus, whereas increasing either to 30% is expected to reduce both. Ti and Zr variations are expected to show the opposite, nonmonotonic trend: an initial decline upon addition followed by recovery at higher content. The optimized alloys are expected to lose strength and stiffness as temperature increases.",
+    "baseline": "Equimolar Hf0.2Nb0.2Ta0.2Ti0.2Zr0.2 (the Nb20/Ta20/Ti20/Zr20 case), with UTS 2.9 GPa, elastic modulus 117.7 ± 3 GPa, and elongation 17.0% at 300 K and 1 × 10^8 s^-1. Its reported linear thermal-expansion coefficient was 1.96 × 10^-5 K^-1.",
+    "boundary": "The conclusions apply to idealized periodic BCC atomistic cells described by the selected MEAM potential, the tested 0–30 at.% single-element variation range with Hf balancing the composition, and the high MD tensile strain rate of 1 × 10^8 s^-1. Mechanical comparisons were primarily at 300 K; high-temperature conclusions were evaluated only for Nb10, Ta10, and Ti0 over 300–1200 K.",
+    "discriminating_measurement": "Simulated uniaxial tensile stress–strain curves were used to determine UTS, the slope-derived elastic modulus, and elongation. Temperature-dependent stress–strain curves, length-versus-temperature changes, OVITO fracture snapshots, and Gaussian-density surface meshes tested thermal degradation, expansion, and fracture morphology.",
+    "actual_result": "At 300 K, Nb10 increased UTS from the equimolar baseline of 2.9 to 3.8 GPa and modulus from 117.7 ± 3 to 137.7 ± 3 GPa; Nb30 fell to 2.7 GPa and 112.2 ± 3 GPa. Ta10 reached 3.9 GPa, 129.1 ± 3 GPa, and the highest elongation, 25.51%, versus 17.0% at baseline; Ta30 fell to 2.7 GPa and 115.0 ± 3 GPa. Ti and Zr showed an initial decrease followed by recovery: Ti0/Ti10/Ti30 UTS values were 4.3/2.7/3.4 GPa, and Zr0/Zr10/Zr30 values were 3.5/2.6/3.9 GPa. For Nb10, heating to 1200 K reduced UTS from about 3.7–3.8 GPa to 0.3 GPa and modulus from 137.7 to 8.35 GPa; Ta10 and Ti0 degraded similarly, with Ti0 slightly better at high temperature. Thermal-expansion coefficients were 6.56 × 10^-6, 8.91 × 10^-6, and 6.98 × 10^-6 K^-1 for Nb10, Ta10, and Ti0, respectively, all below the equimolar value. All samples exhibited shear-associated cup-and-cone-type ductile fracture."
+  },
+  "hidden_target_source": "extracted by trapi:gpt-5.6-sol_2026-07-09 from the abstract and non-Introduction sections (loop.md section 11.1)",
+  "flags": [
+    "failed_gate"
+  ],
+  "scimon": {
+    "background_sentences": [
+      "The recent trend of high-entropy alloys (HEAs) was studied extensively for their promising mechanical properties, but individual constituents' effects have remained unexplored."
+    ],
+    "dropped_self_reference": [],
+    "seed": "the effects of changing the percentage of elements of HfNbTaTiZr-HEA on the mechanical properties",
+    "target_type": "Method",
+    "tries_used": 3,
+    "relation_rank": 1
+  }
+}

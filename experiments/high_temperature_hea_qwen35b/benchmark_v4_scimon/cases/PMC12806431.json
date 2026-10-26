@@ -1,0 +1,47 @@
+{
+  "schema_version": "benchmark-v4-scimon-1.0",
+  "benchmark_version": "v4_scimon",
+  "paper_id": "PMC12806431",
+  "publication_date": "2025-10-27",
+  "split": "test",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "SciMON-style: abstract Background sentences + task-side seed term (loop.md 14.1)",
+  "query_writer": "trapi:o3-mini_2025-01-31 (sentence labels, relations; verbatim spans only)",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "queries": {
+    "scimon": {
+      "text": "Consider the following context: Temper embrittlement, characterized by a dramatic loss of ductility within a narrow temperature window, is ubiquitous in conventional alloys but is not reported in compositionally complex or high‐entropy alloy systems. In that context, which material can be used for ductile–brittle–ductile transition, and why?",
+      "passed_gate": false,
+      "overlap": 0.044,
+      "raw_overlap_exp19_metric": 0.059,
+      "steers_to_answer": true,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "AlCoCrFeNi2.1 eutectic HEA in as-cast state (FCC + B2 phases)",
+    "intervention": "Thermal aging treatments applied at intermediate temperatures (specifically ~600°C for embrittlement and ~750°C for recovery)",
+    "conditions": "Aging regime defined by a specific temperature window (approx. 550-750°C) where chemical ordering kinetics and phase boundary evolution are maximized",
+    "structural_mediator": "Enhanced L12 ordering (approaching perfect Ni3Al stoichiometry) in FCC domains coupled with the formation of jagged B2/FCC phase boundaries",
+    "mechanism": "Elevated APBE and elastic modulus in ordered domains restrict cross-slip and promote planar slip; combined with stress concentration at jagged PB tips, this triggers plastic instability. At higher temperatures, reduced ordering and formation of ductile transition zones along PBs restore ductility.",
+    "predicted_outcome": "A non-monotonic ductile-brittle-ductile transition where ductility is minimized at the aging temperature that maximizes L12 ordering and jagged PB density (600°C) and recovers at higher temperatures (750°C) where ordering is suppressed.",
+    "baseline": "Conventional alloys exhibiting classical grain-boundary mediated thermal embrittlement (e.g., temper embrittlement via impurity segregation)",
+    "boundary": "Temperature regime: <550°C (no transition), 550-750°C (brittle window), >750°C (ductile recovery)",
+    "discriminating_measurement": "Transmission Kikuchi Diffraction (TKD) or TEM observation of dislocation pile-ups and crack initiation specifically at the tips of jagged phase boundaries, with no evidence of intergranular impurity segregation.",
+    "actual_result": "The alloy exhibited a ductile-brittle-ductile transition; the 600°C aged sample showed the lowest ductility due to enhanced L12 ordering and jagged PBs, while the 750°C sample regained ductility via reduced ordering and ductile transition zones."
+  },
+  "hidden_target_source": "copied from the experiment-3 case (unchanged answer key)",
+  "flags": [
+    "failed_gate"
+  ],
+  "scimon": {
+    "background_sentences": [
+      "Temper embrittlement, characterized by a dramatic loss of ductility within a narrow temperature window, is ubiquitous in conventional alloys but is not reported in compositionally complex or high‐entropy alloy systems."
+    ],
+    "dropped_self_reference": [],
+    "seed": "ductile–brittle–ductile transition",
+    "target_type": "Material",
+    "tries_used": 3,
+    "relation_rank": 1
+  }
+}

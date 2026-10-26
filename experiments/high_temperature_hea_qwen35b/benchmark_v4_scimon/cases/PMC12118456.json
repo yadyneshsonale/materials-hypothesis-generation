@@ -1,0 +1,48 @@
+{
+  "schema_version": "benchmark-v4-scimon-1.0",
+  "benchmark_version": "v4_scimon",
+  "paper_id": "PMC12118456",
+  "publication_date": "2025-05-01",
+  "split": "test3",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "SciMON-style: abstract Background sentences + task-side seed term (loop.md 14.1)",
+  "query_writer": "trapi:o3-mini_2025-01-31 (sentence labels, relations; verbatim spans only)",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "queries": {
+    "scimon": {
+      "text": "Consider the following context: High Entropy Alloy nanoparticles (HEA NPs) have been synthetized because they are promising materials to improve nanoscale performance. However, little theoretical study has been carried out regarding the thermal stability of HEA NPs. In that context, which method can be used for study the thermal response of FeCuCrCoNi HEA NPs as a function of size, and why?",
+      "passed_gate": false,
+      "overlap": 0.024,
+      "raw_overlap_exp19_metric": 0.034,
+      "steers_to_answer": true,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "Spherical, initially solid Fe–Ni–Cr–Co–Cu high-entropy-alloy nanoparticles cut from a random equiatomic (20% each element) FCC lattice with a 3.52 Å lattice parameter, then energy-minimized and thermally relaxed to 300 K.",
+    "intervention": "Classical molecular-dynamics simulations (LAMMPS, embedded-atom-method potential) were used to heat FeNiCrCoCu nanoparticles as a function of radius. Constructed radii were reported as 7.5, 10, 15, 20, 25, 30, 35, and 40 Å, although the Results also analyze a 5 Å particle.",
+    "conditions": "After FIRE minimization, particles were heated from 0 to 300 K over 0.2 ns in NVE with velocity rescaling and a 1 fs timestep. The thermal load increased temperature from 300 to 2500 K in 20 K increments, holding each increment for 200 ps (100 ps equilibration and 100 ps averaging), while removing net angular and linear momentum.",
+    "structural_mediator": "Preferential early mobility of Fe and Cu within the chemically disordered FCC nanoparticle, associated with element-dependent local energetic environments; Fe had a potential energy at least about 0.5 eV above the other species. High-displacement/high-strain surface atoms occupied only about 2–3 atomic layers near 900 K, rather than forming a substantial liquid shell, and mobility later propagated into the core.",
+    "mechanism": "Melting proceeds through competition between solid and liquid phases and enhanced element-specific diffusion from both the nanoparticle core and surface, rather than through a stable surface-liquid-shell mechanism. Fe mobility is attributed to its elevated local potential energy/local pressure in the multielement FCC environment, while Cu diffuses early consistently with its relatively low elemental melting point. Enhanced diffusion does not produce persistent elemental clusters or precipitates during the heating ramp.",
+    "predicted_outcome": "Relative to smaller nanoparticles, increasing particle radius raises the melting temperature toward the bulk limit. Relative to a liquid-shell/surface-premelting explanation, the nanoparticles are predicted to follow an approximately inverse-radius two-phase melting relation with no appreciable liquid-shell contribution; Fe and Cu should become mobile first, but the initially random elemental distribution should remain largely unclustered.",
+    "baseline": "The principal baselines were the fitted bulk melting limit of 2184 K, the initially random equiatomic FCC distribution, and conventional surface-melting/liquid-shell models in which unbound surface atoms dominate nanoparticle melting.",
+    "boundary": "The reported behavior holds across the simulated ultrasmall FeNiCrCoCu nanoparticles, nominally about 5–40 Å in radius, under the specified gradual thermal ramp. Preferential Fe/Cu mobility was nearly negligible at R = 5 Å and became clearer with increasing size. Slight short-range CuNi/CuCo clustering and CuCr repulsion appeared at R = 7.5–10 Å, but diminished for larger particles; the conclusions are limited to the employed interatomic potential, composition, sizes, and heating protocol.",
+    "discriminating_measurement": "Melting was identified from potential-energy-versus-temperature curves and fitted against radius and reciprocal radius. Element-resolved mean-square displacement tested preferential mobility; pair-correlation functions, Warren–Cowley parameters, atomic visualizations, common-neighbor analysis, and polyhedral-template matching tested clustering or crystalline subdomains; element-resolved potential energy and local von Mises shear strain tested the proposed energetic and spatial origin of premelting.",
+    "actual_result": "Melting temperature increased strongly with particle size and approached saturation near R = 40 Å. The size fit gave an exponent c = -0.978, close to the classical -1 inverse-radius dependence, with a fitted bulk melting point T0 = 2184 K; the reciprocal-radius fit was consistent with C = 1. Fe and Cu exhibited enhanced low-temperature mobility, with Fe showing an abrupt potential-energy/MSD increase around 1000 K. Only a few high-strain surface layers were present near 900 K, providing no evidence for a substantial liquid shell. Pair correlations showed no new peaks during heating, Warren–Cowley values were generally near zero, and structural analyses found no stable elemental clusters, precipitation, or mono-element crystalline domains, essentially independent of nanoparticle size."
+  },
+  "hidden_target_source": "extracted by trapi:gpt-5.6-sol_2026-07-09 from the abstract and non-Introduction sections (loop.md section 11.1)",
+  "flags": [
+    "failed_gate"
+  ],
+  "scimon": {
+    "background_sentences": [
+      "High Entropy Alloy nanoparticles (HEA NPs) have been synthetized because they are promising materials to improve nanoscale performance.",
+      "However, little theoretical study has been carried out regarding the thermal stability of HEA NPs."
+    ],
+    "dropped_self_reference": [],
+    "seed": "study the thermal response of FeCuCrCoNi HEA NPs as a function of size",
+    "target_type": "Method",
+    "tries_used": 1,
+    "relation_rank": 1
+  }
+}

@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 30)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 31)
 
 Related work (9 hypothesis-generation and materials-KG papers, with how each separates input from answer):
 [RELATED_WORK.md](./RELATED_WORK.md).
@@ -61,6 +61,7 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 28 | 2026-10-25 | Method loop round 3 on dev3 (24 papers): forecasting framing, recalled analogies, high reasoning effort, MBR, evidence, evidence + MBR; offline selector checks; pre-registered test3 evaluation | 1,008 dev3 runs + 288 test3 runs | o3-mini, Llama-3.3-70B (pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete. Exception: dev3 round-3 runs are judged but mostly not audited (GPT-5.6 rate limits) | [loop/](./loop/), [loop.md](../../loop.md) section 11 |
 | 29 | 2026-10-25 | Sensitivity of the score to one input at a time: papers as context (0–30), raw text (0–64k characters), relevance vs random papers, reasoning effort, question detail; replication of the paper-count dip on test3 | 1,152 dev3 runs + 216 test3 runs | o3-mini (pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete | [loop/](./loop/), [loop.md](../../loop.md) section 12 |
 | 30 | 2026-10-26 | Expert evaluation of the AI judge: blind package of 20 questions × 3 hypotheses (o3-mini writer, Llama baseline, the actual study rewritten as a proposal), two-part rating (blind quality; agreement with the paper), unblinding key and pre-registered analysis | 60 items; 20 reference rewrites | GPT-5.6 (reference rewriter) | GPT-5.6, DeepSeek-V4-Pro (+ the expert) | Package ready; awaiting ratings | [expert_evaluation/](../../expert_evaluation/), [expert_eval/](./expert_eval/) |
+| 31 | 2026-10-26 | SciMON-style user input (benchmark v4): abstract Background sentences + a task-side seed term in SciMON's template, leakage-gated; 4 configurations compared with v3.1 on the same 36 papers | 288 runs | o3-mini (labeller, extractor, generator), Llama-3.3-70B (pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete. v4 not better; v3.1 stays the main input | [benchmark_v4_scimon/](./benchmark_v4_scimon/README.md), [loop_v4_scimon/](./loop_v4_scimon/README.md), [loop.md](../../loop.md) section 14 |
 
 ## Correction to section 8 (MatKG)
 
@@ -1326,7 +1327,46 @@ methods-section detail and were re-rendered before release.
   0.49 / 0.29.
 - Blinding check passes; tests pass.
 
-## Comparability and limits, experiments 8 to 30
+## Experiment 31: SciMON-style user input (benchmark v4)
+
+**Question.** Does building the user input the way SciMON does (Wang et al., ACL 2024,
+https://aclanthology.org/2024.acl-long.18.pdf) change the results? Pre-registered in loop.md 14.1; rule
+must_obey.md 3.7.
+
+**Input.** "Consider the following context: M In that context, which p can be used for v, and why?"
+- M is the abstract's Background sentences, verbatim, labelled by o3-mini.
+- v is the task side of the most salient `[method/material used-for task]` relation in the other sentences.
+- p is the hidden side's type.
+- The v3 leakage checker and lexical gate apply; up to 3 relations are tried with no rewriting, and failing cases
+  are flagged.
+- Hidden targets, prompts and judges are unchanged.
+
+Builder: [query_builder_v4_scimon.py](../../query_builder_v4_scimon.py); inputs:
+[benchmark_v4_scimon/](./benchmark_v4_scimon/README.md).
+
+**Construction.** Of 36 papers, 9 give a clean input.
+- 14 abstracts have no Background sentence, so the input is a one-line question.
+- In 13 the input fails the leakage gate: 11 steer toward the answer because the seed names the study design, and 2
+  contain answer phrases.
+
+**Results** (288 runs, 0 failed; v4 − v3.1 per paper; GPT-5.6 / DeepSeek).
+- Llama: −0.02 / **−0.13** (Holm p = 0.045).
+- o3-mini closed-book: +0.12 / −0.26.
+- o3-mini writer: +0.08 / −0.17.
+- Evidence (`text_chunks`): −0.07 / −0.33.
+- No GPT-5.6 change is significant (Holm p ≥ 0.84).
+- On the 9 clean inputs: +0.005 to −0.12 (GPT-5.6).
+- **Ranking unchanged:** writer − Llama +0.22 [0.08, 0.38] / +0.23 [0.10, 0.39].
+
+**Why** (exploratory, loop.md 14.4).
+- The only significant GPT-5.6 gains are on inputs the checker says steer toward the answer (+0.23 to +0.29). On
+  clean inputs there is no gain.
+- Both judges mark condition agreement down, because abstract background sentences rarely state operating
+  conditions.
+
+**Decision.** v3.1 stays the main benchmark input. v4 is kept frozen as a SciMON-comparable variant.
+
+## Comparability and limits, experiments 8 to 31
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -1363,3 +1403,7 @@ methods-section detail and were re-rendered before release.
   have been tried on dev across three rounds; the claims rest on the three pre-registered held-out evaluations.
 - Experiment 29 changes the evidence and reasoning budgets on purpose (declared). Its replication on test3 was decided
   after seeing dev3 and is labelled post hoc. The pooled 36-paper estimates are exploratory.
+- Experiment 31 changes only the user input (benchmark v4). All 36 papers were already spent, so it compares input
+  formats on the same papers and makes no method claim. Only 9 v4 inputs are clean, which is too few to stand
+  alone. The v3.1 comparison for `closed_book_o3mini` and `text_chunks_b_o3mini` covers 24 papers. The breakdown by
+  checker verdict and judge dimension was added after the results and is exploratory.

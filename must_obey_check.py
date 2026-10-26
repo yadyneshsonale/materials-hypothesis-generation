@@ -24,14 +24,17 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parent
 BENCHMARKS = {"v3": ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_v3" / "cases",
-              "v3.1": ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_v3_1" / "cases"}
+              "v3.1": ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_v3_1" / "cases",
+              "v4_scimon": ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_v4_scimon" / "cases"}
+# The `benchmark` field of a run names its frozen query set (test2/test3 runs were built with the v3.1 procedure).
+RUN_BENCHMARK = {"v3.1": "v3.1", "test2": "v3.1", "test3": "v3.1", "v4_scimon": "v4_scimon"}
 # Held-out sets built by the same procedure as a benchmark version and checked with it (loop.md sections 10.1, 11.1).
 EXTRA_CASES = {"v3.1": (ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_test2" / "cases",
                         ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_test3" / "cases")}
 HELD_OUT_SPLITS = ("test", "test2", "test3")
 # Spent held-out splits were each used once for their pre-registered finals and are development data afterwards
 # (loop.md 11.1); the final-run rule applies only to unspent held-out splits.
-SPENT_SPLITS = ("test", "test2")
+SPENT_SPLITS = ("test", "test2", "test3")
 CURRENT = "v3.1"
 CASES = BENCHMARKS[CURRENT]
 
@@ -82,7 +85,8 @@ def judged(run_dir: Path, run_id: str) -> dict[str, bool]:
 
 
 def check(run_dir: Path, loop: bool = False, require_cross: bool = True, bench: str = CURRENT) -> dict[str, Any]:
-    queries = frozen_queries(BENCHMARKS[bench], EXTRA_CASES.get(bench, ()))
+    sets = {name: frozen_queries(BENCHMARKS[name], EXTRA_CASES.get(name, ())) for name in sorted(BENCHMARKS)
+            if BENCHMARKS[name].exists()}
     failures: list[str] = []
     warnings: list[str] = []
     counts = {"runs": 0, "ok": 0, "failed": 0}
@@ -92,12 +96,13 @@ def check(run_dir: Path, loop: bool = False, require_cross: bool = True, bench: 
         rid = run.get("run_id", path.stem)
         counts["runs"] += 1
         key = (run.get("paper_id"), run.get("query_level"))
-        frozen = queries.get(key)
+        version = RUN_BENCHMARK.get(str(run.get("benchmark")), bench)
+        frozen = sets.get(version, {}).get(key)
         if frozen is None:
             failures.append(f"{rid}: unknown case/level {key}")
             continue
         if hashlib.sha256(str(run.get("query", "")).encode("utf-8")).hexdigest() != frozen["sha256"]:
-            failures.append(f"{rid}: query differs from frozen benchmark {bench} text")
+            failures.append(f"{rid}: query differs from frozen benchmark {version} text")
         case_date = date.fromisoformat(frozen["date"])
         for role, identity in query_facing_models(run).items():
             name = deployment(identity)

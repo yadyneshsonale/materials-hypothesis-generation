@@ -32,6 +32,8 @@ Last updated: 2026-10-25 (see the change log at the end).
   - **Spent splits.** A held-out split used once for its pre-registered finals is *spent*. It becomes development
     data, and no later claim rests on it.
   - From round 3, development uses **dev3** = dev + test + test2 (24 papers). Claims rest on test3 (loop.md 11.1).
+  - test3 was used for the round-3 finals (loop.md 11.7), so it is spent too. **No unspent held-out set remains.** A
+    new method claim needs a fresh set (test4) built by the same pre-registered procedure.
 
 - **Queries.** `experiments/high_temperature_hea_qwen35b/benchmark_v3_1/cases` is the current frozen version
   (section 3).
@@ -113,6 +115,19 @@ preferred future option.
 5. **Hidden targets are frozen.** One answer key.
 6. **Check every new query set.** Answer-word overlap must not predict the score; report Spearman ρ
    ([query_leakage_audit.py](./query_leakage_audit.py) and [compare_rerun.py](./compare_rerun.py)).
+7. **Benchmark v4 (SciMON-style input, experiment 31; loop.md 14.1).** This is a versioned exception to rule 1, made
+   at the user's request to match SciMON (Wang et al., ACL 2024).
+   - **Background.** The input's background is the paper's abstract sentences labelled Background, verbatim. The
+     labeller is a pre-cutoff model (o3-mini), and code verifies every sentence is an exact abstract sentence.
+   - **Seed term.** The seed is the task-side entity of the most salient `[method/material used-for task]`
+     relation in the abstract's non-background sentences. It must be an exact span. The method or material side
+     must never enter the input.
+   - **Template.** SciMON's: "Consider the following context: {M} In that context, which {p} can be used for {v},
+     and why?"
+   - **Leakage gates.** The rule-3 checker and the lexical gate apply. Failing inputs are not rewritten: the next
+     relation is tried, up to 3, and otherwise the case is flagged.
+   - **Unchanged.** Hidden targets, system prompts, output schema and judges are unchanged.
+   - **Runs.** v4 runs record `benchmark: v4_scimon` and are hash-checked against `benchmark_v4_scimon/cases`.
 
 ## 4. Evidence and tool leakage
 
@@ -268,3 +283,11 @@ Ablate before combining. Combine only components that helped or that address dif
   - Expert-facing material must pass a blinding check: no source, model or method names; no paper identifiers before
     the unblinded part (`expert_eval_builder.py check`, unit-tested).
   - The unblinding key lives outside the expert's folder.
+- 2026-10-26 (experiment 31, SciMON-style input):
+  - Benchmark v4 adds a versioned exception to 3.1: abstract Background sentences plus a task-side seed term, in
+    SciMON's template, with the 3.3 gates (3.7).
+  - test3 is spent, so no unspent held-out set remains.
+  - `must_obey_check.py` now checks each run against the frozen query set named in its `benchmark` field.
+  - Result (loop.md 14.5): v4 is not better, and v3.1 stays the main benchmark input. A seed taken from a paper's
+    own objective sentence can carry the study design, so any seed-based input must pass the steering test in 3.3,
+    not only the lexical gate.

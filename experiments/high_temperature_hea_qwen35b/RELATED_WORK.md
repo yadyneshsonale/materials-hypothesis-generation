@@ -66,6 +66,11 @@ recorded in that table. Each entry ends with how it relates to the experiments i
   - Its citation-neighbour retrieval is the same idea as our experiment 17. Note that the paper calls access to
     the source paper's citations a "stronger assumption", because it uses knowledge of what the target paper read.
     Our graph avoids that by starting from the query.
+- **Tried here (experiment 31, loop.md section 14).** We built SCIMON's input for our 36 papers: abstract Background
+  sentences, a task-side seed and its template (benchmark v4).
+  - Only 9 papers give a clean input. Many alloy abstracts have no background sentence, and the seed often names
+    the study design.
+  - Scores did not improve, and the input drops the operating conditions. v3.1 stays the main input.
 
 ### 3. Concept graphs for new research directions in materials science (Nature Machine Intelligence 2026)
 

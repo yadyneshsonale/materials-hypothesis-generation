@@ -48,8 +48,9 @@ class GuardTests(unittest.TestCase):
 
 class SplitTests(unittest.TestCase):
     def test_unspent_held_out_split_requires_final(self) -> None:
-        with self.assertRaises(SystemExit):
-            H.generate_stage("closed_book", "test3", 1, final=False)
+        with patch.object(H, "SPENT", ("test", "test2")):  # as if test3 were still unspent
+            with self.assertRaises(SystemExit):
+                H.generate_stage("closed_book", "test3", 1, final=False)
 
 
 class TournamentTests(unittest.TestCase):
@@ -143,11 +144,12 @@ class Bm25PackTests(unittest.TestCase):
 
 class Test2SplitTests(unittest.TestCase):
     def test_spent_splits_are_development_and_all_is_the_original_12(self) -> None:
-        self.assertEqual(set(H.SPENT), {"test", "test2"})
-        for split in ("test", "test2", "all", "dev3"):  # spent held-out splits need no --final (loop.md 11.1)
+        self.assertEqual(set(H.SPENT), {"test", "test2", "test3"})
+        for split in ("test", "test2", "all", "dev3", "all36"):  # spent held-out splits need no --final
             self.assertFalse(H.SPLITS[split] & (set(H.HELD_OUT) - set(H.SPENT)))
         self.assertEqual(H.SPLITS["all"], {"dev", "test"})
         self.assertEqual(H.SPLITS["dev3"], {"dev", "test", "test2"})
+        self.assertEqual(H.SPLITS["all36"], {"dev", "test", "test2", "test3"})
         self.assertEqual(H.split_of({"split": "test2"}), "test2")
         self.assertEqual(H.split_of({"split": "test3"}), "test3")
         self.assertEqual(H.split_of({"split": "validation"}), "dev")

@@ -1,0 +1,48 @@
+{
+  "schema_version": "benchmark-v4-scimon-1.0",
+  "benchmark_version": "v4_scimon",
+  "paper_id": "PMC11775865",
+  "publication_date": "2024-11-21",
+  "split": "validation",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "SciMON-style: abstract Background sentences + task-side seed term (loop.md 14.1)",
+  "query_writer": "trapi:o3-mini_2025-01-31 (sentence labels, relations; verbatim spans only)",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "queries": {
+    "scimon": {
+      "text": "Consider the following context: High entropy alloy nanoparticles bring hope to developing more efficient nanomaterials for high‐temperature applications. Nevertheless, the enhanced thermal stability of nearly equiatomic nanoalloys containing at least 5 metals is nothing more than theoretical speculation about the impact of thermodynamic contributions on their structural properties and remains to be proven. In that context, which method can be used for investigate at the atomic scale the thermal behavior of AuCoCuNiPt nanoparticles, and why?",
+      "passed_gate": false,
+      "overlap": 0.047,
+      "raw_overlap_exp19_metric": 0.08,
+      "steers_to_answer": true,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "Equiatomic AuCoCuNiPt high-entropy alloy (HENA) nanoparticles (sub-10 nm), initially in an FCC multi-twinned/icosahedral structure, synthesized via pulsed laser deposition (PLD) at 873 K on a silicon nitride membrane.",
+    "intervention": "In situ heating from 298 K to 973 K at a rate of 1 K/s under vacuum, followed by analysis via aberration-corrected STEM and atomistic molecular dynamics simulations.",
+    "conditions": "Vacuum environment, heating steps at 473, 673, 773, 873, and 973 K; analysis limited to 45 min per step to mitigate IR radiation effects on EDS.",
+    "structural_mediator": "Active atomic diffusion (non-sluggish) driven by surface energy minimization, leading to the segregation of low surface energy elements (Au, Cu) to the nanoparticle surface and subsequent melting/evaporation.",
+    "mechanism": "Surface energy differences drive the segregation of Au and Cu to the surface; this segregation is enhanced by the reshaping of nanoparticles (e.g., coalescence or elliptical-to-spherical transition) which boosts local atomic diffusion. The process is kinetically controlled rather than thermodynamically stabilized by high entropy.",
+    "predicted_outcome": "Progressive loss of the smallest nanoparticles (2-4 nm), widening of the size distribution, reduction in average particle size due to evaporation of Au/Cu, and a transition from elliptical to spherical shapes with increasing temperature.",
+    "baseline": "Theoretical expectation that HENA exhibit sluggish diffusion and high thermal stability due to entropy stabilization, preserving the initial size and structure up to higher temperatures.",
+    "boundary": "The stability of HENA is compromised above ~673 K where diffusion becomes active enough to cause significant surface segregation and evaporation; the mechanism is shape-dependent (icosahedral vs. truncated octahedron) and size-dependent (sub-10 nm).",
+    "discriminating_measurement": "Simultaneous observation of self-diffusivity of Au atoms (increasing linearly with T until phase transition) and the correlation between surface Au/Cu concentration and particle shape evolution via in situ STEM-EDS.",
+    "actual_result": "Experiments and simulations revealed poor structural stability; Au and Cu segregate to the surface, forming a shell that melts and evaporates at 973 K, leading to a 22% size reduction and confirming that diffusion is not sluggish and the structure is kinetically, not entropically, governed."
+  },
+  "hidden_target_source": "copied from the experiment-3 case (unchanged answer key)",
+  "flags": [
+    "failed_gate"
+  ],
+  "scimon": {
+    "background_sentences": [
+      "High entropy alloy nanoparticles bring hope to developing more efficient nanomaterials for high‐temperature applications.",
+      "Nevertheless, the enhanced thermal stability of nearly equiatomic nanoalloys containing at least 5 metals is nothing more than theoretical speculation about the impact of thermodynamic contributions on their structural properties and remains to be proven."
+    ],
+    "dropped_self_reference": [],
+    "seed": "investigate at the atomic scale the thermal behavior of AuCoCuNiPt nanoparticles",
+    "target_type": "Method",
+    "tries_used": 2,
+    "relation_rank": 1
+  }
+}

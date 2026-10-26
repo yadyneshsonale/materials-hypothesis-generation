@@ -1,0 +1,47 @@
+{
+  "schema_version": "benchmark-v4-scimon-1.0",
+  "benchmark_version": "v4_scimon",
+  "paper_id": "PMC11375216",
+  "publication_date": "2024-09-04",
+  "split": "validation",
+  "benchmark_claim": "retrospective_temporal_reconstruction",
+  "query_source": "SciMON-style: abstract Background sentences + task-side seed term (loop.md 14.1)",
+  "query_writer": "trapi:o3-mini_2025-01-31 (sentence labels, relations; verbatim spans only)",
+  "leakage_checker": "trapi:gpt-5.6-sol_2026-07-09",
+  "queries": {
+    "scimon": {
+      "text": "Consider the following context: Phonon scattering by SRO precipitates might be expected to reduce scattering times and, therefore, decrease thermal conductivity. In that context, which material can be used for lattice heat conductivity, and why?",
+      "passed_gate": false,
+      "overlap": 0.097,
+      "raw_overlap_exp19_metric": 0.135,
+      "steers_to_answer": true,
+      "source_role_refs": []
+    }
+  },
+  "hidden_target": {
+    "material_initial_state": "Random bcc HfNbTaTiZr refractory high-entropy alloy",
+    "intervention": "Induce varying degrees of chemical short-range order (SRO) via Monte Carlo simulation, leading to the formation of HfTi and TiZr clusters and percolation pathways",
+    "conditions": "Atomistic simulation (Monte Carlo for structure, non-equilibrium molecular dynamics for transport), single-phase bcc model constraint, room to high-temperature regime",
+    "structural_mediator": "Ordered B2-like structures and percolative SRO cluster pathways",
+    "mechanism": "SRO reduces lattice distortion (reducing scattering) and creates high-conductivity percolation pathways, outweighing the scattering effect of the precipitates themselves; modifies high-frequency phonon density of states",
+    "predicted_outcome": "Lattice heat conductivity increases by approximately 12% relative to the random alloy state",
+    "baseline": "Random alloy with high lattice distortion and no SRO clustering",
+    "boundary": "Applicability extends to other HEAs (including fcc) and depends on the percolation of specific ordered binary clusters; distinct from random fcc alloys where conductivity typically decreases significantly with temperature",
+    "discriminating_measurement": "Quantification of lattice heat conductivity increase (12%) and reduction in atomic displacements (12.5%) compared to random state; analysis of phonon density of states modifications",
+    "actual_result": "SRO increases lattice heat conductivity by ~12% due to percolative transitions and reduced lattice distortion, contradicting the expectation that ordered phases always reduce conductivity via scattering"
+  },
+  "hidden_target_source": "copied from the experiment-3 case (unchanged answer key)",
+  "flags": [
+    "failed_gate"
+  ],
+  "scimon": {
+    "background_sentences": [
+      "Phonon scattering by SRO precipitates might be expected to reduce scattering times and, therefore, decrease thermal conductivity."
+    ],
+    "dropped_self_reference": [],
+    "seed": "lattice heat conductivity",
+    "target_type": "Material",
+    "tries_used": 2,
+    "relation_rank": 1
+  }
+}
