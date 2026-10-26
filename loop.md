@@ -1694,3 +1694,322 @@ Each moves it toward v3.1's problem-constrained level, which is what v3.1 alread
   - [x] results with and without flagged cases;
   - [x] exploratory analysis labelled;
   - [x] recorded in loop.md, the experiment log (experiment 31) and the READMEs.
+
+---
+
+## 15. All experiments rerun on the SciMON-style input (experiment 32)
+
+### 15.1 Pre-registered plan (written 2026-10-26 06:28, before any experiment-32 run)
+
+**Request.** "Rerun all the experiments using this way": every evaluation, with the SciMON-style user input of
+benchmark v4 (section 14) in place of v3.1 or v3.
+
+**Scope.**
+- **A. Harness experiments 24, 26, 28 and 29** (`loop/`). Every configuration run on v3.1 is re-run on v4 for all 36
+  papers × 1 input × 2 samples, in the root `loop_v4_scimon/`.
+  - 52 configurations: the 4 of experiment 31, plus 48 new (3,456 runs).
+  - Not re-run: the two fresh-sample replicates, `trend_ground_b_o3mini_r2` and `writer_only_b_o3mini_r3`. They
+    repeat their base configuration and existed only to control the winner's curse during selection; nothing is
+    selected on v4.
+  - Generators, prompts, evidence pools and budgets, and samples are unchanged.
+- **B. The experiment-21 suite** (experiments 7, 9, 11, 14, 16 and 17). It runs on the 12 papers it was built for,
+  with the v4 input and the Llama-3.3-70B generator as in experiment 21. Root `rerun_v4_scimon/`, runner
+  `run_v4_suite.sh`.
+  - **Citation graph (17).** Graphs are rebuilt from the v4 input; Llama-3.3 writes the search phrases from it.
+    - Papers already in the extraction cache keep their Qwen cards and citer statements.
+    - New papers are extracted by Llama-3.3. The local Qwen extractor needs a GPU, and all four are in use by other
+      users; must_obey.md 4.5 prefers pre-cutoff extractors anyway.
+    - Each card records its extractor, and the share of Llama-extracted nodes is reported.
+  - **Experiments 7, 9 and 11** also get the DeepSeek cross-judge and the target-free audit, which their frameworks
+    lacked (must_obey.md 6.7).
+  - **Not re-run:** experiment 21's generator × queries factorial. It tested Qwen and the leaky experiment-3
+    queries, and neither is in use.
+- **C. Not re-run, with reasons.**
+  - **Data and benchmark construction** (0–2, 5, 6, 8, 10, 20, 23, 25, 27): no step depends on the user input.
+  - **Experiments 3 and 4** (Qwen, leaky queries): replaced by 7 and 14 in experiment 21.
+  - **Analysis-only experiments** (12, 13, 15, 18, 19, 22): their v4 counterparts come from the new runs (leakage
+    audit and ρ, lever labels, judge dimensions, style).
+  - **Experiment 30** (expert package): it is with the expert, and changing its questions would invalidate ratings
+    in progress.
+
+**Analysis, fixed now.** Script `v4_all_analysis.py`, written before any result.
+- **Family H** (harness, 52 configurations, 36 papers).
+  - **H1 (primary).** Per configuration, v4 − v3.1 GPT-5.6 reconstruction per paper, on the papers that have v3.1
+    runs for it (v3.1 = mean of its three levels). Paper-clustered bootstrap CI and sign test, with Holm across
+    the 52.
+  - **H2.** v4 leaderboard on all 36 papers with both judges. Each configuration is compared with the Llama
+    baseline `closed_book` and with `closed_book_o3mini`, with Holm within each set of 51.
+  - **H3.** Rank agreement of configuration means, v4 vs v3.1, on the papers both cover (Spearman), per judge.
+  - **H4.** Earlier conclusions re-tested on v4:
+    1. the recommended `writer_only_b_o3mini` beats the Llama baseline;
+    2. no configuration beats `writer_only_b_o3mini` (every configuration vs it, Holm across 51);
+    3. 1–3 papers as context lower the score below `writer_only_b_o3mini`, and 30 papers recover (experiment 29);
+    4. raw text, random papers and reasoning effort have no significant effect (experiment 29).
+  - **H5 (robustness, from experiment 31).** H2 and H4 on the 9 unflagged papers and on the 25 papers whose input
+    the checker does not mark as steering. A v4 result counts only if its direction holds in both.
+  - **H6.** Leakage audit: ρ(input overlap, score) per configuration.
+- **Family S** (suite, 12 papers).
+  - **S1.** Per arm, v4 − v3 (experiment 21, mean of three levels) per paper, with Holm across arms.
+  - **S2.** Within v4, each arm vs its framework's primary baseline (raw text chunks, as in experiments 14, 16 and
+    17) and vs closed-book, with Holm within the family.
+  - **S3.** Does any arm beat closed-book on v4? None did in experiment 21.
+- **Decision rule.** The conclusions depend on the input format if either holds:
+  - H3's rank correlation is below 0.5;
+  - a comparison in H4 or S2 is significant on both v3.1 and v4 with opposite signs.
+- **Not a method claim.** All papers are spent, so this tests whether earlier conclusions hold under another input
+  format.
+- **Statistics.** As before: 10,000 bootstrap resamples (seed 20261026), exact sign test, Holm.
+- **Order of evaluation.** GPT-5.6 judge, then the DeepSeek cross-judge, then audits, then lever labels. Labels are
+  secondary; if the GPT-5.6 quota runs out first, this is reported.
+
+### 15.2 Runs, deviations and integrity (2026-10-26)
+
+**Harness** (runner [run_v4_all.sh](./experiments/high_temperature_hea_qwen35b/loop/run_v4_all.sh), root
+`loop_v4_scimon/`).
+- 48 new configurations × 36 papers × 2 samples = 3,456 runs, plus experiment 31's 288.
+- Generation ran 06:30–09:48; Llama-3.3 was congested, so its multi-step configurations took about 4× longer per
+  call than on v3.1.
+- One run failed once: an MBR ranking step picked a candidate that cited a mistyped evidence ID. It is kept in
+  `failed_attempts/` and succeeded on retry, so 0 runs failed.
+- GPT-5.6 and DeepSeek judged all 3,744 runs. All 3,744 also have a target-free audit and a lever label.
+  - Audits and labels first ran alongside generation, using idle GPT-5.6 capacity
+    ([run_v4_all_eval.sh](./experiments/high_temperature_hea_qwen35b/loop/run_v4_all_eval.sh)).
+  - That side loop and the runner's own audit pass had overlapping job lists, so both were stopped. The remaining
+    1,202 audits ran as three passes over disjoint configuration groups, followed by catch-all audit and label
+    passes.
+
+**Suite** (runners [run_v4_suite.sh](./run_v4_suite.sh) and [run_v4_citegraph.sh](./run_v4_citegraph.sh), root
+`rerun_v4_scimon/`). 504 runs, 24 revisions and 24 ensemble selections; 0 failed.
+
+| Experiment | Runs |
+|---|---|
+| 7 (tool agent and one-shot baselines) | 48 |
+| 9 (MatKG agent) | 12, plus 48 copied baselines |
+| 11 (critique) | 12 resample runs and 24 revisions |
+| 14 (rubrics) | 192 |
+| 16 (improvements) | 96 runs and 24 selections |
+| 17 (citation graph) | 120 |
+
+- Every run has GPT-5.6, DeepSeek and a target-free audit. For experiments 7, 9 and 11, the last two come from
+  [suite_extra_eval.py](./suite_extra_eval.py).
+- **Citation graphs are rebuilt from the v4 input.**
+  - On average 1.0 of 10 seeds is shared with experiment 21's graphs, so the v4 input retrieves almost entirely
+    different literature.
+  - 213 full-text papers, 94 of them newly extracted by Llama-3.3 (44%).
+  - Per graph: 1,336 nodes, 24 full-text, 857 citer statements. Experiment 21's graphs had 1,259, 30 and 1,053.
+- **Two fixes, both declared** (run_v4_citegraph.sh header; must_obey.md change log).
+  1. Europe PMC returned HTTP 500 on every request for one full text (PMC9520225), which stopped acquisition. A full
+     text the server keeps failing to deliver now counts as unavailable, like a 404, and the paper is skipped.
+  2. In most citer statements, Llama-3.3 wrote the cited title where the prompt asks for the marker label (R1, …).
+     - The parser rejected them: 0.9 statements per new paper, against 37 for the cached Qwen extractions.
+     - `citegraph.marker_label` now maps copied marker text back to its label (unit-tested). The 91 affected files
+       were re-extracted, giving 30 statements per paper.
+     - The first graphs and 120 runs are kept in `rerun_v4_scimon/citegraph_superseded/` and are not analysed. Seeds
+       and expansions were copied from there, so retrieval is unchanged.
+  - Llama's cards needed no fix: 96% of proposed records kept (Qwen 98%), 1.17 records per card (Qwen 1.08).
+- **Integrity gate.** `must_obey_check.py --bench v4_scimon` passes on every suite directory. The only warnings are the
+  known one-month Llama margins.
+
+### 15.3 Harness results (52 configurations, 36 papers; analysis_all.json and analysis_all.md)
+
+Scores are GPT-5.6 / DeepSeek reconstruction on 0–4, per paper. The full 52-row table, with every CI and Holm p, is
+in `loop_v4_scimon/analysis_all.md`.
+
+**H1, primary: v4 − v3.1 per configuration.**
+- **GPT-5.6.** No configuration changes significantly (all Holm p = 1.0). The mean change is +0.02: 28 configurations
+  higher and 23 lower. One CI excludes zero: `trend_o1_ground_b_o3mini`, +0.26 [+0.08, +0.45], on 8 papers.
+- **DeepSeek.** 49 of 52 are lower (mean −0.16), and 25 CIs lie below zero. Two survive Holm:
+  `trend_ground_b_o3mini` (−0.32) and `papers_n3_b_o3mini` (−0.19).
+- This repeats experiment 31 on all configurations: GPT-5.6 flat, DeepSeek lower.
+
+**H2: leaderboard on v4** (selection; † = not significant after Holm across 51, but the CI excludes zero).
+
+| Configuration | v4 GPT-5.6 | v4 DeepSeek | vs Llama baseline, GPT-5.6 | vs writer, GPT-5.6 |
+|---|---:|---:|---|---|
+| `scaffold_ensemble_o3mini` | 0.69 | 0.48 | +0.22 [+0.10, +0.34]† | +0.00 [−0.12, +0.12] |
+| `writer_only_b_o3mini` (recommended) | 0.69 | 0.42 | +0.22 [+0.08, +0.38]† | – |
+| `text_64k_b_o3mini` | 0.68 | 0.44 | +0.21 [+0.07, +0.37]† | −0.01 [−0.18, +0.15] |
+| `text_chunks_mbr_b_o3mini` | 0.67 | 0.41 | +0.20 [+0.04, +0.36]† | −0.02 [−0.17, +0.12] |
+| `writer_only_b_o3mini_low` | 0.67 | 0.45 | +0.20 [+0.09, +0.32]† | −0.02 [−0.12, +0.08] |
+| `closed_book_o3mini` | 0.66 | 0.31 | +0.18 [+0.05, +0.32]† | −0.04 [−0.16, +0.07] |
+| `forecast_writer_b_o3mini` | 0.64 | 0.48 | +0.16 [+0.05, +0.28]† (DeepSeek +0.28, Holm p = 0.026) | −0.06 [−0.16, +0.05] |
+| `text_chunks_b_o3mini` | 0.59 | 0.44 | +0.12 [−0.04, +0.27] | −0.10 [−0.27, +0.06] |
+| `papers_n1_b_o3mini` | 0.45 | 0.19 | −0.02 [−0.16, +0.12] | −0.24 [−0.38, −0.11]† |
+| `closed_book` (Llama baseline) | 0.47 | 0.19 | – | −0.22 [−0.38, −0.08]† |
+| `writer_only` (Llama, writer A) | 0.34 | 0.13 | −0.14 [−0.22, −0.04]† | −0.36 (Holm p < 0.001) |
+| `breadth_tournament` (Llama) | 0.30 | 0.16 | −0.17 [−0.26, −0.09]† | −0.40 (Holm p < 0.001) |
+
+- **vs the Llama baseline.**
+  - GPT-5.6: 21 configurations have a CI above zero and 6 below, but none survives Holm across 51.
+  - DeepSeek: 22 above and none below. `forecast_writer_b_o3mini` survives Holm (+0.28).
+- **vs `closed_book_o3mini`.** No configuration has a CI above zero with GPT-5.6, and 24 are below. Three Llama
+  multi-step methods survive Holm below it: `decide_then_ground`, `frame_decide` and `precedent_decide`.
+
+**H3: rank agreement between formats.** The configurations rank almost the same way on v4 and v3.1, above the
+pre-registered 0.5 threshold.
+
+| Judge | ρ of means | ρ relative to the Llama baseline |
+|---|---:|---:|
+| GPT-5.6 | 0.77 | 0.73 |
+| DeepSeek | 0.72 | 0.68 |
+
+**H4: earlier conclusions re-tested on v4.**
+1. **The recommended writer beats the Llama baseline.**
+   - GPT-5.6: +0.22 [+0.08, +0.38], 19 papers up and 8 down, sign p = 0.052.
+   - DeepSeek: +0.23 [+0.10, +0.39], 19/6, p = 0.015.
+   - Not robust by H5 (below).
+2. **No configuration beats `writer_only_b_o3mini`.** This holds with both judges: the best is +0.00. Six Llama
+   configurations are significantly below it after Holm, with both judges: `writer_only`, `breadth_tournament`,
+   `frame_decide`, `frame_decide_verify`, `decide_then_ground` and `precedent_decide`.
+3. **A few papers as context lower the score (experiment 29).** This replicates and is larger on v4.
+
+   | Papers as context, vs the writer | GPT-5.6 | DeepSeek |
+   |---|---|---|
+   | 1 | −0.24 [−0.38, −0.11], p = 0.009 | −0.23 (p = 0.043) |
+   | 3 | −0.18 [−0.30, −0.06], p = 0.014 | −0.25 (p = 0.006) |
+   | 10 | −0.20 [−0.35, −0.05], p = 0.016 | −0.19 (n.s.) |
+   | 30 | −0.10 [−0.27, +0.06], n.s. | −0.12 (n.s.) |
+
+   On v3.1, 1 and 3 papers cost −0.10 with GPT-5.6.
+4. **Relevance, raw text and reasoning effort.** No significant effect (experiment 29), with one exception.
+   - Random vs relevant 10 papers: +0.05 / +0.01.
+   - 64k characters of text: −0.01 / +0.01.
+   - Low and high reasoning effort: within ±0.05.
+   - **Exception:** 4k characters of raw text: GPT-5.6 −0.17 [−0.33, −0.03] (sign p = 0.26), DeepSeek −0.04.
+
+**H5: robustness, on the 9 unflagged and the 25 non-steering papers.**
+- **No configuration beats the writer, in either subset, with either judge.**
+- **The papers-as-context dip** keeps its direction in both subsets, with both judges. Examples:
+  - non-steering: 1 paper −0.24 / −0.24, 3 papers −0.18 / −0.18;
+  - unflagged: 3 papers −0.17 / −0.26.
+- **The writer's lead over Llama fails the rule.**
+  - Non-steering: +0.24 [+0.05, +0.46] / +0.16 [+0.00, +0.34].
+  - Unflagged, with GPT-5.6: −0.01 [−0.17, +0.15] (DeepSeek +0.15).
+  - By the pre-registered rule, it is therefore not a robust v4 result. Nine papers are too few to show that it
+    disappears; they only fail to confirm it.
+
+**H6: leakage audit.** ρ(answer-word overlap of the v4 input, score) has a median of 0.15 across configurations
+(range −0.30 to +0.46). Five of 52 exceed 0.3: `frame_decide` 0.46, `frame_decide_verify` 0.44,
+`trend_o1_ground_b_o3mini` 0.39, `trend_ground_b_o1` 0.37 and `trend_chain` 0.31. As in experiment 31, the v4 input carries
+some answer content, so a few configurations score higher where it leaks more.
+
+**Decision rule (15.1).** Neither condition is met:
+- the rank correlation is 0.77, above 0.5;
+- no comparison in H2 or H4 is significant with opposite signs on v3.1 and v4.
+
+So the harness conclusions do not depend on the input format. The one exception in strength is the writer's lead
+over Llama, which v4 supports overall but not on its 9 clean inputs.
+
+### 15.4 Suite results (experiments 7, 9, 11, 14, 16, 17 on 12 papers; rerun_v4_scimon/comparison/)
+
+Scores are GPT-5.6 / DeepSeek reconstruction, paired per paper; v3 is experiment 21 (mean of three levels).
+Experiments 7, 9 and 11 had no DeepSeek judgments on v3, so their v4 − v3 comparison uses GPT-5.6 only.
+
+| Arm (experiment) | v4 GPT-5.6 | v4 DeepSeek | v3 GPT-5.6 | v4 − v3, GPT-5.6 | v4 vs closed-book, GPT-5.6 |
+|---|---:|---:|---:|---|---|
+| fixed closed-book prompt (16) | 0.58 | 0.23 | 0.53 | +0.05 [−0.12, +0.23] | +0.16 [+0.02, +0.31] |
+| knowledge-first refinement (16) | 0.53 | 0.24 | 0.53 | −0.00 [−0.15, +0.16] | +0.10 [−0.04, +0.25] |
+| ensemble selection (16) | 0.52 | 0.28 | 0.54 | −0.02 [−0.22, +0.18] | +0.09 [−0.18, +0.36] |
+| text one-shot (7) | 0.50 | 0.17 | 0.43 | +0.07 [−0.06, +0.20] | +0.07 [−0.16, +0.32] |
+| corroboration-weighted graph (17) | 0.46 | 0.16 | 0.47 | −0.01 [−0.15, +0.15] | +0.03 [−0.12, +0.18] |
+| raw text chunks (14, primary baseline) | 0.44 | 0.28 | 0.47 | −0.03 [−0.23, +0.15] | +0.01 [−0.24, +0.26] |
+| closed-book (14) | 0.43 | 0.20 | 0.60 | −0.17 [−0.34, +0.01] | – |
+| graph profiles (17) | 0.43 | 0.15 | 0.55 | −0.12 [−0.26, −0.01] | +0.00 [−0.19, +0.20] |
+| graph selection (17) | 0.38 | 0.15 | 0.54 | −0.16 [−0.33, +0.04] | −0.05 [−0.25, +0.15] |
+| tool agent (7) | 0.33 | 0.13 | 0.40 | −0.07 [−0.16, +0.03] | −0.09 [−0.27, +0.07] |
+| critique revision (11) | 0.31 | 0.06 | 0.35 | −0.04 [−0.15, +0.07] | −0.12 [−0.30, +0.05] |
+| MatKG agent (9) | 0.29 | 0.13 | 0.35 | −0.06 [−0.21, +0.13] | −0.14 [−0.29, +0.00] |
+| graph tool agent (17) | 0.28 | 0.12 | 0.46 | −0.18 [−0.32, −0.04] | −0.15 [−0.38, +0.09] |
+
+All 26 arms, with DeepSeek comparisons and Holm p: `rerun_v4_scimon/comparison/tables.md`.
+
+- **S1: v4 − v3.** No arm changes significantly.
+  - GPT-5.6: mean −0.05; 20 of 26 lower; smallest Holm p = 0.30.
+  - DeepSeek: mean −0.05; 15 of 18 lower; smallest Holm p = 0.69.
+  - Two citation-graph arms have CIs below zero with GPT-5.6: graph profiles and the graph tool agent. Their graphs
+    were built from different literature (15.2).
+- **S2: within v4.** No arm beats raw text chunks or closed-book after Holm, with either judge.
+  - The fixed closed-book prompt is the only CI above closed-book: +0.16 [+0.02, +0.31], not significant after Holm.
+  - On v3, two arms were significantly below closed-book with GPT-5.6: the critique resample (−0.23) and the MatKG
+    agent (−0.25). On v4 both keep that direction (−0.16, −0.14) without reaching significance.
+- **S3.** No arm beats closed-book on v4, as on v3 (experiment 21): evidence pipelines, agents, critics, rubrics and
+  citation graphs still add nothing a closed-book Llama-3.3 lacks.
+- **Decision rule.** No S2 comparison is significant with opposite signs on v3 and v4.
+- **Unflagged subset.** Only 3 of the 12 suite papers have clean v4 inputs, too few to analyse; reported
+  descriptively in `analysis.json`.
+
+### 15.5 Answer: do the experiments change when the user input is SciMON-style?
+
+The conclusions do not change; only the score levels do, and those depend on the judge.
+- **Scores.**
+  - GPT-5.6: the 52 harness configurations average +0.02 on v4 against v3.1, and the 26 suite arms −0.05 against v3.
+    None changes significantly after Holm.
+  - DeepSeek: lower almost everywhere (harness −0.16; 49 of 52 lower).
+  - As in experiment 31, the GPT-5.6 level is propped up by inputs that leak the study design (H6: median
+    ρ(overlap, score) = 0.15).
+- **Rankings.** They agree between formats: ρ = 0.77 (GPT-5.6), 0.72 (DeepSeek).
+- **Earlier conclusions that hold on v4:**
+  1. Nothing beats the recommended o3-mini conservative writer. Six Llama multi-step methods are significantly
+     worse, with both judges.
+  2. A few papers as context lower the score, more strongly than on v3.1 (one paper −0.24 / −0.23); 30 papers
+     recover.
+  3. Relevance, 64k characters of text and reasoning effort do not matter. 4k characters of raw text is
+     inconclusive: GPT-5.6 −0.17, CI below zero, sign test not significant; DeepSeek −0.04.
+  4. In the experiment-21 suite, no evidence pipeline, agent, critic, rubric or citation graph beats closed-book.
+- **What is weaker on v4.** The writer still leads the Llama baseline overall (+0.22 / +0.23), but not on the 9 clean
+  inputs with GPT-5.6 (−0.01). By the pre-registered robustness rule it is not a robust v4 result.
+- **What changes in the pipelines.** The citation-graph method retrieves almost entirely different literature from
+  the v4 input (1 of 10 seeds shared). Three of its five arms are among the largest drops (−0.12 to −0.18, alongside
+  the rubric closed-book at −0.17). Methods that search with the user input are sensitive to its format.
+- **Decision.**
+  - v3.1 stays the main benchmark input.
+  - v4 is kept as the SciMON-comparable variant, with every experiment re-run on it.
+  - Claims in this repository hold on both formats unless marked otherwise.
+
+### 15.6 Integrity, style and checklist (experiment 32)
+
+- **Runs and evaluation.**
+  - Harness: 3,744 runs, 0 failed after one retry, both judges on all.
+  - Suite: 504 runs, 24 revisions and 24 selections, all judged by both judges and audited.
+  - Superseded citation-graph runs: kept, not analysed (15.2).
+- **Integrity gate.** `must_obey_check.py` passes on every harness and suite directory.
+- **Style (must_obey.md 6.8).** Harness style and audit coverage: 15.7.
+- **Deviations, all declared in 15.1–15.2:**
+  - Llama-3.3 extracts new citation-graph papers;
+  - one unavailable full text skipped;
+  - parser fix and citation-graph rerun;
+  - audits and labels run alongside generation;
+  - replicates `_r2` and `_r3` not re-run;
+  - experiment-21 factorial not re-run;
+  - experiment 30 unchanged.
+- **Checklist:**
+  - [x] pre-registered (15.1) before any experiment-32 run;
+  - [x] pre-cutoff query-facing models (o3-mini, o1, gpt-4o-mini, Llama-3.3, also as the extractor of new papers);
+  - [x] frozen, hash-checked v4 inputs; hidden targets unchanged;
+  - [x] both judges and audits on every analysed run;
+  - [x] leakage ρ reported (H6);
+  - [x] robustness on unflagged and non-steering papers (H5);
+  - [x] failures reported and retried, never dropped; the superseded attempt kept;
+  - [x] recorded in loop.md, must_obey.md, the experiment log (experiment 32) and the READMEs.
+
+### 15.7 Style and audit coverage (must_obey.md 6.8; analysis_all.json `style_must_obey_6_8`)
+
+- **Coverage.** All 3,744 harness runs are judged, cross-judged, audited and labelled. Every suite run is judged by
+  both judges and audited.
+- **Shorter, less specific hypotheses on v4.**
+  - Every one of the 52 configurations writes shorter hypotheses on v4: 754 characters on average against 944 on
+    v3.1.
+  - Audited specificity is 0.23 against 0.39, over the 49 configurations with full v3.1 audits.
+  - Hedges are similar: 0.07 against 0.09 per run.
+  - The SciMON input gives less to build on, so hypotheses name fewer specific systems and conditions (as in
+    experiment 31).
+- **Score does not track style.**
+
+  | Feature | ρ with GPT-5.6 score, pooled over 3,744 v4 runs | Median ρ within configurations |
+  |---|---:|---:|
+  | Length | 0.12 | −0.03 |
+  | Hedges | 0.03 | 0.00 |
+  | Specificity | −0.03 | 0.07 |
+
+  Only the Llama baseline has a length ρ above 0.3 (0.39, as in experiment 31). Its many very short outputs include
+  one abstention that scored 0.

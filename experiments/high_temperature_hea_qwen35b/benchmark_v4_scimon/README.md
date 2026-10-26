@@ -83,7 +83,9 @@ context, which material can be used for high-performance wide-temperature self-l
 | Path | Content |
 |---|---|
 | `cases/<paper>.json` | The v4 case: the input (`queries.scimon`), gate result, flags, background sentences, seed, hidden target |
+| `cases_original12/` | Symbolic links to the 12 original cases (dev 8, test 4), the papers of the experiment-21 suite; used by experiment 32 |
 | `build_log/<paper>.json` | All abstract sentences, labels, relations and every tried input with its check |
 | `summary.json` | Construction counts |
 
-Results: [loop.md](../../../loop.md) section 14 and `../loop_v4_scimon/`.
+Results: [loop.md](../../../loop.md) section 14 (experiment 31) and section 15 (experiment 32, every experiment
+re-run on v4); runs in `../loop_v4_scimon/` and `../rerun_v4_scimon/`.

@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 31)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 32)
 
 Related work (9 hypothesis-generation and materials-KG papers, with how each separates input from answer):
 [RELATED_WORK.md](./RELATED_WORK.md).
@@ -62,6 +62,7 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 29 | 2026-10-25 | Sensitivity of the score to one input at a time: papers as context (0–30), raw text (0–64k characters), relevance vs random papers, reasoning effort, question detail; replication of the paper-count dip on test3 | 1,152 dev3 runs + 216 test3 runs | o3-mini (pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete | [loop/](./loop/), [loop.md](../../loop.md) section 12 |
 | 30 | 2026-10-26 | Expert evaluation of the AI judge: blind package of 20 questions × 3 hypotheses (o3-mini writer, Llama baseline, the actual study rewritten as a proposal), two-part rating (blind quality; agreement with the paper), unblinding key and pre-registered analysis | 60 items; 20 reference rewrites | GPT-5.6 (reference rewriter) | GPT-5.6, DeepSeek-V4-Pro (+ the expert) | Package ready; awaiting ratings | [expert_evaluation/](../../expert_evaluation/), [expert_eval/](./expert_eval/) |
 | 31 | 2026-10-26 | SciMON-style user input (benchmark v4): abstract Background sentences + a task-side seed term in SciMON's template, leakage-gated; 4 configurations compared with v3.1 on the same 36 papers | 288 runs | o3-mini (labeller, extractor, generator), Llama-3.3-70B (pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete. v4 not better; v3.1 stays the main input | [benchmark_v4_scimon/](./benchmark_v4_scimon/README.md), [loop_v4_scimon/](./loop_v4_scimon/README.md), [loop.md](../../loop.md) section 14 |
+| 32 | 2026-10-26 | Every experiment re-run on the SciMON-style input: all 52 harness configurations (experiments 24, 26, 28, 29, 31) on 36 papers, and the experiment-21 suite (7, 9, 11, 14, 16, 17) on its 12 papers, with citation graphs rebuilt from the v4 input | 3,456 new harness runs + 504 suite runs, 24 revisions, 24 selections | o3-mini, o1, gpt-4o-mini, Llama-3.3-70B (pre-cutoff; Llama also extracts new citation-graph papers) | GPT-5.6, DeepSeek-V4-Pro | Complete, verified. Conclusions unchanged (rank ρ 0.77); writer > Llama not robust on the 9 clean v4 inputs | [loop_v4_scimon/](./loop_v4_scimon/README.md), [rerun_v4_scimon/](./rerun_v4_scimon/README.md), [loop.md](../../loop.md) section 15 |
 
 ## Correction to section 8 (MatKG)
 
@@ -1366,7 +1367,47 @@ Builder: [query_builder_v4_scimon.py](../../query_builder_v4_scimon.py); inputs:
 
 **Decision.** v3.1 stays the main benchmark input. v4 is kept frozen as a SciMON-comparable variant.
 
-## Comparability and limits, experiments 8 to 31
+## Experiment 32: every experiment re-run on the SciMON-style input
+
+**Question.** Do the earlier results hold when the user input is built the SciMON way (benchmark v4)? Pre-registered in
+loop.md 15.1, including the scope and the reasons for what was not re-run.
+
+**Setup.**
+- **Harness** (experiments 24, 26, 28, 29, 31). All 52 configurations ran on the 36 papers × 2 samples: 3,456 new
+  runs plus experiment 31's 288 ([run_v4_all.sh](./loop/run_v4_all.sh)). The two replicates were not re-run.
+- **Suite** (experiments 7, 9, 11, 14, 16, 17). The suite ran on its 12 papers with Llama-3.3 as in experiment 21:
+  504 runs, 24 revisions and 24 selections ([run_v4_suite.sh](../../run_v4_suite.sh),
+  [run_v4_citegraph.sh](../../run_v4_citegraph.sh)).
+  - The citation graphs were rebuilt from the v4 input.
+  - New papers were extracted by Llama-3.3: the GPUs for the local Qwen extractor were in use, and must_obey.md 4.5
+    prefers pre-cutoff extractors.
+  - Experiments 7, 9 and 11 got the DeepSeek judge and audits for the first time
+    ([suite_extra_eval.py](../../suite_extra_eval.py)).
+- **Analysis.** [v4_all_analysis.py](../../v4_all_analysis.py).
+- **Fixes during the run** (loop.md 15.2).
+  - One full text that Europe PMC never delivered is skipped as unavailable.
+  - Llama wrote cited titles instead of marker labels in citer statements. After the parser fix, the 91 files were
+    re-extracted and the 120 citation-graph runs redone. The first attempt is kept in `citegraph_superseded/` and
+    not analysed.
+
+**Results** (GPT-5.6 / DeepSeek).
+- **Scores, v4 − v3.1 (harness).**
+  - GPT-5.6: mean +0.02, no configuration significant after Holm.
+  - DeepSeek: −0.16, 49 of 52 lower.
+- **Scores, v4 − v3 (suite).** −0.05 / −0.05, no arm significant.
+- **Rankings agree.** ρ = 0.77 / 0.72 across the 52 configurations, so by the pre-registered rule the conclusions do
+  not depend on the input format.
+- **Holds on v4:**
+  - nothing beats the o3-mini conservative writer, and six Llama multi-step methods are significantly worse;
+  - a few papers as context lower the score (one paper −0.24 / −0.23), and 30 papers recover;
+  - relevance, 64k characters of raw text and reasoning effort do not matter;
+  - no suite arm beats closed-book.
+- **Weaker on v4.** The writer's lead over the Llama baseline (+0.22 [+0.08, +0.38] / +0.23 [+0.10, +0.39]) is
+  absent on the 9 clean inputs with GPT-5.6 (−0.01). It is therefore not a robust v4 result.
+- **Retrieval-based methods are the most input-sensitive.** The v4 citation graphs share 1 of 10 seeds with
+  experiment 21's; three graph arms fall by 0.12–0.18.
+
+## Comparability and limits, experiments 8 to 32
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -1407,3 +1448,10 @@ Builder: [query_builder_v4_scimon.py](../../query_builder_v4_scimon.py); inputs:
   formats on the same papers and makes no method claim. Only 9 v4 inputs are clean, which is too few to stand
   alone. The v3.1 comparison for `closed_book_o3mini` and `text_chunks_b_o3mini` covers 24 papers. The breakdown by
   checker verdict and judge dimension was added after the results and is exploratory.
+- Experiment 32 re-runs every evaluation on the v4 input. All papers were already spent, so it tests whether earlier
+  conclusions hold under another input format; it is not a new method claim.
+  - Harness configurations first developed on 8 or 24 papers now have v4 runs on all 36, but their v4 − v3.1
+    comparison uses only the papers with v3.1 runs.
+  - The suite's citation graphs mix Qwen (cached) and Llama-3.3 (new, 44% of full-text papers) extractions. Llama
+    yields fewer citer statements per paper (30 vs 37).
+  - Only 9 harness and 3 suite papers have clean v4 inputs.

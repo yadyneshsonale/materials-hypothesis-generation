@@ -27,6 +27,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import re
 import statistics
 import time
@@ -48,6 +49,9 @@ OUT = RUN_ROOT / "citegraph"
 # Downloaded papers, their cards and citer statements are pre-cutoff material shared by every run root.
 PAPERS = EXPERIMENT_DIR / "citegraph" / "papers"
 CASES_OUT = OUT / "cases"
+# The query the graph is built from (search phrases, seed relevance, expansion relevance). Benchmark v4 has a single
+# level, so its rerun sets MATHG_GRAPH_LEVEL=scimon (loop.md 15.1).
+GRAPH_LEVEL = os.environ.get("MATHG_GRAPH_LEVEL", "problem_constrained")
 N_SEEDS = 10
 K_PER_SEED = 3
 SEARCH_POOL_PER_PHRASE = 100
@@ -244,11 +248,15 @@ def case_dir(paper_id: str) -> Path:
     return CASES_OUT / paper_id
 
 
+def graph_query(case: dict[str, Any]) -> str:
+    return case["queries"][GRAPH_LEVEL]["text"]
+
+
 def keywords(case: dict[str, Any]) -> list[str]:
     path = case_dir(case["paper_id"]) / "keywords.json"
     if path.exists():
         return _read_json(path)["phrases"]
-    query = case["queries"]["problem_constrained"]["text"]
+    query = graph_query(case)
     raw = lc.chat_json(KEYWORD_SYSTEM, json.dumps({"question": query}, ensure_ascii=False), max_tokens=800, retries=3)
     phrases = [re.sub(r"[\"()]", " ", str(p)).strip() for p in (raw.get("phrases", []) if isinstance(raw, dict) else [])]
     phrases = [re.sub(r"\s+", " ", p) for p in phrases if 2 <= len(p.split()) <= 8][:3]
@@ -296,7 +304,7 @@ def seeds_for_case(case: dict[str, Any]) -> dict[str, Any]:
     """Relevance pool (domain-anchored Europe PMC search, re-ranked by BM25 on title + abstract against the query
     and its search phrases), top RELEVANT_POOL kept, then ordered by citations received before the cutoff year."""
     phrases = keywords(case)
-    query = case["queries"]["problem_constrained"]["text"]
+    query = graph_query(case)
     exclusion = target_exclusion(case)
     last_day = day_before(case["publication_date"])
     candidates: dict[str, dict[str, Any]] = {}
@@ -349,7 +357,13 @@ def fetch_xml(pmcid: str) -> str | None:
     path = PAPERS / pmcid / "paper.xml"
     if path.exists():
         return path.read_text()
-    text = _get(f"{EPMC}/{pmcid}/fullTextXML", raw=True, timeout=120)
+    try:
+        text = _get(f"{EPMC}/{pmcid}/fullTextXML", raw=True, timeout=120)
+    except RuntimeError as error:
+        # A full text the server keeps failing to deliver (persistent 5xx after retries) counts as unavailable, like a
+        # 404: the paper is skipped by the same rule as papers without open full text.
+        print(f"[citegraph] full text unavailable, skipped: {pmcid} ({error})", flush=True)
+        return None
     if not text or "<body" not in text:
         return None
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -569,7 +583,7 @@ def select_expansion(case: dict[str, Any]) -> list[dict[str, Any]]:
         return _read_json(path)["expansion"]
     seeds = select_seeds(case)
     exclusion = target_exclusion(case)
-    query_tokens = title_tokens(case["queries"]["problem_constrained"]["text"] + " " + " ".join(keywords(case)))
+    query_tokens = title_tokens(graph_query(case) + " " + " ".join(keywords(case)))
     seed_ids = {s["openalex_id"] for s in seeds}
     parsed = {s["pmcid"]: _read_json(PAPERS / s["pmcid"] / "parsed.json") for s in seeds}
     cocitation: Counter[str] = Counter()
@@ -685,6 +699,17 @@ def grounding(attributed: str, source: str) -> float:
     return len(terms & set(content_terms(source))) / len(terms) if terms else 0.0
 
 
+def marker_label(ref: Any, info: dict[str, Any]) -> str | None:
+    """The marker label a statement refers to. Some extractors (Llama-3.3) copy the marker's text, the cited title and
+    year, instead of its label; such a ref is mapped back to the label whose text it matches."""
+    label = str(ref or "").strip("[] ")
+    if label in info["labels"]:
+        return label
+    wanted = rx.normalise(label)
+    matches = [lab for lab, text in info["markers"].items() if wanted and rx.normalise(text) == wanted]
+    return matches[0] if len(matches) == 1 else None
+
+
 def extract_contexts(pmcid: str) -> None:
     parsed = _read_json(PAPERS / pmcid / "parsed.json")
     refs = {r["rid"]: r for r in parsed["refs"]}
@@ -717,7 +742,8 @@ def extract_contexts(pmcid: str) -> None:
                 stats["malformed"] += 1
                 continue
             info = meta[st["ctx"]]
-            rid = info["labels"].get(str(st.get("ref", "")).strip("[] "))
+            label = marker_label(st.get("ref"), info)
+            rid = info["labels"].get(label) if label else None
             relation = str(st.get("relation", "")).strip().lower()
             attributed = str(st.get("attributed", "")).strip()
             if rid is None or relation not in RELATIONS:
@@ -726,7 +752,7 @@ def extract_contexts(pmcid: str) -> None:
             if relation == "background" or not attributed:
                 stats["background"] += 1
                 continue
-            score = grounding(attributed, info["source"] + " " + info["markers"][st["ref"].strip("[] ")])
+            score = grounding(attributed, info["source"] + " " + info["markers"][label])
             if score < MIN_GROUNDING:
                 stats["ungrounded"] += 1
                 continue
@@ -1497,8 +1523,8 @@ def render_report(a: dict[str, Any]) -> str:
     for arm, s in a["by_arm"].items():
         lines.append("| " + " | ".join(_f(x) for x in (
             arm, s["runs"], s["failed"], s["reconstruction_gpt56"], s["reconstruction_deepseek"],
-            s["reconstruction_gpt56_non_broad"], s["by_level"]["broad"], s["by_level"]["problem_constrained"],
-            s["by_level"]["expert_context"], s["intervention"], s["mechanism"], s["outcome"], s["evidence_validity"],
+            s["reconstruction_gpt56_non_broad"], s["by_level"].get("broad"), s["by_level"].get("problem_constrained"),
+            s["by_level"].get("expert_context"), s["intervention"], s["mechanism"], s["outcome"], s["evidence_validity"],
             s["novelty"], s["mechanism_own_reasoning"], s["mechanism_transferred_unjustified"], s["specificity"],
             s["packed_papers"], s["packed_with_citer_statements"])) + " |")
     for judge, label in (("gpt", "GPT-5.6"), ("deep", "DeepSeek-V4-Pro")):

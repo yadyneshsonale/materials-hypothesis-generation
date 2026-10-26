@@ -5,6 +5,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import re
 import sys
 from collections import Counter
@@ -18,7 +19,10 @@ from llm_client import chat_json, provider_info
 from materials_evidence import MaterialsEvidenceUnit, load_materials_evidence
 
 SCHEMA_VERSION = "temporal-hypothesis-benchmark-1.0"
-QUERY_LEVELS = ("broad", "problem_constrained", "expert_context")
+DEFAULT_QUERY_LEVELS = ("broad", "problem_constrained", "expert_context")
+# A versioned benchmark may define other levels (benchmark v4 has one, "scimon"; loop.md 14.1). Every framework that
+# imports QUERY_LEVELS follows MATHG_LEVELS, as hypo_loop.LEVELS does.
+QUERY_LEVELS = tuple(os.environ.get("MATHG_LEVELS", ",".join(DEFAULT_QUERY_LEVELS)).split(","))
 VARIANTS = ("roles_only", "v1_evidence", "v2_evidence", "v2_roles_questions")
 ACTIONABLE_QUESTION_TYPES = {
     "counterfactual",

@@ -122,3 +122,15 @@
 - **Result.** No GPT-5.6 change against v3.1 is significant, and DeepSeek scores v4 lower. The only significant
   GPT-5.6 gains are on inputs that steer toward the answer. The ranking is unchanged: writer − Llama +0.22 (GPT-5.6)
   / +0.23 (DeepSeek).
+
+## Experiment 32: every configuration on the SciMON-style input (loop.md section 15)
+
+- **Runs.** [run_v4_all.sh](./run_v4_all.sh) ran the other 48 configurations on benchmark v4 for all 36 papers: 3,456
+  runs in [../loop_v4_scimon/](../loop_v4_scimon/README.md). [run_v4_all_eval.sh](./run_v4_all_eval.sh) ran audits
+  and labels alongside generation.
+- **Analysis.** [v4_all_analysis.py](../../../v4_all_analysis.py) writes `../loop_v4_scimon/analysis_all.json` and
+  `analysis_all.md`.
+- **Result.** Rankings agree with v3.1 (ρ 0.77 GPT-5.6, 0.72 DeepSeek).
+  - Nothing beats `writer_only_b_o3mini`.
+  - The papers-as-context dip replicates, and is larger.
+  - The writer's lead over Llama holds overall but not on the 9 clean v4 inputs.

@@ -291,3 +291,12 @@ Ablate before combining. Combine only components that helped or that address dif
   - Result (loop.md 14.5): v4 is not better, and v3.1 stays the main benchmark input. A seed taken from a paper's
     own objective sentence can carry the study design, so any seed-based input must pass the steering test in 3.3,
     not only the lexical gate.
+- 2026-10-26 (experiment 32, every experiment re-run on the v4 input): no rule changed. How the rules were applied:
+  - 4.5: new citation-graph papers were extracted by a pre-cutoff model (Llama-3.3), because the local Qwen extractor
+    had no free GPU. Cached Qwen extractions were reused, and every card and statement file records its extractor.
+  - 6.7: the experiment 7, 9 and 11 frameworks had only the GPT-5.6 judge. Their v4 runs also get the DeepSeek
+    cross-judge and the target-free audit (`suite_extra_eval.py`).
+  - Evidence acquisition: a full text the server keeps failing to deliver (HTTP 5xx after retries) counts as
+    unavailable, like a 404, and is skipped by the open-full-text rule.
+  - Extraction checks: a new extractor's output must be checked against the cached one before use. Llama's citer
+    statements were first lost to a parser mismatch (loop.md 15.2), and the affected runs were redone.
