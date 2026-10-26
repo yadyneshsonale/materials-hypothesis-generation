@@ -1672,7 +1672,7 @@ Each moves it toward v3.1's problem-constrained level, which is what v3.1 alread
     (14.4).
   - **Not a length effect.** The GPT-5.6 rise for o3-mini comes despite shorter outputs, and for the recommended
     writer length does not predict the score (ρ = 0.04).
-  - **Hedges.** Rare in both (0.01–0.13 per run).
+  - **Hedges.** Rare in both: 0.01–0.13 per run on v4, 0.04–0.15 on v3.1.
   - **One abstention.** On the bare no-background input "Which method can be used for oxidation resistance, and
     why?", one Llama run answered that the method is unknown for lack of evidence and scored 0. It is counted, not
     dropped.

@@ -26,7 +26,6 @@ V31_ROOT, V4_ROOT = E / "loop", E / "loop_v4_scimon"
 V4_CASES = E / "benchmark_v4_scimon" / "cases"
 CONFIGS = ("closed_book", "closed_book_o3mini", "writer_only_b_o3mini", "text_chunks_b_o3mini")
 V31_LEVELS = ("broad", "problem_constrained", "expert_context")
-V31_SPLITS = {"validation", "dev", "test", "test2", "test3"}
 DIMS = ("intervention_reconstruction", "condition_agreement", "mechanism_agreement", "outcome_agreement")
 BOOTSTRAP = 10_000
 SEED = 20261026
