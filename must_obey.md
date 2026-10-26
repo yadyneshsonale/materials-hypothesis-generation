@@ -258,3 +258,6 @@ Ablate before combining. Combine only components that helped or that address dif
     (loop.md 11.1). `must_obey_check.py` requires final runs only on unspent held-out splits (test3).
   - Final hypotheses are restricted to the schema fields.
   - gpt-4o is not used: its memorisation probe could not complete because of rate limits.
+- 2026-10-25 (experiment 29, sensitivity): no rule changed. Finding recorded for method design: on this task, a few
+  paper summaries as context lower the score (anchoring on a predecessor's study), and more papers or more relevant
+  papers do not raise it above closed-book. Evidence must be shown to help on held-out papers, not assumed to.

@@ -65,6 +65,8 @@ MODELS = {  # query-facing deployments (all pre-cutoff, see must_obey.md section
                "max_out": 20000},
     "o3mini_high": {"deployment": "o3-mini_2025-01-31", "token_field": "max_completion_tokens", "temperature": None,
                     "max_out": 40000, "reasoning_effort": "high"},
+    "o3mini_low": {"deployment": "o3-mini_2025-01-31", "token_field": "max_completion_tokens", "temperature": None,
+                   "max_out": 20000, "reasoning_effort": "low"},
     "o1": {"deployment": "o1_2024-12-17", "token_field": "max_completion_tokens", "temperature": None,
            "max_out": 20000},
 }

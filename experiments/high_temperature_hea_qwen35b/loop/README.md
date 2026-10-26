@@ -97,3 +97,17 @@
     0.49 baseline (GPT-5.6, p = 0.009).
 - **Exception.** dev3 runs are judged by both judges, but only F3's are audited, and none are labelled (GPT-5.6 rate
   limits).
+
+## Experiment 29: sensitivity (loop.md section 12)
+
+- **Runs.** [run_sensitivity.sh](./run_sensitivity.sh) ran 8 configurations on dev3 (1,152 runs):
+  - `papers_n{1,3,10,30}_b_o3mini`;
+  - `papers_random10_b_o3mini`;
+  - `text_{4k,64k}_b_o3mini`;
+  - `writer_only_b_o3mini_low`.
+- **Replication.** `papers_n{1,3,30}_b_o3mini` ran once on test3 (216 runs).
+- **Analysis.** `sensitivity.json` (from [sensitivity.py](../../../sensitivity.py)), `sensitivity_test3_replication.json`
+  and `sensitivity_pooled36.json`.
+- **Result.** A few papers as context lower the score (−0.10 GPT-5.6, −0.24 DeepSeek over 36 papers), and 30 papers
+  return toward the no-paper level. Raw text, relevance, reasoning effort and question detail have no significant
+  effect.

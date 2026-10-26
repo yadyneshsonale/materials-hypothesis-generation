@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 28)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 29)
 
 Related work (9 hypothesis-generation and materials-KG papers, with how each separates input from answer):
 [RELATED_WORK.md](./RELATED_WORK.md).
@@ -10,7 +10,7 @@ and they supersede section 8 ("MatKG, planned, blocked") of that log. The commit
 because its working-tree copy has uncommitted changes from another session (it is empty in the working tree).
 Once that is resolved, this document can be merged into the log.
 
-Last updated 2026-10-25. Round 3 adds experiments 27 (test3: 12 more fresh held-out papers) and 28 (writer-level
+Last updated 2026-10-25. Experiment 29 (sensitivity) shows that **adding research papers as context lowers the score**. One to three paper summaries cost 0.10 on GPT-5.6 and 0.24 on DeepSeek (replicated on test3; pooled over 36 papers, sign p ≤ 0.024). Thirty papers return toward the no-paper level without exceeding it. Raw text, relevance and reasoning effort have no significant effect. Round 3 adds experiments 27 (test3: 12 more fresh held-out papers) and 28 (writer-level
 methods developed on 24 papers, with a pre-registered test3 evaluation). **No further increase was found.** The
 round-3 dev winner failed on test3. Over all 28 fresh held-out papers, o3-mini with the conservative writer (one
 call) scores 0.60 against 0.49 for the Llama baseline (GPT-5.6, sign p = 0.009). Round 2 added experiments 25
@@ -59,6 +59,7 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 26 | 2026-10-25 | Method loop round 2 (iterations 6–8: niche occupation, o1, BM25, planner/executor, iterative retrieval, relevance-focused grounding; offline voting and consensus checks) and the pre-registered test2 evaluation | 480 dev runs + 360 test2 runs | o3-mini, o1, Llama-3.3-70B (all pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete, verified | [loop/](./loop/), [loop.md](../../loop.md) section 10 |
 | 27 | 2026-10-25 | Fresh held-out test set test3 (12 papers, 2024-01 to 2025-06) by a rule pre-registered before any search | 37 screened, 12 cases × 3 levels | GPT-5.6 (screen, target extractor, writer, checker) | none | Complete; 35/36 levels pass the gate | [benchmark_test3/](./benchmark_test3/) |
 | 28 | 2026-10-25 | Method loop round 3 on dev3 (24 papers): forecasting framing, recalled analogies, high reasoning effort, MBR, evidence, evidence + MBR; offline selector checks; pre-registered test3 evaluation | 1,008 dev3 runs + 288 test3 runs | o3-mini, Llama-3.3-70B (pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete. Exception: dev3 round-3 runs are judged but mostly not audited (GPT-5.6 rate limits) | [loop/](./loop/), [loop.md](../../loop.md) section 11 |
+| 29 | 2026-10-25 | Sensitivity of the score to one input at a time: papers as context (0–30), raw text (0–64k characters), relevance vs random papers, reasoning effort, question detail; replication of the paper-count dip on test3 | 1,152 dev3 runs + 216 test3 runs | o3-mini (pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete | [loop/](./loop/), [loop.md](../../loop.md) section 12 |
 
 ## Correction to section 8 (MatKG)
 
@@ -1267,7 +1268,43 @@ was pre-registered in loop.md 11.1 before any search.
   only for F3, and no labels. GPT-5.6 throughput (2–37 calls a minute under shared rate limits) made 2,000 more calls
   impractical. Selection did not use audits. All test3 runs are audited.
 
-## Comparability and limits, experiments 8 to 28
+## Experiment 29: sensitivity of the score to the amount of context and other inputs
+
+**Question.** Around the recommended configuration (o3-mini with the conservative writer), does increasing or
+decreasing one input change the score? Plan pre-registered in loop.md 12.1; script
+[sensitivity.py](../../sensitivity.py).
+
+**Setup.** On dev3 (24 papers), 8 new configurations (1,152 runs):
+- A. 1, 3, 10 or 30 paper summaries (cards) as context, against closed-book;
+- B. 4k or 64k characters of raw text chunks (16k from round 3);
+- C. 10 random papers vs the 10 most relevant;
+- D. low reasoning effort (medium and high from earlier runs).
+
+E (question detail) uses existing runs on 36 papers.
+
+**Results** (Δ vs closed-book, GPT-5.6 / DeepSeek).
+- **Papers as context: U-shaped, never above closed-book.**
+  - 1 paper: −0.10 / −0.27.
+  - 3 papers: −0.10 / −0.23.
+  - 10 papers: −0.07 / −0.14.
+  - 30 papers: −0.01 / −0.08.
+  - The monotone trend test is not significant, because the response is not monotone.
+- **Replication.** The dip, a hypothesis formed after dev3 and written down before the run (loop.md 12.2), replicates
+  on test3: 1 paper −0.10 / −0.21; 3 papers −0.10 / −0.23; 30 papers −0.07 / −0.16. Pooled over 36 papers, 1–3
+  papers cost −0.10 on GPT-5.6 (p ≤ 0.024) and −0.24 on DeepSeek (p ≤ 0.009).
+- **No significant effect from:**
+  - raw text, 0 to 64k characters: −0.03 to +0.02 (DeepSeek up to +0.09, trend p = 0.058);
+  - relevance, top-10 vs random-10: −0.04 [−0.10, +0.03];
+  - reasoning effort: ±0.01;
+  - question detail: 0.58 → 0.64, p = 0.34.
+- **Mechanism: anchoring** (target-free). With one paper, 30% of the hypothesis's content words come from that
+  paper's summary, against 20% by chance, and borrowing goes with lower scores. Borrowing returns to chance as more
+  papers are added.
+
+**Integrity.** Both judges on every run. `must_obey_check.py --loop` passes on all 8 directories (0 failed runs; the
+test3 replication runs are final). Audits: see loop.md 12.6.
+
+## Comparability and limits, experiments 8 to 29
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -1302,3 +1339,5 @@ was pre-registered in loop.md 11.1 before any search.
 - Experiments 27–28 develop on dev3 (dev + the spent test and test2), so dev3 scores mix two target extractors.
   test3 claims compare configurations within test3. The pooled 28-paper analysis is exploratory. 46 configurations
   have been tried on dev across three rounds; the claims rest on the three pre-registered held-out evaluations.
+- Experiment 29 changes the evidence and reasoning budgets on purpose (declared). Its replication on test3 was decided
+  after seeing dev3 and is labelled post hoc. The pooled 36-paper estimates are exploratory.

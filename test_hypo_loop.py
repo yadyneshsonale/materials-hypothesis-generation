@@ -159,3 +159,41 @@ class Test2SplitTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SensitivityTests(unittest.TestCase):
+    def _pool(self):
+        from temporal_hypothesis_benchmark import RetrievalRecord
+        return [RetrievalRecord(f"P{p}::r{i}", f"P{p}", "2020-01-01", "rubric:card",
+                                ("tungsten " * (5 - p) if p < 5 else "") + "alloy " * 50, {})
+                for p in range(8) for i in range(2)]
+
+    def test_top_papers_keeps_one_record_per_paper_and_respects_n(self) -> None:
+        h = H.Harness(CASE, "broad", 1)
+        with patch.object(h, "pool", return_value=self._pool()):
+            three = LM.top_papers(h, "tungsten alloy", 3)
+            many = LM.top_papers(h, "tungsten alloy", 50)
+            rand_a = LM.top_papers(h, "tungsten alloy", 3, seed=7)
+            rand_b = LM.top_papers(h, "tungsten alloy", 3, seed=7)
+        expected = []
+        for r in LM.retrieve("tungsten alloy", self._pool(), limit=len(self._pool())):
+            if r.paper_id not in expected:
+                expected.append(r.paper_id)
+        self.assertEqual([r.paper_id for r in three], expected[:3])  # the shared retriever's order, one per paper
+        self.assertEqual(len(many), 8)
+        self.assertEqual(len({r.paper_id for r in many}), 8)
+        self.assertEqual([r.record_id for r in rand_a], [r.record_id for r in rand_b])
+
+    def test_top_text_respects_budget_and_scaled_record_limit(self) -> None:
+        h = H.Harness(CASE, "broad", 1)
+        with patch.object(h, "pool", return_value=self._pool()):
+            packed = LM.top_text(h, "tungsten alloy", 4000)
+        self.assertLessEqual(sum(min(len(r.text), LM.rx.record_cap("text_chunks")) for r in packed), 4000)
+        self.assertLessEqual(len(packed), max(1, round(LM.rx.MAX_RECORDS * 4000 / LM.rx.EVIDENCE_BUDGET_CHARS)))
+
+    def test_trend_test_detects_monotone_dose_response(self) -> None:
+        import sensitivity as S
+        up = [{f"P{i}": float(d) + 0.01 * i for i in range(10)} for d in range(4)]
+        result = S.trend_test(up)
+        self.assertEqual(result["mean_rho"], 1.0)
+        self.assertLess(result["p_two_sided"], 0.01)

@@ -944,3 +944,82 @@ def m_text_chunks_mbr_b(h: Harness, model: str = "o3mini", k: int = 5) -> dict[s
     best = medoid(candidates)
     h.notes["mbr"] = {"k": k, "selected": best}
     return candidates[best]
+
+
+# ================================================================ experiment 29 (loop.md section 12): sensitivity
+# One input varies at a time around the recommended configuration (o3-mini, WRITER_B). The evidence or reasoning
+# budget is the declared variable (must_obey.md 6.1).
+import hashlib  # noqa: E402
+import random  # noqa: E402
+
+
+def _ranked_pool(h: Harness, query: str, representation: str) -> list[Any]:
+    """The whole eligible pool: records that share words with the query first (shared retriever order), then the
+    rest in a fixed order, so that N can exceed the number of overlapping records."""
+    pool = h.pool(representation)
+    ranked = retrieve(query, pool, limit=len(pool))
+    seen = {r.record_id for r in ranked}
+    return ranked + sorted((r for r in pool if r.record_id not in seen), key=lambda r: r.record_id)
+
+
+def top_papers(h: Harness, query: str, n: int, representation: str = "card", seed: int | None = None) -> list[Any]:
+    """One record per paper: the n most relevant papers, or n random eligible papers when a seed is given."""
+    order = _ranked_pool(h, query, representation)
+    if seed is not None:
+        order = sorted(order, key=lambda r: r.record_id)
+        random.Random(seed).shuffle(order)
+    chosen: list[Any] = []
+    papers: set[str] = set()
+    for record in order:
+        if record.paper_id in papers:
+            continue
+        chosen.append(record)
+        papers.add(record.paper_id)
+        if len(chosen) >= n:
+            break
+    for record in chosen:
+        h.seen[record.record_id] = record
+    return chosen
+
+
+def top_text(h: Harness, query: str, budget: int, representation: str = "text_chunks") -> list[Any]:
+    """rx.pack with a different character budget; the record limit scales with the budget."""
+    cap = rx.record_cap(representation)
+    max_records = max(1, round(rx.MAX_RECORDS * budget / rx.EVIDENCE_BUDGET_CHARS))
+    packed: list[Any] = []
+    used = 0
+    for record in _ranked_pool(h, query, representation):
+        size = min(len(record.text), cap)
+        if used + size > budget:
+            continue
+        packed.append(record)
+        used += size
+        if len(packed) >= max_records or used >= budget - 200:
+            break
+    for record in packed:
+        h.seen[record.record_id] = record
+    return packed
+
+
+def write_capped(h: Harness, records: list[Any], cap: int, model: str = "o3mini") -> dict[str, Any]:
+    payload = {"query": h.query, "knowledge_cutoff": h.cutoff, "analysis_notes": {},
+               "eligible_evidence": h.evidence_payload(records, cap)}
+    h.notes["evidence"] = {"records": len(records), "papers": len({r.paper_id for r in records}),
+                           "chars": sum(min(len(r.text), cap) for r in records)}
+    return h.generate_final("writer", model, WRITER_B, payload, {r.record_id for r in records})
+
+
+def _paper_seed(paper_id: str) -> int:
+    return int(hashlib.sha256(paper_id.encode("utf-8")).hexdigest()[:8], 16)
+
+
+for _n in (1, 3, 10, 30):
+    register(f"papers_n{_n}_b_o3mini")(
+        lambda h, _k=_n: write_capped(h, top_papers(h, h.query, _k), rx.record_cap("card")))
+register("papers_random10_b_o3mini")(
+    lambda h: write_capped(h, top_papers(h, h.query, 10, seed=_paper_seed(h.case["paper_id"])),
+                           rx.record_cap("card")))
+for _budget, _name in ((4000, "4k"), (64000, "64k")):
+    register(f"text_{_name}_b_o3mini")(
+        lambda h, _b=_budget: write_capped(h, top_text(h, h.query, _b), rx.record_cap("text_chunks")))
+register("writer_only_b_o3mini_low")(lambda h: m_writer_only_b(h, "o3mini_low"))

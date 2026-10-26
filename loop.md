@@ -14,6 +14,11 @@ summary is section 11.8. **No further increase was found.** The round-3 dev winn
 fresh held-out papers the same one-call configuration scores 0.60 against 0.49 for the Llama baseline (GPT-5.6,
 sign p = 0.009).
 
+Section 12 (experiment 29) varies one input at a time. **Adding research papers as context lowers the score.** One
+to three paper summaries cost 0.10 (GPT-5.6) and 0.24 (DeepSeek), replicated on test3. Thirty papers return toward
+the no-paper level without exceeding it. Raw text, relevance, reasoning effort and question detail have no
+significant effect.
+
 **Code.**
 - [hypo_loop.py](./hypo_loop.py): the harness, with rule enforcement, logging and evaluation.
 - [loop_methods.py](./loop_methods.py): the methods.
@@ -1157,3 +1162,187 @@ runs across the three secondaries.
 - [x] Paired statistics with clustered-bootstrap CIs and Holm. Negative results are recorded: R1–R4, F3 on test3,
   and two offline checks.
 - [x] Experiment log (experiments 27–28), READMEs and loop.md updated.
+
+---
+
+## 12. Sensitivity: what happens to the score when inputs are increased or decreased (experiment 29)
+
+### 12.1 Pre-registered plan (written 2026-10-25 20:20, before any run of this experiment)
+
+**Question.** Holding the recommended configuration fixed (o3-mini, conservative writer WRITER_B), how does the
+GPT-5.6 reconstruction score respond to one input at a time? This is a characterisation, not a method search.
+Every factor below changes the evidence budget or the reasoning budget on purpose (must_obey.md 6.1, declared).
+
+| Factor | Levels | What varies | Configurations |
+|---|---|---|---|
+| **A. Number of papers as context** | N = 0, 1, 3, 10, 30 | The top-N most relevant earlier papers, one card per paper (cards are paper summaries, capped at 3,200 characters), ranked by the shared retriever against the question | N = 0 is the closed-book incumbent (`writer_only_b_o3mini` plus its replicate, 4 samples); `papers_n{1,3,10,30}_b_o3mini` |
+| **B. Amount of raw text** | 0, 4k, 16k, 64k characters | Top-ranked text chunks (1,600-character cap each), with the record limit scaled with the budget | 0 = closed-book; 16k = `text_chunks_b_o3mini` (round 3); `text_{4k,64k}_b_o3mini` |
+| **C. Relevance vs volume** | 10 relevant vs 10 random papers | The same N, with cards chosen at random (seed fixed per case) instead of by relevance | `papers_random10_b_o3mini` vs `papers_n10_b_o3mini` |
+| **D. Reasoning effort** | low, medium, high | o3-mini `reasoning_effort` | `writer_only_b_o3mini_low`, closed-book (medium), `writer_only_b_o3mini_high` (round 3) |
+| **E. Detail in the question** (existing runs, no new calls) | broad, problem, expert | The query level | The incumbent on all 36 papers |
+
+**Data.** dev3 (24 papers × 3 levels × 2 samples). Evidence pools are date-filtered and family-excluded as always.
+
+**Analysis.**
+- **Trend test (primary, factors A and B).** Within each paper, average the score per dose, then take Spearman's ρ
+  between dose and score. The statistic is the mean ρ over papers; its p-value comes from permuting dose labels
+  within papers (10,000 permutations, fixed seed).
+- **Effect sizes.** Paired differences of every dose against N = 0, with paper-clustered bootstrap CIs.
+- **Also reported:** DeepSeek, core, the four dimensions, and input size and calls.
+- **Factor C:** relevant − random, paired.
+- **Factor D:** low and high vs medium.
+
+**Decision rule.**
+- A factor counts as "affecting the score" if its trend p < 0.05 on GPT-5.6 and DeepSeek agrees in sign.
+- Only then is factor A re-run on test3 (12 papers, spent but unused for this question) as a replication of the
+  trend's sign.
+- No dose becomes a new recommended method from this experiment alone. That would need a dev gain with a CI
+  excluding zero and a fresh held-out set (must_obey.md 6.5).
+
+### 12.2 Replication on test3, decided after the dev3 results (written 2026-10-25 21:06, before any test3 run of these configurations)
+
+The pre-registered trend rule (12.1) was not met: no factor has a monotone trend. dev3 instead shows a significant
+*dip* when 1–3 paper cards are added (12.3). This is a new, post-hoc hypothesis. It is tested once on test3, whose 12
+papers were not used to form it; closed-book runs already exist there.
+- **Hypotheses.** On test3, GPT-5.6 reconstruction is lower than closed-book (`writer_only_b_o3mini`) with N = 1
+  and with N = 3 paper cards, and does not differ with N = 30. DeepSeek is reported alongside.
+- **Configurations.** `papers_n1_b_o3mini`, `papers_n3_b_o3mini` and `papers_n30_b_o3mini`, run once on test3
+  with `--final`. Holm runs across the three comparisons.
+
+### 12.3 Results on dev3 (24 papers × 3 levels × 2 samples; 1,152 new runs, 0 failed)
+
+Dose 0 (closed-book) pools the incumbent and its replicate (4 samples per unit). All runs are judged by GPT-5.6 and
+DeepSeek.
+
+**A. Papers given as context (one card each).**
+
+| Papers | GPT-5.6 | Δ vs 0 [95% CI], papers up/down | DeepSeek | Δ DeepSeek [95% CI] | core GPT | intervention | condition | mechanism | outcome | input chars/run |
+|---|---:|---|---:|---|---:|---:|---:|---:|---:|---:|
+| 0 | 0.637 | – | 0.631 | – | 0.576 | 0.38 | 0.57 | 0.77 | 0.83 | 1,833 |
+| 1 | 0.533 | **−0.10 [−0.18, −0.03]**, 6/17 | 0.363 | **−0.27 [−0.41, −0.14]** | 0.448 | 0.28 | 0.49 | 0.62 | 0.75 | 4,907 |
+| 3 | 0.535 | **−0.10 [−0.16, −0.04]**, 8/14 | 0.398 | **−0.23 [−0.34, −0.13]** | 0.448 | 0.25 | 0.53 | 0.65 | 0.71 | 13,251 |
+| 10 | 0.568 | −0.07 [−0.14, +0.00], 6/15 | 0.493 | **−0.14 [−0.25, −0.03]** | 0.483 | 0.30 | 0.57 | 0.67 | 0.74 | 47,018 |
+| 30 | 0.632 | −0.01 [−0.09, +0.08], 11/12 | 0.547 | −0.08 [−0.22, +0.04] | 0.573 | 0.37 | 0.58 | 0.78 | 0.80 | 139,383 |
+
+Monotone trend: GPT-5.6 ρ = +0.01 (p = 0.95); DeepSeek +0.07 (p = 0.54). The response is U-shaped, not monotone.
+
+**B. Raw text (characters of the top chunks).**
+
+| Characters | GPT-5.6 | Δ vs 0 [95% CI], papers up/down | DeepSeek | Δ DeepSeek [95% CI] | core GPT | intervention | condition | mechanism | outcome |
+|---|---:|---|---:|---|---:|---:|---:|---:|---:|
+| 0 | 0.637 | – | 0.631 | – | 0.576 | 0.38 | 0.57 | 0.77 | 0.83 |
+| 4,000 | 0.606 | −0.03 [−0.11, +0.04], 11/13 | 0.627 | −0.00 [−0.14, +0.13] | 0.503 | 0.28 | 0.57 | 0.73 | 0.85 |
+| 16,000 (round-3 R5) | 0.658 | +0.02 [−0.04, +0.09], 11/12 | 0.705 | +0.07 [−0.04, +0.19] | 0.542 | 0.38 | 0.65 | 0.71 | 0.90 |
+| 64,000 | 0.648 | +0.01 [−0.07, +0.09], 12/11 | 0.724 | +0.09 [−0.03, +0.21] | 0.580 | 0.35 | 0.59 | 0.81 | 0.84 |
+
+Monotone trend: GPT-5.6 ρ = +0.05 (p = 0.66); DeepSeek +0.22 (p = 0.058).
+
+**C. Relevance vs volume (10 papers).** The 10 most relevant papers minus 10 random papers: GPT-5.6 −0.04
+[−0.10, +0.03] (9/15 papers); DeepSeek +0.03 [−0.07, +0.13]. Choosing the relevant papers does not matter.
+
+**D. Reasoning effort.** Low −0.01 [−0.04, +0.02] and high +0.00 [−0.04, +0.06] against medium (GPT-5.6); DeepSeek
+−0.00 and +0.02. Effort does not matter.
+
+**E. Detail in the question** (incumbent, 36 papers, existing runs).
+
+| Question level | GPT-5.6 | DeepSeek |
+|---|---:|---:|
+| broad | 0.58 | 0.57 |
+| problem | 0.63 | 0.57 |
+| expert | 0.64 | 0.64 |
+
+The within-paper trend is not significant: GPT-5.6 ρ = +0.12 (p = 0.34); DeepSeek −0.04 (p = 0.77). The Llama
+baseline shows the same small rise, 0.44 → 0.51 → 0.52 (p = 0.11).
+
+**Why a few papers hurt: anchoring (target-free check).** Measure: the share of the hypothesis's content words
+(intervention, mechanism, starting material) that appear in the top-ranked paper's card. Configurations that did not
+see that card give the chance level.
+
+| Papers given | Words borrowed from the top card | GPT-5.6, above / below the median borrowing |
+|---|---:|---|
+| 0 (never saw it) | 0.20 | 0.60 / 0.67 |
+| 1 | **0.30** | 0.46 / 0.61 |
+| 3 | 0.27 | 0.48 / 0.59 |
+| 10 | 0.23 | 0.51 / 0.63 |
+| 30 | 0.22 | 0.56 / 0.71 |
+| 10 random (top card not given) | 0.20 | 0.62 / 0.59 |
+
+- With one card, the hypothesis borrows about 50% more of it than chance, and hypotheses that borrow more score
+  lower.
+- As more papers are added, borrowing falls back toward chance and the score recovers. No single earlier paper
+  dominates, so the model relies on its own prior, which is the closed-book level.
+- Raw chunks are fragments rather than whole-study summaries, so they anchor less: 4k characters −0.03, against
+  −0.10 for one card.
+- **Not a selector (offline).** Within units of about 45 o3-mini candidates, similarity to the top prior paper does
+  not predict score (ρ −0.04 to −0.06). Picking the least similar candidate scores 0.58–0.62 against a pool mean
+  of 0.62.
+
+### 12.4 Replication on test3 (12 papers; hypotheses of 12.2)
+
+| Papers given | GPT-5.6 (closed-book 0.580) | Δ [95% CI], papers up/down | DeepSeek (closed-book 0.514) | Δ DeepSeek [95% CI] |
+|---|---:|---|---:|---|
+| 1 | 0.479 | **−0.10 [−0.19, −0.02]**, 3/8, Holm 0.45 | 0.309 | **−0.21 [−0.33, −0.08]** |
+| 3 | 0.476 | **−0.10 [−0.20, −0.01]**, 2/10, Holm 0.12 | 0.285 | **−0.23 [−0.37, −0.10]** |
+| 30 | 0.510 | −0.07 [−0.16, +0.00], 3/6 | 0.351 | **−0.16 [−0.31, −0.06]** |
+
+- **The dip replicates.** With 1 and 3 papers the effect sizes match dev3 almost exactly: GPT-5.6 −0.10 and −0.10
+  (dev3 −0.10, −0.10); DeepSeek −0.21 and −0.23 (dev3 −0.27, −0.23). The bootstrap CIs exclude zero. With 12 papers
+  the sign tests are not significant after Holm.
+- **The recovery at 30 papers is weaker on test3.** GPT-5.6 is −0.07, and DeepSeek −0.16 with a CI excluding zero.
+  So the hypothesis that 30 papers "do not differ" is not supported on DeepSeek.
+
+**All 36 papers (dev3 + test3, exploratory pooling).**
+
+| Papers given | GPT-5.6 Δ vs none [95% CI], papers up/down, sign p | DeepSeek Δ [95% CI], sign p |
+|---|---|---|
+| 1 | **−0.10 [−0.16, −0.05]**, 9/25, p = 0.009 | **−0.25 [−0.35, −0.15]**, p = 0.009 |
+| 3 | **−0.10 [−0.15, −0.05]**, 10/24, p = 0.024 | **−0.23 [−0.32, −0.15]**, p = 0.001 |
+| 30 | −0.03 [−0.09, +0.04], 14/18 | **−0.11 [−0.21, −0.02]**, p = 0.11 |
+
+### 12.5 Answer: what changes the score when it is increased or decreased?
+
+| Input | Change | Effect on the score | Confidence |
+|---|---|---|---|
+| **Research papers given as context** (summaries) | 0 → 1 or 3 papers | **Down by 0.10 (GPT-5.6, −16%) and 0.24 (DeepSeek, −40%)** | Replicated on 12 independent papers; pooled over 36, sign p ≤ 0.024 on both judges |
+| | 3 → 10 → 30 papers | Recovers toward the no-paper level but never exceeds it: GPT-5.6 −0.03 at 30; DeepSeek still −0.11 | The recovery is weaker on test3 |
+| Raw text excerpts | 0 → 4k → 16k → 64k characters | No significant change (GPT-5.6 −0.03 to +0.02). DeepSeek drifts up to +0.09 (trend p = 0.058) | dev3 only |
+| Relevance of the papers | 10 most relevant vs 10 random | No difference (−0.04 [−0.10, +0.03]) | dev3 only |
+| Reasoning effort (o3-mini) | low → medium → high | No change (±0.01) | dev3 only |
+| Detail in the question | broad → problem → expert | Small rise (0.58 → 0.64), not significant within papers (p = 0.34) | 36 papers |
+
+**Why.**
+- **Anchoring.** Given one paper, the hypothesis borrows about 50% more of that paper's wording than chance: 30% of
+  its content words versus 20%. Hypotheses that borrow more score lower.
+- **The answer is not in the earlier literature.** Experiment 18's evidence ceiling was 1–2 of 4 even with oracle
+  retrieval. A new paper does something its predecessors did not, so a predecessor's study is the wrong template.
+  This is also why relevance does not help (C) and why more text is at best neutral (B).
+- **More papers dilute the anchor without adding the missing information.** Borrowing falls back to chance at 30
+  papers, and the score returns toward, but not above, the closed-book level.
+
+**Practical consequence.** For this task, more papers in the context do not raise the score. A few paper summaries
+lower it significantly, and the best configuration remains the closed-book conservative writer.
+
+### 12.6 Integrity, style and checklist (experiment 29)
+
+- **Integrity.** `must_obey_check.py --loop` passes on all 8 directories with no warnings: 1,368 runs (1,152 dev3
+  + 216 test3), 0 failed, zero leakage counters, and every test3 replication run is final. Every run is judged by
+  GPT-5.6 and DeepSeek and has a target-free audit.
+- **Style (must_obey.md 6.8).** Hypothesis length changes little across doses: 1,176 characters closed-book; 1,254,
+  1,258, 1,263 and 1,371 with 1, 3, 10 and 30 papers. Length does not predict score within configurations
+  (ρ −0.05 to +0.03, except +0.20 for random-10) or overall (ρ −0.004). The one-paper dip comes at almost the same
+  length, so it is not a length effect. Hedges rise slightly with evidence (0.15–0.22 vs 0.12).
+
+**Checklist.**
+- [x] Query-facing model is pre-cutoff (o3-mini at low, medium or high reasoning effort).
+- [x] Queries are frozen (v3.1, test2 and test3; hash-checked).
+- [x] Evidence comes from date-filtered, family-excluded corpus pools; no web or API tools; leakage counters are
+  zero.
+- [x] Payloads are target-free; final hypotheses contain only schema fields; judging is blinded.
+- [x] Plan pre-registered (12.1). The test3 replication was decided after dev3, declared post hoc and written down
+  before its run (12.2).
+- [x] Budgets are the declared variable (evidence characters and records, reasoning effort). Samples are the same
+  as the baselines (2 per unit; 4 for the pooled closed-book reference).
+- [x] GPT-5.6 judge, DeepSeek cross-judge and target-free audit on every run; integrity gate passes.
+- [x] Paired statistics with clustered-bootstrap CIs, a permutation trend test and Holm for the replication.
+  Negative results recorded (B, C, D, E; the offline selector).
+- [x] Experiment log (experiment 29), loop README and loop.md updated.
