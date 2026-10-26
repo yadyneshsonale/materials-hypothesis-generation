@@ -66,7 +66,9 @@ be used as a generator.
   introduction);
 - extractors of pre-cutoff papers, which never see a query or target and are audited (section 4.5);
 - extractors of a held-out paper's answer key (hidden target) from its non-Introduction sections, which never see
-  a query or a generation (test2, loop.md 10.1).
+  a query or a generation (test2, loop.md 10.1);
+- rewriters of an answer key into proposal form for a blind expert evaluation, whose output goes only to the expert
+  and the judges and never to a generator (experiment 30, loop.md 13).
 
 A pre-cutoff model is preferred even in these roles whenever one is good enough.
 
@@ -261,3 +263,8 @@ Ablate before combining. Combine only components that helped or that address dif
 - 2026-10-25 (experiment 29, sensitivity): no rule changed. Finding recorded for method design: on this task, a few
   paper summaries as context lower the score (anchoring on a predecessor's study), and more papers or more relevant
   papers do not raise it above closed-book. Evidence must be shown to help on held-out papers, not assumed to.
+- 2026-10-26 (experiment 30, expert evaluation package):
+  - New allowed role: an answer-key rewriter for blind expert evaluation (2.4).
+  - Expert-facing material must pass a blinding check: no source, model or method names; no paper identifiers before
+    the unblinded part (`expert_eval_builder.py check`, unit-tested).
+  - The unblinding key lives outside the expert's folder.

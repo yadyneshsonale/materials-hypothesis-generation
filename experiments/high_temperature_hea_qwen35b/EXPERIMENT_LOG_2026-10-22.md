@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 29)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 30)
 
 Related work (9 hypothesis-generation and materials-KG papers, with how each separates input from answer):
 [RELATED_WORK.md](./RELATED_WORK.md).
@@ -60,6 +60,7 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 27 | 2026-10-25 | Fresh held-out test set test3 (12 papers, 2024-01 to 2025-06) by a rule pre-registered before any search | 37 screened, 12 cases × 3 levels | GPT-5.6 (screen, target extractor, writer, checker) | none | Complete; 35/36 levels pass the gate | [benchmark_test3/](./benchmark_test3/) |
 | 28 | 2026-10-25 | Method loop round 3 on dev3 (24 papers): forecasting framing, recalled analogies, high reasoning effort, MBR, evidence, evidence + MBR; offline selector checks; pre-registered test3 evaluation | 1,008 dev3 runs + 288 test3 runs | o3-mini, Llama-3.3-70B (pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete. Exception: dev3 round-3 runs are judged but mostly not audited (GPT-5.6 rate limits) | [loop/](./loop/), [loop.md](../../loop.md) section 11 |
 | 29 | 2026-10-25 | Sensitivity of the score to one input at a time: papers as context (0–30), raw text (0–64k characters), relevance vs random papers, reasoning effort, question detail; replication of the paper-count dip on test3 | 1,152 dev3 runs + 216 test3 runs | o3-mini (pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete | [loop/](./loop/), [loop.md](../../loop.md) section 12 |
+| 30 | 2026-10-26 | Expert evaluation of the AI judge: blind package of 20 questions × 3 hypotheses (o3-mini writer, Llama baseline, the actual study rewritten as a proposal), two-part rating (blind quality; agreement with the paper), unblinding key and pre-registered analysis | 60 items; 20 reference rewrites | GPT-5.6 (reference rewriter) | GPT-5.6, DeepSeek-V4-Pro (+ the expert) | Package ready; awaiting ratings | [expert_evaluation/](../../expert_evaluation/), [expert_eval/](./expert_eval/) |
 
 ## Correction to section 8 (MatKG)
 
@@ -1304,7 +1305,28 @@ E (question detail) uses existing runs on 36 papers.
 **Integrity.** Both judges on every run. `must_obey_check.py --loop` passes on all 8 directories (0 failed runs; the
 test3 replication runs are final). Audits: see loop.md 12.6.
 
-## Comparability and limits, experiments 8 to 29
+## Experiment 30: expert evaluation of the AI judge (package ready, awaiting ratings)
+
+**Why.** Every conclusion rests on GPT-5.6 scoring agreement with one paper, and the two judges agree only weakly
+(ρ = 0.39). A materials expert's ratings test whether the judge can be trusted.
+
+**Design** (pre-registered in loop.md 13.1).
+- 20 papers (10 original, 5 test2, 5 test3; seed 20261026), each with its `problem_constrained` question and three
+  blinded hypotheses: the o3-mini writer, the Llama baseline, and the paper's actual study rewritten as a proposal.
+- **Part 1 (blind):** plausibility, testability and usefulness (1–5); whether the question makes sense; a guess of
+  which hypothesis the authors did.
+- **Part 2 (unblinded, with the paper):** agreement on the judge's four dimensions (0–4), answer-key accuracy, and
+  question hints.
+- **Primary analysis:** expert vs GPT-5.6 Spearman ρ over the 40 AI items.
+
+**Package.** [expert_evaluation/](../../expert_evaluation/) (step-by-step READMEs, 40 question pages and an Excel sheet
+with drop-down lists). Key and analysis: [expert_eval/](./expert_eval/README.md). The first reference rewrites kept
+methods-section detail and were re-rendered before release.
+- Judges on the 60 items: references 3.83 (GPT-5.6) / 4.00 (DeepSeek); o3-mini writer 0.61 / 0.66; Llama baseline
+  0.49 / 0.29.
+- Blinding check passes; tests pass.
+
+## Comparability and limits, experiments 8 to 30
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.

@@ -1,0 +1,68 @@
+{
+  "paper_id": "PMC11606917",
+  "writer": "trapi:gpt-5.6-sol_2026-07-09",
+  "rule": "intervention >= 3 on the GPT-5.6 judge, else one retry (loop.md 13.1)",
+  "attempts": 1,
+  "fidelity_ok": true,
+  "generation": {
+    "hypothesis": "For disordered BCC TaVCrW and its liquid, replacing TOR-TILD’s EAM references with a high-fidelity moment tensor potential (MTP), and evaluating the MTP-to-DFT correction by free-energy perturbation (FEP), would provide sufficient reference–target phase-space overlap to determine melting free energies without slowly convergent EAM-to-DFT thermodynamic integration (TI).",
+    "material_initial_state": "The target material would be the nominally equiatomic refractory high-entropy alloy TaVCrW, considered as a chemically disordered BCC solid and as a multicomponent liquid near melting.",
+    "intervention": "An MTP would replace the empirical EAM liquid reference, and FEP would replace the expensive ab initio-MD TI correction. The MTP training objective would be an energy error below approximately 1 meV/atom relative to DFT configurations.",
+    "conditions": "The free-energy framework would use DFT with both GGA-PBE and LDA at 0 GPa. Solid-state short-range order (SRO) would be assessed over approximately 2000–2400 K, spanning the relevant high-temperature solid and liquid regimes.",
+    "structural_mediator": "The mediator would be an MTP whose configurational energy distribution closely matches the ab initio distribution across the diverse local environments of multicomponent solid and liquid phases.",
+    "mechanism": "Improved phase-space overlap would reduce the variance of MTP–DFT energy differences, allowing FEP to converge rapidly and avoiding the long, mismatched TI path required by EAM references. Electronic Gibbs-energy contributions associated with a density-of-states gap near the Fermi level, together with SRO stabilization of the solid, would shift the solid–liquid free-energy crossing.",
+    "predicted_outcome": "FEP and TI free energies should agree within about 0.5 meV/atom, while computational demand should fall by roughly 80%, potentially corresponding to an approximately 20-fold speedup for the relevant correction. Electronic excitations should shift melting by about 50–60 K, while SRO stabilization of roughly 2–3 meV/atom should produce an additional approximately 25 K shift. Predicted melting temperatures could remain about 160–190 K below extrapolated CALPHAD values while still lying within their estimated uncertainty.",
+    "baseline": "The comparator would be original TOR-TILD using two EAM references and computationally expensive TI based on ab initio molecular dynamics.",
+    "boundary": "Applicability would be restricted to Ta–V–Cr–W compositions and temperatures represented in the MTP training domain. Magnetic fluctuations would be assumed negligible at high temperature. Functional-dependent underbinding or overbinding rules may fail for V and Cr, limiting comparison with CALPHAD.",
+    "uncertainty": "The main uncertainty would be incomplete MTP coverage of rare liquid configurations, which could increase FEP variance and bias the melting free energy.",
+    "supporting_evidence_ids": [],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "For an elemental or binary validation system, particularly VW, the same DFT states would be evaluated independently by MTP-based FEP and EAM-based TI under matched high-temperature conditions.",
+      "measurements": [
+        "FEP–TI free-energy difference per atom",
+        "Variance of MTP–DFT energy differences",
+        "Electronic-excitation contribution to the melting-temperature shift"
+      ],
+      "falsification_rule": "The hypothesis would be rejected if the benchmark FEP and TI free energies differed by more than approximately 0.5 meV/atom, or if poor MTP–DFT overlap prevented stable FEP convergence."
+    }
+  },
+  "gpt56": {
+    "schema_version": "temporal-eval-v3-1.0",
+    "run_id": "PMC11606917__problem_constrained__reference__s1",
+    "judge": "trapi:gpt-5.6-sol_2026-07-09",
+    "scores": {
+      "problem_alignment": 4,
+      "intervention_reconstruction": 4,
+      "condition_agreement": 3,
+      "mechanism_agreement": 4,
+      "outcome_agreement": 4,
+      "baseline_quality": 4,
+      "boundary_quality": 4,
+      "experiment_discriminability": 4,
+      "evidence_validity": 2,
+      "novelty": 3
+    },
+    "classification": "exact_reconstruction",
+    "fatal_errors": [],
+    "explanation": "The hypothesis accurately reconstructs the central intervention: replacing TOR-TILD EAM references with an MTP and using MTP-to-DFT FEP rather than slowly convergent ab initio TI. It correctly explains improved overlap through reduced variance of the reference–DFT energy difference and recovers the principal quantitative predictions, baseline, electronic and SRO effects, CALPHAD discrepancy, and a decisive 0.5 meV/atom VW benchmark. Conditions agree on TaVCrW, 0 GPa, PBE/LDA, and 2000–2400 K, but omit the explicit 12x12x12/3456-atom setup and do not define a quantitative compositional neighborhood beyond the MTP training domain. Evidence discipline is the main weakness: no cited evidence is supplied, and VW is presented chiefly as a proposed validation rather than clearly identified prior elemental or binary support. The falsification rule is nevertheless direct and scientifically discriminating."
+  },
+  "deepseek": {
+    "run_id": "PMC11606917__problem_constrained__reference__s1",
+    "judge": "trapi:DeepSeek-V4-Pro_2026-04-23",
+    "scores": {
+      "problem_alignment": 4,
+      "intervention_reconstruction": 4,
+      "condition_agreement": 4,
+      "mechanism_agreement": 4,
+      "outcome_agreement": 4,
+      "baseline_quality": 4,
+      "boundary_quality": 4,
+      "experiment_discriminability": 4,
+      "evidence_validity": 4,
+      "novelty": 4
+    },
+    "classification": "exact_reconstruction"
+  },
+  "rejected": []
+}

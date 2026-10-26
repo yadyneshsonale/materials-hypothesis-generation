@@ -1346,3 +1346,81 @@ lower it significantly, and the best configuration remains the closed-book conse
 - [x] Paired statistics with clustered-bootstrap CIs, a permutation trend test and Holm for the replication.
   Negative results recorded (B, C, D, E; the offline selector).
 - [x] Experiment log (experiment 29), loop README and loop.md updated.
+
+---
+
+## 13. Expert evaluation of the judge (experiment 30)
+
+### 13.1 Pre-registered design and analysis (written 2026-10-26 04:34, before any item was selected or rendered)
+
+**Why.** Every conclusion so far rests on GPT-5.6 scoring how close a hypothesis is to one paper's result. The two
+judges agree only weakly (ρ = 0.39), and the materials expert's earlier feedback was that outputs did not make
+sense. A human calibration is the most valuable next step. The package for the expert is in
+[expert_evaluation/](./expert_evaluation/); the key and analysis are in
+`experiments/high_temperature_hea_qwen35b/expert_eval/`.
+
+**Items: 20 questions × 3 hypotheses = 60 items.**
+- **Papers.** 10 of the original 12 (answer keys built from experiment 3), 5 of test2 and 5 of test3 (answer keys
+  extracted by GPT-5.6). They are drawn at random within each set with seed 20261026; every one of these sets is
+  already spent.
+- **Question.** The `problem_constrained` level: it names the material and the limitation, which an expert needs to
+  judge plausibility.
+- **Three hypotheses per question, all for that question.**
+  1. The recommended configuration, `writer_only_b_o3mini`, sample 1.
+  2. The Llama-3.3 baseline, `closed_book`, sample 1.
+  3. A **reference**: the paper's actual study, rewritten by GPT-5.6 as a forward-looking proposal in the same
+     field schema (future tense, approximate rather than exact values, nothing added). It is the positive control.
+     If GPT-5.6's judge gives the rewrite an intervention score below 3, the rewrite is redone once (a construction
+     rule, recorded).
+- **Blinding.** Questions are in random order and relabelled Q01–Q20. Within each question the three sources are
+  labelled A, B, C by a balanced scheme: each of the 6 orders is used 3–4 times, assigned at random.
+  - No model names, run IDs, paper IDs or titles appear in Part 1.
+  - A target-free scan found no source-revealing meta statements in the 72 candidate hypotheses (only 2 scientific
+    uses of "benchmark"), so nothing is redacted.
+- **Judge scores for all 60 items.** GPT-5.6 and DeepSeek already scored the 40 generated items with the same
+  prompt; the 20 references are scored the same way.
+
+**What the expert does.**
+- **Part 1, blind.** For each question, rate each hypothesis for plausibility, testability and usefulness (1–5).
+  For the question itself, rate whether it makes sense (1–5) and guess which hypothesis is closest to what the
+  authors did.
+- **Part 2, after Part 1 is finished.** With the answer key and the paper link, rate each hypothesis's agreement
+  with the paper on intervention, conditions, mechanism and outcome (0–4, the judge's four dimensions). Per
+  question, rate the answer key's accuracy (1–5) and whether the question hints at the answer (no, slightly,
+  strongly).
+
+**Analysis, fixed now.**
+- **Primary: is the judge valid?** Spearman ρ between the expert's agreement (mean of the 4 dimensions) and GPT-5.6
+  reconstruction, over the **40 generated items**, with a question-clustered bootstrap 95% CI. References are
+  excluded from the primary, because they would inflate ρ.
+  - Interpretation: ρ ≥ 0.6, the judge tracks the expert; 0.3–0.6, partially; below 0.3, judge-based conclusions
+    are not reliable.
+- **Secondary.**
+  1. ρ per dimension and for DeepSeek, and ρ over all 60 items.
+  2. Per question: does the judge order the two generated hypotheses the same way as the expert? (sign agreement,
+     ties excluded).
+  3. Does the expert confirm the main result? o3-mini − Llama on agreement and on Part-1 quality, paired by
+     question (bootstrap CI, sign test).
+  4. Ceiling: the expert's and the judges' scores for the references; a judge mean well below 4 means a compressed
+     scale.
+  5. Answer-key accuracy by extractor (experiment 3 vs GPT-5.6).
+  6. Question quality and human-rated leakage (the share of "strongly" hints).
+  7. Identification of the reference against chance (1/3, binomial test).
+- **Partial completion.** Questions are rated in order; any completed prefix (for example Q01–Q10) is analysed
+  as is.
+
+### 13.2 Construction (2026-10-26) and status
+
+- **Package.** [expert_evaluation/](./expert_evaluation/) has a start page, a page of rating scales, 20 Part-1 pages,
+  20 Part-2 pages, one-page versions for printing, and an Excel rating sheet with drop-down lists (plus CSV
+  versions). Every page has step-by-step instructions.
+- **Key, judge scores and analysis.** In
+  [experiments/high_temperature_hea_qwen35b/expert_eval/](./experiments/high_temperature_hea_qwen35b/expert_eval/README.md).
+- **References.** The first rendering kept methods-section detail (die size, rotation speed, exact values), against
+  the pre-registered "approximate values" rule, and would have let the expert spot the real study by style. The
+  prompt was tightened and all 20 re-rendered before release; there was no expert data, and no score was used.
+  All 20 pass the fidelity rule at the first attempt.
+- **Judges on the 60 items.** References: GPT-5.6 3.83, DeepSeek 4.00 (the judges' ceiling works). o3-mini writer:
+  0.61 and 0.66. Llama baseline: 0.49 and 0.29.
+- **Blinding check.** It passes: no model or source names anywhere; no paper identifiers in Part 1 or the sheet.
+- **Status.** Awaiting the expert's ratings. Analyse them with `expert_eval_analysis.py <returned sheet>`.
