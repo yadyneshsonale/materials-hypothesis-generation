@@ -157,6 +157,13 @@ KG_TOOLS = TOOLS[:3] + [KG_TOOL, TOOLS[3]]
 KG_SYSTEM_NOTE = (" You may also call kg_lookup(topic) for co-occurrence facts from earlier materials abstracts; "
                   "read a fact's record_id before citing it.")
 
+
+# Experiment 36 (loop.md 17.1, 17.3): with MATHG_EVIDENCE=web the corpus is the question's web-search corpus, and
+# search_corpus also returns live web-search results (websearch.WebEligibleCorpus).
+def evidence_mode() -> str:
+    return os.environ.get("MATHG_EVIDENCE", "fixed")
+
+
 PAIR_SYSTEM = (
     "You compare two materials-science hypotheses written for the same query. Decide which one better "
     "reconstructs the hidden paper target. Judge scientific agreement with the target, fidelity of intervention, "
@@ -479,7 +486,14 @@ def build_corpus_and_run(
     cutoff = case["publication_date"]
     query = case["queries"][level]["text"]
     run_id = f"{paper_id}__{level}__{setting}"
-    eligible, chunk_records, unit_records = build_corpus(paper_id, cutoff, metadata, v2_units, paper_maps_dir)
+    web = evidence_mode() == "web"
+    if web:
+        import websearch
+        chunk_records = websearch.case_records(paper_id, level, "text_chunks", question=query)
+        unit_records: list[RetrievalRecord] = []
+        eligible = {record.paper_id for record in chunk_records}
+    else:
+        eligible, chunk_records, unit_records = build_corpus(paper_id, cutoff, metadata, v2_units, paper_maps_dir)
     records = chunk_records + unit_records
     lookup = {record.record_id: record for record in records}
     started = time.time()
@@ -487,6 +501,7 @@ def build_corpus_and_run(
     generation: dict[str, Any] | None = None
     accessed: list[str] = []
     trace: list[dict[str, Any]] = []
+    web_log: list[dict[str, Any]] = []
     tool_calls = turns = 0
     try:
         if setting == "closed_book":
@@ -494,6 +509,8 @@ def build_corpus_and_run(
         elif setting == "text_oneshot":
             generation, accessed = run_oneshot(query, cutoff, chunk_records)
         elif setting == "v2_oneshot":
+            if web:
+                raise ValueError("v2_oneshot has no web-corpus version (LLM-extracted units, loop.md 17.1)")
             generation, accessed = run_oneshot(query, cutoff, unit_records)
         elif setting in ("tool_agent", "tool_agent_kg"):
             kg = None
@@ -501,12 +518,16 @@ def build_corpus_and_run(
                 if kg_db is None:
                     raise ValueError("tool_agent_kg requires a MatKG index (kg_db)")
                 kg = TemporalKG(kg_db, cutoff, kg_excluded_dois(paper_id, metadata))
+            corpus = None
             try:
-                corpus = EligibleCorpus(metadata, eligible, records, kg=kg)
+                corpus = (websearch.WebEligibleCorpus(paper_id, level, query, kg=kg) if web
+                          else EligibleCorpus(metadata, eligible, records, kg=kg))
                 result = run_tool_agent(query, cutoff, corpus, kg_enabled=kg is not None)
             finally:
                 if kg is not None:
                     kg.close()
+                if web and corpus is not None:
+                    web_log = corpus.tools.log
             lookup.update(corpus.lookup)
             generation = result["generation"]
             accessed = sorted(corpus.seen_ids | corpus.read_ids)
@@ -518,7 +539,14 @@ def build_corpus_and_run(
     cited = sorted(set(
         (generation or {}).get("supporting_evidence_ids", []) + (generation or {}).get("conflicting_evidence_ids", [])
     ))
-    audit = audit_accessed(accessed, lookup, paper_id, cutoff, metadata)
+    def is_web(rid: str) -> bool:
+        return rid in lookup and (lookup[rid].structured or {}).get("source") == "web"
+
+    audit = audit_accessed([rid for rid in accessed if not is_web(rid)], lookup, paper_id, cutoff, metadata)
+    if web:
+        audit["target_doi_or_title_leaks"] = 0
+        for key, value in websearch.audit_records([lookup[rid] for rid in accessed if is_web(rid)], paper_id).items():
+            audit[key] = audit.get(key, 0) + value
     audit["invalid_citations"] = len(set(cited) - set(accessed))
     audit["query_leak"] = int(query_leak(query, metadata[paper_id]))
     cited_evidence = [{
@@ -549,6 +577,8 @@ def build_corpus_and_run(
         "turns": turns,
         "tool_trace": trace,
         "audit": audit,
+        **({"evidence_source": "web", "web_tool_log": web_log,
+            "models": {"web_query_writer": f"trapi:{websearch.PHRASE_MODEL}"}} if web else {}),
         "elapsed_seconds": round(time.time() - started, 2),
     }
     atomic_json(output_dir / "runs" / f"{run_id}.json", result)

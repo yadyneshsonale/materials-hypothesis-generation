@@ -151,6 +151,20 @@ preferred future option.
 7. **No open web search, live literature API or tool that can return post-cutoff documents** for any query-facing
    component, unless the tool applies the date filter and the exclusions of 4.1–4.2 itself and logs what it
    returned.
+   - **Web search (experiment 36, loop.md 17.1, 17.2)** is the allowed form. It runs Europe PMC (search and JATS
+     full text) and Crossref (the second, independent date source) through `websearch.py`, which enforces, in code and
+     before any model sees a result:
+     - every known date before the case date, from two independent sources (a partial date counts as the end of its
+       month or year; a paper without a date from both sources is not kept);
+     - no case paper or work family: DOI, PMCID, title Jaccard ≥ 0.8, or ≥ 0.5 with the same first author;
+     - no held-out paper as evidence for any case;
+     - no preprints, reviews, editorials, errata, corrections, retractions or data papers;
+     - no paper that cites the case paper;
+     - no paper containing 5% or more of the case paper's 12-word passages;
+     - ranking by BM25 on title and abstract only, never by citation counts or other present-day signals.
+
+     It records every returned paper with its IDs and dates. A general web search engine is not allowed, because
+     its pages cannot be dated reliably.
 8. **Logging.** Every run stores the IDs and dates of everything the generator saw. Temporal, test-paper, family,
    target DOI/title and invalid-citation counts must all be zero.
 
@@ -320,3 +334,10 @@ Ablate before combining. Combine only components that helped or that address dif
       generator.
     - No method change beats the incumbent, whose lead replicates on test4.
     - test4 is spent.
+- **2026-10-27 (experiment 36, loop.md 17.1–17.2).** Web search for every baseline.
+  - Rule 4.7 now names the allowed web search: Europe PMC (live search, JATS XML) and Crossref (second date source),
+    through `websearch.py`, which applies the date filter and every exclusion in code before a model sees a result
+    and logs what it returned.
+  - Held-out papers are never evidence for any case, not only for their own case.
+  - OpenAlex, the planned second date source, ran out of its free daily budget during the corpus build. Crossref
+    replaced it, every corpus was rebuilt the same way, and the gate also checks the cached OpenAlex dates.

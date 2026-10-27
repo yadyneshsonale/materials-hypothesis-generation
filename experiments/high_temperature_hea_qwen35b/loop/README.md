@@ -151,3 +151,18 @@
   - No configuration beats the incumbent.
   - The incumbent beats the Llama baseline on test4 (+0.12 / +0.26) and over all 37 fresh papers (+0.11, p = 0.003;
     DeepSeek +0.27).
+
+## Experiment 36: web search for every baseline (loop.md section 17)
+
+- **Generation.** [run_web.sh](./run_web.sh) ran the 30 analysed evidence configurations as `web_<name>`, with each
+  question's web-search corpus in place of the fixed corpus, plus three web-search agents. That is 7,398 runs in
+  [../loop_web/](../loop_web/README.md): the five primary-comparison configurations on all 45 papers, the others on
+  all36. It started only after the corpus gate passed.
+- **Evaluation** (loop.md 17.3). GPT-5.6 rate-limited nearly every call on the shared TRAPI instance, so:
+  - [run_web_alt_eval.sh](./run_web_alt_eval.sh) and [run_web_alt_audit.sh](./run_web_alt_audit.sh) ran the GPT-5.6
+    judge, audits and labels on a second instance of the same deployment;
+  - [run_web_shared_audit.sh](./run_web_shared_audit.sh) added audits on the shared instance once it recovered;
+  - [run_web_finish.sh](./run_web_finish.sh) finished the DeepSeek cross-judge after `run_web.sh` was stopped at the
+    end of generation.
+- **Result.** Web search helps no baseline (W1), and web corpora are no better than the fixed corpus (W2): see
+  [../loop_web/analysis_web.md](../loop_web/analysis_web.md).

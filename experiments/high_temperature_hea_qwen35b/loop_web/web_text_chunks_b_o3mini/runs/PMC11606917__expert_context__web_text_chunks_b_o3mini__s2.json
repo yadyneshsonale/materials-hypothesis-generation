@@ -1,0 +1,123 @@
+{
+  "run_id": "PMC11606917__expert_context__web_text_chunks_b_o3mini__s2",
+  "paper_id": "PMC11606917",
+  "query_level": "expert_context",
+  "method": "web_text_chunks_b_o3mini",
+  "sample": 2,
+  "split": "dev",
+  "final": false,
+  "benchmark": "v3.1",
+  "query": "Earlier empirical-potential and first-principles studies primarily targeted phase-transition temperature, while other fusion properties remain difficult because they require free energies on both sides of the transition with vibrational entropy, anharmonicity, and electron–vibration coupling retained. Explicit ab initio free-energy evaluation is highly accurate but depends on costly molecular dynamics. TOR-TILD increased throughput for elemental and binary systems, yet slows substantially for multicomponent high-entropy systems. Under the constraint that the free energies of both solid and fluid states and the relevant entropy terms remain faithful, what single testable methodological hypothesis could substantially reduce the cost of obtaining fusion and high-temperature thermodynamic properties? State the proposed intervention and why it should work, predict its speed and fidelity relative to explicit ab initio molecular-dynamics workflows and TOR-TILD, define composition and temperature boundaries, cite supporting evidence from prior elemental or binary results, and specify a decisive benchmark of phase free energies and derived observables that would falsify the hypothesis.",
+  "publication_date": "2024-11-29",
+  "models": {
+    "web_query_writer": "trapi:Llama-3.3-70B-Instruct_5",
+    "writer": "trapi:o3-mini_2025-01-31",
+    "writer_repair": "trapi:o3-mini_2025-01-31"
+  },
+  "status": "ok",
+  "error": null,
+  "evidence_source": "web",
+  "generation": {
+    "hypothesis": "An active-learning-based moment tensor potential (AL-MTP) trained on a sparse set of ab initio molecular dynamics snapshots for both solid and liquid phases can accurately predict free energy differences and capture the key entropy contributions (vibrational, anharmonic, and electron–vibration) of fusion transitions, while reducing computational cost by roughly an order of magnitude compared to explicit ab initio MD and performing faster than TOR-TILD.",
+    "material_initial_state": "Well-characterized elemental and binary metal systems exhibiting a melting transition (e.g., systems similar to CoCrFeNi alloys in their solid fcc or bcc and liquid states).",
+    "intervention": "Implement an active-learning protocol to train a moment tensor potential on a small, carefully selected set of ab initio MD configurations from both phases. Use this ML potential within an enhanced sampling framework (e.g., thermodynamic integration) to compute fusion free energies while retaining the entropy contributions.",
+    "conditions": "Temperatures in a narrow window around the melting point, and compositions that are elemental, binary, or moderately complex high-entropy systems where free energy landscapes are sufficiently sampled by AL-MTP.",
+    "structural_mediator": "The AL-MTP, which encodes local atomic environments, ensuring that the vibrational, anharmonic, and electron-vibration couplings are faithfully reproduced in both the solid and liquid phases.",
+    "mechanism": "By learning the ab initio potential energy surface via active learning, the ML potential reproduces the critical thermodynamic properties that determine fusion behavior. The enhanced sampling method then leverages this ML potential to efficiently compute free energies with a fidelity comparable to full ab initio MD but at significantly reduced computational cost.",
+    "predicted_outcome": "Fusion free energies and derived thermodynamic properties (including entropy contributions) will be predicted within experimental error margins, while achieving a computational cost roughly ten times lower than that of explicit ab initio MD and faster than TOR-TILD.",
+    "baseline": "Results obtained from explicit ab initio MD workflows and TOR-TILD methods which require extensive computational resources to sample free energies in both phases.",
+    "boundary": "This approach is expected to hold for elemental and binary metal systems and extend to moderately complex high-entropy alloys within temperature ranges narrowly around the melting point. Its performance for systems with very high compositional complexity remains to be validated.",
+    "uncertainty": "There is uncertainty in the potential's ability to fully capture electron–vibration coupling and extreme anharmonicity in more complex or highly multicomponent systems, which may limit its predictive power outside the tested compositional and temperature ranges.",
+    "supporting_evidence_ids": [
+      "PMC11275555::web::000::abstract",
+      "PMC5321736::web::020::computational_methods",
+      "PMC9119285::web::017::conclusions"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Apply the active-learning-trained AL-MTP to compute fusion free energies for a well-characterized elemental or binary system using thermodynamic integration. Compare the ML-predicted free energies and entropy contributions with those from full ab initio MD (and available TOR-TILD results) under identical temperature conditions.",
+      "measurements": [
+        "Computed free energy differences across the fusion transition",
+        "Derived vibrational and anharmonic entropy values",
+        "Total computational time and resources expended"
+      ],
+      "falsification_rule": "If the AL-MTP predictions deviate by more than 10% from the ab initio MD reference values in free energy or fail to reproduce the key entropy contributions, or if the computational cost is not significantly reduced relative to TOR-TILD, then the hypothesis is falsified."
+    },
+    "citation_validation": {
+      "status": "valid_after_regeneration",
+      "initial_error": "generated hypothesis cites unavailable evidence: ['PMC4976365', 'PMC9534987']"
+    }
+  },
+  "seen_ids": [
+    "PMC10095688::web::021::3_2_1_prediction_of_thermodynamic_proper",
+    "PMC10813983::web::000::abstract",
+    "PMC10873362::web::000::abstract",
+    "PMC11275555::web::000::abstract",
+    "PMC4598836::web::013::discussion",
+    "PMC4623812::web::006::magnetic_properties",
+    "PMC4976365::web::000::abstract",
+    "PMC5126569::web::019::discussion",
+    "PMC5321736::web::020::computational_methods",
+    "PMC8950179::web::000::abstract",
+    "PMC8950179::web::003::1_introduction",
+    "PMC9119285::web::000::abstract",
+    "PMC9119285::web::017::conclusions",
+    "PMC9534987::web::000::abstract"
+  ],
+  "cited_ids": [
+    "PMC11275555::web::000::abstract",
+    "PMC5321736::web::020::computational_methods",
+    "PMC9119285::web::017::conclusions"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "PMC11275555::web::000::abstract",
+      "paper_id": "PMC11275555",
+      "publication_date": "2024-07-16",
+      "kind": "web:Abstract",
+      "text": "While first-principles methods have been successfully applied to characterize individual properties of multi-principal element alloys (MPEA), their use in searching for optimal trade-offs between competing properties is hampered by high computational demands. In this work, we present a framework to explore Pareto-optimal compositions by integrating advanced ab initio-based techniques into a Bayesian multi-objective optimization workflow, complemented by a simple analytical model providing straightforward analysis of trends. We benchmark the framework by applying it to solid solution strengthening and ductility of refractory MPEAs, with the parameters of the strengthening and ductility models being efficiently computed using a combination of the coherent-potential approximation method, accounting for finite-temperature effects, and actively-learned moment-tensor potentials parameterized with ab initio data. Properties obtained from ab initio calculations are subsequently used to extend predictions of all relevant material properties to a large class of refractory alloys with the help of the analytical model validated by the data and relying on a few element-specific parameters and u"
+    },
+    {
+      "record_id": "PMC5321736::web::020::computational_methods",
+      "paper_id": "PMC5321736",
+      "publication_date": "2017-02-20",
+      "kind": "web:Computational methods",
+      "text": "Having optimized the volume while allowing the atoms to relax to their ground state, the formation energy (cohesive energy) was derived by subtracting the sum of single-atom energies from the total energy."
+    },
+    {
+      "record_id": "PMC9119285::web::017::conclusions",
+      "paper_id": "PMC9119285",
+      "publication_date": "2019-12-31",
+      "kind": "web:Conclusions",
+      "text": "Using a combined SQS structure search and first-principles calculation approach, we have investigated the microstructures, thermodynamic and mechanical properties of CoCrFeNiTax (x = 0.0–1.0) high entropy alloys. The SQS method was used to construct the disordered candidate structures, which were further verified with first-principles calculations. The identified structures have their lattice constants in good agreement well with the measures. The total and partial PDF reveal that the atoms have different environments from each other, varying with composition and phase structures. Ta atoms have preferences to coordinating with specific atoms. The Cv variations with temperature are similar for the studied alloys, and are consistent with the prediction of Dulong–Petit, Kepp and Debye Models. Structure transition between the fcc and bcc structures was noted with Ta addition, but the formation energies are small for both phases. The magnitudes of ΔScon are about 2–3 times greater than their ΔSvib counterparts. It is configurational entropy that plays a crucial role in stabilizing the alloys. The computed elastic constants and moduli revealed that the mechanical properties of the CoCrFe"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "writer",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 20464,
+      "chars_out": 3649,
+      "seconds": 11.38
+    },
+    {
+      "role": "writer_repair",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 21324,
+      "chars_out": 3931,
+      "seconds": 14.31
+    }
+  ],
+  "llm_calls": 2,
+  "notes": {},
+  "chars_in": 41788,
+  "elapsed_seconds": 25.97
+}

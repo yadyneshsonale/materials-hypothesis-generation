@@ -143,6 +143,10 @@ def assert_no_target_records(record_ids: list[str], lookup: dict[str, Any], case
         family = str(metadata.get(record.paper_id, {}).get("work_family_id") or "")
         if target_family and family == target_family:
             raise ValueError(f"same-family record {record_id} reached a critique payload")
+        if (record.structured or {}).get("source") == "web":
+            import websearch
+            if any(websearch.audit_records([record], case["paper_id"]).values()):
+                raise ValueError(f"web record {record_id} failed the web leakage audit")
 
 
 def analyze_trace(run: dict[str, Any]) -> dict[str, Any]:
@@ -172,6 +176,14 @@ def analyze_trace(run: dict[str, Any]) -> dict[str, Any]:
 
 def case_context(case: dict[str, Any], metadata: dict[str, dict[str, Any]], v2_units: list[Any],
                  paper_maps_dir: Path) -> dict[str, Any]:
+    from temporal_eval_v3 import evidence_mode
+    if evidence_mode() == "web":  # experiment 36: the records the web tool agent saw (its corpora and searches)
+        import websearch
+        lookup = websearch.WebLookup()
+        for level, query in case["queries"].items():
+            for record in websearch.case_records(case["paper_id"], level, "text_chunks", question=query["text"]):
+                lookup[record.record_id] = record
+        return {"lookup": lookup}
     _, chunk_records, unit_records = build_corpus(
         case["paper_id"], case["publication_date"], metadata, v2_units, paper_maps_dir)
     return {"lookup": {record.record_id: record for record in [*chunk_records, *unit_records]}}
@@ -341,6 +353,8 @@ def revise_all(*, out: Path, metadata_path: Path, v2_dir: Path, paper_maps_dir: 
     contexts = {pid: case_context(case, metadata, v2_units, paper_maps_dir) for pid, case in cases.items()}
     bases = [_read_json(path) for path in sorted((BASE_DIR / "runs").glob("PMC*__tool_agent.json"))
              if _read_json(path)["paper_id"] in cases]
+    # A failed base run has no hypothesis to revise; it stays recorded as failed in eval_v3 and is not revised.
+    bases = [base for base in bases if base.get("status") == "ok" and base.get("generation")]
     jobs = []
     for base in bases:
         for arm in arms:

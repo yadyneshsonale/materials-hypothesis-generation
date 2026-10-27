@@ -724,7 +724,8 @@ _BM25_DOCS: dict[str, dict[str, list[str]]] = {}
 
 def pack_bm25(h: Harness, query: str, representation: str = "text_chunks") -> list[Any]:
     pool = h.pool(representation)
-    key = f"{h.case['paper_id']}:{representation}"
+    # Web pools differ by question level (one web corpus per paper and level, loop.md 17.1).
+    key = f"{h.source}:{h.case['paper_id']}:{h.level if h.source == 'web' else '*'}:{representation}"
     if key not in _BM25_DOCS:
         _BM25_DOCS[key] = {r.record_id: content_terms(r.text) for r in pool}
     scores = bm25(content_terms(query), _BM25_DOCS[key])
@@ -1138,3 +1139,107 @@ def m_router_b(h: Harness, model: str = "o3mini") -> dict[str, Any]:
 
 
 register("router_b_o3mini")(m_router_b)
+
+
+# ---------------------------------------------------------------- experiment 36 (loop.md 17.1): web search
+# Every analysed configuration that uses evidence is re-run with the run's web corpus in place of the fixed corpus:
+# the first N = 50 papers of a live web search (Europe PMC), strictly filtered by date, plus their co-cited references
+# (websearch.py). Retrieval, budgets and prompts are unchanged. Three agents search the web themselves.
+
+import websearch as _web  # noqa: E402
+from temporal_hypothesis_benchmark import _GENERATE_SYSTEM as _BASELINE_SYSTEM  # noqa: E402
+from temporal_hypothesis_benchmark import generate_with_citation_repair as _baseline_generate  # noqa: E402
+
+WEB_CONFIGS = (
+    "text_chunks", "text_chunks_b_o3mini", "text_chunks_mbr_b_o3mini", "text_4k_b_o3mini", "text_64k_b_o3mini",
+    "papers_n1_b_o3mini", "papers_n3_b_o3mini", "papers_n10_b_o3mini", "papers_n30_b_o3mini",
+    "papers_random10_b_o3mini", "precedent_decide", "decide_then_ground", "decide_then_ground_b",
+    "decide_then_ground_b_o3mini", "decide_then_ground_v2_o3mini", "multi_decision_ground_o3mini", "trend_chain",
+    "trend_chain_o3mini", "trend_ground_b", "trend_ground_b_o1", "trend_ground_b_o3mini", "trend_ground_bm25_b_o3mini",
+    "trend_ground_iter_b_o3mini", "trend_focus_ground_b_o3mini", "trend_niche_ground_b_o3mini",
+    "trend_o1_ground_b_o3mini", "niche_ground_b_o1", "niche_ground_b_o3mini", "scaffold_ensemble",
+    "scaffold_ensemble_o3mini",
+)
+
+
+def _on_web(base: str) -> Any:
+    def method(h: Harness) -> dict[str, Any]:
+        h.source = "web"
+        return _H.METHODS[base](h)
+    return method
+
+
+for _base in WEB_CONFIGS:
+    register(f"web_{_base}")(_on_web(_base))
+    if _base in _H.METHOD_MODELS:
+        _H.METHOD_MODELS[f"web_{_base}"] = _H.METHOD_MODELS[_base]
+
+WEB_AGENT_CALLS = 10
+WEB_AGENT_SYSTEM = (
+    "You search the scientific literature for a materials-science research question before a hypothesis is written. "
+    "The tools return only open-access papers published before the knowledge cutoff. Find what a researcher would "
+    "read before answering: work on the same material system and property, the earlier attempts and limitations the "
+    "question mentions, and mechanisms, compositions or processing routes that could address them. Use short keyword "
+    "queries. Read the pages most likely to hold results, mechanisms or data; results usually come after the first "
+    "pages. Each step, return JSON {\"thought\": one sentence, \"action\": \"web_search\" | \"read_paper\" | "
+    "\"references\" | \"finish\", \"arguments\": {...}}. Finish when you have read enough: the pages you read are the "
+    "only evidence the hypothesis writer will see."
+)
+
+
+def web_agent_pages(h: Harness, model: str) -> list[Any]:
+    """The search loop: up to WEB_AGENT_CALLS tool calls chosen by the model; returns the pages it read."""
+    h.source = "web"
+    tools = _web.WebTools(h.case["paper_id"], h.level)
+    history: list[dict[str, Any]] = []
+    calls = 0
+    while calls < WEB_AGENT_CALLS:
+        payload = {"question": h.query, "knowledge_cutoff": h.cutoff, "tools": _web.TOOL_DOC,
+                   "tool_calls_left": WEB_AGENT_CALLS - calls, "pages_left": _web.MAX_READS - len(tools.pages),
+                   "history": history}
+        raw = h.ask("searcher", model, WEB_AGENT_SYSTEM, payload, max_out=3000)
+        raw = raw if isinstance(raw, dict) else {}
+        action = str(raw.get("action", "")).strip().lower()
+        if action == "finish":
+            break
+        arguments = raw.get("arguments") if isinstance(raw.get("arguments"), dict) else {
+            k: raw[k] for k in ("query", "paper_id", "page") if k in raw}
+        calls += 1
+        history.append({"step": calls, "action": action, "arguments": arguments,
+                        "result": tools.call(action, arguments)})
+    for record in [*tools.listed.values(), *tools.pages.values()]:
+        h.seen[record.record_id] = record
+    h.notes["web_agent"] = {"tool_calls": calls, "pages": sorted(tools.pages), "listed": len(tools.listed),
+                            "log": tools.log}
+    return sorted(tools.pages.values(), key=lambda r: r.record_id)
+
+
+@register("web_agent")
+def m_web_agent(h: Harness) -> dict[str, Any]:
+    """The Llama baseline (experiment-21 prompt and generator call) with the web search tool."""
+    pages = web_agent_pages(h, "llama")
+    payload = {"query": h.query, "knowledge_cutoff": h.cutoff,
+               "eligible_evidence": h.evidence_payload(pages, _web.PAGE_CHARS)}
+    h.guard(payload)
+    h.models["generator"] = f"trapi:{_H.GENERATOR}"
+    h.trace.append({"role": "generator", "model": _H.GENERATOR, "chars_in": len(json.dumps(payload)), "chars_out": 0,
+                    "seconds": 0})
+    return _baseline_generate(payload, {r.record_id for r in pages})
+
+
+@register("web_agent_o3mini")
+def m_web_agent_o3mini(h: Harness) -> dict[str, Any]:
+    """The o3-mini baseline (closed_book_o3mini's prompt) with the web search tool."""
+    pages = web_agent_pages(h, "o3mini")
+    payload = {"query": h.query, "knowledge_cutoff": h.cutoff,
+               "eligible_evidence": h.evidence_payload(pages, _web.PAGE_CHARS)}
+    return h.generate_final("generator", "o3mini", _BASELINE_SYSTEM, payload, {r.record_id for r in pages})
+
+
+@register("web_agent_b_o3mini")
+def m_web_agent_b(h: Harness) -> dict[str, Any]:
+    """The best method's writer (writer_only_b_o3mini) with the web search tool."""
+    pages = web_agent_pages(h, "o3mini")
+    payload = {"query": h.query, "knowledge_cutoff": h.cutoff, "analysis_notes": {},
+               "eligible_evidence": h.evidence_payload(pages, _web.PAGE_CHARS)}
+    return h.generate_final("writer", "o3mini", WRITER_B, payload, {r.record_id for r in pages})

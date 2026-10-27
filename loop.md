@@ -2514,3 +2514,337 @@ claim needs test5.
   - [x] fresh held-out test run once;
   - [x] negative results recorded;
   - [x] experiment log, must_obey.md, READMEs and PROJECT_SUMMARY.md updated.
+
+---
+
+## 17. Web search for every baseline (experiment 36)
+
+### 17.1 Pre-registered plan (written 2026-10-27 04:25, before any experiment-36 run)
+
+**Request.** Add a web search tool to all the baselines and run all the experiments again. "The 50 papers" should be
+the first N papers a web search returns, strictly filtered by publication date, then expanded through the citation
+graph, using the papers' XML. There must be no data leakage.
+
+Before this plan, only Europe PMC hit counts were checked. Before 2024-02-28 there are 964 open-access, full-text HEA
+papers, of which 4 are preprints; phrase searches return 100–900 hits.
+
+**Web search engine.**
+- **Europe PMC REST** (live): the web's open scholarly index with JATS XML full text.
+- **OpenAlex:** dates and reference lists.
+- **Why not a general web engine:** it returns pages without reliable dates (news, theses, later papers), so it
+  cannot be filtered strictly. must_obey.md 4.7 allows a live literature API only if the tool applies the date filter
+  and exclusions itself and logs what it returned. That is done here, in code, before any model sees a result.
+
+**Per-question web corpus.** Built by code for every paper × question level: 45 papers × 3 levels = 135 corpora.
+1. **Search phrases.** Llama-3.3 (pre-cutoff) writes 3 search phrases from the question only (must_obey.md 4.6;
+   prompt as in experiment 17).
+2. **Search.** For each phrase, the Europe PMC query is:
+   - OR of the phrase's content terms in the abstract;
+   - AND the HEA domain anchor of experiment 17;
+   - AND open access with full text;
+   - AND not a preprint;
+   - AND first publication date before the case's date.
+
+   All hits are fetched, up to 2,000 per phrase, so the engine's own ordering (which may use present-day signals such
+   as citations) never decides what is seen.
+3. **Strict filter** (code). A paper is kept only if:
+   - **(a) Dates.** Every known date is before the case's date: Europe PMC's first and electronic publication dates and
+     OpenAlex's publication date. Two independent sources must agree.
+   - **(b) Not the case paper or its family.** Excluded: same DOI or PMCID; title token Jaccard ≥ 0.8; or Jaccard ≥ 0.5
+     with the same first author.
+   - **(c) Not a held-out paper.** None of the 45 held-out papers is ever evidence for any case.
+   - **(d) Right type.** Not a preprint, review, editorial, erratum, correction, retraction or data paper.
+   - **(e) Does not cite the case paper** (its DOI or a near-identical title): a pre-cutoff paper citing it would mean
+     an earlier version existed. Checked after XML parsing.
+   - **(f) Not a version of the case paper.** It contains fewer than 5% of the case paper's 12-word passages from its
+     non-introduction text.
+   - **(g) Enough text.** At least 3,000 characters of full text.
+4. **Ranking.** BM25 on title (×2) and abstract against the question and the phrases. No citation counts or other
+   present-day signals.
+5. **Seeds.** The first N = 50 papers that pass every filter and have parsable XML.
+6. **Citation-graph expansion** (backward only, must_obey.md 4.3).
+   - Candidates: references of the seeds (OpenAlex) that are cited by at least 2 seeds, have every date before the
+     case's date, and pass the same filters.
+   - Ranked by co-citation count, then BM25 title relevance.
+   - Up to 50 with open-access XML.
+7. **Text.** The XML body (abstract and sections; no references, tables, figures or acknowledgements), split into
+   section-aligned passages of at most 1,600 characters. The **card** is the title, abstract and conclusions,
+   verbatim (at most 3,200 characters). It replaces the LLM-extracted cards, so no extractor touches the web corpus.
+8. **Manifest per corpus.** The phrases, hit counts and filter-reason counts, and every paper with its IDs, all its
+   dates, its role (seed or expansion) and its rank.
+9. **Gate before any run.** No corpus paper may be dated on or after the case's date by any source, and filters (b),
+   (c), (e) and (f) are re-checked. Any violation stops the experiment until it is fixed.
+
+**Web search tool for agents.** Every call applies the same filters and logs everything it returns.
+
+| Tool | What it does |
+|---|---|
+| `web_search(query)` | Europe PMC free-text query with the filters, up to 200 hits, BM25 re-rank on title and abstract; returns the top 8 with title, date, journal and a 300-character abstract snippet |
+| `read_paper(paper_id, page)` | 2,400-character pages of the paper's XML text. Only papers returned to this run by a tool, or in its corpus, can be read. At most 6 reads, so the evidence stays within the 16,000-character budget |
+| `references(paper_id)` | The paper's references that pass the filters and have open-access XML |
+
+An agent gets up to 10 tool calls. Then its writer writes the hypothesis from the pages it read, which are the only
+citable records.
+
+**What is re-run.**
+- **A. Harness** (v3.1 input, the 36 spent papers, 3 levels × 2 samples).
+  - The 30 analysed configurations that use evidence are re-run as `web_<name>`, with the web corpus in place of the
+    fixed corpus. Retrieval, budgets and prompts are unchanged.
+  - Three new web-search agents, one per baseline model and prompt:
+    - `web_agent`: the Llama-3.3 baseline prompt with the web search tool;
+    - `web_agent_o3mini`: the o3-mini baseline prompt with the tool;
+    - `web_agent_b_o3mini`: the best method's conservative writer with the tool.
+  - Closed-book configurations are unchanged (their inputs did not change) and are compared as they are.
+  - **Tier 1.** `web_text_chunks`, `web_text_chunks_b_o3mini` and the three agents also run on test4 (9 papers), so
+    the main comparison uses all 45 papers.
+- **B. Suite** (experiment-21 frameworks, Llama-3.3, the 12 original papers). Every arm whose evidence can come from
+  XML:
+  - experiment 7: text one-shot, and the tool agent (web corpus plus `web_search`);
+  - experiment 9: the KG agent (the same plus MatKG);
+  - experiment 11: critique and self-revision of the web tool agent, and its resample;
+  - experiment 14: text chunks and XML cards;
+  - experiment 16: text and card system-match, knowledge-first, and ensemble selection;
+  - experiment 17: the five citation-graph variants, on a graph built from the web corpus (seeds, expansion and
+    their references) with XML cards and verbatim citing sentences as the statements about each node.
+- **Not re-run.**
+  - Arms whose evidence is LLM-extracted records of the fixed corpus: experiment 14's effects, mechanisms, gaps,
+    mixed and v2 units, and experiment 7's v2 one-shot. Extracting them for about 2,500 web papers would take about
+    20,000 extractor calls, and in experiments 14, 21 and 32 none beat raw text, which is re-run.
+  - Closed-book arms, which are unchanged.
+
+**Analysis** (fixed now; script `web_analysis.py`).
+- **W1 (primary).** Each baseline with web search vs the same baseline without evidence.
+  - Pairs:
+    - `web_text_chunks` and `web_agent` vs `closed_book` (Llama);
+    - `web_agent_o3mini` vs `closed_book_o3mini`;
+    - `web_text_chunks_b_o3mini` and `web_agent_b_o3mini` vs `writer_only_b_o3mini`.
+  - Papers: all 45 where both have runs, otherwise 36.
+  - Judges: GPT-5.6, with DeepSeek alongside; Holm across the five.
+- **W2.** Each web configuration vs its fixed-corpus version, on the papers both cover. Does web search beat the
+  fixed corpus? Holm across all.
+- **W3.** Web leaderboard and rank agreement with the fixed-corpus results.
+- **W4.** Suite arms vs closed-book, and vs experiment 21.
+- **W5. Leakage, after the runs.**
+  - Every run's leakage counters are zero, and no evidence paper is dated on or after the case by any source.
+  - Evidence-leak test: in the evidence each run saw, the share of the true case's answer words, compared with
+    other cases' answer words. Answer words are stems of the key's intervention, mediator, mechanism and outcome,
+    minus question words and common words.
+- **Decision rule.** Web search helps a baseline if W1's GPT-5.6 CI excludes zero and DeepSeek agrees in direction.
+- **Status.** All papers are spent. A claim that web search helps would need a fresh test set (test5).
+
+### 17.2 Amendment before any run (2026-10-27 05:20): OpenAlex replaced by Crossref, and implementation details
+
+**What happened.** The corpus build stopped at corpus 78 of 134. OpenAlex now gives requests without an API key a
+shared free budget per IP address (1,000 requests a day), and this machine's budget was used up. A key needs the
+user's email and a confirmation click, which was not possible during this run. `citegraph.prepare_paper` turned the
+failures into "no XML", so corpora 78–88 may have silently skipped some papers. The build was stopped.
+
+**Change (no run had started).**
+- **Second date source: Crossref** instead of OpenAlex.
+  - Crossref is independent of Europe PMC (publisher-deposited metadata) and needs no key. It is queried in batches
+    of 40 DOIs, one request at a time, at most one per second (its public-pool limit).
+  - The date is Crossref's `published`, the earliest of the print and online dates as deposited.
+  - A partial date counts as the last day of its month or year. For example, "March 2024" fails a 1 March 2024
+    cutoff.
+  - A paper without a Crossref date is not kept.
+  - Types `posted-content`, `peer-review`, `dataset`, `component`, `report` and `dissertation` are excluded.
+- **References from the papers' own JATS XML** instead of OpenAlex reference lists:
+  - co-citation expansion counts reference DOIs;
+  - the cites-the-case check uses each reference's DOI, its title, or (when the title is missing) the raw citation
+    string;
+  - the citation graph's reference nodes are keyed by DOI and dated by Crossref.
+- **Graph node citation count.** It is now the number of corpus papers that cite the node (all before the cutoff),
+  since OpenAlex citation counts are unavailable.
+- **All 135 corpora are rebuilt the same way.**
+  - The 89 corpora built with OpenAlex are kept in `websearch/superseded_openalex/` and not used.
+  - JATS parses go to `websearch/papers/`, so citegraph's shared cache keeps its OpenAlex-resolved parses.
+  - On the first case, the rebuilt corpus has the same 50 seeds and 13 of the 15 expansion papers.
+- **Gate.** It also checks the OpenAlex dates cached before the budget ran out, where present (a third source).
+
+**Implementation details** (fixed before any run):
+1. **Passages leave out back matter.** Data availability, author contributions, conflicts of interest, funding and
+   similar sections are dropped, as acknowledgements already were.
+2. **The agent's `web_search` is plain keywords.**
+   - Field syntax, ranges and boolean operators are stripped, so an agent cannot widen the date filter.
+   - If fewer than 8 eligible papers come back, HEA-domain papers that match any of the words are added before
+     BM25 ranking. Europe PMC needs every word of a free-text query to match, so long queries often return
+     nothing.
+   - Results are parsed before they are shown, so rules (e)–(g) also apply to the titles and snippets an agent
+     sees.
+   - Search results and reference lists shown to an agent are recorded as seen records and audited too.
+3. **Tool errors go back to the agent** (for example, the service not responding) instead of failing the run.
+4. **One request clock** is shared by every thread and process (Europe PMC about 8 requests per second; Crossref
+   1 per second).
+5. **Suite questions.** Experiment 21 used the v3 questions, and 24 of its 36 questions differ from v3.1.
+   - The suite keeps the v3 questions, so its closed-book arms and the comparison with experiment 21 are unchanged.
+   - Each differently worded question gets its own corpus (`corpora/<paper>/<level>.q<hash>.json`): 135 harness
+     corpora plus 24 suite corpora.
+6. **Suite closed-book baselines.** They are copied from `rerun_v3/` into the web run root (`rerun_web/`):
+   - experiment 7's closed book;
+   - experiment 14's closed book;
+   - experiment 16's fixed closed book, which knowledge-first refines and which is a candidate for ensemble
+     selection.
+
+   Copying matches what experiment 9 did with its baselines. Copies are marked as such, and their judgments are
+   copied with them.
+
+### 17.3 Amendment during the run (2026-10-27 06:20): the suite tool agent's web search, before any analysis
+
+**Finding.** The suite's tool agent (experiment 7) with `web_search` as a fifth tool made no tool call in all 36 runs.
+- With Llama-3.3 on Azure, every tool is wrapped into a single `act` tool.
+- With any tool beyond experiment 7's four, the model writes a malformed submission as text, and the agent falls
+  through to a forced submission.
+- Probes with the same question:
+  - experiment 7's four tools: `search_corpus` first in 8 of 8;
+  - with `web_search` or `kg_lookup` added, or replacing `list_papers`: a malformed text reply in 23 of 24.
+- **This was already true of experiment 21's KG agent (experiment 9):** 35 of its 36 runs made no tool call, so with
+  Llama that arm was close to a closed-book run with a different prompt. Experiment 32's KG agent made none in 8 of
+  12.
+
+**Change.**
+- The suite tool agent keeps experiment 7's four tools and prompt unchanged.
+- In web mode its `search_corpus` returns two kinds of result, alternating:
+  - the best passages of the question's web corpus;
+  - the top 3 papers of a live web search for the same query (`websearch.WebEligibleCorpus`). A web paper is a
+    readable record `<pmcid>::paper`, which `read_record` pages through.
+- The 36 runs and 24 judgments made with the fifth tool are kept in `rerun_web/superseded_tool_agent_no_tool_calls/`
+  and not analysed.
+- With the fix, 4 of 8 test runs used tools (2–3 calls, each search showing 3 live papers). The other 4 submitted at
+  once, as 25% did in experiment 21.
+- The KG agent keeps experiment 9's five tools: its `kg_lookup` was part of the original design, so its expected
+  failure to call tools is reported, not changed.
+- The harness agents (`web_agent*`) are unaffected: they use a JSON action loop, not native tool calls.
+
+**Evaluation capacity (same amendment).**
+- From about 06:00, GPT-5.6 on the shared TRAPI instance (`gcr/shared`) rate-limited nearly every call: no harness
+  judgment in 35 minutes, while DeepSeek and every generator worked.
+- The same deployment (`gpt-5.6-sol_2026-07-09`, same model and version) is also served by a second instance
+  (`redmond/interactive`). It now serves the evaluations with few workers:
+  - harness: 4, via `loop/run_web_alt_eval.sh`;
+  - suite: 2 per GPT-5.6 stage, via `JUDGE_TRAPI_ENDPOINT`, which routes only the judge deployment.
+- Every harness judgment, audit and label written from now on records its instance (`trapi_instance`).
+- Evaluation stages take configurations in a set priority order (W1's first), and skip any output another pass
+  wrote meanwhile, so there is no double judging.
+- Required evaluations come first: the GPT-5.6 judge, the DeepSeek cross-judge and the target-free audit
+  (must_obey.md 6.3). Lever labels follow.
+
+**After generation (same amendment, 08:55).**
+- **Harness generation is complete.** All 7,398 runs are OK; a second pass regenerated 5 that had failed.
+- **`run_web.sh` was stopped.** Its remaining GPT-5.6 passes on the rate-limited shared instance would only add
+  load there.
+  - The GPT-5.6 judge and the audits run on the second instance (`run_web_alt_eval.sh`, `run_web_alt_audit.sh`).
+  - The DeepSeek cross-judge runs on the shared instance (`run_web_finish.sh`).
+- **Lever labels are made for the primary comparison's five configurations only.** They are not required
+  (must_obey.md 6.3), and the second instance is saturated at about 27 GPT-5.6 calls a minute. The labels of the
+  other 28 configurations are not made.
+- **Suite.** One experiment-7 web tool-agent unit (PMC12298864, expert level) failed twice with no valid
+  submission.
+  - It was regenerated once more, successfully, and its experiment-7, 9 and 11 evaluations were brought up to date.
+  - The critique stage had crashed on the failed base run. It now skips failed base runs, as it must, since they
+    have no hypothesis to revise; experiment 21 never had one.
+
+### 17.4 Results (experiment 36)
+
+**Runs.**
+- **Harness** (`loop_web/`): 33 configurations, 7,398 runs, all OK.
+  - Every run has a GPT-5.6 judgment, a DeepSeek judgment and a target-free audit.
+  - The five primary configurations also have lever labels (1,350).
+  - `must_obey_check.py --loop` passes all 33 directories. The only warnings are the known papers 1–2 days after
+    Llama-3.3's cutoff.
+- **Suite** (`rerun_web/`): 1,152 runs and 72 revisions, all judged and audited. `must_obey_check.py` passes every
+  suite directory (only the known 2-day Llama margin warning).
+- **Analysis.** [web_analysis.py](./web_analysis.py) writes
+  [loop_web/analysis_web.md](./experiments/high_temperature_hea_qwen35b/loop_web/analysis_web.md) and
+  [rerun_web/comparison/tables.md](./experiments/high_temperature_hea_qwen35b/rerun_web/comparison/tables.md).
+
+**Corpora** ([websearch/README.md](./experiments/high_temperature_hea_qwen35b/websearch/README.md)).
+- 159 corpora (1,315 unique papers): a median of 50 seeds and 16 co-cited expansion papers.
+- The newest evidence is a median 15 days before the paper's date.
+- Filter rejections over all corpora:
+  - 2,017 hits on other held-out papers;
+  - 581 papers that Crossref dates on or after the cutoff;
+  - 33 papers that cite the case paper;
+  - 6 likely versions of the case paper.
+
+**W1 (primary): each baseline with web search vs the same baseline without evidence.** Papers = all 45 (all36 +
+test4) unless stated.
+
+| With web search | Without evidence | GPT-5.6 (web vs none) | Difference [95% CI] | Holm p | DeepSeek difference [CI] |
+|---|---|---|---|---|---|
+| `web_text_chunks` (Llama) | `closed_book` | 0.50 vs 0.50 | −0.00 [−0.06, +0.06] | 1.0 | +0.02 [−0.05, +0.10] |
+| `web_agent` (Llama searches) | `closed_book` | 0.42 vs 0.50 | −0.08 [−0.15, −0.01] | 0.70 | −0.08 [−0.15, +0.00] |
+| `web_agent_o3mini` (24 papers) | `closed_book_o3mini` | 0.58 vs 0.58 | +0.00 [−0.07, +0.07] | 1.0 | +0.13 [+0.02, +0.25] |
+| `web_text_chunks_b_o3mini` | `writer_only_b_o3mini` | 0.61 vs 0.62 | −0.02 [−0.07, +0.04] | 1.0 | +0.04 [−0.05, +0.12] |
+| `web_agent_b_o3mini` | `writer_only_b_o3mini` | 0.56 vs 0.62 | −0.07 [−0.11, −0.02] | 0.16 | −0.05 [−0.13, +0.04] |
+
+- **Decision (pre-registered rule): web search helps no baseline.** No GPT-5.6 CI is above zero.
+- The two agents that write from the pages they read score lower. Their uncorrected GPT-5.6 CIs are below zero and
+  DeepSeek points the same way, but neither survives Holm.
+- The only positive signal is DeepSeek's +0.13 for the o3-mini agent (24 papers). GPT-5.6 sees +0.00 there, so the
+  rule is not met.
+
+**W2: the web corpus vs the fixed 50-paper corpus, same configuration** (30 configurations, on the papers both
+cover).
+- **GPT-5.6:** no difference survives Holm. The range is −0.12 to +0.09, and most are within ±0.05.
+- **DeepSeek:** it prefers the web versions of the configurations built on paper cards: +0.15 to +0.28 for
+  `papers_n1/3/10/30` and random-10 (Holm p 0.08–1.0); other configurations are near zero.
+  - The fixed cards are LLM-extracted digests; the web cards are the verbatim title, abstract and conclusions.
+  - The judges disagree here, so it is not a finding about evidence quality.
+
+**W3: leaderboard and stability.**
+- The best web configuration, `web_trend_ground_b_o1` (0.622), ties the no-evidence incumbent `writer_only_b_o3mini`
+  (0.623 on 45 papers).
+- Configuration ranks agree between web and fixed evidence: Spearman 0.79 (GPT-5.6) and 0.72 (DeepSeek) over 30
+  configurations.
+- How the agents used the tools:
+  - **Llama:** 8.4 tool calls, 3.6 searches and 4.7 pages read per run (from 1.5 papers on average); it cited 3.7
+    records.
+  - **o3-mini agents:** 4.2 tool calls, 2.3 searches and 1.9 pages (from 1.7 papers); they cited 1.5 records.
+  - **Reference lists:** almost unused (under 0.01 calls per run).
+
+**W4: the suite (12 papers, v3 questions).**
+- **No web arm beats closed-book** with either judge. All 17 web arms are below the experiment-14 closed book
+  (0.60). The tool agent's resample is significantly below it: −0.32, Holm p = 0.009.
+- **Web vs experiment 21 (same arm, fixed corpus):** no difference survives Holm. The largest is graph profiles,
+  −0.12 [−0.20, −0.04].
+- **Tool agent use of live search:** 24 of 36 web tool-agent runs were shown live web-search papers, and 9 read and
+  cited one.
+- **KG agent:** it made no tool call in 34 of 36 runs, as in experiment 21 (35 of 36).
+
+**W5: leakage.**
+- **Counters:** every run's counters are zero (7,398 harness and 1,188 suite runs): temporal, test-paper, held-out,
+  case DOI/title and invalid citations.
+- **Dates re-checked:** every web evidence record any run saw was rebuilt and re-checked. No date is on or after the
+  case date by any source.
+- **Version check:** across 10,556 corpus-paper entries, the largest share of a held-out paper's 12-word passages
+  found in any evidence paper is 1.5%. The median is 0, and only 2 entries reach 1%.
+- **Evidence-leak test.** It measures the share of the true case's answer words in what a run saw, minus other
+  cases' answer words.
+  - It is +0.01 to +0.08 on web evidence.
+  - It is higher than on the fixed corpus for the configurations that see the most evidence (30 cards: +0.07; 64k
+    characters: +0.06; trend grounding: +0.05).
+  - Question-targeted search is expected to find more on-topic evidence than a generic 50-paper corpus. The
+    papers that carry the most answer words are older work on the same alloy systems (2017–2022), not versions.
+  - Those configurations' scores did not rise (GPT-5.6 web − fixed: −0.00 and −0.01).
+- **Conclusion: no sign of leakage.**
+
+**Conclusion.**
+- With strict date filtering, a live literature search does not help any baseline in this benchmark. That holds
+  for corpora built from the first 50 search results plus their citation neighbourhood, and for agents that search
+  themselves.
+- It confirms, with a different and larger evidence source, the project's standing result: closed-book and
+  writer-only methods are as good as or better than any retrieval method (experiments 21, 29, 32).
+- The method ranking is stable across evidence sources.
+
+**Status.**
+- All 45 papers were already spent, so these results are exploratory.
+- A claim that web search helps (or hurts) would need a fresh test set (test5) and a pre-registered comparison.
+
+**Afternoon (same amendment, 12:50).**
+- **Judging finished at 12:45.** Both judges are complete for all 7,398 harness runs. The DeepSeek cross-judge
+  finished at 09:50 on the shared instance.
+- **The shared instance served GPT-5.6 again** (6 of 6 test calls in about 3 s). Audits run on both instances:
+  - `run_web_shared_audit.sh` on the shared instance, in the reverse configuration order;
+  - the second-instance loops as before.
+- **Tier 1 lever labels** run on the shared instance as well.
+- Each audit and label records its instance.

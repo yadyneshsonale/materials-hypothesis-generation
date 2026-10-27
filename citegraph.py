@@ -783,6 +783,12 @@ def extract_stage(workers: int, resume: bool, case_ids: list[str] | None = None)
 # ---------------------------------------------------------------- stage: graph
 
 def build_graph(case: dict[str, Any]) -> dict[str, Any]:
+    from temporal_eval_v3 import evidence_mode
+    if evidence_mode() == "web":  # experiment 36: the graph of the question's web corpus (websearch.web_graph)
+        import websearch
+        graph = websearch.web_graph(case["paper_id"], question=graph_query(case), level=GRAPH_LEVEL)
+        atomic_json(case_dir(case["paper_id"]) / "graph.json", graph)
+        return graph
     cutoff = case["publication_date"]
     exclusion = target_exclusion(case)
     seeds = _read_json(case_dir(case["paper_id"]) / "seeds.json")["seeds"]
@@ -1003,10 +1009,18 @@ def corroboration_rank(query: str, pool: list[RetrievalRecord]) -> list[Retrieva
 
 
 def graph_leakage(records: list[RetrievalRecord], case: dict[str, Any]) -> dict[str, int]:
+    from temporal_eval_v3 import evidence_mode
     exclusion = target_exclusion(case)
     audit = rx.leakage_audit(records, case)
     audit["target_doi_or_title_leaks"] = sum(is_excluded(exclusion, r.structured.get("doi", ""), r.paper_id, "")
                                              for r in records)
+    if evidence_mode() == "web":  # held-out papers other than the case are never evidence either (loop.md 17.1)
+        import websearch
+        flt = websearch.CaseFilter(case["paper_id"])
+        for r in records:
+            identity = flt.identity(r.paper_id if r.paper_id.startswith("PMC") else "", r.structured.get("doi", ""))
+            audit["target_doi_or_title_leaks"] += int(identity in ("case_paper", "case_family"))
+            audit["family_leaks"] += int(identity == "held_out")
     return audit
 
 
@@ -1255,7 +1269,8 @@ def generate_one(case: dict[str, Any], level: str, arm: str, sample: int) -> Non
         "cited_evidence": [{"record_id": c, "paper_id": lookup[c].paper_id,
                             "publication_date": lookup[c].publication_date, "kind": lookup[c].kind,
                             "text": lookup[c].text[:CITED_TEXT_CHARS]} for c in cited if c in lookup],
-        "audit": audit, "elapsed_seconds": round(time.time() - started, 2), **extra,
+        "audit": audit, "evidence_source": rx.evidence_source(), **rx.web_models(),
+        "elapsed_seconds": round(time.time() - started, 2), **extra,
     })
 
 

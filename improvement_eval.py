@@ -181,7 +181,7 @@ def save_run(case: dict[str, Any], level: str, arm: str, sample: int, status: st
     lookup = {r.record_id: r for r in packed}
     cited = sorted(set((generation or {}).get("supporting_evidence_ids", [])
                        + (generation or {}).get("conflicting_evidence_ids", [])))
-    audit = rx.leakage_audit(packed, case)
+    audit = rx.evidence_audit(packed, case)
     audit["invalid_citations"] = len(set(cited) - set(lookup))
     rid = run_id(case["paper_id"], level, arm, sample)
     atomic_json(OUT / "runs" / f"{rid}.json", {
@@ -194,13 +194,14 @@ def save_run(case: dict[str, Any], level: str, arm: str, sample: int, status: st
         "cited_evidence": [{"record_id": rid_, "paper_id": lookup[rid_].paper_id,
                             "publication_date": lookup[rid_].publication_date, "kind": lookup[rid_].kind,
                             "text": lookup[rid_].text[:CITED_TEXT_CHARS]} for rid_ in cited if rid_ in lookup],
-        "audit": audit, "elapsed_seconds": round(time.time() - started, 2), **extra,
+        "audit": audit, "evidence_source": rx.evidence_source(), **rx.web_models(),
+        "elapsed_seconds": round(time.time() - started, 2), **extra,
     })
 
 
 def evidence_for(case: dict[str, Any], level: str, representation: str) -> list[Any]:
     """Same pool, ranking and budget as the experiment-14 arm of that representation."""
-    _, pool = rx.case_pool(case, representation)
+    pool = rx.evidence_pool(case, level, representation)
     return rx.pack(case["queries"][level]["text"], pool, rx.record_cap(representation))
 
 

@@ -377,6 +377,44 @@ def record_cap(arm: str) -> int:
     return RECORD_MAX_CHARS_BY_ARM.get(arm, RECORD_MAX_CHARS)
 
 
+def evidence_source() -> str:
+    from temporal_eval_v3 import evidence_mode
+    return evidence_mode()
+
+
+def web_models() -> dict[str, Any]:
+    """With web evidence, the corpus's search phrases were written from the question by a pre-cutoff model."""
+    if evidence_source() != "web":
+        return {}
+    import websearch
+    return {"models": {"web_query_writer": f"trapi:{websearch.PHRASE_MODEL}"}}
+
+
+def evidence_pool(case: dict[str, Any], level: str, representation: str) -> list[RetrievalRecord]:
+    """The arm's pool: the fixed corpus, or with MATHG_EVIDENCE=web the web-search corpus of this question
+    (experiment 36, loop.md 17.1; websearch.py)."""
+    from temporal_eval_v3 import evidence_mode
+    if evidence_mode() == "web":
+        import websearch
+        return websearch.case_records(case["paper_id"], level, representation,
+                                      question=case["queries"][level]["text"])
+    return case_pool(case, representation)[1]
+
+
+def evidence_audit(records: list[RetrievalRecord], case: dict[str, Any]) -> dict[str, int]:
+    """leakage_audit, plus the web counters (dates from every source, case and held-out identity) for web records."""
+    from temporal_eval_v3 import evidence_mode
+    web = [r for r in records if (r.structured or {}).get("source") == "web"]
+    web_ids = {r.record_id for r in web}
+    audit = leakage_audit([r for r in records if r.record_id not in web_ids], case)
+    if web or evidence_mode() == "web":
+        import websearch
+        audit.setdefault("target_doi_or_title_leaks", 0)
+        for key, value in websearch.audit_records(web, case["paper_id"]).items():
+            audit[key] = audit.get(key, 0) + value
+    return audit
+
+
 def pack(query: str, pool: list[RetrievalRecord], cap: int = RECORD_MAX_CHARS) -> list[RetrievalRecord]:
     """Top-ranked records until the shared character budget is reached (identical budget for every arm)."""
     packed: list[RetrievalRecord] = []
@@ -418,7 +456,7 @@ def generate_one(case: dict[str, Any], level: str, arm: str, sample: int) -> Non
         if arm == "closed_book":
             generation, _ = run_closed_book(query, cutoff)
         else:
-            _, pool = case_pool(case, arm)
+            pool = evidence_pool(case, level, arm)
             packed = pack(query, pool, record_cap(arm))
             generation = generate_with_citation_repair(
                 {"query": query, "knowledge_cutoff": cutoff,
@@ -429,7 +467,7 @@ def generate_one(case: dict[str, Any], level: str, arm: str, sample: int) -> Non
     lookup = {r.record_id: r for r in packed}
     cited = sorted(set((generation or {}).get("supporting_evidence_ids", [])
                        + (generation or {}).get("conflicting_evidence_ids", [])))
-    audit = leakage_audit(packed, case)
+    audit = evidence_audit(packed, case)
     audit["invalid_citations"] = len(set(cited) - set(lookup))
     atomic_json(OUT / "runs" / f"{run_id(case['paper_id'], level, arm, sample)}.json", {
         "run_id": run_id(case["paper_id"], level, arm, sample), "paper_id": case["paper_id"], "query_level": level,
@@ -442,7 +480,8 @@ def generate_one(case: dict[str, Any], level: str, arm: str, sample: int) -> Non
         "cited_evidence": [{"record_id": rid, "paper_id": lookup[rid].paper_id,
                             "publication_date": lookup[rid].publication_date, "kind": lookup[rid].kind,
                             "text": lookup[rid].text[:CITED_TEXT_CHARS]} for rid in cited if rid in lookup],
-        "audit": audit, "elapsed_seconds": round(time.time() - started, 2),
+        "audit": audit, "evidence_source": evidence_source(), **web_models(),
+        "elapsed_seconds": round(time.time() - started, 2),
     })
 
 

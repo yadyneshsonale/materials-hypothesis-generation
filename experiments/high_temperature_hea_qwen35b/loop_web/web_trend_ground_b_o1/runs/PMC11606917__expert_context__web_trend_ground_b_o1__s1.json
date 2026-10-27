@@ -1,0 +1,202 @@
+{
+  "run_id": "PMC11606917__expert_context__web_trend_ground_b_o1__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "expert_context",
+  "method": "web_trend_ground_b_o1",
+  "sample": 1,
+  "split": "dev",
+  "final": false,
+  "benchmark": "v3.1",
+  "query": "Earlier empirical-potential and first-principles studies primarily targeted phase-transition temperature, while other fusion properties remain difficult because they require free energies on both sides of the transition with vibrational entropy, anharmonicity, and electron–vibration coupling retained. Explicit ab initio free-energy evaluation is highly accurate but depends on costly molecular dynamics. TOR-TILD increased throughput for elemental and binary systems, yet slows substantially for multicomponent high-entropy systems. Under the constraint that the free energies of both solid and fluid states and the relevant entropy terms remain faithful, what single testable methodological hypothesis could substantially reduce the cost of obtaining fusion and high-temperature thermodynamic properties? State the proposed intervention and why it should work, predict its speed and fidelity relative to explicit ab initio molecular-dynamics workflows and TOR-TILD, define composition and temperature boundaries, cite supporting evidence from prior elemental or binary results, and specify a decisive benchmark of phase free energies and derived observables that would falsify the hypothesis.",
+  "publication_date": "2024-11-29",
+  "models": {
+    "framer": "trapi:o1_2024-12-17",
+    "web_query_writer": "trapi:Llama-3.3-70B-Instruct_5",
+    "trend_forecaster": "trapi:o1_2024-12-17",
+    "writer": "trapi:o1_2024-12-17"
+  },
+  "status": "ok",
+  "error": null,
+  "evidence_source": "web",
+  "generation": {
+    "hypothesis": "Training a machine-learned interatomic potential on a minimal set of ab initio MD snapshots for both the solid and liquid phases, then performing advanced thermodynamic integration (e.g., nested sampling) on that potential can accurately and efficiently capture vibrational, anharmonic, and electron–vibration free-energy terms for multicomponent alloys at high temperatures, at far lower computational cost than full ab initio molecular dynamics or TOR-TILD.",
+    "material_initial_state": "Representative multicomponent alloy configurations for both crystalline and molten phases, generated from a limited set of ab initio molecular-dynamics runs across the relevant temperature range.",
+    "intervention": "Fit a neural-network or moment-tensor potential to ab initio reference snapshots of solid and liquid states, then apply staged thermodynamic integration or nested sampling to determine free energies up to melting.",
+    "conditions": "Implement for compositionally complex alloys (up to five principal elements) in the temperature range encompassing solid–liquid coexistence, ensuring that sampling includes relevant vibrational, anharmonic, and electron–vibration contributions.",
+    "structural_mediator": "A high-fidelity machine-learned potential that interpolates the ab initio potential energy surface of both solid and liquid states in multi-element systems.",
+    "mechanism": "Once trained, the computationally cheap potential enables extensive sampling of configuration space needed for accurate free energies, preserving near–first-principles accuracy with reduced simulation overhead.",
+    "predicted_outcome": "An order-of-magnitude reduction in computational cost for predicting melting properties (T_m, latent heats, fusion entropies) and high-temperature thermal data compared to large-scale ab initio MD/explicit TOR-TILD, while matching or closely approximating their accuracy.",
+    "baseline": "Full ab initio molecular-dynamics or complete TOR-TILD calculations for each alloy composition and phase.",
+    "boundary": "Compositions up to quinary alloys without extreme short-range order and temperatures from ambient up to near the melt. Extrapolation beyond these composition or temperature limits is currently unverified.",
+    "uncertainty": "Accuracy depends on thorough sampling of composition and temperature in the training dataset, and on whether key structural features (e.g., chemical short-range order) are captured by the potential.",
+    "supporting_evidence_ids": [
+      "PMC6207727::web::000::abstract",
+      "PMC8950179::web::000::abstract",
+      "PMC9534987::web::000::abstract",
+      "PMC11275555::web::000::abstract"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Benchmark on a well-characterized high-entropy alloy system with known melting points, latent heats, and high-temperature phase equilibria. Train the ML potential using ab initio snapshots at selected points for both solid and liquid phases, perform free-energy integrations, and compare predicted melting properties and thermodynamics to experiment or full ab initio MD over a broad composition and temperature range.",
+      "measurements": [
+        "Melting temperature via differential scanning calorimetry",
+        "Latent heat of fusion measured experimentally",
+        "Thermophysical properties (heat capacity, thermal expansion, etc.) from the ML-based method",
+        "Phase evolution via in situ diffraction at high temperatures"
+      ],
+      "falsification_rule": "If the ML-based free energies yield errors in the predicted melting point or latent heat greater than established accuracy thresholds (e.g., ±5% vs. experiment or full ab initio references), then the hypothesis is disproven."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "seen_ids": [
+    "PMC10095688::webcard",
+    "PMC10813983::web::000::abstract",
+    "PMC10983832::webcard",
+    "PMC11275555::web::000::abstract",
+    "PMC11275555::webcard",
+    "PMC11469218::webcard",
+    "PMC4366518::web::017::discussion",
+    "PMC5612997::webcard",
+    "PMC6207727::web::000::abstract",
+    "PMC6207727::webcard",
+    "PMC6820750::web::000::abstract",
+    "PMC8357793::web::004::machine_learning_interatomic_potential",
+    "PMC8950179::web::000::abstract",
+    "PMC8950179::web::003::1_introduction",
+    "PMC8950179::web::016::4_conclusions",
+    "PMC8950179::webcard",
+    "PMC9119285::webcard",
+    "PMC9279411::web::000::abstract",
+    "PMC9279411::webcard",
+    "PMC9534987::web::000::abstract",
+    "PMC9534987::web::003::introduction",
+    "PMC9534987::webcard"
+  ],
+  "cited_ids": [
+    "PMC11275555::web::000::abstract",
+    "PMC6207727::web::000::abstract",
+    "PMC8950179::web::000::abstract",
+    "PMC9534987::web::000::abstract"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "PMC11275555::web::000::abstract",
+      "paper_id": "PMC11275555",
+      "publication_date": "2024-07-16",
+      "kind": "web:Abstract",
+      "text": "While first-principles methods have been successfully applied to characterize individual properties of multi-principal element alloys (MPEA), their use in searching for optimal trade-offs between competing properties is hampered by high computational demands. In this work, we present a framework to explore Pareto-optimal compositions by integrating advanced ab initio-based techniques into a Bayesian multi-objective optimization workflow, complemented by a simple analytical model providing straightforward analysis of trends. We benchmark the framework by applying it to solid solution strengthening and ductility of refractory MPEAs, with the parameters of the strengthening and ductility models being efficiently computed using a combination of the coherent-potential approximation method, accounting for finite-temperature effects, and actively-learned moment-tensor potentials parameterized with ab initio data. Properties obtained from ab initio calculations are subsequently used to extend predictions of all relevant material properties to a large class of refractory alloys with the help of the analytical model validated by the data and relying on a few element-specific parameters and u"
+    },
+    {
+      "record_id": "PMC6207727::web::000::abstract",
+      "paper_id": "PMC6207727",
+      "publication_date": "2018-10-30",
+      "kind": "web:Abstract",
+      "text": "AbstractThe ability to predict and understand phases in high-entropy alloys (HEAs) is still being debated, and primarily true predictive capabilities derive from the known thermodynamics of materials. The present work demonstrates that prior work using high-throughput first-principles calculations may be further utilized to provide direct insight into the temperature- and composition-dependent phase evolution in HEAs, particularly Al-containing HEAs with a strengthening multiphase microstructure. Using a simple model with parameters derived from first-principles calculations, we reproduce the major features associated with Al-containing phases, demonstrating a generalizable approach for exploring potential phase evolution where little experimental data exists. Neutron scattering, in situ microscopy, and calorimetry measurements suggest that our high-throughput Monte Carlo technique captures both qualitative and quantitative features for both intermetallic phase formation and microstructure evolution at lower temperatures. This study provides a simple approach to guide HEA development, including ordered multi-phase HEAs, which may prove valuable for structural applications. Explorat"
+    },
+    {
+      "record_id": "PMC8950179::web::000::abstract",
+      "paper_id": "PMC8950179",
+      "publication_date": "2022-03-11",
+      "kind": "web:Abstract",
+      "text": "AbstractThe third-generation thermodynamic descriptions for Ta-Cr and Ta-V binary systems were performed to construct the reliable thermodynamic database for refractory high-entropy alloys (RHEAs) containing Laves phase. The third-generation Gibbs energy expressions of pure Cr and V in both solid and liquid phases were established, from which the thermodynamic properties and thermal vacancy can be well described. The thermodynamic descriptions of Ta-Cr and Ta-V over the whole composition and temperature regions were carried out based on the reviewed phase equilibria and thermodynamic data with the CALPHAD (CALculation of PHAse Diagrams) approach. Specifically, the thermodynamic parameters of C14 and C15 Laves phases were evaluated by combining the theoretically computed and experimentally measured thermodynamic properties as well as the semiempirical relations. The calculated phase diagrams and thermodynamic properties in Ta-Cr and Ta-V systems according to the present thermodynamic parameters had a nice agreement with the experimental data even down to 0 K, indicating the reliability of the present modeling.Keywords: third-generation thermodynamic description, Ta-Cr system, Ta-V s"
+    },
+    {
+      "record_id": "PMC9534987::web::000::abstract",
+      "paper_id": "PMC9534987",
+      "publication_date": "2022-10-05",
+      "kind": "web:Abstract",
+      "text": "This work introduced the high-throughput phase prediction of PtPd-based high-entropy alloys via the algorithm based on a combined Korringa-Kohn-Rostoker coherent potential approximation (KKR-CPA) and artificial neural network (ANN) technique. As the first step, the KKR-CPA was employed to generate 2,720 data of formation energy and lattice parameters in the framework of the first-principles density functional theory. Following the data generation, 15 features were selected and verified for all HEA systems in each phase (FCC and BCC) via ANN. The algorithm exhibited high accuracy for all four prediction models on 36,556 data from 9139 HEA systems with 137,085 features, verified by R2 closed to unity and the mean relative error (MRE) within 5%. From this dataset comprising 5002 and 4137 systems of FCC and BCC phases, it can be realized based on the highest tendency of HEA phase formation that (1) Sc, Co, Cu, Zn, Y, Ru, Cd, Os, Ir, Hg, Al, Si, P, As, and Tl favor FCC phase, (2) Hf, Ga, In, Sn, Pb, and Bi favor BCC phase, and (3) Ti, V, Cr, Mn, Fe, Ni, Zr, Nb, Mo, Tc, Rh, Ag, Ta, W, Re, Au, Ge, and Sb can be found in both FCC and BCC phases with comparable tendency, where all predictio"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "framer",
+      "model": "o1_2024-12-17",
+      "chars_in": 2039,
+      "chars_out": 1760,
+      "seconds": 26.71
+    },
+    {
+      "role": "trend_forecaster",
+      "model": "o1_2024-12-17",
+      "chars_in": 20830,
+      "chars_out": 2518,
+      "seconds": 75.47
+    },
+    {
+      "role": "writer",
+      "model": "o1_2024-12-17",
+      "chars_in": 24245,
+      "chars_out": 3658,
+      "seconds": 23.6
+    }
+  ],
+  "llm_calls": 3,
+  "notes": {
+    "frame": {
+      "system": "Multicomponent high-entropy materials undergoing solid–liquid phase transitions, starting from both solid and fluid configurations.",
+      "goal": "To determine accurate fusion (melting) properties and high-temperature thermodynamic data requiring the free energies of both phases, including vibrational entropy, anharmonic contributions, and electron–vibration coupling effects.",
+      "limitation": "Existing methods that capture full free-energy contributions remain expensive or lose accuracy, especially for multicomponent systems where computations or expansions (e.g., TOR-TILD) scale poorly and ab initio molecular dynamics is prohibitively costly.",
+      "root_cause_cues": [
+        "other fusion properties remain difficult because they require free energies on both sides of the transition",
+        "vibrational entropy, anharmonicity, and electron–vibration coupling retained",
+        " depends on costly molecular dynamics",
+        "TOR-TILD ... slows substantially for multicomponent high-entropy systems"
+      ],
+      "constraints": [
+        "The free energies of both solid and fluid phases must be accurately computed.",
+        "Relevant entropy terms (vibrational, anharmonic, electron–vibration) must be included."
+      ],
+      "regime": "High-temperature thermodynamics and phase transitions (solid–liquid) in multicomponent alloys and similar complex systems.",
+      "prior_attempts": [
+        "Empirical-potential and first-principles studies that focused primarily on phase-transition temperatures but not on other aspects of fusion properties.",
+        "Explicit ab initio free-energy evaluations that, while accurate, rely on computationally expensive molecular-dynamics simulations.",
+        "TOR-TILD, which increased throughput for elemental and binary systems but becomes slow for high-entropy systems."
+      ],
+      "gap_type": "method"
+    },
+    "decision": {
+      "frame": {
+        "system": "Multicomponent high-entropy materials undergoing solid–liquid phase transitions, starting from both solid and fluid configurations.",
+        "goal": "To determine accurate fusion (melting) properties and high-temperature thermodynamic data requiring the free energies of both phases, including vibrational entropy, anharmonic contributions, and electron–vibration coupling effects.",
+        "limitation": "Existing methods that capture full free-energy contributions remain expensive or lose accuracy, especially for multicomponent systems where computations or expansions (e.g., TOR-TILD) scale poorly and ab initio molecular dynamics is prohibitively costly.",
+        "root_cause_cues": [
+          "other fusion properties remain difficult because they require free energies on both sides of the transition",
+          "vibrational entropy, anharmonicity, and electron–vibration coupling retained",
+          " depends on costly molecular dynamics",
+          "TOR-TILD ... slows substantially for multicomponent high-entropy systems"
+        ],
+        "constraints": [
+          "The free energies of both solid and fluid phases must be accurately computed.",
+          "Relevant entropy terms (vibrational, anharmonic, electron–vibration) must be included."
+        ],
+        "regime": "High-temperature thermodynamics and phase transitions (solid–liquid) in multicomponent alloys and similar complex systems.",
+        "prior_attempts": [
+          "Empirical-potential and first-principles studies that focused primarily on phase-transition temperatures but not on other aspects of fusion properties.",
+          "Explicit ab initio free-energy evaluations that, while accurate, rely on computationally expensive molecular-dynamics simulations.",
+          "TOR-TILD, which increased throughput for elemental and binary systems but becomes slow for high-entropy systems."
+        ],
+        "gap_type": "method"
+      },
+      "trend": "Initial studies (PMC6207727) used high-throughput first-principles approaches to predict phase transitions in simpler or Al-containing HEAs. Subsequent work (PMC8950179) refined CALPHAD-based thermodynamic modeling for extended temperature ranges, while high-throughput screening (PMC9534987) adopted combined KKR-CPA and machine learning to reduce computational cost in predicting stable phases. Later research (PMC10983832) introduced effective-temperature-based scaling to unify static and dynamic distortions, and integrated ab initio data with machine learning and Bayesian optimization (PMC11275555) for multi-objective materials design. However, a robust, low-cost strategy to capture free energies (including vibrational, anharmonic, and electron–lattice couplings) for both solid and liquid phases in complex HEAs remains elusive.",
+      "unsolved": "Accurate fusion and high-temperature thermodynamic properties still demand costly ab initio molecular dynamics or TILD expansions. No existing method efficiently includes all vibrational, anharmonic, and electron–vibration effects for both solid and liquid phases across multi-component compositions. Ensuring fidelity at reduced computational cost remains a critical gap.",
+      "chosen_family": "new_sampling_or_free_energy_scheme",
+      "lever": "Train a machine-learned potential (e.g., a neural network or moment-tensor potential) on a limited set of ab initio MD snapshots for both solid and liquid phases, then perform free-energy integration using an advanced sampling technique (e.g., nested sampling or staged thermodynamic integration) to capture vibrational, anharmonic, and electron–vibration contributions at high temperature across up to quinary compositions.",
+      "why": "Evidence from high-throughput, CALPHAD, and ML-based approaches (e.g., PMC6207727, PMC8950179, PMC9534987, PMC10983832, PMC11275555) demonstrates the feasibility of combining small but accurate ab initio datasets with computation-light expansions. This approach can achieve near-ab initio fidelity in both phases without the large-scale overhead of full ab initio molecular dynamics or TOR-TILD. Validation requires matching experimental or full ab initio references of melting points, latent heats, and derived fusion entropies in a benchmark high-entropy alloy system within a predefined accuracy tolerance up to the melt temperature."
+    },
+    "grounding_query": "Earlier empirical-potential and first-principles studies primarily targeted phase-transition temperature, while other fusion properties remain difficult because they require free energies on both sides of the transition with vibrational entropy, anharmonicity, and electron–vibration coupling retained. Explicit ab initio free-energy evaluation is highly accurate but depends on costly molecular dynamics. TOR-TILD increased throughput for elemental and binary systems, yet slows substantially for multicomponent high-entropy systems. Under the constraint that the free energies of both solid and flu"
+  },
+  "chars_in": 47114,
+  "elapsed_seconds": 126.38
+}

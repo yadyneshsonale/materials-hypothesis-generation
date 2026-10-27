@@ -1489,7 +1489,68 @@ The excluded models' runs are kept unanalysed in [loop/excluded_by_probe/](./loo
 - The checklist finds no lead: both systems match only about 6–15% of each paper's specific facts. The advantage is in
   overall closeness, not in reproducing the paper's concrete study.
 
-## Comparability and limits, experiments 8 to 35
+## Experiment 36: web search for every baseline
+
+**Request.** Add a web search tool to all the baselines and re-run all the experiments. The corpus is the first N
+papers of a web search, strictly filtered by publication date, then expanded through the citation graph, using the
+papers' XML, with no data leakage. Plan in loop.md 17.1; amendments 17.2–17.3 were made before any analysis.
+
+**Web search** ([websearch/](./websearch/README.md), [websearch.py](../../websearch.py)).
+- **Engine.** Europe PMC's live REST search (open-access JATS XML), with Crossref as the second, independent date
+  source. OpenAlex, planned for that role, ran out of its free daily budget mid-build; every corpus was rebuilt
+  with Crossref.
+- **Corpus per question.** Llama-3.3 (pre-cutoff) writes three search phrases. Every hit is fetched and filtered in
+  code; a paper is kept only if:
+  - Europe PMC and Crossref both date it before the paper (partial dates count as the end of the period);
+  - it is not the paper, a version of it, or any of the 45 held-out papers;
+  - it is not a preprint, review or erratum;
+  - it does not cite the paper;
+  - it holds less than 5% of the paper's 12-word passages.
+- **Seeds and expansion.** The first 50 survivors by BM25 are the seeds, plus up to 50 references co-cited by two or
+  more seeds.
+- **Evidence.** Passages and cards come verbatim from the XML.
+- **Size.** 159 corpora and 1,315 unique papers; the newest paper is a median 15 days before the cutoff. The gate
+  re-checked every corpus paper with no violation.
+- **Agents' tool.** Agents get `web_search`, `read_paper` and `references` with the same filters on every call.
+
+**What was re-run.**
+- **Harness.** The 30 analysed evidence configurations run as `web_<name>`, plus three agents that search the web
+  themselves (Llama, o3-mini, and o3-mini with the best writer). That is 7,398 runs: the five primary-comparison
+  configurations on all 45 papers, the others on 36.
+- **Suite.** Experiments 7, 9, 11, 14, 16 and 17 run on web corpora: 1,152 runs and 72 revisions on 12 papers.
+  - The tool agent keeps experiment 7's four tools. Its search also returns live web results, because any fifth
+    tool broke Llama's tool calls.
+  - Closed-book arms were copied from experiment 21.
+
+**Results** (GPT-5.6; DeepSeek alongside).
+
+| Baseline with web search vs without evidence | GPT-5.6 difference [CI] | DeepSeek |
+|---|---|---|
+| Llama: web text chunks vs closed-book (45 papers) | −0.00 [−0.06, +0.06] | +0.02 |
+| Llama: web agent vs closed-book | −0.08 [−0.15, −0.01], Holm p 0.70 | −0.08 |
+| o3-mini: web agent vs closed-book (24 papers) | +0.00 [−0.07, +0.07] | +0.13 |
+| Best writer: web text chunks vs writer only | −0.02 [−0.07, +0.04] | +0.04 |
+| Best writer: web agent vs writer only | −0.07 [−0.11, −0.02], Holm p 0.16 | −0.05 |
+
+- **No baseline is helped** by web search (pre-registered rule).
+- **Web vs fixed corpus.** Over the 30 configurations, no web − fixed difference survives Holm with GPT-5.6.
+  DeepSeek prefers the web versions of the card-based configurations (+0.15 to +0.28); GPT-5.6 does not.
+- **Rankings.** Configuration ranks agree across evidence sources: ρ = 0.79 (GPT-5.6) and 0.72 (DeepSeek).
+- **Suite.** No web arm beats closed-book with either judge, and none differs from experiment 21 after Holm.
+- **Leakage: none detected.**
+  - All leakage counters are zero, and every evidence record's dates were re-checked.
+  - The largest share of a held-out paper's passages found in any evidence paper is 1.5%.
+  - The answer-word test rises modestly for the evidence-heavy web configurations. That is what question-targeted
+    search does, and their scores did not rise.
+
+**Operational notes** (loop.md 17.3).
+- GPT-5.6 on the shared TRAPI instance rate-limited nearly every call. Evaluations moved to a second instance of
+  the same deployment, and every output records its instance.
+- Lever labels were made for the five primary configurations only; they are not a required evaluation.
+- **Integrity.** Every harness run has both judges and the target-free audit. `must_obey_check.py` passes all 33
+  harness and all 6 suite run directories.
+
+## Comparability and limits, experiments 8 to 36
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -1545,3 +1606,11 @@ The excluded models' runs are kept unanalysed in [loop/excluded_by_probe/](./loo
   - The checklist judge was not adopted. Its scores are reported as secondary and measure exact fact recovery, a
     stricter target than the 0–4 judges.
   - The triagers' split between "valid alternative" and "wrong" is unresolved without the expert ratings.
+- Experiment 36 replaces the evidence source, not the methods.
+  - All 45 papers were already spent, so it makes no new method claim.
+  - Its corpora are question-specific, so they differ from the fixed 50-paper corpus in both size and targeting.
+  - Its card arms use verbatim title, abstract and conclusions instead of LLM digests, and its citation graphs use
+    verbatim citing sentences instead of extracted statements.
+  - With Llama-3.3 on Azure, the suite's tool agents fail to call tools when a fifth tool is offered. So experiment
+    9's KG agent (in experiment 21 and here) was almost always a closed-book answer with a different prompt, and
+    its results say nothing about MatKG.

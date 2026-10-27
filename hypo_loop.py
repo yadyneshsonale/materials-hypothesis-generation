@@ -167,6 +167,8 @@ class Harness:
         self.models: dict[str, str] = {}
         self.seen: dict[str, RetrievalRecord] = {}
         self.notes: dict[str, Any] = {}  # the run's notebook: intermediate state, derived from the query only
+        # Evidence source: "fixed" = the experiment-21 corpus; "web" = the run's web-search corpus (loop.md 17.1).
+        self.source = "fixed"
         target = case["hidden_target"]
         # Long target values must never appear in a query-facing payload (the query itself is allowed).
         self._forbidden = [str(v).strip().lower() for v in target.values()
@@ -231,6 +233,11 @@ class Harness:
 
     # -- evidence ---------------------------------------------------------------------------------------------
     def pool(self, representation: str) -> list[RetrievalRecord]:
+        if self.source == "web":
+            import websearch
+            # The corpus's search phrases were written from this question by a pre-cutoff model (query-facing).
+            self.models.setdefault("web_query_writer", f"trapi:{websearch.PHRASE_MODEL}")
+            return websearch.case_records(self.case["paper_id"], self.level, representation)
         _, pool = rx.case_pool(self.case, representation)
         return pool
 
@@ -293,7 +300,13 @@ except ModuleNotFoundError as missing:
 
 def leakage_audit(h: Harness, cited: list[str]) -> dict[str, int]:
     records = list(h.seen.values())
-    audit = rx.leakage_audit(records, h.case)
+    web = [r for r in records if (r.structured or {}).get("source") == "web"]
+    audit = rx.leakage_audit([r for r in records if (r.structured or {}).get("source") != "web"], h.case)
+    if web or h.source == "web":
+        import websearch
+        audit.setdefault("target_doi_or_title_leaks", 0)
+        for key, value in websearch.audit_records(web, h.case["paper_id"]).items():
+            audit[key] = audit.get(key, 0) + value
     audit["invalid_citations"] = len(set(cited) - set(h.seen))
     return audit
 
@@ -317,6 +330,7 @@ def generate_one(method: str, case: dict[str, Any], level: str, sample: int, fin
                                                        else "v3.1"),
         "query": h.query,
         "publication_date": h.cutoff, "models": h.models, "status": status, "error": error,
+        "evidence_source": h.source,
         "generation": generation, "seen_ids": sorted(h.seen), "cited_ids": cited,
         "cited_evidence": [{"record_id": c, "paper_id": h.seen[c].paper_id,
                             "publication_date": h.seen[c].publication_date, "kind": h.seen[c].kind,
@@ -377,16 +391,38 @@ def _parallel(jobs: list[tuple[Any, ...]], fn: Callable[..., None], workers: int
     return {"jobs": len(jobs), **counts}
 
 
+def trapi_instance(deployment: str = lc.JUDGE_TRAPI_DEPLOYMENT) -> str:
+    """The TRAPI instance that serves a deployment (experiment 36 used two instances of the same GPT-5.6 deployment,
+    loop.md 17.3)."""
+    return lc.endpoint_for(deployment).rstrip("/").split("microsoft.com/")[-1]
+
+
+def _pending(methods: list[str] | None, rel: str) -> list[tuple[Any, ...]]:
+    """Successful runs without the output <method>/<rel>/<run_id>.json. When methods are given, their order is the
+    priority (experiment 36: the primary comparison's configurations first, loop.md 17.3)."""
+    rank = {m: i for i, m in enumerate(methods or [])}
+    runs = [r for r in all_runs(methods) if r["status"] == "ok"
+            and not (OUT / r["method"] / rel / f"{r['run_id']}.json").exists()]
+    runs.sort(key=lambda r: rank.get(r["method"], len(rank)))
+    return [(r,) for r in runs]
+
+
+def _once(rel: str, fn: Callable[[dict[str, Any]], None]) -> Callable[[dict[str, Any]], None]:
+    """Skips a job whose output was written after the job list was made (by an earlier pass or another process)."""
+    def job(run: dict[str, Any]) -> None:
+        if not (OUT / run["method"] / rel / f"{run['run_id']}.json").exists():
+            fn(run)
+    return job
+
+
 def judge_stage(workers: int, methods: list[str] | None = None) -> dict[str, int]:
     all_cases = cases()
 
     def job(run: dict[str, Any]) -> None:
         atomic_json(OUT / run["method"] / "judgments" / "gpt56" / f"{run['run_id']}.json",
-                    judge_absolute(run, all_cases[run["paper_id"]]))
+                    {**judge_absolute(run, all_cases[run["paper_id"]]), "trapi_instance": trapi_instance()})
 
-    jobs = [(r,) for r in all_runs(methods) if r["status"] == "ok"
-            and not (OUT / r["method"] / "judgments" / "gpt56" / f"{r['run_id']}.json").exists()]
-    return _parallel(jobs, job, workers)
+    return _parallel(_pending(methods, "judgments/gpt56"), _once("judgments/gpt56", job), workers)
 
 
 def cross_judge_stage(workers: int, methods: list[str] | None = None) -> dict[str, int]:
@@ -402,11 +438,10 @@ def cross_judge_stage(workers: int, methods: list[str] | None = None) -> dict[st
         score = _validate_score(raw)
         atomic_json(OUT / run["method"] / "judgments" / "deepseek" / f"{run['run_id']}.json",
                     {"run_id": run["run_id"], "judge": f"trapi:{CROSS_JUDGE['deployment']}", "scores": score["scores"],
-                     "classification": score.get("classification", "")})
+                     "classification": score.get("classification", ""),
+                     "trapi_instance": trapi_instance(CROSS_JUDGE["deployment"])})
 
-    jobs = [(r,) for r in all_runs(methods) if r["status"] == "ok"
-            and not (OUT / r["method"] / "judgments" / "deepseek" / f"{r['run_id']}.json").exists()]
-    return _parallel(jobs, job, workers)
+    return _parallel(_pending(methods, "judgments/deepseek"), _once("judgments/deepseek", job), workers)
 
 
 def audit_stage(workers: int, methods: list[str] | None = None) -> dict[str, int]:
@@ -418,11 +453,10 @@ def audit_stage(workers: int, methods: list[str] | None = None) -> dict[str, int
             raise TargetLeak("audit payload contains the target")
         raw = lc.judge_chat_json(AUDIT_SYSTEM, json.dumps(payload, ensure_ascii=False), max_tokens=16000)
         atomic_json(OUT / run["method"] / "audit" / f"{run['run_id']}.json",
-                    {"run_id": run["run_id"], "auditor": lc.judge_info(), **_validated_audit(raw)})
+                    {"run_id": run["run_id"], "auditor": lc.judge_info(), **_validated_audit(raw),
+                     "trapi_instance": trapi_instance()})
 
-    jobs = [(r,) for r in all_runs(methods) if r["status"] == "ok"
-            and not (OUT / r["method"] / "audit" / f"{r['run_id']}.json").exists()]
-    return _parallel(jobs, job, workers)
+    return _parallel(_pending(methods, "audit"), _once("audit", job), workers)
 
 
 def label_stage(workers: int, methods: list[str] | None = None) -> dict[str, int]:
@@ -447,11 +481,10 @@ def label_stage(workers: int, methods: list[str] | None = None) -> dict[str, int
         atomic_json(OUT / run["method"] / "labels" / f"{run['run_id']}.json",
                     {"run_id": run["run_id"], "labeller": lc.judge_info(), "lever_match": lever,
                      "intervention_class": str(item.get("intervention_class", "other")),
-                     "target_type": raw.get("target_type") if isinstance(raw, dict) else None})
+                     "target_type": raw.get("target_type") if isinstance(raw, dict) else None,
+                     "trapi_instance": trapi_instance()})
 
-    jobs = [(r,) for r in all_runs(methods) if r["status"] == "ok"
-            and not (OUT / r["method"] / "labels" / f"{r['run_id']}.json").exists()]
-    return _parallel(jobs, job, workers)
+    return _parallel(_pending(methods, "labels"), _once("labels", job), workers)
 
 
 # ---------------------------------------------------------------- report

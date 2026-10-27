@@ -1,6 +1,6 @@
 # Project summary: AI hypothesis generation for high-temperature high-entropy alloys
 
-**Status.** 2026-10-26, after experiment 35. This file gathers everything done so far and every main result in one
+**Status.** 2026-10-27, after experiment 36. This file gathers everything done so far and every main result in one
 place.
 
 **Details.**
@@ -26,10 +26,12 @@ judges' values, and differences come with paper-clustered 95% confidence interva
     integrity check.
   - 52 harness method configurations and 26 arms of an earlier evaluation suite: evidence pipelines, agents,
     critics, extraction rubrics, a materials knowledge graph and citation graphs.
+  - A strictly date-filtered web search ([websearch/](./experiments/high_temperature_hea_qwen35b/websearch/README.md)):
+    159 per-question corpora (1,315 papers) and a live search tool for agents.
   - A blind rating package for a materials expert.
   - Measurement checks suggested by two model reviews: judge sanity controls, a checklist judge, failure triage
     and an answer-key audit.
-  - Roughly 15,000 hypothesis-generation runs in total.
+  - Roughly 24,000 hypothesis-generation runs in total.
 - **Best method found: the simplest one.** o3-mini with a conservative writer prompt and no retrieved evidence
   (`writer_only_b_o3mini`).
   - Over all 37 fresh held-out papers it scores 0.61 against 0.50 for the Llama-3.3 baseline: +0.11
@@ -47,7 +49,9 @@ judges' values, and differences come with paper-clustered 95% confidence interva
        papers.
      - Fixing both cut scores from about 1.5 to about 0.5 and erased most differences between methods.
   2. **Evidence does not help.** On clean questions, no evidence pipeline, agent, critic, rubric, knowledge graph
-     or citation graph beats a good model answering closed-book.
+     or citation graph beats a good model answering closed-book. A live, strictly date-filtered web search does not
+     help either: neither as corpora from the first 50 search results plus their citation neighbourhood, nor as
+     agents that search themselves (experiment 36).
   3. **A few papers as context make results worse.** The model copies their study design. With 30 papers the
      score returns to the closed-book level.
   4. **The two AI judges agree only weakly on clean questions** (ρ ≈ 0.39), so they must be checked against an
@@ -138,6 +142,7 @@ judges' values, and differences come with paper-clustered 95% confidence interva
 | 16 | Make the user input like the SciMON paper | Benchmark v4 and a comparison with v3.1 | 31 |
 | 17 | Rerun all the experiments this way | Every experiment rerun on v4 | 32 |
 | 18 | Two model reviews (Opus 5.5, GPT 6.1): suggest changes and run them | Mapped their generic advice onto the project: measurement checks (judge controls, checklist judge, triage, answer-key audit); stronger generators with a memorisation probe; few-shot examples; a router; a fresh test4 | 33, 34, 35 |
+| 19 | Add a web search tool to all the baselines and rerun all the experiments: the first N papers of a web search, strictly date-filtered, expanded through the citation graph, from the XML, with no leakage | Europe PMC web search with Crossref dates and code-enforced filters; 159 corpora (first 50 results + co-cited references); a live search tool for agents; all 30 evidence configurations, 3 new web agents and the whole suite re-run; leakage checks | 36 |
 
 ## 4. Results by phase
 
@@ -408,6 +413,48 @@ None qualified as a finalist.
   - test4: +0.12 [+0.02, +0.21] (GPT-5.6), +0.26 (DeepSeek), +0.19 on the two-judge mean (p = 0.039).
   - All 37 fresh papers: +0.11 [+0.06, +0.17], 26 papers up and 8 down, p = 0.003 (DeepSeek +0.27, p = 0.0001).
 
+### 4.9 Web search for every baseline (experiment 36)
+
+**What was built** ([websearch/](./experiments/high_temperature_hea_qwen35b/websearch/README.md)).
+- **Search.** For each held-out paper and question, a pre-cutoff model writes three search phrases, and Europe PMC
+  (open-access JATS XML) is searched live.
+- **Filter.** A paper is kept only if:
+  - Europe PMC and Crossref both date it before the paper;
+  - it is not the paper, a version of it, or any held-out paper;
+  - it is not a preprint or review;
+  - it does not cite the paper.
+- **Corpus.** The first 50 survivors by relevance, plus up to 50 references co-cited by at least two of them. Text
+  comes verbatim from the XML.
+- **Agents' tool.** Agents get a live search with the same filters on every call.
+- **Size.** 159 corpora, 1,315 papers.
+
+**What was re-run.**
+- **Harness.** All 30 harness configurations that use evidence (7,398 runs), with three new agents that search the
+  web themselves.
+- **Suite.** The whole experiment-21 suite (1,152 runs).
+
+**Results** (GPT-5.6; 45 papers unless stated).
+
+| Baseline | Without evidence | With web text | With a web-search agent |
+|---|---:|---:|---:|
+| Llama-3.3 | 0.50 | 0.50 (−0.00 [−0.06, +0.06]) | 0.42 (−0.08 [−0.15, −0.01], not significant after Holm) |
+| o3-mini (24 papers) | 0.58 | – | 0.58 (+0.00) |
+| Best method's writer (o3-mini) | 0.62 | 0.61 (−0.02 [−0.07, +0.04]) | 0.56 (−0.07 [−0.11, −0.02], not significant after Holm) |
+
+- **Web search helps no baseline.** DeepSeek agrees, except for a +0.13 on the o3-mini agent that GPT-5.6 does not
+  see.
+- **No difference from the fixed corpus.** Across the 30 configurations, web corpora are no better than the fixed
+  50-paper corpus with GPT-5.6, and method rankings hardly change (ρ = 0.79).
+- **Suite.** No web arm beats closed-book.
+- **No leakage detected.**
+  - All leakage counters are zero, and every evidence record's dates were re-checked.
+  - No evidence paper contains more than 1.5% of a held-out paper's text.
+  - The answer-word test rises only where question-targeted search brings more on-topic evidence, and those scores
+    did not rise.
+- **Practical findings.**
+  - OpenAlex now caps unkeyed use at 1,000 requests a day, so Crossref replaced it as the second date source.
+  - Llama-3.3 on Azure stops calling tools when a fifth tool is offered.
+
 ## 5. The recommended method on every held-out comparison
 
 `writer_only_b_o3mini` (o3-mini, conservative writer, no evidence) against the Llama-3.3 closed-book baseline.
@@ -450,6 +497,8 @@ None qualified as a finalist.
   - 1–3 related papers as context make results worse through anchoring (experiments 29, 32);
   - question detail has no significant effect (experiment 29);
   - the SciMON-style input is no improvement (experiments 31–32).
+- **Web search** (experiment 36): web-search corpora (the first 50 results plus co-cited references) for all 30
+  evidence configurations and the suite, and agents that search the web themselves.
 - **Methods suggested by two model reviews** (experiment 34):
   - stronger allowed generators (gpt-4o, gpt-4.1, o4-mini);
   - few-shot worked examples;
@@ -481,6 +530,8 @@ None qualified as a finalist.
 | Experiment 32 | Llama-extracted citation statements silently dropped by the parser | Parser fixed, papers re-extracted, runs redone; first attempt kept but not analysed |
 | Experiment 34 | o3 and gpt-5 recall details of 2024–2026 papers despite stated cutoffs before them | Memorisation probe required for every generator; both forbidden (must_obey.md table) |
 | Experiment 34 | Registering test4 changed the case pool of the frozen expert-package selection | Selection fixed to its original sets; test catches it |
+| Experiment 36 | OpenAlex's daily budget ran out mid-build and failed requests silently dropped papers from corpora | Build stopped; Crossref became the second date source; all corpora rebuilt; failures now raise instead of dropping |
+| Experiments 9, 21, 36 | With Llama-3.3 on Azure, a fifth tool breaks tool calling, so experiment 9's KG agent (35 of 36 runs) never used a tool | Web search placed inside the existing search tool; the KG result is reported as uninformative |
 
 ## 8. Limitations and open questions
 
@@ -502,7 +553,10 @@ None qualified as a finalist.
   - Two papers are dated 1–2 days after Llama-3.3's cutoff.
 - **Answer-key source.** test2, test3 and test4 answer keys were extracted by GPT-5.6, the original 12 by Qwen.
   Scores are compared within each set. The experiment-33 audit found no unusable key.
-- **Narrow corpus.** One topic, 50 open-access papers. 8 of the 12 test2 papers come from one MDPI journal.
+- **Narrow corpus.** One topic, 50 open-access papers. 8 of the 12 test2 papers come from one MDPI journal. The web
+  corpora (experiment 36) are wider but still limited to open-access papers with XML in Europe PMC.
+- **Experiment 36 is exploratory.** All 45 papers were already spent. Its evaluations ran on a second instance of
+  the GPT-5.6 deployment because of rate limits, and lever labels were made only for the primary comparison.
 - **Low absolute level.** About 0.6 out of 4. Choosing the paper's intervention is the core unsolved problem.
 
 ## 9. Where to find everything
@@ -510,7 +564,7 @@ None qualified as a finalist.
 | What | Where |
 |---|---|
 | Rules; instructions for every agent | [must_obey.md](./must_obey.md), [AGENTS.md](./AGENTS.md) |
-| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–16) |
+| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–17) |
 | One section per experiment | [EXPERIMENT_LOG_2026-10-22.md](./experiments/high_temperature_hea_qwen35b/EXPERIMENT_LOG_2026-10-22.md) |
 | Literature reviewed | [RELATED_WORK.md](./experiments/high_temperature_hea_qwen35b/RELATED_WORK.md) (9 hypothesis-generation systems); loop.md sections 2, 10.3 and 11.3 (about 40 sources) |
 | Corpus | [data/corpus/](./experiments/high_temperature_hea_qwen35b/data/corpus/README.md) |
@@ -520,5 +574,7 @@ None qualified as a finalist.
 | Harness runs on v4 (experiments 31–32) | [loop_v4_scimon/](./experiments/high_temperature_hea_qwen35b/loop_v4_scimon/README.md) |
 | Suite on v4 (experiment 32) | [rerun_v4_scimon/](./experiments/high_temperature_hea_qwen35b/rerun_v4_scimon/README.md) |
 | Measurement checks, probe, review-suggested methods (experiments 33–35) | [review_eval/](./experiments/high_temperature_hea_qwen35b/review_eval/README.md) |
+| Web-search corpora (experiment 36) | [websearch/](./experiments/high_temperature_hea_qwen35b/websearch/README.md) |
+| Harness and suite with web search (experiment 36) | [loop_web/](./experiments/high_temperature_hea_qwen35b/loop_web/README.md), [rerun_web/](./experiments/high_temperature_hea_qwen35b/rerun_web/README.md) |
 | Expert package; answer key and analysis | [expert_evaluation/](./expert_evaluation/README.md); [expert_eval/](./experiments/high_temperature_hea_qwen35b/expert_eval/README.md) |
-| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py` |
+| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py`, `websearch.py`, `web_analysis.py` |

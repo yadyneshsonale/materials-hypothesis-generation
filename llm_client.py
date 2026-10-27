@@ -141,6 +141,15 @@ def judge_info() -> str:
     return f"{os.environ.get('JUDGE_PROVIDER')}:{os.environ.get('OPENAI_MODEL', '')}"
 
 
+def endpoint_for(deployment: str) -> str:
+    """The TRAPI instance for a deployment. JUDGE_TRAPI_ENDPOINT, if set, serves the judge deployment only (experiment
+    36 used a second instance of the same GPT-5.6 deployment when the shared one rate-limited nearly every call)."""
+    judge_endpoint = os.environ.get("JUDGE_TRAPI_ENDPOINT")
+    if judge_endpoint and deployment == JUDGE_TRAPI_DEPLOYMENT:
+        return judge_endpoint.rstrip("/")
+    return TRAPI_ENDPOINT
+
+
 def trapi_chat_json(deployment: str, system: str, user: str, *, max_tokens: int,
                     token_field: str = "max_completion_tokens", temperature: float | None = None,
                     retries: int = 6, reasoning_effort: str | None = None) -> Any:
@@ -152,7 +161,7 @@ def trapi_chat_json(deployment: str, system: str, user: str, *, max_tokens: int,
     Rate limits (HTTP 429) are retried after the wait TRAPI reports; other transient failures are retried
     with exponential backoff. Truncated responses raise TruncatedError.
     """
-    url = (f"{TRAPI_ENDPOINT}/openai/deployments/{deployment}"
+    url = (f"{endpoint_for(deployment)}/openai/deployments/{deployment}"
            f"/chat/completions?api-version={TRAPI_API_VERSION}")
     payload: dict[str, Any] = {
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],

@@ -1,0 +1,307 @@
+{
+  "run_id": "PMC11606917__expert_context__web_agent_b_o3mini__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "expert_context",
+  "method": "web_agent_b_o3mini",
+  "sample": 1,
+  "split": "dev",
+  "final": false,
+  "benchmark": "v3.1",
+  "query": "Earlier empirical-potential and first-principles studies primarily targeted phase-transition temperature, while other fusion properties remain difficult because they require free energies on both sides of the transition with vibrational entropy, anharmonicity, and electron–vibration coupling retained. Explicit ab initio free-energy evaluation is highly accurate but depends on costly molecular dynamics. TOR-TILD increased throughput for elemental and binary systems, yet slows substantially for multicomponent high-entropy systems. Under the constraint that the free energies of both solid and fluid states and the relevant entropy terms remain faithful, what single testable methodological hypothesis could substantially reduce the cost of obtaining fusion and high-temperature thermodynamic properties? State the proposed intervention and why it should work, predict its speed and fidelity relative to explicit ab initio molecular-dynamics workflows and TOR-TILD, define composition and temperature boundaries, cite supporting evidence from prior elemental or binary results, and specify a decisive benchmark of phase free energies and derived observables that would falsify the hypothesis.",
+  "publication_date": "2024-11-29",
+  "models": {
+    "searcher": "trapi:o3-mini_2025-01-31",
+    "writer": "trapi:o3-mini_2025-01-31"
+  },
+  "status": "ok",
+  "error": null,
+  "evidence_source": "web",
+  "generation": {
+    "hypothesis": "An actively learned moment‐tensor potential (MTP) trained on ab initio data sampled specifically at and around the fusion point can accurately reproduce the free energies of both solid and liquid phases—including vibrational entropy, anharmonic, and electron–vibration effects—while substantially reducing computational cost compared to full explicit ab initio molecular dynamics and TOR-TILD methods.",
+    "material_initial_state": "Elemental and binary systems near their melting points, with extension to multicomponent high-entropy alloys in the high-temperature regime.",
+    "intervention": "Develop and deploy an active learning framework to train an MTP on a targeted set of ab initio data that densely samples configurations near the phase-transition. Use this potential within a thermodynamic integration scheme to obtain free energies for both solid and liquid states.",
+    "conditions": "Temperature conditions near the fusion point (i.e., close to melting) for elemental, binary, and selected high-entropy alloy systems; simulations must capture both solid and fluid phases with relevant entropy contributions.",
+    "structural_mediator": "The trained MTP, which acts as a surrogate to the ab initio energy landscape, capturing both the local bonding environment and the anharmonic as well as electron–vibration interactions pertinent to melting.",
+    "mechanism": "Active learning ensures that configurations critical for capturing vibrational and anharmonic effects are included in the training set. This allows the resultant potential to simulate the accurate free energy landscape without resorting to full ab initio MD, thereby integrating these effects efficiently into the thermodynamic integration procedure.",
+    "predicted_outcome": "A significant reduction in computational cost (potentially an order of magnitude faster than explicit ab initio molecular dynamics) with predictions of fusion free energies that are within an acceptable error tolerance (e.g., within ~10% deviation) relative to established methods such as TOR-TILD for simpler (elemental or binary) systems, with extended scalability to multicomponent high-entropy alloys.",
+    "baseline": "Explicit ab initio molecular dynamics free energy evaluations and TOR-TILD cost and accuracy for elemental and binary systems.",
+    "boundary": "The method is expected to work reliably near the melting point and in systems where thermal disorder is dominant. Its accuracy at very low temperatures or in systems with strong quantum effects may remain uncertain.",
+    "uncertainty": "The exact speedup factor and the error margins in multicomponent systems are not yet fully quantified; success depends on the representativeness of the ab initio data used in the active learning process. There is also some uncertainty in reliably capturing electron–vibration coupling effects solely via the potential.",
+    "supporting_evidence_ids": [
+      "PMC11275555::page::001",
+      "PMC11275555::page::002"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Perform free energy calculations for a set of binary and multicomponent systems near the fusion temperature using (a) the proposed active learning MTP framework and (b) full ab initio molecular dynamics (or TOR-TILD for binaries). Compute fusion free energies and derived observables such as melting temperatures and entropy contributions.",
+      "measurements": [
+        "Fusion free energy differences (solid vs. liquid phase)",
+        "Melting (phase transition) temperature",
+        "Contributions from vibrational and anharmonic entropy",
+        "Total computational runtime and resource usage"
+      ],
+      "falsification_rule": "If the free energy predictions or derived observables from the MTP-based method deviate significantly (e.g., by more than ~10%) from those obtained via explicit ab initio MD/TOR-TILD, or if the method does not provide at least an order-of-magnitude reduction in computation time, then the hypothesis is falsified."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "seen_ids": [
+    "PMC10058552::search_result",
+    "PMC10499311::search_result",
+    "PMC10533554::search_result",
+    "PMC10582079::search_result",
+    "PMC10719899::search_result",
+    "PMC10883032::search_result",
+    "PMC11234427::search_result",
+    "PMC11247481::search_result",
+    "PMC11263686::search_result",
+    "PMC11275555::page::001",
+    "PMC11275555::page::002",
+    "PMC11275555::search_result",
+    "PMC11369437::search_result",
+    "PMC11396727::search_result",
+    "PMC11648836::search_result",
+    "PMC12103230::search_result",
+    "PMC8658560::search_result",
+    "PMC9105637::search_result",
+    "PMC9481945::search_result",
+    "PMC9871219::search_result"
+  ],
+  "cited_ids": [
+    "PMC11275555::page::001",
+    "PMC11275555::page::002"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "PMC11275555::page::001",
+      "paper_id": "PMC11275555",
+      "publication_date": "2024-07-16",
+      "kind": "web:page",
+      "text": "## Abstract\nWhile first-principles methods have been successfully applied to characterize individual properties of multi-principal element alloys (MPEA), their use in searching for optimal trade-offs between competing properties is hampered by high computational demands. In this work, we present a framework to explore Pareto-optimal compositions by integrating advanced ab initio-based techniques into a Bayesian multi-objective optimization workflow, complemented by a simple analytical model providing straightforward analysis of trends. We benchmark the framework by applying it to solid solution strengthening and ductility of refractory MPEAs, with the parameters of the strengthening and ductility models being efficiently computed using a combination of the coherent-potential approximation method, accounting for finite-temperature effects, and actively-learned moment-tensor potentials parameterized with ab initio data. Properties obtained from ab initio calculations are subsequently used to extend predictions of all relevant material properties to a large class of refractory alloys with the help of the analytical model validated by the data and relying on a few element-specific para"
+    },
+    {
+      "record_id": "PMC11275555::page::002",
+      "paper_id": "PMC11275555",
+      "publication_date": "2024-07-16",
+      "kind": "web:page",
+      "text": "orable combination of strength and ductility than others. For instance, the ductilisation effect of rhenium (Re) and iridium (Ir) in tungsten is a well-known example that keeps the overall strength of the material virtually unchanged. Consequently, the quest for discovering new compositions of refractory MPEAs with improved mechanical properties remains an important challenge in materials science. The conventional trial-and-error method of materials design is too laborious for complex MPEAs. This is where computer-guided design opens new opportunities for efficient exploration of the vast composition space of these materials.\nIn recent years, many works have introduced computational methods to identify and characterize alloys with tailored properties, such as the solid solution strengthening, hardness, ductility index, and thermodynamic stability. Moreover, some of these methods have been employed in the context of the optimization of several target properties,, with the relevant material properties being obtained from various modeling approaches using experimental and theoretical input. For example, methods based on machine learning (ML) use various sets of descriptors partly deri"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "searcher",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 2860,
+      "chars_out": 475,
+      "seconds": 8.75
+    },
+    {
+      "role": "searcher",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 7730,
+      "chars_out": 404,
+      "seconds": 8.18
+    },
+    {
+      "role": "searcher",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 12522,
+      "chars_out": 277,
+      "seconds": 6.7
+    },
+    {
+      "role": "searcher",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 15265,
+      "chars_out": 306,
+      "seconds": 4.9
+    },
+    {
+      "role": "searcher",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 18006,
+      "chars_out": 362,
+      "seconds": 5.95
+    },
+    {
+      "role": "searcher",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 22689,
+      "chars_out": 2681,
+      "seconds": 8.3
+    },
+    {
+      "role": "writer",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 7371,
+      "chars_out": 3932,
+      "seconds": 11.28
+    }
+  ],
+  "llm_calls": 7,
+  "notes": {
+    "web_agent": {
+      "tool_calls": 5,
+      "pages": [
+        "PMC11275555::page::001",
+        "PMC11275555::page::002"
+      ],
+      "listed": 18,
+      "log": [
+        {
+          "tool": "web_search",
+          "query": "ab initio free energy evaluation vibrational entropy anharmonic electron-vibration fusion high entropy machine learning potential cost reduction",
+          "engine_query": "(ab initio free energy evaluation vibrational entropy anharmonic electron-vibration fusion high entropy) AND OPEN_ACCESS:y AND HAS_FT:y AND NOT SRC:PPR AND FIRST_PDATE:[1900-01-01 TO 2024-11-28]",
+          "hit_count": 3,
+          "refused_after_parsing": 0,
+          "broadened_query": "(TITLE_ABS:ab OR TITLE_ABS:initio OR TITLE_ABS:free OR TITLE_ABS:energy OR TITLE_ABS:evaluation OR TITLE_ABS:vibrational OR TITLE_ABS:anharmonic OR TITLE_ABS:electron OR TITLE_ABS:vibration OR TITLE_ABS:fusion) AND (ABSTRACT:\"high entropy\" OR ABSTRACT:\"high-entropy\" OR ABSTRACT:\"multi-principal\" OR ABSTRACT:\"multi-principal-element\" OR ABSTRACT:\"complex concentrated\" OR ABSTRACT:\"medium entropy\" OR ABSTRACT:\"medium-entropy\" OR TITLE:\"high entropy\" OR TITLE:\"high-entropy\") AND OPEN_ACCESS:y AND HAS_FT:y AND NOT SRC:PPR AND FIRST_PDATE:[1900-01-01 TO 2024-11-28]",
+          "broadened_hit_count": 552,
+          "returned": [
+            {
+              "paper_id": "PMC11247481",
+              "date": "2024-06-29"
+            },
+            {
+              "paper_id": "PMC11275555",
+              "date": "2024-07-16"
+            },
+            {
+              "paper_id": "PMC11648836",
+              "date": "2024-11-20"
+            },
+            {
+              "paper_id": "PMC9871219",
+              "date": "2023-01-31"
+            },
+            {
+              "paper_id": "PMC11263686",
+              "date": "2024-07-22"
+            },
+            {
+              "paper_id": "PMC11396727",
+              "date": "2024-09-08"
+            },
+            {
+              "paper_id": "PMC10533554",
+              "date": "2023-09-27"
+            },
+            {
+              "paper_id": "PMC11234427",
+              "date": "2024-04-30"
+            }
+          ]
+        },
+        {
+          "tool": "web_search",
+          "query": "fusion free energy machine learning surrogate ab initio vibrational anharmonic electron-vibration high entropy cost reduction",
+          "engine_query": "(fusion free energy machine learning surrogate ab initio vibrational anharmonic electron-vibration high) AND OPEN_ACCESS:y AND HAS_FT:y AND NOT SRC:PPR AND FIRST_PDATE:[1900-01-01 TO 2024-11-28]",
+          "hit_count": 1,
+          "refused_after_parsing": 0,
+          "broadened_query": "(TITLE_ABS:fusion OR TITLE_ABS:free OR TITLE_ABS:energy OR TITLE_ABS:machine OR TITLE_ABS:learning OR TITLE_ABS:surrogate OR TITLE_ABS:ab OR TITLE_ABS:initio OR TITLE_ABS:vibrational OR TITLE_ABS:anharmonic) AND (ABSTRACT:\"high entropy\" OR ABSTRACT:\"high-entropy\" OR ABSTRACT:\"multi-principal\" OR ABSTRACT:\"multi-principal-element\" OR ABSTRACT:\"complex concentrated\" OR ABSTRACT:\"medium entropy\" OR ABSTRACT:\"medium-entropy\" OR TITLE:\"high entropy\" OR TITLE:\"high-entropy\") AND OPEN_ACCESS:y AND HAS_FT:y AND NOT SRC:PPR AND FIRST_PDATE:[1900-01-01 TO 2024-11-28]",
+          "broadened_hit_count": 451,
+          "returned": [
+            {
+              "paper_id": "PMC12103230",
+              "date": "2024-11-10"
+            },
+            {
+              "paper_id": "PMC8658560",
+              "date": "2021-11-26"
+            },
+            {
+              "paper_id": "PMC10883032",
+              "date": "2024-02-05"
+            },
+            {
+              "paper_id": "PMC10582079",
+              "date": "2023-10-17"
+            },
+            {
+              "paper_id": "PMC11275555",
+              "date": "2024-07-16"
+            },
+            {
+              "paper_id": "PMC9481945",
+              "date": "2022-09-30"
+            },
+            {
+              "paper_id": "PMC9105637",
+              "date": "2022-05-05"
+            },
+            {
+              "paper_id": "PMC11648836",
+              "date": "2024-11-20"
+            }
+          ]
+        },
+        {
+          "tool": "read_paper",
+          "paper_id": "PMC11275555",
+          "page": 1,
+          "date": "2024-07-16"
+        },
+        {
+          "tool": "read_paper",
+          "paper_id": "PMC11275555",
+          "page": 2,
+          "date": "2024-07-16"
+        },
+        {
+          "tool": "web_search",
+          "query": "machine learning surrogate free energy fusion high temperature ab initio vibrational anharmonic electron-vibration",
+          "engine_query": "(machine learning surrogate free energy fusion high temperature ab initio vibrational anharmonic) AND OPEN_ACCESS:y AND HAS_FT:y AND NOT SRC:PPR AND FIRST_PDATE:[1900-01-01 TO 2024-11-28]",
+          "hit_count": 1,
+          "refused_after_parsing": 0,
+          "broadened_query": "(TITLE_ABS:machine OR TITLE_ABS:learning OR TITLE_ABS:surrogate OR TITLE_ABS:free OR TITLE_ABS:energy OR TITLE_ABS:fusion OR TITLE_ABS:temperature OR TITLE_ABS:ab OR TITLE_ABS:initio OR TITLE_ABS:vibrational) AND (ABSTRACT:\"high entropy\" OR ABSTRACT:\"high-entropy\" OR ABSTRACT:\"multi-principal\" OR ABSTRACT:\"multi-principal-element\" OR ABSTRACT:\"complex concentrated\" OR ABSTRACT:\"medium entropy\" OR ABSTRACT:\"medium-entropy\" OR TITLE:\"high entropy\" OR TITLE:\"high-entropy\") AND OPEN_ACCESS:y AND HAS_FT:y AND NOT SRC:PPR AND FIRST_PDATE:[1900-01-01 TO 2024-11-28]",
+          "broadened_hit_count": 714,
+          "returned": [
+            {
+              "paper_id": "PMC8658560",
+              "date": "2021-11-26"
+            },
+            {
+              "paper_id": "PMC11275555",
+              "date": "2024-07-16"
+            },
+            {
+              "paper_id": "PMC11648836",
+              "date": "2024-11-20"
+            },
+            {
+              "paper_id": "PMC10499311",
+              "date": "2023-09-15"
+            },
+            {
+              "paper_id": "PMC10719899",
+              "date": "2023-12-31"
+            },
+            {
+              "paper_id": "PMC9871219",
+              "date": "2023-01-31"
+            },
+            {
+              "paper_id": "PMC11369437",
+              "date": "2024-08-31"
+            },
+            {
+              "paper_id": "PMC10058552",
+              "date": "2023-03-07"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "chars_in": 86443,
+  "elapsed_seconds": 70.32
+}
