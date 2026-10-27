@@ -2499,9 +2499,12 @@ claim needs test5.
 - **Answer keys.** Frozen. No paper met the flag rule, so the "without flagged papers" results equal the main ones.
 - **Spent splits.** test4 is now spent (must_obey.md section 1). No unspent held-out set remains.
 - **Tests.** 17 new tests (`test_review.py`); the full suite passes.
-- **Secondary scores.** Checklist scores for the experiment-34 runs were pre-registered. They cannot change a decision,
-  because the checklist was not adopted and there was no finalist. They are in `review_eval/phase_b.json` once
-  complete.
+- **Secondary scores.** Checklist scores for every experiment-34 run (both judges, 1,428 runs) are complete and
+  agree with the main result, though they could not change a decision (checklist not adopted, no finalist).
+  - Changes vs the replicate, GPT-5.6 / DeepSeek checklist: gpt-4o +0.00 / +0.04, gpt-4.1 +0.03 / +0.04, few-shot
+    similar +0.02 / +0.02, few-shot diverse +0.03 / −0.00, router +0.01 / −0.00. All CIs include zero.
+  - o4-mini is worse: −0.07 [−0.13, −0.02] / −0.06 [−0.10, −0.03].
+  - Every experiment-34 run also has a target-free audit and a lever label (`review_eval/phase_b.json`).
 - **Checklist (must_obey.md section 9):**
   - [x] measurement checks before method changes;
   - [x] pre-registered rules and addenda;
