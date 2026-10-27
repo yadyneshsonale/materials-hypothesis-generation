@@ -1,0 +1,71 @@
+{
+  "run_id": "PMC11606917__broad__writer_only_b_gpt5__s2",
+  "paper_id": "PMC11606917",
+  "query_level": "broad",
+  "method": "writer_only_b_gpt5",
+  "sample": 2,
+  "split": "dev",
+  "final": false,
+  "benchmark": "v3.1",
+  "query": "How can melting temperature, enthalpy and entropy of fusion, volume change at melting, and liquid-phase thermodynamic properties be determined accurately and efficiently across the high-entropy-alloy family? State the physical rationale, expected quantitative performance, range of applicability, supporting prior evidence, and a decisive validation result that would rule out the proposed approach.",
+  "publication_date": "2024-11-29",
+  "models": {
+    "writer": "trapi:gpt-5_2025-08-07"
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "A physically constrained descriptor model, trained on a small set of containerless electrostatic-levitation (ESL) measurements, can accurately and efficiently predict melting temperature (Tm), enthalpy and entropy of fusion (ΔHfus, ΔSfus), volume change at melting (ΔVm), and key liquid-phase thermodynamic properties (density(T), Cp_liq) across single-phase transition-metal high-entropy alloys. The model uses compositional descriptors tied to bonding and packing (weighted cohesive energy, pairwise mixing enthalpy matrix, valence-electron concentration, atomic size-mismatch δ, and elastic moduli proxies) and a structural mediator capturing liquid short-range order from S(q) features. Expected median prediction errors are on the order of Tm ±30–50 K, ΔHfus ±5–10%, ΔSfus ±5–10%, ΔVm ±1–3%, Cp_liq ±5–8%, and liquid density at Tm ±1–2% for FCC and BCC HEAs composed of 3d–5d transition metals, with throughput at least an order-of-magnitude faster than conventional crucible-based methods when scaled.",
+    "material_initial_state": "As-cast, single-phase solid-solution high-entropy alloys (FCC or BCC) composed of 4–6 transition metals in equiatomic or near-equiatomic proportions; oxygen and interstitial content minimized; grain size >100 micrometers to avoid nanocrystalline effects.",
+    "intervention": "Apply a two-step pipeline: (1) generate a training set via high-throughput ESL measurements (containerless melting/solidification) to obtain Tm, ΔHfus, ΔVm, Cp_liq, and liquid density(T), optionally with in situ synchrotron X-ray scattering of the liquid to extract S(q) features; (2) fit a physically constrained surrogate model that takes compositional descriptors (cohesive-energy average, pairwise interaction enthalpy matrix, atomic size-mismatch δ, valence-electron concentration, and elastic proxy) and liquid S(q) features (or trained imputed proxies) to predict the target properties for new HEA compositions.",
+    "conditions": "Containerless electrostatic levitation under high vacuum or inert atmosphere (oxygen partial pressure < 1e-6 bar) with Ti/Zr gettering; optical pyrometry for T(t) with emissivity correction; synchronized radiative calorimetry or drop calorimetry for enthalpy; oscillating-drop imaging for density(T) and viscosity; laser modulation for Cp_liq; optional synchrotron X-ray scattering on levitated droplets to obtain S(q). Heating/cooling rates 10–100 K/s; sample mass 20–100 mg; temperature range from 300 K to 2300 K depending on composition.",
+    "structural_mediator": "Short-range chemical order and liquid packing captured by the first-peak position and height in the liquid structure factor S(q) and the real-space nearest-neighbor distribution (r1, g(r1)). These features mediate the mapping between compositional bonding descriptors (cohesive energy, mixing enthalpy, δ, VEC) and macroscopic properties (Tm, ΔHfus, ΔSfus, ΔVm, density(T), Cp_liq).",
+    "mechanism": "Melting-related properties in transition-metal HEAs are dominated by average bond strength and packing efficiency. The effective cohesive energy per atom sets the scale of Tm, while ΔHfus reflects the fraction of bond energy lost at the solid-to-liquid transition. ΔSfus is primarily the change in vibrational plus configurational entropy; because both solid and liquid phases in HEAs are highly disordered, ΔSfus tends to remain close to elemental-averaged values, with corrections arising from short-range chemical order in the solid and liquid. ΔVm results from differences in packing and compressibility between solid and liquid and correlates with the Grüneisen parameter and elastic moduli. Pairwise mixing enthalpy and atomic size mismatch δ tune short-range order and lattice distortion, which shift Tm and ΔHfus and modulate liquid packing; these effects are quantified via S(q) features. A surrogate model constrained by these physical relationships reduces overfitting and enables accurate extrapolation within the HEA family.",
+    "predicted_outcome": "For single-phase FCC/BCC transition-metal HEAs within the stated boundary, the pipeline will produce: median absolute errors of Tm within ~30–50 K; ΔHfus within ~5–10%; ΔSfus within ~5–10%; ΔVm within ~1–3%; Cp_liq within ~5–8%; liquid density at Tm within ~1–2%. Measurement throughput for generating the training set will be <1 hour per composition for ESL-based properties, enabling a training set of 20–40 alloys to cover the descriptor space; predictions for new compositions will be near-instantaneous. Relative to rule-of-mixtures or unconstrained ML baselines, bias will be reduced and out-of-domain failures will be minimized due to structural mediation via S(q).",
+    "baseline": "Rule-of-mixtures and simple linear correlations to elemental properties often yield large errors for HEAs due to non-linear interaction effects and short-range order; conventional crucible-based DSC/dilatometry can be slow and prone to contamination at high temperatures, and CALPHAD assessments without HEA-specific parameters often have limited accuracy for liquid properties and ΔVm. The proposed pipeline is expected to outperform these baselines in accuracy and speed within the defined HEA domain.",
+    "boundary": "Applicable to single-phase FCC/BCC HEAs of 3d–5d transition metals with moderate size mismatch (δ less than about 6–7%), limited strong ordering tendencies (avoiding high fractions that drive B2/L12 intermetallics), melting points within ESL operational limits (<~2300–2500 K depending on facility), and low reactivity with the atmosphere. Not intended for HEAs containing high fractions of very reactive elements (e.g., high Al plus Ti/Zr leading to oxide formation), multiphase microstructures, amorphous HEAs, or compositions that form peritectic or decompose on melting.",
+    "uncertainty": "Quantitative error targets are estimates without direct supporting records here and may vary with composition space coverage, quality of emissivity corrections, and availability of liquid S(q). Cp_liq determination via ESL can be challenging; liquid short-range order may vary in ways not fully captured by the chosen descriptors, potentially increasing errors for ΔSfus and ΔVm. The throughput claim depends on facility scheduling and may be lower in practice. Model generalization outside the stated boundary is uncertain.",
+    "supporting_evidence_ids": [],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Construct a disjoint test set of at least 20 previously unmeasured single-phase HEAs spanning FCC and BCC, with diverse cohesive-energy averages, δ, and mixing enthalpy signatures. Verify single-phase structure by X-ray diffraction and EDS mapping. Measure Tm, ΔHfus (via radiative/drop calorimetry), ΔVm (via density of solid and liquid near Tm using oscillating-drop method and dilatometry), Cp_liq (via laser modulation during ESL), and liquid density(T). For a subset (n>=10), perform in situ synchrotron X-ray scattering on the liquid to obtain S(q) and extract first-peak position/height. Generate predictions from the trained physically constrained model without retraining on the test set. Compare predicted versus measured values.",
+      "measurements": [
+        "Melting temperature Tm from ESL thermograms with calibrated pyrometry",
+        "Enthalpy of fusion ΔHfus from calorimetry",
+        "Entropy of fusion ΔSfus computed as ΔHfus/Tm",
+        "Volume change at melting ΔVm from solid vs liquid molar volume near Tm",
+        "Liquid heat capacity Cp_liq near and above Tm from modulation calorimetry",
+        "Liquid density as a function of temperature via oscillating-drop analysis",
+        "Liquid structure factor S(q) first peak position and height"
+      ],
+      "falsification_rule": "The hypothesis is ruled out if any of the following occur on the disjoint test set: (a) median absolute error exceeds 60 K for Tm, 12% for ΔHfus, 12% for ΔSfus, 4% for ΔVm, or 10% for Cp_liq; (b) more than 25% of alloys have errors above these thresholds for two or more properties; or (c) inclusion of S(q) features does not reduce prediction error versus a descriptor-only model by at least 20% for ΔVm and Cp_liq, indicating that the structural mediator is not capturing the mechanism."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "seen_ids": [],
+  "cited_ids": [],
+  "cited_evidence": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "writer",
+      "model": "gpt-5_2025-08-07",
+      "chars_in": 1502,
+      "chars_out": 8153,
+      "seconds": 39.24
+    }
+  ],
+  "llm_calls": 1,
+  "notes": {},
+  "chars_in": 1502,
+  "elapsed_seconds": 39.24
+}

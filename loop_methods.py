@@ -1023,3 +1023,118 @@ for _budget, _name in ((4000, "4k"), (64000, "64k")):
     register(f"text_{_name}_b_o3mini")(
         lambda h, _b=_budget: write_capped(h, top_text(h, h.query, _b), rx.record_cap("text_chunks")))
 register("writer_only_b_o3mini_low")(lambda h: m_writer_only_b(h, "o3mini_low"))
+
+
+# ---------------------------------------------------------------- round 4 (loop.md 16.1, experiment 34)
+# Changes suggested by two model reviews:
+# - B1: a stronger backbone;
+# - B2: few-shot worked examples, picked by similarity or for diversity;
+# - B3: a router with a specialist writer instruction per question type.
+# B0 is a fresh-sample replicate of the incumbent, the comparison anchor.
+
+import hypo_loop as _H  # noqa: E402
+from answer_render import render as _render_key  # noqa: E402
+
+register("writer_only_b_o3mini_r4")(lambda h: m_writer_only_b(h, "o3mini"))  # B0
+# B1: the incumbent's single writer call on a stronger model. o3 and gpt-5 were also run, but failed the memorisation
+# probe (loop.md 16.3); their runs are kept unanalysed in loop/excluded_by_probe/.
+for _key in ("4o", "o4mini", "41"):
+    register(f"writer_only_b_{_key}")(lambda h, _k=_key: m_writer_only_b(h, _k))
+    if _key != "4o":
+        _H.METHOD_MODELS[f"writer_only_b_{_key}"] = (_key,)
+
+# B2: worked examples come only from the 36 spent held-out papers, never from an unspent test set. Each example is
+# an earlier paper's problem-constrained question and its answer key, rendered into the schema by code.
+_EXEMPLAR_DIRS = tuple(_H.EXPERIMENT_DIR / d / "cases" for d in ("benchmark_v3_1", "benchmark_test2",
+                                                                 "benchmark_test3"))
+_EXEMPLARS: list[dict[str, Any]] = []
+FEWSHOT_K = 3
+FEWSHOT_NOTE = (
+    "\n\nThe worked_examples answer earlier, different questions; each answer is that earlier paper's actual study "
+    "written in this schema. Use them only to calibrate how specific and complete a hypothesis should be. Do not "
+    "copy their content unless it genuinely fits this question."
+)
+
+
+def exemplar_pool() -> list[dict[str, Any]]:
+    if not _EXEMPLARS:
+        for directory in _EXEMPLAR_DIRS:
+            for path in sorted(directory.glob("PMC*.json")):
+                case = json.loads(path.read_text())
+                gap = case.get("gap")
+                answer = _render_key(case["hidden_target"])
+                _EXEMPLARS.append({
+                    "paper_id": case["paper_id"], "date": case["publication_date"],
+                    "gap_type": gap.get("gap_type") if isinstance(gap, dict) else None,
+                    "question": case["queries"]["problem_constrained"]["text"],
+                    "answer": {k: v for k, v in answer.items()
+                               if k not in ("uncertainty", "supporting_evidence_ids", "conflicting_evidence_ids")}})
+    return _EXEMPLARS
+
+
+def pick_exemplars(query: str, case: dict[str, Any], mode: str, k: int = FEWSHOT_K) -> list[dict[str, Any]]:
+    """Only papers published strictly before the case. similar: highest BM25 to the question. diverse: the least
+    similar paper of each gap type, then the least similar overall."""
+    pool = [e for e in exemplar_pool() if e["date"] < case["publication_date"] and e["paper_id"] != case["paper_id"]]
+    if not pool:
+        return []
+    docs = {e["paper_id"]: content_terms(e["question"] + " " + json.dumps(e["answer"], ensure_ascii=False))
+            for e in pool}
+    scores = bm25(content_terms(query), docs)
+    if mode == "similar":
+        return sorted(pool, key=lambda e: (-scores[e["paper_id"]], e["paper_id"]))[:k]
+    ranked = sorted(pool, key=lambda e: (scores[e["paper_id"]], e["paper_id"]))
+    chosen: list[dict[str, Any]] = []
+    for gap in ("design", "understanding", "method"):
+        pick = next((e for e in ranked if e["gap_type"] == gap and e not in chosen), None)
+        if pick is not None and len(chosen) < k:
+            chosen.append(pick)
+    for e in ranked:
+        if len(chosen) >= k:
+            break
+        if e not in chosen:
+            chosen.append(e)
+    return chosen
+
+
+def m_fewshot_b(h: Harness, mode: str, model: str = "o3mini") -> dict[str, Any]:
+    examples = pick_exemplars(h.query, h.case, mode)
+    h.notes["exemplars"] = [e["paper_id"] for e in examples]
+    payload = {"query": h.query, "knowledge_cutoff": h.cutoff, "analysis_notes": {},
+               "worked_examples": [{"question": e["question"], "hypothesis": e["answer"]} for e in examples],
+               "eligible_evidence": []}
+    return h.generate_final("writer", model, WRITER_B + FEWSHOT_NOTE, payload, set())
+
+
+register("fewshot_similar_b_o3mini")(lambda h: m_fewshot_b(h, "similar"))
+register("fewshot_diverse_b_o3mini")(lambda h: m_fewshot_b(h, "diverse"))
+
+# B3: a short call types the question from the question alone, then the writer gets that type's instruction
+# (aimed at F15-F18: design gets the class but not the lever; understanding loses on conditions; method is weakest).
+ROUTER_SYSTEM = (
+    "You classify a materials-science research question before anyone answers it. Use only the question. design: it "
+    "asks how to improve a property or make a better material; understanding: it asks to explain a behaviour, "
+    "mechanism or effect; method: it asks for a better method, model, process route or measurement. Return JSON "
+    "{\"question_type\": \"design|understanding|method\", \"reason\": str}."
+)
+ROUTE_GUIDE = {
+    "design": "Design question: commit to one concrete lever (a specific composition change, processing route or "
+              "treatment) with its key parameters, name the structural mediator it creates, and give the mechanism "
+              "that links it to the property under the stated operating conditions.",
+    "understanding": "Understanding question: name the controlling variable and the mechanism that would explain the "
+                     "behaviour, state the test conditions (temperature, atmosphere, time, stress) under which it "
+                     "operates, and name the measurement that would reveal it.",
+    "method": "Method question: propose the specific technique, model or protocol with its key settings, say what it "
+              "measures or predicts, and how it would be validated against a baseline method.",
+}
+
+
+def m_router_b(h: Harness, model: str = "o3mini") -> dict[str, Any]:
+    raw = h.ask("router", model, ROUTER_SYSTEM, {"question": h.query})
+    kind = str(raw.get("question_type", "")).strip().lower() if isinstance(raw, dict) else ""
+    kind = kind if kind in ROUTE_GUIDE else "design"
+    h.notes["route"] = kind
+    return write(h, {"question_type": kind, "guidance": ROUTE_GUIDE[kind]}, model, system=WRITER_B)
+
+
+register("router_b_o3mini")(m_router_b)

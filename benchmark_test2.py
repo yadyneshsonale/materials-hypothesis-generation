@@ -56,16 +56,21 @@ SETS: dict[str, dict[str, Any]] = {
               "rule": "loop.md section 10.1", "exclude_sets": ()},
     "test3": {"out": "benchmark_test3", "window": ("2024-02-01", "2025-07-16"), "extend": False, "split": "test3",
               "rule": "loop.md section 11.1", "exclude_sets": ("test2",)},
+    # test4: loop.md 16.1 C1. From 2024-11-01, so every candidate generator (latest cutoff 2024-09-30, plus the 31-day
+    # margin) is eligible on every paper. Never extended; the first 24 that qualify, ranked by citations.
+    "test4": {"out": "benchmark_test4", "window": ("2024-11-01", "2026-10-26"), "extend": False, "split": "test4",
+              "rule": "loop.md section 16.1", "exclude_sets": ("test2", "test3"), "n_cases": 24},
 }
 
 
 def configure(name: str) -> None:
-    global OUT, PAPERS, CASES_OUT, WINDOW, EXTEND, SPLIT, RULE, EXCLUDE_SETS
+    global OUT, PAPERS, CASES_OUT, WINDOW, EXTEND, SPLIT, RULE, EXCLUDE_SETS, N_CASES
     cfg = SETS[name]
     OUT = EXPERIMENT_DIR / cfg["out"]
     PAPERS, CASES_OUT = OUT / "papers", OUT / "cases"
     WINDOW, EXTEND, SPLIT, RULE, EXCLUDE_SETS = cfg["window"], cfg["extend"], cfg["split"], cfg["rule"], \
         cfg["exclude_sets"]
+    N_CASES = cfg.get("n_cases", 12)
 
 
 def excluded_rows() -> list[dict[str, Any]]:

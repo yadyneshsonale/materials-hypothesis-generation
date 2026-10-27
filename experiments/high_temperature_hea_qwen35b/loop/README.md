@@ -134,3 +134,20 @@
   - Nothing beats `writer_only_b_o3mini`.
   - The papers-as-context dip replicates, and is larger.
   - The writer's lead over Llama holds overall but not on the 9 clean v4 inputs.
+
+## Experiments 34–35: changes suggested by two model reviews (loop.md section 16)
+
+- **Runs.** [run_review_b.sh](./run_review_b.sh) ran seven configurations on the 36 spent papers (split `all36`):
+  - the fresh replicate `writer_only_b_o3mini_r4`;
+  - stronger writers `writer_only_b_4o`, `writer_only_b_41` and `writer_only_b_o4mini` (the last two on 29 papers);
+  - few-shot `fewshot_similar_b_o3mini` and `fewshot_diverse_b_o3mini`;
+  - `router_b_o3mini`.
+- **Excluded models.** o3 and gpt-5 failed the memorisation probe, so their runs are kept unanalysed in
+  [excluded_by_probe/](./excluded_by_probe/README.md).
+- **test4 finals.** [run_test4_final.sh](./run_test4_final.sh) ran the test4 finals once (`writer_only_b_o3mini` and
+  `closed_book`, split `test4`, marked final).
+- **Analysis.** [review_analysis.py](../../../review_analysis.py), outputs in [../review_eval/](../review_eval/README.md).
+- **Result.**
+  - No configuration beats the incumbent.
+  - The incumbent beats the Llama baseline on test4 (+0.12 / +0.26) and over all 37 fresh papers (+0.11, p = 0.003;
+    DeepSeek +0.27).

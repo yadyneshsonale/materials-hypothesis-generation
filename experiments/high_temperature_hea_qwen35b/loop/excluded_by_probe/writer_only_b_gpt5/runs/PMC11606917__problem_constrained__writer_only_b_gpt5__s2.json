@@ -1,0 +1,69 @@
+{
+  "run_id": "PMC11606917__problem_constrained__writer_only_b_gpt5__s2",
+  "paper_id": "PMC11606917",
+  "query_level": "problem_constrained",
+  "method": "writer_only_b_gpt5",
+  "sample": 2,
+  "split": "dev",
+  "final": false,
+  "benchmark": "v3.1",
+  "query": "For multicomponent high-entropy alloys in solid and liquid states at and near their high melting temperatures, what single testable methodological intervention could overcome the inability of EAM references to represent the many atomic configurations of the ab initio liquid? Explain why it should improve reference–target phase-space overlap, predict the reduction in thermodynamic-integration path mismatch relative to TOR-TILD’s EAM references, define the applicable composition and temperature ranges, identify supporting evidence from elemental or binary calculations, and specify a decisive free-energy benchmark that would falsify the hypothesis.",
+  "publication_date": "2024-11-29",
+  "models": {
+    "writer": "trapi:gpt-5_2025-08-07"
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Replacing TOR-TILD’s optimized EAM references with a composition- and temperature-conditioned short-range many-body machine-learned reference (e.g., a regularized Atomic Cluster Expansion fitted to DFT liquid and solid snapshots near Tm, with ZBL repulsion) will increase reference–target phase-space overlap for multicomponent metallic high-entropy alloys at and near their melting temperatures, thereby reducing thermodynamic-integration path mismatch (variance and curvature of the reference→DFT correction) by roughly 30–60% compared to EAM-based TOR-TILD, under matched sampling and system sizes.",
+    "material_initial_state": "Multicomponent metallic high-entropy alloys (4–6 principal elements) in solid (FCC or BCC) and liquid states near their high melting temperatures; equiatomic or near-equiatomic compositions without strong covalent or ionic bonding.",
+    "intervention": "Use a liquid-informed machine-learned reference potential in place of EAM: fit a regularized Atomic Cluster Expansion (ACE) (or equivalent short-range many-body model such as MTP) to DFT forces/energies from active-learned MD snapshots covering solid and liquid configurations at 0.8–1.1 Tm for the specific alloy composition; include a short-range ZBL repulsive term and keep the rest of the TOR-TILD pipeline unchanged.",
+    "conditions": "Temperature range: 0.8–1.1 Tm for each composition; pressure: near ambient (0–2 GPa); system size: ≥200 atoms to capture liquid disorder; DFT target uses the same exchange–correlation functional and pseudopotentials across reference training and TI; MD time steps and thermostats matched between reference and DFT for TI.",
+    "structural_mediator": "Explicit angular-dependent many-body terms capturing diverse local coordinations and short-range chemical order in multicomponent metallic liquids (coordination variability, bond-angle distributions, and element-specific local environments).",
+    "mechanism": "By representing the broad distribution of local environments present in the ab initio liquid with angular-dependent many-body descriptors, the ACE reference reduces the Kullback–Leibler divergence between the reference and DFT ensembles. This narrows the distribution of ΔU = U_DFT − U_ref, flattens the λ-dependent TI integrand, and decreases reweighting variance and autocorrelation times, improving phase-space overlap and reducing path mismatch relative to EAM.",
+    "predicted_outcome": "Relative to TOR-TILD’s EAM references, the ACE reference will produce: (i) a 30–60% reduction in the variance of ΔU in the liquid and a comparable reduction in integrand curvature across λ; (ii) a ≥25–40% reduction in the statistical uncertainty of the integrated reference→DFT free-energy correction for the liquid at ~0.9–1.0 Tm under matched sampling; and (iii) a corresponding decrease in the uncertainty of the melting free-energy difference ΔG_s−l by ≥25% at a fixed computational budget.",
+    "baseline": "TOR-TILD with composition-optimized EAM references for solid and liquid, including their observed ΔU distributions, TI integrand shapes, and resulting reference→DFT corrections and uncertainties near Tm.",
+    "boundary": "Applicable to metallic HEAs where short-range many-body metallic interactions dominate and magnetic or long-range electronic effects are either weak or well-represented in the chosen DFT functional. Benefits may diminish for compositions with strong directional/covalent bonding (e.g., C, B additions), significant charge transfer/ionicity, or long-range magnetism not captured by short-range local models. Training data must cover both solid and liquid configurations in 0.8–1.1 Tm; incomplete coverage or overly sparse bases can negate gains.",
+    "uncertainty": "The magnitude of improvement depends on training-set diversity, basis regularization, and the DFT target. The 30–60% reduction is an estimate; actual gains may be smaller for liquids with narrow local-environment distributions or if magnetic/disordered electronic contributions dominate. Without elemental/binary benchmarks included here, the precise improvement remains uncertain.",
+    "supporting_evidence_ids": [],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Select three metallic HEA compositions spanning FCC and BCC (e.g., equiatomic quinary and quaternary alloys). For each: (1) generate DFT MD datasets of solid and liquid at 0.9 Tm with matched cell sizes and k-point/functional settings; (2) fit two references: (a) TOR-TILD-optimized EAM and (b) ACE+ZBL trained via active learning on those DFT snapshots; (3) perform thermodynamic integration from each reference to DFT for solid and liquid under matched sampling and system sizes; (4) compute the melting free-energy difference ΔG_s−l from each reference→DFT TI; and (5) quantify overlap metrics and uncertainties.",
+      "measurements": [
+        "Variance and integrated autocorrelation time of ΔU = U_DFT − U_ref for liquid and solid at 0.9 Tm.",
+        "KL divergence (or effective sample size under reweighting) between reference and DFT ensembles for the liquid.",
+        "Shape (curvature) and smoothness of the TI integrand ⟨ΔU⟩(λ) for the liquid across λ ∈ [0,1].",
+        "Reference→DFT Helmholtz free-energy correction magnitudes and bootstrap uncertainties for liquid and solid.",
+        "Melting free-energy difference ΔG_s−l and its uncertainty from each reference→DFT TI."
+      ],
+      "falsification_rule": "The hypothesis is falsified if, for at least two of the three compositions under matched conditions, the ACE reference fails to reduce (relative to EAM) (i) the liquid ΔU variance by ≥30%, and (ii) the uncertainty of the liquid reference→DFT free-energy correction by ≥30%, and (iii) the uncertainty of ΔG_s−l by ≥25%. Any failure of these thresholds constitutes decisive evidence against the proposed improvement in phase-space overlap."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "seen_ids": [],
+  "cited_ids": [],
+  "cited_evidence": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "writer",
+      "model": "gpt-5_2025-08-07",
+      "chars_in": 1756,
+      "chars_out": 5824,
+      "seconds": 37.41
+    }
+  ],
+  "llm_calls": 1,
+  "notes": {},
+  "chars_in": 1756,
+  "elapsed_seconds": 37.41
+}

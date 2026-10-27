@@ -2013,3 +2013,501 @@ The conclusions do not change; only the score levels do, and those depend on the
 
   Only the Llama baseline has a length ρ above 0.3 (0.39, as in experiment 31). Its many very short outputs include
   one abstention that scored 0.
+
+---
+
+## 16. Changes suggested by two model reviews (experiments 33–35)
+
+### 16.1 Pre-registered plan (written 2026-10-26 20:56, before any experiment 33–35 run)
+
+**Request.** Two reviews, by Opus 5.5 and GPT 6.1, gave generic advice for an LLM pipeline scored against a rubric;
+their models never saw this project. The request: look at both, suggest changes, and run them.
+
+**Mapping.**
+- **Already done here:**
+  - leakage and split-overlap checks;
+  - failure grouping (experiments 12, 15, 18, 22; F9–F18);
+  - retrieval tuning and recall (BM25, aimed retrieval, evidence ceilings);
+  - self-consistency (MBR, consensus) and generate–critique–revise (experiment 11, verifiers);
+  - fixed dev/test with confidence intervals and Holm.
+- **Not applicable:** fine-tuning, encoder backbones, threshold tuning, synthetic training data.
+- **New here, run below:**
+  - check the measurement first (A1–A6);
+  - few-shot examples (B2), a router (B3) and a stronger backbone (B1);
+  - a fresh held-out test (C).
+- **Rescoring rule (GPT 6.1).** Any new judge rescores every compared arm.
+
+**Decisions.** The user was unavailable, so the recommended defaults are taken.
+- All change groups are run.
+- Generators with a 2024 cutoff are used only on papers dated more than 31 days after their cutoff, and only after a
+  memorisation probe.
+- Answer keys stay frozen. Flagged papers are reported with and without.
+- The checklist judge becomes co-primary only by the rule in A4.
+- test4 is built even if no new method wins.
+
+**Live check (2026-10-26).**
+- gpt-4o_2024-11-20 (cutoff 2023-10-01) answers, where earlier it was rate-limited.
+- o3_2025-04-16, o4-mini_2025-04-16, gpt-4.1_2025-04-14 (cutoff 2024-06-01) and gpt-5_2025-08-07 (cutoff 2024-09-30)
+  answer.
+- gpt-4.5-preview is not deployed.
+- Eligible spent papers: 36 for gpt-4o, 29 for o3, o4-mini and gpt-4.1, 23 for gpt-5.
+
+**Statistics.** As before:
+- per-paper paired differences, averaged over levels and samples;
+- paper-clustered bootstrap 95% CI (10,000 resamples, seed 20261026, sorted keys);
+- exact sign test;
+- Holm within each family named below.
+
+#### Phase A: measurement (experiment 33). Script `review_measurement.py`; checklist in `checklist_judge.py`.
+
+**A1. Output audit (offline).** Over every run directory, count:
+- empty core fields (hypothesis, intervention or mechanism);
+- abstentions (pattern: unknown, cannot be determined, insufficient or lack of evidence);
+- hypotheses under 40 characters;
+- writer repair calls, truncation retries and failed runs.
+
+Report the GPT-5.6 score of flagged against unflagged runs per configuration. If empty or truncated outputs exceed
+2% of a configuration used in a claim (Llama baseline, incumbent, finalists), the cause is fixed with a test and
+those runs are redone. Abstentions are model behaviour and stay.
+
+**A2. Two-judge mean (offline).** The mean of GPT-5.6 and DeepSeek reconstruction per unit. It is reported as a
+secondary metric for the key comparisons:
+- incumbent vs baseline on test, test2, test3 and the 28 fresh papers;
+- the same on v4.
+
+**A3. Judge sanity controls.** Built by code from the frozen answer keys; no LLM writes them. Each is scored against
+the paper's v3.1 problem-constrained question. Six controls per paper (36 × 6 = 216), scored by both judges:
+
+| Control | What it is |
+|---|---|
+| positive | the paper's own answer key, rendered into the hypothesis schema |
+| hard negative | the most similar other paper's key (token Jaccard over material, intervention and mechanism) |
+| random negative | a random other paper's key (seeded) |
+| intervention swap | the positive with its intervention replaced by the hard negative's |
+| mechanism swap | the positive with its mechanism and structural mediator replaced by the hard negative's |
+| generic | one fixed textbook hypothesis per gap type |
+
+Checks, per judge:
+- **C1.** AUC of positive vs both negatives ≥ 0.90.
+- **C2.** Positive mean ≥ 3.0, and random-negative mean ≤ 1.0.
+- **C3.** The intervention swap lowers intervention agreement more than mechanism agreement, and the mechanism swap
+  the reverse (mean drop).
+- **C4.** Generic is at least 2.0 below positive.
+
+The controls also place the real methods' scores on this scale.
+
+**A4. Checklist judge** (the reviews' yes/no criteria, partial credit, quoting before scoring).
+- **Facts.** GPT-5.6 turns each answer key once into 6–12 atomic, checkable facts. Each is tagged intervention,
+  conditions, mechanism or outcome, and core or detail. DeepSeek checks each fact against the key; unsupported facts
+  are dropped. The facts are then frozen.
+- **Scoring.** For each fact, the judge first copies a supporting quote from the hypothesis, then gives a verdict
+  (yes, partial or no) and says whether the fact is already given in the question.
+  - Code checks every quote against the hypothesis text; an unverifiable yes or partial becomes no.
+  - Dimension score = mean over facts not given in the question (yes = 1, partial = 0.5).
+  - Checklist score = 4 × mean of the dimensions that have facts.
+- **Rescoring, by both judges:**
+  - the 216 controls;
+  - every v3.1 run of `closed_book`, `closed_book_o3mini`, `writer_only_b_o3mini`, `trend_ground_b_o3mini` and
+    `text_chunks_b_o3mini` (936 runs);
+  - a 60-run retest (seeded sample of those runs).
+- **Adoption as co-primary.** All three must hold:
+  1. The run-level Spearman ρ between GPT-5.6 and DeepSeek on the 936 runs is at least 0.15 higher than the 0–4
+     judge's ρ on the same runs.
+  2. Control AUC (C1) is no more than 0.02 below the 0–4 judge, for each judge.
+  3. Unverifiable quotes are under 10%.
+
+  If adopted, later comparisons report the GPT-5.6 checklist score next to the 0–4 score, and key past conclusions
+  are re-tested under it. Otherwise it is secondary.
+
+**A5. Failure triage** (GPT 6.1: separate model, annotation and scoring errors).
+- **Sample.** 60 v3.1 runs, seeded:
+  - the 24 lowest-scoring `writer_only_b_o3mini` runs (at most 2 per paper);
+  - the 12 lowest `closed_book` runs (at most 1 per paper);
+  - the 12 highest writer runs;
+  - 12 writer runs nearest the median.
+- **Triage.** GPT-5.6 and DeepSeek each see the paper's abstract and non-introduction text, the key, the question,
+  the hypothesis and both judges' scores. They pick one primary cause: answer-key error, judge too harsh, judge too
+  lenient, valid alternative the paper does not test, wrong, generic, or fairly scored. They also give a short
+  reason.
+- **Reported:** the distribution, Cohen's κ between the two triagers, and the share of low scores they attribute to
+  measurement.
+
+**A6. Answer-key audit.**
+- GPT-5.6 and DeepSeek each check all 36 keys field by field against the paper's abstract and non-introduction text:
+  supported, partially supported, unsupported, or missing key information.
+- They also judge whether the intervention is the paper's central lever, and give an overall verdict of ok, minor or
+  major.
+- **Flag.** Major by both auditors, or major by one with an unsupported intervention or mechanism from the other.
+- Flagged papers stay in the benchmark, and all later results are given with and without them.
+
+#### Phase B: methods (experiment 34), developed on the 36 spent papers ("dev36"; v3.1 input, 3 levels × 2 samples)
+
+- **B0.** `writer_only_b_o3mini_r4`: a fresh-sample replicate of the incumbent, used as the anchor.
+- **B1. Stronger generators**, each with the incumbent's conservative writer prompt in one call:
+
+  | Configuration | Model | Papers |
+  |---|---|---:|
+  | `writer_only_b_4o` | gpt-4o | 36 |
+  | `writer_only_b_o3` | o3 | 29 |
+  | `writer_only_b_o4mini` | o4-mini | 29 |
+  | `writer_only_b_41` | gpt-4.1 | 29 |
+  | `writer_only_b_gpt5` | gpt-5 | 23 |
+
+  - The harness skips papers dated within 31 days after the model's cutoff, or earlier.
+  - Each model first takes the memorisation probe (must_obey.md 2.3) on its eligible papers, against the Llama
+    control. A clearly higher rate of specific recall than the control excludes the model.
+  - gpt-5 shares a family with the GPT-5.6 judge, so its result counts only if DeepSeek agrees in direction.
+- **B2. Few-shot worked examples**, with o3-mini and the conservative writer.
+  - Each example is another held-out paper's problem-constrained question plus its answer key, rendered into the
+    output schema by code. Only papers published strictly before the case are used.
+  - `fewshot_similar_b_o3mini` takes the 3 most similar by BM25 on the question.
+  - `fewshot_diverse_b_o3mini` takes the least similar paper of each gap type, falling back to the least similar
+    overall: format calibration without topical anchoring.
+  - Cases with fewer than 3 eligible examples get what exists; the count is reported.
+  - An extractor-leakage check compares the case's answer words in its examples with other cases' answer words
+    (must_obey.md 4.5).
+- **B3. `router_b_o3mini`.**
+  - o3-mini first classifies the question as design, understanding or method, from the question only.
+  - Then a type-specific writer instruction aimed at F15–F18 is added:
+    - design: one concrete lever with its parameters, mediator and mechanism;
+    - understanding: the controlling variable, mechanism, test conditions and revealing measurement;
+    - method: the specific technique, what it measures and how it is validated.
+  - Agreement with the v3.1 gap labels is reported.
+- **Finalist rule** (must_obey.md 6.5).
+  - The GPT-5.6 gain over B0 on the method's eligible papers has a 95% CI excluding zero. The DeepSeek difference
+    is positive, and the GPT-5.6 checklist difference is positive if the checklist is adopted.
+  - At most 3 finalists, ranked by GPT-5.6 gain. If two compatible ones pass (a model plus the router or few-shot),
+    one combination runs on dev36 first and is a finalist if it beats both parts by the same rule.
+  - Holm is applied across the 8 new configurations for reporting.
+- **Evaluation.** Every run gets both judges, an audit, a lever label and the checklist scores (both judges), and
+  must pass `must_obey_check.py`.
+
+#### Phase C: test4 (experiment 35)
+
+**C1. Construction rule.** Fixed now, before any test4 search. The `benchmark_test2.py` procedure with `--set test4`:
+- the same Europe PMC TOPIC query, FIRST_PDATE from 2024-11-01 to the search date, sorted by citations, never
+  extended;
+- exclusions: corpus papers (which include the original 12), test2, test3 and near-duplicate titles (Jaccard ≥ 0.8);
+- the same primary-research, introduction (≥ 1,000 characters after redaction) and GPT-5.6 topic screen;
+- the first 24 that qualify, or all if fewer;
+- answer keys from the abstract and non-introduction sections;
+- v3 writer, checker and gate, then the v3.1 gap templates.
+
+**C2. Blindness and registration.**
+- The designer reads no test4 title, question or answer key before the finals. Scripts print counts only.
+- test4 is registered as an unspent held-out split in must_obey.md, `hypo_loop.py` and `must_obey_check.py`. Its runs
+  must be marked final.
+
+**C3. Finals, run once.**
+- Arms: `closed_book` (Llama baseline), `writer_only_b_o3mini` (incumbent) and the finalists. 24 papers × 3 levels ×
+  2 samples.
+- Evaluation: both judges, checklist scores, audits and labels.
+- **Primary.** Each finalist vs the incumbent (GPT-5.6, Holm across finalists).
+- **Replication.** Incumbent vs baseline (GPT-5.6; one test).
+- Results are given with both judges, the checklist score, and with and without papers flagged by the A6 audit rule.
+  That audit is run on the test4 keys after the finals.
+- If no finalist exists, only the replication runs.
+
+**Addendum (written before the probe ran).** The B1 probe's "clearly higher" threshold, fixed now:
+- **Data.** Each candidate generator is probed on its eligible papers among the 36, with 2 samples, using the
+  must_obey.md 2.3 probe (title and year only; GPT-5.6 scores recall against the key). The Llama-3.3 control is
+  probed on all 36 papers.
+- **Exclusion rule.** A model is excluded if its rate of specific recall (any dimension scored 2) exceeds the
+  control's rate *on the same papers* by more than 15 percentage points.
+- **Precedent.** In experiment 23, o1 (21% vs 8%) and o3-mini (17%) were allowed, and their hits were inferable from
+  titles.
+
+**Addendum 2 (2026-10-26 21:59, after the test4 screen, before any test4 case content was read).** Under the rule in
+C1, test4 has **9 papers**, not 24. Counts only:
+- 66 screened;
+- 29 failed the topic screen;
+- 23 already in the corpus or an earlier held-out set;
+- 5 failed structure checks (no Introduction, XML or primary-research check, too short after redaction).
+
+The rule is not changed after seeing this. A new window or rule would be a different set, chosen with knowledge of
+how this one came out.
+
+**C3 is amended:**
+1. **test4** (9 papers) is the only unspent set and is used once, exactly as pre-registered. Its result is reported
+   as underpowered.
+2. **Pooled replication of the incumbent vs the baseline.** test4 is combined with the 28 fresh papers of rounds 1–3.
+   This is the most informative estimate. The pooling follows rounds 2–3, where it was exploratory, and is labelled
+   that way here.
+3. **Finalists.** No finalist claim rests on test4 alone. A finalist's test4 result is reported as a check of
+   direction.
+
+### 16.2 Measurement results (experiment 33; review_eval/measurement.json)
+
+**A1. Output audit, offline.** All 10,896 runs in 118 run directories were checked.
+
+| Flag | Runs |
+|---|---:|
+| Empty core field | 4 |
+| Abstention | 23 |
+| Hypothesis under 40 characters | 2 |
+| Truncation retry | 15 |
+| Writer repair call | 1,226 |
+| Failed | 1 |
+
+- No configuration used in a claim exceeds the 2% format-failure threshold, so nothing is redone.
+- Abstentions are concentrated in the Llama arms on the bare SciMON inputs (experiment 31), and score near 0.
+- Writer repairs are expected: they fix invalid citations or JSON, and the final output is validated.
+
+**A2. Mean of the two judges.** Incumbent writer − Llama baseline, using the per-unit mean of GPT-5.6 and DeepSeek.
+
+| Papers | GPT-5.6 | DeepSeek | Mean of judges |
+|---|---|---|---|
+| test (4) | 0.00 | +0.33 | +0.17 [0.00, +0.33] |
+| test2 (12) | +0.18 | +0.34 | +0.26 [+0.13, +0.43] |
+| test3 (12) | +0.08 | +0.18 | +0.13 [+0.06, +0.21] |
+| **28 fresh** | +0.11 | +0.27 | **+0.19 [+0.12, +0.28], p = 0.0015** |
+| All 36 | +0.12 | +0.27 | +0.20 [+0.14, +0.26], p = 0.0001 |
+| v4 input, 36 | +0.22 | +0.23 | +0.23 [+0.11, +0.36], p = 0.016 |
+
+The incumbent's lead holds under the judge mean. The mean intervals are narrower than GPT-5.6's alone.
+
+**A3. Judge sanity controls** (216 items built by code from the answer keys; both judges).
+
+| Control | GPT-5.6 | DeepSeek |
+|---|---:|---:|
+| positive (the paper's own key) | 3.90 | 4.00 |
+| intervention swap | 2.67 | 2.63 |
+| mechanism swap | 2.97 | 2.91 |
+| hard negative (most similar other paper) | 0.15 | 0.04 |
+| random negative | 0.00 | 0.00 |
+| generic textbook hypothesis | 0.13 | 0.10 |
+
+- AUC (positive vs negatives) is 1.00 for both judges.
+- Each swap lowers its own dimension most:
+  - intervention swap: intervention −3.67, mechanism −0.42 (GPT-5.6);
+  - mechanism swap: mechanism −3.75, intervention 0.00.
+- All four pre-registered checks (C1–C4) pass for both judges.
+- **Reading.** The 0–4 judges are not broken. They separate the real answer from wrong and generic ones perfectly,
+  and they score the dimension that is wrong. The low scores of real methods (about 0.5) mean the hypotheses really
+  do differ from what the papers did. A hypothesis that is right in mechanism but wrong in intervention would score
+  about 2.7.
+
+**A5. Failure triage** (60 stratified runs; both triagers saw the paper text, the key, the hypothesis and both
+scores).
+
+| | GPT-5.6 | DeepSeek |
+|---|---|---|
+| Valid alternative the paper did not test | 41 | 0 |
+| Wrong | 9 | 45 |
+| Generic | 1 | 10 |
+| Fairly scored | 8 | 2 |
+| Judge too harsh | 0 | 3 |
+| Answer-key error | 1 | 0 |
+
+- Agreement between the triagers: κ = 0.05.
+- Share of low scores due to measurement (key or judge error): 3% for GPT-5.6, 0% for DeepSeek.
+- Mean "fair" reconstruction the triagers would give: 0.48 (GPT-5.6) and 0.33 (DeepSeek), against the sample's
+  judged mean of 0.45.
+- **Reading.** Both triagers agree that the low scores are not judge or answer-key errors; the scoring is fair. They
+  disagree on what a non-matching hypothesis is. GPT-5.6 calls most of them reasonable alternatives that the paper
+  simply did not test; DeepSeek calls them wrong. The benchmark rewards reconstructing one paper and cannot tell a
+  good alternative from a bad guess. Only expert ratings can settle that (experiment 30).
+
+**A6. Answer-key audit** (all 36 keys, field by field against the paper's non-introduction text).
+
+| | ok | minor | major |
+|---|---:|---:|---:|
+| GPT-5.6 | 20 | 12 | 4 |
+| DeepSeek | 25 | 11 | 0 |
+
+- Central lever correct: 33 of 36 (GPT-5.6), 36 of 36 (DeepSeek).
+- GPT-5.6's four majors, all rated minor by DeepSeek:
+  - PMC11077685: the key omits the silicide coating step;
+  - PMC11355469: two simulation protocols merged;
+  - PMC11375712: the mechanism over-states roles the paper discounts;
+  - PMC12298864: powder data attributed to the bulk alloy.
+- **No paper meets the pre-registered flag rule.** The keys stay frozen, and the "without flagged papers" analyses
+  equal the main ones. The four papers are listed so the expert can check them.
+
+**Phase A conclusion.**
+- The measurement chain holds at the level the reviews worried about:
+  - outputs are well formed;
+  - the judges pass every sanity control;
+  - low scores are not judge or key errors;
+  - no answer key is unusable.
+- The remaining validity problem is conceptual, not technical: one paper's study is the only "right" answer, and
+  the judges disagree on whether other hypotheses are reasonable.
+- The checklist judge (A4) tests whether finer-grained scoring helps; its results are in 16.3.
+
+### 16.3 Checklist judge (A4) and methods (experiment 34; review_eval/checklist/analysis.json, review_eval/phase_b.json)
+
+**A4. Checklist judge: works, but not adopted.**
+- **Facts.** 36 keys gave 11.9 facts each on average (430 in total: intervention 66, conditions 79, mechanism 140,
+  outcome 145). DeepSeek found every fact supported by its key, so none was dropped.
+- **Behaviour.**
+  - Retest stability is high: ρ 0.86 (GPT-5.6) and 0.83 (DeepSeek).
+  - Quotes check out: 99.7% verified, 0.28% unverifiable.
+  - Control AUC is 1.00 for both judges. Mean scores (GPT-5.6): positive 3.64, intervention swap 3.22, mechanism
+    swap 3.01, hard negative 0.14, generic 0.17.
+- **Adoption rule (pre-registered).** The checklist must raise inter-judge agreement by at least 0.15.
+
+  | Inter-judge ρ (936 runs) | Checklist | 0–4 judge |
+  |---|---:|---:|
+  | Run level | 0.45 | 0.58 |
+  | Unit level | 0.52 | 0.63 |
+
+  Agreement is lower, not higher, so the checklist is **not adopted**. It is reported as a secondary score.
+- **Reading.**
+  - Splitting the answer into many small facts does not make the two judges agree more on real hypotheses: they
+    disagree about partial matches, fact by fact.
+  - The checklist is also gentler on swaps (3.2 vs 2.7). With most facts about mechanism and outcome, a wrong
+    intervention costs less.
+  - The 0–4 judge's single intervention dimension is the stricter test of the paper's lever.
+
+**B1. Memorisation probe for the stronger generators** (title and year only; rule: excluded if specific recall
+exceeds Llama-3.3's on the same papers by more than 15 points).
+
+| Model | Papers | Specific recall | Llama control | Excess | Decision |
+|---|---:|---:|---:|---:|---|
+| gpt-4o | 36 | 4.2% | 5.6% | −1.4 | used |
+| gpt-4.1 | 29 | 12.1% | 6.9% | +5.2 | used |
+| o4-mini | 29 | 19.0% | 6.9% | +12.1 | used |
+| o3 | 29 | 32.8% | 6.9% | +25.9 | **excluded** |
+| gpt-5 | 23 | 43.5% | 6.5% | +37.0 | **excluded** |
+
+- No model claimed to remember any paper, but o3 and gpt-5 recalled specific details beyond the title. Their stated
+  cutoffs (June and September 2024) are not a safe guarantee for these papers.
+- Their runs had already been generated alongside the probe, so they are kept unanalysed in
+  `loop/excluded_by_probe/`.
+
+**B0–B3. Results on dev36** (each configuration vs the fresh replicate B0 on its eligible papers; 3 levels ×
+2 samples; GPT-5.6 / DeepSeek).
+
+| Configuration | Papers | Mean, GPT-5.6 / DeepSeek | vs B0, GPT-5.6 [95% CI] | Holm p | vs B0, DeepSeek | Two-judge mean |
+|---|---:|---|---|---:|---|---:|
+| B0 replicate (`writer_only_b_o3mini_r4`) | 36 | 0.59 / 0.58 | – | – | – | – |
+| gpt-4o writer | 36 | 0.63 / 0.50 | +0.04 [−0.02, +0.10] | 0.15 | **−0.08 [−0.16, −0.00]** | −0.02 |
+| gpt-4.1 writer | 29 | 0.59 / 0.57 | +0.02 [−0.04, +0.09] | 1.0 | −0.02 | +0.00 |
+| o4-mini writer | 29 | 0.43 / 0.38 | **−0.14 [−0.20, −0.08]** | **0.009** | **−0.21** | −0.18 |
+| few-shot, similar | 36 | 0.60 / 0.62 | +0.01 [−0.04, +0.06] | 1.0 | +0.04 | +0.02 |
+| few-shot, diverse | 36 | 0.59 / 0.57 | −0.00 [−0.06, +0.05] | 1.0 | −0.01 | −0.01 |
+| router | 36 | 0.60 / 0.59 | +0.01 [−0.03, +0.06] | 1.0 | +0.01 | +0.01 |
+
+- **No finalist.** No configuration has a GPT-5.6 CI above zero.
+  - gpt-4o is closest (+0.04, raw sign p = 0.03), but DeepSeek scores it lower (−0.08). This is the judge-family
+    pattern must_obey.md warns about: GPT-5.6 favours a GPT-family generator.
+  - o4-mini is significantly worse with both judges.
+- **Replicate check.** B0 is within noise of the incumbent's original runs (−0.03 [−0.07, +0.02]), and it beats the
+  Llama baseline (+0.10 [+0.04, +0.16]).
+- **Router.** Its question types agree with the v3.1 gap labels 99.1% of the time (216 runs), so the routing works.
+  But type-specific instructions do not change scores.
+- **Few-shot.** 210 of 216 similar runs and 198 of 216 diverse runs got 3 examples; the earliest papers got fewer.
+  Leakage check (must_obey.md 4.5): the case's own answer words appear in its examples at 0.88× the rate of other
+  cases' words, so the examples carry no injected answers.
+- **Reading.**
+  - Neither a stronger backbone nor few-shot examples nor a router improves on the o3-mini conservative writer.
+  - The ceiling is the same as in rounds 1–3: about 0.6 of 4, set by choosing the paper's lever.
+  - Of the models allowed for these papers, o3-mini remains the best choice. The two strongest candidates (o3,
+    gpt-5) fail the memorisation probe, so they cannot be tested fairly on papers from 2024–2026.
+
+### 16.4 test4 finals and the pooled replication (experiment 35; review_eval/test4.json)
+
+**test4 build.**
+- **Size.** By the C1 rule, 9 papers (2024-11 to 2026-03) of 66 screened. Addendum 2 recorded this, and the amended
+  plan, before any case was read.
+- **Content.** All 9 are design questions. Every level passes the gate except 3 expert-context queries, which keep
+  their best attempt as in earlier sets. Mean answer-word overlap: 1.2% / 1.9% / 3.8% (broad / problem / expert).
+- **Answer keys.** The A6 audit found GPT-5.6 5 ok and 4 minor, DeepSeek 7 ok and 2 minor; none is flagged.
+- **Runs.** There was no finalist, so only the pre-registered replication ran once with `--final`: the incumbent and
+  the Llama baseline, 54 runs each, 0 failed.
+- **Evaluation.** Both judges, audits, labels and checklist scores on all 108 runs; `must_obey_check.py --loop`
+  passes.
+
+**Incumbent (`writer_only_b_o3mini`) − Llama baseline.**
+
+| Judge | test4 (9 papers) | Pooled, all 37 fresh papers (exploratory) |
+|---|---|---|
+| GPT-5.6 | 0.66 vs 0.54: **+0.12 [+0.02, +0.21]**, 6 up / 2 down, p = 0.29 | 0.61 vs 0.50: **+0.11 [+0.06, +0.17]**, 26 / 8, **p = 0.003** |
+| DeepSeek | 0.51 vs 0.26: +0.26 [+0.10, +0.41], 7 / 2, p = 0.18 | 0.57 vs 0.30: +0.27 [+0.18, +0.36], 30 / 6, **p = 0.0001** |
+| Two-judge mean | +0.19 [+0.09, +0.29], 8 / 1, **p = 0.039** | +0.19 [+0.13, +0.26], 30 / 6, **p = 0.0001** |
+| Checklist, GPT-5.6 | −0.03 [−0.16, +0.08] | – |
+| Checklist, DeepSeek | −0.11 [−0.25, +0.00] | – |
+
+The pooled 37 are the 28 fresh papers of rounds 1–3 plus test4, each scored on its first use.
+
+**Reading.**
+- **On the 0–4 judges the lead replicates.** test4 shows the same direction and size as rounds 2–3, and over 37 fresh
+  papers the effect is the clearest in the project.
+- **On the checklist there is no lead,** on test4 or on the 36 spent papers:
+  - GPT-5.6: 0.35 vs 0.32, +0.04 [−0.02, +0.09];
+  - DeepSeek: 0.13 vs 0.14, −0.01.
+
+  Both systems match only about 6–15% of the paper's specific facts; the incumbent matches 15.5% and Llama 13.9%
+  (GPT-5.6).
+- **So the writer's advantage is real but partial.** Its hypotheses are judged closer to the paper overall: right
+  direction, plausible mechanism family, fitting conditions. It does not reproduce more of the paper's concrete facts
+  (exact intervention parameters, specific mediator, reported outcome). Under a strict fact-level rubric the two are
+  equally far from the paper.
+- **This is the clearest statement yet of the ceiling.** No configuration in 35 experiments reconstructs a paper's
+  specific study. The 0–4 judges reward partial closeness, and the gains measured throughout are in that partial
+  closeness.
+
+**Status.** test4 is now **spent**: must_obey.md section 1 and `SPENT` / `SPENT_SPLITS` are updated. A further method
+claim needs test5.
+
+### 16.5 Answer: what the reviews' suggestions changed
+
+| Review suggestion | What was run | Result |
+|---|---|---|
+| Check the measurement first | A1 output audit, A3 judge controls, A5 failure triage, A6 answer-key audit | The chain is sound: 4 empty outputs in 10,896; both judges score the true answer 3.9–4.0 and wrong or generic ones 0.0–0.15 (AUC 1.00); low scores are not judge or key errors; no key unusable |
+| Average several judges | A2 two-judge mean | Every incumbent comparison holds and narrows: over 37 fresh papers +0.19 [+0.13, +0.26] |
+| Binary or checklist rubric, partial credit, quote before scoring | A4 checklist judge (430 facts) | Stable and well behaved (retest ρ 0.86, quotes 99.7% verified), but lowers inter-judge agreement (0.45 vs 0.58). Not adopted. It shows that no system matches more than about 15% of a paper's specific facts |
+| Separate model, annotation and scoring errors | A5 triage | Low scores are real differences from the paper. The triagers split on whether those hypotheses are good alternatives (GPT-5.6) or wrong (DeepSeek), κ 0.05 |
+| Clean noisy labels | A6 key audit | 4 keys questioned by one auditor only; none flagged |
+| Stronger backbone | gpt-4o, gpt-4.1, o4-mini (o3 and gpt-5 failed the memorisation probe) | None beats the o3-mini writer: gpt-4o +0.04 / −0.08, gpt-4.1 +0.02 / −0.02, o4-mini −0.14 / −0.21 |
+| Few-shot worked examples | similar and diverse, 3 examples from earlier papers | +0.01 and −0.00: no effect, no anchoring penalty |
+| Router plus specialist steps | question-type router (99% type agreement) | +0.01: no effect |
+| A held-out test that is truly fresh | test4 (9 papers) | Incumbent vs baseline replicates: +0.12 [+0.02, +0.21] (GPT-5.6), +0.26 (DeepSeek) |
+
+**What this changes.**
+1. **The measurement works.** The reviews' main worry, that low scores might come from a broken rubric or judge, is
+   ruled out by the controls and the triage. The scores are low because the hypotheses really differ from the
+   papers.
+2. **The incumbent result is now the project's most robust finding.** o3-mini with the conservative writer beats the
+   Llama-3.3 baseline over 37 fresh papers: GPT-5.6 +0.11 (p = 0.003), DeepSeek +0.27 (p = 0.0001).
+3. **That advantage is in overall closeness, not in specific facts.** On a fact checklist both systems are equally
+   far from the papers.
+4. **Nothing the reviews proposed raises the ceiling.** Stronger models (of those allowed), examples and routing all
+   land within ±0.04 of the incumbent.
+5. **New rule from the probe.** Two of the strongest available models (o3, gpt-5) recall details of 2024–2026 papers
+   beyond their titles, despite cutoffs before them. Stated cutoffs are not enough: every generator needs the probe.
+   must_obey.md now marks o3 and gpt-5 as forbidden.
+
+**What would move the ceiling** (beyond the reviews' generic advice):
+- the expert ratings (experiment 30), to learn whether "valid alternatives" are valuable;
+- a benchmark that accepts several right answers (for example, every intervention later papers tried on the same
+  problem);
+- a much larger fresh test set: test5 needs a wider topic or later papers, since only 9 qualified this time.
+
+### 16.6 Integrity and checklist (experiments 33–35)
+
+- **Pre-registration.** Plan (16.1) written before any run. Two addenda were each written before the data they
+  affect:
+  - the probe threshold, before the probe;
+  - the test4 size, after the screen counts but before any case was read.
+- **Models.** Query-facing models are pre-cutoff by the per-paper rule, with probes. o3 and gpt-5 were excluded by
+  their probe, and their runs are kept unanalysed in `loop/excluded_by_probe/`. GPT-5.6 only judges, audits, triages,
+  writes checklist facts and builds test4.
+- **Integrity gate.** `must_obey_check.py --loop` passes on all nine experiment-34 and -35 directories. The test4 runs
+  are final, and runs of the 2024-cutoff models fail the gate if inside their margin (tested).
+- **Blindness.** test4 contents were not read before its finals. Only counts were printed.
+- **Answer keys.** Frozen. No paper met the flag rule, so the "without flagged papers" results equal the main ones.
+- **Spent splits.** test4 is now spent (must_obey.md section 1). No unspent held-out set remains.
+- **Tests.** 17 new tests (`test_review.py`); the full suite passes.
+- **Secondary scores.** Checklist scores for the experiment-34 runs were pre-registered. They cannot change a decision,
+  because the checklist was not adopted and there was no finalist. They are in `review_eval/phase_b.json` once
+  complete.
+- **Checklist (must_obey.md section 9):**
+  - [x] measurement checks before method changes;
+  - [x] pre-registered rules and addenda;
+  - [x] probes before new generators;
+  - [x] both judges on every analysed run;
+  - [x] frozen keys and inputs;
+  - [x] fresh held-out test run once;
+  - [x] negative results recorded;
+  - [x] experiment log, must_obey.md, READMEs and PROJECT_SUMMARY.md updated.

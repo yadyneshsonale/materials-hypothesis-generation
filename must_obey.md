@@ -32,8 +32,11 @@ Last updated: 2026-10-25 (see the change log at the end).
   - **Spent splits.** A held-out split used once for its pre-registered finals is *spent*. It becomes development
     data, and no later claim rests on it.
   - From round 3, development uses **dev3** = dev + test + test2 (24 papers). Claims rest on test3 (loop.md 11.1).
-  - test3 was used for the round-3 finals (loop.md 11.7), so it is spent too. **No unspent held-out set remains.** A
-    new method claim needs a fresh set (test4) built by the same pre-registered procedure.
+  - test3 was used for the round-3 finals (loop.md 11.7), so it is spent too.
+  - **test4** (9 papers, 2024-11-01 to 2026-03-16, built by the rule in loop.md 16.1 C1; cases in
+    `experiments/high_temperature_hea_qwen35b/benchmark_test4/cases`) was used once for the experiment-35 finals
+    (loop.md 16.4), so it is spent. **No unspent held-out set remains.** A new method claim needs a fresh set (test5)
+    built by the same pre-registered procedure.
 
 - **Queries.** `experiments/high_temperature_hea_qwen35b/benchmark_v3_1/cases` is the current frozen version
   (section 3).
@@ -84,12 +87,15 @@ paper is 2024-01-02.
 |---|---|---|
 | Llama-3.3-70B-Instruct_5 | December 2023 ([Meta model card](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct)) | allowed (flag PMC10759803) |
 | gcr-llama-31-8b-instruct | December 2023 ([Meta model card](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct)) | allowed (flag PMC10759803) |
-| gpt-4o_2024-11-20 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/gpt-4o)) | allowed after a probe; its probe could not complete (rate limited, 0/24 calls on 2026-10-25), so it is not used |
+| gpt-4o_2024-11-20 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/gpt-4o)) | allowed (probe 2026-10-26: 4.2% specific recall vs 5.6% for the Llama control; loop.md 16.3) |
 | gpt-4o-mini_2024-07-18 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/gpt-4o-mini)) | allowed |
 | o1_2024-12-17 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/o1)) | allowed (probe: 21% specific recall, all inferable from titles; loop.md 10.4) |
 | o3-mini_2025-01-31 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/o3-mini)) | allowed |
-| o3, o4-mini, gpt-4.1 family, gpt-oss-120b, codex-mini | 2024-06-01 (OpenAI model pages) | forbidden |
-| gpt-5, gpt-5.1 / gpt-5-mini, gpt-5-nano | 2024-09-30 / 2024-05-31 (OpenAI) | forbidden |
+| o4-mini_2025-04-16, gpt-4.1_2025-04-14 | 2024-06-01 (OpenAI model pages) | allowed **only** on papers dated more than 31 days after the cutoff, enforced by `must_obey_check.py` (probe 2026-10-26 on the 29 eligible papers: 19.0% and 12.1% vs 6.9% for the control; loop.md 16.3) |
+| o3_2025-04-16 | 2024-06-01 (OpenAI model pages) | **forbidden**: failed the memorisation probe (32.8% specific recall vs 6.9% for the control on the same papers) |
+| gpt-4.1 mini/nano, gpt-oss-120b, codex-mini | 2024-06-01 (OpenAI model pages) | forbidden (not probed) |
+| gpt-5_2025-08-07 | 2024-09-30 (OpenAI) | **forbidden**: failed the memorisation probe (43.5% specific recall vs 6.5% for the control on the 23 eligible papers) |
+| gpt-5.1 / gpt-5-mini, gpt-5-nano | 2024-09-30 / 2024-05-31 (OpenAI) | forbidden |
 | gpt-5.2, gpt-5.4 / gpt-5.5 / gpt-5.6 (sol, terra, luna) | 2025-08-31 / 2025-12-01 / **2026-02-16** (OpenAI) | forbidden; gpt-5.6-sol is judge, auditor, query writer and checker only |
 | Phi-4 / Phi-4-reasoning / Gemma 3 / Gemma 4 | 2024-06 / 2025-03 / 2024-08 / 2025-01 (model cards) | forbidden |
 | Qwen3.5 family (local Qwen3.5-35B-A3B), Qwen2.5-VL, DeepSeek-V3.2/V4, Mistral-Large-3, Kimi-K2.5/K2.6, grok-4.x | not published by the vendor; released 2025–2026 | forbidden. Qwen3.5 only extracts pre-cutoff papers, audited; DeepSeek-V4-Pro is cross-judge only |
@@ -300,3 +306,17 @@ Ablate before combining. Combine only components that helped or that address dif
     unavailable, like a 404, and is skipped by the open-full-text rule.
   - Extraction checks: a new extractor's output must be checked against the cached one before use. Llama's citer
     statements were first lost to a parser mismatch (loop.md 15.2), and the affected runs were redone.
+- 2026-10-26 (experiments 33–35, changes suggested by two model reviews; plan in loop.md 16.1):
+  - Measurement is checked before methods change: output audit, judge sanity controls, a candidate checklist judge
+    with a pre-registered adoption rule, failure triage and an answer-key audit. Answer keys stay frozen; flagged
+    papers are reported with and without.
+  - Any new judge rescores every compared arm.
+  - Generators with 2024 cutoffs may be used only on papers dated more than 31 days after their cutoff, and only
+    after a memorisation probe (2.1, 2.3). The model table records the outcome.
+  - A fresh held-out set, test4, is built by the rule in loop.md 16.1.
+  - Result (loop.md 16.5):
+    - The judges pass every sanity control. The checklist judge is not adopted. No answer key is flagged.
+    - o3 and gpt-5 failed the memorisation probe and are forbidden; a stated cutoff alone does not clear a
+      generator.
+    - No method change beats the incumbent, whose lead replicates on test4.
+    - test4 is spent.

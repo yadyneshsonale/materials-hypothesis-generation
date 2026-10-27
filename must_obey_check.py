@@ -27,14 +27,15 @@ BENCHMARKS = {"v3": ROOT / "experiments" / "high_temperature_hea_qwen35b" / "ben
               "v3.1": ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_v3_1" / "cases",
               "v4_scimon": ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_v4_scimon" / "cases"}
 # The `benchmark` field of a run names its frozen query set (test2/test3 runs were built with the v3.1 procedure).
-RUN_BENCHMARK = {"v3.1": "v3.1", "test2": "v3.1", "test3": "v3.1", "v4_scimon": "v4_scimon"}
-# Held-out sets built by the same procedure as a benchmark version and checked with it (loop.md sections 10.1, 11.1).
+RUN_BENCHMARK = {"v3.1": "v3.1", "test2": "v3.1", "test3": "v3.1", "test4": "v3.1", "v4_scimon": "v4_scimon"}
+# Held-out sets built by the same procedure as a benchmark version and checked with it (loop.md 10.1, 11.1, 16.1).
 EXTRA_CASES = {"v3.1": (ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_test2" / "cases",
-                        ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_test3" / "cases")}
-HELD_OUT_SPLITS = ("test", "test2", "test3")
+                        ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_test3" / "cases",
+                        ROOT / "experiments" / "high_temperature_hea_qwen35b" / "benchmark_test4" / "cases")}
+HELD_OUT_SPLITS = ("test", "test2", "test3", "test4")
 # Spent held-out splits were each used once for their pre-registered finals and are development data afterwards
 # (loop.md 11.1); the final-run rule applies only to unspent held-out splits.
-SPENT_SPLITS = ("test", "test2", "test3")
+SPENT_SPLITS = ("test", "test2", "test3", "test4")
 CURRENT = "v3.1"
 CASES = BENCHMARKS[CURRENT]
 
@@ -46,10 +47,17 @@ MODEL_CUTOFFS = {
     "gpt-4o-mini_2024-07-18": "2023-10-01",
     "o1_2024-12-17": "2023-10-01",
     "o3-mini_2025-01-31": "2023-10-01",
+    # 2024 cutoffs: query-facing only on papers dated more than MARGIN_DAYS after the cutoff, after a memorisation
+    # probe (must_obey.md 2.1, 2.3; loop.md 16.1). o3 and gpt-5 failed the probe (loop.md 16.3) and are not listed,
+    # so any run with them fails this check.
+    "o4-mini_2025-04-16": "2024-06-01",
+    "gpt-4.1_2025-04-14": "2024-06-01",
 }
 LEAK_COUNTERS = ("temporal_violations", "test_paper_leaks", "family_leaks", "target_doi_or_title_leaks",
                  "invalid_citations", "unknown_record_ids")
 MARGIN_DAYS = 31
+# Generators with 2024 cutoffs: the one-month margin is a hard rule for them, not a flag (loop.md 16.1).
+STRICT_MARGIN = frozenset({"o4-mini_2025-04-16", "gpt-4.1_2025-04-14"})
 
 
 def deployment(identity: str) -> str:
@@ -113,6 +121,9 @@ def check(run_dir: Path, loop: bool = False, require_cross: bool = True, bench: 
             gap = (case_date - date.fromisoformat(cutoff)).days
             if gap <= 0:
                 failures.append(f"{rid}: {role} model {name} cutoff {cutoff} is not before case date {case_date}")
+            elif name in STRICT_MARGIN and gap <= MARGIN_DAYS:
+                failures.append(f"{rid}: {role} model {name} may only run on papers more than {MARGIN_DAYS} days "
+                                f"after its cutoff {cutoff} (case date {case_date})")
             elif gap < MARGIN_DAYS:
                 margin_flags.add(f"{run['paper_id']} is {gap} days after {name}'s cutoff")
         audit = run.get("audit") or {}

@@ -1,0 +1,67 @@
+{
+  "run_id": "PMC11375216__problem_constrained__writer_only_b_o3__s2",
+  "paper_id": "PMC11375216",
+  "query_level": "problem_constrained",
+  "method": "writer_only_b_o3",
+  "sample": 2,
+  "split": "dev",
+  "final": false,
+  "benchmark": "v3.1",
+  "query": "For bulk HfNbTaTiZr, what testable hypothesis could an unspecified predictive approach make to overcome the limited accuracy of available analytical predictions and their usual restriction to perfect, defect-free crystals? Address the nearly 0–200 K regime and the 300–1200 K regime, for which measurements also exist on a specimen containing 1 wt.% oxygen; explain why the approach should improve accuracy, predict its advantage over existing analytical approaches, define its temperature and sample applicability limits, identify supporting prior evidence, and specify a held-out conductivity benchmark and result that would falsify the hypothesis.",
+  "publication_date": "2024-09-04",
+  "models": {
+    "writer": "trapi:o3_2025-04-16"
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "A first-principles-trained machine–learning interatomic potential (MLIP) coupled to (1) Green–Kubo molecular-dynamics evaluation of the phonon heat current and (2) Kubo–Greenwood electronic conductivity, both performed on chemically disordered supercells that explicitly include ~1 wt.% interstitial oxygen, will predict the total thermal conductivity κ(T) of equiatomic bulk HfNbTaTiZr within ±10 % of experiment for 20–200 K and within ±15 % for 300–1200 K, whereas state-of-the-art analytical models (Debye–Callaway+Klemens/Nordheim) deviate by ≥ 40 %.",
+    "material_initial_state": "Polycrystalline, equiatomic HfNbTaTiZr high-entropy alloy, average grain diameter ≥ 50 µm, two impurity levels: (i) O ≤ 0.05 wt.% (nominally oxygen-free), (ii) O = 1.0 ± 0.1 wt.% interstitial oxygen; residual vacancy concentration ≤ 10⁻³, no long-range order.",
+    "intervention": "Apply the MLIP+Green–Kubo/Kubo–Greenwood multiscale simulation workflow trained on ∼2,000 density-functional theory snapshots that include random site disorder, thermal displacements up to 1500 K, and explicit O interstitials.",
+    "conditions": "Zero external pressure, inert Ar atmosphere; temperature sweep from 2 K to 1200 K in 20 K steps (2–200 K) and 50 K steps (300–1200 K).",
+    "structural_mediator": "Point-defect (mass disorder and interstitial O) scattering of electrons and phonons captured explicitly in the disordered supercells used for the transport calculations.",
+    "mechanism": "The MLIP reproduces the full anharmonic potential energy surface of the chemically disordered alloy, so Green–Kubo MD samples realistic phonon lifetimes and heat currents, while the same configurations feed Kubo–Greenwood evaluations of the electronic contribution. Treating (i) simultaneous mass and force-constant fluctuations, (ii) electron–phonon scattering, and (iii) oxygen-induced local strain fields removes the perfect-crystal assumption that limits analytic Debye/Klemens models, yielding smaller systematic errors.",
+    "predicted_outcome": "Total κ(T) for oxygen-free material: κ(20 K)=2.5 ± 0.3 W m⁻¹ K⁻¹; κ(100 K)=7 ± 0.7; κ(200 K)=9 ± 0.9; κ(300 K)=11 ± 1.1; κ(600 K)=20 ± 2; κ(1000 K)=34 ± 3; κ(1200 K)=38 ± 4. Addition of 1 wt.% O lowers κ by 12–18 % across the entire range (e.g., κ_O(300 K)=9.5 ± 1 W m⁻¹ K⁻¹). Average absolute deviation from experiment ≤ 10 % (20–200 K) and ≤ 15 % (300–1200 K).",
+    "baseline": "Debye–Callaway + Klemens/Nordheim analytical models assuming perfect crystals and point-mass disorder predict κ(300 K) ≈ 17 W m⁻¹ K⁻¹ and κ(1000 K) ≈ 55 W m⁻¹ K⁻¹, giving 40–60 % errors and fail to reproduce the low-T upturn below 30 K.",
+    "boundary": "Validity limited to: (a) oxygen content ≤ 1 wt.% (no oxide precipitation), (b) grain size ≥ 10 µm (phonon mean free path still < grain size above 20 K), (c) temperatures 2–1200 K where no solid–solid phase change occurs, (d) random solid solution (no long-range ordering >5 %).",
+    "uncertainty": "Potential under-sampling of rare but strongly scattering local motifs, neglect of magnetic scattering (assumed negligible), and MLIP transferability above 1200 K are untested; short-range chemical ordering could reduce accuracy if present.",
+    "supporting_evidence_ids": [],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Synthesize arc-melted HfNbTaTiZr with 1.0 wt.% O (verified by LECO analysis). Prepare a 5 mm-thick disk; anneal at 1473 K/24 h to ensure homogeneity; measure density by Archimedes. Measure κ(T) on the same specimen by: (i) PPMS thermal transport (2–300 K), (ii) laser-flash analysis in flowing Ar (300–1200 K). Repeat on an oxygen-lean sample (≤ 0.05 wt.% O). Compare to simulation predictions produced without using these data.",
+      "measurements": [
+        "Total thermal conductivity κ(T) at 2–200 K and 300–1200 K",
+        "Electrical resistivity ρ(T) for Lorenz-number cross-check",
+        "Oxygen content and distribution (LECO + TEM-EDS)"
+      ],
+      "falsification_rule": "If the measured κ(T) differs from the pre-registered MLIP prediction by > 15 % at any temperature above 30 K or by > 25 % below 30 K for either oxygen level, the hypothesis is falsified."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "seen_ids": [],
+  "cited_ids": [],
+  "cited_evidence": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "writer",
+      "model": "o3_2025-04-16",
+      "chars_in": 1753,
+      "chars_out": 4127,
+      "seconds": 23.91
+    }
+  ],
+  "llm_calls": 1,
+  "notes": {},
+  "chars_in": 1753,
+  "elapsed_seconds": 23.91
+}

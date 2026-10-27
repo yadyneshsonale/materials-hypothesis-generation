@@ -1,0 +1,68 @@
+{
+  "run_id": "PMC11606917__expert_context__writer_only_b_o3__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "expert_context",
+  "method": "writer_only_b_o3",
+  "sample": 1,
+  "split": "dev",
+  "final": false,
+  "benchmark": "v3.1",
+  "query": "Earlier empirical-potential and first-principles studies primarily targeted phase-transition temperature, while other fusion properties remain difficult because they require free energies on both sides of the transition with vibrational entropy, anharmonicity, and electron–vibration coupling retained. Explicit ab initio free-energy evaluation is highly accurate but depends on costly molecular dynamics. TOR-TILD increased throughput for elemental and binary systems, yet slows substantially for multicomponent high-entropy systems. Under the constraint that the free energies of both solid and fluid states and the relevant entropy terms remain faithful, what single testable methodological hypothesis could substantially reduce the cost of obtaining fusion and high-temperature thermodynamic properties? State the proposed intervention and why it should work, predict its speed and fidelity relative to explicit ab initio molecular-dynamics workflows and TOR-TILD, define composition and temperature boundaries, cite supporting evidence from prior elemental or binary results, and specify a decisive benchmark of phase free energies and derived observables that would falsify the hypothesis.",
+  "publication_date": "2024-11-29",
+  "models": {
+    "writer": "trapi:o3_2025-04-16"
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Training a compositional-transferable machine-learning interatomic potential (ML-IP) with on-the-fly Δ-learning corrections to density-functional theory (DFT) energies, and coupling it to thermodynamic integration (TI) for both crystalline and liquid branches, can recover fusion free energies of multicomponent alloys to within ±10 meV atom⁻¹ while reducing wall-time by >10³× relative to full ab-initio molecular dynamics (AIMD) and by ≈10× relative to TOR-TILD.",
+    "material_initial_state": "Face-centred-cubic (fcc) CoCrFeMnNi high-entropy alloy at 0 K, fully relaxed DFT structure (4×4×4 conventional cell, stoichiometric).",
+    "intervention": "Replace explicit AIMD in each TI leg by an actively learned Moment-Tensor Potential (MTP) fitted on-the-fly to a sparse (≈10⁴) set of DFT single-point calculations along the MD trajectory; apply a Δ-learning layer that adds a small neural network trained to the residual DFT error at the TI reference points.",
+    "conditions": "Compositions spanning CoₓCrᵧFe_zMn_uNi_{1−x−y−z−u} with any x,y,z,u ∈ [0,0.4] and temperatures T ∈ [0.5 T_m, 1.2 T_m] (where T_m is the experimental melting point of each composition).",
+    "structural_mediator": "Actively learned MTP + Δ-NN captures anharmonic and electronic free-energy contributions that standard ML-IPs lose, because the Δ-layer is periodically re-fitted on a small subset of DFT forces sampled along both solid and liquid TI paths.",
+    "mechanism": "The ML-IP reproduces atomic forces at ≈1 meV Å⁻¹ error, enabling 5 ps MD timesteps at 10⁴× lower computational cost than AIMD; the Δ-learning compensates for electronic free-energy terms (e.g. electron–phonon coupling) by learning the DFT−MTP residual, thereby preserving the accuracy of DFT-based TI while evaluating most force calls with the cheap MTP.",
+    "predicted_outcome": "Fusion free energies and derived melting temperatures will match fully converged AIMD-TI results to within ±10 meV atom⁻¹ (≈50 K in T_m). Computational time will be reduced by >10³× vs. AIMD-TI (hours instead of CPU-years) and by ≈10× vs. published TOR-TILD runs on binaries, enabling practical studies of 5-component alloys.",
+    "baseline": "Explicit DFT-based TI using 96-atom NVT AIMD trajectories (2 fs, 50 ps) for both solid and liquid, sampling 8 λ-points with 10 k-points, as reported in prior elemental and binary studies.",
+    "boundary": "Hypothesis expected to hold only for 3d/4d/5d transition-metal alloys without strong magnetic or charge-transfer ordering below 0.5 T_m; fails for systems requiring beyond-DFT methods (e.g. f-electron materials) or where long-range magnetic excitations dominate the entropy.",
+    "uncertainty": "Residual free-energy error may exceed 10 meV atom⁻¹ if active learning misses rare liquid configurations or if electronic entropy varies non-smoothly with composition; size effects for >1500-atom boxes remain untested.",
+    "supporting_evidence_ids": [],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Compute solid and liquid Helmholtz free energies of equiatomic CoCrFeMnNi with three methods: (i) full AIMD-TI (baseline), (ii) TOR-TILD, (iii) proposed active-learning MTP+Δ-TI. Simulate 128-atom supercells, 8 λ-points, 50 ps sampling each, at 1800 K (liquid) and 1500 K (solid) with finite-temperature electronic free energies included.",
+      "measurements": [
+        "Helmholtz free energy per atom for solid",
+        "Helmholtz free energy per atom for liquid",
+        "Resulting melting temperature from crossing of Gibbs free-energy curves",
+        "Wall-clock CPU hours consumed"
+      ],
+      "falsification_rule": "Hypothesis is falsified if (a) |F_solid^ML − F_solid^AIMD| > 10 meV atom⁻¹ OR |F_liquid^ML − F_liquid^AIMD| > 10 meV atom⁻¹, OR (b) predicted T_m differs from AIMD result by more than 50 K, OR (c) total computational cost reduction is <100× relative to AIMD-TI."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "seen_ids": [],
+  "cited_ids": [],
+  "cited_evidence": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "writer",
+      "model": "o3_2025-04-16",
+      "chars_in": 2298,
+      "chars_out": 3839,
+      "seconds": 16.14
+    }
+  ],
+  "llm_calls": 1,
+  "notes": {},
+  "chars_in": 2298,
+  "elapsed_seconds": 16.14
+}

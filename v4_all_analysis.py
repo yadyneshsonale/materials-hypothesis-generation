@@ -41,7 +41,10 @@ JUDGES = ("gpt", "deep")
 
 
 def harness_configs() -> list[str]:
-    return sorted(p.name for p in A.V31_ROOT.iterdir() if (p / "runs").is_dir() and p.name not in REPLICATES)
+    """Experiment 32's configurations: every harness configuration re-run on v4 (those with runs in loop_v4_scimon/),
+    all of which also have v3.1 runs. Later configurations (experiment 34) are not part of it."""
+    return sorted(p.name for p in A.V4_ROOT.iterdir() if (p / "runs").is_dir() and (A.V31_ROOT / p.name / "runs")
+                  .is_dir() and p.name not in REPLICATES)
 
 
 def holm_family(items: list[dict[str, Any]]) -> list[dict[str, Any]]:

@@ -1,0 +1,68 @@
+{
+  "run_id": "PMC11606917__problem_constrained__writer_only_b_o3__s2",
+  "paper_id": "PMC11606917",
+  "query_level": "problem_constrained",
+  "method": "writer_only_b_o3",
+  "sample": 2,
+  "split": "dev",
+  "final": false,
+  "benchmark": "v3.1",
+  "query": "For multicomponent high-entropy alloys in solid and liquid states at and near their high melting temperatures, what single testable methodological intervention could overcome the inability of EAM references to represent the many atomic configurations of the ab initio liquid? Explain why it should improve reference–target phase-space overlap, predict the reduction in thermodynamic-integration path mismatch relative to TOR-TILD’s EAM references, define the applicable composition and temperature ranges, identify supporting evidence from elemental or binary calculations, and specify a decisive free-energy benchmark that would falsify the hypothesis.",
+  "publication_date": "2024-11-29",
+  "models": {
+    "writer": "trapi:o3_2025-04-16"
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Replacing the embedded-atom method (EAM) reference potential in TOR-TILD free-energy calculations by a machine-learning interatomic potential (ML-IAP) trained on ab-initio snapshots of both solid and liquid configurations will enlarge reference–target phase-space overlap for multicomponent high-entropy alloys (HEAs). Consequently, the variance of the DFT–reference energy difference ⟨(ΔE)²⟩ along the thermodynamic-integration (TI) path will fall by a factor of ≈4–6 relative to the best available EAM references, cutting the number of λ-windows (or MD steps per window) required to converge the solid↔liquid free-energy difference by at least one half.",
+    "material_initial_state": "Near-equiatomic face-centred-cubic (FCC) or body-centred-cubic (BCC) multicomponent high-entropy alloys such as CoCrFeMnNi or MoNbTaW prepared either as crystalline solids at 0.9 T_m or homogeneous liquids at 1.1 T_m.",
+    "intervention": "Generate a short (≈10 ps) ab-initio molecular-dynamics trajectory for each phase at 0.8–1.2 T_m, select a few thousand diversified frames, and fit a chemically-aware local ML-IAP (e.g. moment-tensor or neural-network potential). Use this ML-IAP as the reference Hamiltonian in TOR-TILD instead of the conventional EAM reference.",
+    "conditions": "Temperatures: 0.8–1.2 of the alloy solidus (≈1300–1700 K for CoCrFeMnNi; ≈2000–3000 K for refractory BCC HEAs). Compositions: 3–5 principal elements with 10–40 at.% spread around equiatomic. Pressures: 0–5 GPa.",
+    "structural_mediator": "The ML-IAP encodes local many-body chemical environments up to a cutoff of ≈6 Å, accurately reproducing DFT forces and energies for the disordered solid and liquid snapshots that dominate the Boltzmann weight near melting.",
+    "mechanism": "Better energetic fidelity across the full ensemble lowers |ΔE| and its fluctuations, so the TI integrand ∂F/∂λ = ⟨ΔE⟩_λ becomes smoother. Reduced variance in ⟨ΔE⟩_λ directly lowers statistical integration error, improving overlap between reference and target probability distributions and stabilising reweighting factors.",
+    "predicted_outcome": "For the prototypical CoCrFeMnNi alloy at 1600 K: 1) the ML-IAP will achieve force RMS errors <50 meV Å⁻¹ versus >200 meV Å⁻¹ for the best EAM; 2) ⟨(ΔE)²⟩ along the TI path will be 4–6 × smaller; 3) the solid–liquid free-energy difference will converge to ±2 meV atom⁻¹ with ≤8 λ-points versus ≥20 required for EAM; 4) the derived melting temperature will shift by <30 K upon doubling the MD length, whereas the EAM-based path will vary by >100 K.",
+    "baseline": "TOR-TILD calculations that employ state-of-the-art composition-averaged or composition-dependent EAM references for the same HEAs and thermodynamic conditions.",
+    "boundary": "If the alloy contains >10 elements, exhibits strong electronic or magnetic transitions, or is studied far from 0.8–1.2 T_m, the limited training set may not span the relevant phase space and the improvement could vanish.",
+    "uncertainty": "The magnitude of the variance reduction depends on the quality and transferability of the ML training set; insufficient sampling of rare liquid configurations could leave residual overlap gaps.",
+    "supporting_evidence_ids": [],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Perform two independent TOR-TILD free-energy calculations for equiatomic CoCrFeMnNi at 1600 K: one with an ML-IAP reference obtained as described, the other with the literature-best EAM reference. Use identical λ-schedules and MD lengths (e.g. 10 λ-points, 20 ps each).",
+      "measurements": [
+        "RMS force error of reference vs DFT along the TI path",
+        "Variance ⟨(ΔE)²⟩ at each λ",
+        "Statistical error in integrated free energy ΔF_s→l",
+        "Number of λ-points and trajectory length needed to reach ±2 meV atom⁻¹ precision"
+      ],
+      "falsification_rule": "If the ML-IAP does NOT reduce ⟨(ΔE)²⟩ by at least a factor of 3 OR fails to decrease the statistical error in ΔF_s→l by at least a factor of 2 relative to EAM under identical sampling effort, the hypothesis is falsified."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "seen_ids": [],
+  "cited_ids": [],
+  "cited_evidence": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "writer",
+      "model": "o3_2025-04-16",
+      "chars_in": 1756,
+      "chars_out": 4042,
+      "seconds": 17.73
+    }
+  ],
+  "llm_calls": 1,
+  "notes": {},
+  "chars_in": 1756,
+  "elapsed_seconds": 17.73
+}

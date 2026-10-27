@@ -1,4 +1,4 @@
-# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 32)
+# Experiment log: high-temperature HEA hypothesis generation (experiments 0 to 35)
 
 Related work (9 hypothesis-generation and materials-KG papers, with how each separates input from answer):
 [RELATED_WORK.md](./RELATED_WORK.md).
@@ -63,6 +63,9 @@ Dates are the dates the runs or commits were made (Pacific time for 2026-10-21 a
 | 30 | 2026-10-26 | Expert evaluation of the AI judge: blind package of 20 questions × 3 hypotheses (o3-mini writer, Llama baseline, the actual study rewritten as a proposal), two-part rating (blind quality; agreement with the paper), unblinding key and pre-registered analysis | 60 items; 20 reference rewrites | GPT-5.6 (reference rewriter) | GPT-5.6, DeepSeek-V4-Pro (+ the expert) | Package ready; awaiting ratings | [expert_evaluation/](../../expert_evaluation/), [expert_eval/](./expert_eval/) |
 | 31 | 2026-10-26 | SciMON-style user input (benchmark v4): abstract Background sentences + a task-side seed term in SciMON's template, leakage-gated; 4 configurations compared with v3.1 on the same 36 papers | 288 runs | o3-mini (labeller, extractor, generator), Llama-3.3-70B (pre-cutoff) | GPT-5.6, DeepSeek-V4-Pro | Complete. v4 not better; v3.1 stays the main input | [benchmark_v4_scimon/](./benchmark_v4_scimon/README.md), [loop_v4_scimon/](./loop_v4_scimon/README.md), [loop.md](../../loop.md) section 14 |
 | 32 | 2026-10-26 | Every experiment re-run on the SciMON-style input: all 52 harness configurations (experiments 24, 26, 28, 29, 31) on 36 papers, and the experiment-21 suite (7, 9, 11, 14, 16, 17) on its 12 papers, with citation graphs rebuilt from the v4 input | 3,456 new harness runs + 504 suite runs, 24 revisions, 24 selections | o3-mini, o1, gpt-4o-mini, Llama-3.3-70B (pre-cutoff; Llama also extracts new citation-graph papers) | GPT-5.6, DeepSeek-V4-Pro | Complete, verified. Conclusions unchanged (rank ρ 0.77); writer > Llama not robust on the 9 clean v4 inputs | [loop_v4_scimon/](./loop_v4_scimon/README.md), [rerun_v4_scimon/](./rerun_v4_scimon/README.md), [loop.md](../../loop.md) section 15 |
+| 33 | 2026-10-26 | Measurement checks suggested by two model reviews: output audit, judge sanity controls, two-judge mean, checklist judge, failure triage, answer-key audit | 10,896 runs audited; 216 controls; 936 runs rescored; 60 triaged; 36 keys | none (code-built controls) | GPT-5.6, DeepSeek-V4-Pro | Complete. Judges pass every control (AUC 1.00); checklist not adopted; no key flagged | [review_eval/](./review_eval/README.md), [loop.md](../../loop.md) section 16 |
+| 34 | 2026-10-26 | Method changes suggested by the reviews on the 36 spent papers: stronger generators (gpt-4o, gpt-4.1, o4-mini; o3 and gpt-5 excluded by the memorisation probe), few-shot worked examples, question-type router | 1,452 runs + 364 probe calls | o3-mini, gpt-4o, gpt-4.1, o4-mini (pre-cutoff per paper) | GPT-5.6, DeepSeek-V4-Pro | Complete. No finalist: nothing beats the o3-mini writer | [loop/](./loop/README.md), [loop.md](../../loop.md) section 16.3 |
+| 35 | 2026-10-26 | Fresh held-out test4 (pre-registered rule) and the replication of the incumbent vs the Llama baseline | 9 papers; 108 final runs | o3-mini, Llama-3.3-70B | GPT-5.6, DeepSeek-V4-Pro | Complete. Replicates: +0.12 / +0.26; over 37 fresh papers +0.11 (p = 0.003) | [benchmark_test4/](./benchmark_test4/README.md), [loop.md](../../loop.md) section 16.4 |
 
 ## Correction to section 8 (MatKG)
 
@@ -1407,7 +1410,86 @@ loop.md 15.1, including the scope and the reasons for what was not re-run.
 - **Retrieval-based methods are the most input-sensitive.** The v4 citation graphs share 1 of 10 seeds with
   experiment 21's; three graph arms fall by 0.12–0.18.
 
-## Comparability and limits, experiments 8 to 32
+## Experiment 33: measurement checks suggested by two model reviews
+
+**Why.** Two model reviews (Opus 5.5 and GPT 6.1) advised checking the measurement before changing methods: parsing
+failures, judge reliability, the rubric's granularity, and label (answer-key) errors. Plan pre-registered in loop.md
+16.1. Scripts: [review_measurement.py](../../review_measurement.py), [checklist_judge.py](../../checklist_judge.py).
+
+**Results.**
+- **Output audit** (10,896 runs). 4 empty core fields, 23 abstentions, 15 truncation retries, 1 failed run. No
+  configuration used in a claim exceeds 2% format failures.
+- **Judge sanity controls** (216 items built by code from the answer keys).
+  - The true answer scores 3.90 (GPT-5.6) / 4.00 (DeepSeek); another paper's answer 0.00–0.15; a generic hypothesis
+    0.10–0.13.
+  - Swapping the intervention or the mechanism lowers that dimension most.
+  - AUC 1.00 for both judges; all four pre-registered checks pass.
+- **Two-judge mean.** Incumbent writer − Llama over the 28 fresh papers: +0.19 [+0.12, +0.28], p = 0.0015.
+- **Checklist judge.** 430 atomic facts from the 36 keys.
+  - It works: retest ρ 0.86, quotes 99.7% verified, control AUC 1.00.
+  - But it lowers inter-judge agreement (ρ 0.45 vs 0.58 for the 0–4 judge), so by the pre-registered rule it is not
+    adopted.
+- **Failure triage** (60 runs). Low scores are not judge or key errors (0–3%).
+  - GPT-5.6 calls most low-scoring hypotheses valid alternatives the paper did not test (41 of 60).
+  - DeepSeek calls them wrong (45 of 60), κ = 0.05.
+- **Answer-key audit.** GPT-5.6 rated 4 keys major (DeepSeek: minor); 0 meet the flag rule.
+
+## Experiment 34: method changes suggested by the reviews
+
+**Setup.** On the 36 spent papers ("dev36"), v3.1 input, 3 levels × 2 samples. Each configuration is compared with a
+fresh replicate of the incumbent (loop.md 16.1, B0–B3):
+- the incumbent's single writer call on stronger pre-cutoff generators, each only on papers dated more than 31 days
+  after its cutoff;
+- few-shot worked examples (three earlier papers' questions and their actual studies, chosen similar or diverse);
+- a question-type router.
+
+**Memorisation probe** (title and year only; excluded if more than 15 points above Llama-3.3 on the same papers).
+
+| Model | Specific recall | Llama-3.3 | Decision |
+|---|---:|---:|---|
+| gpt-4o | 4.2% | 5.6% | used |
+| gpt-4.1 | 12.1% | 6.9% | used |
+| o4-mini | 19.0% | 6.9% | used |
+| o3 | 32.8% | 6.9% | **excluded** |
+| gpt-5 | 43.5% | 6.5% | **excluded** |
+
+The excluded models' runs are kept unanalysed in [loop/excluded_by_probe/](./loop/excluded_by_probe/README.md).
+
+**Results** (vs the replicate; GPT-5.6 / DeepSeek).
+
+| Configuration | Change |
+|---|---|
+| gpt-4o | +0.04 [−0.02, +0.10] / −0.08 |
+| gpt-4.1 | +0.02 / −0.02 |
+| o4-mini | **−0.14** (Holm p = 0.009) / −0.21 |
+| few-shot, similar | +0.01 / +0.04 |
+| few-shot, diverse | −0.00 / −0.01 |
+| router | +0.01 / +0.01 |
+
+- No configuration meets the finalist rule (GPT-5.6 CI above zero and DeepSeek positive).
+- The router's question types agree with the gap labels 99.1% of the time.
+- The few-shot examples carry no injected answer words (ratio 0.88 vs other cases).
+
+## Experiment 35: fresh held-out test4 and the replication
+
+**Construction** ([benchmark_test4/](./benchmark_test4/README.md)). The rule was pre-registered in loop.md 16.1 C1:
+2024-11-01 onward, the same procedure as test2 and test3, the first 24 that qualify.
+- Only 9 of 66 screened papers qualified, recorded before any case was read (loop.md 16.1, addendum 2).
+- All 9 are design questions; 24 of 27 levels pass the gate; answer-word overlap is 1.2–3.8%.
+- The answer-key audit flags none.
+
+**Finals** (run once; no finalist, so the incumbent writer and the Llama baseline only).
+
+| | GPT-5.6 | DeepSeek | Two-judge mean | Checklist, GPT-5.6 |
+|---|---|---|---|---|
+| test4, 9 papers | +0.12 [+0.02, +0.21] | +0.26 [+0.10, +0.41] | +0.19 [+0.09, +0.29], p = 0.039 | −0.03 |
+| All 37 fresh papers (exploratory) | +0.11 [+0.06, +0.17], 26 / 8 papers, p = 0.003 | +0.27, p = 0.0001 | +0.19, p = 0.0001 | – |
+
+- The incumbent's lead replicates on fresh papers and is now the project's most robust result.
+- The checklist finds no lead: both systems match only about 6–15% of each paper's specific facts. The advantage is in
+  overall closeness, not in reproducing the paper's concrete study.
+
+## Comparability and limits, experiments 8 to 35
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -1455,3 +1537,11 @@ loop.md 15.1, including the scope and the reasons for what was not re-run.
   - The suite's citation graphs mix Qwen (cached) and Llama-3.3 (new, 44% of full-text papers) extractions. Llama
     yields fewer citer statements per paper (30 vs 37).
   - Only 9 harness and 3 suite papers have clean v4 inputs.
+- Experiments 33–35 follow two model reviews written without access to this project. Only their generic
+  suggestions that were new here were run (loop.md 16.1).
+  - The memorisation probe, not the stated cutoff, decided which stronger models could be used. o3 and gpt-5 failed.
+  - test4 has only 9 papers, so its own intervals are wide. The pooled 37-paper estimate is exploratory, as in rounds
+    2–3.
+  - The checklist judge was not adopted. Its scores are reported as secondary and measure exact fact recovery, a
+    stricter target than the 0–4 judges.
+  - The triagers' split between "valid alternative" and "wrong" is unresolved without the expert ratings.

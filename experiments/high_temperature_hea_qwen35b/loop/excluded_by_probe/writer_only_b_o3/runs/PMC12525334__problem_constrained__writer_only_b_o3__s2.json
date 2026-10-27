@@ -1,0 +1,68 @@
+{
+  "run_id": "PMC12525334__problem_constrained__writer_only_b_o3__s2",
+  "paper_id": "PMC12525334",
+  "query_level": "problem_constrained",
+  "method": "writer_only_b_o3",
+  "sample": 2,
+  "split": "test2",
+  "final": false,
+  "benchmark": "test2",
+  "query": "For reported HfNbTiVAl10 with a hierarchical heterostructure, what testable hypothesis could enable Young’s modulus, yield strength, and fracture-related behavior to be predicted more rapidly and accurately under tensile and fracture testing than with established simulations? State the hypothesized rationale, the measurable gains in predictive accuracy and efficiency, circumstances in which the hypothesis may fail, relevant supporting evidence, and a predeclared result from independent measurements that would decisively falsify it.",
+  "publication_date": "2025-09-01",
+  "models": {
+    "writer": "trapi:o3_2025-04-16"
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "A physics-informed graph neural-network surrogate (PiGNN) that encodes the hierarchical grain/phase topology of HfNbTiVAl10 as a multiscale graph will predict Young’s modulus, 0.2 % offset yield strength, and fracture toughness under monotonic tensile and fracture loading with substantially higher accuracy (≤ 3–7 % mean absolute percentage error) and ≈ 10²-fold lower computational cost than state-of-the-art crystal-plasticity finite-element (CPFEM) and cohesive-zone simulations, provided the alloy’s microstructure lies within the training domain.",
+    "material_initial_state": "HfNbTiVAl10 high-entropy alloy bar, thermomechanically processed to a hierarchical heterostructure consisting of 50 nm–10 µm FCC/BCC grains and Al-rich nanoprecipitates, tested in the solution-annealed condition (no irradiation, <5 vol % intermetallics).",
+    "intervention": "Replace conventional CPFEM + cohesive-zone modelling with a PiGNN surrogate trained on <200 microstructure–property datapoints that incorporate 3D EBSD grain maps and tomography-derived phase topology as graph inputs.",
+    "conditions": "Room temperature (25 °C) to 400 °C, quasi-static strain rate 10⁻⁴–10⁻² s⁻¹ tensile and single-edge-notched bend tests conducted in air.",
+    "structural_mediator": "Multiscale graph representation of the grain/phase network (nodes: grains, precipitates; edges: orientation and composition misorientation, interface curvature) that transmits long-range constraint information to the neural message-passing layers.",
+    "mechanism": "The graph captures the heterostructure’s load-sharing pathways; message-passing layers learn elastic-plastic constitutive relations constrained by physics-based loss terms (elastic symmetry, plastic work). This reduces the need to solve the full set of crystal-plasticity equations, accelerating inference while retaining microstructure sensitivity.",
+    "predicted_outcome": "On previously unseen test microstructures the PiGNN will achieve:  • Young’s modulus MAPE ≤ 3 %  • Yield strength MAPE ≤ 5 %  • Plane-strain fracture toughness K_IC MAPE ≤ 7 %  with prediction latency < 1 s on a single GPU, versus ~10–15 % MAPE and ≈ 1 h CPU time for CPFEM.",
+    "baseline": "Commercial or open-source CPFEM coupled to cohesive-zone fracture modelling using experimentally fitted parameters, run on a workstation with 16 CPU cores (~1 h per simulation).",
+    "boundary": "Accuracy holds only for microstructures whose grain-size distribution, phase fraction (<5 vol % intermetallic), temperature (≤400 °C), and strain rate (10⁻⁴–10⁻² s⁻¹) fall within the training envelope; performance may degrade for irradiation-damaged, highly-cold-worked, or precipitate-overaged states.",
+    "uncertainty": "Generalisation to other alloy chemistries and extreme loading paths (fatigue, high-strain-rate impact) is untested; limited training data may omit rare crack-initiation modes, risking overfitting.",
+    "supporting_evidence_ids": [],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Generate 20 independent HfNbTiVAl10 specimens with microstructures not used during training. Measure Young’s modulus (ultrasonic pulse-echo), 0.2 % offset yield strength (quasi-static tension), and plane-strain K_IC (ASTM E399 single-edge-notched bend). Predict the same properties with the locked PiGNN and with a calibrated CPFEM model. Record wall-clock prediction times.",
+      "measurements": [
+        "Young’s modulus",
+        "0.2 % yield strength",
+        "Fracture toughness K_IC",
+        "Prediction latency"
+      ],
+      "falsification_rule": "The hypothesis is falsified if either (a) the PiGNN’s MAPE exceeds 7 % for any two of the three properties or its average MAPE exceeds the CPFEM baseline by >2 %, or (b) the mean prediction latency is >10 min per specimen."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "seen_ids": [],
+  "cited_ids": [],
+  "cited_evidence": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "writer",
+      "model": "o3_2025-04-16",
+      "chars_in": 1640,
+      "chars_out": 3748,
+      "seconds": 19.05
+    }
+  ],
+  "llm_calls": 1,
+  "notes": {},
+  "chars_in": 1640,
+  "elapsed_seconds": 19.05
+}

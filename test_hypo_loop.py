@@ -144,14 +144,17 @@ class Bm25PackTests(unittest.TestCase):
 
 class Test2SplitTests(unittest.TestCase):
     def test_spent_splits_are_development_and_all_is_the_original_12(self) -> None:
-        self.assertEqual(set(H.SPENT), {"test", "test2", "test3"})
-        for split in ("test", "test2", "all", "dev3", "all36"):  # spent held-out splits need no --final
+        self.assertEqual(set(H.SPENT), {"test", "test2", "test3", "test4"})
+        self.assertEqual(set(H.HELD_OUT), {"test", "test2", "test3", "test4"})
+        for split in ("test", "test2", "all", "dev3", "all36", "test4", "fresh37"):  # spent: no --final needed
             self.assertFalse(H.SPLITS[split] & (set(H.HELD_OUT) - set(H.SPENT)))
         self.assertEqual(H.SPLITS["all"], {"dev", "test"})
         self.assertEqual(H.SPLITS["dev3"], {"dev", "test", "test2"})
         self.assertEqual(H.SPLITS["all36"], {"dev", "test", "test2", "test3"})
+        self.assertEqual(H.SPLITS["fresh37"], {"test", "test2", "test3", "test4"})
         self.assertEqual(H.split_of({"split": "test2"}), "test2")
         self.assertEqual(H.split_of({"split": "test3"}), "test3")
+        self.assertEqual(H.split_of({"split": "test4"}), "test4")
         self.assertEqual(H.split_of({"split": "validation"}), "dev")
 
     def test_final_hypothesis_keeps_only_schema_fields(self) -> None:

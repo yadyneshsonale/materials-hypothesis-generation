@@ -1,0 +1,67 @@
+{
+  "run_id": "PMC11606917__problem_constrained__writer_only_b_o3__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "problem_constrained",
+  "method": "writer_only_b_o3",
+  "sample": 1,
+  "split": "dev",
+  "final": false,
+  "benchmark": "v3.1",
+  "query": "For multicomponent high-entropy alloys in solid and liquid states at and near their high melting temperatures, what single testable methodological intervention could overcome the inability of EAM references to represent the many atomic configurations of the ab initio liquid? Explain why it should improve reference–target phase-space overlap, predict the reduction in thermodynamic-integration path mismatch relative to TOR-TILD’s EAM references, define the applicable composition and temperature ranges, identify supporting evidence from elemental or binary calculations, and specify a decisive free-energy benchmark that would falsify the hypothesis.",
+  "publication_date": "2024-11-29",
+  "models": {
+    "writer": "trapi:o3_2025-04-16"
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Replacing the embedded-atom-method (EAM) reference in TOR-TILD free-energy calculations for chemically complex, near-equiatomic high-entropy alloys (HEAs) with a composition-specific, actively trained moment-tensor potential (MTP) will raise reference–target phase-space overlap enough that the fluctuation bias in the liquid free-energy leg is cut by ≥5× (to <2 meV atom⁻¹) relative to the best available EAM references.",
+    "material_initial_state": "Chemically disordered fcc CoCrFeMnNi (representative 5-component HEA) prepared either as solid at 0.9 T_m or as undercooled liquid at 1.05 T_m in 128-atom periodic supercells at 0 GPa.",
+    "intervention": "Train an MTP by on-the-fly active learning on ∼200–500 ab-initio (PBE) snapshots drawn from AIMD trajectories of the same alloy at 0.9–1.1 T_m and use this MTP, instead of a published EAM, as the classical reference in the TOR-TILD thermodynamic-integration workflow.",
+    "conditions": "Temperatures 0.8–1.1 T_m (≈1450–2000 K for CoCrFeMnNi); pressures 0–2 GPa; 64–256 atom supercells; NVT (Nosé–Hoover) dynamics with 2–5 ps correlation lengths.",
+    "structural_mediator": "A short-range, many-body moment-tensor interatomic potential whose parameters are fitted to DFT energies, forces and virials for both solid and liquid configurations of the target alloy.",
+    "mechanism": "Because the MTP is explicitly trained on a diverse ensemble that spans the disordered liquid and solid environments, its energy surface closely reproduces DFT across the relevant configurational manifold. This reduces the instantaneous DFT–reference energy differences ΔU and their variance σ²_ΔU that enter exponential reweighting, thereby increasing reference–target overlap and shortening the effective thermodynamic-integration path length.",
+    "predicted_outcome": "Along 20–30 ps reference MD trajectories, the variance σ²_ΔU (and hence the second-order cumulant contribution to the free-energy correction) will drop by at least a factor of five relative to EAM (e.g., from ~150 (meV atom⁻¹)² to ≤30 (meV atom⁻¹)²), yielding total liquid free-energy corrections of |ΔF| ≤2 meV atom⁻¹ vs. ~10–20 meV atom⁻¹ for EAM.",
+    "baseline": "Published TOR-TILD calculations that use multicomponent EAM references typically report liquid free-energy corrections of 10–20 meV atom⁻¹ for 100–150-atom CoCrFeMnNi at ~1750 K, with large hysteresis between forward and reverse integration branches.",
+    "boundary": "Expected to hold for 3–6 component transition-metal HEAs (elements 21–32, 37–48) at 0.7–1.2 T_m and pressures below 5 GPa. May fail for alloys containing main-group elements with strong directional bonding (e.g. Al, Si) or at T <0.5 T_m where magnetic ordering or quantum nuclear effects dominate.",
+    "uncertainty": "Success depends on adequacy of the training set to capture rare liquid configurations; finite-size effects in 64–128 atom cells; possible overfitting of MTP; transferability to off-stoichiometric compositions not in the training pool.",
+    "supporting_evidence_ids": [],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "For equiatomic CoCrFeMnNi at 1750 K and 0 GPa, run (a) 30 ps NVT MD with the published multicomponent EAM and (b) 30 ps NVT MD with the actively trained MTP, each in a 128-atom cell. Sample 300 uncorrelated frames from each trajectory and compute single-point DFT energies, forces and stresses. Evaluate free energies by the Bennett acceptance ratio (BAR) method for both references.",
+      "measurements": [
+        "Variance σ²_ΔU between reference and DFT for liquid configurations (meV^2 atom⁻2)",
+        "BAR-evaluated free-energy correction ΔF (meV atom⁻¹)",
+        "Forward–reverse TI hysteresis (meV atom⁻¹)"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the MTP reference fails to reduce σ²_ΔU by at least a factor of 3 relative to EAM OR if the resulting |ΔF| exceeds 3 meV atom⁻¹ OR if forward–reverse hysteresis with the MTP exceeds that obtained with EAM."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "seen_ids": [],
+  "cited_ids": [],
+  "cited_evidence": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "writer",
+      "model": "o3_2025-04-16",
+      "chars_in": 1756,
+      "chars_out": 3953,
+      "seconds": 28.33
+    }
+  ],
+  "llm_calls": 1,
+  "notes": {},
+  "chars_in": 1756,
+  "elapsed_seconds": 28.33
+}

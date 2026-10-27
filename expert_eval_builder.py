@@ -100,7 +100,12 @@ SOURCE_WORDS = re.compile(r"(writer_only|closed_book|o3-?mini|llama|gpt-?\d|deep
 # ---------------------------------------------------------------- selection
 
 def set_of(case: dict[str, Any]) -> str:
-    return case["split"] if case["split"] in ("test2", "test3") else "original12"
+    """original12 = the dev and test splits. Later held-out sets (test4, experiment 35) are their own set and are
+    never drawn for this package, which was frozen in experiment 30."""
+    split = case["split"]
+    if split in ("test2", "test3", "test4"):
+        return split
+    return "original12"
 
 
 def select() -> dict[str, Any]:

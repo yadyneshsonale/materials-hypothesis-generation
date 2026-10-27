@@ -35,6 +35,7 @@ import statistics  # noqa: E402
 import time  # noqa: E402
 from collections import Counter, defaultdict  # noqa: E402
 from concurrent.futures import ThreadPoolExecutor, as_completed  # noqa: E402
+from datetime import date, timedelta  # noqa: E402
 from pathlib import Path  # noqa: E402
 from typing import Any, Callable  # noqa: E402
 
@@ -42,7 +43,7 @@ import llm_client as lc  # noqa: E402
 import rubric_eval as rx  # noqa: E402
 from failure_clean import LABEL_SYSTEM  # noqa: E402
 from hypothesis_evidence_v2 import atomic_json  # noqa: E402
-from must_obey_check import MODEL_CUTOFFS  # noqa: E402
+from must_obey_check import MARGIN_DAYS, MODEL_CUTOFFS  # noqa: E402
 from stage_metrics import AUDIT_SYSTEM, CROSS_JUDGE, HEDGE, _validated_audit  # noqa: E402
 from temporal_eval_v3 import (ALL_DIMENSIONS, CITED_TEXT_CHARS, EXPERIMENT_DIR, HYPOTHESIS_FIELDS,  # noqa: E402
                               PRIMARY_DIMENSIONS, QUERY_LEVELS, _blind_candidate, cluster_bootstrap,
@@ -69,20 +70,42 @@ MODELS = {  # query-facing deployments (all pre-cutoff, see must_obey.md section
                    "max_out": 20000, "reasoning_effort": "low"},
     "o1": {"deployment": "o1_2024-12-17", "token_field": "max_completion_tokens", "temperature": None,
            "max_out": 20000},
+    "4o": {"deployment": "gpt-4o_2024-11-20", "token_field": "max_completion_tokens", "temperature": 0.2,
+           "max_out": 8000},
+    # 2024 cutoffs (loop.md 16.1): used only on papers dated more than MARGIN_DAYS after the cutoff; see eligible().
+    # o3 and gpt-5 failed the memorisation probe (loop.md 16.3) and are not registered.
+    "o4mini": {"deployment": "o4-mini_2025-04-16", "token_field": "max_completion_tokens", "temperature": None,
+               "max_out": 20000},
+    "41": {"deployment": "gpt-4.1_2025-04-14", "token_field": "max_completion_tokens", "temperature": 0.2,
+           "max_out": 8000},
 }
 for _spec in MODELS.values():
     assert _spec["deployment"] in MODEL_CUTOFFS, _spec["deployment"]
+
+# Methods whose generator has a 2024 cutoff list their model keys here (set by loop_methods.py); generation skips
+# papers dated MARGIN_DAYS or less after the latest such cutoff (must_obey.md 2.1; loop.md 16.1).
+METHOD_MODELS: dict[str, tuple[str, ...]] = {}
+
+
+def eligible(method: str, case: dict[str, Any]) -> bool:
+    keys = METHOD_MODELS.get(method, ())
+    if not keys:
+        return True
+    latest = max(date.fromisoformat(MODEL_CUTOFFS[MODELS[k]["deployment"]]) for k in keys)
+    return date.fromisoformat(case["publication_date"]) > latest + timedelta(days=MARGIN_DAYS)
 
 
 # ---------------------------------------------------------------- cases and splits
 
 TEST2_DIR = EXPERIMENT_DIR / "benchmark_test2"  # fresh held-out set (loop.md section 10.1)
-HELD_OUT_DIRS = (TEST2_DIR, EXPERIMENT_DIR / "benchmark_test3")  # test3: loop.md section 11.1
+HELD_OUT_DIRS = (TEST2_DIR, EXPERIMENT_DIR / "benchmark_test3",  # test3: loop.md section 11.1
+                 EXPERIMENT_DIR / "benchmark_test4")  # test4: loop.md section 16.1 (unspent until its finals)
 # "all" = the original 12. dev3 = development set of round 3 (loop.md 11.1): dev plus the spent test and test2 splits.
 SPLITS = {"dev": {"dev"}, "test": {"test"}, "test2": {"test2"}, "test3": {"test3"}, "all": {"dev", "test"},
-          "dev3": {"dev", "test", "test2"}, "all36": {"dev", "test", "test2", "test3"}}
-HELD_OUT = ("test", "test2", "test3")
-SPENT = ("test", "test2", "test3")  # each used once for its pre-registered finals (test3: round 3, loop.md 11.7)
+          "dev3": {"dev", "test", "test2"}, "all36": {"dev", "test", "test2", "test3"}, "test4": {"test4"},
+          "fresh37": {"test", "test2", "test3", "test4"}}
+HELD_OUT = ("test", "test2", "test3", "test4")
+SPENT = ("test", "test2", "test3", "test4")  # each used once for its pre-registered finals (test4: loop.md 16.4)
 # Query levels: the three v3/v3.1 levels by default; benchmark v4 (SciMON-style) has one input per paper.
 LEVELS = tuple(os.environ.get("MATHG_LEVELS", ",".join(QUERY_LEVELS)).split(","))
 
@@ -290,7 +313,7 @@ def generate_one(method: str, case: dict[str, Any], level: str, sample: int, fin
     atomic_json(path, {
         "run_id": rid, "paper_id": case["paper_id"], "query_level": level, "method": method, "sample": sample,
         "split": split_of(case), "final": final,
-        "benchmark": case.get("benchmark_version") or (split_of(case) if split_of(case) in ("test2", "test3")
+        "benchmark": case.get("benchmark_version") or (split_of(case) if split_of(case) in ("test2", "test3", "test4")
                                                        else "v3.1"),
         "query": h.query,
         "publication_date": h.cutoff, "models": h.models, "status": status, "error": error,
@@ -309,6 +332,8 @@ def generate_stage(method: str, split: str, workers: int, final: bool) -> dict[s
         raise SystemExit("held-out runs must be pre-registered finals: pass --final (must_obey.md 6.5)")
     jobs = []
     for case, level in units(split):
+        if not eligible(method, case):
+            continue
         for sample in SAMPLES:
             path = OUT / method / "runs" / f"{run_id(case['paper_id'], level, method, sample)}.json"
             if path.exists() and _read_json(path)["status"] == "ok":

@@ -1,0 +1,68 @@
+{
+  "run_id": "PMC11606917__broad__writer_only_b_o3__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "broad",
+  "method": "writer_only_b_o3",
+  "sample": 1,
+  "split": "dev",
+  "final": false,
+  "benchmark": "v3.1",
+  "query": "How can melting temperature, enthalpy and entropy of fusion, volume change at melting, and liquid-phase thermodynamic properties be determined accurately and efficiently across the high-entropy-alloy family? State the physical rationale, expected quantitative performance, range of applicability, supporting prior evidence, and a decisive validation result that would rule out the proposed approach.",
+  "publication_date": "2024-11-29",
+  "models": {
+    "writer": "trapi:o3_2025-04-16"
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "A machine-learned interatomic potential (ML-IP) trained on a sparse but diversity-maximized set of density-functional-theory (DFT) energies/forces for solid and liquid local environments can predict (i) equilibrium melting temperature (T_m), (ii) enthalpy of fusion (ΔH_fus), (iii) entropy of fusion (ΔS_fus) and (iv) molar volume change on melting (ΔV_m) of face–centered-cubic (FCC) transition-metal high-entropy alloys (HEAs) with an accuracy better than ±30 K (T_m), ±5 % (ΔH_fus, ΔS_fus) and ±4 % (ΔV_m) over the 300–2000 K range, without any composition-specific experimental fitting beyond a small (≤3) calibration set.",
+    "material_initial_state": "Equiatomic or near-equiatomic FCC high-entropy alloys drawn from 3d/4d/5d transition-metal elements (e.g., Co, Cr, Fe, Mn, Ni, Cu, Pd, Pt) in the as-cast, chemically disordered solid solution state at 300 K, ambient pressure.",
+    "intervention": "1. Generate a DFT database covering ≈5000 configurations that sample binaries, ternaries and selected quinaries in both solid (FCC) and liquid snapshots.\n2. Train an equivariant graph-neural-network ML-IP with active-learning to reach force/energy errors <30 meV/Å and <2 meV/atom, respectively.\n3. For any target HEA composition, compute (a) solid Helmholtz free energy via quasi-harmonic lattice dynamics on supercells with random and short-range-ordered occupancy, and (b) liquid free energy via thermodynamic integration along an NPT path from a reference ideal gas state.\n4. Locate the solid–liquid crossing of G(T,P) to obtain T_m; obtain ΔH_fus, ΔS_fus and ΔV_m at that T.",
+    "conditions": "Ambient pressure (≤0.1 GPa); temperature 300–2000 K; compositions containing 4–8 transition-metal elements each between 5–35 at. %.",
+    "structural_mediator": "The ML-IP encodes local chemical disorder and short-range order in high-dimensional descriptor space, enabling accurate sampling of both solid and liquid atomic configurations.",
+    "mechanism": "Because free energies are path-independent state functions, accurate energies and forces from the ML-IP allow Monte-Carlo/MD sampling to converge vibrational, electronic and configurational contributions in both phases. The intersection of solid and liquid free-energy curves yields T_m, while differences in enthalpy, entropy and volume at that T provide ΔH_fus, ΔS_fus and ΔV_m. The large configurational entropy of HEAs is naturally included through the random and short-range-ordered supercell sampling.",
+    "predicted_outcome": "For unseen FCC HEA compositions within the stated domain, the protocol will deliver:\n• Melting temperature within ±30 K of experiment.\n• ΔH_fus and ΔS_fus within ±5 % of levitation micro-calorimetry values.\n• ΔV_m within ±4 % of measured density changes.\nComputation time after training: <12 h on 256 GPU cores per composition, enabling high-throughput mapping of >100 alloys/week.",
+    "baseline": "Conventional extrapolative CALPHAD or empirical mixing-rule estimates exhibit typical errors of ±80–150 K in T_m and >15 % in ΔH_fus for multi-principal-element alloys lacking extensive experimental data.",
+    "boundary": "The approach is expected to fail or lose accuracy for:\n1. Alloys that undergo order–disorder or magnetic transitions above 300 K.\n2. Systems containing light elements (B, C, N) or strong covalency (e.g., refractory HEAs with Hf, Ta, etc.) that are not represented in the training database.\n3. BCC or dual-phase HEAs where the relevant solid phase is not FCC.",
+    "uncertainty": "Key uncertainties stem from (a) completeness of the DFT training set in capturing rare but thermodynamically relevant local motifs, (b) transferability of the quasi-harmonic approximation at high T, and (c) possible systematic DFT errors (e.g., magnetic entropy contributions) propagating through the ML-IP.",
+    "supporting_evidence_ids": [],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Select five FCC HEA compositions that are (i) absent from the training/validation set and (ii) deliberately span extremes in mixing enthalpy and atomic-size mismatch (e.g., CoCrFeMnNi, CoCrFeNiPd, CrFeMnNiCu, CoCrFeNiPt, and CrFeMnNiPt).\nFor each alloy:\n1. Synthesize by arc-melting and homogenize.\n2. Measure melting curves, ΔH_fus, ΔS_fus and ΔV_m using containerless laser-heating levitation calorimetry with high-speed pyrometry and X-ray imaging.\n3. Compare experimental values to predictions made a priori by the ML-IP protocol.",
+      "measurements": [
+        "Melting onset and completion temperatures (±10 K accuracy)",
+        "Heat absorbed at fusion via calorimetry (±3 %)",
+        "Entropy of fusion from ΔH_fus/T_m",
+        "Density of solid and liquid to obtain ΔV_m (±2 %)"
+      ],
+      "falsification_rule": "If ≥3 of the 5 alloys exhibit |T_m(pred) – T_m(exp)| > 50 K or |ΔH_fus(pred)/ΔH_fus(exp) – 1| > 15 %, the hypothesis that the ML-IP protocol achieves the stated accuracy is falsified."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "seen_ids": [],
+  "cited_ids": [],
+  "cited_evidence": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "writer",
+      "model": "o3_2025-04-16",
+      "chars_in": 1502,
+      "chars_out": 4884,
+      "seconds": 21.0
+    }
+  ],
+  "llm_calls": 1,
+  "notes": {},
+  "chars_in": 1502,
+  "elapsed_seconds": 21.0
+}

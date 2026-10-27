@@ -1,0 +1,68 @@
+{
+  "run_id": "PMC11606917__broad__writer_only_b_o3__s2",
+  "paper_id": "PMC11606917",
+  "query_level": "broad",
+  "method": "writer_only_b_o3",
+  "sample": 2,
+  "split": "dev",
+  "final": false,
+  "benchmark": "v3.1",
+  "query": "How can melting temperature, enthalpy and entropy of fusion, volume change at melting, and liquid-phase thermodynamic properties be determined accurately and efficiently across the high-entropy-alloy family? State the physical rationale, expected quantitative performance, range of applicability, supporting prior evidence, and a decisive validation result that would rule out the proposed approach.",
+  "publication_date": "2024-11-29",
+  "models": {
+    "writer": "trapi:o3_2025-04-16"
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "For face-centered-cubic (FCC) and body-centered-cubic (BCC) 4- to 7-component transition-metal high-entropy alloys (HEAs), a combined first-principles–trained CALPHAD surrogate can predict (i) liquidus / solidus temperature (T_m), (ii) enthalpy and entropy of fusion (ΔH_f, ΔS_f), (iii) volume change on melting (ΔV_m), and (iv) temperature-dependent liquid enthalpy and heat capacity, with mean absolute errors ≤ 30 K for T_m, ≤ 5 kJ mol⁻¹ for ΔH_f, ≤ 0.5 J mol⁻¹ K⁻¹ for ΔS_f, and ≤ 2 % for ΔV_m over 900–2000 K.",
+    "material_initial_state": "Equiatomic or near-equiatomic (±10 at. %) FCC or BCC high-entropy alloys drawn from elements Cr, Mn, Fe, Co, Ni, Cu, Al, Ti, V, Nb, Mo, Ta, W.",
+    "intervention": "Construct a thermodynamic surrogate by (1) generating ~10³ random quaternary-to-heptanary compositions; (2) performing DFT + machine-learned interatomic-potential molecular dynamics to compute 0 K energies and 2000–4000 K liquid enthalpies; (3) training Gaussian-process regressors on sub-lattice-wise Redlich–Kister polynomial coefficients; (4) embedding the learned parameters in a CALPHAD framework to predict melt-related properties for arbitrary compositions without further ab-initio calculations.",
+    "conditions": "Ambient pressure (≤0.1 GPa), temperature 300-2200 K, single-phase solid solutions before melting (no intermetallics).",
+    "structural_mediator": "Composition-dependent excess Gibbs-energy polynomial coefficients describing the disordered FCC or BCC solid solution and the corresponding liquid solution phase.",
+    "mechanism": "First-principles data capture bonding and magnetic contributions to Gibbs energy; surrogate maps composition to these excess energies. CALPHAD extrapolates phase equilibria. Melting properties emerge from the crossing of the free-energy surfaces of solid and liquid phases; therefore accurate excess Gibbs energies yield accurate fusion properties and liquid-phase thermodynamics.",
+    "predicted_outcome": "Across the specified HEA compositional space, the surrogate will reproduce experimental or high-fidelity AIMD reference data with MAE ≤ 30 K (T_m), ≤ 5 kJ mol⁻¹ (ΔH_f), ≤ 0.5 J mol⁻¹ K⁻¹ (ΔS_f) and ≤ 2 % (ΔV_m). Systematic deviations will remain <3× the stated MAE for ≥90 % of compositions.",
+    "baseline": "Conventional extrapolated binary / ternary CALPHAD databases yield errors typically 80-150 K in T_m and >10 kJ mol⁻¹ in ΔH_f for multicomponent HEAs.",
+    "boundary": "Fails for compositions containing >30 at.% light elements (B, C) or reactive elements (rare-earths) not in the training set, for ordered-intermetallic-forming alloys, or above 0.1 GPa where volume dependence is non-linear.",
+    "uncertainty": "Moderate: limited experimental fusion data for multi-component HEAs; surrogate accuracy depends on representativeness of ab-initio training set and on reliability of magnetic entropy treatment.",
+    "supporting_evidence_ids": [],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Select five quinary HEAs (not used in training) spanning FCC and BCC regions (e.g., CoCrFeMnNi, AlCoCrFeNi, VNbMoTaW, TiVNbMoW, CrMnFeCoNiCu). (1) Arc-melt buttons, homogenize 1200 °C/48 h. (2) Measure melting onset, peak, and completion by containerless laser-heating DSC under Ar. (3) Measure liquid density via electrostatic levitation to 1% accuracy; derive ΔV_m. (4) Integrate DSC curves for ΔH_f and derive ΔS_f = ΔH_f/T_m. Compare to model predictions.",
+      "measurements": [
+        "Liquidus and solidus temperatures (°C)",
+        "Enthalpy of fusion (kJ/mol)",
+        "Heat capacity of liquid (J/mol·K)",
+        "Density of liquid and solid at T_m (g/cm³)"
+      ],
+      "falsification_rule": "If the mean absolute error exceeds any of: 30 K in T_m, 5 kJ mol⁻¹ in ΔH_f, 0.5 J mol⁻¹ K⁻¹ in ΔS_f, or 2 % in ΔV_m for more than two of the five alloys, the hypothesis is falsified."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "seen_ids": [],
+  "cited_ids": [],
+  "cited_evidence": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "writer",
+      "model": "o3_2025-04-16",
+      "chars_in": 1502,
+      "chars_out": 3827,
+      "seconds": 15.3
+    }
+  ],
+  "llm_calls": 1,
+  "notes": {},
+  "chars_in": 1502,
+  "elapsed_seconds": 15.3
+}

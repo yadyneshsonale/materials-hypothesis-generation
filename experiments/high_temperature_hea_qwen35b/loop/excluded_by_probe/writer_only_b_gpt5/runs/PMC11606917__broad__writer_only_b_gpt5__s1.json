@@ -1,0 +1,72 @@
+{
+  "run_id": "PMC11606917__broad__writer_only_b_gpt5__s1",
+  "paper_id": "PMC11606917",
+  "query_level": "broad",
+  "method": "writer_only_b_gpt5",
+  "sample": 1,
+  "split": "dev",
+  "final": false,
+  "benchmark": "v3.1",
+  "query": "How can melting temperature, enthalpy and entropy of fusion, volume change at melting, and liquid-phase thermodynamic properties be determined accurately and efficiently across the high-entropy-alloy family? State the physical rationale, expected quantitative performance, range of applicability, supporting prior evidence, and a decisive validation result that would rule out the proposed approach.",
+  "publication_date": "2024-11-29",
+  "models": {
+    "writer": "trapi:gpt-5_2025-08-07"
+  },
+  "status": "ok",
+  "error": null,
+  "generation": {
+    "hypothesis": "Across metallic high-entropy alloys (HEAs), melting temperature (Tm), enthalpy and entropy of fusion (ΔHfus, ΔSfus), volume change on melting (ΔV), and key liquid thermodynamic properties (Cp, thermal expansivity α, isothermal compressibility κT) can be predicted to practical accuracy by a physics-informed free-energy framework that (i) represents the liquid as a polydisperse hard-sphere mixture with a single calibrated attractive perturbation and (ii) represents the solid near Tm with a quasiharmonic Debye model anchored to mixture elastic moduli; the free-energy difference is corrected by pairwise excess enthalpy from binary parameters. The structural mediators that control transferability are the packing fraction of the polydisperse liquid at Tm and the magnitude of near-neighbor short-range order (SRO).",
+    "material_initial_state": "Single-phase, metallic-bonded HEAs (4–6 principal elements, equiatomic or near-equiatomic) forming fcc or bcc solid solutions at ambient conditions; oxygen and interstitials below ~200 wt-ppm; grain size >10 μm; no second phases detectable by XRD.",
+    "intervention": "Apply a composition-to-property predictor built from closed-form free-energy components:\n1) Solid near Tm: compute vibrational Helmholtz free energy with a quasiharmonic Debye model using rule-of-mixtures elastic moduli (G, B) plus a misfit correction proportional to the squared atomic size mismatch δ^2; thermal expansion from Grüneisen parameter estimated from B and its pressure derivative. \n2) Liquid: compute Helmholtz free energy as that of a polydisperse hard-sphere mixture (Carnahan–Starling for mixtures) with effective diameters from Barker–Henderson mapping of atomic diameters at Tm; add a single scalar attractive perturbation term proportional to a composition-weighted cohesive energy density and calibrated once against 3–5 anchor HEAs; include an excess enthalpy of mixing term from binary pair parameters (CALPHAD-like or Miedema-type) combined by Redlich–Kister composition weighting; include ideal configurational entropy of mixing. \n3) Determine Tm by solving Gs(T)=Gl(T) at 1 bar; evaluate ΔHfus, ΔSfus at Tm from enthalpy and entropy differences; compute ΔV from the predicted discontinuity between quasiharmonic solid volume and hard-sphere liquid volume at Tm; obtain Cp, α, κT of the liquid from temperature and pressure derivatives of the liquid free energy. \n4) Optional: estimate first-shell SRO (Warren–Cowley α1) from pairwise interaction energies and include a mean-field stabilization of the solid when strong SRO is predicted; if |α1|>0.2, flag reduced confidence.",
+    "conditions": "Ambient pressure (0.1 MPa) for property prediction and comparison; temperature window Tm±200 K; calibration performed under high vacuum containerless electrostatic levitation (ESL) to minimize contamination; predictions valid up to ~2 GPa using quasiharmonic/clapeyron extrapolation if dTm/dP is measured or estimated.",
+    "structural_mediator": "Two scalars evaluated at T≈Tm: (i) the liquid packing fraction η of the polydisperse hard-sphere representation (set by effective diameters and composition), and (ii) the nearest-neighbor Warren–Cowley short-range order parameter α1 (estimated from pairwise interaction energies). η governs the liquid excess entropy and compressibility; α1 governs the relative stabilization of the solid vs liquid through short-range chemical ordering.",
+    "mechanism": "Melting occurs when vibrational and configurational entropies overcome cohesive bonding. In multicomponent metallic alloys, size polydispersity raises the liquid packing entropy and lowers its compressibility, shifting the Gs–Gl balance and typically reducing Tm, ΔHfus, and |ΔV| relative to ideal mixture expectations. Pairwise chemical interactions modulate cohesive energy; moderately negative mixing enthalpies may stabilize SRO in the solid more than in the liquid, raising Tm, whereas positive interactions or weak SRO favor lower Tm. The hard-sphere mixture captures the dominant entropic structure of metallic liquids; a single calibrated attractive perturbation captures cohesive attractions across compositions; the quasiharmonic solid captures the vibrational free energy near Tm. The Clapeyron relation links ΔV to ΔS via dTm/dP, enabling cross-checks among predicted quantities.",
+    "predicted_outcome": "For equiatomic 4–6 component fcc/bcc HEAs with metallic bonding and modest SRO (|α1|<~0.2):\n- Tm mean absolute error ~1–3% (≈40–100 K over 1500–3500 K range).\n- ΔHfus and ΔSfus mean absolute percentage errors ~7–15%; predicted ΔSfus typically 1.1–1.6 R per mole-atom, with composition-dependent deviations from Richards’ rule explained by η and α1.\n- ΔV/V across melting predicted within ~0.3–0.8 percentage points absolute for most alloys; correct sign in ≥85% of cases.\n- Liquid Cp within ~5–8%, α within ~10–15%, κT within ~15–20%.\nComputational cost per composition: milliseconds on a CPU once elemental data and binary parameters are loaded; calibration requires a one-time fit of a single attraction factor using 3–5 ESL anchor alloys spanning low/high δ and Δχ.",
+    "baseline": "Rule-of-mixtures or ideal-solution estimates (e.g., Tm and ΔHfus as composition-weighted averages of elements; liquid treated as an ideal monodisperse fluid) systematically misestimate HEA liquid stability, often producing large errors in ΔV and κT and failing to capture the effect of polydispersity and pair interactions. Conventional CALPHAD without tuned multicomponent parameters for a given HEA family can be data-limited and less transferable across 5–6 component spaces. The proposed framework achieves better accuracy than these baselines by (i) capturing the dominant entropic physics of metallic liquids via polydisperse hard-spheres, (ii) anchoring solids to elastic properties, and (iii) incorporating binary excess enthalpies for transferability with minimal calibration.",
+    "boundary": "Reduced validity when: (a) strong chemical ordering or intermetallic clusters persist near Tm (|α1|≳0.2) or melting is non-congruent/peritectic; (b) significant covalent, directional bonding or magneto-volume anomalies near Tm (e.g., strong localized moments or electronic transitions) alter entropy or volume; (c) compositions with very large size mismatch (δ≳8–10%) or deeply negative mixing enthalpies behave as glass formers; (d) oxygen/interstitial contamination >~500 wt-ppm changes liquid structure; (e) pressures >~2–3 GPa where hard-sphere mapping and quasiharmonic assumptions degrade.",
+    "uncertainty": "Main uncertainties arise from: (i) estimating effective hard-sphere diameters at Tm in multicomponent liquids; (ii) transferability of binary-derived excess enthalpy parameters to 5–6 component liquids; (iii) magnitude and temperature dependence of SRO near Tm; (iv) magnetic contributions in Fe–Co–Ni–Cr systems; (v) sensitivity of ΔV to small errors in both solid expansivity and liquid packing fraction. Quantitative error targets are plausible but may vary by composition; outliers are most likely in alloys with strong SRO or electronic anomalies.",
+    "supporting_evidence_ids": [],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Select 12 equiatomic quinary HEAs spanning low/high atomic size mismatch δ (≈3–9%), electronegativity spread Δχ, and VEC, all single-phase fcc or bcc at room temperature. For each alloy: (1) measure Tm, ΔHfus, and Cp_liq(T) via containerless ESL drop calorimetry and multiwavelength pyrometry; (2) measure liquid density ρ(T) and α_liq by oscillating-drop method and synchrotron radiography to resolve the volume discontinuity at melting; (3) measure sound speed in the levitated liquid to extract κT_liq; (4) determine dTm/dP up to 2 GPa for a 4-alloy subset using multi-anvil or piston-cylinder, then infer ΔV via the Clapeyron relation and cross-check against the directly observed density jump. Fit the single attractive-perturbation scalar once using 4 anchor alloys (one per quadrant in {low/high δ}×{low/high Δχ}); predict all properties for the remaining 8 alloys without further tuning.",
+      "measurements": [
+        "Tm (K) from recalescence and plateau in ESL heating/cooling",
+        "ΔHfus (kJ/mol) from drop calorimetry",
+        "ΔSfus (J/mol·K) via ΔHfus/Tm",
+        "Liquid Cp(T) (J/mol·K) from calorimetry",
+        "Liquid density ρ(T) and thermal expansivity α(T) from oscillating-drop shape and radiography",
+        "Isentropic sound speed c(T); derive κT_liq via equation of state",
+        "Volume change on melting ΔV/V from ρ solid vs ρ liquid at Tm",
+        "dTm/dP (K/GPa) up to ~2 GPa; infer ΔV via Clapeyron dTm/dP = ΔV/ΔS"
+      ],
+      "falsification_rule": "The approach is falsified if any one of the following holds for the 8 untuned test alloys: (i) median absolute percentage error (MAPE) of Tm exceeds 5% or more than 3 alloys exceed 3% absolute error; (ii) MAPE of ΔHfus exceeds 20% or sign of ΔV is wrong in ≥3 alloys; (iii) for alloys with measured dTm/dP, the Clapeyron-derived ΔV disagrees with the directly measured ΔV by >25% in ≥2 of 4 cases; (iv) ΔSfus shows no correlation with predicted liquid packing fraction η (Pearson |r|<0.2) while errors exceed 20%, indicating the structural mediator is not predictive."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "seen_ids": [],
+  "cited_ids": [],
+  "cited_evidence": [],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "writer",
+      "model": "gpt-5_2025-08-07",
+      "chars_in": 1502,
+      "chars_out": 9215,
+      "seconds": 56.49
+    }
+  ],
+  "llm_calls": 1,
+  "notes": {},
+  "chars_in": 1502,
+  "elapsed_seconds": 56.49
+}
