@@ -1,6 +1,6 @@
 # Project summary: AI hypothesis generation for high-temperature high-entropy alloys
 
-**Status.** 2026-10-27, after experiment 36. This file gathers everything done so far and every main result in one
+**Status.** 2026-10-28, after experiment 37. This file gathers everything done so far and every main result in one
 place.
 
 **Details.**
@@ -28,17 +28,20 @@ judges' values, and differences come with paper-clustered 95% confidence interva
     critics, extraction rubrics, a materials knowledge graph and citation graphs.
   - A strictly date-filtered web search ([websearch/](./experiments/high_temperature_hea_qwen35b/websearch/README.md)):
     159 per-question corpora (1,315 papers) and a live search tool for agents.
+  - A three-agent method (a proposer, a critic and a decider, with optional web evidence at each step) in 16
+    configurations ([loop_pcd/](./experiments/high_temperature_hea_qwen35b/loop_pcd/README.md)).
   - A blind rating package for a materials expert.
   - Measurement checks suggested by two model reviews: judge sanity controls, a checklist judge, failure triage
     and an answer-key audit.
-  - Roughly 24,000 hypothesis-generation runs in total.
+  - Roughly 28,500 hypothesis-generation runs in total.
 - **Best method found: the simplest one.** o3-mini with a conservative writer prompt and no retrieved evidence
   (`writer_only_b_o3mini`).
   - Over all 37 fresh held-out papers it scores 0.61 against 0.50 for the Llama-3.3 baseline: +0.11
     [+0.06, +0.17], 26 papers up and 8 down, p = 0.003 (DeepSeek +0.27, p = 0.0001). This includes the fresh test4,
     where it replicated (+0.12 / +0.26).
   - No other method beat it on fresh papers. Stronger allowed models, few-shot examples and a question router did not
-    either (experiment 34).
+    either (experiment 34). On the spent papers, a proposer–critic–decider agent pipeline scored below it, with or
+    without web evidence (experiment 37).
   - Its lead is in overall closeness. On a strict checklist of each paper's specific facts, it and the baseline both
     match only about 6–15% (experiments 33, 35).
 - **The absolute level is low.** About 0.6 out of 4, while the paper's actual study, rewritten as a proposal, scores
@@ -64,6 +67,10 @@ judges' values, and differences come with paper-clustered 95% confidence interva
      - The judges disagree on whether a hypothesis that differs from the paper is a valid alternative or wrong.
   7. **A stated knowledge cutoff is not enough.** o3 and gpt-5 recall details of 2024–2026 papers from their titles
      alone and were excluded by the memorisation probe.
+  8. **More agents make it worse** (experiment 37).
+     - A proposer, a critic and a decider score below one o3-mini call, with or without web evidence.
+     - The four proposed ideas include the paper's lever more often than one call does, but the decider picks among
+       them at chance, and the critic cannot tell the paper's direction from the others.
 - **Open items.**
   - The expert's ratings, which will show whether the AI judge can be trusted.
   - Every held-out set, including test4, is used up, so a new method claim needs test5. Only 9 papers qualified
@@ -143,6 +150,7 @@ judges' values, and differences come with paper-clustered 95% confidence interva
 | 17 | Rerun all the experiments this way | Every experiment rerun on v4 | 32 |
 | 18 | Two model reviews (Opus 5.5, GPT 6.1): suggest changes and run them | Mapped their generic advice onto the project: measurement checks (judge controls, checklist judge, triage, answer-key audit); stronger generators with a memorisation probe; few-shot examples; a router; a fresh test4 | 33, 34, 35 |
 | 19 | Add a web search tool to all the baselines and rerun all the experiments: the first N papers of a web search, strictly date-filtered, expanded through the citation graph, from the XML, with no leakage | Europe PMC web search with Crossref dates and code-enforced filters; 159 corpora (first 50 results + co-cited references); a live search tool for agents; all 30 evidence configurations, 3 new web agents and the whole suite re-run; leakage checks | 36 |
+| 20 | Use three types of agents (one proposes ideas, one critiques them, one sees both and decides the direction), each able to use the web-searched data; try all baselines and ablations, formalise it and run the evaluations | Formal three-role method with optional web evidence per role; 16 configurations (web at each role, no critic, no decider, one idea, Llama-3.3); 8 baselines; coverage-vs-selection labels | 37 |
 
 ## 4. Results by phase
 
@@ -455,6 +463,49 @@ None qualified as a finalist.
   - OpenAlex now caps unkeyed use at 1,000 requests a day, so Crossref replaced it as the second date source.
   - Llama-3.3 on Azure stops calling tools when a fifth tool is offered.
 
+### 4.10 Propose, critique, decide: three agent roles (experiment 37)
+
+**The method** ([loop_pcd/](./experiments/high_temperature_hea_qwen35b/loop_pcd/README.md); loop.md section 18).
+- **Proposer.** Four research directions, each with a different lever or mechanism.
+- **Critic.** Reviews every direction against six fixed criteria (the stated limitation, constraints, physical
+  soundness, feasibility, evidence, main risk). It gives each a verdict and one fix.
+- **Decider.** Sees the directions and critiques in a shuffled order with neutral labels. It adopts or merges
+  directions and writes the final hypothesis with the best method's conservative-writer instruction.
+- **Web evidence, optional at each role,** comes from experiment 36's date-filtered corpora:
+  - the proposer gets the most relevant paper cards;
+  - the critic and decider get passages retrieved with each idea's own text.
+- **Configurations.**
+  - Web at every combination of roles (8);
+  - no critic, no decider (the best verdict wins), one idea instead of four (each with and without web);
+  - Llama-3.3 in every role.
+
+  That makes 16 configurations, each with 270 runs on all 45 papers, compared with 8 existing baselines.
+
+**Results** (GPT-5.6 / DeepSeek; 45 papers).
+
+| Configuration | Score | vs the best method (0.62 / 0.58) |
+|---|---:|---|
+| Full system, web at every role | 0.50 / 0.36 | −0.12 [−0.17, −0.07], Holm p 0.003 (DeepSeek −0.21) |
+| No web | 0.47 / 0.35 | −0.15 [−0.21, −0.10], Holm p < 0.001 (DeepSeek −0.23) |
+| Best of the 16: one idea, no web | 0.53 / 0.43 | – |
+| Llama-3.3 in every role, no web | 0.42 / 0.20 | vs Llama closed-book (0.50): −0.08 [−0.13, −0.03] |
+
+- **Worse than one call.** The full system is worse than every o3-mini baseline, including o3-mini closed-book
+  (−0.09) and the best web method (−0.14). It only matches the Llama-3.3 closed-book baseline.
+- **Web helps only the decider, slightly:** +0.03 [+0.01, +0.05], not significant after Holm.
+- **No agent earns its place.**
+  - The critic adds nothing.
+  - The decider is no better than "the best verdict wins".
+  - Four ideas are no better than one.
+- **Why.**
+  - At least one of the four ideas matches the paper's lever in 37–40% of runs (one call: 17–23%), but the final
+    hypothesis matches in only 15%.
+  - The decider picks among the ideas at chance, and the critic calls nearly every idea "viable with changes".
+  - The hypotheses lose most on the intervention (0.08–0.12 vs 0.32). They are more novel and more specific, not
+    more hedged.
+- **No leakage detected.** All counters are zero, and every web record a run saw was re-checked against the paper's
+  date.
+
 ## 5. The recommended method on every held-out comparison
 
 `writer_only_b_o3mini` (o3-mini, conservative writer, no evidence) against the Llama-3.3 closed-book baseline.
@@ -499,6 +550,8 @@ None qualified as a finalist.
   - the SciMON-style input is no improvement (experiments 31–32).
 - **Web search** (experiment 36): web-search corpora (the first 50 results plus co-cited references) for all 30
   evidence configurations and the suite, and agents that search the web themselves.
+- **Multi-agent propose, critique, decide** (experiment 37): a proposer, a critic and a decider, with web evidence at
+  any role or none, and without the critic, without the decider or with one idea.
 - **Methods suggested by two model reviews** (experiment 34):
   - stronger allowed generators (gpt-4o, gpt-4.1, o4-mini);
   - few-shot worked examples;
@@ -532,6 +585,7 @@ None qualified as a finalist.
 | Experiment 34 | Registering test4 changed the case pool of the frozen expert-package selection | Selection fixed to its original sets; test catches it |
 | Experiment 36 | OpenAlex's daily budget ran out mid-build and failed requests silently dropped papers from corpora | Build stopped; Crossref became the second date source; all corpora rebuilt; failures now raise instead of dropping |
 | Experiments 9, 21, 36 | With Llama-3.3 on Azure, a fifth tool breaks tool calling, so experiment 9's KG agent (35 of 36 runs) never used a tool | Web search placed inside the existing search tool; the KG result is reported as uninformative |
+| Experiment 37 | In the smoke test, the decider saw the ideas in the proposer's order and chose the first in 16 of 16 runs | Before any run, ideas shown in a seeded random order with neutral labels (must_obey.md 5.2) |
 
 ## 8. Limitations and open questions
 
@@ -555,8 +609,9 @@ None qualified as a finalist.
   Scores are compared within each set. The experiment-33 audit found no unusable key.
 - **Narrow corpus.** One topic, 50 open-access papers. 8 of the 12 test2 papers come from one MDPI journal. The web
   corpora (experiment 36) are wider but still limited to open-access papers with XML in Europe PMC.
-- **Experiment 36 is exploratory.** All 45 papers were already spent. Its evaluations ran on a second instance of
-  the GPT-5.6 deployment because of rate limits, and lever labels were made only for the primary comparison.
+- **Experiments 36 and 37 are exploratory.** All 45 papers were already spent. Experiment 36's evaluations ran on a
+  second instance of the GPT-5.6 deployment because of rate limits, and its lever labels were made only for the
+  primary comparison.
 - **Low absolute level.** About 0.6 out of 4. Choosing the paper's intervention is the core unsolved problem.
 
 ## 9. Where to find everything
@@ -564,7 +619,7 @@ None qualified as a finalist.
 | What | Where |
 |---|---|
 | Rules; instructions for every agent | [must_obey.md](./must_obey.md), [AGENTS.md](./AGENTS.md) |
-| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–17) |
+| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–18) |
 | One section per experiment | [EXPERIMENT_LOG_2026-10-22.md](./experiments/high_temperature_hea_qwen35b/EXPERIMENT_LOG_2026-10-22.md) |
 | Literature reviewed | [RELATED_WORK.md](./experiments/high_temperature_hea_qwen35b/RELATED_WORK.md) (9 hypothesis-generation systems); loop.md sections 2, 10.3 and 11.3 (about 40 sources) |
 | Corpus | [data/corpus/](./experiments/high_temperature_hea_qwen35b/data/corpus/README.md) |
@@ -576,5 +631,6 @@ None qualified as a finalist.
 | Measurement checks, probe, review-suggested methods (experiments 33–35) | [review_eval/](./experiments/high_temperature_hea_qwen35b/review_eval/README.md) |
 | Web-search corpora (experiment 36) | [websearch/](./experiments/high_temperature_hea_qwen35b/websearch/README.md) |
 | Harness and suite with web search (experiment 36) | [loop_web/](./experiments/high_temperature_hea_qwen35b/loop_web/README.md), [rerun_web/](./experiments/high_temperature_hea_qwen35b/rerun_web/README.md) |
+| Propose, critique, decide (experiment 37) | [loop_pcd/](./experiments/high_temperature_hea_qwen35b/loop_pcd/README.md) |
 | Expert package; answer key and analysis | [expert_evaluation/](./expert_evaluation/README.md); [expert_eval/](./experiments/high_temperature_hea_qwen35b/expert_eval/README.md) |
-| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py`, `websearch.py`, `web_analysis.py` |
+| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py`, `websearch.py`, `web_analysis.py`, `pcd_analysis.py` |

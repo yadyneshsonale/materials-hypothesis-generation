@@ -404,6 +404,9 @@ def _pending(methods: list[str] | None, rel: str) -> list[tuple[Any, ...]]:
     runs = [r for r in all_runs(methods) if r["status"] == "ok"
             and not (OUT / r["method"] / rel / f"{r['run_id']}.json").exists()]
     runs.sort(key=lambda r: rank.get(r["method"], len(rank)))
+    if os.environ.get("MATHG_PENDING_SHUFFLE"):
+        # An extra evaluation loop takes jobs in a seeded random order, so it rarely meets an ordered loop (loop.md 18).
+        random.Random(int(os.environ["MATHG_PENDING_SHUFFLE"])).shuffle(runs)
     return [(r,) for r in runs]
 
 

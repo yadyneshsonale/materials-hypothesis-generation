@@ -1,16 +1,17 @@
-"""Progress of experiment 36's runs: per configuration, runs (ok / failed), judged by both judges, audited, labelled.
+"""Progress of a run root's configurations: runs (ok / failed), judged by both judges, audited, labelled.
 
-Usage: python web_status.py
+Usage: python web_status.py [run root under experiments/high_temperature_hea_qwen35b, default loop_web]
 """
 
 from __future__ import annotations
 
 import json
+import sys
 from collections import Counter
 from pathlib import Path
 
 E = Path(__file__).resolve().parent / "experiments" / "high_temperature_hea_qwen35b"
-WEB = E / "loop_web"
+WEB = E / (sys.argv[1] if len(sys.argv) > 1 else "loop_web")
 
 
 def count(path: Path) -> int:

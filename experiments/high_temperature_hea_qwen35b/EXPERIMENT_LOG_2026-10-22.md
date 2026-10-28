@@ -1550,7 +1550,93 @@ papers' XML, with no data leakage. Plan in loop.md 17.1; amendments 17.2–17.3 
 - **Integrity.** Every harness run has both judges and the target-free audit. `must_obey_check.py` passes all 33
   harness and all 6 suite run directories.
 
-## Comparability and limits, experiments 8 to 36
+## Experiment 37: propose, critique, decide
+
+**Request.** Use three types of agents: one proposes ideas, one critiques them, and one sees the ideas and the
+critiques and decides the direction. Each step can be augmented with the web-searched data. Try all baselines and
+ablations, formalise it and run the evaluations. Plan in loop.md 18.1; amendment 18.2 before any run; results in
+18.3.
+
+**Method** ([loop_pcd/](./loop_pcd/README.md); `m_pcd` in [loop_methods.py](../../loop_methods.py)).
+- **Proposer.** Four research directions, each with a different lever or mechanism.
+- **Critic.** One call reviews every direction against six fixed criteria:
+  - the stated limitation;
+  - the constraints;
+  - physical soundness;
+  - feasibility;
+  - the evidence;
+  - the main risk.
+
+  Each direction gets a verdict and one fix.
+- **Decider.**
+  - It sees the directions and critiques in a seeded random order with neutral labels.
+  - It adopts one direction (with or without the fix) or merges compatible ones.
+  - It writes the final hypothesis with the best method's conservative-writer instruction.
+- **Web evidence (optional per role)** comes from the question's experiment-36 corpus:
+  - the proposer gets the 10 most relevant paper cards;
+  - the critic and decider get passages retrieved with each idea's own text (HyDE-style).
+
+  Each role gets at most 16,000 characters.
+- **Sources.** AI co-scientist (the roles), ResearchAgent (fixed review criteria), Large Language Monkeys (coverage
+  vs selection), HyDE (idea-targeted retrieval), The AI Scientist (ideas checked against the literature).
+
+**Configurations.** 16, each with 270 runs on the 45 papers (3 levels × 2 samples): 4,320 runs, none failed in the
+end. Four first attempts cited a web record their role had not been given; each succeeded on its one retry, and the
+first attempts are kept.
+- **Web grid** (o3-mini in every role): web at no role, or at the proposer (P), critic (C) or decider (D), or any
+  combination.
+- **Ablations**, each at no web and full web: no critic; no decider (the best verdict wins); one idea instead of four.
+- **Llama-3.3** in every role, at no web and full web.
+- **Baselines.** The existing runs of the best method `writer_only_b_o3mini`, `closed_book_o3mini`, `closed_book`,
+  `web_text_chunks(_b_o3mini)`, `web_agent(_o3mini)` and `web_text_64k_b_o3mini`.
+  - `closed_book_o3mini` was completed on test3 and test4, and `web_text_64k_b_o3mini` on test4, so that every
+    baseline covers all 45 papers.
+
+**Results** (GPT-5.6; DeepSeek alongside; 45 papers).
+
+| Comparison | GPT-5.6 difference [CI] | DeepSeek |
+|---|---|---|
+| Full system (web at every role) vs best method | −0.12 [−0.17, −0.07], Holm p 0.003 | −0.21 |
+| Full system vs o3-mini closed-book | −0.09 [−0.14, −0.04], Holm p 0.014 | −0.14 |
+| Full system vs best web method (`web_text_64k_b_o3mini`) | −0.14 [−0.20, −0.08], Holm p 0.001 | −0.29 |
+| Full system vs o3-mini web agent | −0.06 [−0.10, −0.02], Holm p 0.11 | −0.19 |
+| Full system vs Llama closed-book | −0.00 [−0.05, +0.05] | +0.06 |
+| No web vs best method | −0.15 [−0.21, −0.10], Holm p < 0.001 | −0.23 |
+| Web at the decider (main effect) | +0.03 [+0.01, +0.05], Holm p 0.38 | +0.04 |
+| Four ideas minus one, no web | −0.06 [−0.12, −0.01], Holm p 0.86 | −0.08 |
+| Llama in every role (no web) vs Llama closed-book | −0.08 [−0.13, −0.03], Holm p 0.05 | −0.11 |
+
+- **Worse than one call.**
+  - The three-role system scores 0.47–0.52 with o3-mini, against 0.62 for the best method and 0.59 for o3-mini
+    closed-book, with both judges.
+  - It only matches the Llama-3.3 closed-book baseline.
+  - The best of the 16 configurations is one idea without web (0.53).
+- **Web evidence.** Only web at the decider has a positive effect. Its CI is above 0 with both judges, but it does
+  not survive Holm. Web at the proposer or critic does nothing.
+- **Each agent.** The critic adds nothing, and the decider is no better than "the best verdict wins". Four ideas are
+  no better than one; without web, one is better.
+- **Coverage and selection.**
+  - At least one of the four ideas matches the paper's lever in 37–40% of runs (one call: 17–23%), but the final
+    hypothesis matches in only 15%.
+  - When an idea matches, the decider picks one 37–39% of the time, about what a random pick gives (32–35%).
+    Taking the proposer's first idea would give 38–53%.
+  - The critic rates matching ideas like the others, mostly "viable with changes".
+- **Where the score is lost.**
+  - Every reconstruction dimension falls, most of all the intervention: 0.08–0.12 against 0.32 (GPT-5.6).
+  - GPT-5.6 rates the hypotheses more novel (2.0 vs 1.6), and the audit finds them more specific (0.50 vs 0.31).
+  - Hedges did not increase.
+- **Leakage: none detected.**
+  - All counters are zero over 4,320 runs.
+  - 60,141 web-record reads were re-checked against each paper's date: 0 violations.
+
+**Operational notes** (loop.md 18.2).
+- Extra judge, audit and label loops ran on both GPT-5.6 instances to add throughput. Loops added later took jobs in
+  a seeded random order and skipped any output another loop had written.
+- No rate limiting occurred.
+- **Integrity.** Every run has both judges and the target-free audit. `must_obey_check.py` passes all 16 directories
+  and the two completed baselines.
+
+## Comparability and limits, experiments 8 to 37
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -1614,3 +1700,9 @@ papers' XML, with no data leakage. Plan in loop.md 17.1; amendments 17.2–17.3 
   - With Llama-3.3 on Azure, the suite's tool agents fail to call tools when a fifth tool is offered. So experiment
     9's KG agent (in experiment 21 and here) was almost always a closed-book answer with a different prompt, and
     its results say nothing about MatKG.
+- Experiment 37 tests a new method on the 45 spent papers, so it is exploratory; a claim would need test5.
+  - Its web evidence comes from experiment 36's corpora.
+  - The proposer lists its strongest idea first. In the smoke test, the decider still favoured that idea when it was
+    shown last (loop.md 18.2).
+  - The Q6 labels are a target-aware analysis by GPT-5.6, the primary judge's model. The comparison of the decider's
+    selection with chance was added after the results (post hoc).

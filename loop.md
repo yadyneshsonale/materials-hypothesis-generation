@@ -2848,3 +2848,311 @@ cover).
   - the second-instance loops as before.
 - **Tier 1 lever labels** run on the shared instance as well.
 - Each audit and label records its instance.
+
+## 18. Propose, critique, decide: three agent roles with optional web evidence (experiment 37)
+
+### 18.1 Pre-registered plan (written 2026-10-28 at about 02:00, before any experiment-37 run)
+
+**Request.** Use three types of agents: one proposes ideas, one critiques them, and one sees the ideas and the
+critiques and decides the direction. Each step can be augmented with the web-searched data. Try all baselines and
+ablations, formalise it and run the evaluations.
+
+**Sources** (must_obey.md 8).
+
+| ID | Source | What I understood | What we integrate |
+|---|---|---|---|
+| C1 | AI co-scientist, Gottweis et al. 2025. https://arxiv.org/abs/2502.18864 | Separate generation, reflection (review) and meta-review roles | Proposer, critic and decider. One round; no tournament, because tournaments and self-scored selection did not help here (iterations 3 and 5) |
+| C5 | ResearchAgent, Baek et al. 2025. https://arxiv.org/abs/2404.07738 | Reviewing agents with explicit, narrow criteria | The critic's six fixed criteria |
+| C7 | Large Language Monkeys, Brown et al. 2024. https://arxiv.org/abs/2407.21787 | Coverage (any of k right) and selection are separate problems | Measured separately: proposal recall and selection accuracy (Q6) |
+| C11 | HyDE, Gao et al. 2023. https://arxiv.org/abs/2212.10496 | Retrieve with a hypothetical answer, not the bare question | The critic's and decider's web evidence is retrieved with each proposed idea, not with the question |
+| D1 | The AI Scientist, Lu et al. 2024. https://arxiv.org/abs/2408.06292 | Ideas are checked against the literature before they are pursued | Criterion 5 of the critic: does the evidence support, contradict or already cover the idea |
+
+**Failures targeted.**
+- **F1:** the wrong kind of intervention.
+- **F10:** coverage exists, but selection fails (lever ≥ 2 in any of 20 o3-mini hypotheses for 42% of units, in one
+  for 17%). Self-scoring selection already failed.
+- **Experiment 36:** retrieving with the question returns background (59% of picks are abstracts and
+  introductions) and matches the question's description, not its problem.
+- **Known risks:** critique made hypotheses hedge (experiment 11), and selection steps did not beat the writer
+  (iterations 3, 5, round 2). The decider writes with the incumbent's conservative-writer instruction, and hedges
+  are tracked.
+
+**Formal definition.** For a question q with cutoff t and its experiment-36 web corpus W(q), every record in W(q) is
+dated before t.
+1. **Proposer.** I = P(q, E_P) = {i_1 … i_K}, with K = 4.
+   - Each idea gives: the material system and starting state; the intervention with key parameters; conditions;
+     structural mediator; mechanism; predicted outcome against the baseline; and why it addresses the question's
+     limitation.
+   - Ideas must differ in lever or mechanism.
+   - E_P is either ∅ or the top 10 cards of W(q) by BM25 against q: one per paper, ≤ 1,600 characters each,
+     ≤ 16,000 characters in total.
+2. **Critic.** c_k = C(q, i_k, E_C(i_k)) for every k, in one call.
+   - Criteria: (1) addresses the stated limitation at its root cause; (2) respects every explicit constraint;
+     (3) mechanism physically sound for this system and regime; (4) feasible with established methods; (5) supported,
+     contradicted or already tried according to the evidence (record IDs cited); (6) main risk.
+   - Verdict: strong, viable with changes, or weak, plus one fix for the main weakness.
+   - E_C(i_k) is either ∅ or passages of W(q) ranked by BM25 against the idea's own text (system, intervention,
+     conditions, mediator, mechanism): 16,000/K characters per idea, no passage twice, ≤ 16,000 in total.
+3. **Decider.** (decision, h) = D(q, I, C, E_D).
+   - It adopts one idea, adopts it with the critic's fix, or merges compatible ideas. It may not switch to an idea
+     nobody proposed.
+   - It writes the final hypothesis h in the shared schema with the incumbent's conservative-writer instruction.
+   - E_D is either ∅ or the same idea-targeted passages as E_C. h may cite only records in E_D.
+4. **Harness.** Every call goes through `Harness.ask`: pre-cutoff models, target guard, logging. Every record a run
+   sees is audited. Ideas and critiques are passed between roles with record IDs removed.
+
+**Configurations (16).** Each runs on the 45 papers (all36 + test4), 3 levels × 2 samples: 270 runs.
+- **Web grid** (o3-mini in every role): `pcd_{none,P,C,D,PC,PD,CD,PCD}_o3mini`. The letters say which roles get web
+  evidence.
+- **Structure ablations** (o3-mini), each at no web and at full web:
+  - `pcd_nocritic_{none,PCD}_o3mini`: the decider sees the ideas only.
+  - `pcd_nodecider_{none,PCD}_o3mini`: code picks the idea with the best verdict (strong > viable > weak; ties by
+    proposer order). The incumbent's writer writes it up with its critique, plus E_D with web.
+  - `pcd_k1_{none,PCD}_o3mini`: one idea instead of four.
+- **Model:** `pcd_{none,PCD}_llama`, Llama-3.3 in every role.
+
+**Baselines** (existing runs on the same papers, levels and samples, with the same judges):
+- `closed_book` (Llama), `closed_book_o3mini`, `writer_only_b_o3mini` (best method);
+- `web_text_chunks_b_o3mini`, `web_agent_o3mini` (best web agent), `web_text_64k_b_o3mini` (best web method);
+- `web_text_chunks` and `web_agent` (Llama).
+
+So that every baseline covers all 45 papers, `closed_book_o3mini` is completed on test3 and test4 (126 runs) and
+`web_text_64k_b_o3mini` on test4 (54 runs).
+
+**Budgets** (must_obey.md 6.1, declared).
+- Each web-augmented role sees at most 16,000 characters, the standard evidence budget. A run with web at all three
+  roles therefore reads up to 32,000 distinct characters (the critic and decider share theirs). The amount of
+  evidence is part of the variable under test, as with the agents of experiment 36.
+- Samples: 2. Output caps: the harness defaults.
+
+**Analysis** (fixed now; script `pcd_analysis.py`). GPT-5.6 is primary, with DeepSeek alongside. Differences are
+paired per paper with paper-bootstrap CIs, sign tests and Holm correction within each question.
+- **Q1 (primary): the full system vs the baselines.** `pcd_PCD_o3mini` vs `writer_only_b_o3mini`,
+  `closed_book_o3mini`, `closed_book`, `web_text_chunks_b_o3mini`, `web_agent_o3mini` and `web_text_64k_b_o3mini`,
+  on 45 papers; Holm across the 6. It beats a baseline if the GPT-5.6 CI is above 0 and DeepSeek agrees in
+  direction.
+- **Q2: the framework without web.** `pcd_none_o3mini` vs `writer_only_b_o3mini` and `closed_book_o3mini`.
+- **Q3: web at each step.**
+  - Main effect of web at a role: per paper, the mean of the 4 grid cells with web at that role minus the mean of
+    the 4 without; Holm across the 3 roles.
+  - Each cell vs `pcd_none_o3mini`; Holm across the 7.
+- **Q4: each agent's contribution.** The full three-role system vs no critic, no decider and K = 1, at both web
+  settings; Holm across the 6.
+- **Q5: model.** `pcd_none_llama` and `pcd_PCD_llama` vs `closed_book`; `pcd_PCD_llama` vs `web_text_chunks` and
+  `web_agent`; Holm across the 4.
+- **Q6 (diagnostic): coverage and selection.** For `pcd_none_o3mini` and `pcd_PCD_o3mini`, one GPT-5.6 lever-label
+  call per run labels all K ideas and the final hypothesis. The labels are target-aware analysis only, never shown
+  to a method. Measures:
+  - proposal recall: any idea with lever ≥ 2;
+  - final lever ≥ 2;
+  - selection: when an idea has lever ≥ 2, how often the final hypothesis does too;
+  - the critic's verdicts on matching vs other ideas;
+  - how often the decider takes the first idea;
+  - decision modes;
+  - idea diversity: distinct intervention classes.
+- **Secondary:** all 10 judge dimensions, the audit (chain, specificity), hedges, length, cost (calls, characters,
+  seconds) and failures. Standard lever labels for the two Q6 configurations.
+- **Leakage:**
+  - every run's counters must be zero;
+  - every web record's dates are re-checked;
+  - `must_obey_check.py` must pass.
+- **Status:** all 45 papers are spent, so results are exploratory. A claim needs a fresh test set (test5).
+
+**Expectations, recorded before running.**
+- Proposal recall rises above one-shot (17%), but selection stays the bottleneck (F10).
+- The full system is unlikely to beat `writer_only_b_o3mini` by much.
+- Web helps the critic and decider more than the proposer, because idea-targeted retrieval returns evidence about
+  the proposed solution.
+
+**Smoke test.** Before the runs, one unit per configuration in a scratch root checks the mechanics only: valid JSON,
+budgets, zero counters. These outputs are not judged or analysed.
+
+### 18.2 Amendment before any run (02:11; runs started 02:14): neutral presentation of the ideas
+
+**What the first smoke test showed** (one unit × 16 configurations; mechanics only, nothing judged): the decider
+chose the proposer's first idea, I1, in all 16 runs.
+
+**Change.**
+- The critic and the decider now see the ideas in a seeded random order, with neutral labels A–D (Harness rng,
+  seeded by paper, level and sample). This is what must_obey.md 5.2 requires of selectors: shuffled candidates with
+  neutral labels.
+- Decisions are mapped back to the proposer's IDs. The run records the presentation and both the chosen labels and
+  the chosen original IDs.
+- The no-decider rule breaks ties by the proposer's order, as pre-registered.
+
+**Second change.** When the decider (or the no-decider writer) has no records to cite, the critic's record IDs are
+removed from the critiques it sees.
+
+**Second smoke test** (2 units × 16 configurations, 32 runs, not judged):
+- All 32 runs OK; every leakage counter is zero.
+- 10 runs needed the standard repair call, because the decider cited a bare paper ID mentioned in a critique. The
+  repair fixed every one.
+- With the shuffled order, the decider still chose the proposer's first idea in 28 of 32 runs, including runs where
+  that idea was shown last (as D). The proposer tends to list its strongest idea first; the choice is not a
+  presentation artefact.
+
+No prompt was changed after either smoke test, and no smoke output was judged.
+
+**Operational note (03:28).** `run_pcd.sh`'s two evaluation loops alternate judge and audit passes. They spent long
+passes on audits while judging waited, and neither GPT-5.6 instance was rate limiting.
+- One judge-only loop per instance was added (`loop/run_pcd_judges.sh`). Jobs another loop already wrote are skipped.
+- Throughput rose from about 31 to about 70 GPT-5.6 calls a minute, with no rate limiting.
+- Nothing about what is evaluated, or how, changed.
+- **Extra audit loops.** At 04:33, audit-only loops were added the same way. They used the same order as the
+  evaluation loops on the same instance, so pairs of processes audited the same runs in lockstep and duplicated work.
+  At 05:00 they were restarted with a seeded random job order (`MATHG_PENDING_SHUFFLE`), and the audit rate rose from
+  about 31 to about 53 a minute.
+- **Extra label loops (05:30).** The pre-registered Q6 labels were started while the last audits ran
+  (`loop/run_pcd_labels.sh`). Each label type ran on the instance `run_pcd.sh` does not use for it, in a seeded random
+  job order. `pcd_analysis.py labels` got the same skip-if-written check and shuffle as the harness stages (tested in
+  `test_pcd.py`). Nothing about what is labelled, or how, changed.
+- **Report completed (05:33).** `pcd_analysis.py report` lacked some pre-registered secondary metrics. It now also
+  reports, for every configuration and baseline:
+  - all 10 judge dimensions for both judges (run-level means, as in the harness summary);
+  - the share of runs the GPT-5.6 judge classes as unsupported;
+  - output length (characters in the final hypothesis's text fields);
+  - the standard lever labels.
+
+  Q6 is now rendered as a table. This was added after the Q1–Q5 results had been seen; it adds metrics that 18.1
+  already listed and changes no pre-registered comparison.
+
+### 18.3 Results (2026-10-28, 05:50; exploratory, because all 45 papers are spent)
+
+**Runs.**
+- 16 configurations × 270 runs = 4,320 runs; none failed in the end.
+- Four first attempts (one each in `pcd_k1_PCD_o3mini` and `pcd_nodecider_PCD_o3mini`, two in `pcd_PD_o3mini`) cited a
+  web record that the writing role had not been given, even after the repair call. Each succeeded on its one retry.
+  The first attempts are kept in `failed_attempts/` (must_obey.md 6).
+- Every run has both judges and the audit. The two Q6 configurations also have idea labels and standard labels.
+- 28 runs' idea labels were written twice, by two label loops working at the same moment; the later label is kept.
+- `must_obey_check.py` passes all 16 directories and the two completed baselines.
+- Full tables: `loop_pcd/analysis_pcd.md`.
+
+**Q1 (primary): the full system is worse than every o3-mini baseline.** `pcd_PCD_o3mini` scores 0.50 (GPT-5.6) and
+0.36 (DeepSeek).
+
+| Baseline (GPT-5.6 score) | GPT-5.6 difference [CI], Holm p | DeepSeek difference [CI] | Decision |
+|---|---|---|---|
+| `writer_only_b_o3mini` (0.62) | −0.12 [−0.17, −0.07], 0.003 | −0.21 [−0.31, −0.12] | worse |
+| `closed_book_o3mini` (0.59) | −0.09 [−0.14, −0.04], 0.014 | −0.14 [−0.23, −0.05] | worse |
+| `closed_book`, Llama (0.50) | −0.00 [−0.05, +0.05], 0.87 | +0.06 [−0.01, +0.12] | no detectable difference |
+| `web_text_chunks_b_o3mini` (0.61) | −0.11 [−0.17, −0.06], 0.014 | −0.25 [−0.34, −0.15] | worse |
+| `web_agent_o3mini` (0.56) | −0.06 [−0.10, −0.02], 0.11 | −0.19 [−0.27, −0.11] | worse |
+| `web_text_64k_b_o3mini` (0.64) | −0.14 [−0.20, −0.08], 0.001 | −0.29 [−0.38, −0.20] | worse |
+
+**Q2: it is worse without web too.** `pcd_none_o3mini` scores 0.47 (DeepSeek 0.35).
+- vs the writer: −0.15 [−0.21, −0.10], Holm p < 0.001 (DeepSeek −0.23).
+- vs `closed_book_o3mini`: −0.12 [−0.17, −0.07], Holm p 0.003 (DeepSeek −0.16).
+
+**Q3: web evidence helps only the decider, and only slightly.**
+- **Main effects** (with web minus without, over the grid):
+  - proposer +0.01 [−0.02, +0.04];
+  - critic −0.01 [−0.04, +0.01];
+  - decider +0.03 [+0.01, +0.05], Holm p 0.38 (DeepSeek +0.04 [+0.01, +0.08]).
+- **Cell means (GPT-5.6):** none 0.47, P 0.50, C 0.48, D 0.50, PC 0.46, PD 0.52, CD 0.50, PCD 0.50. No cell differs
+  from no web after Holm.
+
+**Q4: no agent earns its place** (full system minus ablation; GPT-5.6 [CI], DeepSeek in brackets).
+
+| Full minus | No web | Full web |
+|---|---|---|
+| No critic | −0.01 [−0.05, +0.03] (+0.02) | +0.02 [−0.02, +0.06] (−0.02) |
+| No decider (best verdict wins) | −0.04 [−0.09, +0.01] (−0.03) | −0.02 [−0.06, +0.02] (−0.10 [−0.17, −0.04]) |
+| One idea instead of four | −0.06 [−0.12, −0.01] (−0.08) | −0.00 [−0.03, +0.03] (−0.12 [−0.18, −0.06]) |
+
+- None of the six survives Holm.
+- The critic adds nothing, and the decider is no better than the rule.
+- Four ideas are no better than one. Without web, one idea is better by the pre-registered decision rule.
+- The best of the 16 configurations is one idea without web (`pcd_k1_none_o3mini`, 0.53 / 0.43).
+
+**Q5: Llama-3.3 in every role is worse than Llama closed-book.**
+- `pcd_none_llama` (0.42): −0.08 [−0.13, −0.03], Holm p 0.05 (DeepSeek −0.11).
+- `pcd_PCD_llama` (0.40): −0.11 [−0.16, −0.04], Holm p 0.012 (DeepSeek −0.06).
+- `pcd_PCD_llama` vs `web_text_chunks`: −0.10 [−0.17, −0.05]; vs `web_agent`: −0.02 [−0.07, +0.03].
+
+**Q6: coverage rises, but selection fails.**
+
+| Measure | No web | Full web |
+|---|---:|---:|
+| Proposal recall: any of the 4 ideas with lever ≥ 2 | 37% | 40% |
+| Final hypothesis lever ≥ 2 (idea labels) | 15% | 15% |
+| Final hypothesis lever ≥ 2 (standard labels; writer 19%, `closed_book_o3mini` 23% of 144 labelled) | 13% | 12% |
+| When an idea matches, the final hypothesis matches | 39% | 35% |
+| Decider took the proposer's first idea | 47% | 44% |
+| Decision modes: adopt with fix / adopt / merge | 258 / 3 / 9 | 246 / 16 / 8 |
+| Distinct intervention classes among the 4 ideas | 2.5 | 2.6 |
+| Critic says "strong": matching vs other ideas | 5% vs 4% | 11% vs 7% |
+| Critic says "weak": matching vs other ideas | 6% vs 15% | 12% vs 13% |
+
+- **Post hoc check (not pre-registered).** Among runs with a matching idea:
+  - a random pick would choose one 35% (no web) and 32% (full web) of the time;
+  - always taking the proposer's first idea would choose one 53% and 38% of the time;
+  - the decider chose one 39% and 37% of the time.
+
+  So selection is at chance, and below the proposer's own order.
+- **The first idea alone.** It matches in 19% of all runs without web, the same as one writer call. The pipeline adds
+  coverage, then moves away from the proposer's best guess.
+
+**Secondary.**
+- **Where the score is lost.** Both judges score every reconstruction dimension lower than the writer's (no web /
+  full web vs the writer).
+
+  | Dimension | GPT-5.6 | DeepSeek |
+  |---|---|---|
+  | Intervention (largest drop with GPT-5.6) | 0.08 / 0.12 vs 0.32 | 0.23 / 0.27 vs 0.45 |
+  | Conditions | 0.46 / 0.47 vs 0.58 | 0.39 vs 0.66 |
+  | Mechanism | 0.58 / 0.59 vs 0.75 | 0.36 / 0.38 vs 0.55 |
+  | Outcome | 0.76 / 0.82 vs 0.85 | 0.41 vs 0.65 |
+- **Different rather than hedged.**
+  - GPT-5.6 rates the pipeline's hypotheses more novel: 1.99 / 2.05 vs 1.56 (DeepSeek 1.31 / 1.36 vs 1.21).
+  - It rates their baselines (1.58 / 1.56 vs 1.42) and boundaries (1.53 vs 1.35) higher.
+  - Problem alignment falls: 2.49 / 2.47 vs 2.64.
+  - Hedges are not more frequent: 0.08 / 0.13 per run vs 0.12.
+  - The audit finds them more specific (0.50 / 0.51 vs 0.31), with complete chains less often (0.79 / 0.67 vs
+    0.84).
+- **Unsupported.**
+  - GPT-5.6 classes 85% (no web) and 62% (full web) as unsupported, against 73% for the writer.
+  - Web at the decider gives the hypothesis something to cite: evidence validity 0.94 vs 0.04.
+- **Length.** About the same: 3,490 / 3,590 characters vs 3,350 for the writer.
+- **Cost.**
+  - 2–4 calls a run (the writer makes 1);
+  - 10,000–82,000 input characters (1,900);
+  - 30–61 seconds (10).
+
+**Expectations** (18.1).
+- Proposal recall rose (37–40%, against 17–23% for one call), and selection stayed the bottleneck: as expected.
+- The full system did not beat the writer, as expected, but it was also significantly worse, which was not expected.
+- Web helped the decider slightly but not the critic: partly as expected.
+
+**Leakage: none detected.**
+- All counters are zero over 4,320 runs.
+- 60,141 web-record reads were re-checked against each paper's date: 0 violations, 0 unresolved.
+
+**Interpretation.**
+- Splitting the answer into propose, critique and decide moves the final hypothesis away from the conventional next
+  step, which is what these papers took:
+  - the ideas are framed as distinct directions, so most are not the paper's lever;
+  - the critic's fixes add specifics;
+  - the decider picks at chance.
+- The critic cannot tell the paper's direction from the others: it calls nearly every idea "viable with changes".
+- The proposer's first idea is as good a guess as one call, and every later step loses ground against this target.
+- This agrees with earlier findings:
+  - selection, critique and revision steps did not help (iterations 3 and 5, round 2, experiment 11);
+  - one conservative call remains the best method.
+
+**Status.** Exploratory, with no method claim. No configuration is a candidate for a test5 evaluation.
+
+**Checklist** (must_obey.md section 9).
+- [x] Query-facing models are pre-cutoff (o3-mini and Llama-3.3, both cleared by the memorisation probe).
+- [x] Frozen, hash-checked v3.1-procedure questions; no question edited.
+- [x] Evidence only from experiment 36's date-filtered corpora, with every record re-checked (0 violations); no live
+  tools.
+- [x] Payloads target-free (harness guard) and judging blinded. The critic and decider see the ideas shuffled, with
+  neutral labels (5.2).
+- [x] Spent papers only; exploratory, with no held-out split used.
+- [x] Budgets declared (18.1): each web-augmented role reads at most 16,000 characters; 2 samples, as for the
+  baselines.
+- [x] GPT-5.6 judge, DeepSeek cross-judge and target-free audit on every run. Failures reported (4 first attempts
+  kept).
+- [x] Paired statistics with CIs and Holm; negative results recorded.
+- [x] READMEs, experiment log, loop.md and PROJECT_SUMMARY.md updated; `must_obey_check.py` passes.

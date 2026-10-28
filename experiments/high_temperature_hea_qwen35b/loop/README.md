@@ -166,3 +166,19 @@
     end of generation.
 - **Result.** Web search helps no baseline (W1), and web corpora are no better than the fixed corpus (W2): see
   [../loop_web/analysis_web.md](../loop_web/analysis_web.md).
+
+## Experiment 37: propose, critique, decide (loop.md section 18)
+
+- **Generation.** [run_pcd.sh](./run_pcd.sh) ran the 16 configurations of the three-role method (proposer, critic,
+  decider; optional web evidence at each role) on all 45 papers, 270 runs each, into
+  [../loop_pcd/](../loop_pcd/README.md). It also completed two baselines on all 45 papers: `closed_book_o3mini` here
+  (test3 and test4, 126 runs) and `web_text_64k_b_o3mini` in [../loop_web/](../loop_web/README.md) (test4, 54 runs).
+- **Evaluation.** `run_pcd.sh` ran the GPT-5.6 judge and audits on both TRAPI instances, then the DeepSeek
+  cross-judge, the Q6 labels and the report. Extra loops added throughput without changing what is evaluated (loop.md
+  18.2):
+  - [run_pcd_judges.sh](./run_pcd_judges.sh): judge-only loops;
+  - [run_pcd_audits.sh](./run_pcd_audits.sh): audit-only loops in a seeded random job order;
+  - [run_pcd_labels.sh](./run_pcd_labels.sh): the Q6 labels, started while the last audits ran.
+- **Analysis.** [pcd_analysis.py](../../../pcd_analysis.py), outputs in [../loop_pcd/](../loop_pcd/README.md).
+- **Result.** The three-role method is worse than one o3-mini call, with or without web evidence, and no better than
+  the Llama-3.3 closed-book baseline.

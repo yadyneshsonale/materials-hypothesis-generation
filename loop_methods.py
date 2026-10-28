@@ -1243,3 +1243,290 @@ def m_web_agent_b(h: Harness) -> dict[str, Any]:
     payload = {"query": h.query, "knowledge_cutoff": h.cutoff, "analysis_notes": {},
                "eligible_evidence": h.evidence_payload(pages, _web.PAGE_CHARS)}
     return h.generate_final("writer", "o3mini", WRITER_B, payload, {r.record_id for r in pages})
+
+
+# ---------------------------------------------------------------- experiment 37 (loop.md 18.1): propose, critique, decide
+# Three agent roles (C1 co-scientist: generation, reflection, meta-review; C5 ResearchAgent: criterion-based review).
+# Each role can get web evidence from the question's experiment-36 corpus. The proposer widens coverage on purpose
+# (F10); the critic and the decider replace self-scored selection. The critic's and decider's evidence is retrieved
+# with each proposed idea instead of the question (C11 HyDE): experiment 36 showed the question retrieves background.
+
+import threading  # noqa: E402
+from collections import OrderedDict  # noqa: E402
+
+from temporal_hypothesis_benchmark import _validate_generation  # noqa: E402
+
+PCD_K = 4
+IDEA_FIELDS = ("material_system", "intervention", "conditions", "structural_mediator", "mechanism",
+               "predicted_outcome", "why_it_addresses_the_question")
+SEARCH_FIELDS = ("material_system", "intervention", "conditions", "structural_mediator", "mechanism")
+CRITIQUE_FIELDS = ("addresses_problem", "constraints", "physical_soundness", "feasibility", "evidence", "main_risk",
+                   "fix")
+VERDICT_RANK = {"strong": 2, "viable_with_changes": 1, "weak": 0}
+IDEA_JSON = ("{\"material_system\": str, \"intervention\": str, \"conditions\": str, \"structural_mediator\": str, "
+             "\"mechanism\": str, \"predicted_outcome\": str, \"why_it_addresses_the_question\": str, "
+             "\"supporting_record_ids\": [IDs copied from the supplied records, or empty]}")
+
+
+def proposer_system(k: int) -> str:
+    task = ("Propose the single most promising research direction that could answer the question. It must"
+            if k == 1 else
+            f"Propose {k} candidate research directions that could answer the question. Each must")
+    differ = "" if k == 1 else (
+        ", and differ from the others in its lever (for example composition, processing or synthesis route, heat or "
+        "thermomechanical treatment, microstructure architecture, surface or coating, or a measurement, simulation or "
+        "modelling approach) or in its mechanism")
+    return (
+        "You are the proposer in a team of materials scientists. You receive a research question, a knowledge cutoff "
+        "and, optionally, summaries of earlier papers (all published before the cutoff). " + task + " attack the "
+        "limitation or open question the question states and respect every explicit constraint" + differ + ". Use only "
+        "materials-science knowledge from before the cutoff and the supplied records; never claim knowledge of later "
+        "work. Be specific: name the material system and starting state, the intervention or study with its key "
+        "parameters, the conditions, the expected structural change, the mechanism, and the predicted outcome "
+        "relative to the baseline the question implies. Return JSON {\"ideas\": [" + IDEA_JSON + "]}."
+    )
+
+
+CRITIC_SYSTEM = (
+    "You are the critic in a team of materials scientists. You receive a research question, a knowledge cutoff, "
+    "candidate research directions proposed by a colleague and, optionally, earlier literature records retrieved for "
+    "each direction (all published before the cutoff). Review every direction rigorously and fairly against these "
+    "criteria: (1) does it address the limitation or open question the question states, at its root cause; (2) does it "
+    "respect every explicit constraint, such as the material system, the operating conditions and the properties that "
+    "must not be sacrificed; (3) is its mechanism physically sound for this specific material system and regime; (4) is "
+    "it feasible with established methods; (5) do the supplied records support it, contradict it, or show it was "
+    "already tried (cite their record IDs); (6) what is its main risk. Then give a verdict, strong, viable_with_changes "
+    "or weak, and one concrete fix for its main weakness. Judge each direction on its merits and do not propose new "
+    "directions. Return JSON {\"critiques\": [{\"id\": str, \"addresses_problem\": str, \"constraints\": str, "
+    "\"physical_soundness\": str, \"feasibility\": str, \"evidence\": str, \"evidence_ids\": [record IDs], "
+    "\"main_risk\": str, \"verdict\": str, \"fix\": str}]} with one entry per direction."
+)
+DECIDER_SYSTEM = (
+    "You lead a team of materials scientists and decide the research direction. You receive a research question, a "
+    "knowledge cutoff, candidate directions from the proposer, the critic's review of each direction when one is "
+    "supplied and, optionally, earlier literature records (all published before the cutoff). Decide which direction the "
+    "team pursues: weigh how directly each attacks the limitation or open question the question states, whether the "
+    "critic's objections are fatal or fixable, and the evidence. You may adopt one direction, adopt it with the "
+    "critic's fix, or merge compatible elements of several directions into one coherent study; do not switch to a "
+    "direction nobody proposed. Then write the final hypothesis for the chosen direction. Do not claim knowledge of the "
+    "held-out paper. Predict the direction and approximate size of effects only as far as the reasoning and evidence "
+    "support; if support is insufficient, state the uncertainty instead of inventing support or precise values.\n\n"
+    "Return JSON with \"decision\": {\"chosen_ids\": [direction IDs], \"mode\": \"adopt\" | \"adopt_with_fix\" | "
+    "\"merge\", \"rationale\": str}, followed by all fields of:\n" + SCHEMA +
+    "\nEvidence IDs must be copied from the supplied records."
+)
+
+_PCD_DOCS: OrderedDict[str, dict[str, list[str]]] = OrderedDict()
+_PCD_DOCS_LOCK = threading.Lock()
+
+
+def _pcd_ranked(h: Harness, search: str, representation: str) -> list[Any]:
+    """The pool ranked by BM25 against the search text (content words only); records sharing no word are dropped."""
+    pool = h.pool(representation)
+    key = f"{h.source}:{h.case['paper_id']}:{h.level if h.source == 'web' else '*'}:{representation}"
+    with _PCD_DOCS_LOCK:
+        docs = _PCD_DOCS.get(key)
+    if docs is None:
+        docs = {r.record_id: content_terms(r.text) for r in pool}
+        with _PCD_DOCS_LOCK:
+            _PCD_DOCS[key] = docs
+            while len(_PCD_DOCS) > 12:
+                _PCD_DOCS.popitem(last=False)
+    scores = bm25(content_terms(search), docs)
+    return sorted((r for r in pool if scores.get(r.record_id, 0.0) > 0),
+                  key=lambda r: (-scores[r.record_id], r.publication_date, r.record_id))
+
+
+def pcd_evidence(h: Harness, search: str, representation: str, budget: int, cap: int,
+                 one_per_paper: bool = False, exclude: frozenset[str] = frozenset()) -> list[Any]:
+    """Top-ranked records within a character budget; the record limit scales with the budget (24 per 16,000)."""
+    max_records = max(1, round(rx.MAX_RECORDS * budget / rx.EVIDENCE_BUDGET_CHARS))
+    packed: list[Any] = []
+    used = 0
+    papers: set[str] = set()
+    for record in _pcd_ranked(h, search, representation):
+        if record.record_id in exclude or (one_per_paper and record.paper_id in papers):
+            continue
+        size = min(len(record.text), cap)
+        if used + size > budget:
+            continue
+        packed.append(record)
+        used += size
+        papers.add(record.paper_id)
+        if len(packed) >= max_records or used >= budget - 200:
+            break
+    for record in packed:
+        h.seen[record.record_id] = record
+    return packed
+
+
+def idea_search_text(idea: dict[str, Any]) -> str:
+    return " ".join(str(idea.get(f, "")) for f in SEARCH_FIELDS)
+
+
+def present(h: Harness, ideas: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """The ideas in a seeded random order with neutral labels A, B, ... (must_obey.md 5.2: selectors see shuffled
+    candidates with neutral labels), so the proposer's order cannot steer the critic or the decider."""
+    order = list(range(len(ideas)))
+    h.rng.shuffle(order)
+    shown = [{**ideas[n], "label": chr(ord("A") + pos)} for pos, n in enumerate(order)]
+    h.notes["presentation"] = {i["label"]: i["id"] for i in shown}
+    return shown
+
+
+def public_idea(idea: dict[str, Any]) -> dict[str, Any]:
+    """An idea as the critic and decider see it: its neutral label, no record IDs (they may not see those records)."""
+    return {"id": idea["label"], **{f: idea[f] for f in IDEA_FIELDS}}
+
+
+def parse_ideas(raw: Any, k: int, allowed: set[str]) -> list[dict[str, Any]]:
+    items = raw.get("ideas") if isinstance(raw, dict) else None
+    ideas: list[dict[str, Any]] = []
+    for item in items if isinstance(items, list) else []:
+        if not isinstance(item, dict):
+            continue
+        fields = {f: str(item.get(f) or "").strip() for f in IDEA_FIELDS}
+        if not fields["intervention"] or not fields["mechanism"]:
+            continue
+        cited = item.get("supporting_record_ids")
+        ideas.append({"id": f"I{len(ideas) + 1}", **fields,
+                      "supporting_record_ids": [c for c in cited if c in allowed] if isinstance(cited, list) else []})
+        if len(ideas) == k:
+            break
+    if not ideas:
+        raise ValueError("proposer returned no usable idea")
+    return ideas
+
+
+def parse_critiques(raw: Any, ideas: list[dict[str, Any]], allowed: set[str]) -> list[dict[str, Any]]:
+    items = raw.get("critiques") if isinstance(raw, dict) else None
+    ids = [i["label"] for i in ideas]
+    found: dict[str, dict[str, Any]] = {}
+    for item in items if isinstance(items, list) else []:
+        if not isinstance(item, dict):
+            continue
+        iid = str(item.get("id") or "").strip()
+        if iid not in ids or iid in found:
+            continue
+        verdict = str(item.get("verdict") or "").strip().lower().replace(" ", "_").replace("-", "_")
+        cited = item.get("evidence_ids")
+        found[iid] = {"id": iid, **{f: str(item.get(f) or "").strip()[:1500] for f in CRITIQUE_FIELDS},
+                      "evidence_ids": [c for c in cited if c in allowed] if isinstance(cited, list) else [],
+                      "verdict": verdict if verdict in VERDICT_RANK else "not_stated"}
+    if not found:
+        raise ValueError("critic returned no usable critique")
+    return [found.get(i, {"id": i, "verdict": "not_reviewed"}) for i in ids]
+
+
+def rule_choice(ideas: list[dict[str, Any]], critiques: list[dict[str, Any]]) -> dict[str, Any]:
+    """No-decider ablation: the idea with the best verdict; ties go to the proposer's earlier idea."""
+    rank = {c["id"]: VERDICT_RANK.get(c.get("verdict", ""), -1) for c in critiques}
+    return max(ideas, key=lambda i: (rank.get(i["label"], -1), -int(i["id"][1:])))
+
+
+def pcd_propose(h: Harness, model: str, k: int, web: bool) -> list[dict[str, Any]]:
+    payload: dict[str, Any] = {"question": h.query, "knowledge_cutoff": h.cutoff}
+    records: list[Any] = []
+    if web:
+        records = pcd_evidence(h, h.query, "card", rx.EVIDENCE_BUDGET_CHARS, rx.RECORD_MAX_CHARS, one_per_paper=True)
+        payload["earlier_papers"] = h.evidence_payload(records, rx.RECORD_MAX_CHARS)
+    raw = h.ask("proposer", model, proposer_system(k), payload)
+    ideas = parse_ideas(raw, k, {r.record_id for r in records})
+    h.notes["proposals"] = ideas
+    h.notes["proposer_evidence"] = [r.record_id for r in records]
+    return ideas
+
+
+def pcd_idea_evidence(h: Harness, ideas: list[dict[str, Any]]) -> dict[str, list[Any]]:
+    """Passages retrieved with each idea's own text (C11), an equal share of the 16,000-character budget each."""
+    budget = rx.EVIDENCE_BUDGET_CHARS // len(ideas)
+    out: dict[str, list[Any]] = {}
+    taken: set[str] = set()
+    for idea in ideas:
+        out[idea["label"]] = pcd_evidence(h, idea_search_text(idea), "text_chunks", budget, rx.RECORD_MAX_CHARS,
+                                          exclude=frozenset(taken))
+        taken |= {r.record_id for r in out[idea["label"]]}
+    h.notes["idea_evidence"] = {iid: [r.record_id for r in recs] for iid, recs in out.items()}
+    return out
+
+
+def pcd_critique(h: Harness, model: str, ideas: list[dict[str, Any]],
+                 evidence: dict[str, list[Any]] | None) -> list[dict[str, Any]]:
+    payload: dict[str, Any] = {"question": h.query, "knowledge_cutoff": h.cutoff,
+                               "directions": [public_idea(i) for i in ideas]}
+    allowed: set[str] = set()
+    if evidence is not None:
+        payload["evidence_by_direction"] = {iid: h.evidence_payload(recs, rx.RECORD_MAX_CHARS)
+                                            for iid, recs in evidence.items()}
+        allowed = {r.record_id for recs in evidence.values() for r in recs}
+    raw = h.ask("critic", model, CRITIC_SYSTEM, payload)
+    critiques = parse_critiques(raw, ideas, allowed)
+    h.notes["critiques"] = critiques
+    return critiques
+
+
+def final_with_decision(h: Harness, model: str, payload: dict[str, Any], allowed: set[str]) -> dict[str, Any]:
+    """The decider's call: the decision is kept in the notes, and the hypothesis is validated like every final
+    hypothesis (schema fields only, citations only from the supplied records, one repair call)."""
+    raw = h.ask("decider", model, DECIDER_SYSTEM, payload)
+    decision = raw.get("decision") if isinstance(raw, dict) else None
+    try:
+        out = _H._schema_only(_validate_generation(raw, allowed))
+        out["citation_validation"] = {"status": "valid", "removed_unknown_ids": []}
+    except ValueError as error:
+        repair = {**payload, "validation_error": str(error), "allowed_evidence_ids": sorted(allowed),
+                  "repair_instruction": "Regenerate the complete JSON, including the decision. The hypothesis field must "
+                                        "be a non-empty statement, and evidence ID arrays may contain only exact IDs "
+                                        "from allowed_evidence_ids."}
+        raw = h.ask("decider_repair", model, DECIDER_SYSTEM, repair)
+        decision = raw.get("decision") if isinstance(raw, dict) else decision
+        out = _H._schema_only(_validate_generation(raw, allowed))
+        out["citation_validation"] = {"status": "valid_after_regeneration", "initial_error": str(error)}
+    decision = decision if isinstance(decision, dict) else {"unparsed": str(decision)[:500]}
+    labels = decision.get("chosen_ids") if isinstance(decision.get("chosen_ids"), list) else []
+    decision["chosen_labels"] = labels
+    decision["chosen_ids"] = [h.notes.get("presentation", {}).get(str(x), str(x)) for x in labels]
+    h.notes["decision"] = decision
+    return out
+
+
+def m_pcd(h: Harness, model: str = "o3mini", web: str = "", k: int = PCD_K, critic: bool = True,
+          decider: bool = True) -> dict[str, Any]:
+    """Propose -> critique -> decide. `web` lists the roles given web evidence: P (proposer), C (critic), D (decider;
+    the writer in the no-decider ablation)."""
+    if web:
+        h.source = "web"
+    h.notes["pcd"] = {"model": model, "web": web or "none", "k": k, "critic": critic, "decider": decider}
+    ideas = present(h, pcd_propose(h, model, k, "P" in web))
+    needs = ("C" in web and critic) or "D" in web
+    evidence = pcd_idea_evidence(h, ideas) if needs else None
+    critiques = pcd_critique(h, model, ideas, evidence if "C" in web else None) if critic else None
+    final_records = [r for recs in evidence.values() for r in recs] if evidence is not None and "D" in web else None
+    if critiques is not None and final_records is None:
+        # The decider (or writer) has no records to cite, so the critic's record IDs are not passed on.
+        critiques = [{k_: v for k_, v in c.items() if k_ != "evidence_ids"} for c in critiques]
+    if not decider:
+        chosen = rule_choice(ideas, critiques or [])
+        h.notes["decision"] = {"chosen_labels": [chosen["label"]], "chosen_ids": [chosen["id"]],
+                               "mode": "rule_best_verdict"}
+        notes = {"chosen_direction": public_idea(chosen),
+                 "critique": next(c for c in critiques or [] if c["id"] == chosen["label"])}
+        return write(h, notes, model, records=final_records, system=WRITER_B)
+    payload: dict[str, Any] = {"query": h.query, "knowledge_cutoff": h.cutoff,
+                               "directions": [public_idea(i) for i in ideas]}
+    if critiques is not None:
+        payload["critiques"] = critiques
+    payload["eligible_evidence"] = h.evidence_payload(final_records, rx.RECORD_MAX_CHARS) if final_records else []
+    return final_with_decision(h, model, payload, {r.record_id for r in final_records or []})
+
+
+PCD_WEB = {"none": "", "P": "P", "C": "C", "D": "D", "PC": "PC", "PD": "PD", "CD": "CD", "PCD": "PCD"}
+for _flags, _web in PCD_WEB.items():
+    register(f"pcd_{_flags}_o3mini")(lambda h, _w=_web: m_pcd(h, "o3mini", _w))
+for _flags in ("none", "PCD"):
+    _web = PCD_WEB[_flags]
+    register(f"pcd_nocritic_{_flags}_o3mini")(lambda h, _w=_web: m_pcd(h, "o3mini", _w, critic=False))
+    register(f"pcd_nodecider_{_flags}_o3mini")(lambda h, _w=_web: m_pcd(h, "o3mini", _w, decider=False))
+    register(f"pcd_k1_{_flags}_o3mini")(lambda h, _w=_web: m_pcd(h, "o3mini", _w, k=1))
+    register(f"pcd_{_flags}_llama")(lambda h, _w=_web: m_pcd(h, "llama", _w))
+PCD_CONFIGS = tuple(m for m in _H.METHODS if m.startswith("pcd_"))
