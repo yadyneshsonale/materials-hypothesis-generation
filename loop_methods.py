@@ -1530,3 +1530,81 @@ for _flags in ("none", "PCD"):
     register(f"pcd_k1_{_flags}_o3mini")(lambda h, _w=_web: m_pcd(h, "o3mini", _w, k=1))
     register(f"pcd_{_flags}_llama")(lambda h, _w=_web: m_pcd(h, "llama", _w))
 PCD_CONFIGS = tuple(m for m in _H.METHODS if m.startswith("pcd_"))
+
+
+# ================================================================ experiment 38 (loop.md 19.1): synthesis
+# Several independent drafts, then one final hypothesis that keeps what the drafts agree on (Mixture-of-Agents; the
+# wisdom of the silicon crowd). Selection (MBR, voting, likelihood) keeps one whole candidate with its idiosyncratic
+# details; a synthesis drops the details only one draft states. Drafts are the incumbent's writer (WRITER_B).
+
+SYNTH_SYSTEM = (
+    "You are a materials-science hypothesis agent in a chronological benchmark. You receive several independent draft "
+    "hypotheses written for the same research question (labels A, B, ...; their order means nothing). Write one final "
+    "hypothesis that keeps what the drafts agree on. (1) Intervention: use the intervention that most drafts share. If "
+    "no intervention is shared by two or more drafts, keep the single draft intervention that most directly addresses "
+    "the limitation the question states. Never combine different interventions into one. (2) Conditions, structural "
+    "mediator, mechanism, predicted outcome, baseline and boundary: keep the elements that two or more drafts state "
+    "consistently, and drop specifics (numbers, compositions, phases, parameters) that only one draft states, unless "
+    "the chosen intervention needs them. (3) Do not claim knowledge of the held-out paper. Predict the direction and "
+    "approximate size of effects only as far as the drafts agree and any supplied evidence supports; if support is "
+    "insufficient, state the uncertainty instead of inventing support or precise values.\n\n"
+    "Return one falsifiable hypothesis as JSON:\n" + SCHEMA + "\nEvidence IDs must be copied from the supplied records."
+)
+DRAFT_FIELDS = ("hypothesis", "material_initial_state", "intervention", "conditions", "structural_mediator",
+                "mechanism", "predicted_outcome", "baseline", "boundary", "falsification_experiment")
+SYNTH_WEB_BUDGET = 64000  # the best web method's evidence (web_text_64k_b_o3mini)
+CROWD = ("o3mini", "o1", "4o", "4omini", "llama")  # every allowed generator with a 2023 cutoff (must_obey.md 2)
+
+
+def synth_draft(h: Harness, model: str, records: list[Any], n: int) -> dict[str, Any]:
+    """One draft from the incumbent's writer, closed-book or with the evidence pack."""
+    if not records:
+        return write(h, {}, model, role=f"draft_{n}", system=WRITER_B)
+    payload = {"query": h.query, "knowledge_cutoff": h.cutoff, "analysis_notes": {},
+               "eligible_evidence": h.evidence_payload(records, rx.record_cap("text_chunks"))}
+    return h.generate_final(f"draft_{n}", model, WRITER_B, payload, {r.record_id for r in records})
+
+
+def m_synth(h: Harness, drafts_spec: list[tuple[str, bool]], model: str = "o3mini") -> dict[str, Any]:
+    """drafts_spec: (model, with web evidence) per draft. A draft that fails even after its repair call is recorded
+    in the notes and the synthesis uses the others."""
+    records: list[Any] = []
+    if any(web for _, web in drafts_spec):
+        h.source = "web"
+        records = top_text(h, h.query, SYNTH_WEB_BUDGET)
+        h.notes["evidence"] = {"records": len(records), "papers": len({r.paper_id for r in records}),
+                               "chars": sum(min(len(r.text), rx.record_cap("text_chunks")) for r in records)}
+    drafts: list[dict[str, Any]] = []
+    for n, (draft_model, web) in enumerate(drafts_spec, 1):
+        try:
+            g = synth_draft(h, draft_model, records if web else [], n)
+        except Exception as error:  # noqa: BLE001 - recorded; the synthesis uses the other drafts
+            h.notes.setdefault("draft_failures", []).append(
+                {"draft": n, "model": draft_model, "error": f"{type(error).__name__}: {str(error)[:200]}"})
+            continue
+        drafts.append({"id": f"D{n}", "model": draft_model, "web": web, **{f: g.get(f) for f in DRAFT_FIELDS},
+                       "supporting_evidence_ids": list(g.get("supporting_evidence_ids") or []) if web else []})
+    if not drafts:
+        raise ValueError("every draft failed")
+    order = list(range(len(drafts)))
+    h.rng.shuffle(order)  # must_obey.md 5.2: shuffled, neutral labels, no model names
+    shown = []
+    for pos, i in enumerate(order):
+        item = {"label": chr(ord("A") + pos), **{f: drafts[i][f] for f in DRAFT_FIELDS}}
+        if records:
+            item["supporting_evidence_ids"] = drafts[i]["supporting_evidence_ids"]
+        shown.append(item)
+    h.notes["drafts"] = drafts
+    h.notes["presentation"] = {s["label"]: drafts[i]["id"] for s, i in zip(shown, order)}
+    payload = {"query": h.query, "knowledge_cutoff": h.cutoff, "drafts": shown,
+               "eligible_evidence": h.evidence_payload(records, rx.record_cap("text_chunks")) if records else []}
+    return h.generate_final("writer", model, SYNTH_SYSTEM, payload, {r.record_id for r in records})
+
+
+register("synth_k4_b_o3mini")(lambda h: m_synth(h, [("o3mini", False)] * 4))
+register("synth_crowd_b_o3mini")(lambda h: m_synth(h, [(m, False) for m in CROWD]))
+register("synth_mixed_b_o3mini")(lambda h: m_synth(h, [("o3mini", False)] * 2 + [("o3mini", True)] * 2))
+register("synth_k1_b_o3mini")(lambda h: m_synth(h, [("o3mini", False)]))
+register("writer_only_b_o3mini_r5")(lambda h: m_writer_only_b(h, "o3mini"))  # fresh-sample replicate (19.1)
+SYNTH_CONFIGS = ("synth_k4_b_o3mini", "synth_crowd_b_o3mini", "synth_mixed_b_o3mini", "synth_k1_b_o3mini",
+                 "writer_only_b_o3mini_r5")

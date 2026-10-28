@@ -1636,7 +1636,65 @@ first attempts are kept.
 - **Integrity.** Every run has both judges and the target-free audit. `must_obey_check.py` passes all 16 directories
   and the two completed baselines.
 
-## Comparability and limits, experiments 8 to 37
+## Experiment 38: round 4, ways to improve the hypothesis generation
+
+**Request.** First think of ways to improve the hypothesis generation, then implement them. Plan, offline checks and
+pre-registration in loop.md 19.1; results in 19.2.
+
+**Thinking first: where the score is lost** ([loop_r4/offline/](./loop_r4/README.md), `round4_offline.py`).
+- The best method proposes a different kind of intervention from the paper's in 60% of hypotheses.
+- Only the paper's specific lever pays: 0.84 with it, against 0.55 without.
+- The writer's study types are miscalibrated: processing routes 7% (papers 22%), simulation studies 0% (11%).
+- The best of the ~47 o3-mini hypotheses per question would score 1.14, so the headroom is in choosing.
+
+**Ideas, each checked offline on existing runs before anything was built.**
+
+| Idea | Source | Offline result | Built? |
+|---|---|---|---|
+| Base rates of study types in the earlier literature (outside view) | Flyvbjerg 2006; Halawi et al. 2024 | The modal type of the most similar earlier papers matches the paper's in 28–29% of questions (recent papers only: 19–29%); o3-mini's own choice in 38% | No |
+| Likelihood selection with a local pre-cutoff model (Llama-3.2-3B, cutoff December 2023): forward and noisy-channel PMI | Luo et al. 2024; Holtzman et al. 2021; Min et al. 2022 | Separates weak from strong configurations, but among the strongest configurations' candidates it is worse than a random pick (GPT-5.6 −0.02 to −0.03, DeepSeek −0.07 to −0.11) | No |
+| State concrete test conditions | F17 | No effect within the same question (−0.06 [−0.19, +0.09]) | No |
+| Mechanisms written at the level of the problem | – | Credit when the lever is wrong is rare (15 of 163) | No |
+| A model fine-tuned on how earlier papers followed their introductions | Wen et al. 2025 | Only 724 usable pre-2024 pairs, and the literature predicts the study type worse than o3-mini | No (future work) |
+| **Synthesis of several drafts into one hypothesis** | Mixture-of-Agents; wisdom of the silicon crowd; universal self-consistency | Not testable offline | **Yes** |
+
+**What was run** ([loop_r4/](./loop_r4/README.md); `m_synth` in [loop_methods.py](../../loop_methods.py)). Several
+independent drafts from the best method's writer, shown shuffled with neutral labels. An o3-mini synthesis keeps the
+intervention most drafts share, and the conditions, mechanism and outcome that two or more drafts state. Five
+configurations of 270 runs each (1,350 runs, none failed):
+- 4 o3-mini drafts;
+- a crowd of 5 pre-cutoff models (o3-mini, o1, gpt-4o, gpt-4o-mini, Llama-3.3);
+- 2 closed-book and 2 web-evidence drafts;
+- 1 draft rewritten (ablation);
+- a fresh replicate of the best method.
+
+**Results** (45 papers; reference: the best method's original runs plus its fresh replicate, 0.631 / 0.568).
+
+| Configuration | GPT-5.6 difference [CI] | DeepSeek difference |
+|---|---|---|
+| 4 o3-mini drafts | −0.01 [−0.04, +0.02] | +0.02 |
+| Crowd of 5 models | +0.01 [−0.02, +0.05] | −0.03 |
+| Closed-book + web drafts | −0.00 [−0.05, +0.04] | +0.07 |
+| 1 draft rewritten | −0.04 [−0.07, −0.01], Holm p 0.17 | −0.00 |
+| Fresh replicate vs original (noise floor) | +0.02 [−0.02, +0.06] | −0.01 |
+
+- **No synthesis beats the best method.** Aggregating four drafts only recovers what the rewrite step loses (+0.03).
+- **Why.** The synthesis follows the drafts' majority study type in 88–96% of runs, and that majority carries the
+  shared bias: even the five-model crowd proposes composition changes in 47% of drafts and simulation studies in
+  0.1%. The lever matches in 18–23% of runs, against 19%.
+- **Leakage: none detected.** All counters are zero over 1,350 runs; 14,658 web-record reads were re-checked with 0
+  date violations.
+- **Conclusion.** The paper's specific study is not predictable from the question by any signal tried: the model,
+  the literature, likelihood, or crowds of models. Further gains need either a model trained on a much larger
+  history of introduction-to-study pairs, or an evaluation that credits several directions or valid alternatives
+  (the expert ratings).
+
+**Operational notes** (loop.md 19.1–19.2).
+- The likelihood scorer ran on one shared V100 under a hard 11 GB memory cap, in a separate PyTorch environment.
+- From about 12:45, other projects saturated the shared GPT-5.6 quota, so the target-free audits lagged the judges.
+  Their coverage is stated in `loop_r4/analysis_r4.md`.
+
+## Comparability and limits, experiments 8 to 38
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -1706,3 +1764,8 @@ first attempts are kept.
     shown last (loop.md 18.2).
   - The Q6 labels are a target-aware analysis by GPT-5.6, the primary judge's model. The comparison of the decider's
     selection with chance was added after the results (post hoc).
+- Experiment 38 develops and tests on the 45 spent papers, so it is exploratory.
+  - Its offline checks reuse runs from many earlier configurations, and the ideas were chosen after seeing their
+    targets' labels (dev analysis).
+  - The likelihood scorer (Llama-3.2-3B) ranks only finished hypotheses and is never shown to a generator.
+  - The draft study-type labels come from gpt-4o-mini without the target; the lever labels come from GPT-5.6 with it.

@@ -86,6 +86,7 @@ paper is 2024-01-02.
 | Deployment | Knowledge cutoff (source) | Query-facing use |
 |---|---|---|
 | Llama-3.3-70B-Instruct_5 | December 2023 ([Meta model card](https://huggingface.co/meta-llama/Llama-3.3-70B-Instruct)) | allowed (flag PMC10759803) |
+| Llama-3.2-3B (local base model, open weights) | December 2023 ([Meta model card](https://huggingface.co/meta-llama/Llama-3.2-3B)) | allowed (flag PMC10759803); used only to score likelihoods offline (loop.md 19.1) |
 | gcr-llama-31-8b-instruct | December 2023 ([Meta model card](https://huggingface.co/meta-llama/Llama-3.1-8B-Instruct)) | allowed (flag PMC10759803) |
 | gpt-4o_2024-11-20 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/gpt-4o)) | allowed (probe 2026-10-26: 4.2% specific recall vs 5.6% for the Llama control; loop.md 16.3) |
 | gpt-4o-mini_2024-07-18 | 2023-10-01 ([OpenAI](https://developers.openai.com/api/docs/models/gpt-4o-mini)) | allowed |

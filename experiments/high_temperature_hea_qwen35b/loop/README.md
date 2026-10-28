@@ -182,3 +182,22 @@
 - **Analysis.** [pcd_analysis.py](../../../pcd_analysis.py), outputs in [../loop_pcd/](../loop_pcd/README.md).
 - **Result.** The three-role method is worse than one o3-mini call, with or without web evidence, and no better than
   the Llama-3.3 closed-book baseline.
+
+## Experiment 38: round 4, synthesis (loop.md section 19)
+
+- **Offline checks first.** [round4_offline.py](../../../round4_offline.py) and the local likelihood scorer
+  [round4_pmi.py](../../../round4_pmi.py) tested four ideas on existing runs before anything was built:
+  - literature base rates;
+  - likelihood selection;
+  - concrete conditions;
+  - problem-level mechanisms.
+
+  None passed. Outputs are in [../loop_r4/offline/](../loop_r4/README.md).
+- **Generation and evaluation.** [run_r4.sh](./run_r4.sh) ran the four synthesis configurations and a fresh
+  replicate of the incumbent on all 45 papers (1,350 runs) into [../loop_r4/](../loop_r4/README.md). It then ran:
+  - the GPT-5.6 judge, audit and label loops on both TRAPI instances, each in a seeded random job order;
+  - the DeepSeek cross-judge;
+  - the draft class labels;
+  - the report ([round4_analysis.py](../../../round4_analysis.py)).
+- **Result.** No synthesis beats the incumbent. The final hypothesis follows the drafts' shared majority, so the
+  decision does not change.

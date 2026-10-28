@@ -3156,3 +3156,208 @@ passes on audits while judging waited, and neither GPT-5.6 instance was rate lim
   kept).
 - [x] Paired statistics with CIs and Holm; negative results recorded.
 - [x] READMEs, experiment log, loop.md and PROJECT_SUMMARY.md updated; `must_obey_check.py` passes.
+
+## 19. Round 4: new signals for the decision, then consensus synthesis (experiment 38)
+
+### 19.1 Failure analysis, offline checks and pre-registered plan (written 2026-10-28 at about 11:48, before any experiment-38 generation)
+
+**Request.** First think of ways to improve the hypothesis generation, then implement them.
+
+**Failure analysis of the incumbent** (`writer_only_b_o3mini`, 270 runs on the 45 spent papers; GPT-5.6 labels and
+judgments; `round4_offline.py decompose`, output `loop_r4/offline/decompose.json`).
+
+| Lever match (share of runs) | GPT-5.6 score | Intervention | Conditions | Mechanism | Outcome |
+|---|---:|---:|---:|---:|---:|
+| 0, a different kind of intervention (60%) | 0.55 | 0.21 | 0.61 | 0.66 | 0.71 |
+| 1, same kind, different lever (21%) | 0.62 | 0.18 | 0.48 | 0.82 | 0.98 |
+| 2, same lever (18%) | 0.84 | 0.73 | 0.57 | 0.90 | 1.16 |
+| 3, essentially the paper's intervention (1%) | 1.75 | 2.00 | 1.00 | 2.50 | 1.50 |
+
+- **F19. A class hit alone is worth little.** The kind of study matches in 40% of runs, but only the lever is worth
+  much: +0.30 for lever 2 over lever 0, and +0.07 for lever 1.
+- **F20. The writer's study types are miscalibrated** (writer vs targets):
+  - processing route 7% vs 22%;
+  - simulation study 0% vs 11%;
+  - heat or thermomechanical treatment 25% vs 13%;
+  - composition change 34% vs 24%.
+- **F21. Even the right lever gives few points on details.** With lever 2, conditions score 0.57 and outcome 1.16 of 4.
+- **Headroom is in selection.** The best of the ~47 judged o3-mini hypotheses per unit averages 1.14, against a pool
+  mean of 0.58.
+
+**Ideas, and the offline check each had to pass before it could be built.** Offline checks use existing runs only.
+
+| ID | Idea | Source (what I understood; what we take) | Failure | Offline check and result | Built? |
+|---|---|---|---|---|---|
+| I1 | Literature base rates: give the writer the study types of the most similar earlier papers (outside view first) | **From Nobel Prize to project management: getting risks right**, Flyvbjerg 2006, https://arxiv.org/abs/1302.3642 (reference-class forecasting: start from the distribution of outcomes in similar past cases); **Approaching human-level forecasting with language models**, Halawi et al. 2024, https://arxiv.org/abs/2402.18563 (retrieval improves LLM forecasts) | F20 | gpt-4o-mini (pre-cutoff) labelled the study type of the 1,171 seed papers of the 135 web corpora (`classify`). The modal type of the top 5–50 seeds matches the target's type in 28–29% of units, against 38% for o3-mini's own choice. Seeds from only the last 1–3 years before the paper: 19–29% | No: the literature is a worse prior than the model |
+| I2 | Likelihood selection: generate candidates, keep the one a pre-cutoff language model finds most probable given the question (forward PMI), or that best explains the question (backward, noisy-channel PMI) | **Large language models surpass human experts in predicting neuroscience results**, Luo et al. 2024, https://arxiv.org/abs/2403.03230 (perplexity picks the real result); **Surface form competition**, Holtzman et al. 2021, https://arxiv.org/abs/2104.08315 (normalise by the unconditional probability); **Noisy channel language model prompting**, Min et al. 2022, https://arxiv.org/abs/2108.04106 (score the input given the output) | F10, headroom | Llama-3.2-3B (local; data cutoff December 2023, Meta model card) scored 3,962 judged o3-mini hypotheses (`round4_pmi.py`). Raw likelihood: within-unit ρ ≈ 0. PMI and channel: ρ 0.03–0.16, and over all o3-mini configurations (3,024 candidates) the top-scored candidate beats a random one (channel: DeepSeek +0.11 [+0.05, +0.16]). But among the strongest configurations' candidates (about 11 per unit) it is worse than a random pick: GPT-5.6 −0.02 to −0.03, DeepSeek −0.07 to −0.11. The signal separates the weaker configurations' writing style, not better hypotheses | No |
+| I3 | State concrete test conditions | F17 (section 11.2) | F21 | Incumbent conditions that name a temperature score 0.77 vs 0.44, but within the same unit the difference is −0.06 [−0.19, +0.09]: the question, not the statement, drives it | No |
+| I4 | Mechanisms written at the level of the problem, so they agree whatever the paper's intervention | – | F21 | When the lever is wrong, mechanism scores ≥ 2 in 15 of 163 runs, only where two mechanisms share a generic element (a protective oxide scale). Target mechanisms are specific to the study | No |
+| I5 | A model fine-tuned on how earlier papers' introductions led to their studies | **Predicting empirical AI research outcomes with language models**, Wen et al. 2025, https://arxiv.org/abs/2506.00794 (off-the-shelf models, o3 included, are at chance when predicting which idea works; a model fine-tuned on 6,000 historical pairs reaches 77%) | F9, F20 | Only 724 usable pre-2024 introduction-to-study pairs in the downloaded papers, and I1 shows the earlier literature predicts the target's type worse than o3-mini | No (future work, with a larger historical training set) |
+| I6 | **Synthesis:** several independent drafts, then one final hypothesis that keeps what the drafts agree on (not a selection) | **Mixture-of-Agents**, Wang et al. 2024, https://arxiv.org/abs/2406.04692 (an aggregator that reads several models' answers writes a better one than any single model); **Wisdom of the silicon crowd**, Schoenegger et al. 2024, https://arxiv.org/abs/2402.19379 (an ensemble of diverse LLMs forecasts as well as a human crowd); **Universal self-consistency**, Chen et al. 2023, https://arxiv.org/abs/2311.17311 (consistency across free-form samples identifies the better answer) | F21 (detail errors), F9 (shared decision errors) | Not testable offline: selection (MBR, voting) was tried in rounds 2–3, synthesis never | **Yes** |
+
+**Why synthesis is different from what failed.** MBR, voting and likelihood selection keep one whole candidate,
+with all its idiosyncratic details. A synthesis keeps the elements several drafts share and drops the details only
+one draft states. The decision errors are shared across samples (F9), so a crowd of different pre-cutoff models
+tests whether model diversity breaks them, and mixed closed-book and web-evidence drafts test evidence diversity.
+
+**Configurations** (each on the 45 papers: all36 + test4, 3 levels × 2 samples = 270 runs).
+
+| Configuration | Drafts | Final writer | Calls |
+|---|---|---|---:|
+| `synth_k4_b_o3mini` | 4 o3-mini WRITER_B drafts, closed-book | o3-mini synthesis | 5 |
+| `synth_crowd_b_o3mini` | 5 WRITER_B drafts, closed-book, one each from o3-mini, o1, gpt-4o, gpt-4o-mini and Llama-3.3 (all with a 2023 cutoff; a declared mix of generators, must_obey.md 2.5) | o3-mini synthesis | 6 |
+| `synth_mixed_b_o3mini` | 2 o3-mini WRITER_B closed-book drafts and 2 with the best web method's evidence (`web_text_64k_b_o3mini`: 64,000 characters of the question's web corpus) | o3-mini synthesis, with the same evidence | 5 |
+| `synth_k1_b_o3mini` (ablation) | 1 o3-mini WRITER_B draft | o3-mini synthesis | 2 |
+| `writer_only_b_o3mini_r5` (reference) | – | the incumbent with fresh samples (winner's curse, must_obey.md 6.5) | 1 |
+
+- **Synthesis prompt.**
+  - Use the intervention most drafts share. If none is shared, keep the single draft intervention that most directly
+    addresses the stated limitation; never combine interventions.
+  - Keep conditions, mediator, mechanism, outcome, baseline and boundary elements that two or more drafts state.
+  - Drop specifics that only one draft states.
+  - Keep the conservative-writer rule.
+- **Presentation.** Drafts are shown in a seeded random order with neutral labels (must_obey.md 5.2), without the
+  model that wrote them.
+- **Evidence.** In `synth_mixed`, the synthesis sees the same 64,000-character pack and may cite only it. Every record
+  is dated before the paper (experiment 36's corpora).
+
+**Analysis** (fixed now; script `round4_analysis.py`). GPT-5.6 is primary, with DeepSeek alongside. Differences are
+paired per paper with paper-bootstrap CIs, sign tests and Holm correction.
+- **Reference:** the incumbent's original runs and its fresh replicate together (4 samples per unit).
+- **Q1 (primary):** each of the four synthesis configurations vs the reference; Holm across the 4.
+- **Decision rule:** a configuration beats the incumbent if its GPT-5.6 CI is above 0 and DeepSeek agrees in
+  direction.
+- **Q2 (ablations):**
+  - `synth_k4` vs `synth_k1` (aggregation);
+  - `synth_crowd` vs `synth_k4` (model diversity);
+  - `synth_mixed` vs `synth_k4` (evidence diversity);
+  - `synth_k1` vs the reference (the rewrite alone).
+
+  Holm across the 4.
+- **Secondary** (all configurations):
+  - the replicate vs the original incumbent (noise floor);
+  - the 10 judge dimensions;
+  - standard lever labels: lever ≥ 2 and class hit;
+  - audits, hedges, length, unsupported share, cost;
+  - draft agreement: how often two or more drafts share the final hypothesis's intervention class, from gpt-4o-mini
+    class labels of the drafts (target-free).
+- **Leakage:** all counters zero, every web record's dates re-checked, and `must_obey_check.py` passes.
+- **Status:** all 45 papers are spent, so results are exploratory. A configuration that meets the decision rule is a
+  candidate for a fresh test set (test5), which is not part of this round.
+
+**Expectations, recorded before running.**
+- Synthesis lowers detail errors: small gains in conditions, mechanism and outcome, and fewer unsupported claims.
+- It does not change the lever much, because decision errors are shared (F9).
+- The crowd is the most likely to change the lever.
+- No configuration is expected to beat the incumbent by more than about +0.05.
+
+**Smoke test.** Before the runs, one unit per configuration in a scratch root checks the mechanics only. Those
+outputs are not judged or analysed.
+
+**Smoke test and start.**
+- One unit (PMC11077685, problem-constrained) per configuration in a scratch root: all 5 runs OK, every leakage
+  counter zero.
+- The crowd used all five models. The mixed configuration packed 63,933 characters from 30 earlier papers.
+- Nothing was judged, and no prompt changed.
+- Runs started at 11:52 (`loop/run_r4.sh`).
+
+### 19.2 Results (2026-10-28, 13:30; exploratory, because all 45 papers are spent)
+
+**Runs.**
+- 5 configurations × 270 runs = 1,350 runs; none failed.
+- 3 of the 540 web-evidence drafts in `synth_mixed` failed after their repair call: each cited a record ID that
+  was not in its pack. They were recorded, and those syntheses used the other three drafts.
+- Every run has both judges, lever labels and draft class labels.
+- The target-free audits lagged because other projects saturated the shared GPT-5.6 quota from about 12:45.
+  - At 13:30, 1,001 of 1,350 runs were audited: the replicate 270, `synth_k1` 267, `synth_k4` 175, `synth_mixed`
+    147 and `synth_crowd` 142.
+  - `must_obey_check.py` passes and reports the missing audits as warnings.
+  - No result above uses the audit.
+  - The audit loops continue (`loop/run_r4.sh`), and the report regenerates when they finish.
+- Full tables: `loop_r4/analysis_r4.md`.
+
+**Q1 (primary): no synthesis beats the incumbent.** Reference: the incumbent's original runs plus its fresh replicate,
+4 samples per unit (GPT-5.6 0.631, DeepSeek 0.568).
+
+| Configuration | GPT-5.6 | GPT-5.6 difference [CI], papers up/down, Holm p | DeepSeek | DeepSeek difference [CI] | Decision |
+|---|---:|---|---:|---|---|
+| `synth_k4_b_o3mini` (4 o3-mini drafts) | 0.621 | −0.010 [−0.044, +0.024], 17/24, 1.0 | 0.592 | +0.024 [−0.020, +0.067] | no detectable difference |
+| `synth_crowd_b_o3mini` (5 models) | 0.645 | +0.014 [−0.024, +0.053], 22/20, 1.0 | 0.542 | −0.026 [−0.082, +0.024] | no detectable difference |
+| `synth_mixed_b_o3mini` (closed-book + web drafts) | 0.629 | −0.002 [−0.047, +0.044], 18/24, 1.0 | 0.633 | +0.065 [−0.008, +0.137] | no detectable difference |
+| `synth_k1_b_o3mini` (1 draft, rewritten) | 0.591 | −0.040 [−0.074, −0.006], 14/28, 0.17 | 0.566 | −0.002 [−0.050, +0.044] | worse by the rule (not after Holm) |
+
+**Q2 (ablations).**
+- **Aggregation** (4 drafts minus 1): +0.031 [−0.006, +0.067] (DeepSeek +0.026). Synthesising four drafts recovers
+  what rewriting one draft loses, and no more.
+- **Model diversity** (crowd minus 4 o3-mini drafts): +0.024 [−0.019, +0.067], but DeepSeek −0.050
+  [−0.106, +0.008]. The judges disagree.
+- **Evidence diversity** (mixed minus 4 closed-book drafts): +0.007 [−0.043, +0.058] (DeepSeek +0.042).
+- **Noise floor** (replicate minus original incumbent): +0.016 [−0.023, +0.055] (DeepSeek −0.014).
+
+**Why it does not help: synthesis inherits the drafts' shared decision.**
+- The final hypothesis's study type is the drafts' modal type in 88–96% of runs, and two or more drafts share it in
+  91–95%. The synthesis follows the instruction.
+- Drafts agree unanimously in 55% of runs with o3-mini, and in only 35% with the five-model crowd. Yet the crowd's
+  majority is still the shared default: composition change 47% of drafts and 43% of finals, simulation study 0.1% of
+  drafts.
+- The decision does not change.
+  - Lever ≥ 2: 18.5% (`synth_k4`), 20.7% (crowd), 22.6% (mixed), against 18.9% and 17.8% for the incumbent and its
+    replicate.
+  - Class hit: 0.37–0.42, against 0.40.
+- **Details** (GPT-5.6, `synth_k4` vs the incumbent):
+
+  | Dimension | `synth_k4` | Incumbent | Replicate |
+  |---|---:|---:|---:|
+  | Conditions | 0.60 | 0.58 | 0.66 |
+  | Mechanism | 0.74 | 0.75 | 0.71 |
+  | Outcome | 0.85 | 0.85 | 0.89 |
+
+  These are within the replicate-to-replicate spread. Against one rewritten draft, aggregation helps every detail
+  dimension (conditions 0.60 vs 0.56, mechanism 0.74 vs 0.70, outcome 0.85 vs 0.82). The rewrite itself costs about
+  as much.
+- **Web drafts.** As in experiment 36, they lower the share the judge calls unsupported (0.57 vs 0.73) and raise
+  DeepSeek's scores. They do not raise GPT-5.6's.
+
+**Expectations** (19.1).
+- Decision unchanged (F9): as expected.
+- Small gains in details: only relative to a single rewritten draft, not to the incumbent.
+- The crowd did not change the lever more than the others.
+- No configuration beyond +0.05: as expected; none beat the incumbent at all.
+
+**Leakage: none detected.**
+- All counters are zero over 1,350 runs.
+- 14,658 web-record reads were re-checked against each paper's date: 0 violations, 0 unresolved.
+
+**Answer: what improves the hypothesis generation?** On this benchmark, nothing tried in round 4.
+- **The diagnosis explains why.** The score rewards the paper's specific lever:
+  - the lever is right in only ~19% of single hypotheses;
+  - it is worth +0.30 when right;
+  - it is predictable neither from the earlier literature's study types (I1) nor by a likelihood signal (I2);
+  - it is not changed by synthesising drafts, even across five different models (I6), because their errors are
+    shared.
+- **Two directions remain open, and both are outside prompt engineering.**
+  1. **A model trained on many historical introduction-to-study pairs** (I5; Wen et al. 2025). It needs a training set
+     an order of magnitude larger than the 724 pairs at hand, and a fresh test set.
+  2. **Changing what is measured.** In experiment 37, four diverse proposals contained the paper's lever in 37–40% of
+     runs, against 19% for one hypothesis. A user who reads several directions benefits from that coverage, which a
+     single-hypothesis score cannot see. The expert ratings (experiment 30) are still the way to check the judge.
+
+**Status.** Exploratory, with no method claim. No configuration is a candidate for test5.
+
+**Checklist** (must_obey.md section 9).
+- [x] Query-facing models are pre-cutoff:
+  - generators: o3-mini, o1, gpt-4o, gpt-4o-mini and Llama-3.3, all in the model table;
+  - the offline likelihood scorer: Llama-3.2-3B, December 2023, added to the table;
+  - the paper classifier (gpt-4o-mini) reads only earlier papers and drafts, never a target.
+- [x] Frozen v3.1-procedure questions; nothing edited.
+- [x] Evidence only from experiment 36's date-filtered corpora, with every record re-checked (0 violations).
+- [x] Payloads are target-free (harness guard). Drafts are shown shuffled, with neutral labels and no model names
+  (5.2).
+- [x] Spent papers only; exploratory.
+- [x] Budgets declared (19.1): drafts × calls per configuration, and 64,000 characters of evidence in the mixed
+  configuration.
+- [x] GPT-5.6 judge, DeepSeek cross-judge and lever labels on every run. The audit is incomplete because of the
+  shared quota: coverage reported above, loops continuing. Failures reported (3 drafts).
+- [x] Paired statistics with CIs and Holm; negative results recorded, including every idea rejected offline.
+- [x] READMEs, experiment log, loop.md, must_obey.md (model table) and PROJECT_SUMMARY.md updated;
+  `must_obey_check.py` passes.
