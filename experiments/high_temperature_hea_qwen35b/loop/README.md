@@ -233,3 +233,13 @@
   The audits paused during GPT-5.6 rate limiting and were finished by [run_agent_audits.sh](./run_agent_audits.sh).
 - **Result.** No gain in reconstruction. The agent's hypotheses are preferred to the closed-book writer's, but the
   simpler web-evidence writer (`web_text_64k_b_o3mini`) remains the best agent overall.
+
+## Experiment 41: raising the score from the failure points (loop.md section 22)
+
+- **Offline.** [select_offline.py](../../../select_offline.py) tested target-free selection rules over 15,600 judged
+  hypotheses: literature support, consensus, and a reranker learned leave-one-paper-out. None beats the writer.
+- **Runs.** [run_study.sh](./run_study.sh) ran the complete-study writer, its two guides separately and its
+  web-evidence variant on all 45 papers (1,080 runs) into [../loop_study/](../loop_study/README.md). It also ran the
+  same-session baselines, the target-free pairwise judges, the report, and the audits last.
+- **Result.** No configuration raises the score. The hypotheses are preferred on quality, but intervention agreement
+  falls.

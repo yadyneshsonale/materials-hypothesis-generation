@@ -1829,3 +1829,56 @@ register("agent_choose_ground_b_o3mini")(lambda h: m_agent(h, choose=True, groun
 register("agent_choose_only_b_o3mini")(lambda h: m_agent(h, choose=True, ground=False))
 register("agent_draft_ground_b_o3mini")(lambda h: m_agent(h, choose=False, ground=True))
 AGENT_CONFIGS = ("agent_choose_ground_b_o3mini", "agent_choose_only_b_o3mini", "agent_draft_ground_b_o3mini")
+
+
+# ================================================================ experiment 41 (loop.md 22.1): a complete-study
+# writer. The failure points of the best method: it almost never proposes processing routes (2% lever match on
+# processing-route papers) or simulation studies (0%); answer keys name the processing route in 58% of interventions
+# against 28% of hypotheses; the judge criticises the conditions in 86% of runs. The guides are appended to WRITER_B.
+
+STUDY_TYPES_GUIDE = (
+    "Before writing, decide which kind of study a research group would most plausibly carry out next to address the "
+    "stated limitation. Consider every kind, not only composition changes or heat treatments: a different processing "
+    "or manufacturing route (when the limitation stems from how the material is made, such as casting defects, "
+    "segregation, porosity, manufacturability or cost), a coating or surface treatment (when the limitation acts at "
+    "the surface, such as oxidation, corrosion or wear), a designed microstructure, a computational or simulation "
+    "study (when the question asks to explain or predict atomic-scale behaviour or properties that are hard to "
+    "measure), or a characterization study (when the mechanism is unknown)."
+)
+STUDY_DESIGN_GUIDE = (
+    "Describe the study as it would be carried out and reported: how the material is made and treated (the processing "
+    "route and key treatment steps), the intervention, and the test conditions (temperature, atmosphere, loading or "
+    "strain rate, duration) that match the question's stated regime. State the mechanism as the general physical "
+    "process through which the intervention acts for this class of alloys, and the predicted outcome as the direction "
+    "of change of the property the question names, relative to the stated baseline."
+)
+_RETURN = "\n\nReturn one falsifiable hypothesis as JSON:"
+
+
+def writer_with(*guides: str) -> str:
+    assert WRITER_B.count(_RETURN) == 1
+    return WRITER_B.replace(_RETURN, " " + " ".join(guides) + _RETURN)
+
+
+WRITER_STUDY = writer_with(STUDY_TYPES_GUIDE, STUDY_DESIGN_GUIDE)
+WRITER_TYPES = writer_with(STUDY_TYPES_GUIDE)
+WRITER_DESIGN = writer_with(STUDY_DESIGN_GUIDE)
+register("writer_study_b_o3mini")(lambda h: write(h, {}, "o3mini", system=WRITER_STUDY))
+register("writer_types_b_o3mini")(lambda h: write(h, {}, "o3mini", system=WRITER_TYPES))
+register("writer_design_b_o3mini")(lambda h: write(h, {}, "o3mini", system=WRITER_DESIGN))
+
+
+@register("web_study_64k_b_o3mini")
+def m_web_study_64k(h: Harness) -> dict[str, Any]:
+    """`web_text_64k_b_o3mini` with the complete-study writer: the same 64,000-character web pack and record cap."""
+    h.source = "web"
+    records = top_text(h, h.query, 64000)
+    cap = rx.record_cap("text_chunks")
+    payload = {"query": h.query, "knowledge_cutoff": h.cutoff, "analysis_notes": {},
+               "eligible_evidence": h.evidence_payload(records, cap)}
+    h.notes["evidence"] = {"records": len(records), "papers": len({r.paper_id for r in records}),
+                           "chars": sum(min(len(r.text), cap) for r in records)}
+    return h.generate_final("writer", "o3mini", WRITER_STUDY, payload, {r.record_id for r in records})
+
+
+STUDY_CONFIGS = ("writer_study_b_o3mini", "writer_types_b_o3mini", "writer_design_b_o3mini", "web_study_64k_b_o3mini")

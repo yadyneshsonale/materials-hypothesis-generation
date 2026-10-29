@@ -3907,3 +3907,234 @@ or analysed.
 - [x] Baselines judged in the same session (6.10); target-free quality reported (6.11).
 - [x] Paired statistics with CIs and Holm; the negative result recorded, including why the offline check misled.
 - [x] Records updated; `must_obey_check.py` passes.
+
+## 22. Raising the score: failure points, selection limits and a complete-study writer (experiment 41)
+
+### 22.1 Failure analysis, offline checks and pre-registered plan (written 2026-10-29 at about 06:12, before any experiment-41 run)
+
+**Request.** "I want the score to increase. Look at the failure points, then brainstorm or take inspiration and run
+the experiments."
+
+**Where the best method loses points** (`writer_only_b_o3mini`, 270 runs, GPT-5.6; target-aware analysis only).
+- **By dimension.** Points lost out of 4: intervention 3.69, conditions 3.42, mechanism 3.25, outcome 3.15.
+- **By the paper's study type** (score, and share of runs matching the paper's lever):
+
+  | Study type | Score | Lever match |
+  |---|---:|---:|
+  | Composition | 0.58 | 33% |
+  | Processing route (22% of runs) | 0.64 | **2%** |
+  | Simulation (11%) | **0.48** | **0%** |
+  | Coating | 0.57 | 12% |
+  | Heat treatment | 0.68 | 25% |
+  | Characterisation | 0.72 | 25% |
+
+  The writer almost never proposes processing routes or simulation studies.
+- **By question level.** Broad 0.62, problem-constrained 0.61, expert 0.64. Lever match rises with context (13%, 18%,
+  26%), but the mechanism score falls (0.86, 0.70, 0.69): generic mechanisms earn more credit.
+- **The judge's explanations** criticise:
+  - the conditions in 86% of runs;
+  - the mechanism in 70%;
+  - vagueness in 75%;
+  - a different intervention in 51%.
+
+  The most frequent fatal error is "no prior evidence is cited".
+- **Processing routes in the study design.** 58% of answer keys name the processing or treatment route in the
+  intervention, against 28% of strong hypotheses. Within the same unit, hypotheses that name a route score
+  +0.036 [−0.01, +0.09] (conditions +0.05). Multi-step interventions do not help (−0.02).
+- **What perfect knowledge would be worth** (experiment 39 oracles):
+  - the study type: +0.04;
+  - the exact lever: +0.64;
+  - the whole key: +2.76.
+
+  By study type, knowing the type moves processing-route papers from 0.64 to 0.72 and simulation papers from 0.48 to
+  0.54. Knowing the lever lifts every type to 1.05–1.71.
+
+**Offline check: can selection find the better hypotheses?** (`select_offline.py`; exact, using the existing
+judgments).
+- **Pool.** 15,600 judged, target-free o3-mini hypotheses from 79 configurations: 116 per unit. The best per unit
+  averages 1.28 (DeepSeek 1.52); the writer averages 0.62.
+
+| Selection rule (target-free) | GPT-5.6 vs writer | vs a random pick | DeepSeek vs writer |
+|---|---|---|---|
+| Most literature support (BM25 against the corpus abstracts) | −0.07 | −0.01 | −0.05 |
+| Least literature support | −0.08 | −0.02 | −0.10 |
+| Most consensus (approach words shared with other candidates) | −0.01 [−0.06, +0.05] | +0.05 | +0.04 |
+| Least consensus | −0.16 | −0.10 | −0.31 |
+| Learned reranker, leave-one-paper-out (ridge on support, consensus, length, evidence) | +0.005 [−0.05, +0.06] | +0.06 [+0.01, +0.12] | +0.03 |
+
+- No target-free selection rule beats the writer. The learned reranker learns consensus, and the writer already sits
+  at the consensus level.
+- The headroom is real, but nothing available without the target finds it.
+
+**What this implies.**
+- The score of target-free methods is close to a ceiling set by the default answer.
+- The large gain (the lever) needs knowledge of which study the paper chose.
+- What remains are the measurable failure points that a writer can address:
+  - the processing-route and simulation blind spots;
+  - the study design (processing route and test conditions);
+  - the level of the mechanism.
+
+  Their expected gains are small (≤ +0.05 each), so this round tests them together and apart.
+
+**Sources.**
+- **Forecasting with base rates.** **Superforecasting: The Art and Science of Prediction**, Tetlock and Gardner 2015,
+  https://en.wikipedia.org/wiki/Superforecasting:_The_Art_and_Science_of_Prediction. Consider the outside view: what
+  kinds of studies are typically done before the specifics of this case.
+- **Studies as reported.** The answer keys' own structure: an intervention described together with its processing
+  route and test conditions.
+- **Prior work here.** The conservative writer (WRITER_B, rounds 1–2) and the experiment-39 finding that evidence
+  improves the conditions dimension.
+
+**Configurations.** Each runs on the 45 papers × 3 levels × 2 samples = 270 runs, with o3-mini, 1 call.
+
+| Configuration | Writer instruction | Evidence |
+|---|---|---|
+| `writer_study_b_o3mini` (primary) | WRITER_B + study types + study design | none |
+| `writer_types_b_o3mini` | WRITER_B + study types | none |
+| `writer_design_b_o3mini` | WRITER_B + study design | none |
+| `web_study_64k_b_o3mini` | WRITER_B + study types + study design | the 64,000-character web pack (as `web_text_64k_b_o3mini`) |
+
+- **Study types** (appended to WRITER_B). "Before writing, decide which kind of study a research group would most
+  plausibly carry out next to address the stated limitation." Consider every kind, not only composition changes or
+  heat treatments:
+  - a different processing or manufacturing route, when the limitation stems from how the material is made;
+  - a coating or surface treatment, when the limitation acts at the surface;
+  - a designed microstructure;
+  - a computational or simulation study, when the question asks to explain or predict atomic-scale behaviour or
+    properties that are hard to measure;
+  - a characterisation study, when the mechanism is unknown.
+- **Study design** (appended to WRITER_B). Describe the study as it would be carried out and reported:
+  - how the material is made and treated (processing route and key treatment steps);
+  - the intervention;
+  - the test conditions (temperature, atmosphere, loading or strain rate, duration) matching the question's regime;
+  - the mechanism as the general physical process through which the intervention acts for this class of alloys;
+  - the outcome as the direction of change of the property the question names, relative to the stated baseline.
+
+**Analysis** (fixed now; `study_analysis.py`). GPT-5.6 primary against baselines judged again in this session
+(must_obey.md 6.10); DeepSeek alongside.
+- **Q1 (primary).** `writer_study_b_o3mini` vs the writer, and `web_study_64k_b_o3mini` vs `web_text_64k_b_o3mini`.
+  Holm across the 2.
+- **Q2 (components).** `writer_types` and `writer_design` vs the writer. Holm across the 2.
+- **Q3 (failure points).**
+  - Lever ≥ 2 and class hit, overall and for processing-route and simulation targets.
+  - The share of hypotheses naming a processing route.
+  - The four dimensions.
+- **Q4 (quality, must_obey.md 6.11).** Target-free pairwise judge, both orders, GPT-5.6, DeepSeek and o1:
+  `writer_study_b_o3mini` vs the writer.
+- **Decision rule.** A configuration raises the score if its GPT-5.6 CI is above 0 and DeepSeek's difference is above
+  0. Spent papers, so a pass is a development result and a candidate for test5.
+
+**Expectations, recorded before running.**
+- Lever match on processing-route and simulation targets rises, while composition hits may fall.
+- Conditions rise slightly.
+- The overall gain is small: about 0 to +0.05, likely within the CI.
+- The offline checks say the ceiling for target-free methods is close.
+
+**Smoke test (about 06:14, before any experiment-41 run; runs started at 06:15 with `loop/run_study.sh`).**
+- One unit (PMC11077685, problem-constrained) per configuration in a scratch root: all 4 OK, one call each, every
+  leakage counter zero. The web variant read a 55-record pack.
+- Nothing was judged, and no prompt changed.
+
+### 22.2 Results (2026-10-29, 07:16; exploratory, because all 45 papers are spent)
+
+**Runs.**
+- 4 configurations × 270 = 1,080 runs. One first attempt cited a passage it had not been given and succeeded on its
+  retry.
+- Both judges and lever labels on every run.
+- 540 same-session re-judgments of the baselines: writer 0.632, 64,000-character writer 0.631.
+- 1,620 target-free pairwise judgments.
+- The audits ran after the judging and finished at 08:03: 1,080 of 1,080.
+
+**Decision: no configuration raises the score.**
+
+| Comparison | GPT-5.6 [CI] | DeepSeek |
+|---|---|---|
+| Complete-study writer vs writer (primary) | −0.031 [−0.08, +0.01] | −0.037 |
+| Complete-study writer with web evidence vs the 64,000-character writer (primary) | −0.025 [−0.07, +0.02] | −0.026 |
+| Study types only vs writer | −0.000 [−0.03, +0.03] | −0.050 |
+| Study design only vs writer | −0.019 [−0.06, +0.02] | −0.031 |
+
+**Failure points (Q3).**
+
+| Configuration | Lever ≥ 2 | Processing-route papers | Simulation papers | Names a route | Intervention | Conditions | Mechanism | Outcome |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Writer | 18.9% | 1.7% | 0% | 27% | 0.32 | 0.58 | 0.75 | 0.85 |
+| Complete-study writer | 11.9% | 3.4% | 0% | 50% | 0.20 | 0.60 | 0.75 | 0.86 |
+| Study types only | 13.3% | 1.7% | 0% | 46% | 0.26 | 0.66 | 0.77 | 0.84 |
+| Study design only | 17.0% | 0% | 0% | 44% | 0.24 | 0.59 | 0.73 | 0.90 |
+| With web evidence | 20.0% | 5.2% | 3.3% | 54% | 0.23 | 0.64 | 0.71 | 0.84 |
+
+- The guides did what they asked: twice as many hypotheses describe the processing route. The type guide raises
+  conditions (+0.08) and the design guide outcome (+0.04).
+- But every guide moves the model away from its own best guess, so intervention agreement falls by 0.06–0.12.
+- The blind spots stay blind: processing-route and simulation papers remain near 0%.
+
+**Quality, without the answer key (Q4).** Net preference for the complete-study writer over the writer:
+- GPT-5.6: +0.32 [+0.21, +0.41], 34/6 papers;
+- DeepSeek: +0.23 [+0.16, +0.30], 33/6;
+- o1: +0.20 [+0.12, +0.28], 27/7.
+
+All three are Holm-significant.
+
+**Expectations** (22.1).
+- Blind-spot levers rise: wrong. Composition hits fall: right.
+- Conditions rise: right, for the type guide.
+- Overall within about 0 to +0.05: the result is −0.03 to 0.
+- The ceiling is close: consistent.
+
+**Additional offline check after the launch** (not a run; recorded so that it is not repeated).
+- **Idea.** Many-shot in-context learning from earlier papers: show o3-mini the problem → study pairs of the 10–30
+  earlier papers most similar to the question (Agarwal et al. 2024, https://arxiv.org/abs/2404.11018).
+- **Check.** Corpus papers carrying the paper's lever (experiment-39 corpus labels):
+
+  | Earlier papers | Carrying the lever |
+  |---|---:|
+  | The whole corpus | 11.9% |
+  | The 10 most question-similar | 13.4% |
+  | The 30 most question-similar | 12.2% |
+  | The 30 newest | 12.6% |
+
+- **Verdict.** No selection of examples concentrates the paper's lever. The near-identical card configurations
+  (10 or 30 papers) already score 0.57–0.59 against 0.62. Not run.
+
+**Answer: can the score be raised by a target-free method?** Every route tried in experiments 37–41 has failed.
+- **Agents.** Propose–critique–decide; choosing the approach from the evidence.
+- **Synthesis.** Drafts from one model or from five.
+- **Selection.** Over 15,600 candidates, by literature support, consensus, likelihood or a reranker learned
+  leave-one-paper-out.
+- **Prompt guides.** Aimed at the failure points.
+
+The diagnostics explain why:
+1. **The intervention carries most of the lost points**, and only the paper's specific lever earns them. Knowing the
+   study type is worth +0.04; knowing the lever, +0.64.
+2. **Nothing available before the paper identifies its lever.**
+   - The literature carries it in about 12% of earlier papers, however they are selected.
+   - The model's own prior picks it 19% of the time, and every guide or agent that overrides that prior picks it less
+     often.
+   - The selection headroom (best candidate 1.28) cannot be found without the target.
+3. **What the changes do improve is hypothesis quality**, which the score does not measure. Every evidence-based or
+   design-focused writer is preferred by all three judges that do not see the answer key.
+
+So the closed-book conservative writer (about 0.62–0.63 in the same session) is at the ceiling for target-free
+methods with these models. A higher score would need either:
+- a forecaster trained on a large history of introduction-to-study pairs (thousands, against the 724 available
+  here); or
+- a measure that credits valid alternatives, which only the expert ratings can calibrate.
+
+**Status.** Exploratory (spent papers). No configuration is a candidate for test5 on reconstruction.
+
+**Leakage: none detected.**
+- All counters are zero over 1,080 runs.
+- 14,658 web-record reads were re-checked against each paper's date: 0 violations.
+
+**Checklist** (must_obey.md section 9).
+- [x] Query-facing models are pre-cutoff: o3-mini; Llama-3.3 search phrases. o1 is used only as a target-free judge.
+- [x] Frozen questions; prompts fixed in 22.1 before the runs.
+- [x] Evidence from date-filtered web corpora, re-checked.
+- [x] Payloads target-free (guard on); pairwise judgments in both orders.
+- [x] Spent papers only; exploratory. Offline checks used existing judgments only.
+- [x] Same budgets as the baselines; one call each.
+- [x] GPT-5.6 judge, DeepSeek cross-judge, lever labels and audit on every run. One failed first attempt is kept.
+- [x] Same-session baselines (6.10); target-free quality reported (6.11).
+- [x] Paired statistics with CIs and Holm; negative results recorded.
+- [x] Records updated; `must_obey_check.py` passes.

@@ -1786,7 +1786,52 @@ results in 21.2.
 - Raising reconstruction needs a better prediction of the paper's choice of approach than any target-free signal
   tried so far.
 
-## Comparability and limits, experiments 8 to 40
+## Experiment 41: raising the score from the failure points
+
+**Request.** "I want the score to increase. Look at the failure points, then brainstorm or take inspiration and run
+the experiments." Plan, failure analysis and offline checks in loop.md 22.1; results in 22.2.
+
+**Failure points of the best method** ([loop_study/](./loop_study/README.md)).
+- Most points are lost on the intervention: 3.69 of 4.
+- **Blind spots.** It almost never proposes the paper's lever for processing-route papers (2%; 22% of runs) or
+  simulation papers (0%; score 0.48).
+- **Study design.** Answer keys name the processing route in 58% of interventions, hypotheses in 28%.
+- **Judge criticisms:** the conditions in 86% of runs, vagueness in 75%.
+- **What perfect knowledge would be worth:** the study type +0.04, the lever +0.64.
+
+**Offline checks** (exact, on existing judgments; `select_offline.py`).
+- Among 15,600 judged target-free hypotheses (116 per unit), the best averages 1.28.
+- No target-free selection rule beats the writer:
+  - literature support: −0.07;
+  - consensus: −0.01;
+  - a reranker learned leave-one-paper-out: +0.005.
+- Many-shot examples from the most similar earlier papers would not concentrate the paper's lever (12–13% of papers,
+  as in the whole corpus). Not run.
+
+**What was run** (1,080 runs; GPT-5.6 against same-session baselines).
+
+| Configuration | GPT-5.6 vs baseline [CI] | DeepSeek | Lever ≥ 2 |
+|---|---|---|---:|
+| Complete-study writer (study types + study design) vs the writer | −0.03 [−0.08, +0.01] | −0.04 | 12% (writer 19%) |
+| Study types only | −0.00 [−0.03, +0.03] | −0.05 | 13% |
+| Study design only | −0.02 [−0.06, +0.02] | −0.03 | 17% |
+| Complete-study writer with web evidence vs the 64,000-character writer | −0.03 [−0.07, +0.02] | −0.03 | 20% |
+
+- **The guides did what they asked, but nothing raised the score.** Twice as many hypotheses describe the processing
+  route, conditions rise with the type guide (+0.08) and outcome with the design guide (+0.04). But each guide moves
+  the model away from its own best guess, so intervention agreement falls by 0.06–0.12.
+- **Quality without the answer key.** All three judges prefer the complete-study writer's hypotheses: +0.20 to +0.32,
+  Holm-significant.
+- **Leakage:** none detected.
+
+**Conclusion** (with experiments 37–40).
+- No target-free route raises the score: agents, synthesis, selection, evidence or prompt guides.
+- The lost points are in the paper's specific lever, which nothing available before the paper identifies.
+- The closed-book conservative writer is at the ceiling for target-free methods with these models.
+- A higher score needs a forecaster trained on a large history of introduction-to-study pairs, or a measure that
+  credits valid alternatives.
+
+## Comparability and limits, experiments 8 to 41
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -1871,3 +1916,7 @@ results in 21.2.
   - Its decision rule was chosen offline on the same papers, using experiment 39's target-aware passage labels. Those
     labels proved more lenient than the labels of final hypotheses, so the offline estimate overstated the gain.
   - Its GPT-5.6 audits ran after the judging, because of rate limiting.
+- Experiment 41 is exploratory: development on the 45 spent papers.
+  - Its offline selection checks reuse judgments made on different days. GPT-5.6 drift (about ±0.04) affects
+    comparisons across configurations, but not the conclusion that no rule beats the writer.
+  - The writer's same-session score was 0.632 here, against 0.621 in experiment 40 and 0.623 originally.
