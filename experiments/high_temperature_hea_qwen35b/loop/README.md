@@ -201,3 +201,20 @@
   - the report ([round4_analysis.py](../../../round4_analysis.py)).
 - **Result.** No synthesis beats the incumbent. The final hypothesis follows the drafts' shared majority, so the
   decision does not change.
+
+## Experiment 39: why more information does not raise the score (loop.md section 20)
+
+- **Generation.** [run_diag.sh](./run_diag.sh) ran six diagnostic configurations on all 45 papers (1,620 runs) into
+  [../loop_diag/](../loop_diag/README.md):
+  - five `oracle_*` configurations that use the answer key on purpose (diagnostics, never methods; must_obey.md
+    5.4);
+  - one target-free reading method.
+- **Evaluation.** The same runner ran:
+  - the judge, audit and label loops on both GPT-5.6 instances, and the DeepSeek cross-judge;
+  - the pack and corpus labels, the target-free pairwise quality judges (GPT-5.6, DeepSeek, o1) and the judge
+    re-test;
+  - the report.
+
+  [run_diag_audits.sh](./run_diag_audits.sh) added two audit loops when the audits lagged.
+- **Result.** The information is diluted, not missing. The model copies details but not the decision. The score
+  measures one paper's study, which three target-free judges show is not the same as hypothesis quality.

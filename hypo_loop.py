@@ -335,7 +335,10 @@ def generate_one(method: str, case: dict[str, Any], level: str, sample: int, fin
         "cited_evidence": [{"record_id": c, "paper_id": h.seen[c].paper_id,
                             "publication_date": h.seen[c].publication_date, "kind": h.seen[c].kind,
                             "text": h.seen[c].text[:CITED_TEXT_CHARS]} for c in cited if c in h.seen],
-        "audit": leakage_audit(h, cited), "target_free_asserted": not (error or "").startswith("TargetLeak"),
+        "audit": leakage_audit(h, cited),
+        # An oracle diagnostic uses the answer key on purpose (loop.md 20.1), so it never asserts a target-free payload.
+        "target_free_asserted": not (error or "").startswith("TargetLeak") and not h.notes.get("oracle_diagnostic"),
+        **({"oracle_diagnostic": h.notes["oracle_diagnostic"]} if h.notes.get("oracle_diagnostic") else {}),
         "trace": h.trace, "llm_calls": sum(1 for t in h.trace if "event" not in t), "notes": h.notes,
         "chars_in": sum(t.get("chars_in", 0) for t in h.trace), "elapsed_seconds": round(time.time() - started, 2),
     })

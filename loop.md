@@ -3356,8 +3356,328 @@ outputs are not judged or analysed.
 - [x] Spent papers only; exploratory.
 - [x] Budgets declared (19.1): drafts × calls per configuration, and 64,000 characters of evidence in the mixed
   configuration.
-- [x] GPT-5.6 judge, DeepSeek cross-judge and lever labels on every run. The audit is incomplete because of the
-  shared quota: coverage reported above, loops continuing. Failures reported (3 drafts).
+- [x] GPT-5.6 judge, DeepSeek cross-judge, lever labels and the target-free audit on every run. The audits finished
+  at 14:09, after the results above were written. Only the audit columns of `analysis_r4.md` changed: specificity
+  0.24–0.29 and complete chains 0.66–0.78 for the syntheses, against 0.31 and 0.84 for the incumbent. Failures
+  reported (3 drafts).
 - [x] Paired statistics with CIs and Holm; negative results recorded, including every idea rejected offline.
 - [x] READMEs, experiment log, loop.md, must_obey.md (model table) and PROJECT_SUMMARY.md updated;
   `must_obey_check.py` passes.
+
+## 20. Why more information does not raise the score (experiment 39)
+
+### 20.1 Pre-registered diagnostic plan (written 2026-10-28 at about 22:25, before any experiment-39 run or label)
+
+**Request.** "More information should give better results. Either we are giving the models bad information, or the
+model is not thinking about the information and is just repeating it, or the judging of the outputs is not fair."
+
+**What is already known** (aggregates seen before this plan).
+- Evidence of any kind has never raised the GPT-5.6 reconstruction score significantly. The best web method
+  (`web_text_64k_b_o3mini`) ties the closed-book writer: 0.64 vs 0.62, DeepSeek 0.66 vs 0.58.
+- With evidence, the judges' own quality labels improve:
+  - unsupported: 47% vs 73%;
+  - evidence validity: 1.10 vs 0.06;
+  - novelty: 1.80 vs 1.56.
+- One to three papers as context lower the score, and the model copies their study design (experiment 29).
+- Question-retrieved passages are mostly abstracts and introductions (experiment 36).
+- On the fixed corpus, top-20 records retrieved with the answer key made a case only partly reconstructible
+  (experiment 12).
+- The judges pass sanity controls (AUC 1.00). They disagree on whether a non-matching hypothesis is a valid
+  alternative (GPT-5.6: 41 of 60) or wrong (DeepSeek: 45 of 60) (experiment 33).
+
+**Design.** Three explanations, each with its own measurements. All runs use o3-mini with the incumbent's writer
+(WRITER_B) on the 45 spent papers, 3 levels × 2 samples = 270 runs per configuration, with both judges, the audit and
+lever labels.
+
+**A. Is the information bad?**
+- **A1–A3.** GPT-5.6 rates, against the answer key, every passage in each unit's evidence pack: does it describe the
+  paper's lever (lever match 0–3, the scale of the standard labels)? Packs:
+  - Q16: the question-retrieved 16,000-character pack of `web_text_chunks_b_o3mini`;
+  - Q64: the 64,000-character pack of `web_text_64k_b_o3mini`;
+  - T16: the oracle pack below.
+
+  A unit's whole web corpus (titles and abstracts of seeds and expansion) is rated the same way.
+
+  A pack or corpus "contains the lever" if any item scores ≥ 2.
+- **A4. Oracle selection** (`oracle_targetpack_b_o3mini`).
+  - The same retriever, corpus and 16,000-character budget as Q16, but the retrieval query is the answer key's
+    intervention, structural mediator and mechanism.
+  - The passages are still all dated before the paper (date filters unchanged), so no text of the paper can enter.
+    Only the selection is target-aware.
+  - This is the best evidence that existed before the paper.
+- **Rule.** Bad information limits the score if Q16 contains the lever in ≤ 25% of units and T16 beats Q16 (GPT-5.6
+  CI > 0 and DeepSeek difference > 0).
+
+**B. Is the model not thinking, just repeating?**
+- **B1. Uptake.** Among units whose pack contains the lever, the share of hypotheses with lever ≥ 2, with the pack,
+  minus the closed-book writer's share on the same units. Reported for Q16, Q64 and T16.
+- **B2. Copying** (lexical; no LLM).
+  - The share of the hypothesis's specific terms found in the evidence the run saw: alloy and compound formulas,
+    numbers with units, and content words not in the question.
+  - Control: the same share for the closed-book writer's hypothesis of the same unit against the same evidence.
+  - Also class anchoring: whether the hypothesis's study type equals the modal study type of the pack's papers, with
+    the pack vs closed-book.
+- **B3. A reading step** (`oracle_targetpack_read_b_o3mini`, and the target-free `read_web_chunks_b_o3mini` on
+  Q16).
+  - An o3-mini reader first lists the approaches the passages report (what, on which material, result, limitation,
+    record IDs).
+  - It then chooses the approach that most directly addresses the question's limitation, preferring one shown to work
+    on a related system but not yet applied to this one.
+  - The incumbent writer builds on that choice with the same evidence.
+- **B4. Lever hint.** See C1: when the paper's lever is given, how often the hypothesis uses it.
+- **Rule.**
+  - The model does not use the information if, on T16, uptake (B1) is below 0.15 while T16 contains the lever in at
+    least 25% of units.
+  - It repeats rather than reasons if, in addition, the copied share minus its control (B2) is at least 0.20.
+
+**C. Is the judging unfair?**
+- **C1. Oracle hints** (no evidence; the hint is given as the writer's analysis notes):
+  - `oracle_hint_class_b_o3mini`: the paper's study type, with its definition;
+  - `oracle_hint_lever_b_o3mini`: the paper's lever in at most 20 words, with no amounts, temperatures, times,
+    parameters or results. Written once per paper by GPT-5.6 from the key's intervention, frozen before any
+    generation;
+  - `oracle_hint_full_b_o3mini`: the whole answer key rendered as a proposal by code (`answer_render.py`).
+
+  This calibrates the scale: what a hypothesis scores when the information is right.
+- **C2. A target-free quality judge.**
+  - Pairwise, both orders, without the answer key: which hypothesis is the better research proposal (addresses the
+    stated limitation; physically sound; specific and testable; well grounded, no invented values; substantive)?
+  - Pairs, matched by unit and sample: Q64 vs closed-book, and T16 vs closed-book.
+  - Judges:
+    - GPT-5.6 and DeepSeek, which may know the papers;
+    - **o1** (cutoff 2023-10), which cannot know any of the papers, so it cannot reward resemblance to the real
+      result.
+  - Per pair: +1 if a side wins in both orders, −1 if it loses in both, otherwise 0. Per-paper means, bootstrap CI,
+    sign test.
+- **C3.** On existing runs: the quality dimensions and the judge's classification (exact, partial, plausible
+  alternative, unsupported) along the information axis. Configurations:
+  - closed-book;
+  - text of 4,000, 16,000 and 64,000 characters;
+  - 1, 3, 10 and 30 paper cards (web corpora).
+
+  Each is paired against the closed-book writer on common papers.
+- **C4. Test–retest.** The 135 sample-1 runs of `writer_only_b_o3mini` are judged again by GPT-5.6 and DeepSeek. Per-run
+  and per-paper agreement.
+- **Rule.**
+  - The score is unfair to information if o1 and at least one other quality judge prefer the information-rich
+    hypotheses (net preference CI > 0) while their reconstruction score is not higher (GPT-5.6 CI includes 0 or is
+    below it).
+  - The scale gives little credit even for the right idea if the lever hint scores below 1.5 (GPT-5.6).
+
+**Oracle runs are diagnostics, not methods.**
+- They deliberately use the answer key, so they break the target-free payload rule (must_obey.md 5) by design.
+- They are stored only in `loop_diag/oracle_*`, and every run records `oracle_diagnostic` and
+  `target_free_asserted: false`.
+- `must_obey_check.py` fails them unless called with `--oracle`, which accepts them only in `oracle_*` directories.
+- No oracle configuration may be compared as a method or enter a leaderboard of methods.
+- `read_web_chunks_b_o3mini` is an ordinary target-free method.
+
+**Statistics.**
+- Paired per paper, with a paper-clustered bootstrap (10,000) and an exact sign test.
+- Holm correction within each family: A4; B3 (2 comparisons); C1 (3 rungs vs closed-book); C2 (2 comparisons × 3
+  judges).
+- GPT-5.6 is primary for reconstruction. For C2, each judge is reported.
+- Status: exploratory; all papers are spent.
+
+**Expectations, recorded before running.**
+- Q16 rarely contains the lever (about 10–20% of units); T16 more often (about 40%).
+- T16 raises the score modestly.
+- Uptake is low, and copying is high.
+- The lever hint scores about 1.3–1.8, the full key above 3.
+- GPT-5.6 prefers the information-rich hypotheses in the target-free comparison; o1 is uncertain.
+
+**Hints frozen and smoke test (about 22:30, before any experiment-39 run; runs started at 22:32 with `loop/run_diag.sh`).**
+- `loop_diag/oracle_hints.json` (SHA-256 prefix `fb59f73164f2d237`): 45 papers.
+  - Study types: composition 11, processing route 10, heat treatment 6, characterisation 6, simulation 5,
+    coating 4, computational method 2, microstructure 1.
+  - Levers: at most 20 words. The only digits are in names (SS316L, 3D, C14, TC4, L1₂, ZrB2), not amounts.
+- **Smoke test.** One unit (PMC11077685, problem-constrained) per configuration in a scratch root.
+  - All 6 OK, every leakage counter zero.
+  - Oracle runs record `oracle_diagnostic` and `target_free_asserted: false`; the reader method stays target-free.
+  - Nothing was judged, and no prompt changed.
+- **Operational note (23:50).** The audits lagged the judges (about 10 a minute), so two extra audit-only loops were
+  added (`loop/run_diag_audits.sh`), each in its own seeded random job order. What is audited, and how, is unchanged.
+
+### 20.2 Post hoc check prompted by C4 (added 2026-10-29 00:20, after the interim results)
+
+C4 found that GPT-5.6 scores the same runs higher when it judges them again now. The originals were judged on
+2026-10-25 and 26, three to four days earlier.
+- GPT-5.6: second minus first +0.037 [+0.004, +0.070], 20 papers up and 8 down, p = 0.036.
+- DeepSeek: no shift, −0.013 [−0.046, +0.020].
+
+So comparisons between runs judged days apart can be biased by about +0.04 in favour of the newer runs. The
+baselines (`web_text_chunks_b_o3mini`, and the closed-book writer's sample-2 runs) are therefore judged again with
+GPT-5.6 in the same session (`diag_analysis.py samesession`). A4, B3 and C1 are repeated against these same-session
+baselines. The pre-registered results are reported unchanged; this check is labelled post hoc.
+
+**Result of the check** (`analysis_diag.md`, section D).
+- Re-judged now, the closed-book writer scores 0.639 (originally 0.623) and the question-retrieved pack 0.600
+  (originally 0.607). The drift is not uniform across configurations.
+- Every conclusion of 20.3 holds against the re-judged baselines:
+  - oracle selection vs question-retrieved: +0.139 [+0.08, +0.20], 33 papers up and 11 down;
+  - oracle selection vs closed-book: +0.095 [+0.03, +0.16];
+  - reading step vs question-retrieved: −0.030 [−0.07, +0.01];
+  - study-type hint vs closed-book: +0.026 [−0.03, +0.08];
+  - lever hint: +0.62;
+  - whole key: +2.74.
+- The 64,000-character pack vs closed-book is −0.007 [−0.07, +0.06].
+
+### 20.3 Results (2026-10-29, 00:38; exploratory, because all 45 papers are spent)
+
+**Runs.**
+- 6 configurations × 270 = 1,620 runs. Two first attempts cited a passage they had not been given; both succeeded on
+  their retry.
+- Every run has both judges, the lever label and the audit.
+- Also done:
+  - 405 pack labels and 135 corpus labels;
+  - 3,240 target-free pairwise judgments (GPT-5.6, DeepSeek, o1; both orders);
+  - 270 re-judgments for C4, and 405 same-session re-judgments (20.2).
+- `must_obey_check.py` passes:
+  - the five oracle directories only with `--oracle`, which recognises their 1,350 runs as diagnostics;
+  - `read_web_chunks_b_o3mini` as an ordinary method.
+- Full tables: `loop_diag/analysis_diag.md`.
+
+**Pre-registered decisions.**
+
+| Explanation | Rule | Result |
+|---|---|---|
+| A. The information is bad (it lacks the paper's lever, and better information would help) | Q16 contains the lever in ≤ 25% of units, and T16 > Q16 | **Not supported as stated.** The lever is usually present (78%), but better-selected information does raise the score |
+| B. The model does not use the information | T16 uptake < 0.15 while T16 contains the lever in ≥ 25% of units | **Supported** (uptake 0.09; T16 contains the lever in 87% of units) |
+| B. It repeats rather than reasons | in addition, copied words − control ≥ 0.20 | **Not supported** for words (+0.07 to +0.10). Numbers (+0.25 to +0.37) and formulas (+0.22 to +0.48) do pass 0.20 |
+| C. The score is unfair to information | o1 and one other target-free judge prefer the information-rich hypotheses, while reconstruction is not higher | **Supported** |
+| C. Little credit for the right idea | the lever hint scores < 1.5 (GPT-5.6) | **Supported** (1.26) |
+
+**A. The information is diluted, not missing.**
+
+| Information | Contains the paper's lever (≥ 2) | Share of passages that carry it |
+|---|---:|---:|
+| Question-retrieved, 16,000 characters (Q16) | 78% of units | 18% |
+| Question-retrieved, 64,000 characters (Q64) | 93% | 16% |
+| Oracle-selected, 16,000 characters (T16) | 87% | 37% |
+| The whole web corpus (titles and abstracts) | 94% | – |
+
+- Every pack contains the paper's kind of intervention (lever ≥ 1 in 100% of units).
+- The paper's lever is usually one approach among several in what the model reads. Its studies typically apply a
+  known lever to a new system.
+- **Selection matters** (A4). T16, with the same retriever, corpus, budget and writer, scores 0.739 against 0.607 for
+  Q16:
+  - GPT-5.6: +0.131 [+0.07, +0.20], Holm p 0.012;
+  - DeepSeek: +0.086 [−0.02, +0.19].
+
+  It is the first evidence condition in this project that clearly beats the closed-book writer on GPT-5.6 (+0.10 in
+  the same session).
+- The gain is mostly in mechanism (0.95 vs 0.67) and conditions (0.73 vs 0.63). The lever moves little: lever ≥ 2 in
+  26% vs 21%.
+
+**B. The model takes details from the evidence, not its decision.**
+- **Uptake** (B1). Where the pack contains the lever, the hypothesis uses it hardly more often than without the pack:
+  - Q16: 24% vs 21%, +0.00 [−0.08, +0.07];
+  - Q64: +0.02;
+  - T16: 27% vs 18%, +0.09 [+0.03, +0.17].
+- **Copying** (B2). Of the hypothesis's specific terms, the share found in the evidence it saw, against the
+  closed-book hypothesis checked against the same evidence:
+  - numbers with units: 46% vs 19% (Q16), 58% vs 23% (T16);
+  - alloy and compound formulas: 52% vs 31% (Q16), 69% vs 35% (T16);
+  - content words: +0.05 to +0.10.
+- **Anchoring.** The study type follows the pack's papers slightly: +0.07 [+0.00, +0.13] on Q16.
+- **When told the lever directly** (C1), the hypothesis uses it in 93% of runs. The model can use information that is
+  explicit; it does not pick the paper's option out of a pack of options.
+- **Reading step** (B3). It does not help:
+  - on T16: −0.053, Holm p 0.019 (DeepSeek −0.10);
+  - on Q16: −0.037 (DeepSeek −0.12).
+
+  Asked to choose the approach "shown on a related system but not yet applied here", the reader picks creative
+  transfers, such as adding oxygen to form ordered oxygen complexes, rather than the paper's direction.
+
+**C. The judging is consistent and responsive, but it measures one paper's study, not hypothesis quality.**
+- **Responsive to correct information** (C1; GPT-5.6 / DeepSeek):
+
+  | What the model is given | Score | Difference from closed-book | Lever ≥ 2 |
+  |---|---:|---|---:|
+  | The paper's study type | 0.67 / 0.66 | +0.04 [−0.01, +0.10] / +0.09 [+0.01, +0.16] | 42% |
+  | The paper's lever | 1.26 / 1.50 | +0.64 / +0.93 | 93% |
+  | The whole answer key | 3.38 / 3.64 | +2.76 / +3.06 | 93% |
+
+  With the lever right, intervention agreement is 2.07, but conditions 0.86, mechanism 1.06 and outcome 1.05. The
+  score also requires the paper's specific conditions and results, which nobody could know before the experiment.
+- **Blind to what information improves** (C2). Pairwise judges without the answer key (net preference for the
+  information-rich hypothesis; +1 for winning both orders, −1 for losing both):
+
+  | Comparison | GPT-5.6 | DeepSeek | o1 (cannot know the papers) |
+  |---|---|---|---|
+  | 64,000 characters vs closed-book | +0.26 [+0.13, +0.39], 30/11 papers | +0.29 [+0.20, +0.39], 33/6 | +0.44 [+0.35, +0.53], 41/1 |
+  | Oracle 16,000 vs closed-book | +0.33 [+0.18, +0.47], 31/10 | +0.33 [+0.24, +0.42], 32/3 | +0.43 [+0.34, +0.52], 38/4 |
+
+  - All six are Holm-significant.
+  - o1 prefers the closed-book hypothesis in both orders in only 5–6% of pairs.
+  - The reconstruction score of the same 64,000-character hypotheses: +0.013 [−0.05, +0.08] (−0.007 in the same
+    session).
+  - The judges' own classification agrees:
+
+    | | Closed-book | 64,000 characters |
+    |---|---:|---:|
+    | Unsupported | 73% | 47% |
+    | Plausible alternative | 22% | 47% |
+    | Evidence validity | 0.06 | 1.10 |
+- **Along the amount of information** (C3, GPT-5.6 reconstruction vs closed-book):
+
+  | Information | Difference |
+  |---|---|
+  | 1 paper | −0.12 [−0.19, −0.05] |
+  | 3 papers | −0.09 |
+  | 10 papers | −0.04 |
+  | 30 papers | −0.02 |
+  | 10 random papers | −0.07 |
+  | 4,000 characters | −0.12 [−0.18, −0.05] |
+  | 16,000 characters | −0.02 |
+  | 64,000 characters | +0.01 |
+
+  - DeepSeek: +0.07 to +0.10 with 10–30 papers or 64,000 characters (not significant).
+  - Unsupported falls from 73% to 42–47% with the larger amounts.
+- **Consistency** (C4). Re-judging the same runs:
+  - GPT-5.6: run ρ 0.84, paper ρ 0.90, mean |difference| 0.13;
+  - DeepSeek: run ρ 0.91, paper ρ 0.96.
+
+  GPT-5.6 drifted by +0.04 between occasions (20.2).
+
+**Expectations** (20.1).
+- Q16 rarely contains the lever: wrong; it usually does.
+- T16 raises the score modestly: right (+0.13).
+- Uptake low and copying high: right.
+- Lever hint 1.3–1.8: right (1.26 / 1.50). Whole key above 3: right.
+- GPT-5.6 prefers the information-rich hypotheses: right, and so do DeepSeek and o1.
+
+**Leakage: none detected.**
+- All counters are zero over 1,620 runs.
+- 10,986 web-record reads were re-checked against each paper's date: 0 violations.
+- The oracle runs used the answer key by design; they are recorded as diagnostics and enter no method comparison.
+
+**Answer: why more information does not give better results.**
+1. **It does give better hypotheses, but the score does not measure that.**
+   - Three judges that do not see the answer key prefer the hypotheses written with information in 30–41 of 45
+     papers. One of them, o1, cannot know any of these papers.
+   - The judges' own labels say the same: far fewer unsupported hypotheses.
+   - The score measures how closely a hypothesis reconstructs one paper's specific study. Information about earlier
+     work can tell the model what is plausible, but not which option this paper chose or what exactly it found.
+2. **The model uses information for details, not for the decision.**
+   - It copies numbers and alloy names from what it reads.
+   - When the paper's approach is among the options in the evidence, it adopts it hardly more often than without
+     evidence.
+   - When told the approach directly, it uses it 93% of the time. Making it reason over the evidence explicitly made
+     things worse.
+3. **The information is diluted, not missing.**
+   - The paper's approach is in 78–93% of the evidence packs, but in only 16–18% of their passages.
+   - Evidence selected to match the paper's study raises the score by +0.13. Better selection helps, but in practice
+     we cannot select by the answer.
+
+**Status.** Exploratory diagnostics on spent papers. Oracle configurations are not methods.
+
+**Checklist** (must_obey.md section 9).
+- [x] Query-facing models are pre-cutoff: o3-mini; Llama-3.3 search phrases; o1 as a target-free judge.
+- [x] Frozen questions.
+- [x] Oracle exceptions declared before the runs, recorded per run and checked by `must_obey_check.py --oracle`.
+- [x] Evidence date filters unchanged; every record re-checked.
+- [x] Pairwise judgments in both orders.
+- [x] Both judges, audit and lever labels on every run.
+- [x] Paired statistics with CIs and Holm; post hoc checks labelled.
+- [x] Records updated; `must_obey_check.py` passes.

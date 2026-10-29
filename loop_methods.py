@@ -1608,3 +1608,110 @@ register("synth_k1_b_o3mini")(lambda h: m_synth(h, [("o3mini", False)]))
 register("writer_only_b_o3mini_r5")(lambda h: m_writer_only_b(h, "o3mini"))  # fresh-sample replicate (19.1)
 SYNTH_CONFIGS = ("synth_k4_b_o3mini", "synth_crowd_b_o3mini", "synth_mixed_b_o3mini", "synth_k1_b_o3mini",
                  "writer_only_b_o3mini_r5")
+
+
+# ================================================================ experiment 39 (loop.md 20.1): why information does
+# not raise the score. Oracle configurations deliberately use the answer key to measure what information is worth.
+# They are diagnostics, never methods: each run records oracle_diagnostic, target_free_asserted is false, and they live
+# only in loop_diag/oracle_* (must_obey_check.py --oracle). read_web_chunks_b_o3mini is an ordinary target-free method.
+
+ORACLE_HINTS = _H.EXPERIMENT_DIR / "loop_diag" / "oracle_hints.json"  # frozen before any generation (loop.md 20.1)
+STUDY_TYPES = {
+    "composition_change": "changing the alloy composition or adding elements",
+    "processing_route": "the synthesis or manufacturing route, e.g. additive manufacturing, powder metallurgy, casting "
+                        "or deposition",
+    "heat_or_thermomechanical_treatment": "annealing, ageing, rolling, forging or another treatment after processing",
+    "microstructure_architecture": "a designed microstructure, e.g. heterogeneous, lamellar, gradient or precipitate "
+                                   "architecture",
+    "surface_or_coating": "coatings, cladding or surface treatment",
+    "computational_method_development": "a new machine-learning or computational method or tool",
+    "simulation_study": "a DFT, molecular-dynamics, CALPHAD or phase-field study of a material",
+    "experimental_characterization_study": "characterising the behaviour or mechanisms of a material without a "
+                                           "designed change",
+    "other": "another kind of study",
+}
+READER_SYSTEM = (
+    "You read evidence passages from earlier papers before a materials-science hypothesis is written. Use only the "
+    "passages and general materials-science knowledge from before the knowledge cutoff. (1) List the distinct "
+    "approaches the passages report (interventions, processing routes, treatments, coatings, compositions, "
+    "simulations or measurements): for each, what was done, to which material, what it achieved, its limitation, and "
+    "the record IDs. (2) Choose the approach, or a combination of approaches from different passages, that most "
+    "directly addresses the limitation the research question states for its own material system and conditions. "
+    "Prefer an approach the passages show working on a related system that has not yet been applied to this system. "
+    "Return JSON {\"approaches\": [{\"approach\": str, \"material\": str, \"result\": str, \"limitation\": str, "
+    "\"record_ids\": [str]}], \"chosen_family\": one of " + ", ".join(t for t in STUDY_TYPES if t != "other")
+    + ", \"lever\": \"the chosen approach in at most 25 words\", \"why\": \"one sentence\"}."
+)
+
+
+def oracle_hint(h: Harness) -> dict[str, Any]:
+    return json.loads(ORACLE_HINTS.read_text())[h.case["paper_id"]]
+
+
+def target_query(h: Harness) -> str:
+    """The answer key's intervention, mediator and mechanism: the query of the oracle evidence selection."""
+    t = h.case["hidden_target"]
+    return " ".join(str(t.get(k) or "") for k in ("intervention", "structural_mediator", "mechanism"))
+
+
+def read_then_write(h: Harness, records: list[Any], model: str = "o3mini") -> dict[str, Any]:
+    """B3: a reader lists the approaches the passages report and chooses one; the incumbent writer builds on it."""
+    payload = {"query": h.query, "knowledge_cutoff": h.cutoff,
+               "eligible_evidence": h.evidence_payload(records, rx.record_cap("text_chunks"))}
+    raw = h.ask("reader", model, READER_SYSTEM, payload)
+    raw = raw if isinstance(raw, dict) else {}
+    family = str(raw.get("chosen_family", "")).strip()
+    h.notes["reading"] = {"approaches": len(raw.get("approaches") or []), "chosen_family": family,
+                          "lever": str(raw.get("lever", ""))[:300], "why": str(raw.get("why", ""))[:400]}
+    notes = {"chosen_family": family, "lever": str(raw.get("lever", ""))[:300], "why": str(raw.get("why", ""))[:400]}
+    return write(h, notes, model, records=records, system=WRITER_B)
+
+
+@register("oracle_targetpack_b_o3mini")
+def m_oracle_targetpack(h: Harness) -> dict[str, Any]:
+    """A4: the question-retrieved pack's retriever, corpus and budget, queried with the answer key. Every passage is
+    still dated before the paper, and the payload guard stays on: only the selection is target-aware."""
+    h.notes["oracle_diagnostic"] = "target_selected_evidence"
+    h.source = "web"
+    return write(h, {}, "o3mini", records=h.pack(target_query(h), "text_chunks"), system=WRITER_B)
+
+
+@register("oracle_targetpack_read_b_o3mini")
+def m_oracle_targetpack_read(h: Harness) -> dict[str, Any]:
+    h.notes["oracle_diagnostic"] = "target_selected_evidence_with_reader"
+    h.source = "web"
+    return read_then_write(h, h.pack(target_query(h), "text_chunks"))
+
+
+@register("read_web_chunks_b_o3mini")
+def m_read_web_chunks(h: Harness) -> dict[str, Any]:
+    """B3 on the ordinary question-retrieved pack (target-free)."""
+    h.source = "web"
+    return read_then_write(h, h.pack(h.query, "text_chunks"))
+
+
+@register("oracle_hint_class_b_o3mini")
+def m_oracle_hint_class(h: Harness) -> dict[str, Any]:
+    h.notes["oracle_diagnostic"] = "hint_study_type"
+    hint = oracle_hint(h)
+    notes = {"chosen_family": hint["class"], "family_definition": STUDY_TYPES[hint["class"]]}
+    return write(h, notes, "o3mini", system=WRITER_B)
+
+
+@register("oracle_hint_lever_b_o3mini")
+def m_oracle_hint_lever(h: Harness) -> dict[str, Any]:
+    h.notes["oracle_diagnostic"] = "hint_lever"
+    hint = oracle_hint(h)
+    notes = {"chosen_family": hint["class"], "family_definition": STUDY_TYPES[hint["class"]], "lever": hint["lever"]}
+    return write(h, notes, "o3mini", system=WRITER_B)
+
+
+@register("oracle_hint_full_b_o3mini")
+def m_oracle_hint_full(h: Harness) -> dict[str, Any]:
+    h.notes["oracle_diagnostic"] = "hint_full_answer_key"
+    h._forbidden = []  # the guard would (rightly) block the answer key; this is the declared exception (loop.md 20.1)
+    return write(h, {"collaborator_plan": _render_key(h.case["hidden_target"])}, "o3mini", system=WRITER_B)
+
+
+DIAG_CONFIGS = ("oracle_targetpack_b_o3mini", "oracle_targetpack_read_b_o3mini", "read_web_chunks_b_o3mini",
+                "oracle_hint_class_b_o3mini", "oracle_hint_lever_b_o3mini", "oracle_hint_full_b_o3mini")

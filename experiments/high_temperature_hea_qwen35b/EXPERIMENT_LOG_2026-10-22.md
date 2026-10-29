@@ -1694,7 +1694,56 @@ configurations of 270 runs each (1,350 runs, none failed):
 - From about 12:45, other projects saturated the shared GPT-5.6 quota, so the target-free audits lagged the judges.
   Their coverage is stated in `loop_r4/analysis_r4.md`.
 
-## Comparability and limits, experiments 8 to 38
+## Experiment 39: why more information does not raise the score
+
+**Request.** "More information should give better results. Either we are giving the models bad information, or the
+model is not thinking about the information and is just repeating it, or the judging of the outputs is not fair."
+Plan in loop.md 20.1 (written before any run); post hoc check in 20.2; results in 20.3.
+
+**Design.** Each explanation got its own measurements, on the 45 spent papers with the best method's writer
+(o3-mini, WRITER_B), in 6 new configurations of 270 runs (1,620 runs; [loop_diag/](./loop_diag/README.md)).
+- **Bad information?**
+  - GPT-5.6 rated every passage the model saw against the answer key: does it describe the paper's lever?
+  - An **oracle** pack: the same retriever, corpus and budget, but queried with the answer key. Every passage is still
+    dated before the paper.
+- **Not thinking, just repeating?**
+  - How often the hypothesis uses the paper's lever when the evidence contains it (uptake).
+  - How many of its numbers and alloy names come from the evidence (copying).
+  - A reading step that lists the approaches in the evidence and chooses one.
+- **Unfair judging?**
+  - **Oracle hints**: the paper's study type, its lever, or the whole answer key.
+  - A **target-free pairwise quality judge**: GPT-5.6, DeepSeek, and o1, which cannot know the papers.
+  - A judge test-retest.
+
+  The oracle runs use the answer key on purpose. They are diagnostics, never methods (must_obey.md 5.4), and are
+  checked by `must_obey_check.py --oracle`.
+
+**Results** (GPT-5.6; DeepSeek alongside).
+
+| Explanation | Finding | Key numbers |
+|---|---|---|
+| The information is bad | Diluted, not missing | The paper's lever is in 78% of 16,000-character packs (93% of 64,000), but in only 16–18% of their passages. Evidence selected to match the paper: +0.13 [+0.07, +0.20] over question-retrieved (+0.14 same-session; DeepSeek +0.09), +0.10 over closed-book |
+| The model does not use it, just repeats | It copies details, not the decision | When the pack contains the paper's lever, it is used only 0–9 points more often than without the pack. Numbers from the evidence: 46% vs 19% control. Alloy formulas: 52% vs 31%. Told the lever directly: used in 93%. A reading step: −0.04 to −0.05 (DeepSeek −0.10 to −0.12) |
+| The judging is unfair | Consistent and responsive, but it measures one paper's study, not quality | Given the paper's lever the score is only 1.26 (whole key 3.38). Without the answer key, all three judges prefer the evidence-based hypotheses (o1: 41 of 45 papers, net +0.44; GPT-5.6 +0.26; DeepSeek +0.29), while reconstruction moves +0.01. Unsupported: 73% → 47%. Re-test ρ 0.84 / 0.91 |
+
+- **Pre-registered decisions.**
+  - "Bad information" not supported as stated: the lever is usually present.
+  - "Not using the information": supported.
+  - "Repeating" not supported for words, though numbers and formulas pass the threshold.
+  - "Unfair to information": supported.
+  - "Little credit for the right idea": supported.
+- **Judge drift** (post hoc, loop.md 20.2). GPT-5.6 scored the same runs +0.04 [+0.004, +0.07] higher three to four
+  days later. Every conclusion holds against same-session re-judged baselines. New must_obey.md rule 6.10.
+- **Leakage: none detected.** All counters are zero; 10,986 web-record reads were re-checked with 0 date violations.
+
+**Answer.**
+- More information does make better hypotheses: better supported and preferred by three judges that do not see the
+  answer key. The score we report measures something else: how closely a hypothesis reconstructs one paper's study.
+- Information improves that score only when it points at the paper's own direction, and the model rarely picks that
+  direction out of a pack of options, although it copies the pack's details.
+- New rule (must_obey.md 6.11): claims about information also report the target-free quality comparison.
+
+## Comparability and limits, experiments 8 to 39
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -1769,3 +1818,9 @@ configurations of 270 runs each (1,350 runs, none failed):
     targets' labels (dev analysis).
   - The likelihood scorer (Llama-3.2-3B) ranks only finished hypotheses and is never shown to a generator.
   - The draft study-type labels come from gpt-4o-mini without the target; the lever labels come from GPT-5.6 with it.
+- Experiment 39 is diagnostic.
+  - Its oracle configurations use the answer key on purpose and are never methods.
+  - Pack, corpus and lever labels come from GPT-5.6, the primary judge's model.
+  - The pairwise quality judges see each hypothesis's cited evidence, so part of their preference may be for visible
+    grounding; their prompt says not to prefer citing more evidence as such.
+  - Earlier GPT-5.6 comparisons between runs judged on different days may carry a drift of about ±0.04 (loop.md 20.2).

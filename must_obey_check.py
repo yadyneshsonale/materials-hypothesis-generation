@@ -10,6 +10,8 @@ A run directory has `runs/*.json` (any of this repository's run formats) and, op
 - missing GPT-5.6 / DeepSeek judgments or target-free audits for successful runs (section 6);
 - with --loop: held-out (test or test2) runs not marked final, or no proof that the payload was asserted target-free
   (5, 6.5).
+- with --oracle: target-aware diagnostic runs (loop.md 20.1) are accepted instead of failing the target-free rule, but
+  only when the run records `oracle_diagnostic` and its directory is named `oracle_*`.
 """
 
 from __future__ import annotations
@@ -92,11 +94,13 @@ def judged(run_dir: Path, run_id: str) -> dict[str, bool]:
             "audit": (run_dir / "audit" / f"{run_id}.json").exists()}
 
 
-def check(run_dir: Path, loop: bool = False, require_cross: bool = True, bench: str = CURRENT) -> dict[str, Any]:
+def check(run_dir: Path, loop: bool = False, require_cross: bool = True, bench: str = CURRENT,
+          oracle: bool = False) -> dict[str, Any]:
     sets = {name: frozen_queries(BENCHMARKS[name], EXTRA_CASES.get(name, ())) for name in sorted(BENCHMARKS)
             if BENCHMARKS[name].exists()}
     failures: list[str] = []
     warnings: list[str] = []
+    diagnostics = 0
     counts = {"runs": 0, "ok": 0, "failed": 0}
     margin_flags: set[str] = set()
     for path in sorted((run_dir / "runs").glob("PMC*.json")):
@@ -134,7 +138,10 @@ def check(run_dir: Path, loop: bool = False, require_cross: bool = True, bench: 
             if frozen["split"] in HELD_OUT_SPLITS and frozen["split"] not in SPENT_SPLITS and not run.get("final"):
                 failures.append(f"{rid}: held-out ({frozen['split']}) run not marked final (pre-register in loop.md)")
             if run.get("status") == "ok" and run.get("target_free_asserted") is not True:
-                failures.append(f"{rid}: no proof that query-facing payloads were asserted target-free")
+                if oracle and run.get("oracle_diagnostic") and run_dir.name.startswith("oracle_"):
+                    diagnostics += 1
+                else:
+                    failures.append(f"{rid}: no proof that query-facing payloads were asserted target-free")
         if run.get("status") == "ok":
             counts["ok"] += 1
             have = judged(run_dir, rid)
@@ -146,6 +153,8 @@ def check(run_dir: Path, loop: bool = False, require_cross: bool = True, bench: 
                 warnings.append(f"{rid}: missing target-free audit")
         else:
             counts["failed"] += 1
+    if diagnostics:
+        warnings.append(f"{diagnostics} oracle diagnostic run(s): target-aware by design, never a method (loop.md 20.1)")
     if counts["failed"]:
         warnings.append(f"{counts['failed']} failed run(s): report them, do not drop them")
     warnings += sorted(margin_flags)
@@ -157,11 +166,12 @@ def main() -> None:
     parser.add_argument("run_dirs", nargs="+", type=Path)
     parser.add_argument("--loop", action="store_true", help="also apply the method-development rules")
     parser.add_argument("--no-cross", action="store_true", help="do not require DeepSeek judgments and audits")
+    parser.add_argument("--oracle", action="store_true", help="accept target-aware oracle diagnostics in oracle_* dirs")
     parser.add_argument("--bench", choices=sorted(BENCHMARKS), default=CURRENT, help="frozen query version")
     args = parser.parse_args()
     all_passed = True
     for run_dir in args.run_dirs:
-        result = check(run_dir, loop=args.loop, require_cross=not args.no_cross, bench=args.bench)
+        result = check(run_dir, loop=args.loop, require_cross=not args.no_cross, bench=args.bench, oracle=args.oracle)
         all_passed &= result["passed"]
         status = "PASS" if result["passed"] else "FAIL"
         print(f"[{status}] {run_dir}: {result['runs']} runs, {result['ok']} ok, {result['failed']} failed")

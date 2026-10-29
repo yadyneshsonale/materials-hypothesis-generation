@@ -179,6 +179,14 @@ preferred future option.
    labels. Never pass arm names, model names or the held-out paper's ID or title.
 3. **Pairwise judgments.** Run every pairwise judgment in both orders, and resolve ties and conflicts by a written
    rule (position bias was 72% in experiment 16).
+4. **Oracle diagnostics: the only exception to rule 1.** A diagnostic may give a model information from the answer
+   key, to measure what information is worth (loop.md 20.1). It must:
+   - be declared in a pre-registration;
+   - record `oracle_diagnostic` in every run, with `target_free_asserted: false`;
+   - live only in directories named `oracle_*`;
+   - be checked with `must_obey_check.py --oracle`.
+
+   An oracle configuration is never a method. It never enters a method comparison or leaderboard.
 
 ## 6. Evaluation design
 
@@ -221,6 +229,16 @@ preferred future option.
      for judge quirks.
 9. **Honest scale.** 12 papers (8 dev units ×3, 4 test units ×3) give wide intervals; treat results as
    indicative. Record negative results as fully as positive ones.
+10. **Judge drift.** GPT-5.6 scored the same runs +0.04 [+0.004, +0.07] higher when it judged them again three to
+    four days later (loop.md 20.2).
+    - When compared runs were judged on different days, judge the baseline again in the same session, or report
+      the drift.
+    - A difference within about ±0.05 needs the same-session check.
+11. **Reconstruction is not quality.** The primary metric measures how closely a hypothesis reconstructs one paper's
+    study. In experiment 39, three judges without the answer key preferred the hypotheses written with evidence,
+    while reconstruction did not move (loop.md 20.3).
+    - For any claim about evidence, information or reasoning steps, also report the target-free pairwise quality
+      judge (`diag_analysis.py pairwise`): both orders; GPT-5.6, DeepSeek and o1, which cannot know the papers.
 
 ## 7. Reproducibility and records
 
@@ -256,6 +274,8 @@ Ablate before combining. Combine only components that helped or that address dif
 - [ ] GPT-5.6 judge, DeepSeek cross-judge and target-free audit all done; integrity gate passes; failures
   reported.
 - [ ] Paired statistics with CIs and Holm; negative results recorded.
+- [ ] Baselines judged in the same session as the compared runs, or the drift reported (6.10).
+- [ ] Oracle diagnostics declared and checked with `--oracle`, never compared as methods (5.4).
 - [ ] README, experiment log and loop.md updated; `must_obey_check.py` passes.
 
 ## 10. Violations found in earlier work (do not repeat)
@@ -342,3 +362,9 @@ Ablate before combining. Combine only components that helped or that address dif
   - Held-out papers are never evidence for any case, not only for their own case.
   - OpenAlex, the planned second date source, ran out of its free daily budget during the corpus build. Crossref
     replaced it, every corpus was rebuilt the same way, and the gate also checks the cached OpenAlex dates.
+- 2026-10-29 (experiment 39):
+  - Rule 5.4: target-aware oracle diagnostics are allowed only as declared, recorded and checked diagnostics, never
+    as methods.
+  - Rule 6.10: judge drift. Re-judge baselines in the same session when comparing runs judged on different days.
+  - Rule 6.11: report a target-free quality comparison beside reconstruction for claims about information.
+  - Rule 5.1 is unchanged for methods.
