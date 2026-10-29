@@ -1,6 +1,6 @@
 # Project summary: AI hypothesis generation for high-temperature high-entropy alloys
 
-**Status.** 2026-10-29, after experiment 39. This file gathers everything done so far and every main result in one
+**Status.** 2026-10-29, after experiment 40. This file gathers everything done so far and every main result in one
 place.
 
 **Details.**
@@ -37,7 +37,8 @@ judges' values, and differences come with paper-clustered 95% confidence interva
     scorer.
   - Diagnostics of why more information does not raise the score, with oracle information from the answer key, a
     target-free pairwise quality judge (including o1, which cannot know the papers) and a judge re-test.
-  - Roughly 31,500 hypothesis-generation runs in total.
+  - An agent that chooses its approach from the evidence and focuses the evidence on it, with a 2 × 2 ablation.
+  - Roughly 32,300 hypothesis-generation runs in total.
 - **Best method found: the simplest one.** o3-mini with a conservative writer prompt and no retrieved evidence
   (`writer_only_b_o3mini`).
   - Over all 37 fresh held-out papers it scores 0.61 against 0.50 for the Llama-3.3 baseline: +0.11
@@ -46,9 +47,18 @@ judges' values, and differences come with paper-clustered 95% confidence interva
   - No other method beat it on fresh papers. Stronger allowed models, few-shot examples and a question router did not
     either (experiment 34). On the spent papers:
     - a proposer–critic–decider agent pipeline scored below it, with or without web evidence (experiment 37);
-    - synthesising several drafts, even from five different models, only tied it (experiment 38).
+    - synthesising several drafts, even from five different models, only tied it (experiment 38);
+    - an agent that chooses its approach from the evidence did not beat it either (experiment 40).
   - Its lead is in overall closeness. On a strict checklist of each paper's specific facts, it and the baseline both
     match only about 6–15% (experiments 33, 35).
+- **Recommended agent for generating hypotheses: the same writer with web evidence** (`web_text_64k_b_o3mini`, 64,000
+  characters of the question's date-filtered web corpus).
+  - On the spent papers it ties the closed-book writer on reconstruction when both are judged in the same session
+    (0.620 vs 0.621; DeepSeek 0.656 vs 0.575).
+  - Judges that do not see the answer key prefer its hypotheses: o1, which cannot know the papers, in 41 of 45
+    papers.
+  - It also beats the evidence-choosing agent of experiment 40 on quality.
+  - The closed-book writer keeps the held-out reconstruction results above.
 - **The absolute level is low.** About 0.6 out of 4, while the paper's actual study, rewritten as a proposal, scores
   3.83. Choosing the paper's specific intervention is the unsolved part.
 - **Main lessons.**
@@ -93,6 +103,11 @@ judges' values, and differences come with paper-clustered 95% confidence interva
         approaches.
       - **Selection would help.** Evidence selected to match the paper raises the score by +0.13.
       - **The judge drifts.** GPT-5.6 drifted +0.04 between occasions; comparisons now need same-session baselines.
+  11. **Choosing the approach from the evidence does not fix the decision** (experiment 40).
+      - An agent that picks the evidence's most direct approach and focuses its evidence on it still matches the
+        paper's approach in only 19% of runs. Its score does not rise (−0.04, not significant).
+      - Specific evidence about an approach that is usually not the paper's lowers mechanism agreement.
+      - The offline estimate (36%) was inflated by lenient passage labels.
 - **Open items.**
   - The expert's ratings, which will show whether the AI judge can be trusted.
   - Every held-out set, including test4, is used up, so a new method claim needs test5. Only 9 papers qualified
@@ -175,6 +190,7 @@ judges' values, and differences come with paper-clustered 95% confidence interva
 | 20 | Use three types of agents (one proposes ideas, one critiques them, one sees both and decides the direction), each able to use the web-searched data; try all baselines and ablations, formalise it and run the evaluations | Formal three-role method with optional web evidence per role; 16 configurations (web at each role, no critic, no decider, one idea, Llama-3.3); 8 baselines; coverage-vs-selection labels | 37 |
 | 21 | First think of ways to improve the hypothesis generation, then implement them | Failure decomposition; six ideas, each with an offline check on existing runs: literature base rates, likelihood selection with a local pre-cutoff model, concrete conditions, problem-level mechanisms, a fine-tuned field model, synthesis. Only synthesis passed to a full run (4 configurations and a fresh replicate) | 38 |
 | 22 | More information should give better results: is the information bad, is the model just repeating it, or is the judging unfair? | Pre-registered tests of each explanation: what the evidence contains, oracle-selected evidence, uptake and copying, a reading step, oracle hints, a target-free pairwise quality judge (GPT-5.6, DeepSeek, o1), a judge re-test, same-session re-judging | 39 |
+| 23 | Make the changes to the agent so that it performs better | Offline checks of evidence re-ranking and of decision rules over approach groups; an agent that chooses its approach from the evidence and focuses the evidence on it; 2 × 2 ablation, same-session baselines, target-free quality judges | 40 |
 
 ## 4. Results by phase
 
@@ -593,6 +609,44 @@ diagnostics, never methods (must_obey.md 5.4).
   - same-session baselines because of judge drift (6.10);
   - a target-free quality comparison beside reconstruction for any claim about information (6.11).
 
+### 4.13 A better agent: choosing the approach from the evidence (experiment 40)
+
+**The change** ([loop_agent/](./experiments/high_temperature_hea_qwen35b/loop_agent/README.md); loop.md section 21).
+- **Basis.** Experiment 39 showed that the model keeps its own choice of approach (right in 19%), while the paper's
+  approach is usually somewhere in the evidence.
+- **Offline check.** On labelled packs, "the group of passages that most directly addresses the question's
+  limitation" matched the paper's approach in 36% of questions.
+- **The new agent:**
+  1. retrieves a 64,000-character pack;
+  2. groups its passages by approach and takes the most direct group;
+  3. focuses the evidence on that approach;
+  4. writes with the best method's conservative writer.
+- **Design.** A 2 × 2 ablation (approach chosen by the model or from the evidence × focused writing evidence), 810
+  runs. Baselines were re-judged in the same session, and quality was judged without the answer key.
+
+**Results** (GPT-5.6 / DeepSeek).
+
+| Configuration | Reconstruction | Matches the paper's approach | Unsupported | Quality vs the closed-book writer (GPT-5.6 / DeepSeek / o1) |
+|---|---:|---:|---:|---|
+| Closed-book writer (same session) | 0.62 / 0.58 | 19% | 73% | – |
+| 64,000-character web writer (same session) | 0.62 / 0.66 | 21% | 47% | +0.26 / +0.29 / +0.44 (experiment 39) |
+| **New agent** | 0.58 / 0.57 | 19% | 41% | +0.29 / +0.19 / +0.24 |
+
+- **No reconstruction gain:** −0.04 [−0.10, +0.03] against the writer. The approach still matches the paper in only
+  19% of runs.
+- **Why the offline estimate failed.**
+  - Its passage labels were lenient.
+  - The chosen groups are often topics rather than levers.
+  - The writer adopts them only partly.
+- **Specific evidence about a usually-wrong approach lowers mechanism agreement** (0.66 vs 0.75).
+- **Quality.** The judges prefer the agent's hypotheses to the closed-book writer's, but o1 and DeepSeek prefer the
+  simpler 64,000-character writer to the agent.
+- **Conclusion.**
+  - The recommended agent for generating hypotheses is the simple web-evidence writer: same reconstruction, better
+    quality.
+  - Raising reconstruction needs a better prediction of the paper's choice than any target-free signal tried. A
+    forecaster trained on many historical introduction-to-study pairs is the remaining untested route.
+
 ## 5. The recommended method on every held-out comparison
 
 `writer_only_b_o3mini` (o3-mini, conservative writer, no evidence) against the Llama-3.3 closed-book baseline.
@@ -616,7 +670,7 @@ diagnostics, never methods (must_obey.md 5.4).
 - **Evidence, for hypothesis quality.** Judges that do not see the answer key prefer hypotheses written with
   evidence, and fewer are unsupported (experiment 39). The reconstruction score does not show it.
 - Evidence that matches the paper's own direction, for reconstruction: +0.13 (an oracle diagnostic in experiment 39;
-  not available in practice).
+  not available in practice). Choosing the approach from the evidence does not reproduce it (experiment 40).
 - A stronger pre-cutoff model: o3-mini over Llama-3.3.
 - A conservative writer that does not invent numbers or unsupported specifics.
 - In round 1, retrieval aimed at a forecast next step. It did not hold on test2, where the harness added nothing
@@ -707,7 +761,7 @@ diagnostics, never methods (must_obey.md 5.4).
   corpora (experiment 36) are wider but still limited to open-access papers with XML in Europe PMC.
 - **Judge drift.** GPT-5.6 drifted +0.04 between occasions. Earlier comparisons between runs judged days apart
   carry that uncertainty; differences within about ±0.05 among them are not reliable (experiment 39).
-- **Experiments 36–39 are exploratory.** All 45 papers were already spent. Experiment 36's evaluations ran on a
+- **Experiments 36–40 are exploratory.** All 45 papers were already spent. Experiment 36's evaluations ran on a
   second instance of the GPT-5.6 deployment because of rate limits, and its lever labels were made only for the
   primary comparison.
 - **Low absolute level.** About 0.6 out of 4. Choosing the paper's intervention is the core unsolved problem.
@@ -717,7 +771,7 @@ diagnostics, never methods (must_obey.md 5.4).
 | What | Where |
 |---|---|
 | Rules; instructions for every agent | [must_obey.md](./must_obey.md), [AGENTS.md](./AGENTS.md) |
-| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–20) |
+| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–21) |
 | One section per experiment | [EXPERIMENT_LOG_2026-10-22.md](./experiments/high_temperature_hea_qwen35b/EXPERIMENT_LOG_2026-10-22.md) |
 | Literature reviewed | [RELATED_WORK.md](./experiments/high_temperature_hea_qwen35b/RELATED_WORK.md) (9 hypothesis-generation systems); loop.md sections 2, 10.3 and 11.3 (about 40 sources) |
 | Corpus | [data/corpus/](./experiments/high_temperature_hea_qwen35b/data/corpus/README.md) |
@@ -732,5 +786,6 @@ diagnostics, never methods (must_obey.md 5.4).
 | Propose, critique, decide (experiment 37) | [loop_pcd/](./experiments/high_temperature_hea_qwen35b/loop_pcd/README.md) |
 | Round 4: offline checks and synthesis (experiment 38) | [loop_r4/](./experiments/high_temperature_hea_qwen35b/loop_r4/README.md) |
 | Why more information does not raise the score (experiment 39) | [loop_diag/](./experiments/high_temperature_hea_qwen35b/loop_diag/README.md) |
+| A better agent: choosing the approach from the evidence (experiment 40) | [loop_agent/](./experiments/high_temperature_hea_qwen35b/loop_agent/README.md) |
 | Expert package; answer key and analysis | [expert_evaluation/](./expert_evaluation/README.md); [expert_eval/](./experiments/high_temperature_hea_qwen35b/expert_eval/README.md) |
-| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py`, `websearch.py`, `web_analysis.py`, `pcd_analysis.py`, `round4_offline.py`, `round4_pmi.py`, `round4_analysis.py`, `diag_analysis.py` |
+| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py`, `websearch.py`, `web_analysis.py`, `pcd_analysis.py`, `round4_offline.py`, `round4_pmi.py`, `round4_analysis.py`, `diag_analysis.py`, `agent_offline.py`, `agent_analysis.py` |

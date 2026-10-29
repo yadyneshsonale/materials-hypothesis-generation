@@ -1715,3 +1715,117 @@ def m_oracle_hint_full(h: Harness) -> dict[str, Any]:
 
 DIAG_CONFIGS = ("oracle_targetpack_b_o3mini", "oracle_targetpack_read_b_o3mini", "read_web_chunks_b_o3mini",
                 "oracle_hint_class_b_o3mini", "oracle_hint_lever_b_o3mini", "oracle_hint_full_b_o3mini")
+
+
+# ================================================================ experiment 40 (loop.md 21.1): a better agent.
+# Experiment 39: the model copies details from evidence but not the decision, and the paper's approach is in most
+# evidence packs but diluted. The agent chooses its approach from the evidence (the group of passages that most
+# directly addresses the question's limitation; offline 35.6% match vs 18.9% for the model's own choice), then focuses
+# the writing evidence on that approach (the practical counterpart of the oracle pack, which gained +0.13).
+
+GROUP_SYSTEM = (
+    "You read numbered passages from earlier materials-science papers retrieved for a research question. Group the "
+    "passages by the main approach they report or discuss: a specific intervention (an element addition, processing "
+    "route, heat treatment, coating or microstructure design) or a specific study design (a simulation method or a "
+    "characterization study). Each passage belongs to at most one group; passages that report no approach go in no "
+    "group. For each group, rate how directly the approach addresses the limitation the research question states "
+    "(0 = not at all, 3 = directly). Return JSON {\"groups\": [{\"approach\": \"the specific approach in at most 12 "
+    "words\", \"passage_ids\": [int], \"addresses_question\": int}]}."
+)  # the offline prompt, verbatim (agent_offline.py)
+AGENT_POOL_BUDGET = 64000
+AGENT_WRITE_BUDGET = rx.EVIDENCE_BUDGET_CHARS
+
+
+def agent_int(value: Any) -> int:
+    try:
+        return max(0, min(3, int(value)))
+    except (TypeError, ValueError):
+        return 0
+
+
+def parse_groups(raw: Any, records: list[Any]) -> list[dict[str, Any]]:
+    """Valid groups only: passage IDs that exist, each passage in at most one group, a non-empty approach."""
+    groups, used = [], set()
+    for g in (raw.get("groups") or []) if isinstance(raw, dict) else []:
+        if not isinstance(g, dict) or not str(g.get("approach", "")).strip():
+            continue
+        ids = []
+        for i in g.get("passage_ids") or []:
+            if isinstance(i, int) and 1 <= i <= len(records) and i not in used:
+                ids.append(i)
+                used.add(i)
+        if ids:
+            members = [records[i - 1] for i in ids]
+            groups.append({"approach": str(g["approach"]).strip()[:200], "records": members,
+                           "papers": len({r.paper_id for r in members}), "addresses": agent_int(g.get("addresses_question"))})
+    return groups
+
+
+def choose_group(groups: list[dict[str, Any]]) -> dict[str, Any] | None:
+    """The pre-registered rule: most direct, then more papers, then more passages, then first listed."""
+    if not groups:
+        return None
+    return max(groups, key=lambda g: (g["addresses"], g["papers"], len(g["records"])))
+
+
+def choose_from_evidence(h: Harness, model: str = "o3mini") -> dict[str, Any] | None:
+    pool = top_text(h, h.query, AGENT_POOL_BUDGET)
+    payload = {"research_question": h.query,
+               "passages": [{"id": n + 1, "text": r.text[:rx.record_cap("text_chunks")]} for n, r in enumerate(pool)]}
+    groups = parse_groups(h.ask("chooser", model, GROUP_SYSTEM, payload), pool)
+    chosen = choose_group(groups)
+    h.notes["choice"] = {"pool_records": len(pool), "groups": len(groups),
+                         "chosen": None if chosen is None else {"approach": chosen["approach"],
+                                                               "addresses": chosen["addresses"],
+                                                               "papers": chosen["papers"],
+                                                               "passages": len(chosen["records"])}}
+    return chosen
+
+
+def focused_pack(h: Harness, search: str, first: list[Any], budget: int = AGENT_WRITE_BUDGET) -> list[Any]:
+    """The given records first, then the whole corpus ranked by BM25 against the search text, within the budget."""
+    cap = rx.record_cap("text_chunks")
+    max_records = max(1, round(rx.MAX_RECORDS * budget / rx.EVIDENCE_BUDGET_CHARS))
+    packed: list[Any] = []
+    used = 0
+    for record in list(first) + _pcd_ranked(h, search, "text_chunks"):
+        if any(record.record_id == p.record_id for p in packed):
+            continue
+        size = min(len(record.text), cap)
+        if used + size > budget:
+            continue
+        packed.append(record)
+        used += size
+        if len(packed) >= max_records or used >= budget - 200:
+            break
+    for record in packed:
+        h.seen[record.record_id] = record
+    h.notes["focused_pack"] = {"records": len(packed), "papers": len({r.paper_id for r in packed}), "chars": used,
+                               "from_chosen_group": sum(1 for r in packed if r in first)}
+    return packed
+
+
+def m_agent(h: Harness, choose: bool, ground: bool, model: str = "o3mini") -> dict[str, Any]:
+    h.source = "web"
+    if choose:
+        chosen = choose_from_evidence(h, model)
+        if chosen is None:  # recorded fallback: the incumbent writer, closed-book
+            h.notes["fallback"] = "no valid group"
+            return write(h, {}, model, system=WRITER_B)
+        notes = {"lever": chosen["approach"],
+                 "why": f"the approach that the earlier literature reports most directly for the stated limitation "
+                        f"({len(chosen['records'])} passages from {chosen['papers']} papers)"}
+        search, first = f"{chosen['approach']} {h.query}", chosen["records"]
+    else:
+        draft = write(h, {}, model, role="draft", system=WRITER_B)
+        notes = {"lever": str(draft.get("intervention", ""))[:300]}
+        search = " ".join(str(draft.get(f) or "") for f in ("intervention", "structural_mediator", "mechanism"))
+        first = []
+    records = focused_pack(h, search, first) if ground else None
+    return write(h, notes, model, records=records, system=WRITER_B)
+
+
+register("agent_choose_ground_b_o3mini")(lambda h: m_agent(h, choose=True, ground=True))
+register("agent_choose_only_b_o3mini")(lambda h: m_agent(h, choose=True, ground=False))
+register("agent_draft_ground_b_o3mini")(lambda h: m_agent(h, choose=False, ground=True))
+AGENT_CONFIGS = ("agent_choose_ground_b_o3mini", "agent_choose_only_b_o3mini", "agent_draft_ground_b_o3mini")

@@ -1743,7 +1743,50 @@ Plan in loop.md 20.1 (written before any run); post hoc check in 20.2; results i
   direction out of a pack of options, although it copies the pack's details.
 - New rule (must_obey.md 6.11): claims about information also report the target-free quality comparison.
 
-## Comparability and limits, experiments 8 to 39
+## Experiment 40: a better agent, choosing the approach from the evidence
+
+**Request.** Make the changes to the agent so that it performs better. Plan and offline checks in loop.md 21.1;
+results in 21.2.
+
+**What was changed, and why** ([loop_agent/](./loop_agent/README.md); `m_agent` in
+[loop_methods.py](../../loop_methods.py)).
+- **Why.** Experiment 39 showed that the model copies details from the evidence but keeps its own choice of approach
+  (right in 19% of hypotheses), while the paper's approach is usually somewhere in the evidence.
+- **Offline check.** On existing labelled packs, choosing "the group of passages that most directly addresses the
+  question's limitation" matched the paper's approach in 35.6% of questions.
+- **The new agent.** It retrieves a 64,000-character pack. o3-mini groups its passages by approach, and code takes
+  the most direct group. The evidence is then focused on that approach, and the best method's writer writes the
+  hypothesis on it.
+- **2 × 2 ablation.** Approach chosen by the model or from the evidence, crossed with writing without evidence or
+  with focused evidence. 810 new runs, none failed.
+
+**Results** (GPT-5.6 against baselines re-judged in the same session; DeepSeek alongside).
+
+| Comparison | Reconstruction, GPT-5.6 [CI] | DeepSeek | Quality without the answer key (GPT-5.6 / DeepSeek / o1) |
+|---|---|---|---|
+| Agent vs the closed-book writer | −0.04 [−0.10, +0.03] | −0.01 | agent preferred: +0.29 / +0.19 / +0.24 (all significant) |
+| Agent vs the 64,000-character writer | −0.04 [−0.08, +0.01] | −0.09 | split: +0.13 / −0.09 / −0.19 |
+
+- **The rule is not met.** The approach still matches the paper in only 19% of runs.
+- **Why the offline estimate failed.**
+  - It used lenient passage labels.
+  - The chosen groups are often topics rather than levers.
+  - The writer adopts them only partly.
+- **Specific evidence about a usually-wrong approach lowers mechanism agreement:** 0.66 against 0.75 for the
+  closed-book writer.
+- **Each change alone lowers the score; together they return to about the writer's level** (interaction +0.06,
+  DeepSeek +0.13).
+- **The new agent gives the most grounded hypotheses:** unsupported 41%, against 73% for the writer. The judges
+  prefer it to the closed-book writer, but o1 and DeepSeek prefer the simpler 64,000-character web-evidence writer.
+- **Leakage: none detected.** All counters are zero; 33,848 web-record reads were re-checked with 0 date violations.
+
+**Conclusion.**
+- The best agent overall is the existing web-evidence writer (`web_text_64k_b_o3mini`). It ties the closed-book
+  writer on reconstruction (same session) and is clearly preferred on hypothesis quality.
+- Raising reconstruction needs a better prediction of the paper's choice of approach than any target-free signal
+  tried so far.
+
+## Comparability and limits, experiments 8 to 40
 
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
@@ -1824,3 +1867,7 @@ Plan in loop.md 20.1 (written before any run); post hoc check in 20.2; results i
   - The pairwise quality judges see each hypothesis's cited evidence, so part of their preference may be for visible
     grounding; their prompt says not to prefer citing more evidence as such.
   - Earlier GPT-5.6 comparisons between runs judged on different days may carry a drift of about ±0.04 (loop.md 20.2).
+- Experiment 40 develops and tests on the 45 spent papers, so it is exploratory.
+  - Its decision rule was chosen offline on the same papers, using experiment 39's target-aware passage labels. Those
+    labels proved more lenient than the labels of final hypotheses, so the offline estimate overstated the gain.
+  - Its GPT-5.6 audits ran after the judging, because of rate limiting.

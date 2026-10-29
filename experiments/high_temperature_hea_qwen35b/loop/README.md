@@ -218,3 +218,18 @@
   [run_diag_audits.sh](./run_diag_audits.sh) added two audit loops when the audits lagged.
 - **Result.** The information is diluted, not missing. The model copies details but not the decision. The score
   measures one paper's study, which three target-free judges show is not the same as hypothesis quality.
+
+## Experiment 40: an agent that chooses its approach from the evidence (loop.md section 21)
+
+- **Offline checks.** [agent_offline.py](../../../agent_offline.py) re-ranked the evidence and tested decision rules
+  over approach groups on experiment 39's labels. Outputs are in [../loop_agent/offline/](../loop_agent/README.md).
+- **Generation and evaluation.** [run_agent.sh](./run_agent.sh) ran the agent and its 2 × 2 ablations on all 45
+  papers (810 runs) into [../loop_agent/](../loop_agent/README.md). It also ran:
+  - the judge, label and DeepSeek loops;
+  - same-session GPT-5.6 re-judging of the baselines;
+  - the target-free pairwise judges;
+  - the report.
+
+  The audits paused during GPT-5.6 rate limiting and were finished by [run_agent_audits.sh](./run_agent_audits.sh).
+- **Result.** No gain in reconstruction. The agent's hypotheses are preferred to the closed-book writer's, but the
+  simpler web-evidence writer (`web_text_64k_b_o3mini`) remains the best agent overall.

@@ -3681,3 +3681,229 @@ baselines. The pre-registered results are reported unchanged; this check is labe
 - [x] Both judges, audit and lever labels on every run.
 - [x] Paired statistics with CIs and Holm; post hoc checks labelled.
 - [x] Records updated; `must_obey_check.py` passes.
+
+## 21. A better agent: choose the approach from the evidence, then focus the evidence on it (experiment 40)
+
+### 21.1 Offline checks and pre-registered plan (written 2026-10-29 at about 02:40, before any experiment-40 run)
+
+**Request.** Make the changes to the agent so that it performs better.
+
+**What experiment 39 showed the agent must fix.**
+- **The decision.** The model takes details from the evidence, not its choice of approach. When the paper's approach
+  is in the evidence, it is used only 0–9 points more often. When the approach is given, it is used in 93% of runs,
+  and the score doubles (0.62 → 1.26).
+- **The selection.** The paper's approach is in 93% of the question-retrieved 64,000-character packs, but in only
+  16% of their passages. Evidence concentrated on it (37% of passages) raised the score by +0.13, mostly in mechanism
+  and conditions.
+- **The reading step of experiment 39 hurt.** It chose approaches "shown on a related system but not yet applied
+  here", that is, novel transfers.
+
+**Offline checks** (existing runs and the experiment-39 pack labels; target-aware analysis only;
+`agent_offline.py`, outputs in `loop_agent/offline/`).
+
+1. **Re-ranking the labelled 64,000-character pool down to 16,000 characters.** Share of passages that carry the
+   paper's lever:
+
+   | Ranking | Share of lever passages | Packs containing the lever |
+   |---|---:|---:|
+   | Question order | 17% | 67% |
+   | BM25 on the question's content words | 18% | 70% |
+   | The writer's own closed-book draft (HyDE) | 21% | 79% |
+   | Four pcd ideas, round robin | 20% | 77% |
+   | Newest papers first | 14% | 65% |
+
+   Re-ranking alone is a small lever.
+2. **Choosing the approach from the evidence.**
+   - o3-mini, without the key, grouped each 64,000-character pack's passages by approach (8.3 groups per unit) and
+     rated how directly each addresses the question's stated limitation (0–3).
+   - A group matches the paper if most of its passages carry its lever (≥ 2):
+
+   | Decision rule | Group matches the paper's lever |
+   |---|---:|
+   | The group that most directly addresses the limitation (ties: more papers, then more passages) | 35.6% (any passage: 49%) |
+   | The largest group | 25.9% |
+   | A random group | 24.8% |
+   | The model's own choice, for comparison (the writer's lever ≥ 2) | 18.9% |
+
+   Even a random approach from the evidence beats the model's own choice. "Most directly addresses the limitation"
+   nearly doubles it. This is the opposite of experiment 39's reading step, which preferred novel transfers.
+
+**The agent** (`agent_choose_ground_b_o3mini`; o3-mini throughout, target-free, 2 calls).
+1. Retrieve the question's 64,000-character pack from its web corpus (as `web_text_64k_b_o3mini`).
+2. **Choose.**
+   - o3-mini groups the pack's passages by approach and rates how directly each addresses the limitation (the
+     offline prompt).
+   - Code picks the group by the pre-registered rule: most direct, then more papers, then more passages, then first
+     listed.
+3. **Focus.**
+   - A 16,000-character pack (≤ 24 records) is built: the chosen group's passages first, then passages of the whole
+     web corpus ranked by BM25 against the chosen approach and the question.
+   - Every record is dated before the paper.
+4. **Write.** The incumbent writer (WRITER_B) writes the hypothesis, with the chosen approach as its lever and the
+   focused pack as its evidence.
+5. **Fallback.** If no valid group is returned, the agent writes closed-book. Fallbacks are counted.
+
+**Design: a 2 × 2 of the approach and the writing evidence.** Each configuration runs on the 45 papers × 3 levels ×
+2 samples = 270 runs.
+
+| Approach chosen by | No evidence for writing | Focused evidence for writing |
+|---|---|---|
+| The model (closed-book draft) | `writer_only_b_o3mini` (existing) | `agent_draft_ground_b_o3mini`: a closed-book WRITER_B draft, then the focused pack retrieved with the draft's intervention, mediator and mechanism, then WRITER_B with the draft's intervention as lever |
+| The evidence (grouping rule) | `agent_choose_only_b_o3mini` | `agent_choose_ground_b_o3mini` (the agent) |
+
+**Baselines.**
+- `writer_only_b_o3mini` (the best method) and `web_text_64k_b_o3mini` (the best evidence configuration).
+- Both are judged again with GPT-5.6 in the same session as the new runs (must_obey.md 6.10).
+- The oracle-selected pack (`oracle_targetpack_b_o3mini`) is shown only as an upper reference, never as a
+  comparison.
+
+**Analysis** (fixed now; script `agent_analysis.py`). GPT-5.6 primary, DeepSeek alongside. Paired per paper, with a
+paper bootstrap, sign test and Holm.
+- **Q1 (primary).** `agent_choose_ground_b_o3mini` vs the same-session writer, and vs the same-session
+  `web_text_64k_b_o3mini`. Holm across the 2.
+- **Q2 (the 2 × 2).**
+  - Main effect of choosing from the evidence: per paper, the mean of the two evidence-choice cells minus the mean of
+    the two model-choice cells.
+  - Main effect of focused evidence, defined likewise.
+  - The interaction.
+
+  Holm across the 3.
+- **Q3 (mechanism).** Lever ≥ 2 and class hit (standard GPT-5.6 labels) per configuration. Also how often the chosen
+  group was rated directly addressing (3), and the fallback rate.
+- **Q4 (quality, must_obey.md 6.11).** Target-free pairwise judge, both orders, GPT-5.6, DeepSeek and o1. Comparisons:
+  the agent vs the writer, and the agent vs `web_text_64k_b_o3mini`. Holm across the 6.
+- **Secondary:** the 10 dimensions for both judges, unsupported share, audit, hedges, length and cost.
+- **Decision rule.**
+  - The agent performs better if, against the same-session writer, its GPT-5.6 CI is above 0 and DeepSeek's
+    difference is above 0, and no quality judge prefers the writer (no net-preference CI entirely below 0).
+  - All 45 papers are spent, so a pass makes the agent the new development incumbent and a candidate for a fresh
+    test set (test5). It is not a held-out claim.
+
+**Expectations, recorded before running.**
+- The chosen approach matches the paper's lever more often: lever ≥ 2 in about 28–33% of runs, against 19%.
+- Reconstruction rises by about +0.05 to +0.12, mostly from the choice. Focused evidence adds mechanism and
+  conditions.
+- The quality judges prefer the agent over the closed-book writer.
+
+**Smoke test.** One unit per configuration in a scratch root checks the mechanics only. Those outputs are not judged
+or analysed.
+
+**Smoke test (about 02:45, before any experiment-40 run; runs started at 02:48 with `loop/run_agent.sh`).**
+- One unit (PMC11077685, problem-constrained) per configuration in a scratch root: all 3 OK, every leakage counter
+  zero, focused packs within 16,000 characters, no fallback.
+- The grouper sometimes returns a single group (once in the smoke test and once in 3 direct calls). The same
+  happened in 8 of 135 units offline, so the 35.6% estimate already includes it.
+- Passage IDs are always integers.
+- Nothing was judged, and no prompt or rule changed.
+- **Operational note (03:40).** From about 03:25, GPT-5.6 rate-limited almost every call on both instances (HTTP
+  429, "retry after about 30 seconds"); single test calls still succeeded. To give the judgments the decision rests
+  on priority (the new runs, the same-session baselines and the quality pairs), the two audit loops were stopped.
+  The audits are run after the judging. What is evaluated, and how, is unchanged.
+- **Operational note (04:28).** The rate limiting eased. The audits were restarted (`loop/run_agent_audits.sh`), one
+  loop per instance, each in its own seeded random job order.
+
+### 21.2 Results (2026-10-29, 04:55; exploratory, because all 45 papers are spent)
+
+**Runs.**
+- 3 configurations × 270 = 810 runs; none failed, and no fallback was needed.
+- Every run has both judges and the lever label.
+- 540 same-session GPT-5.6 re-judgments of the baselines (writer 0.621, originally 0.623; 64,000-character
+  writer 0.620, originally 0.636).
+- 3,240 target-free pairwise judgments.
+- The audits finished at 05:33: 810 of 810. The agent's hypotheses are more specific than the writer's (0.40 vs 0.31) and have complete chains less often (0.70 vs 0.84).
+
+**Decision: the pre-registered rule is not met.** The agent does not raise the reconstruction score.
+
+**Q1 (primary).** GPT-5.6 against same-session baselines; DeepSeek alongside.
+
+| Comparison | GPT-5.6 | DeepSeek |
+|---|---|---|
+| Agent vs writer | −0.037 [−0.10, +0.03], 15/23 papers, Holm p 0.51 | −0.006 [−0.12, +0.11] |
+| Agent vs 64,000-character writer | −0.036 [−0.08, +0.01], Holm p 0.53 | −0.086 [−0.17, −0.00] |
+
+**Q2 (the 2 × 2).** Cell means, GPT-5.6 / DeepSeek:
+
+| Approach chosen by | No evidence for writing | Focused evidence |
+|---|---|---|
+| The model | 0.621 / 0.575 (writer) | 0.567 / 0.549 |
+| The evidence | 0.583 / 0.468 | 0.584 / 0.569 (agent) |
+
+- Main effects (GPT-5.6):
+  - choosing from the evidence: −0.010 [−0.06, +0.04];
+  - focused evidence: −0.027 [−0.06, +0.01] (DeepSeek +0.038, Holm p 0.045);
+  - interaction: +0.056 [+0.00, +0.11] (DeepSeek +0.128, Holm p 0.029).
+- Each change alone lowers the score. Together they only return to about the writer's level.
+
+**Q3 (why).**
+- **The approach still matches the paper in only about 19% of runs** (lever ≥ 2: agent 19.3%, evidence choice
+  alone 18.5%, writer 18.9%). Class hit is 0.33–0.38 against 0.40.
+- **The offline estimate (35.6%) was too optimistic**, for three reasons:
+  1. **Lenient passage labels.** The offline check scored the chosen group by its passage labels, which count general
+     mentions (for example "a coating") as the paper's lever. The labels of final hypotheses are stricter. In the
+     agent's runs, the passages the hypothesis cited carry the paper's lever in 29.5% of cases (question-retrieved
+     packs: 18%). Yet when most cited passages carry it, the final hypothesis matches in only 31% of runs (14%
+     otherwise).
+  2. **Topics, not levers.** The grouper rates almost every chosen group as directly addressing the limitation (232 of
+     270 runs rated 3). The chosen "approach" is often a topic rather than a lever, for example "SLM-fabricated HEA
+     studies addressing hot ductility drop".
+  3. **Partial uptake.** The writer adopts it only partly: at least half of the approach's words appear in the
+     intervention in 43–47% of runs, against 93% for the oracle lever hint of experiment 39.
+- **Specific evidence lowers mechanism agreement.** Focusing the evidence on an approach that is usually not the
+  paper's makes the mechanism specific to that approach: mechanism 0.66 (agent) and 0.64 (model choice plus focused
+  evidence), against 0.75 for the closed-book writer. With evidence focused on the paper's own approach (the oracle
+  pack), mechanism is 0.95.
+
+**Q4 (quality, without the answer key).** Net preference for the agent:
+
+| Comparison | GPT-5.6 | DeepSeek | o1 (cannot know the papers) |
+|---|---|---|---|
+| Agent vs writer | +0.29 [+0.15, +0.42], 30/10 | +0.19 [+0.10, +0.28], 29/8 | +0.24 [+0.14, +0.33], 35/6 |
+| Agent vs 64,000-character writer | +0.13 [+0.03, +0.24], 26/11 | −0.09 [−0.17, +0.00], 13/25 | −0.19 [−0.28, −0.10], 9/26 |
+
+- All three judges prefer the agent's hypotheses to the closed-book writer's. The agent has the most grounded
+  output: evidence validity 1.45; unsupported 41%, against 73% for the writer and 47% for the 64,000-character
+  writer.
+- Against the simpler 64,000-character writer the judges split. o1 and DeepSeek prefer the simpler one.
+
+**Expectations** (21.1).
+- Lever ≥ 2 rises to 28–33%: wrong (19%).
+- Reconstruction rises by +0.05 to +0.12: wrong (−0.04, not significant).
+- The quality judges prefer the agent over the closed-book writer: right.
+
+**Leakage: none detected.**
+- All counters are zero over 810 runs.
+- 33,848 web-record reads were re-checked against each paper's date: 0 violations.
+
+**What this means for the agent.**
+- **On the reconstruction score, the closed-book conservative writer remains as good as any target-free agent tried.**
+  - Evidence makes hypotheses more specific.
+  - When the approach is not the paper's (about 80% of the time, whatever chooses it), specific mechanisms and
+    conditions agree less with the paper than the writer's generic ones.
+  - Only evidence focused on the paper's own approach (the oracle) raises the score.
+- **On quality, evidence helps clearly.** The best agent overall is the simple 64,000-character web-evidence writer
+  (`web_text_64k_b_o3mini`):
+  - it ties the writer on reconstruction in the same session (0.620 vs 0.621; DeepSeek 0.656 vs 0.575);
+  - the target-free judges prefer it to the writer (o1 in 41 of 45 papers, experiment 39);
+  - o1 and DeepSeek prefer it to the new agent.
+
+  It is the recommended agent for generating hypotheses. The closed-book writer remains the configuration with
+  held-out reconstruction evidence (experiment 35).
+- **Raising reconstruction needs a better prediction of which approach the paper chose.** Neither the model's prior,
+  the evidence's groups, the literature's study types (experiment 38) nor crowds of models (experiment 38) provide
+  it. A forecaster trained on many historical introduction-to-study pairs is the remaining untested route (Wen et al.
+  2025).
+
+**Status.** Exploratory (spent papers). No configuration is a candidate for test5 on reconstruction.
+
+**Checklist** (must_obey.md section 9).
+- [x] Query-facing models are pre-cutoff: o3-mini; Llama-3.3 search phrases. o1 is used only as a target-free judge.
+- [x] Frozen questions; the decision rule and prompt were fixed before the runs. No prompt or rule changed after the
+  smoke test.
+- [x] Evidence from date-filtered web corpora; every record re-checked (0 violations).
+- [x] Payloads target-free (guard on); pairwise judgments in both orders.
+- [x] Spent papers only; exploratory.
+- [x] Budgets declared: the chooser reads 64,000 characters, the writer 16,000.
+- [x] GPT-5.6 judge, DeepSeek cross-judge, lever labels and audit on every run; no failures.
+- [x] Baselines judged in the same session (6.10); target-free quality reported (6.11).
+- [x] Paired statistics with CIs and Holm; the negative result recorded, including why the offline check misled.
+- [x] Records updated; `must_obey_check.py` passes.
