@@ -243,3 +243,23 @@
   same-session baselines, the target-free pairwise judges, the report, and the audits last.
 - **Result.** No configuration raises the score. The hypotheses are preferred on quality, but intervention agreement
   falls.
+
+## Experiment 42: six stage reviews, and the changes they support (loop.md section 23)
+
+- **Offline.** [v2_offline.py](../../../v2_offline.py) reproduced the reviewers' evidence before anything ran:
+  - retrieval without the question template's words: run;
+  - gap analogs: did not reproduce, not run.
+
+  Outputs are in [../loop_v2/offline/](../loop_v2/README.md).
+- **Runs.** [run_v2.sh](./run_v2.sh) generated the three configurations (810 runs) into
+  [../loop_v2/](../loop_v2/README.md) and started their evaluation.
+- **The TRAPI block (loop.md 23.1 notes).**
+  - About 38 parallel GPT-5.6 workers got the identity blocked for excessive retries.
+  - The client was rewritten: a process-wide gate on `Retry-After`, paced starts, a stop on 403, and workload IDs.
+  - The evaluation resumed with at most 6 workers: [run_v2_resume.sh](./run_v2_resume.sh) to
+    [run_v2_resume5.sh](./run_v2_resume5.sh).
+  - The last version takes `<instance> <tag> <stage>[:rev]...`, so that two runners can work on the same stage from
+    opposite ends.
+  - `run_v2_late.sh` and `run_v2_extra.sh` were the paused helpers of the first evaluation.
+- **Result.** No stage change raises the score, and the writing block lowers it. Quality without the answer key is
+  again higher with evidence. The recommended generator stays `web_text_64k_b_o3mini`.

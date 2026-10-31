@@ -4138,3 +4138,420 @@ methods with these models. A higher score would need either:
 - [x] Same-session baselines (6.10); target-free quality reported (6.11).
 - [x] Paired statistics with CIs and Holm; negative results recorded.
 - [x] Records updated; `must_obey_check.py` passes.
+
+**Correction (2026-10-30), found by the selection review of experiment 42.**
+- The offline selection test in 22.1 merged the two samples of a unit into one selection (`select_offline.py`
+  keyed on paper and level). It also compared judgments made on different days.
+- Selecting separately per sample changes:
+  - consensus: from −0.006 to −0.001 [−0.040, +0.037] (DeepSeek −0.006);
+  - the leave-one-paper-out reranker: from +0.005 to −0.013 (DeepSeek +0.006).
+- The conclusion is unchanged: no target-free selection rule beats the writer.
+
+## 23. Six stage reviews, and the changes they support (experiment 42)
+
+### 23.1 Reviews, offline reproductions and pre-registered plan (written 2026-10-30 at about 07:06, before any experiment-42 run)
+
+**Request.** Run multiple rubber-duck reviews to find how to improve each stage, make the changes they suggest, and
+get the best possible runs.
+
+**The reviews.** Six independent reviewer agents (rubber-duck), one per stage, each received:
+- the full project context;
+- every failed idea;
+- the rules.
+
+Each returned flaws and ranked proposals, with offline checks on existing data.
+
+| Stage | Flaws found | Main proposal | Reviewer's offline evidence | Their estimate |
+|---|---|---|---|---|
+| Retrieval | The question ranker counts the template's words ("hypothesis" is in 132 and "evidence" in 125 of 135 questions). 164 of 810 Europe PMC queries reduce to one term. Titles are dropped from the evidence payload | BM25 without template words, with section and study-action weights; titles and sections in the payload | Lever density of the top 16,000 characters 0.169 → 0.205 | +0.01–0.04 |
+| Writing | The schema fields are undefined. Most condition loss is unknowable (only 4–8% of the target's condition words are in the question). A citation slip triggers a full regeneration (8 of 270 runs) | Lock the question's stated facts; conditions = settings of the chosen intervention + the evaluation conditions the question states; no invented numbers; outcome = measured property + direction | Runs with invented outcome numbers score outcome 0.82 vs 0.86 (GPT-5.6) and 0.53 vs 0.69 (DeepSeek) | +0.01–0.03 |
+| Selection | My experiment-41 test merged samples and mixed judging days (correction above) | An o1 "most likely next study" round robin | o1's existing quality choices: only +0.006 above random on reconstruction | 0 to +0.02 |
+| Judging | No per-dimension anchors (lever-1 runs score intervention 0.149, below lever-0 runs at 0.173). Three of 45 questions do not match their keys. The cited evidence is visible while the four reconstruction dimensions are scored | Anchored per-dimension rubric with partial credit; evidence-blind reconstruction | Label-floor rescoring +0.08–0.12; rankings may change | measurement |
+| Question | The label taxonomy mixes study mode and lever (7 of 45 papers change target type across labels) | A factorised decision card with span checks | None: classifiers that predict the type from the question, trained leave-one-paper-out, score 14–20%, below the 24% of always guessing the most common type | 0 to +0.03 |
+| Strategy | The memorisation probe cannot probe local adapters; test5 is not in the web search's held-out registry | Gap analogs now; later a LoRA forecaster trained on historical gap → study pairs and a broadened test5 | Top-1 gap analog carries the lever 25.9% vs 11.9% (parser-sensitive) | +0.01–0.04 |
+
+**My reproductions before deciding** (`v2_offline.py`; existing labels; target-aware analysis only).
+- **Retrieval.** Re-ranking each labelled 64,000-character pack down to 16,000 characters gives:
+
+  | Ranking | Share of passages carrying the lever | Pack contains the lever |
+  |---|---:|---:|
+  | Question order | 16.9% | 67% |
+  | BM25 without template words | 19.4% (+0.025 [−0.005, +0.056]) | 75% |
+  | + section weights | 18.8% | – |
+  | + section weights and action boost | 18.9% | – |
+
+  Only removing the template words carries the gain. **Retrieval v2 = BM25 on the question's content words without
+  the template words.**
+- **Gap analogs.** The most gap-similar corpus paper carries the paper's lever 17.0% of the time (top 3: 17.5%; top
+  10: 16.5%). The most topic-similar carries it 17.8%, and a random one 11.9%. The reviewer's 25.9% did not reproduce
+  with an independent gap parser, and these lenient paper-level labels overstated online gains about twofold in
+  experiment 40. **Not run.**
+- **o1 selector.** An expected 0 to +0.02 does not justify about 3,240 o1 calls. **Not run.**
+- **Question decision card.** No offline signal. **Not run.**
+- **Forecaster.** It needs thousands of pairs, a repaired probe and a chronological validation. Recorded as the next
+  step.
+
+**Configurations.**
+- o3-mini, 1 call, 270 runs each.
+- A citation slip is repaired by dropping the unknown IDs, not by regenerating; the removed IDs are recorded.
+
+| Configuration | Writer | Evidence |
+|---|---|---|
+| `writer_v2_b_o3mini` | WRITER_B + the v2 writing block | none |
+| `web64k_r2_b_o3mini` | WRITER_B | 64,000 characters by retrieval v2, with titles and sections in the payload |
+| `web64k_v2_b_o3mini` (primary) | WRITER_B + the v2 writing block | the same pack as `web64k_r2` |
+
+**The v2 writing block**, appended to WRITER_B (verbatim in `loop_methods.WRITER_V2_GUIDE`):
+
+> Treat everything the research question states as fixed: the material and its starting state, the baseline, the
+> constraints, the observables, and the service or test regime. Choose exactly one intervention and build the
+> hypothesis on it. Describe exactly what is changed, in which material, and against which control; name a
+> processing route only when the question states it or the chosen intervention requires it. In conditions, give the
+> settings that realise the chosen intervention and the evaluation conditions the question states; where a value is
+> stated neither in the question nor in the supplied evidence, name the controlled variable instead of inventing a
+> number. In predicted_outcome, name the primary measured property and the direction of its change relative to the
+> stated baseline; give a magnitude only when the question or the supplied evidence states one.
+
+**Measurement v2 (secondary, validated before use; `judge_v2.py`).**
+- **Rubric.** An anchored per-dimension rubric for the four reconstruction dimensions, with a one-sentence comparison
+  before each score. Intervention: 0 = a different kind of intervention or study; 1 = the same kind, a different
+  lever; 2 = the same lever, different specifics; 3 = minor differences; 4 = essentially the paper's. The other
+  three dimensions have analogous anchors.
+- **Evidence-blind.** The judge sees the question, the target and the hypothesis, without citation lists or cited
+  evidence.
+- **Judges.** Both GPT-5.6 and DeepSeek.
+- **Applied to every configuration compared here:**
+  - the 3 new ones;
+  - `writer_only_b_o3mini` and `web_text_64k_b_o3mini`;
+  - `closed_book_o3mini` and `closed_book` (Llama);
+  - `writer_study_b_o3mini`;
+  - `oracle_hint_lever_b_o3mini` (a scale reference).
+- **Validation, per judge:**
+  - C1: AUC of the true key against the negatives ≥ 0.90 on the 216 sanity controls of experiment 33;
+  - C2: positive ≥ 3 and random negative ≤ 1;
+  - C3: each swap lowers its own dimension most;
+  - C4: generic at least 2 below positive;
+  - C5: monotonic partial credit. On runs with standard lever labels, the mean v2 intervention score rises from lever
+    0 to lever 1 to lever 2 (v1 fails this);
+  - C6: test-retest on the 135 sample-1 writer runs: run-level ρ ≥ 0.80.
+- A judge that passes C1–C6 is reported as a validated alternative measurement.
+- **v1 stays the primary metric for every method decision.** v2 never replaces v1 retroactively.
+
+**Analysis** (`v2_analysis.py`). GPT-5.6 against v1 baselines re-judged in this session; DeepSeek alongside.
+- **Q1 (primary).** `web64k_v2` vs the writer, and vs `web_text_64k_b_o3mini`. Holm across the 2.
+- **Q2 (stages).** Holm across the 3:
+  - `writer_v2` vs the writer (the writing stage);
+  - `web64k_r2` vs `web_text_64k` (the retrieval stage);
+  - `web64k_v2` vs `web64k_r2` (the writing stage with evidence).
+- **Decision.** A configuration raises the score if its GPT-5.6 CI is above 0 and DeepSeek's difference is above 0.
+- **Q3 (quality without the key, must_obey.md 6.11).** `web64k_v2` vs the writer: GPT-5.6, DeepSeek and o1, both
+  orders.
+- **Q4 (measurement v2).** C1–C6; every configuration under v2; Q1–Q2 repeated under v2; rank agreement of v1 and v2.
+- **Diagnostics:**
+  - lever ≥ 2;
+  - the four dimensions;
+  - invented numbers (unit-bearing numbers in conditions or outcome that the question does not contain);
+  - citation-filtering events;
+  - GPT-5.6 pack labels of the retrieval-v2 64,000-character packs (density against the old packs; target-aware
+    analysis only);
+  - sensitivity without the three question–key mismatches (PMC12525334, PMC12985727, PMC12991304).
+- **Status.** Exploratory (spent papers).
+
+**Expectations, recorded before running.**
+- `writer_v2` vs the writer: +0.00 to +0.02 on GPT-5.6, more on DeepSeek (fewer invented numbers).
+- `web64k_r2` vs `web_text_64k`: +0.00 to +0.02.
+- `web64k_v2` is the best of the three, +0.01 to +0.04 over the writer, probably not significant.
+- Measurement v2 raises every configuration by about +0.1 and passes C1–C6. Rankings mostly unchanged.
+
+**Smoke test (about 07:10, before any experiment-42 run; runs started at 07:11 with `loop/run_v2.sh`).**
+- One unit (PMC11077685, problem-constrained) per configuration in a scratch root: all 3 OK, one call each, every
+  leakage counter zero.
+- Retrieval-v2 packs: 45 records from 31 papers, 63,904 characters with titles and sections.
+- One v2 judgment per judge parsed correctly. Both gave intervention 1: pack aluminisation against the paper's
+  silicide coating, the same kind of intervention with a different lever.
+- The unit tests (`test_v2.py`) caught a budget overrun before the smoke test: titles and sections pushed a pack
+  300 characters over 64,000. Fixed: the items are now sized exactly as sent.
+- Nothing was analysed, and no prompt changed.
+- **Operational note (07:33).** GPT-5.6 delivered only about 29 calls a minute: the shared instance took about 34
+  seconds even for a trivial call. The GPT-5.6 jobs of measurement v2 and of the pairwise quality judge were paused,
+  so that the primary v1 judging and the same-session baselines finish first. They resume automatically when those
+  are complete (`loop/run_v2_late.sh`). Nothing about what is judged, or how, changes.
+- **Operational note (07:43).** The lever labels took more than half of the GPT-5.6 calls. They were paused, and one
+  extra v1 judge loop was added on the faster instance. The labels resume automatically when every new run has its
+  v1 judgment (`loop/run_v2_extra.sh`). Nothing about what is judged or labelled, or how, changes.
+- **Operational note (07:53).** A second same-session re-judging process was added on the other instance, in another
+  seeded order; outputs another process already wrote are skipped.
+- **Incident (09:15): the TRAPI identity was blocked.**
+  - About 38 parallel GPT-5.6 workers were running (v1 judge, labels, same-session re-judging, pack labels), each
+    allowed 20 retries on rate limits (`MATHG_MIN_RETRIES=20`).
+  - TRAPI blocked the identity on both instances: HTTP 403 "PrincipalBlocked: Your client sent excessive retries
+    after repeated errors".
+  - Every experiment-42 process was stopped at 09:15.
+  - At that point: 566 of 810 new runs had their v1 GPT-5.6 judgment, 341 of 540 baseline re-judgments were done,
+    and 107 of 135 pack labels. Every DeepSeek and o1 job was complete: v1 cross-judge, measurement v2, and the
+    pairwise quality judges.
+- **Fix** (`llm_client.py`, tested in `test_trapi_policy.py`):
+  - a 403 stops the process's TRAPI calls at once, with no retry from any thread;
+  - 429s back off exponentially with jitter;
+  - attempts are capped at 8 whatever `MATHG_MIN_RETRIES` says;
+  - every request carries a per-process `X-TRAPI-Workload-ID`.
+- **Resumption.** After the block lifts, GPT-5.6 work resumes with at most 6 parallel workers in total (new rule
+  must_obey.md 7). Order: the primary v1 judgments, the baseline re-judgments, then the rest.
+- **Cause and second fix (09:50, before any resumed call).** TRAPI's troubleshooting guide explains the block.
+  - **Cause.** A retry-flood block means the client ignored the wait that each 429 asks for. TRAPI sends that wait in
+    the `Retry-After` header (1 to 3,600 seconds). Our client read only a hint in the message body, and otherwise
+    retried after at most 240 seconds.
+  - **Duration.** TRAPI lifts a retry-flood block automatically after 60 minutes.
+  - **Probing.** The first resumption script probed every 5 minutes, and those probes might have restarted the
+    60 minutes. It was stopped at 09:46. The last request had been sent at 09:44.
+  - **`llm_client.py`, extended** (tests in `test_trapi_policy.py`, 9 OK):
+    - a 429 or 503 closes a process-wide gate for that deployment until max(`Retry-After`, the exponential backoff)
+      has passed, with jitter; no thread sends to it before then;
+    - non-transient errors (400, 404, 409, 413, 422) are no longer retried.
+  - **New runner `loop/run_v2_resume2.sh`.**
+    - It sends no request before 10:50, and while blocked it probes once every 65 minutes.
+    - It runs one stage at a time with 6 workers, and gives each stage a stable workload ID.
+  - **Order.**
+    1. The primary v1 judgments (244), then the same-session baselines (199).
+    2. The GPT-5.6 pairwise quality judge (483).
+    3. The target-free audits (810), then the pack labels (28).
+    4. The lever labels (530).
+    5. GPT-5.6 measurement v2 (2,714). Its jobs now run in priority order: controls and re-test first, then the five
+       Q1–Q2 configurations, then the other four.
+  - **If GPT-5.6 cannot finish measurement v2** (secondary), the report gives it for the items completed. The
+    counts are stated, and a judge without C1–C6 complete is not called validated.
+  - Nothing about what is judged, or how, changes.
+- **Throughput (11:00).** The block lifted at 10:50. The first stage then stalled after 21 judgments: TRAPI
+  rate-limits each identity.
+  - **Probes, one call at a time.** gcr/shared answered a trivial call with 429 ("retry after 51 seconds").
+    redmond/interactive answered, with a per-identity window of about 70,800 tokens and 70 requests
+    (`x-apim-remaining-*` headers).
+  - **Other instances.** TRAPI's metadata service lists only gcr/shared, redmond/interactive and gcr/batch for this
+    identity.
+  - **My gate made it worse.** It waited the longer of `Retry-After` and each thread's own exponential backoff, so
+    one thread's fifth retry held every thread for up to 4 minutes.
+  - **Client fix** (`llm_client.py`; `test_trapi_policy.py`, 14 OK; full suite 347 OK):
+    - wait exactly the stated `Retry-After` (with jitter), and back off exponentially only without one;
+    - pace request starts per deployment: the spacing doubles once per rate-limit event and shrinks by 5% per
+      success;
+    - an optional response log (`MATHG_TRAPI_LOG`: status and rate-limit headers).
+  - **Simulation** (6 real threads, a fake TRAPI allowing 4 requests per 4 s): 24 calls in 25 s (ideal 24 s),
+    7 rate limits, and no request sent while a stated wait was running.
+  - **New runner `loop/run_v2_resume3.sh`**, on redmond/interactive with 6 workers. Same stages, order and scope.
+- **Both instances saturated (11:23–11:40).** Every GPT-5.6 call was refused on both instances. One refusal at
+  11:19 came with 94,444 tokens and 94 requests of our own budget left, so the whole instance was busy, not our
+  identity.
+  - The runners polled at about one request per minute per instance, each after the wait TRAPI stated.
+  - TRAPI's batch service is no way round this: it runs each prompt only after a capacity check against the same
+    deployments, and GPT-5.6 is not on gcr/batch.
+  - **Two runners** (`loop/run_v2_resume4.sh`), 3 workers each, 6 in total, on disjoint stage lists:
+    - redmond/interactive: v1 judge, GPT-5.6 pairwise, measurement v2;
+    - gcr/shared: same-session baselines, pack labels, audits, lever labels.
+- **Finalisation rule (11:45, before any further GPT-5.6 result).**
+  - The report and records are written when the primary GPT-5.6 data are complete: the v1 judgments of the new
+    runs and the same-session baselines.
+  - Every other GPT-5.6 stage still incomplete at that point is reported with its counts:
+    - the pairwise quality judge;
+    - the pack labels, audits and lever labels;
+    - measurement v2.
+  - The runners then keep going, and `v2_analysis.py report` regenerates the report from whatever is complete.
+  - DeepSeek and o1 are already complete, so every decision has its second judge.
+- **Deviation from the finalisation rule (12:17).**
+  - **Why.** GPT-5.6 answered 1 of about 150 requests between 11:13 and 12:17, on both instances, so the remaining
+    421 primary calls could take many hours.
+  - **What changes.** The records are written now with the GPT-5.6 data available: 588 of 810 v1 judgments of the
+    new runs, and 341 of 540 same-session baseline judgments. Every count is stated.
+  - **Why no decision can change.** Under the pre-registered rule, a configuration raises the score only if
+    DeepSeek's difference is also above 0. DeepSeek is complete and below 0 in all five comparisons. The missing
+    GPT-5.6 data can only move a comparison between "no detectable difference" and "lowers the score".
+  - **Afterwards.** The runners keep going, and `v2_analysis.py report` regenerates the report from whatever is
+    complete.
+  - **Withdrawn (about 12:22), before any results were written.** `must_obey_check.py` fails while runs lack their GPT-5.6
+    judgment (222 of 810). must_obey.md requires the check to pass before results are reported. The results stay
+    interim, and the 11:45 finalisation rule stands: the report waits for the primary GPT-5.6 data.
+- **Runners for the wait (12:25, `loop/run_v2_resume5.sh`).**
+  - **Pacing.** The 11:00 pacing was too strict once capacity is partial: it held steady only while fewer than about
+    7% of requests were refused, and otherwise stayed at its 60-second cap even though every stated wait was honoured.
+    It now grows ×1.5 per rate-limit event and shrinks ×0.9 per success, capped at 30 s, and holds steady while up to
+    about 20% of requests are refused.
+  - **Simulation.** No request was sent during a stated wait, either under a fixed budget (24 calls in 25 s) or with
+    30% of requests refused at random (24 calls in 21 s). Tests: `test_trapi_policy.py` 15 OK; full suite 349 OK.
+  - **Both primary stages on both instances.**
+    - redmond/interactive: v1 judge, then the baselines in reverse order, then pairwise and measurement v2.
+    - gcr/shared: the baselines, then the v1 judge in reverse order, then pack labels, audits and labels.
+    - A second loop on a stage starts from the other end (`MATHG_PENDING_REVERSE`), so whichever instance has
+      capacity finishes the primary data.
+- **Primary data complete (2026-10-31, 06:38).**
+  - Overnight, GPT-5.6 answered between 5 and 64 calls an hour (about one refusal a minute per instance, median
+    stated wait 50 s). The client never sent during a stated wait, and there was no further block.
+  - redmond/interactive regained capacity at about 06:30.
+  - `must_obey_check.py` then passed on all three configurations. Its only warnings were the audits, still to come.
+  - **Runners from 06:39.**
+    - Runner a does the audits first, in reverse order (must_obey.md 6, every run), then pairwise and measurement v2.
+    - Runner b moved to redmond/interactive at 06:43, because gcr/shared still refused most calls. It does pack
+      labels, the audits from the other end, then lever labels.
+    - 6 workers in total, each stage with its own workload ID.
+  - The report and records were then written, as the 11:45 rule says (23.2).
+
+### 23.2 Results (2026-10-31, 06:47; exploratory, because all 45 papers are spent)
+
+**Runs and evaluations** (counts when this was written; `loop_v2/analysis_v2.md` gives them per configuration).
+- 3 configurations × 270 = 810 runs, all OK, one o3-mini call each.
+- Citation slips were repaired by dropping the unknown IDs: `writer_v2` 4 runs, `web64k_r2` 56, `web64k_v2` 41.
+- Complete:
+  - GPT-5.6 v1 judge 810 of 810; DeepSeek 810 of 810;
+  - same-session GPT-5.6 baselines 540 of 540 (writer 0.646, 64,000-character writer 0.629);
+  - pairwise quality, DeepSeek and o1: 540 of 540 each;
+  - measurement v2, DeepSeek: 2,781 of 2,781.
+- Still running when this was written (finalisation rule, 23.1):
+  - the audits (in progress);
+  - lever labels: 280 of 810;
+  - pack labels: 107 of 135;
+  - GPT-5.6 pairwise: 16 of 270 pairs;
+  - GPT-5.6 measurement v2: 67 of 2,781.
+- `must_obey_check.py` passes on all three configurations; its only warnings are the missing audits.
+
+**Decision: no stage change raises the score, and the writing block lowers it.**
+
+| Comparison | GPT-5.6 [CI] | DeepSeek [CI] | Decision |
+|---|---|---|---|
+| Q1: both changes (`web64k_v2`) vs writer (primary) | −0.027 [−0.08, +0.02], 15/23 papers | −0.023 [−0.13, +0.08], 21/24 | no detectable difference |
+| Q1: both changes vs the 64,000-character writer | −0.009 [−0.05, +0.03], 20/20 | −0.104 [−0.20, −0.02], 15/26 | no detectable difference |
+| Q2 writing: `writer_v2` vs writer | −0.056 [−0.11, −0.01], 15/26 | −0.069 [−0.13, −0.01], 14/25 | **lowers the score** |
+| Q2 retrieval: `web64k_r2` vs the 64,000-character writer | +0.016 [−0.02, +0.06], 17/20 | −0.046 [−0.12, +0.02], 15/26 | no detectable difference |
+| Q2 writing with evidence: `web64k_v2` vs `web64k_r2` | −0.025 [−0.07, +0.02], 16/25 | −0.057 [−0.14, +0.02], 14/25 | no detectable difference |
+
+- **"Lowers the score"** follows the pre-registered rule (GPT-5.6 CI below 0, DeepSeek below 0). Neither p-value
+  survives Holm (0.35 and 0.32).
+- **Without the three question–key mismatches:** GPT-5.6 −0.029 and −0.017; DeepSeek −0.020 and −0.107. Same
+  conclusions.
+- **Means** (GPT-5.6 same session / DeepSeek):
+
+  | Configuration | GPT-5.6 | DeepSeek |
+  |---|---:|---:|
+  | Writer | 0.646 | 0.575 |
+  | 64,000-character writer | 0.629 | 0.656 |
+  | `web64k_r2` | 0.644 | 0.609 |
+  | `web64k_v2` | 0.619 | 0.552 |
+  | `writer_v2` | 0.591 | 0.506 |
+
+- **Interim figures were too favourable.** An interim look at 12:04 on 2026-10-30, with 588 of 810 judgments and
+  341 of 540 baselines, gave `writer_v2` −0.006. The jobs still pending then were not a random sample: the 53 late
+  `writer_v2` judgments fell in 16 papers late in the processing order.
+
+**Why the writing block lowered the score** (DeepSeek, complete, one session; exploratory).
+
+| Configuration | Intervention | Conditions | Mechanism | Outcome | Invented numbers | Lever ≥ 2 (GPT-5.6 labels) |
+|---|---:|---:|---:|---:|---:|---:|
+| Writer | 0.448 | 0.656 | 0.548 | 0.648 | 47% | 18.9% (270) |
+| `writer_v2` | 0.337 | 0.581 | 0.496 | 0.607 | 10% | 9.4% (106) |
+| 64,000-character writer | 0.530 | 0.774 | 0.589 | 0.730 | 50% | 20.7% (270) |
+| `web64k_r2` | 0.500 | 0.700 | 0.567 | 0.670 | 57% | 12.5% (88) |
+| `web64k_v2` | 0.430 | 0.626 | 0.515 | 0.637 | 36% | 12.8% (86) |
+
+- **The block did what it asked.** Invented numbers fell from 47% to 10% closed-book, and from 57% to 36% with
+  evidence.
+- **But DeepSeek's agreement fell on every dimension, most of all the intervention:** −0.11 closed-book, −0.07 with
+  evidence.
+- **The outcome:** GPT-5.6 rose (0.90 vs 0.85, in the direction the writing review predicted), while DeepSeek fell
+  (0.61 vs 0.65).
+- **Two explanations were checked and rejected:**
+  - It did not suppress processing routes: routes are named in 76% of `writer_v2` interventions vs 68% for the
+    writer, and in 64% of answer keys.
+  - It did not remove hedged, multi-part interventions: 48% vs 43%, and `writer_v2` scores lower within both kinds.
+- **What remains.** Its interventions are longer (28 vs 22 words) and committed to one stated frame. As with the
+  guides of experiment 41, any instruction that moves the model away from its own best guess lowers intervention
+  agreement.
+
+**Retrieval v2** (target-aware analysis only).
+- **Lever density.** 16.9% of passages carry the paper's lever (107 packs labelled), against 15.5% for question
+  order (135 packs).
+- **Packs containing the lever:** 92.5% vs 93.3%.
+- **Smaller than offline.** The offline gain at 16,000 characters was +2.5 points; at 64,000 characters it is about
+  +1.4. On GPT-5.6, `web64k_r2` ties the 64,000-character writer (+0.016); DeepSeek is −0.046.
+
+**Citation slips.** Most removed IDs were the right passage, with its section label rewritten by the model.
+- **`web64k_r2`:** 90 IDs removed:
+  - 62 were the right passage with a rewritten section label;
+  - 27 were another passage of a paper in the pack;
+  - 1 was a paper not in the pack.
+
+  22 runs were left with no citation.
+- **`web64k_v2`:** 53 removed (32 rewritten labels, 21 other passages); 14 runs were left with no citation.
+- **No consistent penalty.** Against the 64,000-character writer, filtered runs did not score consistently lower
+  than valid ones: GPT-5.6 −0.023 and +0.179 for runs left with no citation, against +0.002 and −0.026 for valid
+  runs.
+- **Fix for later runs:** resolve a rewritten section label to the pack passage with the same paper and index.
+
+**Quality without the answer key (Q3).** Net preference for `web64k_v2` over the closed-book writer:
+- DeepSeek +0.33 [+0.25, +0.40], 39/2 papers;
+- o1 +0.44 [+0.35, +0.53], 38/0 papers.
+
+Both are Holm-significant. GPT-5.6 is incomplete.
+
+In experiment 39 the 64,000-character writer earned the same against the writer (DeepSeek +0.29, o1 +0.44). So
+the v2 changes add no quality beyond what the evidence already gives. This compares two sessions.
+
+**Measurement v2 (Q4).**
+- **DeepSeek: not validated.**
+  - It passes C1–C5:
+    - controls AUC 1.00;
+    - positive 4.0, random 0.0, generic 0.09;
+    - each swap lowers its own dimension most.
+  - Partial credit is now monotonic. Intervention scores 0.13, 0.25, 0.76 and 1.59 for lever labels 0 to 3; v1 is
+    not monotonic.
+  - It fails C6: re-test ρ 0.751 < 0.80 (mean absolute difference 0.14).
+- **GPT-5.6: not evaluated.** Only 4 of 216 controls and 3 of 135 re-test items were done, because of the capacity
+  limits in 23.1.
+- **Scores fall rather than rise under DeepSeek v2.** Writer 0.37 (v1 0.58); oracle lever hint 0.95 (v1 1.50).
+- **Ranks agree with v1** (ρ 0.86 over 9 configurations), **but the differences compress.** The Llama-3.3 baseline
+  scores 0.35 against the writer's 0.37 (v1: 0.31 vs 0.58).
+  - So the writer's held-out lead depends on the rubric.
+  - The expert ratings are needed to settle it.
+- **Q1–Q2 under DeepSeek v2:** −0.013 to −0.045. No change raises the score under either rubric.
+
+**Expectations** (23.1).
+- `writer_v2` +0.00 to +0.02: wrong (−0.056 / −0.069).
+- `web64k_r2` +0.00 to +0.02: right on GPT-5.6 (+0.016), wrong on DeepSeek (−0.046).
+- `web64k_v2` the best of the three and +0.01 to +0.04 over the writer: wrong (−0.027 / −0.023). `web64k_r2` scores
+  higher.
+- Measurement v2 raises scores by about +0.1 and passes C1–C6: wrong for DeepSeek (lower scores; fails C6).
+  Ranks mostly unchanged: right.
+
+**Leakage: none detected so far.**
+- All counters are zero over 810 runs.
+- 25,036 web-record reads were re-checked against each paper's date: 0 violations.
+- The audits are still running (see above).
+
+**Conclusion.**
+- **The fixes did what they asked, but none raises the score.** The six reviews found real flaws. The fixes
+  produced fewer invented numbers, slightly denser retrieval and anchored partial credit. None raises
+  reconstruction, and the writing block lowers it.
+- **The reviews' larger proposals did not survive reproduction:**
+  - gap analogs carry the lever 17.0% of the time, not the claimed 25.9%;
+  - the o1 selector was expected to gain 0 to +0.02;
+  - the question card had no offline signal.
+- **Quality, judged without the answer key, is again higher with evidence**, as in experiments 39–41.
+- **Recommended generator unchanged:** `web_text_64k_b_o3mini`. The retrieval-v2 variant ties it on GPT-5.6 and is
+  lower on DeepSeek.
+- **Remaining routes:**
+  - a forecaster trained on a large history of problem-to-study pairs;
+  - the expert ratings, to calibrate a measure that credits valid alternatives. Measurement v2's compression of the
+    writer's lead makes them more urgent.
+- **Operational lesson.** The TRAPI block and a day of saturation (23.1 notes) cost most of the elapsed time. They
+  led to the API rules of must_obey.md 7.
+
+**Status.** Exploratory (spent papers). No configuration is a candidate for test5 on reconstruction.
+
+**Checklist** (must_obey.md section 9).
+- [x] Query-facing models are pre-cutoff: o3-mini only. o1 is used only as a target-free judge.
+- [x] Frozen questions; prompts fixed in 23.1 before the runs.
+- [x] Evidence from date-filtered web corpora, re-checked.
+- [x] Payloads target-free (guard on); pairwise judgments in both orders.
+- [x] Spent papers only; exploratory. Offline checks used existing labels and judgments only.
+- [x] Same budgets as the baselines; one call each.
+- [x] GPT-5.6 judge and DeepSeek cross-judge on every run.
+- [ ] Lever labels and audits on every run: still running when this was written (finalisation rule in 23.1).
+- [x] Same-session baselines (6.10); target-free quality reported (6.11) from DeepSeek and o1.
+- [x] Paired statistics with CIs and Holm; negative results recorded.
+- [x] Records updated; `must_obey_check.py` passes (warnings: missing audits).

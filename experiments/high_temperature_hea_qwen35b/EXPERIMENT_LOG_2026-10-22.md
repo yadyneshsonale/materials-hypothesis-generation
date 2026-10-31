@@ -1831,8 +1831,56 @@ the experiments." Plan, failure analysis and offline checks in loop.md 22.1; res
 - A higher score needs a forecaster trained on a large history of introduction-to-study pairs, or a measure that
   credits valid alternatives.
 
-## Comparability and limits, experiments 8 to 41
+## Experiment 42: six stage reviews, and the changes they support
 
+**Request.** "Run multiple rubber duckies to find how to improve each stage, then make the changes they suggest and
+get the best possible runs." Plan, reviews and offline reproductions in loop.md 23.1; results in 23.2.
+
+**Reviews.** Six independent reviewer agents, one per stage: retrieval, writing, selection, judging, the question
+and strategy ([loop_v2/](./loop_v2/README.md)).
+- **Reproduced first** (`v2_offline.py`).
+  - Removing the question template's words from retrieval ranking raises the share of passages carrying the
+    paper's lever from 16.9% to 19.4%. Section weights add nothing.
+  - Gap analogs did not reproduce: 17.0%, against the reviewer's 25.9%.
+- **Not run** (reasons recorded): an o1 selector, a question decision card, a trained forecaster.
+- **The selection review found an error in experiment 41's offline test** (samples merged). Corrected in loop.md
+  22.2: the conclusion is unchanged.
+
+**What was run** (810 runs: o3-mini, one call; GPT-5.6 against same-session baselines).
+
+| Configuration | GPT-5.6 vs comparison [CI] | DeepSeek |
+|---|---|---|
+| Both changes (`web64k_v2`) vs writer (primary) | −0.027 [−0.08, +0.02] | −0.023 |
+| Both changes vs the 64,000-character writer | −0.009 [−0.05, +0.03] | −0.104 |
+| Writing block (lock the question's facts; no invented numbers) vs writer | −0.056 [−0.11, −0.01] | −0.069 |
+| Retrieval v2 (BM25 without template words; titles) vs the 64,000-character writer | +0.016 [−0.02, +0.06] | −0.046 |
+
+- **The writing block did what it asked** (invented numbers fell from 47% to 10%), **but it lowers the score**: by
+  the pre-registered rule, though not Holm-significant. DeepSeek's agreement fell on every dimension, most of all
+  the intervention.
+- **Retrieval v2** raised lever density only slightly at 64,000 characters (15.5% → 16.9%).
+- **Quality without the answer key.** The combined configuration is strongly preferred to the writer: DeepSeek
+  +0.33, o1 +0.44. That is what the 64,000-character writer earned in experiment 39.
+- **Measurement v2** (anchored, evidence-blind).
+  - DeepSeek passes the controls and gives monotonic partial credit, but fails re-test (ρ 0.75): not validated.
+  - Under it, the writer's lead over the Llama baseline nearly disappears (0.37 vs 0.35).
+- **Leakage:** none detected (counters zero; 25,036 web-record reads re-checked).
+
+**Incident.** About 38 parallel GPT-5.6 workers got the TRAPI identity blocked ("retry-flood").
+- The client now honours `Retry-After` with a process-wide gate and paces requests (`llm_client.py`; new
+  must_obey.md 7 rules).
+- The evaluation then waited a day on GPT-5.6 saturation on both instances.
+
+**Conclusion.**
+- No review-driven change raises reconstruction.
+- The recommended generator stays `web_text_64k_b_o3mini`.
+- The remaining routes are a trained forecaster and the expert ratings.
+
+## Comparability and limits, experiments 8 to 42
+
+- Experiment 42's GPT-5.6 judgments span two days because of the TRAPI block and saturation. Its baselines were
+  judged again in the same span. The lever labels, audits, GPT-5.6 pairwise and GPT-5.6 measurement v2 were still
+  running when its records were written (loop.md 23.1, finalisation rule).
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
 - Experiment 9 has 12 papers. Intervals are wide, and no comparison survives multiple-comparison correction.

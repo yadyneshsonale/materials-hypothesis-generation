@@ -13,9 +13,12 @@ Supports three modes, selected by the MATHG_PROVIDER env var:
 """
 from __future__ import annotations
 
+import email.utils
 import json
 import os
+import random
 import re
+import threading
 import time
 from typing import Any
 
@@ -150,6 +153,140 @@ def endpoint_for(deployment: str) -> str:
     return TRAPI_ENDPOINT
 
 
+class TrapiBlocked(LLMError):
+    """TRAPI answered 403 (PrincipalBlocked): the identity is blocked for excessive retries. Never retried."""
+
+
+class TrapiRejected(LLMError):
+    """A non-transient TRAPI error (400, 404, 409, 413, 422): the same request cannot succeed, so it is not retried."""
+
+
+# Experiment 42 (loop.md 23.1, incident notes): about 38 parallel workers, each retrying rate limits up to 20 times, got
+# the identity blocked on every TRAPI instance ("retry-flood"): each thread waited on its own, so the identity as a
+# whole kept sending during every wait. The policy now, shared by every thread of a process, per deployment URL:
+# - a 429 (or 503) closes a gate until TRAPI's Retry-After (header, else body hint; else exponential backoff) has
+#   passed, with jitter; no thread sends before then;
+# - request starts are paced: the spacing grows by PACE_UP once per rate-limit event and shrinks by PACE_DOWN on each
+#   success (at most MAX_PACE), so threads do not fire together when the gate opens;
+# - a 403 stops this process's TRAPI calls at once (no retries from any thread);
+# - non-transient errors are not retried;
+# - attempts are capped at MAX_TRAPI_ATTEMPTS whatever MATHG_MIN_RETRIES says;
+# - every request carries a workload ID (MATHG_WORKLOAD_ID, stable per stage in the runners; else per process).
+MAX_TRAPI_ATTEMPTS = 8
+MAX_RETRY_AFTER = 3600.0
+MAX_PACE = 30.0
+PACE_UP, PACE_DOWN = 1.5, 0.9  # per rate-limit event, per success: stable while up to about 20% of requests are refused
+NON_TRANSIENT = (400, 404, 409, 413, 422)
+_TRAPI_BLOCKED = threading.Event()
+_GATES: dict[str, float] = {}
+_PACE: dict[str, float] = {}
+_NEXT: dict[str, float] = {}
+_GATES_LOCK = threading.Lock()
+WORKLOAD_ID = os.environ.get("MATHG_WORKLOAD_ID") or f"mathg-{os.getpid()}"
+
+
+def _retry_after(resp: Any) -> float | None:
+    """Seconds TRAPI asks the client to wait: the retry-after-ms or Retry-After header, else a hint in the body."""
+    headers = getattr(resp, "headers", None) or {}
+    for name, scale in (("retry-after-ms", 0.001), ("Retry-After", 1.0)):
+        value = headers.get(name)
+        if value is None:
+            continue
+        try:
+            seconds = float(value) * scale
+        except (TypeError, ValueError):
+            try:
+                seconds = email.utils.parsedate_to_datetime(str(value)).timestamp() - time.time()
+            except (TypeError, ValueError):
+                continue
+        return min(MAX_RETRY_AFTER, max(0.0, seconds))
+    match = re.search(r"(?:in|after) (\d+) seconds", getattr(resp, "text", "") or "")
+    return min(MAX_RETRY_AFTER, float(match.group(1))) if match else None
+
+
+def _close_gate(url: str, seconds: float) -> None:
+    with _GATES_LOCK:
+        _GATES[url] = max(_GATES.get(url, 0.0), time.monotonic() + seconds)
+
+
+def _rate_limited(url: str, seconds: float) -> None:
+    """Close the URL's gate for `seconds`. The pacing interval grows once per rate-limit event: a 429 that arrives
+    while the gate is already closed (another request was in flight) does not grow it again."""
+    with _GATES_LOCK:
+        now = time.monotonic()
+        if _GATES.get(url, 0.0) <= now:
+            _PACE[url] = min(MAX_PACE, max(1.0, PACE_UP * _PACE.get(url, 0.0)))
+        _GATES[url] = max(_GATES.get(url, 0.0), now + seconds)
+
+
+def _succeeded(url: str) -> None:
+    with _GATES_LOCK:
+        pace = PACE_DOWN * _PACE.get(url, 0.0)
+        _PACE[url] = pace if pace >= 0.5 else 0.0
+
+
+_LOG_LOCK = threading.Lock()
+_LOG_HEADERS = ("retry-after", "retry-after-ms", "x-ratelimit-remaining-requests", "x-ratelimit-remaining-tokens",
+                "x-apim-remaining-requests", "x-apim-remaining-tokens", "x-trapi-preconfig-ratelimit-remaining")
+
+
+def _log_response(resp: Any, url: str, attempt: int) -> None:
+    """One JSON line per TRAPI response (status and rate-limit headers) when MATHG_TRAPI_LOG names a file."""
+    path = os.environ.get("MATHG_TRAPI_LOG")
+    if not path:
+        return
+    headers = getattr(resp, "headers", None) or {}
+    line = {"t": time.strftime("%Y-%m-%dT%H:%M:%S"), "workload": WORKLOAD_ID, "url": url.split("/openai/")[0],
+            "status": resp.status_code, "attempt": attempt,
+            **{h: headers.get(h) for h in _LOG_HEADERS if headers.get(h) is not None}}
+    if resp.status_code != 200:
+        line["body"] = (getattr(resp, "text", "") or "")[:200]
+    with _LOG_LOCK, open(path, "a", encoding="utf-8") as handle:
+        handle.write(json.dumps(line) + "\n")
+
+
+def _wait_gate(url: str) -> None:
+    """Wait until this URL's rate-limit gate is open and its paced start time has come (shared by every thread of
+    the process); the thread that finds both takes the turn and sets the next start time."""
+    for _ in range(1000):
+        with _GATES_LOCK:
+            now = time.monotonic()
+            ready = max(_GATES.get(url, 0.0), _NEXT.get(url, 0.0))
+            if ready <= now:
+                _NEXT[url] = now + _PACE.get(url, 0.0)
+                return
+            delay = ready - now
+        time.sleep(delay + random.uniform(0.0, min(2.0, 0.05 + 0.1 * delay)))
+
+
+def _trapi_headers() -> dict[str, str]:
+    return {"Authorization": f"Bearer {_trapi_token()}", "Content-Type": "application/json",
+            "X-TRAPI-Workload-ID": WORKLOAD_ID}
+
+
+def _trapi_attempts(retries: int) -> int:
+    return max(1, min(MAX_TRAPI_ATTEMPTS, max(retries, int(os.environ.get("MATHG_MIN_RETRIES", "0")))))
+
+
+def _check_trapi_response(resp: Any, attempt: int, url: str = "") -> bool:
+    """True when the caller should retry a rate limit (the URL's gate is then closed for the wait). Raises
+    TrapiBlocked on 403 and TrapiRejected on non-transient errors."""
+    _log_response(resp, url, attempt)
+    if resp.status_code == 403:
+        _TRAPI_BLOCKED.set()
+        raise TrapiBlocked(f"TRAPI blocked this identity (403): {resp.text[:600]}")
+    if resp.status_code in NON_TRANSIENT:
+        raise TrapiRejected(f"TRAPI rejected the request ({resp.status_code}): {resp.text[:300]}")
+    if resp.status_code in (429, 503):
+        hint = _retry_after(resp)
+        wait = hint if hint is not None else min(240.0, 10.0 * 2 ** attempt)
+        _rate_limited(url, max(1.0, wait) * random.uniform(1.0, 1.2))
+        return True
+    if resp.status_code == 200:
+        _succeeded(url)
+    return False
+
+
 def trapi_chat_json(deployment: str, system: str, user: str, *, max_tokens: int,
                     token_field: str = "max_completion_tokens", temperature: float | None = None,
                     retries: int = 6, reasoning_effort: str | None = None) -> Any:
@@ -172,16 +309,17 @@ def trapi_chat_json(deployment: str, system: str, user: str, *, max_tokens: int,
         payload["temperature"] = temperature
     if reasoning_effort is not None:
         payload["reasoning_effort"] = reasoning_effort
-    retries = max(retries, int(os.environ.get("MATHG_MIN_RETRIES", "0")))  # resilience under shared rate limits
+    retries = _trapi_attempts(retries)
     timeout = float(os.environ.get("MATHG_REQUEST_TIMEOUT", "240"))
     last_err: Exception | None = None
     for attempt in range(retries):
+        _wait_gate(url)
+        if _TRAPI_BLOCKED.is_set():
+            raise TrapiBlocked("TRAPI blocked this identity earlier in this process; not retrying")
         try:
-            headers = {"Authorization": f"Bearer {_trapi_token()}", "Content-Type": "application/json"}
+            headers = _trapi_headers()
             resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
-            if resp.status_code == 429:
-                match = re.search(r"in (\d+) seconds", resp.text)
-                time.sleep(min(int(match.group(1)) + 2 if match else 30, 120))
+            if _check_trapi_response(resp, attempt, url):
                 last_err = LLMError(f"rate limited: {resp.text[:160]}")
                 continue
             resp.raise_for_status()
@@ -189,11 +327,11 @@ def trapi_chat_json(deployment: str, system: str, user: str, *, max_tokens: int,
             if choice.get("finish_reason") == "length":
                 raise TruncatedError(f"TRAPI response from {deployment} truncated at {token_field}={max_tokens}")
             return json.loads(choice["message"]["content"])
-        except TruncatedError:
+        except (TruncatedError, TrapiBlocked, TrapiRejected):
             raise
         except Exception as e:  # noqa: BLE001 - retry transient failures
             last_err = e
-            time.sleep(2 ** min(attempt, 5))
+            time.sleep(2 ** min(attempt, 5) * random.uniform(1.0, 1.5))
     raise LLMError(f"TRAPI call to {deployment} failed after {retries} attempts: {last_err}")
 
 
@@ -266,22 +404,25 @@ def trapi_chat_with_tools(messages: list[dict[str, Any]], tools: list[dict[str, 
         payload["temperature"] = float(os.environ["MATHG_TEMPERATURE"])
     timeout = float(os.environ.get("MATHG_REQUEST_TIMEOUT", "240"))
     last_err: Exception | None = None
-    for attempt in range(retries):
+    for attempt in range(_trapi_attempts(retries)):
+        _wait_gate(url)
+        if _TRAPI_BLOCKED.is_set():
+            raise TrapiBlocked("TRAPI blocked this identity earlier in this process; not retrying")
         try:
-            headers = {"Authorization": f"Bearer {_trapi_token()}", "Content-Type": "application/json"}
+            headers = _trapi_headers()
             resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
-            if resp.status_code == 429:
-                match = re.search(r"in (\d+) seconds", resp.text)
-                time.sleep(min(int(match.group(1)) + 2 if match else 30, 120))
+            if _check_trapi_response(resp, attempt, url):
                 last_err = LLMError(f"rate limited: {resp.text[:160]}")
                 continue
             resp.raise_for_status()
             message = resp.json()["choices"][0]["message"]
             message = {k: v for k, v in message.items() if k in ("role", "content", "tool_calls")}
             return _unwrap_message(message) if single else message
+        except (TrapiBlocked, TrapiRejected):
+            raise
         except Exception as e:  # noqa: BLE001 - retry transient failures
             last_err = e
-            time.sleep(2 ** min(attempt, 5))
+            time.sleep(2 ** min(attempt, 5) * random.uniform(1.0, 1.5))
     raise LLMError(f"TRAPI tool call to {TRAPI_DEPLOYMENT} failed after {retries} attempts: {last_err}")
 
 

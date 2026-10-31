@@ -1,6 +1,6 @@
 # Project summary: AI hypothesis generation for high-temperature high-entropy alloys
 
-**Status.** 2026-10-29, after experiment 41. This file gathers everything done so far and every main result in one
+**Status.** 2026-10-31, after experiment 42. This file gathers everything done so far and every main result in one
 place.
 
 **Details.**
@@ -40,7 +40,11 @@ judges' values, and differences come with paper-clustered 95% confidence interva
   - An agent that chooses its approach from the evidence and focuses the evidence on it, with a 2 × 2 ablation.
   - A failure-point analysis, exact offline tests of selection rules over 15,600 judged hypotheses, and writers
     aimed at the failure points.
-  - Roughly 33,400 hypothesis-generation runs in total.
+  - Six stage reviews by independent reviewer agents, with the changes that survived reproduction (experiment 42):
+    - retrieval without the question template's words;
+    - a writing block against invented numbers;
+    - an anchored, evidence-blind measurement v2.
+  - Roughly 34,200 hypothesis-generation runs in total.
 - **Best method found: the simplest one.** o3-mini with a conservative writer prompt and no retrieved evidence
   (`writer_only_b_o3mini`).
   - Over all 37 fresh held-out papers it scores 0.61 against 0.50 for the Llama-3.3 baseline: +0.11
@@ -51,7 +55,8 @@ judges' values, and differences come with paper-clustered 95% confidence interva
     - a proposer–critic–decider agent pipeline scored below it, with or without web evidence (experiment 37);
     - synthesising several drafts, even from five different models, only tied it (experiment 38);
     - an agent that chooses its approach from the evidence did not beat it either (experiment 40);
-    - neither did selection over 15,600 judged hypotheses, nor writers aimed at the failure points (experiment 41).
+    - neither did selection over 15,600 judged hypotheses, nor writers aimed at the failure points (experiment 41);
+    - nor the changes six stage reviews suggested; their writing block lowered the score (experiment 42).
   - Its lead is in overall closeness. On a strict checklist of each paper's specific facts, it and the baseline both
     match only about 6–15% (experiments 33, 35).
 - **Recommended agent for generating hypotheses: the same writer with web evidence** (`web_text_64k_b_o3mini`, 64,000
@@ -118,6 +123,14 @@ judges' values, and differences come with paper-clustered 95% confidence interva
         conditions, outcome and quality, but pull the model away from its best guess, so the score falls slightly.
       - The lost points are in the paper's specific lever. Earlier literature carries it in about 12% of papers,
         however they are chosen.
+  13. **Fixing each stage's flaws does not raise the score either** (experiment 42).
+      - Six reviewers found real flaws: template words in the retrieval ranking, invented numbers, no partial
+        credit in the rubric.
+      - The fixes did what they asked, but none raised reconstruction. Locking the question's facts and banning
+        invented numbers lowered intervention agreement.
+      - An anchored rubric (measurement v2, DeepSeek) gives monotonic partial credit, but is less reliable on
+        re-test. It also shrinks the writer's lead over the Llama baseline to almost nothing (0.37 vs 0.35), which
+        makes the expert ratings more urgent.
 - **Open items.**
   - The expert's ratings, which will show whether the AI judge can be trusted.
   - Every held-out set, including test4, is used up, so a new method claim needs test5. Only 9 papers qualified
@@ -202,6 +215,7 @@ judges' values, and differences come with paper-clustered 95% confidence interva
 | 22 | More information should give better results: is the information bad, is the model just repeating it, or is the judging unfair? | Pre-registered tests of each explanation: what the evidence contains, oracle-selected evidence, uptake and copying, a reading step, oracle hints, a target-free pairwise quality judge (GPT-5.6, DeepSeek, o1), a judge re-test, same-session re-judging | 39 |
 | 23 | Make the changes to the agent so that it performs better | Offline checks of evidence re-ranking and of decision rules over approach groups; an agent that chooses its approach from the evidence and focuses the evidence on it; 2 × 2 ablation, same-session baselines, target-free quality judges | 40 |
 | 24 | Increase the score: look at the failure points, brainstorm or take inspiration, run the experiments | Failure-point analysis; exact offline tests of selection rules over 15,600 judged hypotheses (literature support, consensus, learned reranker); an offline screen of many-shot examples; a complete-study writer, its two guides and a web variant (1,080 runs) | 41 |
+| 25 | Run multiple rubber-duck reviews to find how to improve each stage, make the changes they suggest, and get the best possible runs | Six independent stage reviews; their evidence reproduced offline before anything ran; the changes that survived run as a 2 × 2 design (retrieval v2, a writing block; 810 runs) with an anchored, evidence-blind measurement v2; a TRAPI retry-flood block fixed in the client | 42 |
 
 ## 4. Results by phase
 
@@ -691,6 +705,38 @@ section 22).
   - A higher score needs knowledge of which study the paper chose: a forecaster trained on a large history of
     introduction-to-study pairs, or a measure that credits valid alternatives (the expert ratings).
 
+### 4.15 Six stage reviews, and the changes they support (experiment 42)
+
+**Reviews** ([loop_v2/](./experiments/high_temperature_hea_qwen35b/loop_v2/README.md); loop.md section 23).
+- Six independent reviewer agents examined one stage each: retrieval, writing, selection, judging, the question and
+  strategy.
+- Their evidence was reproduced offline before anything ran:
+  - removing the question template's words from retrieval ranking raises the share of passages carrying the
+    paper's lever (16.9% → 19.4%);
+  - the strategy reviewer's gap analogs did not reproduce (17.0% vs 25.9%).
+- The selection reviewer found an error in experiment 41's offline test; the conclusion is unchanged.
+
+**What was run** (810 runs; GPT-5.6 against same-session baselines).
+
+| Change | GPT-5.6 [CI] | DeepSeek |
+|---|---|---|
+| Both changes vs the writer (primary) | −0.027 [−0.08, +0.02] | −0.023 |
+| Writing block (lock the question's facts, no invented numbers) | −0.056 [−0.11, −0.01] | −0.069 |
+| Retrieval v2, against the 64,000-character writer | +0.016 [−0.02, +0.06] | −0.046 |
+
+- **The writing block cut invented numbers** from 47% to 10%, **but lowered intervention agreement**. It lowers the
+  score by the pre-registered rule, though not Holm-significantly.
+- **Retrieval v2 barely changes the evidence** at 64,000 characters (lever density 15.5% → 16.9%).
+- **Quality without the answer key.** Hypotheses with evidence are again strongly preferred (DeepSeek +0.33, o1
+  +0.44), as the 64,000-character writer already was.
+- **Measurement v2 (DeepSeek).** It passes the controls and gives monotonic partial credit, but fails re-test
+  (ρ 0.75), so it is not validated. It nearly erases the writer's lead over the Llama baseline (0.37 vs 0.35).
+- **Operations.** About 38 parallel workers got the TRAPI identity blocked for excessive retries. The client now
+  honours `Retry-After` with a process-wide gate and paces requests (must_obey.md 7). GPT-5.6 saturation then
+  delayed the evaluation by a day.
+- **Conclusion.** No review-driven change raises reconstruction. The recommended generator stays
+  `web_text_64k_b_o3mini`.
+
 ## 5. The recommended method on every held-out comparison
 
 `writer_only_b_o3mini` (o3-mini, conservative writer, no evidence) against the Llama-3.3 closed-book baseline.
@@ -749,6 +795,10 @@ section 22).
   - stronger allowed generators (gpt-4o, gpt-4.1, o4-mini);
   - few-shot worked examples;
   - a question-type router.
+- **Changes from six stage reviews** (experiment 42):
+  - retrieval ranking without the question template's words;
+  - a writing block that locks the question's facts and bans invented numbers. It lowers the score: −0.056 on
+    GPT-5.6, −0.069 on DeepSeek.
 
 ## 7. Integrity: the rules and the problems they caught
 
@@ -780,6 +830,9 @@ section 22).
 | Experiments 9, 21, 36 | With Llama-3.3 on Azure, a fifth tool breaks tool calling, so experiment 9's KG agent (35 of 36 runs) never used a tool | Web search placed inside the existing search tool; the KG result is reported as uninformative |
 | Experiment 37 | In the smoke test, the decider saw the ideas in the proposer's order and chose the first in 16 of 16 runs | Before any run, ideas shown in a seeded random order with neutral labels (must_obey.md 5.2) |
 | Experiment 39 | GPT-5.6 scored the same runs +0.04 higher when judging them again three to four days later | Same-session re-judging of baselines; new rule must_obey.md 6.10. All experiment-39 conclusions hold against same-session baselines |
+| Experiment 41 | The offline selection test merged the two samples of a question and mixed judging days (found by experiment 42's selection review) | Recomputed per sample: the conclusion is unchanged (loop.md 22.2 correction) |
+| Experiment 42 | About 38 parallel GPT-5.6 workers, each waiting on its own, retried rate limits until TRAPI blocked the identity for excessive retries | Client gate on `Retry-After` shared by all threads, paced starts, stop on 403, workload IDs; at most 6 workers per model (must_obey.md 7) |
+| Experiment 42 | An early look at partial GPT-5.6 data (pending jobs not random) was too favourable to the writing block (−0.006 vs −0.056 final) | Results written only after `must_obey_check.py` passed on complete primary data |
 
 ## 8. Limitations and open questions
 
@@ -805,7 +858,7 @@ section 22).
   corpora (experiment 36) are wider but still limited to open-access papers with XML in Europe PMC.
 - **Judge drift.** GPT-5.6 drifted +0.04 between occasions. Earlier comparisons between runs judged days apart
   carry that uncertainty; differences within about ±0.05 among them are not reliable (experiment 39).
-- **Experiments 36–41 are exploratory.** All 45 papers were already spent. Experiment 36's evaluations ran on a
+- **Experiments 36–42 are exploratory.** All 45 papers were already spent. Experiment 36's evaluations ran on a
   second instance of the GPT-5.6 deployment because of rate limits, and its lever labels were made only for the
   primary comparison.
 - **Low absolute level.** About 0.6 out of 4. Choosing the paper's intervention is the core unsolved problem.
@@ -815,7 +868,7 @@ section 22).
 | What | Where |
 |---|---|
 | Rules; instructions for every agent | [must_obey.md](./must_obey.md), [AGENTS.md](./AGENTS.md) |
-| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–22) |
+| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–23) |
 | One section per experiment | [EXPERIMENT_LOG_2026-10-22.md](./experiments/high_temperature_hea_qwen35b/EXPERIMENT_LOG_2026-10-22.md) |
 | Literature reviewed | [RELATED_WORK.md](./experiments/high_temperature_hea_qwen35b/RELATED_WORK.md) (9 hypothesis-generation systems); loop.md sections 2, 10.3 and 11.3 (about 40 sources) |
 | Corpus | [data/corpus/](./experiments/high_temperature_hea_qwen35b/data/corpus/README.md) |
@@ -832,5 +885,6 @@ section 22).
 | Why more information does not raise the score (experiment 39) | [loop_diag/](./experiments/high_temperature_hea_qwen35b/loop_diag/README.md) |
 | A better agent: choosing the approach from the evidence (experiment 40) | [loop_agent/](./experiments/high_temperature_hea_qwen35b/loop_agent/README.md) |
 | Raising the score: failure points, selection, complete-study writer (experiment 41) | [loop_study/](./experiments/high_temperature_hea_qwen35b/loop_study/README.md) |
+| Six stage reviews and the changes they support (experiment 42) | [loop_v2/](./experiments/high_temperature_hea_qwen35b/loop_v2/README.md) |
 | Expert package; answer key and analysis | [expert_evaluation/](./expert_evaluation/README.md); [expert_eval/](./experiments/high_temperature_hea_qwen35b/expert_eval/README.md) |
-| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py`, `websearch.py`, `web_analysis.py`, `pcd_analysis.py`, `round4_offline.py`, `round4_pmi.py`, `round4_analysis.py`, `diag_analysis.py`, `agent_offline.py`, `agent_analysis.py`, `select_offline.py`, `study_analysis.py` |
+| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py`, `websearch.py`, `web_analysis.py`, `pcd_analysis.py`, `round4_offline.py`, `round4_pmi.py`, `round4_analysis.py`, `diag_analysis.py`, `agent_offline.py`, `agent_analysis.py`, `select_offline.py`, `study_analysis.py`, `stage_v2.py`, `judge_v2.py`, `v2_offline.py`, `v2_analysis.py` |

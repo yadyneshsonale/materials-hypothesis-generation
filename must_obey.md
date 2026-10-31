@@ -5,7 +5,7 @@ If a rule cannot be met, stop, write down why, and do not report the result as c
 rules is [must_obey_check.py](./must_obey_check.py); it must pass before results are reported. Every experiment
 README and every [loop.md](./loop.md) entry carries the checklist in section 9.
 
-Last updated: 2026-10-25 (see the change log at the end).
+Last updated: 2026-10-30 (see the change log at the end).
 
 ---
 
@@ -250,6 +250,16 @@ preferred future option.
   - an entry in `experiments/high_temperature_hea_qwen35b/EXPERIMENT_LOG_2026-10-22.md`;
   - an entry in [loop.md](./loop.md) for method work.
 - **Never commit** other sessions' uncommitted files, secrets, raw downloaded papers or large caches.
+- **API discipline (TRAPI).** Experiment 42 (loop.md 23.1) got the shared identity blocked ("retry-flood"): about
+  38 parallel workers each retried rate limits up to 20 times, and the client never read the `Retry-After` header.
+  - Run at most 6 parallel workers per model across all processes.
+  - Never raise retries to survive rate limits.
+  - Honour `Retry-After` on every 429: `llm_client.py` closes a process-wide gate for the deployment until it has
+    elapsed, so no thread re-fires early, and paces request starts after rate limits. Never retry non-transient
+    errors (400, 404, 409, 413, 422).
+  - Stop at once on HTTP 403. TRAPI lifts a retry-flood block after 60 minutes; send no request during that time.
+  - Give every stage a stable workload ID (`MATHG_WORKLOAD_ID`), so that TRAPI's retry protection can isolate it.
+  - `llm_client.py` enforces the retry cap, the gate, and the 403 stop (`test_trapi_policy.py`).
 
 ## 8. Method development (the loop)
 
@@ -368,3 +378,8 @@ Ablate before combining. Combine only components that helped or that address dif
   - Rule 6.10: judge drift. Re-judge baselines in the same session when comparing runs judged on different days.
   - Rule 6.11: report a target-free quality comparison beside reconstruction for claims about information.
   - Rule 5.1 is unchanged for methods.
+
+- 2026-10-30 (experiment 42): API discipline rule in section 7 (at most 6 parallel workers per model; no retry
+  floods; stop on 403) after the TRAPI identity was blocked. Extended the same day after reading TRAPI's
+  troubleshooting guide: honour the `Retry-After` header with a process-wide gate; no retries of non-transient
+  errors; no requests for 60 minutes after a block; a stable workload ID per stage.

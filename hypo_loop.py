@@ -148,6 +148,18 @@ class TargetLeak(RuntimeError):
     pass
 
 
+def _filter_citations(raw: dict[str, Any], allowed: set[str]) -> tuple[dict[str, Any], list[str]]:
+    """The generation with every citation ID that is not in `allowed` removed, and the removed IDs."""
+    out, removed = dict(raw), []
+    for key in ("supporting_evidence_ids", "conflicting_evidence_ids"):
+        value = out.get(key)
+        items = ([] if value is None else [value] if isinstance(value, str)
+                 else list(value) if isinstance(value, (list, tuple, set)) else [value])
+        out[key] = [str(i) for i in items if str(i) in allowed]
+        removed += [str(i) for i in items if str(i) not in allowed and str(i).strip()]
+    return out, removed
+
+
 def _schema_only(generation: dict[str, Any]) -> dict[str, Any]:
     """The judge sees every field of a generation, so a final hypothesis keeps only the shared schema fields; a method
     cannot hand the judge extra content (none of the 2,376 runs before round 3 had extra fields)."""
@@ -214,14 +226,22 @@ class Harness:
         return raw
 
     def generate_final(self, role: str, model: str, system: str, payload: dict[str, Any],
-                       allowed: set[str]) -> dict[str, Any]:
-        """Final hypothesis with the same validation and one repair call as the baselines."""
+                       allowed: set[str], citation_repair: str = "regenerate") -> dict[str, Any]:
+        """Final hypothesis with the same validation and one repair call as the baselines. With
+        citation_repair="filter" (experiment 42, loop.md 23.1), a valid hypothesis whose only error is an unknown
+        citation ID keeps its content: the unknown IDs are removed and recorded, so a citation slip cannot change the
+        decision. Any other error is repaired by regeneration, as before."""
         raw = self.ask(role, model, system, payload)
         try:
             out = _schema_only(_validate_generation(raw, allowed))
             out["citation_validation"] = {"status": "valid", "removed_unknown_ids": []}
             return out
         except ValueError as error:
+            if citation_repair == "filter" and isinstance(raw, dict) and str(raw.get("hypothesis", "")).strip():
+                filtered, removed = _filter_citations(raw, allowed)
+                out = _schema_only(_validate_generation(filtered, allowed))
+                out["citation_validation"] = {"status": "filtered_unknown_ids", "removed_unknown_ids": removed}
+                return out
             repair = {**payload, "validation_error": str(error), "allowed_evidence_ids": sorted(allowed),
                       "repair_instruction": "Regenerate the complete JSON. The hypothesis field must be a non-empty "
                                             "statement, and evidence ID arrays may contain only exact IDs from "
@@ -410,6 +430,9 @@ def _pending(methods: list[str] | None, rel: str) -> list[tuple[Any, ...]]:
     if os.environ.get("MATHG_PENDING_SHUFFLE"):
         # An extra evaluation loop takes jobs in a seeded random order, so it rarely meets an ordered loop (loop.md 18).
         random.Random(int(os.environ["MATHG_PENDING_SHUFFLE"])).shuffle(runs)
+    if os.environ.get("MATHG_PENDING_REVERSE"):
+        # A second loop on the same stage takes the jobs from the other end (experiment 42, loop.md 23.1).
+        runs.reverse()
     return [(r,) for r in runs]
 
 

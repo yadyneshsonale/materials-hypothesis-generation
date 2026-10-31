@@ -1882,3 +1882,101 @@ def m_web_study_64k(h: Harness) -> dict[str, Any]:
 
 
 STUDY_CONFIGS = ("writer_study_b_o3mini", "writer_types_b_o3mini", "writer_design_b_o3mini", "web_study_64k_b_o3mini")
+
+
+# ================================================================ experiment 42 (loop.md 23.1): stage changes from
+# six independent reviews. Writing: lock the question's stated facts, define the conditions and outcome fields, no
+# invented numbers. Retrieval: BM25 without the question template's words, titles and sections in the payload.
+# Repair: a citation slip drops the unknown IDs instead of regenerating the hypothesis.
+import stage_v2 as _S2  # noqa: E402
+
+WRITER_V2_GUIDE = (
+    "Treat everything the research question states as fixed: the material and its starting state, the baseline, the "
+    "constraints, the observables, and the service or test regime. Choose exactly one intervention and build the "
+    "hypothesis on it. Describe exactly what is changed, in which material, and against which control; name a "
+    "processing route only when the question states it or the chosen intervention requires it. In conditions, give "
+    "the settings that realise the chosen intervention and the evaluation conditions the question states; where a "
+    "value is stated neither in the question nor in the supplied evidence, name the controlled variable instead of "
+    "inventing a number. In predicted_outcome, name the primary measured property and the direction of its change "
+    "relative to the stated baseline; give a magnitude only when the question or the supplied evidence states one."
+)
+WRITER_V2 = writer_with(WRITER_V2_GUIDE)
+R2_BUDGET = 64000
+_R2_DOCS: OrderedDict[str, dict[str, list[str]]] = OrderedDict()
+_R2_LOCK = threading.Lock()
+
+
+def r2_pack(h: Harness, budget: int = R2_BUDGET) -> list[Any]:
+    """Retrieval v2: the unit's web passages ranked by BM25 on the question's content words without the template's
+    words (records sharing no such word come last in a fixed order), packed within the budget; the record limit scales
+    with the budget (24 per 16,000 characters)."""
+    pool = h.pool("text_chunks")
+    key = f"{h.case['paper_id']}:{h.level}"
+    with _R2_LOCK:
+        docs = _R2_DOCS.get(key)
+    if docs is None:
+        docs = {r.record_id: _S2.clean_terms(r.text) for r in pool}
+        with _R2_LOCK:
+            _R2_DOCS[key] = docs
+            while len(_R2_DOCS) > 12:
+                _R2_DOCS.popitem(last=False)
+    scores = _S2.bm25_scores(_S2.clean_terms(h.query), docs)
+    order = sorted(pool, key=lambda r: (-scores.get(r.record_id, 0.0), r.record_id))
+    cap = rx.record_cap("text_chunks")
+    max_records = max(1, round(rx.MAX_RECORDS * budget / rx.EVIDENCE_BUDGET_CHARS))
+    packed: list[Any] = []
+    used = 0
+    for record in order:
+        size = v2_item_size(v2_item(record, cap))  # counted exactly as sent, title and section included
+        if used + size > budget:
+            continue
+        packed.append(record)
+        used += size
+        if len(packed) >= max_records or used >= budget - 200:
+            break
+    return packed
+
+
+def v2_item(record: Any, cap: int) -> dict[str, Any]:
+    """An evidence item with the paper's title and the passage's section; the text is shortened so that title,
+    section and text together stay within the record cap."""
+    title = str((record.structured or {}).get("title", "")).strip()[:150]
+    section = str(record.kind).split(":", 1)[-1][:60]
+    room = max(200, cap - len(title) - len(section) - 4)
+    text = " ".join(str(record.text).split())
+    if len(text) > room:
+        text = text[:room].rsplit(" ", 1)[0] + " ..."
+    return {"record_id": record.record_id, "paper_title": title, "section": section,
+            "publication_date": record.publication_date, "evidence": text}
+
+
+def v2_item_size(item: dict[str, Any]) -> int:
+    return len(item["evidence"]) + len(item["paper_title"]) + len(item["section"])
+
+
+def evidence_payload_v2(h: Harness, records: list[Any], cap: int) -> list[dict[str, Any]]:
+    for record in records:
+        h.seen[record.record_id] = record
+    return [v2_item(record, cap) for record in records]
+
+
+def m_v2(h: Harness, retrieval: bool, writer_v2: bool, model: str = "o3mini") -> dict[str, Any]:
+    system = WRITER_V2 if writer_v2 else WRITER_B
+    payload: dict[str, Any] = {"query": h.query, "knowledge_cutoff": h.cutoff, "analysis_notes": {},
+                               "eligible_evidence": []}
+    allowed: set[str] = set()
+    if retrieval:
+        h.source = "web"
+        records = r2_pack(h)
+        cap = rx.record_cap("text_chunks")
+        payload["eligible_evidence"] = evidence_payload_v2(h, records, cap)
+        allowed = {r.record_id for r in records}
+        h.notes["evidence"] = {"records": len(records), "papers": len({r.paper_id for r in records}),
+                               "chars": sum(v2_item_size(i) for i in payload["eligible_evidence"])}
+    return h.generate_final("writer", model, system, payload, allowed, citation_repair="filter")
+
+
+register("writer_v2_b_o3mini")(lambda h: m_v2(h, retrieval=False, writer_v2=True))
+register("web64k_r2_b_o3mini")(lambda h: m_v2(h, retrieval=True, writer_v2=False))
+register("web64k_v2_b_o3mini")(lambda h: m_v2(h, retrieval=True, writer_v2=True))
+V2_CONFIGS = ("writer_v2_b_o3mini", "web64k_r2_b_o3mini", "web64k_v2_b_o3mini")
