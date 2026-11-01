@@ -4393,23 +4393,30 @@ Each returned flaws and ranked proposals, with offline checks on existing data.
     - 6 workers in total, each stage with its own workload ID.
   - The report and records were then written, as the 11:45 rule says (23.2).
 
-### 23.2 Results (2026-10-31, 06:47; exploratory, because all 45 papers are spent)
+### 23.2 Results (2026-10-31, 06:47; updated 2026-11-01 at about 08:25, after the audits; exploratory, because all 45 papers are spent)
 
-**Runs and evaluations** (counts when this was written; `loop_v2/analysis_v2.md` gives them per configuration).
+**Runs and evaluations** (counts at the update; `loop_v2/analysis_v2.md` gives them per configuration).
 - 3 configurations × 270 = 810 runs, all OK, one o3-mini call each.
 - Citation slips were repaired by dropping the unknown IDs: `writer_v2` 4 runs, `web64k_r2` 56, `web64k_v2` 41.
 - Complete:
   - GPT-5.6 v1 judge 810 of 810; DeepSeek 810 of 810;
   - same-session GPT-5.6 baselines 540 of 540 (writer 0.646, 64,000-character writer 0.629);
+  - target-free audits 810 of 810 (finished 2026-11-01, 08:15);
+  - pack labels 135 of 135;
   - pairwise quality, DeepSeek and o1: 540 of 540 each;
   - measurement v2, DeepSeek: 2,781 of 2,781.
-- Still running when this was written (finalisation rule, 23.1):
-  - the audits (in progress);
-  - lever labels: 280 of 810;
-  - pack labels: 107 of 135;
-  - GPT-5.6 pairwise: 16 of 270 pairs;
+- Stopped at 08:20, with the counts reached:
+  - lever labels: 299 of 810;
+  - GPT-5.6 pairwise: 24 of 270 complete pairs;
   - GPT-5.6 measurement v2: 67 of 2,781.
-- `must_obey_check.py` passes on all three configurations; its only warnings are the missing audits.
+
+  At about 40 GPT-5.6 calls an hour, the rest (about 3,700 calls) would take about 4 days on an identity shared
+  with other projects. None of it can change a decision. To resume:
+  `loop/run_v2_resume5.sh redmond/interactive a pairwise judge2` and
+  `loop/run_v2_resume5.sh redmond/interactive b label`.
+- `must_obey_check.py` passes on all three configurations. The only warnings are the known one-month margin cases
+  for Llama-3.3, which writes the web-search phrases: PMC10759803 (2 days) and PMC11302478 (1 day), as in
+  experiments 36–41.
 
 **Decision: no stage change raises the score, and the writing block lowers it.**
 
@@ -4417,7 +4424,7 @@ Each returned flaws and ranked proposals, with offline checks on existing data.
 |---|---|---|---|
 | Q1: both changes (`web64k_v2`) vs writer (primary) | −0.027 [−0.08, +0.02], 15/23 papers | −0.023 [−0.13, +0.08], 21/24 | no detectable difference |
 | Q1: both changes vs the 64,000-character writer | −0.009 [−0.05, +0.03], 20/20 | −0.104 [−0.20, −0.02], 15/26 | no detectable difference |
-| Q2 writing: `writer_v2` vs writer | −0.056 [−0.11, −0.01], 15/26 | −0.069 [−0.13, −0.01], 14/25 | **lowers the score** |
+| Q2 writing: `writer_v2` vs writer | −0.055 [−0.11, −0.01], 15/26 | −0.069 [−0.13, −0.01], 14/25 | **lowers the score** |
 | Q2 retrieval: `web64k_r2` vs the 64,000-character writer | +0.016 [−0.02, +0.06], 17/20 | −0.046 [−0.12, +0.02], 15/26 | no detectable difference |
 | Q2 writing with evidence: `web64k_v2` vs `web64k_r2` | −0.025 [−0.07, +0.02], 16/25 | −0.057 [−0.14, +0.02], 14/25 | no detectable difference |
 
@@ -4433,7 +4440,7 @@ Each returned flaws and ranked proposals, with offline checks on existing data.
   | 64,000-character writer | 0.629 | 0.656 |
   | `web64k_r2` | 0.644 | 0.609 |
   | `web64k_v2` | 0.619 | 0.552 |
-  | `writer_v2` | 0.591 | 0.506 |
+  | `writer_v2` | 0.592 | 0.506 |
 
 - **Interim figures were too favourable.** An interim look at 12:04 on 2026-10-30, with 588 of 810 judgments and
   341 of 540 baselines, gave `writer_v2` −0.006. The jobs still pending then were not a random sample: the 53 late
@@ -4441,10 +4448,10 @@ Each returned flaws and ranked proposals, with offline checks on existing data.
 
 **Why the writing block lowered the score** (DeepSeek, complete, one session; exploratory).
 
-| Configuration | Intervention | Conditions | Mechanism | Outcome | Invented numbers | Lever ≥ 2 (GPT-5.6 labels) |
+| Configuration | Intervention | Conditions | Mechanism | Outcome | Invented numbers | Lever ≥ 2 (GPT-5.6 labels; partial for the new ones) |
 |---|---:|---:|---:|---:|---:|---:|
 | Writer | 0.448 | 0.656 | 0.548 | 0.648 | 47% | 18.9% (270) |
-| `writer_v2` | 0.337 | 0.581 | 0.496 | 0.607 | 10% | 9.4% (106) |
+| `writer_v2` | 0.337 | 0.581 | 0.496 | 0.607 | 10% | 8.0% (125) |
 | 64,000-character writer | 0.530 | 0.774 | 0.589 | 0.730 | 50% | 20.7% (270) |
 | `web64k_r2` | 0.500 | 0.700 | 0.567 | 0.670 | 57% | 12.5% (88) |
 | `web64k_v2` | 0.430 | 0.626 | 0.515 | 0.637 | 36% | 12.8% (86) |
@@ -4459,16 +4466,36 @@ Each returned flaws and ranked proposals, with offline checks on existing data.
   - It did not suppress processing routes: routes are named in 76% of `writer_v2` interventions vs 68% for the
     writer, and in 64% of answer keys.
   - It did not remove hedged, multi-part interventions: 48% vs 43%, and `writer_v2` scores lower within both kinds.
+- **A third was checked and rejected after the audits: dropping numbers is not the cause.** Pairing each unit of
+  `writer_v2` with the writer's unit:
+
+  | Units | Change in intervention, GPT-5.6 / DeepSeek | Change in conditions, GPT-5.6 / DeepSeek |
+  |---|---|---|
+  | Neither states a number (121) | −0.10 / −0.14 | −0.11 / −0.12 |
+  | The writer states one, `writer_v2` does not (70) | −0.09 / −0.10 | −0.16 / −0.11 |
+  | Both state one (74) | +0.04 / −0.08 | −0.12 / +0.04 |
+
+  The block costs as much where no number was ever involved.
+- **The audits confirm it made hypotheses less specific without making them better built.**
+  - Process parameters: 11% of hypotheses vs 34% for the writer.
+  - A quantified outcome: 7% vs 28%.
+  - Complete causal chain (85% vs 84%) and falsifiability (0.90 vs 0.90): unchanged.
+  - With evidence, the same pattern: 28% vs 49% (parameters), 16% vs 35% (outcome).
 - **What remains.** Its interventions are longer (28 vs 22 words) and committed to one stated frame. As with the
   guides of experiment 41, any instruction that moves the model away from its own best guess lowers intervention
   agreement.
 
 **Retrieval v2** (target-aware analysis only).
-- **Lever density.** 16.9% of passages carry the paper's lever (107 packs labelled), against 15.5% for question
-  order (135 packs).
-- **Packs containing the lever:** 92.5% vs 93.3%.
-- **Smaller than offline.** The offline gain at 16,000 characters was +2.5 points; at 64,000 characters it is about
-  +1.4. On GPT-5.6, `web64k_r2` ties the 64,000-character writer (+0.016); DeepSeek is −0.046.
+- **Lever density.** 17.5% of passages carry the paper's lever, against 15.5% for question order (135 packs each):
+  +2.0 points [−0.1, +4.1], 29/16 papers, p = 0.07.
+- **Packs containing the lever:** 93.3% vs 93.3%.
+- **As offline, but no gain in the score.** The offline estimate at 16,000 characters was +2.5 points. Yet on
+  GPT-5.6 `web64k_r2` only ties the 64,000-character writer (+0.016); on DeepSeek it is −0.046. Slightly denser
+  evidence does not change which lever the model chooses.
+- **The audits.** Retrieval v2 changes almost nothing about the hypotheses either:
+  - complete chain 71% vs 69%;
+  - claims supported by the cited evidence 37% vs 40%;
+  - contradictions per run 0.33 vs 0.42.
 
 **Citation slips.** Most removed IDs were the right passage, with its section label rewritten by the model.
 - **`web64k_r2`:** 90 IDs removed:
@@ -4511,17 +4538,18 @@ the v2 changes add no quality beyond what the evidence already gives. This compa
 - **Q1–Q2 under DeepSeek v2:** −0.013 to −0.045. No change raises the score under either rubric.
 
 **Expectations** (23.1).
-- `writer_v2` +0.00 to +0.02: wrong (−0.056 / −0.069).
+- `writer_v2` +0.00 to +0.02: wrong (−0.055 / −0.069).
 - `web64k_r2` +0.00 to +0.02: right on GPT-5.6 (+0.016), wrong on DeepSeek (−0.046).
 - `web64k_v2` the best of the three and +0.01 to +0.04 over the writer: wrong (−0.027 / −0.023). `web64k_r2` scores
   higher.
 - Measurement v2 raises scores by about +0.1 and passes C1–C6: wrong for DeepSeek (lower scores; fails C6).
   Ranks mostly unchanged: right.
 
-**Leakage: none detected so far.**
+**Leakage: none detected.**
 - All counters are zero over 810 runs.
 - 25,036 web-record reads were re-checked against each paper's date: 0 violations.
-- The audits are still running (see above).
+- The target-free audits are complete (810 of 810). They check grounding and internal quality, not leakage; their
+  results are above.
 
 **Conclusion.**
 - **The fixes did what they asked, but none raises the score.** The six reviews found real flaws. The fixes
@@ -4550,8 +4578,29 @@ the v2 changes add no quality beyond what the evidence already gives. This compa
 - [x] Payloads target-free (guard on); pairwise judgments in both orders.
 - [x] Spent papers only; exploratory. Offline checks used existing labels and judgments only.
 - [x] Same budgets as the baselines; one call each.
-- [x] GPT-5.6 judge and DeepSeek cross-judge on every run.
-- [ ] Lever labels and audits on every run: still running when this was written (finalisation rule in 23.1).
+- [x] GPT-5.6 judge, DeepSeek cross-judge and target-free audit on every run (audits finished 2026-11-01, 08:15).
+- [ ] Lever labels on every run (a diagnostic, not required by must_obey.md 9): 299 of 810 when the runners were
+  stopped (see the update).
 - [x] Same-session baselines (6.10); target-free quality reported (6.11) from DeepSeek and o1.
 - [x] Paired statistics with CIs and Holm; negative results recorded.
-- [x] Records updated; `must_obey_check.py` passes (warnings: missing audits).
+- [x] Records updated; `must_obey_check.py` passes (warnings: the two known Llama-3.3 margin papers).
+
+**Update (2026-11-01, about 08:25), after the audits.** What changed since the first version of this section:
+- **The audits finished** (810 of 810). They are reported above: the writing block made hypotheses less specific
+  without making them better built. `must_obey_check.py` now passes with no missing-audit warnings.
+- **The pack labels finished** (135 of 135). Retrieval v2's density is +2.0 points [−0.1, +4.1], against the +1.4
+  from 107 packs reported first.
+- **Dropping numbers was ruled out** as the cause of the writing block's loss (the paired table above).
+- **One GPT-5.6 judgment was replaced** (`PMC12057660__problem_constrained__writer_v2_b_o3mini__s2`, 2026-10-31
+  06:42).
+  - The two runners met on it from opposite ends, and the second judgment replaced the first.
+  - The first version of this section and the first commit's `analysis_v2.md` used the first judgment. The
+    replacement moves `writer_v2` vs writer from −0.056 to −0.055, and its mean from 0.591 to 0.592.
+  - Which judgment survived did not depend on its score, so there is no bias. Every run still has exactly one
+    judgment.
+  - **Fix:** evaluation outputs are now written first-wins (`hypo_loop.write_once`, an atomic link that fails if
+    the file exists; tested with 8 concurrent writers).
+- **Secondary stages stopped (08:20).** Both runners were on redmond/interactive: runner a on GPT-5.6 pairwise
+  (measurement v2 was next), runner b on the lever labels. They were stopped with the counts given at the top of
+  this section. The scope reduction anticipated in 23.1 applies: GPT-5.6's quality judgment and its
+  measurement-v2 validation are reported as incomplete, and neither enters a decision.

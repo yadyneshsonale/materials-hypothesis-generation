@@ -166,6 +166,73 @@ class StageHelperTests(unittest.TestCase):
             self.assertEqual([r["run_id"] for (r,) in H._pending(["m"], "audit")], ["r3", "r2", "r0"])
             self.assertEqual(VA._shuffle([1, 2, 3]), [3, 2, 1])
 
+    def test_audit_summary(self) -> None:
+        import json
+        import tempfile
+        from pathlib import Path
+
+        import v2_analysis as VA
+        runs = [{"run_id": f"r{i}"} for i in range(3)]
+        audits = {
+            "r0": {"chain": {"a": 2, "b": 2, "c": 2}, "contradictions": [{"fields": ["x"]}],
+                   "mechanism_source": "same_system_evidence",
+                   "falsifiability": {"m": True, "t": True, "c": False, "d": False},
+                   "specificity": {"composition_quantified": True, "process_parameters": False,
+                                   "outcome_quantified": False},
+                   "claims": [{"needs_support": True, "support": "entailed"},
+                              {"needs_support": True, "support": "unsupported"},
+                              {"needs_support": False, "support": "unsupported"}]},
+            "r1": {"chain": {"a": 2, "b": 1, "c": 2}, "contradictions": [], "mechanism_source": "not_from_evidence",
+                   "falsifiability": {"m": True, "t": True, "c": True, "d": True},
+                   "specificity": {"composition_quantified": False, "process_parameters": True,
+                                   "outcome_quantified": False},
+                   "claims": [{"needs_support": True, "support": "partial"}]},
+        }  # r2 has no audit yet
+        with tempfile.TemporaryDirectory() as tmp:
+            folder = Path(tmp) / "m" / "audit"
+            folder.mkdir(parents=True)
+            for rid, audit in audits.items():
+                (folder / f"{rid}.json").write_text(json.dumps(audit))
+            with patch.object(VA, "root_of", return_value=Path(tmp)), patch.object(VA, "runs_of", return_value=runs):
+                out = VA.audit_summary("m")
+        self.assertEqual(out["audited"], 2)
+        self.assertEqual(out["complete_chain"], 0.5)
+        self.assertEqual(out["claims_needing_support"], 3)
+        self.assertAlmostEqual(out["claims_supported"], 2 / 3, places=3)
+        self.assertEqual(out["contradictions_per_run"], 0.5)
+        self.assertEqual(out["mechanism_from_evidence"], 0.5)
+        self.assertEqual(out["falsifiability"], 0.75)
+        self.assertEqual(out["specificity"], {"composition_quantified": 0.5, "process_parameters": 0.5,
+                                              "outcome_quantified": 0.0})
+
+    def test_write_once_keeps_the_first_output(self) -> None:
+        import json
+        import tempfile
+        import threading
+        from pathlib import Path
+
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "judgments" / "r0.json"
+            self.assertTrue(H.write_once(path, {"score": 1}))
+            self.assertFalse(H.write_once(path, {"score": 2}))
+            self.assertEqual(json.loads(path.read_text()), {"score": 1})
+            results: list[tuple[int, bool]] = []
+            barrier = threading.Barrier(8)
+
+            def writer(n: int) -> None:
+                barrier.wait()
+                results.append((n, H.write_once(Path(tmp) / "race.json", {"writer": n})))
+
+            threads = [threading.Thread(target=writer, args=(n,)) for n in range(8)]
+            for t in threads:
+                t.start()
+            for t in threads:
+                t.join()
+            winners = [n for n, won in results if won]
+            self.assertEqual(len(winners), 1)
+            self.assertEqual(json.loads((Path(tmp) / "race.json").read_text()), {"writer": winners[0]})
+            self.assertEqual([x.name for x in Path(tmp).rglob("*.tmp")], [])
+
     def test_gap_and_study(self) -> None:
         intro = ("Refractory alloys oxidise quickly. Coatings were tried before. Their adhesion is poor at high "
                  "temperature, and spallation limits their life in air. Little is known about silicide coatings on "

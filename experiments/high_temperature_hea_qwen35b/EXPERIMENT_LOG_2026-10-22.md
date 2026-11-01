@@ -1852,19 +1852,23 @@ and strategy ([loop_v2/](./loop_v2/README.md)).
 |---|---|---|
 | Both changes (`web64k_v2`) vs writer (primary) | −0.027 [−0.08, +0.02] | −0.023 |
 | Both changes vs the 64,000-character writer | −0.009 [−0.05, +0.03] | −0.104 |
-| Writing block (lock the question's facts; no invented numbers) vs writer | −0.056 [−0.11, −0.01] | −0.069 |
+| Writing block (lock the question's facts; no invented numbers) vs writer | −0.055 [−0.11, −0.01] | −0.069 |
 | Retrieval v2 (BM25 without template words; titles) vs the 64,000-character writer | +0.016 [−0.02, +0.06] | −0.046 |
 
 - **The writing block did what it asked** (invented numbers fell from 47% to 10%), **but it lowers the score**: by
-  the pre-registered rule, though not Holm-significant. DeepSeek's agreement fell on every dimension, most of all
-  the intervention.
-- **Retrieval v2** raised lever density only slightly at 64,000 characters (15.5% → 16.9%).
+  the pre-registered rule, though not Holm-significant.
+  - DeepSeek's agreement fell on every dimension, most of all the intervention.
+  - Dropping numbers is not the cause: the loss is as large in units where neither version stated a number.
+  - The audits show less specific hypotheses (process parameters 11% vs 34%) that are no better built.
+- **Retrieval v2** raised lever density at 64,000 characters from 15.5% to 17.5% (+2.0 points [−0.1, +4.1]), as
+  offline. The score did not move.
 - **Quality without the answer key.** The combined configuration is strongly preferred to the writer: DeepSeek
   +0.33, o1 +0.44. That is what the 64,000-character writer earned in experiment 39.
 - **Measurement v2** (anchored, evidence-blind).
   - DeepSeek passes the controls and gives monotonic partial credit, but fails re-test (ρ 0.75): not validated.
   - Under it, the writer's lead over the Llama baseline nearly disappears (0.37 vs 0.35).
-- **Leakage:** none detected (counters zero; 25,036 web-record reads re-checked).
+- **Leakage:** none detected (counters zero; 25,036 web-record reads re-checked). Target-free audits on all 810
+  runs.
 
 **Incident.** About 38 parallel GPT-5.6 workers got the TRAPI identity blocked ("retry-flood").
 - The client now honours `Retry-After` with a process-wide gate and paces requests (`llm_client.py`; new
@@ -1879,8 +1883,9 @@ and strategy ([loop_v2/](./loop_v2/README.md)).
 ## Comparability and limits, experiments 8 to 42
 
 - Experiment 42's GPT-5.6 judgments span two days because of the TRAPI block and saturation. Its baselines were
-  judged again in the same span. The lever labels, audits, GPT-5.6 pairwise and GPT-5.6 measurement v2 were still
-  running when its records were written (loop.md 23.1, finalisation rule).
+  judged again in the same span. The audits finished on 2026-11-01. The lever labels (299 of 810), GPT-5.6 pairwise
+  (24 of 270 pairs) and GPT-5.6 measurement v2 (67 of 2,781) were stopped incomplete: about 4 more days of GPT-5.6
+  at the available capacity (loop.md 23.2).
 - Experiment 9 uses the v3 generator, judge and blinding, so its scores are comparable with v3. The judge is
   not calibrated against experts, and KG facts are recognisable to the judge from their wording.
 - Experiment 9 has 12 papers. Intervals are wide, and no comparison survives multiple-comparison correction.

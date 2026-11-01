@@ -7,8 +7,8 @@ Pre-registered in loop.md 23.1. Primary metric: the original judge (v1); GPT-5.6
 - v1 GPT-5.6, new runs: {"writer_v2_b_o3mini": 270, "web64k_r2_b_o3mini": 270, "web64k_v2_b_o3mini": 270} of 270 each
 - v1 DeepSeek, new runs: {"writer_v2_b_o3mini": 270, "web64k_r2_b_o3mini": 270, "web64k_v2_b_o3mini": 270} of 270 each
 - same-session GPT-5.6 baselines: {"writer_only_b_o3mini": 270, "web_text_64k_b_o3mini": 270} of 270 each
-- audits: {"writer_v2_b_o3mini": 0, "web64k_r2_b_o3mini": 0, "web64k_v2_b_o3mini": 4}; lever labels: {"writer_v2_b_o3mini": 106, "web64k_r2_b_o3mini": 88, "web64k_v2_b_o3mini": 86} (of 270 each)
-- pack labels: 107 of 135; pairwise: {"gpt56": 85, "deepseek": 540, "o1": 540} of 540 each
+- audits: {"writer_v2_b_o3mini": 270, "web64k_r2_b_o3mini": 270, "web64k_v2_b_o3mini": 270}; lever labels: {"writer_v2_b_o3mini": 125, "web64k_r2_b_o3mini": 88, "web64k_v2_b_o3mini": 86} (of 270 each)
+- pack labels: 135 of 135; pairwise: {"gpt56": 100, "deepseek": 540, "o1": 540} of 540 each
 - measurement v2: {"gpt56": {"runs": {"writer_v2_b_o3mini": 5, "web64k_r2_b_o3mini": 11, "web64k_v2_b_o3mini": 5, "writer_only_b_o3mini": 7, "web_text_64k_b_o3mini": 7, "closed_book_o3mini": 7, "closed_book": 7, "writer_study_b_o3mini": 7, "oracle_hint_lever_b_o3mini": 4}, "controls": 4, "retest": 3}, "deepseek": {"runs": {"writer_v2_b_o3mini": 270, "web64k_r2_b_o3mini": 270, "web64k_v2_b_o3mini": 270, "writer_only_b_o3mini": 270, "web_text_64k_b_o3mini": 270, "closed_book_o3mini": 270, "closed_book": 270, "writer_study_b_o3mini": 270, "oracle_hint_lever_b_o3mini": 270}, "controls": 216, "retest": 135}} (runs of 270 each; controls of 216; retest of 135)
 
 ## Q1 (primary, v1): the combined configuration
@@ -22,7 +22,7 @@ Pre-registered in loop.md 23.1. Primary metric: the original judge (v1); GPT-5.6
 
 | comparison | GPT-5.6 [CI] | DeepSeek [CI] | decision |
 |---|---|---|---|
-| writer_v2_b_o3mini vs writer_only_b_o3mini | -0.056 [-0.11, -0.01] (45 papers, 15/26, Holm p 0.3519) | -0.069 [-0.13, -0.01] (45 papers, 14/25, Holm p 0.3243) | lowers the score |
+| writer_v2_b_o3mini vs writer_only_b_o3mini | -0.055 [-0.11, -0.01] (45 papers, 15/26, Holm p 0.3519) | -0.069 [-0.13, -0.01] (45 papers, 14/25, Holm p 0.3243) | lowers the score |
 | web64k_r2_b_o3mini vs web_text_64k_b_o3mini | +0.016 [-0.02, +0.06] (45 papers, 17/20, Holm p 0.7428) | -0.046 [-0.12, +0.02] (45 papers, 15/26, Holm p 0.3243) | no detectable difference |
 | web64k_v2_b_o3mini vs web64k_r2_b_o3mini | -0.025 [-0.07, +0.02] (45 papers, 16/25, Holm p 0.422) | -0.057 [-0.14, +0.02] (45 papers, 14/25, Holm p 0.3243) | no detectable difference |
 
@@ -37,18 +37,18 @@ Pre-registered in loop.md 23.1. Primary metric: the original judge (v1); GPT-5.6
 
 | judge | pairs | new wins | writer wins | net preference [CI] |
 |---|---:|---:|---:|---|
-| gpt56 | 16 | incomplete (16 of 270 pairs): not interpretable | | |
+| gpt56 | 24 | incomplete (24 of 270 pairs): not interpretable | | |
 | deepseek | 270 | 0.352 | 0.026 | +0.326 [+0.25, +0.40] (45 papers, 39/2, Holm p 0.0) |
 | o1 | 270 | 0.5 | 0.063 | +0.437 [+0.35, +0.53] (45 papers, 38/0, Holm p 0.0) |
 
 ## Q4: measurement v2 (anchored, evidence-blind)
 
 - gpt56: incomplete (4 of 216 controls, 3 of 135 re-test items), so not evaluated; its numbers below are not interpretable
-- deepseek: validated False; checks {"C1_auc_ge_0.90": true, "C2_positive_ge_3_and_random_le_1": true, "C3_swaps_hit_their_dimension": true, "C4_generic_2_below_positive": true, "C5_monotonic_partial_credit": true, "C6_retest_rho_ge_0.80": false}; intervention by lever label {"0": 0.131, "1": 0.248, "2": 0.764, "3": 1.589}; retest {"runs": 135, "rho": 0.751, "mean_abs_diff": 0.137}; controls means {"positive": 4.0, "hard_negative": 0.104, "random_negative": 0.0, "intervention_swap": 1.729, "mechanism_swap": 3.021, "generic": 0.09}, AUC 1.0
+- deepseek: validated False; checks {"C1_auc_ge_0.90": true, "C2_positive_ge_3_and_random_le_1": true, "C3_swaps_hit_their_dimension": true, "C4_generic_2_below_positive": true, "C5_monotonic_partial_credit": true, "C6_retest_rho_ge_0.80": false}; intervention by lever label {"0": 0.129, "1": 0.244, "2": 0.764, "3": 1.589}; retest {"runs": 135, "rho": 0.751, "mean_abs_diff": 0.137}; controls means {"positive": 4.0, "hard_negative": 0.104, "random_negative": 0.0, "intervention_swap": 1.729, "mechanism_swap": 3.021, "generic": 0.09}, AUC 1.0
 
 | configuration | v1 GPT-5.6 | v2 GPT-5.6 (incomplete) | v1 DeepSeek | v2 DeepSeek |
 |---|---:|---:|---:|---:|
-| writer_v2_b_o3mini | 0.591 | 0.6 | 0.506 | 0.331 |
+| writer_v2_b_o3mini | 0.592 | 0.6 | 0.506 | 0.331 |
 | web64k_r2_b_o3mini | 0.644 | 0.583 | 0.609 | 0.381 |
 | web64k_v2_b_o3mini | 0.619 | 0.45 | 0.552 | 0.357 |
 | writer_only_b_o3mini | 0.646 | 0.893 | 0.575 | 0.37 |
@@ -79,13 +79,23 @@ Rank agreement v1 vs v2: {"gpt": "GPT-5.6 v2 incomplete", "deep": {"configuratio
 
 | configuration | runs | lever ≥ 2 | intervention | conditions | mechanism | outcome | unsupported | invented numbers | citations filtered | calls | input chars |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| writer_v2_b_o3mini | 270 | 0.094 | 0.252 | 0.522 | 0.689 | 0.9 | 0.763 | 0.1 | 4 | 1.0 | 2690.844 |
+| writer_v2_b_o3mini | 270 | 0.08 | 0.256 | 0.522 | 0.689 | 0.9 | 0.763 | 0.1 | 4 | 1.0 | 2690.844 |
 | web64k_r2_b_o3mini | 270 | 0.125 | 0.296 | 0.637 | 0.733 | 0.911 | 0.478 | 0.57 | 56 | 1.0 | 72320.281 |
 | web64k_v2_b_o3mini | 270 | 0.128 | 0.252 | 0.585 | 0.711 | 0.93 | 0.504 | 0.356 | 41 | 1.0 | 73192.281 |
 | writer_only_b_o3mini | 270 | 0.189 | 0.315 | 0.578 | 0.748 | 0.852 | 0.726 | 0.47 | 0 | 1.03 | 1899.959 |
 | web_text_64k_b_o3mini | 270 | 0.207 | 0.319 | 0.67 | 0.696 | 0.859 | 0.47 | 0.496 | 0 | 1.256 | 94561.144 |
 
-Pack density: {"R2 (retrieval v2, 64,000 characters)": {"units": 107, "lever_passage_share": 0.169, "pack_contains_lever": 0.925}, "Q64 (question order, 64,000 characters)": {"units": 135, "lever_passage_share": 0.155, "pack_contains_lever": 0.933}}
+## Target-free audits (GPT-5.6; grounding and internal quality, never the target)
+
+| configuration | audited | complete chain | claims supported | contradictions per run | mechanism from evidence | falsifiability | composition quantified | process parameters | outcome quantified |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| writer_v2_b_o3mini | 270 | 0.848 | 0.0 | 0.189 | 0.0 | 0.895 | 0.274 | 0.111 | 0.074 |
+| web64k_r2_b_o3mini | 270 | 0.711 | 0.372 | 0.33 | 0.207 | 0.903 | 0.393 | 0.485 | 0.348 |
+| web64k_v2_b_o3mini | 270 | 0.707 | 0.375 | 0.389 | 0.196 | 0.888 | 0.356 | 0.278 | 0.159 |
+| writer_only_b_o3mini | 270 | 0.837 | 0.0 | 0.256 | 0.0 | 0.895 | 0.3 | 0.337 | 0.281 |
+| web_text_64k_b_o3mini | 270 | 0.693 | 0.4 | 0.422 | 0.178 | 0.89 | 0.441 | 0.444 | 0.33 |
+
+Pack density: {"R2 (retrieval v2, 64,000 characters)": {"units": 135, "lever_passage_share": 0.175, "pack_contains_lever": 0.933}, "Q64 (question order, 64,000 characters)": {"units": 135, "lever_passage_share": 0.155, "pack_contains_lever": 0.933}, "R2 minus Q64 (per paper)": {"papers": 45, "a_mean": 0.175, "b_mean": 0.155, "diff": 0.02, "ci95": [-0.001, 0.041], "up": 29, "down": 16, "p": 0.0725}}
 
 Citation slips (repaired by filtering) and the v1 difference against web_text_64k by filter status: {"web64k_r2_b_o3mini": {"removed_ids": {"pack record, section suffix rewritten": 62, "pack paper, record not in pack": 27, "paper not in pack": 1}, "difference_vs_web_text_64k": {"gpt56": {"valid": {"runs": 214, "mean": 0.002}, "filtered, citations left": {"runs": 34, "mean": 0.066}, "filtered, none left": {"runs": 22, "mean": -0.023}}, "deepseek": {"valid": {"runs": 214, "mean": -0.062}, "filtered, citations left": {"runs": 34, "mean": 0.0}, "filtered, none left": {"runs": 22, "mean": 0.034}}}}, "web64k_v2_b_o3mini": {"removed_ids": {"pack record, section suffix rewritten": 32, "pack paper, record not in pack": 21}, "difference_vs_web_text_64k": {"gpt56": {"valid": {"runs": 229, "mean": -0.026}, "filtered, citations left": {"runs": 27, "mean": -0.037}, "filtered, none left": {"runs": 14, "mean": 0.179}}, "deepseek": {"valid": {"runs": 229, "mean": -0.107}, "filtered, citations left": {"runs": 27, "mean": -0.12}, "filtered, none left": {"runs": 14, "mean": -0.018}}}}}
 

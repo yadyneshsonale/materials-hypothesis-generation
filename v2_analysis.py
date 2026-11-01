@@ -85,7 +85,7 @@ def rejudge_stage(workers: int) -> dict[str, Any]:
 
     def job(j: tuple[dict[str, Any], Path]) -> None:
         if not j[1].exists():
-            atomic_json(j[1], judge_absolute(j[0], cases[j[0]["paper_id"]]))
+            H.write_once(j[1], judge_absolute(j[0], cases[j[0]["paper_id"]]))
 
     return D._parallel(jobs, job, workers, "rejudge")
 
@@ -157,7 +157,7 @@ def judge2_stage(judge: str, workers: int) -> dict[str, Any]:
     def job(j: tuple[Path, str, dict[str, Any], dict[str, Any]]) -> None:
         path, query, target, generation = j
         if not path.exists():
-            atomic_json(path, {"item": path.stem, **J2.judge(judge, query, target, generation)})
+            H.write_once(path, {"item": path.stem, **J2.judge(judge, query, target, generation)})
 
     return D._parallel(jobs, job, workers, f"judge2-{judge}")
 
@@ -222,10 +222,10 @@ def packlabels_stage(workers: int) -> dict[str, Any]:
         records = [evidence.web(rid) for rid in run["seen_ids"]]
         items = [{"id": n + 1, "text": rec.text[:1600]} for n, rec in enumerate(records) if rec is not None]
         labels = D.label_items(cases[run["paper_id"]], items)
-        atomic_json(V2 / "pack_labels" / "R2" / f"{run['paper_id']}__{run['query_level']}.json",
-                    {"pack": "R2", "paper_id": run["paper_id"], "level": run["query_level"],
-                     "items": [{"record_id": run["seen_ids"][i["id"] - 1], "lever_match": labels.get(i["id"])}
-                               for i in items]})
+        H.write_once(V2 / "pack_labels" / "R2" / f"{run['paper_id']}__{run['query_level']}.json",
+                     {"pack": "R2", "paper_id": run["paper_id"], "level": run["query_level"],
+                      "items": [{"record_id": run["seen_ids"][i["id"] - 1], "lever_match": labels.get(i["id"])}
+                                for i in items]})
 
     return D._parallel(jobs, job, workers, "packlabels")
 
@@ -257,8 +257,8 @@ def pairwise_stage(workers: int, judges: tuple[str, ...]) -> dict[str, Any]:
         winner = str(raw.get("winner", "tie")).strip().upper()
         winner = winner if winner in ("A", "B", "TIE") else "TIE"
         side = "B" if order == "baseline_first" else "A"
-        atomic_json(path, {"judge": judge, "order": order, "winner": winner, "new_won": winner == side,
-                           "baseline_won": winner not in (side, "TIE"), "reason": str(raw.get("reason", ""))[:600]})
+        H.write_once(path, {"judge": judge, "order": order, "winner": winner, "new_won": winner == side,
+                            "baseline_won": winner not in (side, "TIE"), "reason": str(raw.get("reason", ""))[:600]})
 
     return D._parallel(jobs, job, workers, "pairwise")
 
@@ -318,6 +318,29 @@ def diagnostics(method: str) -> dict[str, Any]:
             "llm_calls": W.A_mean([r["llm_calls"] for r in runs]), "chars_in": W.A_mean([r["chars_in"] for r in runs])}
 
 
+def audit_summary(method: str) -> dict[str, Any]:
+    """Target-free GPT-5.6 audits (stage_metrics.AUDIT_SYSTEM): grounding and internal quality, never the target."""
+    root = root_of(method)
+    audits = [_read_json(p) for r in runs_of(method)
+              if (p := root / method / "audit" / f"{r['run_id']}.json").exists()]
+    claims = [c for a in audits for c in a.get("claims", []) if c.get("needs_support", True)]
+    return {
+        "audited": len(audits),
+        "complete_chain": D.share([all(v == 2 for v in a.get("chain", {}).values()) and bool(a.get("chain"))
+                                   for a in audits]),
+        "claims_needing_support": len(claims),
+        "claims_supported": D.share([c.get("support") in ("entailed", "partial") for c in claims]),
+        "contradictions_per_run": W.A_mean([float(len(a.get("contradictions", []))) for a in audits]),
+        "mechanism_from_evidence": D.share([a.get("mechanism_source") in ("same_system_evidence",
+                                                                         "transferred_with_justification")
+                                            for a in audits]),
+        "falsifiability": W.A_mean([statistics.fmean(1.0 if v else 0.0 for v in a["falsifiability"].values())
+                                    for a in audits if a.get("falsifiability")]),
+        "specificity": {k: D.share([bool(a.get("specificity", {}).get(k)) for a in audits])
+                        for k in ("composition_quantified", "process_parameters", "outcome_quantified")},
+    }
+
+
 def citation_slips() -> dict[str, Any]:
     """Citation slips of the evidence configurations (repaired by filtering) and the paired v1 score difference
     against web_text_64k_b_o3mini by filter status: does the repair explain the result?"""
@@ -347,17 +370,27 @@ def citation_slips() -> dict[str, Any]:
 
 
 def pack_density() -> dict[str, Any]:
-    out = {}
-    for name, folder in (("R2 (retrieval v2, 64,000 characters)", V2 / "pack_labels" / "R2"),
-                         ("Q64 (question order, 64,000 characters)", E / "loop_diag" / "pack_labels" / "Q64")):
+    """Share of each 64,000-character pack's passages carrying the paper's lever (target-aware analysis only), and
+    the paired, paper-clustered difference retrieval v2 minus question order."""
+    out: dict[str, Any] = {}
+    per_paper: dict[str, dict[str, float]] = {}
+    for key, name, folder in (("R2", "R2 (retrieval v2, 64,000 characters)", V2 / "pack_labels" / "R2"),
+                              ("Q64", "Q64 (question order, 64,000 characters)",
+                               E / "loop_diag" / "pack_labels" / "Q64")):
         dens, contains = [], []
+        by_paper: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
         for path in sorted(folder.glob("*.json")):
             values = [i["lever_match"] for i in _read_json(path)["items"] if i["lever_match"] is not None]
             if values:
-                dens.append(statistics.fmean(v >= 2 for v in values))
+                share = statistics.fmean(v >= 2 for v in values)
+                dens.append(share)
                 contains.append(any(v >= 2 for v in values))
+                paper, level = path.stem.split("__")[:2]
+                by_paper[paper][level].append(share)
+        per_paper[key] = A.per_paper(by_paper)
         out[name] = {"units": len(dens), "lever_passage_share": round(statistics.fmean(dens), 3) if dens else None,
                      "pack_contains_lever": D.share(contains)}
+    out["R2 minus Q64 (per paper)"] = A.paired(per_paper["R2"], per_paper["Q64"])
     return out
 
 
@@ -420,6 +453,7 @@ def report() -> dict[str, Any]:
         "Q4_Q1_v2": family(q1, v2_scores), "Q4_Q2_v2": family(q2, v2_scores),
         "diagnostics": {m: diagnostics(m) for m in LM.V2_CONFIGS + BASELINES},
         "pack_density": pack_density(), "citation_slips": citation_slips(), "leakage": leakage(),
+        "audits": {m: audit_summary(m) for m in LM.V2_CONFIGS + BASELINES},
         "completeness": completeness(),
         "same_session_baselines": {m: {"same_session_gpt": v1_means[m]["gpt"],
                                        "original_gpt": W.A_mean(list(W.per_paper(root_of(m), m, "gpt").values()))}
@@ -494,6 +528,17 @@ def render(r: dict[str, Any]) -> str:
                  f"{dg['condition_agreement']} | {dg['mechanism_agreement']} | {dg['outcome_agreement']} | "
                  f"{d['unsupported_gpt']} | {d['invented_numbers']} | {d['citation_filtered']} | {d['llm_calls']} | "
                  f"{d['chars_in']} |")
+    audit_head = "## Target-free audits (GPT-5.6; grounding and internal quality, never the target)"
+    if min(a["audited"] for a in r["audits"].values()) < c["planned"]["runs_per_configuration"]:
+        audit_head += " (incomplete: see the audited column)"
+    L += ["", audit_head, "", "| configuration | audited | complete chain | claims supported | contradictions per run | "
+          "mechanism from evidence | falsifiability | composition quantified | process parameters | "
+          "outcome quantified |", "|---|" + "---:|" * 9]
+    for m, a in r["audits"].items():
+        s = a["specificity"]
+        L.append(f"| {m} | {a['audited']} | {a['complete_chain']} | {a['claims_supported']} | "
+                 f"{a['contradictions_per_run']} | {a['mechanism_from_evidence']} | {a['falsifiability']} | "
+                 f"{s['composition_quantified']} | {s['process_parameters']} | {s['outcome_quantified']} |")
     L += ["", f"Pack density: {json.dumps(r['pack_density'])}", "",
           f"Citation slips (repaired by filtering) and the v1 difference against web_text_64k by filter status: "
           f"{json.dumps(r['citation_slips'])}", "",

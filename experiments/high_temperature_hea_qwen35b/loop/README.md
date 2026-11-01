@@ -261,5 +261,7 @@
   - The last version takes `<instance> <tag> <stage>[:rev]...`, so that two runners can work on the same stage from
     opposite ends.
   - `run_v2_late.sh` and `run_v2_extra.sh` were the paused helpers of the first evaluation.
+  - The secondary GPT-5.6 stages (lever labels, pairwise, measurement v2) were stopped on 2026-11-01.
+    [../loop_v2/README.md](../loop_v2/README.md) gives the commands to resume them.
 - **Result.** No stage change raises the score, and the writing block lowers it. Quality without the answer key is
   again higher with evidence. The recommended generator stays `web_text_64k_b_o3mini`.

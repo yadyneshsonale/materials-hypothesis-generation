@@ -721,12 +721,15 @@ section 22).
 | Change | GPT-5.6 [CI] | DeepSeek |
 |---|---|---|
 | Both changes vs the writer (primary) | −0.027 [−0.08, +0.02] | −0.023 |
-| Writing block (lock the question's facts, no invented numbers) | −0.056 [−0.11, −0.01] | −0.069 |
+| Writing block (lock the question's facts, no invented numbers) | −0.055 [−0.11, −0.01] | −0.069 |
 | Retrieval v2, against the 64,000-character writer | +0.016 [−0.02, +0.06] | −0.046 |
 
 - **The writing block cut invented numbers** from 47% to 10%, **but lowered intervention agreement**. It lowers the
   score by the pre-registered rule, though not Holm-significantly.
-- **Retrieval v2 barely changes the evidence** at 64,000 characters (lever density 15.5% → 16.9%).
+  - Dropping numbers is not the cause: the loss is as large in units where neither version stated a number.
+  - The audits show less specific hypotheses (process parameters 11% vs 34%), no better built.
+- **Retrieval v2 slightly densifies the evidence, but the score does not move.** Lever density at 64,000 characters
+  goes from 15.5% to 17.5% (+2.0 points [−0.1, +4.1]).
 - **Quality without the answer key.** Hypotheses with evidence are again strongly preferred (DeepSeek +0.33, o1
   +0.44), as the 64,000-character writer already was.
 - **Measurement v2 (DeepSeek).** It passes the controls and gives monotonic partial credit, but fails re-test
@@ -797,7 +800,7 @@ section 22).
   - a question-type router.
 - **Changes from six stage reviews** (experiment 42):
   - retrieval ranking without the question template's words;
-  - a writing block that locks the question's facts and bans invented numbers. It lowers the score: −0.056 on
+  - a writing block that locks the question's facts and bans invented numbers. It lowers the score: −0.055 on
     GPT-5.6, −0.069 on DeepSeek.
 
 ## 7. Integrity: the rules and the problems they caught
@@ -832,7 +835,8 @@ section 22).
 | Experiment 39 | GPT-5.6 scored the same runs +0.04 higher when judging them again three to four days later | Same-session re-judging of baselines; new rule must_obey.md 6.10. All experiment-39 conclusions hold against same-session baselines |
 | Experiment 41 | The offline selection test merged the two samples of a question and mixed judging days (found by experiment 42's selection review) | Recomputed per sample: the conclusion is unchanged (loop.md 22.2 correction) |
 | Experiment 42 | About 38 parallel GPT-5.6 workers, each waiting on its own, retried rate limits until TRAPI blocked the identity for excessive retries | Client gate on `Retry-After` shared by all threads, paced starts, stop on 403, workload IDs; at most 6 workers per model (must_obey.md 7) |
-| Experiment 42 | An early look at partial GPT-5.6 data (pending jobs not random) was too favourable to the writing block (−0.006 vs −0.056 final) | Results written only after `must_obey_check.py` passed on complete primary data |
+| Experiment 42 | An early look at partial GPT-5.6 data (pending jobs not random) was too favourable to the writing block (−0.006 vs −0.055 final) | Results written only after `must_obey_check.py` passed on complete primary data |
+| Experiment 42 | Two evaluation loops meeting from opposite ends judged one run at the same time; the second judgment replaced the first (1 of 810; −0.056 became −0.055) | Evaluation outputs written first-wins (`hypo_loop.write_once`, tested with concurrent writers); the change is reported in loop.md 23.2 |
 
 ## 8. Limitations and open questions
 

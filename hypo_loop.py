@@ -436,6 +436,22 @@ def _pending(methods: list[str] | None, rel: str) -> list[tuple[Any, ...]]:
     return [(r,) for r in runs]
 
 
+def write_once(path: Path, payload: Any) -> bool:
+    """Write an evaluation output unless it already exists; False when another loop wrote it first. `_once` skips a
+    job whose output exists when the job starts, but two loops on one stage (MATHG_PENDING_REVERSE, _SHUFFLE) can
+    still run the same job at the same time; the first output then stays (experiment 42, loop.md 23.2)."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_name(f"{path.name}.{os.getpid()}.{random.getrandbits(48):x}.tmp")
+    temporary.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
+    try:
+        os.link(temporary, path)  # atomic, and fails if the path exists
+        return True
+    except FileExistsError:
+        return False
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 def _once(rel: str, fn: Callable[[dict[str, Any]], None]) -> Callable[[dict[str, Any]], None]:
     """Skips a job whose output was written after the job list was made (by an earlier pass or another process)."""
     def job(run: dict[str, Any]) -> None:
@@ -448,8 +464,8 @@ def judge_stage(workers: int, methods: list[str] | None = None) -> dict[str, int
     all_cases = cases()
 
     def job(run: dict[str, Any]) -> None:
-        atomic_json(OUT / run["method"] / "judgments" / "gpt56" / f"{run['run_id']}.json",
-                    {**judge_absolute(run, all_cases[run["paper_id"]]), "trapi_instance": trapi_instance()})
+        write_once(OUT / run["method"] / "judgments" / "gpt56" / f"{run['run_id']}.json",
+                   {**judge_absolute(run, all_cases[run["paper_id"]]), "trapi_instance": trapi_instance()})
 
     return _parallel(_pending(methods, "judgments/gpt56"), _once("judgments/gpt56", job), workers)
 
@@ -465,10 +481,10 @@ def cross_judge_stage(workers: int, methods: list[str] | None = None) -> dict[st
                                  max_tokens=8000, token_field=CROSS_JUDGE["token_field"],
                                  temperature=CROSS_JUDGE["temperature"], retries=6)
         score = _validate_score(raw)
-        atomic_json(OUT / run["method"] / "judgments" / "deepseek" / f"{run['run_id']}.json",
-                    {"run_id": run["run_id"], "judge": f"trapi:{CROSS_JUDGE['deployment']}", "scores": score["scores"],
-                     "classification": score.get("classification", ""),
-                     "trapi_instance": trapi_instance(CROSS_JUDGE["deployment"])})
+        write_once(OUT / run["method"] / "judgments" / "deepseek" / f"{run['run_id']}.json",
+                   {"run_id": run["run_id"], "judge": f"trapi:{CROSS_JUDGE['deployment']}", "scores": score["scores"],
+                    "classification": score.get("classification", ""),
+                    "trapi_instance": trapi_instance(CROSS_JUDGE["deployment"])})
 
     return _parallel(_pending(methods, "judgments/deepseek"), _once("judgments/deepseek", job), workers)
 
@@ -481,9 +497,9 @@ def audit_stage(workers: int, methods: list[str] | None = None) -> dict[str, int
         if "hidden_target" in json.dumps(payload):
             raise TargetLeak("audit payload contains the target")
         raw = lc.judge_chat_json(AUDIT_SYSTEM, json.dumps(payload, ensure_ascii=False), max_tokens=16000)
-        atomic_json(OUT / run["method"] / "audit" / f"{run['run_id']}.json",
-                    {"run_id": run["run_id"], "auditor": lc.judge_info(), **_validated_audit(raw),
-                     "trapi_instance": trapi_instance()})
+        write_once(OUT / run["method"] / "audit" / f"{run['run_id']}.json",
+                   {"run_id": run["run_id"], "auditor": lc.judge_info(), **_validated_audit(raw),
+                    "trapi_instance": trapi_instance()})
 
     return _parallel(_pending(methods, "audit"), _once("audit", job), workers)
 
@@ -507,11 +523,11 @@ def label_stage(workers: int, methods: list[str] | None = None) -> dict[str, int
             lever = max(0, min(3, int(item.get("lever_match", 0))))
         except (TypeError, ValueError):
             lever = 0
-        atomic_json(OUT / run["method"] / "labels" / f"{run['run_id']}.json",
-                    {"run_id": run["run_id"], "labeller": lc.judge_info(), "lever_match": lever,
-                     "intervention_class": str(item.get("intervention_class", "other")),
-                     "target_type": raw.get("target_type") if isinstance(raw, dict) else None,
-                     "trapi_instance": trapi_instance()})
+        write_once(OUT / run["method"] / "labels" / f"{run['run_id']}.json",
+                   {"run_id": run["run_id"], "labeller": lc.judge_info(), "lever_match": lever,
+                    "intervention_class": str(item.get("intervention_class", "other")),
+                    "target_type": raw.get("target_type") if isinstance(raw, dict) else None,
+                    "trapi_instance": trapi_instance()})
 
     return _parallel(_pending(methods, "labels"), _once("labels", job), workers)
 

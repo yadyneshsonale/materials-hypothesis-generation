@@ -13,6 +13,12 @@
 - `run_v2.sh` generated and started the evaluation.
 - After the TRAPI block (loop.md 23.1 notes), `run_v2_resume*.sh` resumed it with the paced client. The last
   version, `run_v2_resume5.sh`, runs one runner per instance with at most 6 GPT-5.6 workers in total.
+- The secondary GPT-5.6 stages were stopped on 2026-11-01 at 08:20, with the counts in loop.md 23.2. To resume
+  them, from the repository root:
+  - `experiments/high_temperature_hea_qwen35b/loop/run_v2_resume5.sh redmond/interactive a pairwise judge2`
+  - `experiments/high_temperature_hea_qwen35b/loop/run_v2_resume5.sh redmond/interactive b label`
+
+  Then run `python v2_analysis.py report`.
 
 **Report.** `analysis_v2.md` and `analysis_v2.json`, regenerated with `python v2_analysis.py report`. The report
 starts with a completeness section.
@@ -52,17 +58,22 @@ the baselines judged again in the same session.
 |---|---|---|---|
 | Both changes (`web64k_v2`) vs writer (primary) | −0.027 [−0.08, +0.02] | −0.023 [−0.13, +0.08] | no detectable difference |
 | Both changes vs the 64,000-character writer | −0.009 [−0.05, +0.03] | −0.104 [−0.20, −0.02] | no detectable difference |
-| Writing block: `writer_v2` vs writer | −0.056 [−0.11, −0.01] | −0.069 [−0.13, −0.01] | lowers the score (not Holm-significant) |
+| Writing block: `writer_v2` vs writer | −0.055 [−0.11, −0.01] | −0.069 [−0.13, −0.01] | lowers the score (not Holm-significant) |
 | Retrieval v2: `web64k_r2` vs the 64,000-character writer | +0.016 [−0.02, +0.06] | −0.046 [−0.12, +0.02] | no detectable difference |
 | Writing block with evidence: `web64k_v2` vs `web64k_r2` | −0.025 [−0.07, +0.02] | −0.057 [−0.14, +0.02] | no detectable difference |
 
 - **The writing block.**
   - It cut invented numbers from 47% to 10% of hypotheses.
   - But DeepSeek's agreement fell on every dimension, most of all the intervention (−0.11).
-  - Two explanations were checked and rejected: it did not suppress processing routes, and it did not remove hedged
-    interventions.
-- **Retrieval v2.** It raised the share of passages carrying the paper's lever only from 15.5% to 16.9% at 64,000
-  characters.
+  - Three explanations were checked and rejected:
+    - it did not suppress processing routes;
+    - it did not remove hedged interventions;
+    - dropping numbers is not the cause: the loss is as large in units where neither version stated a number.
+  - The audits show hypotheses that are less specific, but no better built. Process parameters appear in 11% of
+    hypotheses (34% for the writer), and a quantified outcome in 7% (28%); the causal chain and falsifiability are
+    unchanged.
+- **Retrieval v2.** It raised the share of passages carrying the paper's lever from 15.5% to 17.5% at 64,000
+  characters (+2.0 points [−0.1, +4.1]), as offline. The score did not move.
 - **Citation slips.** Most dropped citations were the right passage, with its section label rewritten by the model.
   Filtered runs did not score consistently lower.
 - **Quality without the answer key.** `web64k_v2` is strongly preferred to the closed-book writer: DeepSeek +0.33
@@ -71,11 +82,11 @@ the baselines judged again in the same session.
 - **Measurement v2.**
   - DeepSeek passes the controls and gives monotonic partial credit, but fails re-test (ρ 0.75 < 0.80): not
     validated.
-  - GPT-5.6 could not be evaluated (capacity limits).
+  - GPT-5.6 could not be evaluated (capacity limits; stopped with 67 of 2,781 items).
   - Under DeepSeek v2 the writer's lead over the Llama-3.3 baseline nearly disappears (0.37 vs 0.35). The expert
     ratings should settle this.
 - **Leakage: none detected.** All counters are zero, and 25,036 web-record reads were re-checked against each
-  paper's date. The audits were still running when this was written (loop.md 23.2).
+  paper's date. The target-free audits are complete (810 of 810).
 - **Recommended generator unchanged:** `web_text_64k_b_o3mini`.
 
 ## Checklist (must_obey.md section 9)
@@ -84,6 +95,8 @@ the baselines judged again in the same session.
 - [x] Frozen questions; prompts fixed before the runs (loop.md 23.1).
 - [x] Date-filtered evidence, re-checked; target-free payloads; pairwise judgments in both orders.
 - [x] Spent papers only (exploratory); same budgets as the baselines.
-- [x] GPT-5.6 and DeepSeek judgments on every run; same-session baselines; target-free quality reported.
-- [ ] Lever labels and audits on every run: still running when this was written (loop.md 23.1 finalisation rule).
-- [x] Paired statistics with CIs and Holm; negative results recorded; `must_obey_check.py` passes.
+- [x] GPT-5.6 and DeepSeek judgments and the target-free audit on every run; same-session baselines; target-free
+  quality reported.
+- [ ] Lever labels on every run (a diagnostic): 299 of 810 when the secondary stages were stopped.
+- [x] Paired statistics with CIs and Holm; negative results recorded; `must_obey_check.py` passes (warnings: the two
+  known Llama-3.3 margin papers).
