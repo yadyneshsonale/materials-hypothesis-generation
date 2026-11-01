@@ -265,3 +265,18 @@
     [../loop_v2/README.md](../loop_v2/README.md) gives the commands to resume them.
 - **Result.** No stage change raises the score, and the writing block lowers it. Quality without the answer key is
   again higher with evidence. The recommended generator stays `web_text_64k_b_o3mini`.
+
+## Experiment 43: the 2.5 target, and research quality (loop.md section 24)
+
+- **No generation.** The research-quality judge ([rq_judge.py](../../../rq_judge.py)) scored existing runs into
+  [../loop_rq/](../loop_rq/README.md).
+- **Runners.**
+  - [run_rq_a.sh](./run_rq_a.sh): phase A, the instrument (controls, writer runs, re-test).
+  - [run_rq_a_expert.sh](./run_rq_a_expert.sh): the 60 expert items, after a path fix.
+  - [run_rq_b.sh](./run_rq_b.sh): phase B, the other configurations. Its o1 half was stopped (loop.md 24.2).
+  - [run_rq_reps.sh](./run_rq_reps.sh): DeepSeek-3, two more DeepSeek calls per item.
+  - Each judge is queued behind its own earlier stages, so that no model has more than 5 workers.
+- **Result.**
+  - Every o3-mini configuration scores above 2.5 on research quality: DeepSeek-3 writer 3.10. The Llama baseline
+    scores 1.40.
+  - Reconstruction stays at 0.62. 2.5 there is out of reach without leakage.

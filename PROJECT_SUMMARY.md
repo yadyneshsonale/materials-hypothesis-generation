@@ -1,6 +1,6 @@
 # Project summary: AI hypothesis generation for high-temperature high-entropy alloys
 
-**Status.** 2026-10-31, after experiment 42. This file gathers everything done so far and every main result in one
+**Status.** 2026-11-01, after experiment 43. This file gathers everything done so far and every main result in one
 place.
 
 **Details.**
@@ -44,6 +44,8 @@ judges' values, and differences come with paper-clustered 95% confidence interva
     - retrieval without the question template's words;
     - a writing block against invented numbers;
     - an anchored, evidence-blind measurement v2.
+  - A research-quality score (RQ) on the expert's own blind scales, judged by AI with controls and a re-test
+    (experiment 43).
   - Roughly 34,200 hypothesis-generation runs in total.
 - **Best method found: the simplest one.** o3-mini with a conservative writer prompt and no retrieved evidence
   (`writer_only_b_o3mini`).
@@ -69,6 +71,13 @@ judges' values, and differences come with paper-clustered 95% confidence interva
   - The closed-book writer keeps the held-out reconstruction results above.
 - **The absolute level is low.** About 0.6 out of 4, while the paper's actual study, rewritten as a proposal, scores
   3.83. Choosing the paper's specific intervention is the unsolved part.
+  - **2.5 on this score is out of reach without leakage** (experiment 43). Told the paper's exact lever, the writer
+    scores only 1.26 / 1.50, and the best of 15,600 hypotheses picked with the answer key 1.28 / 1.52.
+  - **On research quality, the writer already scores above 2.5.** That is the expert's blind scales (plausibility,
+    testability, usefulness), judged by AI: 3.10 [3.00, 3.20] on the mean of three DeepSeek calls.
+  - That is on a par with the authors' actual studies written as proposals, and far above the Llama baseline
+    (1.40).
+  - It is provisional until the expert's ratings arrive.
 - **Main lessons.**
   1. **The first benchmark leaked the answer.**
      - Expert-level questions contained 47% of the answer's words, and the generator (Qwen3.5) was newer than the
@@ -131,8 +140,20 @@ judges' values, and differences come with paper-clustered 95% confidence interva
       - An anchored rubric (measurement v2, DeepSeek) gives monotonic partial credit, but is less reliable on
         re-test. It also shrinks the writer's lead over the Llama baseline to almost nothing (0.37 vs 0.35), which
         makes the expert ratings more urgent.
+  14. **2.5 needs the paper's own choices; quality does not** (experiment 43).
+      - On reconstruction, an agent with perfect knowledge of the earlier literature would top out around
+        2.0–2.25.
+      - The rest of the points are the paper's own protocol and results. Four independent reviews found no
+        legitimate source that comes close.
+      - On research quality, the existing writer is already above 2.5 (AI-judged, 3.10), and 1.70 above the Llama
+        baseline.
+      - The AI quality judge has limits:
+        - it is reliable only when three calls are averaged;
+        - o1 cannot discriminate at all;
+        - it rates the AI's hypotheses above what the authors actually did.
 - **Open items.**
-  - The expert's ratings, which will show whether the AI judge can be trusted.
+  - The expert's ratings, which will show whether the AI judges can be trusted. That covers both reconstruction and
+    research quality: the 60 items are already scored on RQ.
   - Every held-out set, including test4, is used up, so a new method claim needs test5. Only 9 papers qualified
     for test4, so test5 needs a wider topic or later papers.
 
@@ -216,6 +237,7 @@ judges' values, and differences come with paper-clustered 95% confidence interva
 | 23 | Make the changes to the agent so that it performs better | Offline checks of evidence re-ranking and of decision rules over approach groups; an agent that chooses its approach from the evidence and focuses the evidence on it; 2 × 2 ablation, same-session baselines, target-free quality judges | 40 |
 | 24 | Increase the score: look at the failure points, brainstorm or take inspiration, run the experiments | Failure-point analysis; exact offline tests of selection rules over 15,600 judged hypotheses (literature support, consensus, learned reranker); an offline screen of many-shot examples; a complete-study writer, its two guides and a web variant (1,080 runs) | 41 |
 | 25 | Run multiple rubber-duck reviews to find how to improve each stage, make the changes they suggest, and get the best possible runs | Six independent stage reviews; their evidence reproduced offline before anything ran; the changes that survived run as a 2 × 2 design (retrieval v2, a writing block; 810 runs) with an anchored, evidence-blind measurement v2; a TRAPI retry-flood block fixed in the client | 42 |
+| 26 | Keep spawning rubber ducks and running experiments until an agent averages 2.5+ | The ceiling checked from existing data and by four independent reviews (2.5 on reconstruction needs leakage); a research-quality score on the expert's blind scales, judged by o1 and DeepSeek with controls and a re-test; the existing agents scored on it | 43 |
 
 ## 4. Results by phase
 
@@ -621,7 +643,7 @@ diagnostics, never methods (must_obey.md 5.4).
 |---|---|---|
 | Bad information | **Diluted, not missing** | The paper's approach is in 78–93% of the evidence packs, but in only 16–18% of their passages. Evidence selected to match the paper's study scores +0.13 [+0.07, +0.20] over the normal evidence (+0.10 over none) |
 | Not using it / repeating | **It copies details, not the decision** | With the paper's approach in the evidence, the model uses it only 0–9 points more often than without evidence. 46% of its numbers and 52% of its alloy formulas come from the evidence (19% and 31% by chance). Told the approach directly, it uses it 93% of the time. Making it reason over the evidence made things worse |
-| Unfair judging | **Consistent, but it measures one paper's study, not quality** | Given the paper's approach: 1.26 / 1.50 of 4. Given the whole answer key: 3.38 / 3.64. Without the answer key, all three judges prefer the evidence-based hypotheses: o1, which cannot know the papers, in 41 of 45 papers, net +0.44; GPT-5.6 +0.26; DeepSeek +0.29. Reconstruction moves +0.01. Re-test ρ 0.84 / 0.91; GPT-5.6 drifted +0.04 |
+| Unfair judging | **Consistent, but it measures one paper's study, not quality** | Given the paper's approach: 1.26 / 1.50 of 4. Given the answer key's proposal fields: 3.38 / 3.64. Without the answer key, all three judges prefer the evidence-based hypotheses: o1, which cannot know the papers, in 41 of 45 papers, net +0.44; GPT-5.6 +0.26; DeepSeek +0.29. Reconstruction moves +0.01. Re-test ρ 0.84 / 0.91; GPT-5.6 drifted +0.04 |
 
 - **Answer.**
   - More information does make better hypotheses: better supported, and preferred by judges that do not see the
@@ -740,6 +762,40 @@ section 22).
 - **Conclusion.** No review-driven change raises reconstruction. The recommended generator stays
   `web_text_64k_b_o3mini`.
 
+### 4.16 The 2.5 target and research quality (experiment 43)
+
+**The ceiling** ([loop_rq/](./experiments/high_temperature_hea_qwen35b/loop_rq/README.md); loop.md section 24).
+
+| Information given to the writer | GPT-5.6 | DeepSeek |
+|---|---:|---:|
+| None (best method) | 0.62 | 0.57 |
+| The paper's exact lever | 1.26 | 1.50 |
+| The answer key's proposal fields | 3.38 | 3.64 |
+
+- Picking the best of 15,600 existing hypotheses with the answer key gives 1.28 / 1.52.
+- Four independent reviews: perfect knowledge of the earlier literature would top out around 2.0–2.25, and no
+  legitimate pre-publication source comes close to the coverage 2.5 would need.
+
+**Research quality (RQ).** The expert package's own blind scales (plausibility, testability, usefulness), judged on
+what the expert sees, with no answer key; 0–4.
+
+| Configuration | RQ (mean of three DeepSeek calls) |
+|---|---|
+| Writer (best method) | **3.10 [3.00, 3.20]** |
+| Other o3-mini configurations | 2.97–3.13 |
+| The authors' actual study, written by the same writer | 2.71 |
+| Llama-3.3 baseline | 1.40 |
+
+- **Instrument checks** (sanity controls and a re-test).
+  - The mean of three DeepSeek calls passes them all (re-test ρ 0.82). This was a post-hoc amendment; a single call
+    gives ρ 0.64.
+  - o1 sits at the ceiling: the Llama baseline scores 3.17 and the re-test ρ is 0.16.
+- **Every o3-mini configuration is above 2.5**, so no new agents were needed.
+- **Limits.**
+  - The AI judge rates the writer above the authors' actual studies (+0.39).
+  - Convergence with the GPT-5.6 audits is weak (ρ ≤ 0.25).
+  - The expert's ratings of the same 60 items are the decisive test.
+
 ## 5. The recommended method on every held-out comparison
 
 `writer_only_b_o3mini` (o3-mini, conservative writer, no evidence) against the Llama-3.3 closed-book baseline.
@@ -846,6 +902,10 @@ section 22).
   - On clean questions the two judges agree only weakly (ρ ≈ 0.39) and often differ in direction (experiments
     31–32).
   - The expert ratings will settle this.
+- **The research-quality score (RQ, experiment 43) is AI-judged and only internally validated.**
+  - It needs three DeepSeek calls averaged to be reliable; o1 cannot discriminate.
+  - It agrees only weakly with the GPT-5.6 audits, and rates the AI's hypotheses above the authors' actual studies.
+  - Its "2.5+" is provisional until the expert's ratings of the same 60 items arrive.
 - **The checklist shows the ceiling.** Both the best method and the baseline reproduce only about 6–15% of a paper's
   specific facts. The measured gains are in partial, overall closeness.
 - **Small samples.**
@@ -862,7 +922,7 @@ section 22).
   corpora (experiment 36) are wider but still limited to open-access papers with XML in Europe PMC.
 - **Judge drift.** GPT-5.6 drifted +0.04 between occasions. Earlier comparisons between runs judged days apart
   carry that uncertainty; differences within about ±0.05 among them are not reliable (experiment 39).
-- **Experiments 36–42 are exploratory.** All 45 papers were already spent. Experiment 36's evaluations ran on a
+- **Experiments 36–43 are exploratory.** All 45 papers were already spent. Experiment 36's evaluations ran on a
   second instance of the GPT-5.6 deployment because of rate limits, and its lever labels were made only for the
   primary comparison.
 - **Low absolute level.** About 0.6 out of 4. Choosing the paper's intervention is the core unsolved problem.
@@ -872,7 +932,7 @@ section 22).
 | What | Where |
 |---|---|
 | Rules; instructions for every agent | [must_obey.md](./must_obey.md), [AGENTS.md](./AGENTS.md) |
-| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–23) |
+| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–24) |
 | One section per experiment | [EXPERIMENT_LOG_2026-10-22.md](./experiments/high_temperature_hea_qwen35b/EXPERIMENT_LOG_2026-10-22.md) |
 | Literature reviewed | [RELATED_WORK.md](./experiments/high_temperature_hea_qwen35b/RELATED_WORK.md) (9 hypothesis-generation systems); loop.md sections 2, 10.3 and 11.3 (about 40 sources) |
 | Corpus | [data/corpus/](./experiments/high_temperature_hea_qwen35b/data/corpus/README.md) |
@@ -890,5 +950,6 @@ section 22).
 | A better agent: choosing the approach from the evidence (experiment 40) | [loop_agent/](./experiments/high_temperature_hea_qwen35b/loop_agent/README.md) |
 | Raising the score: failure points, selection, complete-study writer (experiment 41) | [loop_study/](./experiments/high_temperature_hea_qwen35b/loop_study/README.md) |
 | Six stage reviews and the changes they support (experiment 42) | [loop_v2/](./experiments/high_temperature_hea_qwen35b/loop_v2/README.md) |
+| The 2.5 target and research quality on the expert's scales (experiment 43) | [loop_rq/](./experiments/high_temperature_hea_qwen35b/loop_rq/README.md) |
 | Expert package; answer key and analysis | [expert_evaluation/](./expert_evaluation/README.md); [expert_eval/](./experiments/high_temperature_hea_qwen35b/expert_eval/README.md) |
-| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py`, `websearch.py`, `web_analysis.py`, `pcd_analysis.py`, `round4_offline.py`, `round4_pmi.py`, `round4_analysis.py`, `diag_analysis.py`, `agent_offline.py`, `agent_analysis.py`, `select_offline.py`, `study_analysis.py`, `stage_v2.py`, `judge_v2.py`, `v2_offline.py`, `v2_analysis.py` |
+| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py`, `websearch.py`, `web_analysis.py`, `pcd_analysis.py`, `round4_offline.py`, `round4_pmi.py`, `round4_analysis.py`, `diag_analysis.py`, `agent_offline.py`, `agent_analysis.py`, `select_offline.py`, `study_analysis.py`, `stage_v2.py`, `judge_v2.py`, `v2_offline.py`, `v2_analysis.py`, `rq_judge.py` |

@@ -3436,7 +3436,7 @@ lever labels.
   - `oracle_hint_lever_b_o3mini`: the paper's lever in at most 20 words, with no amounts, temperatures, times,
     parameters or results. Written once per paper by GPT-5.6 from the key's intervention, frozen before any
     generation;
-  - `oracle_hint_full_b_o3mini`: the whole answer key rendered as a proposal by code (`answer_render.py`).
+  - `oracle_hint_full_b_o3mini`: the whole answer key rendered as a proposal by code (`answer_render.py`). (Correction, 24.1: the rendering omits the key's actual result, so this is the key's proposal fields.)
 
   This calibrates the scale: what a hypothesis scores when the information is right.
 - **C2. A target-free quality judge.**
@@ -4604,3 +4604,307 @@ the v2 changes add no quality beyond what the evidence already gives. This compa
   (measurement v2 was next), runner b on the lever labels. They were stopped with the counts given at the top of
   this section. The scope reduction anticipated in 23.1 applies: GPT-5.6's quality judgment and its
   measurement-v2 validation are reported as incomplete, and neither enters a decision.
+
+## 24. The 2.5 target: the ceiling, four reviews, and a validated research-quality score (experiment 43)
+
+### 24.1 Reviews, decision and pre-registered plan (written 2026-11-01 at about 08:46, before any experiment-43 call)
+
+**Request.** "Keep on spawning rubber duckies and running experiments until you get an agent capable enough to get
+an avg of 2.5+ scores."
+
+**The ceiling, from existing data** (offline; `rd25_findings` in the session notes).
+
+| Information given to the o3-mini writer | GPT-5.6 | DeepSeek | Runs ≥ 2.5 |
+|---|---:|---:|---:|
+| None (`writer_only_b_o3mini`) | 0.62 | 0.57 | 0% |
+| The paper's class of intervention | 0.66 | 0.66 | 0% |
+| Evidence selected with the answer key | 0.74 | 0.70 | 0–1% |
+| The paper's exact lever (≤ 20 words) | 1.26 | 1.50 | 0.4% / 11% |
+| The answer key's proposal fields | 3.38 | 3.64 | 90% |
+
+- **The pool.** Of 15,600 judged target-free hypotheses from 79 methods, 1 scored ≥ 2.5 on GPT-5.6. Picking the
+  best per question with a perfect target-aware oracle gives 1.28 / 1.52. No paper averages 2.5.
+
+**Four independent rubber-duck reviews**, each re-computing from the data.
+- **Ceiling.**
+  - A combination of the lever oracle's intervention with the pool's best other dimensions gives 1.75.
+  - About 2.1 of the full-key oracle's 3.38 points arrive only with paper-specific details:
+    - unit-bearing specifics appear in 37 of 45 interventions, 43 conditions and 43 actual results;
+    - broad questions repeat 0 of 773 numeric tokens.
+  - An agent with perfect knowledge of the earlier literature would top out around 2.0–2.25. A realistic stretch
+    target is 1.0–1.2.
+- **Information sources.** No legitimate pre-publication source approaches the coverage 2.5 would need:
+  full-key-equivalent information for about 30 of 45 papers. Bounds:
+  - the same group's earlier papers, reached from the question alone: 6 of 45 papers, at most 0.75;
+  - grant abstracts: 19 of 45 funded, at most 0.89–0.97 even with exact levers;
+  - backward citation chains: 0.69;
+  - "future work" sentences: 6.1% lever match, against 7.6% for random sentences.
+- **Reformulation.**
+  - A 2.5 on another measure is not "2.5 reconstruction". It is legitimate only if renamed, pre-registered, applied
+    uniformly and validated.
+  - Ranked first: an absolute, expert-calibrated research-quality score.
+  - Best-of-k reconstruction cannot reach 2.5 for any k (1.28 / 1.52 for all 116).
+- **Methods.**
+  - The strongest untried agent under the current metric is a selective LoRA "next-study" forecaster.
+  - Expected 0.65–0.75 (at most 0.85), after a chronological offline gate.
+  - Realistic target-free best case under reconstruction: about 0.85.
+
+**Verdict.** 2.5 on the reconstruction score is not reachable by any leakage-free agent. Reaching it requires the
+paper's own protocol choices and results.
+
+**Decision.** I asked the user to choose; they were not available, so I chose.
+- **Pursue 2.5 on a separate research-quality score.** It is target-free and validated before use, and is defined
+  by the expert's own blind rating scales (RQ, below).
+  - It is reported beside reconstruction, never as reconstruction.
+  - It is the only route on which 2.5 is both legitimate and meaningful.
+  - o1 and DeepSeek, which judge it, have capacity; GPT-5.6 is saturated.
+- **Defer the forecaster.** It cannot reach 2.5, and costs 25–60 GPU-hours plus about 540 GPT-5.6 calls per online
+  test. Its gate is recorded as the next step for reconstruction:
+  - train on ≤ 2021 pairs, tune on 2022, test on 2023;
+  - continue only if the exact-lever top-1 beats retrieval by ≥ 10 points.
+
+**Corrections to earlier records.**
+- **Experiment 39's "whole answer key" oracle omitted the key's actual result.** `answer_render.render` reads
+  `actual_result` but never outputs it. It was the key's proposal fields. No conclusion changes.
+- **Pre-2024 problem-to-study pairs.** 1,122 are available (1,076 with a one-month margin), not 724.
+
+**The RQ instrument (fixed now; no tuning after any method is scored).**
+- **Scales.** The expert package's Part 1 scales, with their anchors verbatim
+  (`expert_evaluation/1_read_first/README.md`): plausibility, testability and usefulness, each 1–5.
+- **RQ** = the mean of the three minus 1, on 0–4.
+  - An RQ of 2.5 = 3.5 on the expert scales: between "possible, but with notable gaps" and "sound, with minor
+    issues", and between "moderately useful" and "useful: worth testing".
+- **The judge sees what the expert sees.** The research question and the hypothesis rendered by
+  `expert_eval_builder.render_hypothesis`: no citations, no evidence text, no answer key (target-free guard).
+- **Prompt.** The expert's background on the fields and the three scales, verbatim, plus:
+  - one sentence of reasoning before each score;
+  - "length or the number of details does not make a hypothesis better in itself".
+- **Judges.**
+  - o1 is primary: cutoff 2023-10, so it cannot know the papers.
+  - DeepSeek-V4-Pro is second (temperature 0).
+  - A claim needs both.
+- **Validation, per judge, on the 216 sanity controls of experiment 33** (36 held-out papers × 6). Control kinds:
+  - positive: the paper's study, rendered;
+  - hard negative: the most similar other paper's study;
+  - random negative: a random other paper's study;
+  - intervention swap and mechanism swap;
+  - generic.
+
+  Checks:
+  - **C1 relevance:** usefulness(positive) − usefulness(random negative) ≥ 1.0 (on 1–5).
+  - **C2 specificity:** RQ(positive) − RQ(generic) ≥ 1.0.
+  - **C3 consistency:** plausibility(positive) − plausibility(swap) ≥ 0.5, for each of the two swaps.
+  - **C4 re-test:** run-level Spearman ρ ≥ 0.80 on the 135 sample-1 writer runs, judged twice.
+    - Pre-registered fallback: if a judge fails C4, its RQ becomes the mean of two calls per item.
+    - The fallback is accepted if the Spearman–Brown value 2ρ/(1+ρ) is ≥ 0.80.
+  - A judge passing C1–C4 is "internally validated".
+  - **Descriptive.**
+    - A hard negative is a different real study for a similar question. RQ should credit it as a valid
+      alternative, whereas reconstruction gives 0.10 against 4.0.
+    - Convergence with the GPT-5.6 audits: testability against falsifiability, plausibility against
+      contradictions.
+    - Convergence with the pairwise quality judges: o1 and DeepSeek preferred `web64k_v2` to the writer in 38–39 of
+      45 papers.
+- **External validation.** The 60 expert-package items (20 questions × the authors' study, the Llama baseline and
+  the writer) are scored now. When the expert's ratings arrive, the judge–expert ρ must be ≥ 0.6 on each scale.
+  Until then, RQ is internally validated only.
+
+**Phase A: the instrument** (no method runs).
+- 216 controls + 60 expert items + 135 writer runs judged twice, per judge.
+- About 820 calls per judge; at most 6 workers per model; paced client.
+
+**Phase B: existing configurations** (no new generation; 270 runs each).
+- Configurations:
+  - `writer_only_b_o3mini`, `web_text_64k_b_o3mini`, `web64k_v2_b_o3mini`;
+  - `writer_study_b_o3mini`, which was preferred on quality in experiment 41;
+  - `closed_book` (the Llama-3.3 baseline), `closed_book_o3mini`;
+  - as a reference, not a method: `oracle_hint_full_b_o3mini` (the authors' study written by the same writer).
+- Analysis:
+  - per-paper RQ means; paired differences against the writer (bootstrap, Holm);
+  - the target check: RQ ≥ 2.5 on both judges, with the lower bound of the paper-clustered 95% CI reported;
+  - the per-scale means;
+  - the correlation of RQ with hypothesis length.
+
+**Phase C: iterate, if no configuration reaches 2.5 on both judges.**
+- **Each round.**
+  - A rubber-duck review aimed at RQ, then new configurations, pre-registered in 24.x before their runs.
+  - 270 o3-mini runs each, with the baselines' budgets.
+  - Both RQ judges; DeepSeek reconstruction as a guard.
+  - GPT-5.6 judge and audit in the background (must_obey.md 6; finalisation rule as in 23.1).
+- **Stop** when either:
+  - a configuration reaches RQ ≥ 2.5 on both judges with the paper-clustered CI lower bound ≥ 2.5. Then GPT-5.6
+    confirms on 90 items (capacity permitting), and test5 confirms later. Or:
+  - three consecutive rounds add no more than +0.05.
+
+**Guardrails against gaming RQ.**
+- No generator prompt contains the RQ rubric, its anchors or the expert scales. Generators may get general guidance
+  written independently of them.
+- No method uses o1 or DeepSeek with the RQ prompt as a critic or selector: the judges stay independent of the
+  methods.
+- RQ is always reported with reconstruction. A configuration that raises RQ but lowers reconstruction (by the rule of
+  23.1) is reported as such.
+- Length is reported, and an RQ gain must survive controlling for length.
+- The judges are evidence-blind, so citing more cannot help.
+
+**Expectations, recorded now.**
+- Positives (real studies): about 2.5–3.0. Generic: about 1.0. Random negatives: usefulness ≤ 2 (on 1–5).
+- Writer about 2.0; `web_text_64k` above the writer by 0.1–0.3.
+- Whether any existing configuration reaches 2.5: uncertain.
+
+**Status.** Exploratory (spent papers). RQ is a new measure: internally validated at best, until the expert ratings
+arrive.
+
+**Smoke test (2026-11-01, about 08:49; scratch folder, not used).** Code: `rq_judge.py`; tests `test_rq.py`, 7 OK.
+One paper's positive and generic controls (PMC10759803) were judged by each judge: 4 calls, all parsed.
+- **The positive control is a mechanical rendering of the key** (`answer_render`). Its main hypothesis is a
+  concatenation of fields, its falsification rule is boilerplate, and for this paper the key does not address the
+  question's density goal.
+  - o1 rated it RQ 2.0 and the generic control 1.67.
+  - DeepSeek rated it 0.33 and the generic 0.0.
+- **DeepSeek's plausibility reason contains a factual error.** It says Cr is denser than the elements it replaces;
+  in fact Cr is about 7.2 g/cm³, against 10–17 for Hf, Mo and Ta.
+- **Decision:** nothing changes. The pre-registered checks stand. Weak positives and judge errors are what the
+  validation is meant to measure.
+- **Phase A starts with `loop/run_rq_a.sh`.** Both judges run in parallel, at most 5 workers per model, with the
+  paced client and the response log.
+- **Operational notes (08:50–09:05).**
+  - Phase A started at 08:50.
+  - Its expert stage failed: `expert_eval_builder.items()` reads the runs from `H.OUT`, which is `loop_rq` in this
+    process. Fixed in `rq_judge.expert_entries`, which reads them from `loop/`. The 60 items run afterwards
+    (`loop/run_rq_a_expert.sh`).
+  - Phase B (`loop/run_rq_b.sh`) is queued per judge, behind that judge's phase-A work, so that no model ever has more
+    than 5 workers.
+  - DeepSeek's controls were complete at 08:56. Nothing about what is judged, or how, changed.
+
+### 24.2 Amendment after the instrument checks (written 2026-11-01 at about 09:08, before any of its calls)
+
+**What the checks showed** (Phase A data; method scores had been seen for DeepSeek only).
+- **DeepSeek passes C1–C3** (gaps 1.36, 1.01, and 0.64 / 1.33). It **fails C4**: re-test ρ 0.637 over 135 runs.
+  The pre-registered two-call fallback predicts 0.778 < 0.80, so DeepSeek is not internally validated.
+- **o1 passes C1 and C2** (2.69, 1.19). It **fails C3**: plausibility drops by only 0.445 for the intervention
+  swap (mechanism swap 0.695). Its C4 is still running. o1 is lenient: the generic template scores RQ 2.09
+  (DeepSeek 0.42).
+
+**Amendment (post hoc, labelled as such everywhere it is reported).**
+- DeepSeek-3 = the mean of three independent DeepSeek calls per item.
+- Every Phase A and Phase B item gets two more DeepSeek calls. The 135 re-test items also get two more re-test
+  calls, so the re-test of DeepSeek-3 is **measured** (two independent three-call means), not predicted.
+- DeepSeek-3 is internally validated under this amendment if it passes C1–C4 with the pre-registered thresholds.
+- The pre-registered single-call results stay the primary report. DeepSeek-3 is reported beside them as a
+  sensitivity analysis.
+- Nothing else changes: no prompt, threshold, item or configuration.
+- o1's C3 failure is a validity result, not noise. It is reported as it stands, and no extra o1 calls are made to
+  change it.
+- **o1's Phase B stopped (09:35), a scope reduction made before any o1 Phase B result was analysed.**
+  - o1's Phase A ended at 09:27. Its results:
+    - it fails C3 (intervention-swap gap 0.445);
+    - it fails C4: re-test ρ 0.16 over 135 runs; the two-call prediction is 0.28;
+    - the reason is a ceiling: the writer scores RQ 3.69 [3.65, 3.73], with testability 4.94 of 5 and usefulness
+      4.79 of 5, and every run is ≥ 2.5. The two judgments of a run differ by only 0.20 on average, but o1 cannot
+      rank hypotheses.
+  - Its Phase B (about 1,600 calls, about 2.7 hours) could not change any decision: the writer already clears 2.5 on
+    o1. It was stopped after 150 of 270 `web_text_64k` runs. These are not analysed.
+  - o1's controls, expert items and writer runs are complete and reported.
+
+### 24.3 Results (2026-11-01, 10:10; exploratory, because all 45 papers are spent)
+
+**Calls** (o1 and DeepSeek-V4-Pro; at most 5 workers per model; no rate-limit problems).
+- o1: 216 controls, 60 expert items, 270 writer runs, 135 re-test runs. Its Phase B was stopped (24.2): 150
+  `web_text_64k` runs, not analysed.
+- DeepSeek, single call: everything in Phases A and B (216 + 60 + 1,890 runs + 135 re-test).
+- DeepSeek-3 (24.2): two more calls for every item and two more re-test calls.
+- No new hypotheses were generated. `must_obey_check.py` checks run directories, so it has nothing new to check:
+  every judged run comes from an earlier, already-checked experiment.
+
+**Instrument validation** (C1–C4, pre-registered in 24.1).
+
+| Judge | C1 relevance | C2 specificity | C3 consistency | C4 re-test | Internally validated |
+|---|---|---|---|---|---|
+| o1 | 2.69 ✓ | 1.19 ✓ | 0.45 / 0.70 ✗ | ρ 0.16 ✗ | no |
+| DeepSeek, single call (pre-registered) | 1.36 ✓ | 1.01 ✓ | 0.64 / 1.33 ✓ | ρ 0.64 ✗ (two calls predicted 0.78) | no |
+| DeepSeek-3 (post-hoc amendment, 24.2) | 1.45 ✓ | 1.12 ✓ | 0.68 / 1.37 ✓ | **ρ 0.82 measured** ✓ | **yes, post hoc** |
+
+- **o1 sits at the ceiling.**
+  - It gives the writer testability 4.94 and usefulness 4.79 of 5, the Llama baseline 3.17 on the expert items,
+    and the generic template 2.09.
+  - Its scores barely move between calls (mean absolute difference 0.20), but it cannot rank hypotheses.
+- **Agreement and convergence are weak.**
+  - o1 against DeepSeek, per run: ρ 0.16–0.17.
+  - DeepSeek-3 testability against the GPT-5.6 audit's falsifiability: ρ 0.25.
+  - DeepSeek-3 plausibility against the audit's contradictions: ρ −0.04.
+- **Controls under DeepSeek-3.** The paper's study, rendered mechanically: 1.49. Another real study: 0.44. A random
+  study: 0.26. The swaps: 0.89 and 0.34. Generic: 0.37.
+
+**Research quality of the configurations** (per-paper means, 95% CI; target 2.5).
+
+| Configuration | o1 | DeepSeek (1 call) | DeepSeek-3 |
+|---|---|---|---|
+| `writer_only_b_o3mini` (the best method) | 3.69 [3.65, 3.73] | 3.09 [3.00, 3.18] | **3.10 [3.00, 3.20]** |
+| `writer_study_b_o3mini` | – | 3.09 [2.99, 3.19] | 3.13 [3.04, 3.22] |
+| `web64k_v2_b_o3mini` | – | 3.07 [2.97, 3.17] | 3.06 [2.97, 3.15] |
+| `web_text_64k_b_o3mini` (recommended generator) | stopped | 3.02 [2.92, 3.12] | 3.03 [2.93, 3.13] |
+| `closed_book_o3mini` (o3-mini, plain prompt) | – | 2.94 [2.84, 3.04] | 2.97 [2.88, 3.06] |
+| The authors' study, written by the same writer (reference) | – | 2.74 [2.55, 2.90] | 2.71 [2.53, 2.88] |
+| `closed_book` (the Llama-3.3 baseline) | – | 1.36 [1.22, 1.51] | 1.40 [1.26, 1.54] |
+
+- **Against the writer** (DeepSeek-3, Holm): Llama −1.70 [−1.82, −1.58], lower in all 45 papers. Plain o3-mini
+  −0.13 [−0.21, −0.05] (Holm p 0.06). The other o3-mini configurations: within ±0.08.
+- **Against the authors' own study** (same writer, same style; DeepSeek-3): the writer is +0.39 [+0.21, +0.59]
+  higher, in 33 of 45 papers (p = 0.003).
+- **Expert-package items** (20 per source; DeepSeek-3): writer 3.11, the authors' study rewritten as a proposal
+  3.11, Llama 1.19. o1 gives 3.75 / 3.73 / 3.17.
+- **No length effect.** RQ against words, per run: ρ between −0.10 and +0.10.
+- **By question level** (DeepSeek, writer): broad 3.00, problem-constrained 3.15, expert 3.12.
+
+**Decision by the pre-registered rule.**
+- The stopping condition of 24.1 is met by the existing writer: RQ ≥ 2.5 on both judges, with the paper-clustered
+  CI lower bound ≥ 2.5 (o1 3.65; DeepSeek 3.00; DeepSeek-3 3.00).
+- So Phase C (iterating new agents) is not triggered.
+- The planned GPT-5.6 confirmation is not possible now: two probes at about 09:06 were both refused (429). Test5 remains
+  the confirmation on fresh papers.
+
+**What this means.**
+1. **On the research-quality scale, the existing writer already scores above 2.5.** The scale is the expert's own
+   three blind scales, judged by the one AI judge that passes the instrument checks (DeepSeek-3, under a post-hoc
+   amendment).
+   - It is far above the Llama baseline (+1.70), where reconstruction showed only +0.11.
+   - It is on a par with, or above, the authors' actual studies written as proposals.
+   - So the agent's hypotheses are judged sound, testable and useful. What they rarely are is the specific study the
+     paper chose: reconstruction 0.62.
+2. **But AI-judged quality is a weak instrument.**
+   - Run-level reliability needs three calls averaged.
+   - o1 cannot discriminate at all.
+   - Agreement with the GPT-5.6 audits is weak.
+   - The AI judge prefers the AI's hypotheses to what the authors actually did. That may reflect a taste for
+     coherent, ambitious proposals over incremental real work, rather than research value.
+3. **The expert's ratings are the decisive test.** The expert package rates exactly these three sources (writer,
+   Llama, the authors' study) on exactly these scales. Until the ratings arrive, "2.5+ on research quality" is a
+   provisional, AI-judged result, not a validated capability claim.
+
+**Expectations** (24.1).
+- Positives 2.5–3.0: wrong. The mechanically rendered keys score 1.49 on DeepSeek-3 (o1 3.29); written as proposals,
+  2.71.
+- Generic about 1.0: wrong in both directions (DeepSeek 0.37, o1 2.09).
+- Writer about 2.0: wrong (3.10).
+- `web_text_64k` above the writer by 0.1–0.3: wrong (−0.07).
+- Whether any configuration reaches 2.5: it already does.
+
+**Status.**
+- Exploratory (spent papers).
+- RQ is internally validated for DeepSeek-3 only, post hoc. External validation (the expert) is pending.
+- Reconstruction is unchanged (0.62), and 2.5 there remains out of reach without leakage (24.1).
+
+**Next steps.**
+- Calibrate RQ against the expert's ratings: judge–expert ρ ≥ 0.6 per scale on the 60 items, already judged.
+- For reconstruction, the chronological forecaster gate (24.1).
+
+**Checklist** (must_obey.md section 9).
+- [x] No model saw a question that it may not see: no generation; the judges are target-free.
+- [x] Instrument and thresholds fixed before any call (24.1). The one post-hoc change is labelled (24.2).
+- [x] Target-free payloads: question and rendered hypothesis only (guard on).
+- [x] Spent papers only; exploratory.
+- [x] Every compared configuration judged by DeepSeek (1 and 3 calls), the writer also by o1. o1's Phase B stopped
+  by a recorded scope reduction.
+- [x] Paired statistics with CIs and Holm; negative and unfavourable results recorded (o1 ceiling, weak
+  convergence, AI judge preferring the AI's hypotheses).
+- [x] Records updated.

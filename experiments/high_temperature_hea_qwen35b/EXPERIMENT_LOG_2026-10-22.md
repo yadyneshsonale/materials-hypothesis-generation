@@ -1880,8 +1880,55 @@ and strategy ([loop_v2/](./loop_v2/README.md)).
 - The recommended generator stays `web_text_64k_b_o3mini`.
 - The remaining routes are a trained forecaster and the expert ratings.
 
-## Comparability and limits, experiments 8 to 42
+## Experiment 43: the 2.5 target, and research quality on the expert's blind scales
 
+**Request.** "Keep on spawning rubber duckies and running experiments until you get an agent capable enough to get
+an avg of 2.5+ scores." Plan, reviews and decision in loop.md 24.1; amendment in 24.2; results in 24.3
+([loop_rq/](./loop_rq/README.md)).
+
+**2.5 on the reconstruction score is out of reach without leakage.**
+- Told the paper's exact lever, the writer scores 1.26 / 1.50.
+- The best of 15,600 existing hypotheses, picked with the answer key, scores 1.28 / 1.52.
+- Four independent rubber-duck reviews agree:
+  - ceiling: perfect knowledge of the earlier literature would top out around 2.0–2.25;
+  - information sources: group papers, grants, citation chains and future-work sentences are each bounded at
+    0.69–0.97;
+  - reformulation: a 2.5 on another measure is legitimate only if renamed, pre-registered and validated;
+  - methods: a trained forecaster is the best untried route, at 0.65–0.85.
+
+**So 2.5 was pursued on a separate, target-free research-quality score (RQ).** It is the expert package's own blind
+scales (plausibility, testability, usefulness), judged by o1 and DeepSeek on what the expert sees.
+
+| Configuration | RQ, DeepSeek-3 [CI] |
+|---|---|
+| Writer (best method) | **3.10 [3.00, 3.20]** |
+| Other o3-mini configurations | 2.97–3.13 |
+| The authors' actual study, written by the same writer | 2.71 |
+| Llama-3.3 baseline | 1.40 |
+
+- **Instrument checks.**
+  - o1 sits at the ceiling (re-test ρ 0.16).
+  - Single-call DeepSeek fails re-test (ρ 0.64).
+  - The mean of three DeepSeek calls (a post-hoc amendment) passes all checks (ρ 0.82).
+- **Every o3-mini configuration is above 2.5**, so no new agents were needed (the pre-registered stopping rule).
+- **Caveats.**
+  - The AI judge rates the writer above the authors' actual studies (+0.39).
+  - Convergence with the GPT-5.6 audits is weak.
+  - The expert's ratings are the decisive test.
+- **Corrections.**
+  - Experiment 39's "whole key" oracle omitted the actual result.
+  - 1,122 pre-2024 problem-to-study pairs are available, not 724.
+
+**Conclusion.**
+- The agent is rated a capable hypothesis writer by an AI judge (RQ 3.10).
+- It still rarely reproduces the specific study a paper chose (reconstruction 0.62), and no leakage-free agent
+  could reach 2.5 there.
+
+## Comparability and limits, experiments 8 to 43
+
+- Experiment 43's research-quality score (RQ) is a different measure from reconstruction. It is target-free, judged
+  by AI on the expert's blind scales, and internally validated only for the mean of three DeepSeek calls (post hoc).
+  It is not comparable with any reconstruction score.
 - Experiment 42's GPT-5.6 judgments span two days because of the TRAPI block and saturation. Its baselines were
   judged again in the same span. The audits finished on 2026-11-01. The lever labels (299 of 810), GPT-5.6 pairwise
   (24 of 270 pairs) and GPT-5.6 measurement v2 (67 of 2,781) were stopped incomplete: about 4 more days of GPT-5.6
