@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import os
 import random
 import unittest
 from typing import Any
@@ -237,6 +238,18 @@ class LoopTests(unittest.TestCase):
         reviews = RL.critique(h, cands, 1)
         self.assertEqual(set(reviews), set(RL.CRITICS))
         self.assertEqual(len({tuple(o) for o in seen_orders}) > 1, True)
+
+
+class ReportTests(unittest.TestCase):
+    def test_unknown_judge_name_is_rejected(self) -> None:
+        import rq_judge as RQ
+
+        with patch.dict(os.environ), patch.dict(RQ.ROOTS):
+            import rx_experiment as X
+
+            for fn in (X.recon_scores, X.judged_count):
+                with self.assertRaises(ValueError):
+                    fn("rx_r", "gpt56")
 
 
 if __name__ == "__main__":

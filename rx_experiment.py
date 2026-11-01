@@ -177,12 +177,20 @@ def packlabels_stage(workers: int) -> dict[str, int]:
 
 # ---------------------------------------------------------------- analysis
 
+def _check_judge(judge: str) -> None:
+    # web_analysis.load reads DeepSeek for any name other than "gpt", so a wrong name would silently swap judges.
+    if judge not in JUDGES:
+        raise ValueError(f"judge must be one of {JUDGES}, not {judge!r}")
+
+
 def recon_scores(method: str, judge: str) -> dict[str, float]:
+    _check_judge(judge)
     root = OUT if method in ARMS else RQ.root_of(method)
     return W.per_paper(root, method, judge)
 
 
 def judged_count(method: str, judge: str) -> int:
+    _check_judge(judge)
     root = OUT if method in ARMS else RQ.root_of(method)
     folder = "deepseek" if judge == "deep" else "gpt56"
     return len(list((root / method / "judgments" / folder).glob("*.json")))
