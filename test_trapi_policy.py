@@ -161,6 +161,56 @@ class PolicyTests(unittest.TestCase):
         self.assertIn("body", lines[0])
         self.assertNotIn("body", lines[1])
 
+    def test_deployment_slots_cap_concurrency(self) -> None:
+        import threading
+        import time as real_time
+        active, peak = [0], [0]
+        lock = threading.Lock()
+
+        def post(url, headers, json, timeout):
+            with lock:
+                active[0] += 1
+                peak[0] = max(peak[0], active[0])
+            real_time.sleep(0.05)
+            with lock:
+                active[0] -= 1
+            return Resp(200)
+
+        lc._SLOTS.clear()
+        with patch.object(lc.requests, "post", side_effect=post), patch.object(lc, "_trapi_token", return_value="t"), \
+                patch.dict(os.environ, {"MATHG_MAX_PER_DEPLOYMENT": "2"}):
+            threads = [threading.Thread(target=lc.trapi_chat_json, args=("dep", "s", "u"), kwargs={"max_tokens": 10})
+                       for _ in range(8)]
+            for t in threads:
+                t.start()
+            for t in threads:
+                t.join()
+        lc._SLOTS.clear()
+        self.assertEqual(peak[0], 2)
+
+    def test_instances_route_around_a_rate_limited_one(self) -> None:
+        a, b = "https://x/gcr/shared", "https://x/redmond/interactive"
+        urls = []
+
+        def post(url, headers, json, timeout):
+            urls.append(url)
+            return Resp(429, "busy", headers={"retry-after": "60"}) if url.startswith(a) else Resp(200)
+
+        with patch.object(lc.requests, "post", side_effect=post), patch.object(lc.time, "sleep", self.sleep), \
+                patch.object(lc.time, "monotonic", lambda: self.now), patch.object(lc, "_trapi_token", return_value="t"), \
+                patch.dict(os.environ, {"MATHG_TRAPI_INSTANCES": f"{a},{b}"}):
+            for _ in range(4):
+                self.assertEqual(lc.trapi_chat_json("dep", "s", "u", max_tokens=10), {"ok": True})
+        self.assertTrue(all(u.startswith(b) for u in urls[-3:]))  # once a is gated, every call goes to b
+        self.assertEqual(sum(u.startswith(a) for u in urls), 1)
+        self.assertEqual(self.sleeps, [])  # nothing waited: the open instance was used
+
+    def test_judge_keeps_its_endpoint(self) -> None:
+        with patch.dict(os.environ, {"MATHG_TRAPI_INSTANCES": "https://x/a,https://x/b",
+                                     "JUDGE_TRAPI_ENDPOINT": "https://x/judge"}):
+            self.assertEqual(lc.instances_for(lc.JUDGE_TRAPI_DEPLOYMENT), ["https://x/judge"])
+            self.assertEqual(lc.instances_for("gpt-4o_2024-11-20"), ["https://x/a", "https://x/b"])
+
     def test_workload_id_header(self) -> None:
         self.call([Resp(200)])
         self.assertEqual(self.headers[0]["X-TRAPI-Workload-ID"], lc.WORKLOAD_ID)

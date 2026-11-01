@@ -1,6 +1,6 @@
 # Project summary: AI hypothesis generation for high-temperature high-entropy alloys
 
-**Status.** 2026-11-01, after experiment 43. This file gathers everything done so far and every main result in one
+**Status.** 2026-11-01, after experiment 44 (interim). This file gathers everything done so far and every main result in one
 place.
 
 **Details.**
@@ -46,6 +46,8 @@ judges' values, and differences come with paper-clustered 95% confidence interva
     - an anchored, evidence-blind measurement v2.
   - A research-quality score (RQ) on the expert's own blind scales, judged by AI with controls and a re-test
     (experiment 43).
+  - Focused retrieval with relevance screening, a literature-map prompt, and a multi-critic refinement loop, in
+    seven individual and combined arms (experiment 44).
   - Roughly 34,200 hypothesis-generation runs in total.
 - **Best method found: the simplest one.** o3-mini with a conservative writer prompt and no retrieved evidence
   (`writer_only_b_o3mini`).
@@ -69,6 +71,10 @@ judges' values, and differences come with paper-clustered 95% confidence interva
     papers.
   - It also beats the evidence-choosing agent of experiment 40 on quality.
   - The closed-book writer keeps the held-out reconstruction results above.
+  - **Candidate replacement: the same writer with focused retrieval** (`rx_r`, experiment 44; interim, DeepSeek).
+    - It reaches the highest reconstruction of the seven arms (0.662 vs 0.630; +0.03, not detectable).
+    - Its hypotheses are preferred without the answer key in 26 of 45 papers (+0.16).
+    - It is pending GPT-5.6 confirmation.
 - **The absolute level is low.** About 0.6 out of 4, while the paper's actual study, rewritten as a proposal, scores
   3.83. Choosing the paper's specific intervention is the unsolved part.
   - **2.5 on this score is out of reach without leakage** (experiment 43). Told the paper's exact lever, the writer
@@ -151,6 +157,15 @@ judges' values, and differences come with paper-clustered 95% confidence interva
         - it is reliable only when three calls are averaged;
         - o1 cannot discriminate at all;
         - it rates the AI's hypotheses above what the authors actually did.
+  15. **Relevant evidence helps quality; critique loops hurt** (experiment 44, interim).
+      - Two-thirds of the old web corpora were off-topic: a relevance screener grades only 36% of their papers as
+        relevant.
+      - Focused retrieval (concept searches, relevance screening, passage grading) makes every pack relevant. Its
+        hypotheses are preferred without the answer key (+0.16), and reconstruction is +0.03.
+      - A literature map with a broad prompt does not help (−0.06).
+      - A multi-critic loop (four candidates, three critic models, critique-driven re-retrieval, revision) lowers
+        reconstruction (−0.15) and quality (−0.27). Candidates written together are thinner, critic selection among
+        them costs more than revision recovers, and the critics agree only weakly (ρ 0.29–0.43).
 - **Open items.**
   - The expert's ratings, which will show whether the AI judges can be trusted. That covers both reconstruction and
     research quality: the 60 items are already scored on RQ.
@@ -238,6 +253,7 @@ judges' values, and differences come with paper-clustered 95% confidence interva
 | 24 | Increase the score: look at the failure points, brainstorm or take inspiration, run the experiments | Failure-point analysis; exact offline tests of selection rules over 15,600 judged hypotheses (literature support, consensus, learned reranker); an offline screen of many-shot examples; a complete-study writer, its two guides and a web variant (1,080 runs) | 41 |
 | 25 | Run multiple rubber-duck reviews to find how to improve each stage, make the changes they suggest, and get the best possible runs | Six independent stage reviews; their evidence reproduced offline before anything ran; the changes that survived run as a 2 × 2 design (retrieval v2, a writing block; 810 runs) with an anchored, evidence-blind measurement v2; a TRAPI retry-flood block fixed in the client | 42 |
 | 26 | Keep spawning rubber ducks and running experiments until an agent averages 2.5+ | The ceiling checked from existing data and by four independent reviews (2.5 on reconstruction needs leakage); a research-quality score on the expert's blind scales, judged by o1 and DeepSeek with controls and a re-test; the existing agents scored on it | 43 |
+| 27 | Fix retrieval (quality, relevant papers), evidence use and narrowing prompts; add a loop of many hypotheses, multi-model critiques, critique-driven re-retrieval and revision until the critiques are fine; run combined and individual ablations | The retrieval failure measured; focused retrieval (concept searches, relevance screening, passage grading); a literature-map prompt; a three-critic refinement loop; seven arms (270 runs each) with DeepSeek, research-quality and pairwise evaluation, GPT-5.6 running | 44 |
 
 ## 4. Results by phase
 
@@ -796,6 +812,30 @@ what the expert sees, with no answer key; 0–4.
   - Convergence with the GPT-5.6 audits is weak (ρ ≤ 0.25).
   - The expert's ratings of the same 60 items are the decisive test.
 
+### 4.17 Retrieval quality, evidence use and a multi-critic refinement loop (experiment 44, interim)
+
+**The problem** ([loop_rx/](./experiments/high_temperature_hea_qwen35b/loop_rx/README.md); loop.md section 25).
+- The web corpora of experiment 36 search an OR of single words and rank by word overlap.
+- A gpt-4o relevance screener grades only 36% of their papers as relevant to the question; 21% are unrelated.
+
+**Seven arms** (o3-mini writer, 270 runs each, the same 64,000-character evidence ceiling; DeepSeek decides until
+GPT-5.6 completes).
+
+| Arm | Reconstruction | vs base | Pairwise quality vs base |
+|---|---:|---|---|
+| Base (incumbent web writer) | 0.630 | – | – |
+| **Focused retrieval** | **0.662** | +0.03 (not detectable) | **+0.16, 26/5 papers** |
+| Literature map + broad prompt | 0.569 | −0.06 | +0.07 |
+| Critique loop | 0.480 | **−0.15** | **−0.27, 5/38 papers** |
+| All three | 0.402 | **−0.23** | −0.04 |
+
+- **Focused retrieval makes every pack relevant.** 85% of its passages are graded fully relevant, and its hypotheses
+  are preferred. The paper's specific lever is still almost never in the earlier literature.
+- **The loop lowers both reconstruction and quality.**
+  - Four candidates written in one call are thinner (230–265 words against 346–381).
+  - Critic selection costs more than revision recovers.
+  - The three critic models agree only weakly with each other, and with the independent judge.
+
 ## 5. The recommended method on every held-out comparison
 
 `writer_only_b_o3mini` (o3-mini, conservative writer, no evidence) against the Llama-3.3 closed-book baseline.
@@ -822,6 +862,8 @@ what the expert sees, with no answer key; 0–4.
   not available in practice). Choosing the approach from the evidence does not reproduce it (experiment 40).
 - A stronger pre-cutoff model: o3-mini over Llama-3.3.
 - A conservative writer that does not invent numbers or unsupported specifics.
+- **Relevance-screened retrieval** (experiment 44, interim): every pack relevant. Hypotheses are preferred without the
+  answer key (+0.16); reconstruction is +0.03, not detectable.
 - In round 1, retrieval aimed at a forecast next step. It did not hold on test2, where the harness added nothing
   over the writer.
 
@@ -854,6 +896,9 @@ what the expert sees, with no answer key; 0–4.
   - stronger allowed generators (gpt-4o, gpt-4.1, o4-mini);
   - few-shot worked examples;
   - a question-type router.
+- **A literature map with a broad-reasoning prompt** (experiment 44, interim): −0.06.
+- **A multi-critic refinement loop** (experiment 44, interim): four candidates, critiques by o1, gpt-4o and Llama-3.3,
+  critique-driven re-retrieval and revision. Reconstruction −0.15 and pairwise quality −0.27 against the base writer.
 - **Changes from six stage reviews** (experiment 42):
   - retrieval ranking without the question template's words;
   - a writing block that locks the question's facts and bans invented numbers. It lowers the score: −0.055 on
@@ -893,6 +938,9 @@ what the expert sees, with no answer key; 0–4.
 | Experiment 42 | About 38 parallel GPT-5.6 workers, each waiting on its own, retried rate limits until TRAPI blocked the identity for excessive retries | Client gate on `Retry-After` shared by all threads, paced starts, stop on 403, workload IDs; at most 6 workers per model (must_obey.md 7) |
 | Experiment 42 | An early look at partial GPT-5.6 data (pending jobs not random) was too favourable to the writing block (−0.006 vs −0.055 final) | Results written only after `must_obey_check.py` passed on complete primary data |
 | Experiment 42 | Two evaluation loops meeting from opposite ends judged one run at the same time; the second judgment replaced the first (1 of 810; −0.056 became −0.055) | Evaluation outputs written first-wins (`hypo_loop.write_once`, tested with concurrent writers); the change is reported in loop.md 23.2 |
+| Experiment 44 | The experiment-36 web corpora were mostly off-topic: OR-of-words queries and word-overlap ranking; a relevance screener grades only 36% of their papers relevant | Focused retrieval with concept searches, relevance screening and passage grading (`focused_search.py`); must_obey.md 4.6/4.7 amended for pre-cutoff relevance grades and critique-derived searches |
+| Experiment 44 | Smoke tests: a planner's nested search format left the critique loop with no searches, and lenient critics ended every loop after the first round | Robust plan parsing with a fallback; every loop run revises at least once; both recorded before the plan was frozen |
+| Experiment 44 | Parallel builds cached the same paper record through one shared temporary file name, so one rename failed | `atomic_json` uses a temporary name unique per process and thread (tested with 8 concurrent writers) |
 
 ## 8. Limitations and open questions
 
@@ -922,7 +970,7 @@ what the expert sees, with no answer key; 0–4.
   corpora (experiment 36) are wider but still limited to open-access papers with XML in Europe PMC.
 - **Judge drift.** GPT-5.6 drifted +0.04 between occasions. Earlier comparisons between runs judged days apart
   carry that uncertainty; differences within about ±0.05 among them are not reliable (experiment 39).
-- **Experiments 36–43 are exploratory.** All 45 papers were already spent. Experiment 36's evaluations ran on a
+- **Experiments 36–44 are exploratory.** All 45 papers were already spent. Experiment 36's evaluations ran on a
   second instance of the GPT-5.6 deployment because of rate limits, and its lever labels were made only for the
   primary comparison.
 - **Low absolute level.** About 0.6 out of 4. Choosing the paper's intervention is the core unsolved problem.
@@ -932,7 +980,7 @@ what the expert sees, with no answer key; 0–4.
 | What | Where |
 |---|---|
 | Rules; instructions for every agent | [must_obey.md](./must_obey.md), [AGENTS.md](./AGENTS.md) |
-| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–24) |
+| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–25) |
 | One section per experiment | [EXPERIMENT_LOG_2026-10-22.md](./experiments/high_temperature_hea_qwen35b/EXPERIMENT_LOG_2026-10-22.md) |
 | Literature reviewed | [RELATED_WORK.md](./experiments/high_temperature_hea_qwen35b/RELATED_WORK.md) (9 hypothesis-generation systems); loop.md sections 2, 10.3 and 11.3 (about 40 sources) |
 | Corpus | [data/corpus/](./experiments/high_temperature_hea_qwen35b/data/corpus/README.md) |
@@ -951,5 +999,6 @@ what the expert sees, with no answer key; 0–4.
 | Raising the score: failure points, selection, complete-study writer (experiment 41) | [loop_study/](./experiments/high_temperature_hea_qwen35b/loop_study/README.md) |
 | Six stage reviews and the changes they support (experiment 42) | [loop_v2/](./experiments/high_temperature_hea_qwen35b/loop_v2/README.md) |
 | The 2.5 target and research quality on the expert's scales (experiment 43) | [loop_rq/](./experiments/high_temperature_hea_qwen35b/loop_rq/README.md) |
+| Retrieval quality, evidence use and a multi-critic loop (experiment 44) | [loop_rx/](./experiments/high_temperature_hea_qwen35b/loop_rx/README.md) |
 | Expert package; answer key and analysis | [expert_evaluation/](./expert_evaluation/README.md); [expert_eval/](./experiments/high_temperature_hea_qwen35b/expert_eval/README.md) |
-| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py`, `websearch.py`, `web_analysis.py`, `pcd_analysis.py`, `round4_offline.py`, `round4_pmi.py`, `round4_analysis.py`, `diag_analysis.py`, `agent_offline.py`, `agent_analysis.py`, `select_offline.py`, `study_analysis.py`, `stage_v2.py`, `judge_v2.py`, `v2_offline.py`, `v2_analysis.py`, `rq_judge.py` |
+| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py`, `websearch.py`, `web_analysis.py`, `pcd_analysis.py`, `round4_offline.py`, `round4_pmi.py`, `round4_analysis.py`, `diag_analysis.py`, `agent_offline.py`, `agent_analysis.py`, `select_offline.py`, `study_analysis.py`, `stage_v2.py`, `judge_v2.py`, `v2_offline.py`, `v2_analysis.py`, `rq_judge.py`, `focused_search.py`, `refine_loop.py`, `rx_experiment.py` |

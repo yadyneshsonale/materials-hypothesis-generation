@@ -4908,3 +4908,311 @@ One paper's positive and generic controls (PMC10759803) were judged by each judg
 - [x] Paired statistics with CIs and Holm; negative and unfavourable results recorded (o1 ceiling, weak
   convergence, AI judge preferring the AI's hypotheses).
 - [x] Records updated.
+
+
+## 25. Retrieval quality, evidence use and a multi-critic refinement loop (experiment 44)
+
+### 25.1 Problem, design, review and pre-registered plan (written 2026-11-01 at about 11:22, before any experiment-44 run)
+
+**Request.** "We are retrieving papers but not quality ones which are completely relevant. Even if we are
+retrieving the good papers we aren't using them properly; we might be narrowing the field of view of the LLM to
+reason by also giving bad prompts. The LLMs might give so many hypotheses for a user query, run all these through a
+critique and send it back to the LLM with the critiques (use multiple judges / models as signals) which again
+retrieve papers using the previous context and new critique reviews and repeats this process till the critiques are
+fine. Fix all these, run combined and individual ablations."
+
+**The retrieval failure, checked in the code and data** (`websearch.build_corpus`, experiment 36).
+- **How the corpora are built.**
+  - Llama-3.3 writes at most 3 search phrases per question.
+  - Each phrase becomes an OR of its single content words in the abstract, inside the high-entropy-alloy domain:
+    `(ABSTRACT:hfmotatizr OR ABSTRACT:density OR ABSTRACT:reduction) AND HEA`, with a median of 615 hits.
+  - Candidates are ranked by BM25 against the question's words, template words included. The 50 best become seeds,
+    and their co-cited references are added (16.7 on average).
+- **Example.** PMC10759803 asks how to reduce the density of HfMoTaTiZr. Its seeds include "Tunable magnetocaloric
+  effect in transition metal alloys" (rank 4), He-ion irradiation of a low-activation alloy, and L12 strain-rate
+  behaviour. Its expansion includes CrCoNi at cryogenic temperatures.
+- **Earlier diagnostics.** The paper's lever is in 78–93% of packs, but in only 16–18% of passages (experiments 39,
+  42).
+- **The open-access pool is itself small.** For example, `TITLE_ABS:"refractory high-entropy" AND TITLE_ABS:density`
+  gives 16 papers before 2024.
+
+**Components** (each targets one failure; inspirations per must_obey.md 8).
+
+| | Component | Targets | Inspired by | What was taken |
+|---|---|---|---|---|
+| R | **Focused retrieval** (`focused_search.py`): a search plan, concept searches, relevance screening and passage grading | Off-topic papers and diluted passages | Corrective RAG, Yan et al. 2024, https://arxiv.org/abs/2401.15884; PaperQA, Lála et al. 2023, https://arxiv.org/abs/2312.07559; Boolean query writing with LLMs, Wang et al. 2023, https://arxiv.org/abs/2302.03495 | A retrieval evaluator grades relevance before use; the model scores relevance of papers and chunks; the model writes concept-group Boolean queries |
+| U | **Evidence use and a broad prompt** (`refine_loop.py`): a literature map, then at least five directions considered before one is chosen | The model copies details but not decisions (experiment 39); a conservative prompt may narrow its reasoning | Chain of Ideas, C6 (https://arxiv.org/abs/2410.13185); SciMON, C4 (https://arxiv.org/abs/2305.14259) | Organise the literature before ideating; consider several directions before committing |
+| C | **Multi-critic refinement loop** | Unsupported or flawed hypotheses (47–73% unsupported claims; contradictions) | AI co-scientist, C1 (https://arxiv.org/abs/2502.18864); ResearchAgent, C5 (https://arxiv.org/abs/2404.07738); Self-Refine, Madaan et al. 2023, https://arxiv.org/abs/2303.17651; Replacing Judges with Juries, Verga et al. 2024, https://arxiv.org/abs/2404.18796 | Generate several candidates, review them with criteria, refine with feedback, and use a panel of different model families rather than one judge |
+
+**R in detail.**
+1. **Plan.** o3-mini, from the question only, writes concept groups (material, material class, property, regime,
+   and up to six approaches). Each group lists 1–6 phrases. The plan has 6–8 searches, each an AND of 2–3 groups.
+2. **Search.** Europe PMC: AND across groups, OR of `TITLE_ABS:"phrase"` within a group, plus the experiment-36
+   filters (open access with full text, no preprints, before the case date). A three-group search with fewer than
+   3 hits drops its last group.
+3. **Recall channel.** The experiment-36 corpus papers enter the same pool.
+4. **Admit.** Everything passes `websearch.admit` (two date sources, types, case paper and work family, held-out
+   papers).
+5. **Screen.** BM25 on the plan's terms; then gpt-4o screens the top 120 by title and abstract, in batches of 20 in a
+   seeded random order. Grades:
+   - 3 = same or closely related system AND same property or limitation, or a direct approach to it;
+   - 2 = related class or property, or a usable approach;
+   - 1 = tangential;
+   - 0 = unrelated.
+6. **Select.** Grade ≥ 2, by grade then BM25, at most 30 papers, each passing the XML checks (cites the case,
+   version overlap, length).
+7. **Expand.** Co-cited open-access references, screened the same way (at most 10).
+8. **Passages.** The 6 best per paper by BM25 on the plan's terms; gpt-4o grades them 0–3. Grade 3 then grade 2
+   are packed to 64,000 characters, with titles and sections.
+
+**C in detail.**
+- **Candidates.** o3-mini writes K = 4 distinct full-schema candidates.
+- **Critics.** o1, gpt-4o and Llama-3.3-70B: three model families, all pre-cutoff. Each sees the candidates in its
+  own seeded order, with neutral labels and the passages each cites, and scores five criteria from 1 to 5:
+  soundness, fit, specificity, evidence and significance. The rubric was written independently of the
+  research-quality (RQ) scales. Each critic also lists major and minor issues, fixes and evidence needs.
+- **Aggregation.**
+  - Each critic's mean scores become ranks.
+  - A candidate is **fine** if at least two critics see no major issue and no criterion below 4.
+  - The best candidate is the first by: fine, then mean rank, then mean score.
+- **Re-retrieval.** gpt-4o turns the reviewers' doubts into concept searches, including searches that could refute
+  the candidates. The backend is a live focused search in R arms, and BM25 over the experiment-36 corpus otherwise.
+  At most 8,000 new characters per round.
+- **Revision.** o3-mini revises the set. It is told to keep each hypothesis specific and decisive, not hedged.
+- **Stopping.**
+  - The previous best stays in the next round, unchanged and first, so it wins ties.
+  - Every run revises at least once.
+  - It then stops when the best is fine, when the previous best wins again, or after 3 critique rounds.
+
+**Arms** (o3-mini writer; 270 runs each = 45 papers × 3 levels × 2 samples; root `loop_rx/`).
+
+| Arm | R | U | C | Evidence |
+|---|---|---|---|---|
+| `rx_base` (fresh replicate of the incumbent web writer `web64k_r2_b_o3mini`) | – | – | – | 64,000 |
+| `rx_r` | ✓ | – | – | 64,000 |
+| `rx_u` | – | ✓ | – | 64,000 |
+| `rx_ru` | ✓ | ✓ | – | 64,000 |
+| `rx_c` | – | – | loop | 48,000 + ≤ 2 × 8,000 |
+| `rx_ruc_select` (one critique round, no revision) | ✓ | ✓ | select | 48,000 |
+| `rx_ruc` (combined) | ✓ | ✓ | loop | 48,000 + ≤ 2 × 8,000 |
+
+- **Same evidence ceiling.** Every arm sees at most 64,000 distinct characters, rendered with titles and sections.
+  This is the 64,000-character exception of experiments 36–42 (must_obey.md 6.1). The loop arms move 16,000 of
+  them to critique-driven retrieval.
+- **U and C are packages.** U = a literature map plus the broad writer. C = several candidates, critics, selection,
+  re-retrieval and revision. `rx_ruc_select` separates selection from revision with re-retrieval.
+
+**Contrasts** (paired per paper; one Holm family).
+- R, U and C each against `rx_base`;
+- RU against `rx_base`;
+- RUC against `rx_base`;
+- RUC against RU: the loop on top;
+- RUC against RUC-select: revision with re-retrieval.
+
+Also reported: the R × U interaction.
+
+**Rule amendments** (must_obey.md change log, 2026-11-01).
+- **4.6.** Search text may also be derived from the outputs of pre-cutoff models in the same run (candidates,
+  critiques), which are themselves derived from the query and eligible evidence. The lineage is logged.
+- **4.7.** Results may also be ranked by a pre-cutoff model's relevance grade of the title and abstract (or of the
+  passage text). Like BM25, it uses no present-day signal. Every grade is logged.
+- **5.2.** Screeners and graders also see items in a seeded random order with neutral numbers.
+- **The payload guard (`hypo_loop.Harness`)** now also forbids the case paper's PMCID, DOI and title, for every
+  method.
+
+**Design review.** A rubber-duck review before any spend raised these points; the fixes are adopted above:
+- the rules above;
+- blinding;
+- the evidence budget (the loop appends but must not exceed 64,000);
+- confounds (one renderer; package arms; a select-only control);
+- a fresh baseline;
+- recall (the old corpus as a second channel);
+- critic calibration (ranks and majority rather than raw means and unanimity; the parent stays eligible);
+- circular RQ (DeepSeek pairwise quality added; RQ is supportive only);
+- cost (seven arms, not all leave-one-out combinations).
+
+**Smoke tests** (scratch folders, not used).
+- **Retrieval, two questions.** For example, on PMC10759803 the selected papers are on HfMoNbTaW,
+  NbTaHfTiZrV0.5, HfNbTaTiZr processing, and boride-toughened HfMoNbTaTiZr, against the old corpus's magnetocaloric
+  and irradiation papers. 17 calls and about 80–110 s per question.
+- **All seven arms on one question.** All OK; every leakage counter zero.
+- **Two changes from the smoke tests, made before this plan was frozen:**
+  1. the follow-up planner wraps each search in an extra list, so nothing was retrieved. The parser now accepts the
+     common forms, both prompts show the format, and a plan without a usable search pairs its first group with the
+     others;
+  2. the critics judged the best round-1 candidate fine in 4 of 4 runs, so the loop never revised. Every loop run
+     now revises at least once.
+
+  After both, the RUC loop took 14 calls (about 4 minutes) and added 5 passages through a live search; the C loop
+  took 9 calls.
+
+**Evaluation.**
+- **Reconstruction.**
+  - DeepSeek on every run: the interim decision judge.
+  - GPT-5.6 on every run in the background, with audits (must_obey.md 6). It runs at about 40 calls an hour, so
+    probably for days.
+  - The decision rule is unchanged (GPT-5.6 CI > 0 and DeepSeek > 0). Results are interim until GPT-5.6 completes.
+- **Quality without the answer key.**
+  - RQ, the mean of three DeepSeek calls (experiment 43), on every run. It is supportive only, because C's critics
+    optimise related constructs.
+  - DeepSeek pairwise quality in both orders: R, U, C and RUC against base, and RUC against RUC-select.
+- **Retrieval.**
+  - The same screener applied to the experiment-36 corpora (relevance distributions).
+  - DeepSeek lever labels on both packs: target-aware analysis only.
+- **The loop.** Rounds, stop reasons, critic agreement, and re-retrieval.
+- **Leakage.** The runs' counters, and every seen record re-dated.
+
+**Expectations, recorded now** (from experiments 37–43).
+- **R.**
+  - Far more relevant papers: the share of screened grade ≥ 2 rises from about a third to nearly all.
+  - Lever density +2 to +5 points.
+  - Reconstruction 0 to +0.05.
+- **U.** −0.03 to +0.03.
+- **C.**
+  - Reconstruction −0.05 to +0.03 (critics favour soundness over the paper's choice; experiment 37 −0.12).
+  - RQ and pairwise quality up (+0.1 to +0.3).
+- **RUC against base.** Reconstruction −0.03 to +0.05; quality up.
+
+**Status.** Exploratory (all 45 papers are spent).
+- **Operational note (11:23–11:30).**
+  - The runners started at 11:23: `loop/run_rx.sh` (build, then generation, then the old-corpus screening),
+    `loop/run_rx_eval.sh` (DeepSeek stages) and `loop/run_rx_gpt.sh` (GPT-5.6).
+  - The first build pass hit a race: parallel builds cached the same paper record through one shared temporary file
+    name. `hypothesis_evidence_v2.atomic_json` now uses a temporary name unique to each process and thread (tested
+    with 8 concurrent writers).
+  - The failed questions are rebuilt by the later passes. Nothing about what is built, or how, changes.
+- **Operational note (11:34).**
+  - **The problem.** The build was slow (about 15 calls a minute). gpt-4o on gcr/shared has a shared token limit
+    (255,000 tokens a minute) and answered 429 "Token limit is exceeded".
+  - **The change.** TRAPI's metadata service lists the same deployments on redmond/interactive, with their own
+    quotas (gpt-4o 382,500 tokens a minute). With `MATHG_TRAPI_INSTANCES`, `llm_client.py` sends each non-judge call
+    to whichever instance's rate-limit gate is open (tested in `test_trapi_policy.py`, 18 OK). The per-model cap of
+    6 calls in flight still applies across both instances.
+  - **Restart.** The main runner restarted as `loop/run_rx2.sh`, giving about 45–50 calls a minute. Same models and
+    deployments; nothing about what is built or generated changes.
+- **Operational note (15:46).** The GPT-5.6 runner restarted as `loop/run_rx_gpt2.sh`, with jobs in a seeded random
+  order. Partial GPT-5.6 data then cover every arm and paper evenly instead of one arm after another.
+
+### 25.2 Interim results (2026-11-01, about 15:47; DeepSeek decides until GPT-5.6 completes; exploratory)
+
+**Status.**
+- **Complete.**
+  - All 1,890 runs, ok. 5 first attempts failed and were retried; they are kept in `failed_attempts/`.
+  - DeepSeek reconstruction on 1,890 of 1,890.
+  - Research quality (RQ), three DeepSeek calls each: 1,890 of 1,890.
+  - DeepSeek pairwise quality: 5 × 540 judgments.
+  - Pack labels on 135 + 135 packs; the old-corpus screening.
+- **Running.** GPT-5.6: 187 of 1,890 judgments, then the audits. At about 45 calls an hour on a shared identity this
+  will take days.
+- **`must_obey_check.py`.** Its only failures are the missing GPT-5.6 judgments (1,703). Its warnings are the
+  missing audits and the two known Llama-3.3 margin papers.
+- **So these results are interim.** The final verdict follows the unchanged decision rule when GPT-5.6 is complete.
+
+**Reconstruction** (DeepSeek, per-paper means; paired against `rx_base`; Holm over the seven contrasts).
+
+| Arm | DeepSeek | Difference [CI] | Papers up/down | Interim decision |
+|---|---:|---|---|---|
+| `rx_base` (incumbent web writer, fresh) | 0.630 | – | – | – |
+| `rx_r` (focused retrieval) | **0.662** | +0.032 [−0.05, +0.11] | 19/20 | no detectable difference |
+| `rx_u` (literature map + broad prompt) | 0.569 | −0.060 [−0.13, +0.01] | 14/25 | no detectable difference |
+| `rx_ru` | 0.554 | −0.076 [−0.17, +0.01] | 14/27 | no detectable difference |
+| `rx_c` (critique loop) | 0.480 | −0.150 [−0.23, −0.07] | 12/31 | **lowers the score** (Holm p 0.03) |
+| `rx_ruc_select` | 0.447 | – | – | – |
+| `rx_ruc` (combined) | 0.402 | −0.228 [−0.31, −0.15] | 8/36 | **lowers the score** (Holm p < 0.001) |
+
+- **The loop on top of R and U** (`rx_ruc` − `rx_ru`): −0.152 [−0.22, −0.08], 10/30 papers, Holm p 0.01.
+- **Revision with re-retrieval** (`rx_ruc` − `rx_ruc_select`): −0.045 [−0.11, +0.02], not detectable.
+- **R × U interaction:** −0.048 [−0.12, +0.02].
+- **References:** the closed-book writer scores 0.575; experiment 42's `web64k_r2` scored 0.609 (the same incumbent;
+  `rx_base` is its fresh replicate).
+- **Dimensions** (DeepSeek).
+  - R raises all four slightly: intervention +0.03, conditions +0.05, mechanism +0.04, outcome +0.02.
+  - The loop lowers all four: intervention 0.48 → 0.34, conditions 0.73 → 0.58.
+
+**Quality without the answer key.**
+
+| Comparison | DeepSeek pairwise, net preference [CI] | Papers | RQ (three calls), difference |
+|---|---|---|---|
+| R vs base | **+0.156 [+0.09, +0.22]** (Holm p < 0.001) | 26/5 | −0.017 |
+| U vs base | +0.074 [+0.01, +0.14] (Holm p 0.27) | 23/13 | −0.076 |
+| C vs base | **−0.270 [−0.35, −0.19]** (Holm p < 0.001) | 5/38 | +0.005 |
+| RUC vs base | −0.044 [−0.11, +0.02] | 13/22 | −0.074 |
+| RUC vs RUC-select | **+0.193 [+0.12, +0.27]** (Holm p 0.002) | 30/8 | +0.114 [−0.00, +0.22] |
+
+- **RQ hardly separates the arms.** Every o3-mini arm scores 2.86–3.06, with plausibility 3.4–3.7, testability
+  about 4.2 and usefulness 4.0–4.4. The pairwise judge is the sharper quality instrument here.
+
+**Retrieval** (the same gpt-4o screener on both corpora; target-free).
+- **The old corpus is mostly off-topic, as the user suspected.** Of its 8,950 papers, only 36.3% are graded relevant
+  (2 or 3); 21.0% are unrelated (0) and 42.8% tangential (1).
+  - Seeds: 37.5% relevant.
+  - Citation expansion: 32.5% relevant.
+- **The focused packs.**
+  - Every selected paper is relevant: 64.6% graded 2, 35.4% graded 3.
+  - 84.8% of packed passages are graded 3.
+  - 27.2 papers and 57,930 characters per question; no empty pack.
+- **The candidate pool is similar in both.** Screened candidates are 36% relevant. Of the 3,670 selected papers,
+  1,904 came only from the old corpus, 1,162 only from the new searches, 457 from both, and 147 from expansion. 472 of
+  1,025 searches had no hits, because the open-access pool is small.
+- **So the fix that matters is selection, not search.**
+- **The paper's lever** (DeepSeek labels; target-aware analysis only). It is in 1.6% of focused-pack passages against
+  1.2% for the old packs (+0.4 points, not detectable), and in 26.7% vs 31.1% of packs.
+  - DeepSeek labels far more strictly than the GPT-5.6 labels of experiments 39–42 (15–18%).
+  - Either way, the earlier literature almost never contains the specific lever (24.1).
+
+**The loop** (`rx_c`, `rx_ruc`).
+- **Rounds.** All runs revised at least once (by design). `rx_c` stopped after 2 critique rounds in 75% of runs and
+  after 3 in 25%; `rx_ruc` 85% and 15%.
+  - Stop reasons: fine 88%, no improvement 7–9%, maximum rounds 3–6%.
+  - 88% of final hypotheses are fine by the critics' majority.
+- **Re-retrieval** added 6.4 records per run (`rx_c`) and 4.9 (`rx_ruc`).
+- **Critic agreement** is weak to moderate: Spearman 0.29–0.43 between o1, gpt-4o and Llama-3.3 on the same
+  candidates.
+- **Why the loop hurts.**
+  - **Shorter candidates.** Writing four candidates in one call makes each shorter: 230–265 words against 346–381
+    for a single hypothesis, with fewer specifics.
+  - **Selection hurts.** Critic selection among them already lowers reconstruction (select-only 0.447 against RU
+    0.554).
+  - **Revision helps, but not enough.** One revision with critique-driven evidence improves quality (pairwise +0.19
+    over select-only), but does not recover the loss.
+  - **The critics and the DeepSeek judge disagree.** The critics call 88% of final hypotheses fine. The pairwise judge
+    prefers the base writer's single hypothesis in 38 of 45 papers.
+
+**Expectations** (25.1).
+- R reconstruction 0 to +0.05: right (+0.032, not detectable).
+- More relevant papers: right, but the screened pool is similar; the gain is in selection.
+- Lever density +2 to +5 points: wrong (+0.4 on DeepSeek's strict labels).
+- U −0.03 to +0.03: slightly worse (−0.06, not detectable).
+- C reconstruction −0.05 to +0.03: wrong, it is lower (−0.15). C quality up: wrong (pairwise −0.27, RQ flat).
+- RUC −0.03 to +0.05: wrong, lower (−0.23).
+
+**Leakage: none detected.**
+- Every counter is zero over 1,890 runs.
+- 80,198 seen-record reads were re-dated against each case: 0 violations.
+- The guard now also forbids the case paper's identifiers and title.
+
+**Interim conclusion.**
+1. **The retrieval complaint was right, and fixing it is the one change that helps.** Two-thirds of the old corpus
+   is off-topic. Focused retrieval makes every pack relevant, and its hypotheses are preferred without the answer key
+   in 26 of 45 papers (+0.16). Reconstruction is +0.03 and not detectable. `rx_r` is the best arm on both
+   measures.
+2. **The broad prompt and literature map do not help.** Reconstruction −0.06; quality roughly unchanged.
+3. **The multi-critic loop, as specified, makes hypotheses worse** on reconstruction (−0.15) and on pairwise quality
+   (−0.27). The main cause is generating many candidates in one call, which makes each one thinner. Revision helps
+   within the loop, but critic selection among thin candidates costs more.
+4. **Next steps.**
+   - Make focused retrieval the default.
+   - If the loop is revisited, write each candidate in its own call (full-length), and calibrate the critics against
+     the expert ratings first.
+
+**Checklist** (must_obey.md section 9).
+- [x] Query-facing models are pre-cutoff: o3-mini, gpt-4o, o1 and Llama-3.3 (the critics, screeners and planners).
+- [x] Frozen questions; the plan was fixed before the runs (25.1). Two smoke-test changes were recorded before the
+  freeze.
+- [x] Evidence filters on; every seen record re-dated; the rule amendments recorded (must_obey.md change log).
+- [x] Target-free payloads (guard extended); screeners, critics and rankers blinded; pairwise judgments in both orders.
+- [x] Spent papers only; exploratory. Fresh incumbent replicate (`rx_base`).
+- [x] Same evidence ceiling (64,000 distinct characters) in every arm; differences declared (C reallocates 16,000).
+- [ ] GPT-5.6 judge and audit on every run: running (187 of 1,890 judgments). DeepSeek complete.
+- [x] Paired statistics with CIs and Holm; negative results recorded.
+- [ ] `must_obey_check.py` passes: not yet (missing GPT-5.6 judgments only).

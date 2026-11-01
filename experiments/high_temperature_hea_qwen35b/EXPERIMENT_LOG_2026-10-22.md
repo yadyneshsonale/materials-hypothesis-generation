@@ -1924,8 +1924,57 @@ scales (plausibility, testability, usefulness), judged by o1 and DeepSeek on wha
 - It still rarely reproduces the specific study a paper chose (reconstruction 0.62), and no leakage-free agent
   could reach 2.5 there.
 
-## Comparability and limits, experiments 8 to 43
+## Experiment 44: retrieval quality, evidence use and a multi-critic refinement loop (interim)
 
+**Request.** Fix retrieval (relevant, quality papers), fix how evidence is used and prompts that may narrow the model,
+and add a loop. In the loop the model writes many hypotheses; several critic models review them; the model
+re-retrieves papers from the critiques and revises, until the critiques are fine. Run individual and combined
+ablations. Plan in loop.md 25.1; interim results in 25.2 ([loop_rx/](./loop_rx/README.md)).
+
+**The retrieval complaint was right.**
+- **The old queries.** Each is an OR of single words inside the high-entropy-alloy domain.
+- **How much is relevant.** The same gpt-4o screener grades only 36% of the 8,950 old-corpus papers as relevant;
+  21% are unrelated.
+- **The focused retrieval.** It plans concept searches, screens titles and abstracts, grades passages, and keeps the
+  old corpus as a second channel. Every selected paper is relevant, and 85% of packed passages are graded fully
+  relevant.
+
+**Seven arms** (o3-mini writer, 270 runs each, the same 64,000-character evidence ceiling). DeepSeek decides until
+GPT-5.6 is complete (187 of 1,890 judged).
+
+| Arm | DeepSeek reconstruction | vs base [CI] | Pairwise quality vs base |
+|---|---:|---|---|
+| Base (incumbent web writer, fresh) | 0.630 | – | – |
+| Focused retrieval (R) | **0.662** | +0.032 [−0.05, +0.11] | **+0.16, 26/5 papers** |
+| Literature map + broad prompt (U) | 0.569 | −0.060 | +0.07 |
+| R + U | 0.554 | −0.076 | – |
+| Critique loop (C) | 0.480 | **−0.150 [−0.23, −0.07]** | **−0.27, 5/38 papers** |
+| R + U + one critique round, select only | 0.447 | – | – |
+| R + U + C (combined) | 0.402 | **−0.228 [−0.31, −0.15]** | −0.04 |
+
+- **Focused retrieval is the one change that helps.** Its hypotheses are preferred without the answer key; on
+  reconstruction it is +0.03, not detectable. The paper's specific lever is still almost never in the earlier
+  literature.
+- **The loop makes hypotheses worse.**
+  - Four candidates written in one call are thinner (230–265 words against 346–381).
+  - Critic selection among them lowers the score.
+  - Revision helps within the loop (+0.19 pairwise), but not enough.
+  - The critics agree weakly with each other (ρ 0.29–0.43) and with the independent judge.
+- **Leakage:** none detected (80,198 seen-record reads re-dated).
+- **Rules amended** (must_obey.md 4.6, 4.7, 5.2): critique-derived searches, pre-cutoff relevance grades, blinded
+  screeners; the payload guard now forbids the case paper's identifiers and title.
+
+**Interim conclusion.**
+- Make focused retrieval the default.
+- Do not use the loop as specified. If revisited, write each candidate in its own call, and calibrate the critics
+  against the expert ratings.
+- Final once GPT-5.6 is complete.
+
+## Comparability and limits, experiments 8 to 44
+
+- Experiment 44 is interim until its GPT-5.6 judgments and audits complete: DeepSeek decides meanwhile. Its arms
+  share a 64,000-character evidence ceiling, but differ in evidence source (R), prompt and calls (U), and number of
+  candidates, critics and revision (C), as declared in loop.md 25.1.
 - Experiment 43's research-quality score (RQ) is a different measure from reconstruction. It is target-free, judged
   by AI on the expert's blind scales, and internally validated only for the mean of three DeepSeek calls (post hoc).
   It is not comparable with any reconstruction score.

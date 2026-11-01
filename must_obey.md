@@ -5,7 +5,7 @@ If a rule cannot be met, stop, write down why, and do not report the result as c
 rules is [must_obey_check.py](./must_obey_check.py); it must pass before results are reported. Every experiment
 README and every [loop.md](./loop.md) entry carries the checklist in section 9.
 
-Last updated: 2026-10-30 (see the change log at the end).
+Last updated: 2026-11-01 (see the change log at the end).
 
 ---
 
@@ -148,7 +148,9 @@ preferred future option.
    [extractor_leakage_audit.py](./extractor_leakage_audit.py): the true-case injection rate must not exceed the
    other-case control.
 6. **Query-derived text.** Search phrases, sub-questions and hypothetical documents built from the query must be
-   written by a pre-cutoff model, from the query only.
+   written by a pre-cutoff model, from the query only, or (experiment 44) also from the outputs of pre-cutoff models
+   in the same run, such as candidate hypotheses and their critiques, which derive from the query and eligible
+   evidence only. Log the lineage of every such search.
 7. **No open web search, live literature API or tool that can return post-cutoff documents** for any query-facing
    component, unless the tool applies the date filter and the exclusions of 4.1–4.2 itself and logs what it
    returned.
@@ -162,7 +164,9 @@ preferred future option.
      - no preprints, reviews, editorials, errata, corrections, retractions or data papers;
      - no paper that cites the case paper;
      - no paper containing 5% or more of the case paper's 12-word passages;
-     - ranking by BM25 on title and abstract only, never by citation counts or other present-day signals.
+     - ranking by BM25 on title and abstract, or (experiment 44) by a pre-cutoff model's relevance grade of the
+       title and abstract or of the passage text, which uses no present-day signal either; every grade is
+       logged. Never by citation counts or other present-day signals.
 
      It records every returned paper with its IDs and dates. A general web search engine is not allowed, because
      its pages cannot be dated reliably.
@@ -175,8 +179,9 @@ preferred future option.
    Enforce this in code with `stage_metrics.assert_target_free`, and test it.
    - The judge sees every field of a generation, so a final hypothesis keeps only the shared schema fields
      (`hypo_loop._schema_only`). A method cannot add extra judged content, such as recalled precedents or notes.
-2. **Blinding.** Judges see neutral evidence labels. Selectors and rankers see shuffled candidates with neutral
-   labels. Never pass arm names, model names or the held-out paper's ID or title.
+2. **Blinding.** Judges see neutral evidence labels. Selectors, rankers, screeners and graders see shuffled items with
+   neutral labels or numbers. Never pass arm names, model names or the held-out paper's ID or title
+   (`hypo_loop.Harness.guard` forbids the case paper's PMCID, DOI and title in every query-facing payload).
 3. **Pairwise judgments.** Run every pairwise judgment in both orders, and resolve ties and conflicts by a written
    rule (position bias was 72% in experiment 16).
 4. **Oracle diagnostics: the only exception to rule 1.** A diagnostic may give a model information from the answer
@@ -383,3 +388,10 @@ Ablate before combining. Combine only components that helped or that address dif
   floods; stop on 403) after the TRAPI identity was blocked. Extended the same day after reading TRAPI's
   troubleshooting guide: honour the `Retry-After` header with a process-wide gate; no retries of non-transient
   errors; no requests for 60 minutes after a block; a stable workload ID per stage.
+- 2026-11-01 (experiment 44, loop.md 25.1):
+  - 4.6: search text may also derive from earlier outputs of pre-cutoff models in the same run (candidates,
+    critiques), with the lineage logged.
+  - 4.7: a pre-cutoff model's relevance grade of the title and abstract (or of the passage text) may rank web
+    results, like BM25; it uses no present-day signal.
+  - 5.2: screeners and graders are also blinded (shuffled order, neutral numbers); the payload guard forbids the
+    case paper's PMCID, DOI and title.

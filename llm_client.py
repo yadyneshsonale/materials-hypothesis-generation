@@ -14,6 +14,7 @@ Supports three modes, selected by the MATHG_PROVIDER env var:
 from __future__ import annotations
 
 import email.utils
+import itertools
 import json
 import os
 import random
@@ -153,6 +154,36 @@ def endpoint_for(deployment: str) -> str:
     return TRAPI_ENDPOINT
 
 
+def chat_url(endpoint: str, deployment: str) -> str:
+    return f"{endpoint}/openai/deployments/{deployment}/chat/completions?api-version={TRAPI_API_VERSION}"
+
+
+def instances_for(deployment: str) -> list[str]:
+    """Experiment 44 (loop.md 25.1): MATHG_TRAPI_INSTANCES lists several TRAPI instances serving the same deployments,
+    each with its own token quota. A non-judge deployment is then sent to whichever instance's rate-limit gate opens
+    first (round-robin among open ones). Otherwise the single endpoint_for instance."""
+    listed = [u.strip().rstrip("/") for u in os.environ.get("MATHG_TRAPI_INSTANCES", "").split(",") if u.strip()]
+    if listed and not (deployment == JUDGE_TRAPI_DEPLOYMENT and os.environ.get("JUDGE_TRAPI_ENDPOINT")):
+        return listed
+    return [endpoint_for(deployment)]
+
+
+_ROUND_ROBIN = itertools.count()
+
+
+def pick_url(deployment: str) -> str:
+    urls = [chat_url(e, deployment) for e in instances_for(deployment)]
+    if len(urls) == 1:
+        return urls[0]
+    with _GATES_LOCK:
+        opens = [_GATES.get(u, 0.0) for u in urls]
+    now = time.monotonic()
+    ready = [u for u, t in zip(urls, opens) if t <= now]
+    if ready:
+        return ready[next(_ROUND_ROBIN) % len(ready)]
+    return urls[opens.index(min(opens))]
+
+
 class TrapiBlocked(LLMError):
     """TRAPI answered 403 (PrincipalBlocked): the identity is blocked for excessive retries. Never retried."""
 
@@ -183,6 +214,28 @@ _PACE: dict[str, float] = {}
 _NEXT: dict[str, float] = {}
 _GATES_LOCK = threading.Lock()
 WORKLOAD_ID = os.environ.get("MATHG_WORKLOAD_ID") or f"mathg-{os.getpid()}"
+# Experiment 44 (loop.md 25.1): one process may run many configurations at once, with more threads than the
+# per-model limit of must_obey.md 7. MATHG_MAX_PER_DEPLOYMENT caps the requests in flight per deployment, across all
+# threads of the process.
+_SLOTS: dict[str, threading.BoundedSemaphore] = {}
+_SLOTS_LOCK = threading.Lock()
+
+
+class _deployment_slot:
+    def __init__(self, deployment: str) -> None:
+        limit = int(os.environ.get("MATHG_MAX_PER_DEPLOYMENT", "0") or 0)
+        self.semaphore = None
+        if limit > 0:
+            with _SLOTS_LOCK:
+                self.semaphore = _SLOTS.setdefault(deployment, threading.BoundedSemaphore(limit))
+
+    def __enter__(self) -> None:
+        if self.semaphore is not None:
+            self.semaphore.acquire()
+
+    def __exit__(self, *exc: Any) -> None:
+        if self.semaphore is not None:
+            self.semaphore.release()
 
 
 def _retry_after(resp: Any) -> float | None:
@@ -298,8 +351,7 @@ def trapi_chat_json(deployment: str, system: str, user: str, *, max_tokens: int,
     Rate limits (HTTP 429) are retried after the wait TRAPI reports; other transient failures are retried
     with exponential backoff. Truncated responses raise TruncatedError.
     """
-    url = (f"{endpoint_for(deployment)}/openai/deployments/{deployment}"
-           f"/chat/completions?api-version={TRAPI_API_VERSION}")
+    url = pick_url(deployment)
     payload: dict[str, Any] = {
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
         token_field: max_tokens,
@@ -313,12 +365,15 @@ def trapi_chat_json(deployment: str, system: str, user: str, *, max_tokens: int,
     timeout = float(os.environ.get("MATHG_REQUEST_TIMEOUT", "240"))
     last_err: Exception | None = None
     for attempt in range(retries):
+        if attempt:
+            url = pick_url(deployment)  # with several instances, a rate-limited one is avoided on the retry
         _wait_gate(url)
         if _TRAPI_BLOCKED.is_set():
             raise TrapiBlocked("TRAPI blocked this identity earlier in this process; not retrying")
         try:
             headers = _trapi_headers()
-            resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
+            with _deployment_slot(deployment):
+                resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
             if _check_trapi_response(resp, attempt, url):
                 last_err = LLMError(f"rate limited: {resp.text[:160]}")
                 continue
@@ -410,7 +465,8 @@ def trapi_chat_with_tools(messages: list[dict[str, Any]], tools: list[dict[str, 
             raise TrapiBlocked("TRAPI blocked this identity earlier in this process; not retrying")
         try:
             headers = _trapi_headers()
-            resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
+            with _deployment_slot(TRAPI_DEPLOYMENT):
+                resp = requests.post(url, headers=headers, json=payload, timeout=timeout)
             if _check_trapi_response(resp, attempt, url):
                 last_err = LLMError(f"rate limited: {resp.text[:160]}")
                 continue

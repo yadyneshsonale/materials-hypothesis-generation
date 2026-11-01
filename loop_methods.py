@@ -1980,3 +1980,8 @@ register("writer_v2_b_o3mini")(lambda h: m_v2(h, retrieval=False, writer_v2=True
 register("web64k_r2_b_o3mini")(lambda h: m_v2(h, retrieval=True, writer_v2=False))
 register("web64k_v2_b_o3mini")(lambda h: m_v2(h, retrieval=True, writer_v2=True))
 V2_CONFIGS = ("writer_v2_b_o3mini", "web64k_r2_b_o3mini", "web64k_v2_b_o3mini")
+
+
+# ================================================================ experiment 44 (loop.md 25.1): focused retrieval, evidence
+# use and a multi-critic refinement loop, as individual and combined arms (refine_loop.py registers rx_*).
+import refine_loop  # noqa: E402,F401

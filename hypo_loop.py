@@ -186,6 +186,12 @@ class Harness:
         self._forbidden = [str(v).strip().lower() for v in target.values()
                            if isinstance(v, str) and len(str(v).strip()) >= 40
                            and str(v).strip().lower() not in self.query.lower()]
+        # Experiment 44 (loop.md 25.1): nor the case paper's identifiers or title (titles often name the lever).
+        meta = rx.metadata().get(case["paper_id"], {}) if isinstance(rx.metadata(), dict) else {}
+        for value in (case["paper_id"], meta.get("doi"), meta.get("title")):
+            value = " ".join(str(value or "").split()).lower()
+            if len(value) >= 8 and value not in self.query.lower():
+                self._forbidden.append(value)
         self.rng = random.Random(int(hashlib.sha1(f"{case['paper_id']}|{level}|{sample}".encode()).hexdigest()[:8],
                                      16))
 

@@ -280,3 +280,18 @@
   - Every o3-mini configuration scores above 2.5 on research quality: DeepSeek-3 writer 3.10. The Llama baseline
     scores 1.40.
   - Reconstruction stays at 0.62. 2.5 there is out of reach without leakage.
+
+## Experiment 44: retrieval quality, evidence use and a multi-critic refinement loop (loop.md section 25)
+
+- **Runners.**
+  - [run_rx.sh](./run_rx.sh) started the build. [run_rx2.sh](./run_rx2.sh) restarted it with both TRAPI instances,
+    then generated all seven arms in one process (at most 6 calls in flight per model) and screened the old corpora.
+  - [run_rx_eval.sh](./run_rx_eval.sh) ran the DeepSeek stages and the report.
+  - [run_rx_gpt.sh](./run_rx_gpt.sh), then [run_rx_gpt2.sh](./run_rx_gpt2.sh) (seeded random order), runs the GPT-5.6
+    judgments and audits.
+- **Outputs.** [../loop_rx/](../loop_rx/README.md); focused corpora in `../websearch/focused/`.
+- **Interim result** (DeepSeek).
+  - Focused retrieval: +0.03 reconstruction, and preferred on quality (+0.16).
+  - The literature map and broad prompt: −0.06.
+  - The critique loop: lower on both reconstruction (−0.15) and quality (−0.27).
+  - All three combined: −0.23.

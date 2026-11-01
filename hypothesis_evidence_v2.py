@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import threading
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Any
@@ -280,8 +282,10 @@ class HypothesisEvidenceUnit:
 
 
 def atomic_json(path: Path, payload: Any) -> None:
+    """Write JSON atomically. The temporary name is unique per process and thread (experiment 44: parallel builds
+    cached the same paper record at once, and a shared temporary name made one rename fail)."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary = path.with_suffix(f"{path.suffix}.{os.getpid()}.{threading.get_ident()}.tmp")
     temporary.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n")
     temporary.replace(path)
 
