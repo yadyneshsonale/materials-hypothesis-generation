@@ -1,6 +1,6 @@
 # Project summary: AI hypothesis generation for high-temperature high-entropy alloys
 
-**Status.** 2026-11-01, after experiment 44 (interim). This file gathers everything done so far and every main result in one
+**Status.** 2026-11-02, after experiment 45 (interim). This file gathers everything done so far and every main result in one
 place.
 
 **Details.**
@@ -48,6 +48,7 @@ judges' values, and differences come with paper-clustered 95% confidence interva
     (experiment 43).
   - Focused retrieval with relevance screening, a literature-map prompt, and a multi-critic refinement loop, in
     seven individual and combined arms (experiment 44).
+  - A lever-preserving editor and a one-sentence domain context, in six arms on two bases (experiment 45).
   - Roughly 34,200 hypothesis-generation runs in total.
 - **Best method found: the simplest one.** o3-mini with a conservative writer prompt and no retrieved evidence
   (`writer_only_b_o3mini`).
@@ -166,6 +167,18 @@ judges' values, and differences come with paper-clustered 95% confidence interva
       - A multi-critic loop (four candidates, three critic models, critique-driven re-retrieval, revision) lowers
         reconstruction (−0.15) and quality (−0.27). Candidates written together are thinner, critic selection among
         them costs more than revision recovers, and the critics agree only weakly (ρ 0.29–0.43).
+  16. **Editing how a hypothesis is written does not raise the score; vaguer hypotheses lose quality** (experiment
+      45, interim).
+      - Prompt changes move the writer off its best guess of the lever (experiments 41–42). So a second call
+        edited only the wording of finished hypotheses, and code kept their lever.
+      - It removed unsupported numbers (interventions 26% → 2%, conditions 40% → 3%), named multi-principal-element
+        effects where relevant, and stated the causal link.
+      - Reconstruction moved by ±0.02 (DeepSeek). The judges that do not see the answer key preferred the original
+        in almost every paper (−0.27 and −0.30).
+      - The feature effects a regression over the 15,600 earlier hypotheses had promised did not survive this test
+        on the same hypotheses.
+      - One domain sentence ("the group works on high-entropy alloys"), given on the 44 questions that do not name
+        the class, barely changed the writer.
 - **Open items.**
   - The expert's ratings, which will show whether the AI judges can be trusted. That covers both reconstruction and
     research quality: the 60 items are already scored on RQ.
@@ -254,6 +267,7 @@ judges' values, and differences come with paper-clustered 95% confidence interva
 | 25 | Run multiple rubber-duck reviews to find how to improve each stage, make the changes they suggest, and get the best possible runs | Six independent stage reviews; their evidence reproduced offline before anything ran; the changes that survived run as a 2 × 2 design (retrieval v2, a writing block; 810 runs) with an anchored, evidence-blind measurement v2; a TRAPI retry-flood block fixed in the client | 42 |
 | 26 | Keep spawning rubber ducks and running experiments until an agent averages 2.5+ | The ceiling checked from existing data and by four independent reviews (2.5 on reconstruction needs leakage); a research-quality score on the expert's blind scales, judged by o1 and DeepSeek with controls and a re-test; the existing agents scored on it | 43 |
 | 27 | Fix retrieval (quality, relevant papers), evidence use and narrowing prompts; add a loop of many hypotheses, multi-model critiques, critique-driven re-retrieval and revision until the critiques are fine; run combined and individual ablations | The retrieval failure measured; focused retrieval (concept searches, relevance screening, passage grading); a literature-map prompt; a three-critic refinement loop; seven arms (270 runs each) with DeepSeek, research-quality and pairwise evaluation, GPT-5.6 running | 44 |
+| 28 | Look at the pipeline, make some changes and get a better score | A failure analysis over the 15,600 judged hypotheses; a lever-preserving editor and a domain sentence for questions that omit the alloy class; six arms on two bases (892 runs) with DeepSeek, research quality and pairwise evaluation, GPT-5.6 running | 45 |
 
 ## 4. Results by phase
 
@@ -836,6 +850,28 @@ GPT-5.6 completes).
   - Critic selection costs more than revision recovers.
   - The three critic models agree only weakly with each other, and with the independent judge.
 
+### 4.18 A lever-preserving editor and the programme's domain (experiment 45, interim)
+
+**Why** ([loop_rx/](./experiments/high_temperature_hea_qwen35b/loop_rx/README.md); loop.md section 26).
+- Instructions in the writer's prompt move it off its own best guess of the lever, the best target-free predictor.
+- So E edits only the wording of finished hypotheses, and code holds the lever. D adds one sentence of research
+  context where the question does not name the alloy class (44 of 135 questions).
+
+**Results** (DeepSeek complete; GPT-5.6 200 of 1,196 primary judgments).
+
+| Variant | DeepSeek vs base | Pairwise quality vs base (DeepSeek) |
+|---|---|---|
+| E on `rx_base` / `rx_r` | +0.016 / −0.017 | **−0.27 / −0.30** (0/36, 0/39 papers) |
+| D on `rx_base` / `rx_r` | +0.016 / +0.011 | +0.01 / +0.06 |
+| D+E on `rx_base` / `rx_r` | +0.068 [+0.01, +0.12] / −0.006 | **−0.26 / −0.25** |
+
+- **The editor does what it is asked.** Unsupported numbers fell from 26% to 2% of interventions and from 40% to 3%
+  of conditions, with length unchanged.
+- **It does not raise the score.** The judges that do not see the answer key read the edited hypotheses as vaguer.
+- **D barely changes the writer.**
+- **D+E's DeepSeek gain** on one base is not replicated on the other.
+- **Interim verdict:** adopt neither.
+
 ## 5. The recommended method on every held-out comparison
 
 `writer_only_b_o3mini` (o3-mini, conservative writer, no evidence) against the Llama-3.3 closed-book baseline.
@@ -899,6 +935,10 @@ GPT-5.6 completes).
 - **A literature map with a broad-reasoning prompt** (experiment 44, interim): −0.06.
 - **A multi-critic refinement loop** (experiment 44, interim): four candidates, critiques by o1, gpt-4o and Llama-3.3,
   critique-driven re-retrieval and revision. Reconstruction −0.15 and pairwise quality −0.27 against the base writer.
+- **A lever-preserving editor** (experiment 45, interim). It removes unsupported numbers, names
+  multi-principal-element effects and states the causal link. Reconstruction ±0.02 (DeepSeek); target-free pairwise
+  quality −0.27 and −0.30.
+- **A domain sentence** on the questions that do not name the alloy class (experiment 45, interim): within ±0.06.
 - **Changes from six stage reviews** (experiment 42):
   - retrieval ranking without the question template's words;
   - a writing block that locks the question's facts and bans invented numbers. It lowers the score: −0.055 on
@@ -970,7 +1010,7 @@ GPT-5.6 completes).
   corpora (experiment 36) are wider but still limited to open-access papers with XML in Europe PMC.
 - **Judge drift.** GPT-5.6 drifted +0.04 between occasions. Earlier comparisons between runs judged days apart
   carry that uncertainty; differences within about ±0.05 among them are not reliable (experiment 39).
-- **Experiments 36–44 are exploratory.** All 45 papers were already spent. Experiment 36's evaluations ran on a
+- **Experiments 36–45 are exploratory.** All 45 papers were already spent. Experiment 36's evaluations ran on a
   second instance of the GPT-5.6 deployment because of rate limits, and its lever labels were made only for the
   primary comparison.
 - **Low absolute level.** About 0.6 out of 4. Choosing the paper's intervention is the core unsolved problem.
@@ -980,7 +1020,7 @@ GPT-5.6 completes).
 | What | Where |
 |---|---|
 | Rules; instructions for every agent | [must_obey.md](./must_obey.md), [AGENTS.md](./AGENTS.md) |
-| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–25) |
+| Method work, pre-registrations, all statistics | [loop.md](./loop.md) (sections 0–26) |
 | One section per experiment | [EXPERIMENT_LOG_2026-10-22.md](./experiments/high_temperature_hea_qwen35b/EXPERIMENT_LOG_2026-10-22.md) |
 | Literature reviewed | [RELATED_WORK.md](./experiments/high_temperature_hea_qwen35b/RELATED_WORK.md) (9 hypothesis-generation systems); loop.md sections 2, 10.3 and 11.3 (about 40 sources) |
 | Corpus | [data/corpus/](./experiments/high_temperature_hea_qwen35b/data/corpus/README.md) |
@@ -1000,5 +1040,6 @@ GPT-5.6 completes).
 | Six stage reviews and the changes they support (experiment 42) | [loop_v2/](./experiments/high_temperature_hea_qwen35b/loop_v2/README.md) |
 | The 2.5 target and research quality on the expert's scales (experiment 43) | [loop_rq/](./experiments/high_temperature_hea_qwen35b/loop_rq/README.md) |
 | Retrieval quality, evidence use and a multi-critic loop (experiment 44) | [loop_rx/](./experiments/high_temperature_hea_qwen35b/loop_rx/README.md) |
+| A lever-preserving editor and the programme's domain (experiment 45) | [loop_rx/](./experiments/high_temperature_hea_qwen35b/loop_rx/README.md) |
 | Expert package; answer key and analysis | [expert_evaluation/](./expert_evaluation/README.md); [expert_eval/](./experiments/high_temperature_hea_qwen35b/expert_eval/README.md) |
-| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py`, `websearch.py`, `web_analysis.py`, `pcd_analysis.py`, `round4_offline.py`, `round4_pmi.py`, `round4_analysis.py`, `diag_analysis.py`, `agent_offline.py`, `agent_analysis.py`, `select_offline.py`, `study_analysis.py`, `stage_v2.py`, `judge_v2.py`, `v2_offline.py`, `v2_analysis.py`, `rq_judge.py`, `focused_search.py`, `refine_loop.py`, `rx_experiment.py` |
+| Main code | `hypo_loop.py` (harness), `loop_methods.py`, `must_obey_check.py`, `query_builder_v3.py`, `query_builder_v3_1.py`, `query_builder_v4_scimon.py`, `citegraph.py`, `rubric_eval.py`, `improvement_eval.py`, `v4_scimon_analysis.py`, `v4_all_analysis.py`, `review_measurement.py`, `checklist_judge.py`, `review_probe.py`, `review_analysis.py`, `expert_eval_analysis.py`, `websearch.py`, `web_analysis.py`, `pcd_analysis.py`, `round4_offline.py`, `round4_pmi.py`, `round4_analysis.py`, `diag_analysis.py`, `agent_offline.py`, `agent_analysis.py`, `select_offline.py`, `study_analysis.py`, `stage_v2.py`, `judge_v2.py`, `v2_offline.py`, `v2_analysis.py`, `rq_judge.py`, `focused_search.py`, `refine_loop.py`, `rx_experiment.py`, `edit_loop.py`, `edit_experiment.py` |

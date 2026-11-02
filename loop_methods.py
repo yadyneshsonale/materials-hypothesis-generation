@@ -1985,3 +1985,7 @@ V2_CONFIGS = ("writer_v2_b_o3mini", "web64k_r2_b_o3mini", "web64k_v2_b_o3mini")
 # ================================================================ experiment 44 (loop.md 25.1): focused retrieval, evidence
 # use and a multi-critic refinement loop, as individual and combined arms (refine_loop.py registers rx_*).
 import refine_loop  # noqa: E402,F401
+
+# ================================================================ experiment 45 (loop.md 26.1): a lever-preserving editor and
+# the programme's domain on questions that do not name the alloy class (edit_loop.py registers edit_* and domain_*).
+import edit_loop  # noqa: E402,F401

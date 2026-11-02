@@ -96,9 +96,10 @@ def _parallel(jobs: list[Any], fn: Any, workers: int, tag: str) -> dict[str, int
     return D._parallel(jobs, fn, workers, tag)
 
 
-def pairwise_stage(workers: int, judge: str = "deepseek") -> dict[str, int]:
+def pairwise_stage(workers: int, judge: str = "deepseek", pairs: tuple[tuple[str, str], ...] = PAIRWISE
+                   ) -> dict[str, int]:
     jobs = []
-    for new, base in PAIRWISE:
+    for new, base in pairs:
         base_runs = {D.key_of(r): r for r in runs_of(base)}
         for r in runs_of(new):
             k = D.key_of(r)
@@ -320,13 +321,13 @@ def arm_summary(arm: str) -> dict[str, Any]:
             "evidence_records_seen": W.A_mean([float(len(r["seen_ids"])) for r in runs])}
 
 
-def leakage() -> dict[str, Any]:
+def leakage(arms: tuple[str, ...] | list[str] | None = None) -> dict[str, Any]:
     """The runs' leakage counters, and every seen web record's dates re-checked against its case (cached lookup)."""
     totals: Counter[str] = Counter()
     checked, violations = 0, 0
     evidence = W.Evidence()
     cutoffs: dict[str, str] = {}
-    for arm in ARMS:
+    for arm in arms or ARMS:
         for run in W.runs(OUT, arm):
             for key, value in (run.get("audit") or {}).items():
                 totals[key] += int(value or 0)

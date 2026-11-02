@@ -1970,8 +1970,59 @@ GPT-5.6 is complete (187 of 1,890 judged).
   against the expert ratings.
 - Final once GPT-5.6 is complete.
 
-## Comparability and limits, experiments 8 to 44
+## Experiment 45: keep the writer's lever, fix how the hypothesis is written, state the domain (interim)
 
+**Request.** "Just look at the pipeline, make some changes and get a better score." Plan in loop.md 26.1; interim
+results in 26.2 ([loop_rx/](./loop_rx/README.md)).
+
+**Failure analysis.**
+- Every instruction added to the writer's prompt moved o3-mini off its own best guess of the paper's lever, the
+  strongest target-free predictor, and lowered the score (experiments 41–42).
+- A regression over the 15,600 judged hypotheses credited:
+  - fewer numbers that neither the question nor the evidence states;
+  - mechanisms phrased through multi-principal-element effects;
+  - a stated causal link.
+- 44 of 135 questions do not name the alloy class, and score about 0.25 lower.
+
+**Two changes that leave the lever alone.**
+- **E**, a second o3-mini call, edits only how the finished hypothesis is written. Code keeps the lever, the evidence
+  IDs and every other field.
+- **D** adds one sentence of research context (the group works on high-entropy alloys for high-temperature use) on
+  the 44 questions.
+- Six arms on experiment 44's two bases, 892 runs. DeepSeek decides until GPT-5.6 is complete (200 of 1,196 primary
+  judgments).
+
+| Variant | DeepSeek vs base [CI] | Pairwise quality vs base (DeepSeek) |
+|---|---|---|
+| E on `rx_base` | +0.016 [−0.03, +0.06] | **−0.27, 0/36 papers** |
+| D on `rx_base` | +0.016 [−0.02, +0.05] | +0.01 |
+| D+E on `rx_base` | +0.068 [+0.01, +0.12] (Holm 0.43) | **−0.26, 1/38** |
+| E on `rx_r` | −0.017 [−0.07, +0.03] | **−0.30, 0/39** |
+| D on `rx_r` | +0.011 [−0.03, +0.05] | +0.06 |
+| D+E on `rx_r` | −0.006 [−0.07, +0.05] | **−0.25, 1/35** |
+
+- **The editor did what it was asked, and it does not help.**
+  - Unsupported numbers fell from 26% to 2% of interventions and from 40% to 3% of conditions, with no change in
+    length.
+  - Reconstruction moves by ±0.02.
+  - The judges that do not see the answer key prefer the originals almost everywhere (o1 −0.04 to −0.05), and
+    research quality falls by 0.01–0.07.
+- **The domain sentence barely moves the writer** (hypotheses bringing in the class: 31% → 34%, 24% → 35%).
+- **D+E on `rx_base` is DeepSeek's one CI above zero.** It is not replicated on `rx_r` and comes with lower
+  quality: noise unless GPT-5.6 confirms it.
+- **Leakage:** none detected (40,718 seen-record reads re-dated).
+
+**Interim conclusion.**
+- Adopt neither.
+- The regression's feature effects did not survive a test on the same hypotheses.
+- The target-free ceiling of about 0.63 stands.
+- Final once GPT-5.6 is complete.
+
+## Comparability and limits, experiments 8 to 45
+
+- Experiment 45 is interim until its GPT-5.6 judgments and audits complete. Its edit arms add one o3-mini call to
+  experiment 44's runs (stage 1 unchanged), and its domain arms differ from their base by one sentence on 44 of the
+  135 questions, as declared in loop.md 26.1.
 - Experiment 44 is interim until its GPT-5.6 judgments and audits complete: DeepSeek decides meanwhile. Its arms
   share a 64,000-character evidence ceiling, but differ in evidence source (R), prompt and calls (U), and number of
   candidates, critics and revision (C), as declared in loop.md 25.1.

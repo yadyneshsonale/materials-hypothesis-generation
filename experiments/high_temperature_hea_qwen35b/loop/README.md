@@ -295,3 +295,18 @@
   - The literature map and broad prompt: −0.06.
   - The critique loop: lower on both reconstruction (−0.15) and quality (−0.27).
   - All three combined: −0.23.
+
+## Experiment 45: a lever-preserving editor and the programme's domain (loop.md section 26)
+
+- **Runners.**
+  - [run_x45.sh](./run_x45.sh) generated the six arms (at most 6 o3-mini calls at once over both instances).
+  - [run_x45_eval.sh](./run_x45_eval.sh) runs DeepSeek, RQ ×3, pairwise (DeepSeek, o1) and the report.
+  - [run_x45_gpt.sh](./run_x45_gpt.sh) waited for generation, stopped experiment 44's GPT-5.6 runner and runs the
+    GPT-5.6 judge and audits on both instances (3 workers each): the experiment-45 arms with their bases first, then
+    the rest of experiment 44.
+- **Outputs.** [../loop_rx/](../loop_rx/README.md) (`analysis_edit.md`).
+- **Interim result.**
+  - The editor does not raise reconstruction (DeepSeek ±0.02), and the judges that do not see the answer key prefer
+    the original hypotheses (pairwise −0.25 to −0.30).
+  - The domain sentence is neutral.
+

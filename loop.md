@@ -5216,3 +5216,244 @@ Also reported: the R × U interaction.
 - [ ] GPT-5.6 judge and audit on every run: running (187 of 1,890 judgments). DeepSeek complete.
 - [x] Paired statistics with CIs and Holm; negative results recorded.
 - [ ] `must_obey_check.py` passes: not yet (missing GPT-5.6 judgments only).
+
+## 26. Keep the writer's lever, fix how the hypothesis is written, and state the programme's domain (experiment 45)
+
+### 26.1 Failure analysis, design and pre-registered plan (written 2026-11-02 at about 11:40, before any experiment-45 run; runs started at 11:41)
+
+**Request.** "Just look at the pipeline, make some changes and get a better score."
+
+**What constrains any change** (experiments 41 and 42).
+- Every instruction added to the writer's prompt moved o3-mini off its own best guess, and intervention agreement
+  fell. `writer_v2` cut the share of hypotheses matching the paper's lever from 18.9% to 8.0% (DeepSeek
+  intervention −0.11), even where no number was involved.
+- The model's own guess is the best target-free predictor of the paper's lever. Across the 79 configurations of the
+  15,600-hypothesis pool, most questions get the same idea (for one question, 131 of 132 hypotheses proposed oxide
+  dispersoids).
+- So a change that can raise the score must either leave the writer's choice of lever alone, or add information the
+  writer does not have.
+
+**Failure analysis** (target-aware, offline; existing judgments only).
+- **Description-level features that cost or earn points.** A regression of the reconstruction score over the pool,
+  with question and configuration fixed effects (paper-clustered bootstrap CIs):
+
+  | Feature of the hypothesis | Share | GPT-5.6 | DeepSeek |
+  |---|---:|---|---|
+  | A number in the intervention that neither the question nor the cited passages state | 39% | −0.024 [−0.043, −0.006] | −0.046 [−0.082, −0.015] |
+  | Such a number in the conditions | 47% | −0.014 [−0.031, −0.003] | −0.015 [−0.048, +0.010] |
+  | The mechanism names a multi-principal-element effect (lattice distortion, sluggish diffusion, ...) | 12% | +0.031 [−0.014, +0.086] | +0.094 [+0.029, +0.171] |
+  | The hypothesis sentence states how the intervention acts (via, through, by, because) | 50% | +0.017 [+0.004, +0.029] | +0.019 [+0.002, +0.036] |
+  | Alternatives listed in the intervention (e.g., or, such as) | 44% | +0.015 [−0.005, +0.031] | +0.023 [+0.003, +0.037] |
+  | A number in the predicted outcome not in the sources | 27% | −0.012 [−0.035, +0.010] | +0.007 [−0.024, +0.044] |
+
+  Listing alternatives is a hedge, and must_obey.md 6.8 forbids optimising for judge quirks, so it is not used.
+  Numbers in the outcome have no clear effect and are left alone.
+- **Questions that do not name the alloy class.** 44 of the 135 questions (broad 11, problem-constrained 19,
+  expert 14) do not name a high-entropy, medium-entropy, multi-principal-element or compositionally complex alloy.
+  The question gate hid it where it was part of the answer, for example an HEA coating on steel or on Zr-alloy
+  cladding, or HEA shells on Pd seeds.
+  - On these questions the score is much lower (experiment 44, DeepSeek): `rx_base` 0.47 against 0.71 on the
+    others, `rx_r` 0.48 against 0.75 (intervention 0.34 against 0.55, and 0.32 against 0.60).
+  - Within these questions, the hypotheses that bring in such an alloy score +0.054 [+0.003, +0.115] on GPT-5.6 and
+    +0.056 [−0.029, +0.145] on DeepSeek (same regression), but only 16% of them do.
+- **Which base.** Experiment 44's interim data disagree on its two writers: on 64 runs judged so far by GPT-5.6 (random
+  order), `rx_r` − `rx_base` is −0.057 [−0.18, +0.06]; DeepSeek on the same runs, +0.047. Both are used as bases.
+
+**Sources.**
+- **Decide the content, then write it.** **Data-to-Text Generation with Content Selection and Planning**,
+  Puduppully, Dong and Lapata, AAAI 2019, https://arxiv.org/abs/1809.00582. Generation split into a content plan,
+  then a realisation conditioned on it. Integrated: the writer's hypothesis is the fixed content plan (its lever);
+  a second call only rewrites how it is expressed, and code holds the content fixed.
+- **State the expert's context.** **ExpertPrompting: Instructing Large Language Models to be Distinguished
+  Experts**, Xu et al., 2023, https://arxiv.org/abs/2305.14688. Conditioning the model on a description of the
+  expert's background improves answers. Integrated as one sentence of research context: the asking group works on
+  high-entropy alloys for high-temperature use.
+- **Prior work here.** The conservative writer (rounds 1–2: invented numbers are penalised), and experiments 41–42
+  (prompt changes move the lever).
+
+**Components.**
+- **E, a lever-preserving editor** (`edit_loop.py`, `EDIT_SYSTEM`). One o3-mini call receives the question, the
+  cutoff, the finished hypothesis and the passages it cites, and edits only:
+  1. numbers in the intervention, conditions and structural mediator that neither the question nor a cited passage
+     states, replaced by qualitative descriptions;
+  2. conditions kept to the regime the question states;
+  3. where the mechanism acts through a process that multi-principal-element effects directly control
+     (diffusion-controlled kinetics, solid-solution strengthening, ordering, phase stability), that effect named;
+     otherwise the mechanism is left unchanged;
+  4. a few words added to the hypothesis sentence if it does not say how the intervention acts.
+
+  **Enforced in code.**
+  - Only `hypothesis`, `intervention`, `conditions`, `structural_mediator` and `mechanism` may change. Every other
+    field, the evidence IDs and the falsification experiment are the draft's.
+  - Lever check: no element of the draft's intervention may be dropped. None may be added that the draft or the
+    question does not name. At least 50% of the intervention's content words must stay.
+  - A failed check gets one retry naming the problem. If it fails again, the draft is kept unchanged and recorded.
+  - The run re-builds the stage-1 pack and must match its seen records.
+- **D, the programme's domain** (`m_domain`). The research context is stated beside the question: "The research
+  group asking this question works on high-entropy (multi-principal-element) alloys for high-temperature
+  applications."
+  - It is given only on the 44 questions that do not name the class (`edit_loop.names_alloy_class`, a fixed regular
+    expression).
+  - Elsewhere the writer's prompt is unchanged, so its choices cannot move.
+  - D uses the same pack and WRITER_B as its base.
+
+**Arms** (o3-mini; the 64,000-character packs of experiment 44; samples 1–2).
+
+| Arm | Stage 1 | Runs |
+|---|---|---:|
+| `edit_rx_base` | E on the `rx_base` runs | 270 |
+| `edit_rx_r` | E on the `rx_r` runs | 270 |
+| `domain_rx_base` | D with the `rx_base` pack, on the 44 questions | 88 |
+| `domain_rx_r` | D with the `rx_r` pack | 88 |
+| `domain_edit_rx_base` | E on `domain_rx_base` | 88 |
+| `domain_edit_rx_r` | E on `domain_rx_r` | 88 |
+
+- **Composed agents** (`edit_experiment.py`).
+  - **D:** the base on questions that name the class, and D on the others.
+  - **D+E (the combined agent):** E on questions that name the class, and D+E on the others.
+- **Declared difference** (must_obey.md 6.1). E adds one o3-mini call and sees only the cited passages again. The
+  evidence ceiling is unchanged.
+
+**Smoke test** (about 11:25–11:35, scratch root, 5 units, nothing judged).
+- 18 runs, all OK, every leakage counter zero. One lever check failed (32% of content words kept) and passed on
+  its retry (96%).
+- **One change before the freeze.** The first editor prompt added "lattice distortion and sluggish diffusion" to
+  nearly every mechanism, relevant or not, and rewrote every hypothesis into one long sentence. Rules 3 and 4 above
+  replaced it, and the second version left an unrelated mechanism unchanged. Variants tried: 2.
+
+**Analysis** (fixed now; `edit_experiment.py report`).
+- **Primary family** (base `rx_base`; Holm across 3). E, D and D+E against the base, paired by question and sample:
+  GPT-5.6 primary, DeepSeek alongside.
+- **Secondary family:** the same on `rx_r`.
+- **Decision rule** (as in experiments 41–44):
+  - "raises the score": GPT-5.6 CI above 0 and DeepSeek above 0;
+  - "lowers the score": both below.
+- **On the 44 questions** that do not name the class: D and D+E against the base, and D+E against E.
+- **Diagnostics.**
+  - The four dimensions.
+  - For E:
+    - edits applied, retries and rejections;
+    - the share of fields with numbers not in the sources, before and after;
+    - multi-principal-element effects in the mechanism;
+    - a causal link in the hypothesis sentence;
+    - words per field, before and after (must_obey.md 6.8: the score must not simply track length or style).
+  - For D: the share of hypotheses bringing in the alloy class.
+- **Quality without the answer key** (must_obey.md 6.11).
+  - RQ: the mean of three DeepSeek calls, composed like the score.
+  - Target-free pairwise judgments, both orders, DeepSeek and o1 (Holm per judge and base). GPT-5.6 is left out
+    because of its capacity.
+- **Integrity.**
+  - GPT-5.6 judge, DeepSeek cross-judge and audit on every run.
+  - Leakage counters, and the dates of every seen record checked again.
+  - `must_obey_check.py` must pass before final results.
+- **Same session.** The remaining GPT-5.6 judgments of `rx_base` and `rx_r` (157 and 147) are made by the same
+  runner as the new arms, in a shuffled order.
+
+**Expectations, recorded before running** (the regression's estimates, if causal and additive).
+- E: GPT-5.6 +0.02 to +0.05; DeepSeek larger (+0.05 to +0.12), because DeepSeek credits the mechanism wording more.
+- D: +0.03 to +0.06 on the 44 questions, about +0.01 to +0.02 overall.
+- D+E: +0.03 to +0.07.
+- RQ unchanged or slightly lower (fewer specifics); pairwise quality roughly neutral.
+- Observational estimates usually overstate effects, so the lower ends are more likely.
+- **Scope.** Spent papers: exploratory. A pass would be a candidate for test5.
+
+**Operations.**
+- `loop/run_x45.sh`: generation, with at most 6 o3-mini calls at once over both TRAPI instances.
+- `loop/run_x45_eval.sh`: then DeepSeek, RQ ×3, pairwise (DeepSeek, o1) and the report.
+- `loop/run_x45_gpt.sh` replaces experiment 44's GPT-5.6 runner (`rx_gpt`). It waits until generation is done
+  (`rx_gpt` keeps judging experiment 44 until then), stops `rx_gpt`, and runs two loops of 3 workers, one per
+  instance, 6 in total (must_obey.md 7). Both loops take the same seeded order from opposite ends:
+  1. the v1 judge on the new arms with `rx_base` and `rx_r`;
+  2. then the rest of experiment 44;
+  3. then the audits in the same order.
+
+### 26.2 Interim results (2026-11-02, about 14:10; DeepSeek, research quality and DeepSeek pairwise complete; GPT-5.6 partial; exploratory, because all 45 papers are spent)
+
+**Runs and evaluations.**
+- 892 runs in six arms, all OK.
+- Edits applied in 98% of runs: `edit_rx_base` 265 of 270, `edit_rx_r` 264 of 270, D+E 86 of 88 and 88 of 88. The
+  others failed the lever check twice and kept the draft.
+- Complete:
+  - DeepSeek reconstruction, 892 of 892;
+  - RQ, three DeepSeek calls per run;
+  - DeepSeek pairwise, both orders, all six comparisons (1,784 judgments);
+  - o1 pairwise for the `rx_base` comparisons. The `rx_r` comparisons are running.
+- **GPT-5.6: 200 of 1,196 primary judgments.**
+  - The new arms have 152 of their 892.
+  - The bases need 134 and 122 more.
+  - Both TRAPI instances refuse about half of all GPT-5.6 calls because of other users' load, so about 50–100
+    judgments arrive an hour. The order is random, but these small samples are not yet interpretable.
+
+**Interim decision: neither change raises the score, and the editor lowers hypothesis quality.**
+
+| Variant | DeepSeek vs base [CI] | GPT-5.6 vs base (partial) | RQ vs base | Pairwise, DeepSeek | Pairwise, o1 |
+|---|---|---|---|---|---|
+| **Base `rx_base`** (DeepSeek 0.630) | | | | | |
+| E | +0.016 [−0.03, +0.06] | −0.13 [−0.24, −0.03], 12 papers | −0.008 | **−0.27 [−0.32, −0.21], 0/36 papers** | −0.04 [−0.10, +0.02] |
+| D | +0.016 [−0.02, +0.05] | −0.00, 5 papers | +0.000 | +0.01 | +0.04 |
+| D+E | +0.068 [+0.01, +0.12] | −0.09 [−0.20, +0.04], 11 papers | −0.035 | **−0.26 [−0.32, −0.20], 1/38** | −0.05 [−0.12, +0.01] |
+| **Base `rx_r`** (DeepSeek 0.662) | | | | | |
+| E | −0.017 [−0.07, +0.03] | +0.02, 10 papers | −0.058 [−0.11, −0.00] | **−0.30 [−0.36, −0.24], 0/39** | running |
+| D | +0.011 [−0.03, +0.05] | −0.01 | +0.005 | +0.06 | running |
+| D+E | −0.006 [−0.07, +0.05] | +0.04, 12 papers | −0.074 [−0.14, −0.01] | **−0.25 [−0.31, −0.19], 1/35** | running |
+
+- "Papers" counts the papers in which the variant is preferred or scores higher, against those in which the base is.
+- **D+E on `rx_base` is the only DeepSeek difference whose CI excludes 0** (+0.068; +0.11 on the 44 questions).
+  - It does not survive Holm (0.43).
+  - It is not replicated on `rx_r` (−0.006).
+  - It comes with lower quality.
+  - So it is treated as noise unless GPT-5.6 confirms it.
+
+**The editor did what it was asked, without changing length.**
+- Numbers not in the sources: 26% → 2% of interventions, 40% → 3% of conditions.
+- Mechanisms naming a multi-principal-element effect: 19% → 41%.
+- Hypothesis sentences stating how the intervention acts: 55% → 90%.
+- Words per hypothesis: 227 → 228. So length cannot explain any difference (must_obey.md 6.8).
+
+**Why it does not help.**
+- **The regression misled.** The features it credited were confounded with other differences between methods.
+  Changed on the same hypotheses, they move DeepSeek reconstruction by ±0.02.
+- **The judges that do not see the answer key prefer the original almost everywhere.** DeepSeek prefers the
+  unedited hypothesis in all 36 and all 39 papers with a preference. Without its numbers, a hypothesis reads as
+  vaguer, and RQ falls slightly too.
+- **GPT-5.6's paired dimensions are not yet interpretable.** On 24 and 29 doubly judged runs, conditions moved −0.29
+  on `rx_base` and +0.10 on `rx_r`.
+
+**The domain sentence barely moves the writer.** On the 44 questions, hypotheses bringing in the alloy class rose
+from 31% to 34% (`rx_base` pack) and from 24% to 35% (`rx_r`).
+- Reconstruction on those questions: DeepSeek +0.02 and +0.06.
+- Quality: neutral.
+
+**Expectations** (26.1).
+- E, +0.02 to +0.05 on GPT-5.6 and more on DeepSeek: wrong on DeepSeek (+0.02, −0.02). GPT-5.6 is pending.
+- D, +0.03 to +0.06 on the 44 questions and +0.01 to +0.02 overall: DeepSeek +0.02 and +0.06 on the questions, and
+  +0.016 and +0.011 overall. Within range, but not detectable.
+- RQ unchanged or slightly lower: right (−0.01 to −0.07).
+- Pairwise quality roughly neutral: right for D; wrong for E, which is clearly worse.
+
+**Interim conclusion.**
+1. **Do not adopt the editor.** It does not raise reconstruction, and the judges that do not see the answer key
+   clearly prefer the original hypotheses.
+2. **The domain sentence is harmless but changes little.** Not adopted.
+3. **What this adds.**
+   - The writer's concrete values are not a liability on balance: removing them costs quality and gains nothing.
+   - Effects estimated across methods in the pool did not survive a test on the same hypotheses.
+   - The target-free ceiling of about 0.63 stands. The change that would move it is the paper's specific lever,
+     which no earlier source carries (experiments 41, 43).
+4. **Final when GPT-5.6 completes:** about 1,000 judgments, then the audits.
+
+**Leakage: none detected.** All counters are zero, and the dates of 40,718 seen-record reads were checked again:
+0 violations.
+
+**Checklist** (must_obey.md section 9).
+- [x] Query-facing models are pre-cutoff: o3-mini (writer and editor); experiment 44's packs.
+- [x] Frozen questions. The plan was fixed before the runs (26.1); one smoke-test change before the freeze was
+  recorded (2 variants tried).
+- [x] Evidence filters on; every seen record re-dated.
+- [x] Target-free payloads (guard). Code holds the lever, evidence IDs and fixed fields. Pairwise judgments in both
+  orders.
+- [x] Spent papers only; exploratory. Paired against the same stage-1 hypotheses.
+- [x] Same packs and writer; the extra editor call declared.
+- [ ] GPT-5.6 judge and audit on every run: running (200 of 1,196 primary judgments). DeepSeek complete.
+- [x] Paired statistics with CIs and Holm; negative results recorded.
+- [ ] `must_obey_check.py` passes: not yet (missing GPT-5.6 judgments and audits).
