@@ -5549,3 +5549,40 @@ across methods within a question are not effects (as with the selection checks o
 - [x] Same-session baselines, with the restricted check above (6.10).
 - [x] Paired statistics with CIs and Holm; negative results recorded.
 - [x] `must_obey_check.py --loop` passes on all eight arms.
+
+### 26.4 Offline check after the results (2026-11-02, about 21:30): is the paper's intervention in the models' idea space?
+
+**Question.** Would scoring a shortlist reveal that the models do propose the paper's intervention, just not first?
+The shortlist score is hit@k, as pass@k in code generation: **Evaluating Large Language Models Trained on Code**,
+Chen et al., 2021, https://arxiv.org/abs/2107.03374.
+
+**Check** (existing judgments only; no new calls).
+- **Pool.** The 15,600 judged target-free o3-mini hypotheses of 79 configurations (`select_offline` pool, about 116
+  per question; oracle diagnostics excluded).
+- **Hit.** A hypothesis whose intervention the judge scores ≥ 2 (a substantial match) or ≥ 1 (related).
+- **hit@k.** The share of questions where at least one of k hypotheses, drawn at random from the question's pool,
+  is a hit (200 draws per question).
+
+| Threshold | Judge | hit@1 | hit@5 | hit@10 | hit@20 | Any of the pool |
+|---|---|---:|---:|---:|---:|---:|
+| ≥ 2 (substantial match) | GPT-5.6 | 3% | 7% | 9% | 14% | 26% |
+| ≥ 2 | DeepSeek | 2% | 7% | 11% | 16% | 33% |
+| ≥ 1 (related) | GPT-5.6 | 20% | 44% | 54% | 64% | 83% |
+| ≥ 1 | DeepSeek | 36% | 68% | 78% | 84% | 95% |
+
+**Verdict.**
+- **The paper's intervention lies outside these models' idea space for most questions.**
+  - Even 116 hypotheses from 79 methods substantially match it for only 26% (GPT-5.6) to 33% (DeepSeek) of
+    questions.
+  - A shortlist of 10 would do so for about 10%.
+  - So hit@k at the level of the intervention would not give a high score. Not run.
+- **Related interventions are common** (hit@10 54–78%). The models usually propose something in the same area,
+  which the reconstruction score does not credit.
+  - Example: on the density question for HfMoTaTiZr (PMC10759803, problem-constrained), the 158 hypotheses proposed
+    Nb (84), Al (21), Ti (18) and V (17).
+  - The paper added 4.2 at.% Cr; 1 hypothesis mentioned Cr.
+- **What remains is a choice of measure, not of method.**
+  - A score that credits agreement in kind (the type of study, the property and its direction, the regime, the
+    mechanism family), with no credit for what the question already states, would credit these related proposals.
+  - It would change what the benchmark measures, and it can only be validated against the expert's ratings. Left to
+    the user (asked 2026-11-02; not yet answered).

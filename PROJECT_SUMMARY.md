@@ -80,6 +80,27 @@ judges' values, and differences come with paper-clustered 95% confidence interva
   3.83. Choosing the paper's specific intervention is the unsolved part.
   - **2.5 on this score is out of reach without leakage** (experiment 43). Told the paper's exact lever, the writer
     scores only 1.26 / 1.50, and the best of 15,600 hypotheses picked with the answer key 1.28 / 1.52.
+  - **Why: the score asks for one paper's specific choice, among many valid ones.**
+    - The ladder (GPT-5.6):
+
+      | Information given to the writer | Score |
+      |---|---:|
+      | Nothing (the agent) | 0.62 |
+      | The kind of study the paper did | 0.66 |
+      | The paper's exact intervention | 1.26 |
+      | The whole answer | 3.38 |
+
+      The remaining 2 points are the paper's own numbers and measured results, which exist only after its experiment.
+    - **An example.** As-cast HfMoTaTiZr is strong but dense; what single change lowers its density without losing
+      strength up to about 1000 °C?
+      - 158 hypotheses from 79 methods proposed Nb (84), Al (21), Ti (18) or V (17).
+      - The paper added 4.2 at.% Cr; one hypothesis mentioned Cr.
+      - The agent's "replace Hf with Nb" was called physically plausible and supported by the judge, and scored 0 on
+        the intervention.
+    - **More ideas do not find it** (experiment 45 offline check, loop.md 26.4).
+      - The paper's intervention is substantially matched by 26–33% of questions' whole pools of about 116 hypotheses,
+        and by about 10% of shortlists of 10.
+      - Related interventions are common (54–78% of shortlists), but they earn no credit.
   - **On research quality, the writer already scores above 2.5.** That is the expert's blind scales (plausibility,
     testability, usefulness), judged by AI: 3.10 [3.00, 3.20] on the mean of three DeepSeek calls.
   - That is on a par with the authors' actual studies written as proposals, and far above the Llama baseline
