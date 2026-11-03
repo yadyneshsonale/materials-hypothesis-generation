@@ -305,8 +305,8 @@
     GPT-5.6 judge and audits on both instances (3 workers each): the experiment-45 arms with their bases first, then
     the rest of experiment 44.
 - **Outputs.** [../loop_rx/](../loop_rx/README.md) (`analysis_edit.md`).
-- **Interim result.**
-  - The editor does not raise reconstruction (DeepSeek ±0.02), and the judges that do not see the answer key prefer
-    the original hypotheses (pairwise −0.25 to −0.30).
-  - The domain sentence is neutral.
+- **Result** (GPT-5.6 complete; the audits are still running).
+  - The editor does not raise reconstruction (GPT-5.6 −0.010 and −0.004; DeepSeek ±0.02), and the judges that do not
+    see the answer key prefer the original hypotheses (pairwise −0.25 to −0.30).
+  - The domain sentence is neutral (GPT-5.6 +0.012 and +0.006).
 

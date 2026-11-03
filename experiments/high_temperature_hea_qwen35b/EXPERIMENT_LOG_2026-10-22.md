@@ -1970,10 +1970,10 @@ GPT-5.6 is complete (187 of 1,890 judged).
   against the expert ratings.
 - Final once GPT-5.6 is complete.
 
-## Experiment 45: keep the writer's lever, fix how the hypothesis is written, state the domain (interim)
+## Experiment 45: keep the writer's lever, fix how the hypothesis is written, state the domain
 
 **Request.** "Just look at the pipeline, make some changes and get a better score." Plan in loop.md 26.1; interim
-results in 26.2 ([loop_rx/](./loop_rx/README.md)).
+results in 26.2, final in 26.3 ([loop_rx/](./loop_rx/README.md)).
 
 **Failure analysis.**
 - Every instruction added to the writer's prompt moved o3-mini off its own best guess of the paper's lever, the
@@ -1989,38 +1989,39 @@ results in 26.2 ([loop_rx/](./loop_rx/README.md)).
   IDs and every other field.
 - **D** adds one sentence of research context (the group works on high-entropy alloys for high-temperature use) on
   the 44 questions.
-- Six arms on experiment 44's two bases, 892 runs. DeepSeek decides until GPT-5.6 is complete (200 of 1,196 primary
-  judgments).
+- Six arms on experiment 44's two bases, 892 runs, all judged by GPT-5.6 and DeepSeek.
 
-| Variant | DeepSeek vs base [CI] | Pairwise quality vs base (DeepSeek) |
-|---|---|---|
-| E on `rx_base` | +0.016 [−0.03, +0.06] | **−0.27, 0/36 papers** |
-| D on `rx_base` | +0.016 [−0.02, +0.05] | +0.01 |
-| D+E on `rx_base` | +0.068 [+0.01, +0.12] (Holm 0.43) | **−0.26, 1/38** |
-| E on `rx_r` | −0.017 [−0.07, +0.03] | **−0.30, 0/39** |
-| D on `rx_r` | +0.011 [−0.03, +0.05] | +0.06 |
-| D+E on `rx_r` | −0.006 [−0.07, +0.05] | **−0.25, 1/35** |
+| Variant | GPT-5.6 vs base [CI] | DeepSeek vs base [CI] | Pairwise quality vs base (DeepSeek / o1) |
+|---|---|---|---|
+| E on `rx_base` | −0.010 [−0.04, +0.02] | +0.016 [−0.03, +0.06] | **−0.27** (0/36 papers) / −0.04 |
+| D on `rx_base` | +0.012 [−0.01, +0.03] | +0.016 [−0.02, +0.05] | +0.01 / +0.04 |
+| D+E on `rx_base` | +0.015 [−0.02, +0.04] | +0.068 [+0.01, +0.12] | **−0.26** (1/38) / −0.03 |
+| E on `rx_r` | −0.004 [−0.03, +0.02] | −0.017 [−0.07, +0.03] | **−0.30** (0/39) / **−0.08** |
+| D on `rx_r` | +0.006 [−0.01, +0.02] | +0.011 [−0.03, +0.05] | +0.06 / +0.08 |
+| D+E on `rx_r` | −0.004 [−0.03, +0.03] | −0.006 [−0.07, +0.05] | **−0.25** (1/35) / −0.04 |
 
 - **The editor did what it was asked, and it does not help.**
   - Unsupported numbers fell from 26% to 2% of interventions and from 40% to 3% of conditions, with no change in
     length.
   - Reconstruction moves by ±0.02.
-  - The judges that do not see the answer key prefer the originals almost everywhere (o1 −0.04 to −0.05), and
+  - The judges that do not see the answer key prefer the originals almost everywhere (o1 −0.03 to −0.08), and
     research quality falls by 0.01–0.07.
 - **The domain sentence barely moves the writer** (hypotheses bringing in the class: 31% → 34%, 24% → 35%).
-- **D+E on `rx_base` is DeepSeek's one CI above zero.** It is not replicated on `rx_r` and comes with lower
-  quality: noise unless GPT-5.6 confirms it.
+- **GPT-5.6 confirms that no variant moves the score:** every change is within ±0.015, and every CI includes 0.
+  - D+E's DeepSeek gain on `rx_base` is not confirmed (GPT-5.6 +0.015 [−0.02, +0.04]).
+  - On the 44 questions, D+E with the old pack is +0.054 [+0.02, +0.09] on GPT-5.6, but it does not replicate with
+    the focused pack (+0.005).
+  - The same holds against only the base runs judged in the same session.
 - **Leakage:** none detected (40,718 seen-record reads re-dated).
 
-**Interim conclusion.**
+**Conclusion** (GPT-5.6 complete; `must_obey_check.py` passes; the audits are still running).
 - Adopt neither.
 - The regression's feature effects did not survive a test on the same hypotheses.
-- The target-free ceiling of about 0.63 stands.
-- Final once GPT-5.6 is complete.
+- The target-free ceiling of about 0.62–0.63 (GPT-5.6) stands.
 
 ## Comparability and limits, experiments 8 to 45
 
-- Experiment 45 is interim until its GPT-5.6 judgments and audits complete. Its edit arms add one o3-mini call to
+- Experiment 45's GPT-5.6 judgments are complete; its audits are still running. Its edit arms add one o3-mini call to
   experiment 44's runs (stage 1 unchanged), and its domain arms differ from their base by one sentence on 44 of the
   135 questions, as declared in loop.md 26.1.
 - Experiment 44 is interim until its GPT-5.6 judgments and audits complete: DeepSeek decides meanwhile. Its arms

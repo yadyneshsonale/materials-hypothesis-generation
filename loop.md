@@ -5457,3 +5457,95 @@ from 31% to 34% (`rx_base` pack) and from 24% to 35% (`rx_r`).
 - [ ] GPT-5.6 judge and audit on every run: running (200 of 1,196 primary judgments). DeepSeek complete.
 - [x] Paired statistics with CIs and Holm; negative results recorded.
 - [ ] `must_obey_check.py` passes: not yet (missing GPT-5.6 judgments and audits).
+
+### 26.3 Final results (2026-11-02, about 21:25; GPT-5.6 complete; exploratory, because all 45 papers are spent)
+
+**Status.**
+- All 1,432 runs of the six arms and their two bases have GPT-5.6 judgments.
+- Same-session GPT-5.6 base means: `rx_base` 0.623, `rx_r` 0.625.
+- `must_obey_check.py --loop` passes on all eight. Its only warnings are the target-free audits, which run after
+  experiment 44's remaining GPT-5.6 judgments (runner `x45_gpt`).
+- o1 pairwise is complete for all six comparisons.
+
+**Decision (the pre-registered rule): no variant changes the score.**
+
+| Variant | GPT-5.6 vs base [CI] | DeepSeek | RQ | Pairwise, DeepSeek | Pairwise, o1 |
+|---|---|---|---|---|---|
+| **Base `rx_base`** (GPT-5.6 0.623) | | | | | |
+| E | −0.010 [−0.04, +0.02], 14/20 papers | +0.016 | −0.008 | **−0.27**, 0/36 | −0.04 [−0.10, +0.02] |
+| D | +0.012 [−0.01, +0.03], 8/7 | +0.016 | 0.000 | +0.01 | +0.04 |
+| D+E | +0.015 [−0.02, +0.04], 19/17 | +0.068 [+0.01, +0.12] | −0.035 | **−0.26**, 1/38 | −0.03 [−0.10, +0.04] |
+| **Base `rx_r`** (GPT-5.6 0.625) | | | | | |
+| E | −0.004 [−0.03, +0.02], 17/17 | −0.017 | −0.058 [−0.11, −0.00] | **−0.30**, 0/39 | **−0.08 [−0.12, −0.03]**, Holm 0.012 |
+| D | +0.006 [−0.01, +0.02], 8/7 | +0.011 | +0.005 | +0.06 | +0.08 |
+| D+E | −0.004 [−0.03, +0.03], 20/17 | −0.006 | −0.074 [−0.14, −0.01] | **−0.25**, 1/35 | −0.04 [−0.10, +0.01] |
+
+- Every GPT-5.6 CI includes 0. Holm p is 1.0 in both families.
+- **Same-session check** (must_obey.md 6.10). Some base judgments were made on 2026-11-01 by experiment 44's runner.
+  Against only the base runs judged since 12:17 on 2026-11-02 (151 and 144), the contrasts are:
+
+  | Variant | `rx_base` | `rx_r` |
+  |---|---|---|
+  | E | −0.028 [−0.06, +0.01] | −0.012 [−0.06, +0.04] |
+  | D | +0.005 [−0.02, +0.03] | +0.007 [−0.02, +0.03] |
+  | D+E | +0.009 [−0.03, +0.05] | −0.009 [−0.06, +0.05] |
+
+  The conclusions are the same.
+- **On the 44 questions that do not name the alloy class** (secondary; uncorrected).
+  - `rx_base` pack:
+    - D: +0.015 [−0.03, +0.06];
+    - D+E: +0.054 [+0.02, +0.09], 13/4 papers, p 0.049 (DeepSeek +0.113);
+    - D+E vs E: +0.062 [+0.02, +0.10].
+  - `rx_r` pack:
+    - D: +0.020 [−0.04, +0.09];
+    - D+E: +0.005 [−0.06, +0.07] (DeepSeek +0.065);
+    - D+E vs E: −0.011.
+  - The one positive sign, D+E with the old pack on these questions, does not replicate with the focused pack. It
+    would not survive Holm across the six subset contrasts. An observation, not a result.
+- **Dimensions** (GPT-5.6, change against the base):
+
+  | Variant | Intervention | Conditions | Mechanism | Outcome |
+  |---|---|---|---|---|
+  | E on `rx_base` | +0.04 | −0.03 | −0.02 | −0.04 |
+  | E on `rx_r` | −0.01 | −0.02 | 0.00 | +0.01 |
+
+  The mechanisms now name multi-principal-element effects twice as often (41% against 19%). GPT-5.6's mechanism
+  agreement did not rise.
+
+**Expectations** (26.1).
+- E, GPT-5.6 +0.02 to +0.05 with DeepSeek larger: wrong (−0.010 and −0.004; DeepSeek +0.016 and −0.017).
+- D:
+  - overall +0.01 to +0.02: +0.012 and +0.006, at or below the range;
+  - on the 44 questions +0.03 to +0.06: +0.015 and +0.020, below.
+- D+E, +0.03 to +0.07: wrong (+0.015 and −0.004).
+- RQ unchanged or slightly lower: right.
+- Pairwise quality neutral: right for D, wrong for E (clearly worse).
+
+**Why the regression misled.** It compared hypotheses written by different methods for the same question. Methods
+that write fewer invented numbers or name these effects also differ in their evidence and prompts, so the features
+stood in for those differences. Changing the features alone, on the same hypotheses, moves nothing. Correlations
+across methods within a question are not effects (as with the selection checks of 22.1).
+
+**Conclusion.**
+1. How a hypothesis is written does not move reconstruction. The score depends on which study the writer chooses,
+   not on how it is expressed.
+2. The writer's concrete values are worth keeping: the judges that do not see the answer key prefer them.
+3. The domain sentence is harmless and changes little. Not adopted.
+4. With these models, the target-free ceiling stays at about 0.62–0.63 on GPT-5.6.
+
+**Leakage: none detected.** All counters are zero, and the dates of 40,718 seen-record reads were checked again:
+0 violations.
+
+**Checklist** (must_obey.md section 9).
+- [x] Query-facing models are pre-cutoff: o3-mini (writer and editor); experiment 44's packs.
+- [x] Frozen questions; the plan was fixed before the runs (26.1).
+- [x] Evidence filters on; every seen record re-dated.
+- [x] Target-free payloads (guard). Code holds the lever, evidence IDs and fixed fields. Pairwise judgments in both
+  orders.
+- [x] Spent papers only; exploratory. Paired against the same stage-1 hypotheses.
+- [x] Same packs and writer; the extra editor call declared.
+- [x] GPT-5.6 judge on every run; DeepSeek, RQ ×3 and pairwise (DeepSeek, o1) complete.
+- [ ] Target-free audits: still running (warnings in the gate).
+- [x] Same-session baselines, with the restricted check above (6.10).
+- [x] Paired statistics with CIs and Holm; negative results recorded.
+- [x] `must_obey_check.py --loop` passes on all eight arms.

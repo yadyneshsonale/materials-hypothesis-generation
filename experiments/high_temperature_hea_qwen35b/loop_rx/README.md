@@ -104,10 +104,10 @@ DeepSeek decides until GPT-5.6 is complete. 187 of 1,890 GPT-5.6 judgments were 
 - [x] Paired statistics with CIs and Holm; negative results recorded.
 - [ ] `must_obey_check.py`: fails only on the missing GPT-5.6 judgments, until they complete.
 
-## Experiment 45: keep the writer's lever, fix how the hypothesis is written, state the domain (interim)
+## Experiment 45: keep the writer's lever, fix how the hypothesis is written, state the domain
 
 **Plan and results.** [loop.md](../../../loop.md) section 26: 26.1 failure analysis and pre-registration; 26.2
-interim results.
+interim results; 26.3 final results.
 
 **Code.**
 - [edit_loop.py](../../../edit_loop.py): the arms (`edit_*`, `domain_*`).
@@ -145,17 +145,17 @@ interim results.
 - **Composed agents.** D is the base on questions that name the alloy class, and D on the others. D+E is E, and D+E
   on the others.
 
-**Interim results.** DeepSeek, RQ and DeepSeek pairwise are complete. GPT-5.6 has made 200 of 1,196 primary
-judgments; both instances refuse about half of all calls.
+**Results.** Every evaluation is complete except the GPT-5.6 audits, which are still running.
+`must_obey_check.py` passes.
 
-| Variant | DeepSeek vs base | Pairwise quality vs base (DeepSeek) | RQ vs base |
-|---|---|---|---|
-| E on `rx_base` | +0.016 [−0.03, +0.06] | **−0.27, 0/36 papers** | −0.01 |
-| D on `rx_base` | +0.016 | +0.01 | 0.00 |
-| D+E on `rx_base` | +0.068 [+0.01, +0.12] (Holm 0.43) | **−0.26, 1/38** | −0.04 |
-| E on `rx_r` | −0.017 | **−0.30, 0/39** | −0.06 |
-| D on `rx_r` | +0.011 | +0.06 | +0.01 |
-| D+E on `rx_r` | −0.006 | **−0.25, 1/35** | −0.07 |
+| Variant | GPT-5.6 vs base [CI] | DeepSeek vs base | Pairwise quality vs base (DeepSeek) | RQ vs base |
+|---|---|---|---|---|
+| E on `rx_base` | −0.010 [−0.04, +0.02] | +0.016 | **−0.27, 0/36 papers** | −0.01 |
+| D on `rx_base` | +0.012 [−0.01, +0.03] | +0.016 | +0.01 | 0.00 |
+| D+E on `rx_base` | +0.015 [−0.02, +0.04] | +0.068 [+0.01, +0.12] | **−0.26, 1/38** | −0.04 |
+| E on `rx_r` | −0.004 [−0.03, +0.02] | −0.017 | **−0.30, 0/39** | −0.06 |
+| D on `rx_r` | +0.006 [−0.01, +0.02] | +0.011 | +0.06 | +0.01 |
+| D+E on `rx_r` | −0.004 [−0.03, +0.03] | −0.006 | **−0.25, 1/35** | −0.07 |
 
 - **The editor did what it was asked, and it does not help.**
   - Numbers not in the sources fell from 26% to 2% of interventions and from 40% to 3% of conditions, with no
@@ -164,5 +164,5 @@ judgments; both instances refuse about half of all calls.
   - The judges that do not see the answer key prefer the original hypotheses in almost every paper.
 - **The domain sentence barely changes the writer.** Hypotheses bringing in the alloy class went from 31% to 34% and
   from 24% to 35%. Its effects are within ±0.06.
-- **Interim conclusion:** adopt neither; final when GPT-5.6 completes.
+- **Conclusion:** adopt neither.
 - **Leakage: none detected.** All counters zero; 40,718 seen-record reads re-dated, 0 violations.

@@ -1,6 +1,6 @@
 # Project summary: AI hypothesis generation for high-temperature high-entropy alloys
 
-**Status.** 2026-11-02, after experiment 45 (interim). This file gathers everything done so far and every main result in one
+**Status.** 2026-11-02, after experiment 45. This file gathers everything done so far and every main result in one
 place.
 
 **Details.**
@@ -168,13 +168,13 @@ judges' values, and differences come with paper-clustered 95% confidence interva
         reconstruction (−0.15) and quality (−0.27). Candidates written together are thinner, critic selection among
         them costs more than revision recovers, and the critics agree only weakly (ρ 0.29–0.43).
   16. **Editing how a hypothesis is written does not raise the score; vaguer hypotheses lose quality** (experiment
-      45, interim).
+      45).
       - Prompt changes move the writer off its best guess of the lever (experiments 41–42). So a second call
         edited only the wording of finished hypotheses, and code kept their lever.
       - It removed unsupported numbers (interventions 26% → 2%, conditions 40% → 3%), named multi-principal-element
         effects where relevant, and stated the causal link.
-      - Reconstruction moved by ±0.02 (DeepSeek). The judges that do not see the answer key preferred the original
-        in almost every paper (−0.27 and −0.30).
+      - Reconstruction moved by at most ±0.02 on both judges (GPT-5.6 −0.010 to +0.015). The judges that do not see
+        the answer key preferred the original in almost every paper (DeepSeek −0.27 and −0.30).
       - The feature effects a regression over the 15,600 earlier hypotheses had promised did not survive this test
         on the same hypotheses.
       - One domain sentence ("the group works on high-entropy alloys"), given on the 44 questions that do not name
@@ -850,27 +850,27 @@ GPT-5.6 completes).
   - Critic selection costs more than revision recovers.
   - The three critic models agree only weakly with each other, and with the independent judge.
 
-### 4.18 A lever-preserving editor and the programme's domain (experiment 45, interim)
+### 4.18 A lever-preserving editor and the programme's domain (experiment 45)
 
 **Why** ([loop_rx/](./experiments/high_temperature_hea_qwen35b/loop_rx/README.md); loop.md section 26).
 - Instructions in the writer's prompt move it off its own best guess of the lever, the best target-free predictor.
 - So E edits only the wording of finished hypotheses, and code holds the lever. D adds one sentence of research
   context where the question does not name the alloy class (44 of 135 questions).
 
-**Results** (DeepSeek complete; GPT-5.6 200 of 1,196 primary judgments).
+**Results** (GPT-5.6 and DeepSeek complete).
 
-| Variant | DeepSeek vs base | Pairwise quality vs base (DeepSeek) |
-|---|---|---|
-| E on `rx_base` / `rx_r` | +0.016 / −0.017 | **−0.27 / −0.30** (0/36, 0/39 papers) |
-| D on `rx_base` / `rx_r` | +0.016 / +0.011 | +0.01 / +0.06 |
-| D+E on `rx_base` / `rx_r` | +0.068 [+0.01, +0.12] / −0.006 | **−0.26 / −0.25** |
+| Variant | GPT-5.6 vs base | DeepSeek vs base | Pairwise quality vs base (DeepSeek) |
+|---|---|---|---|
+| E on `rx_base` / `rx_r` | −0.010 / −0.004 | +0.016 / −0.017 | **−0.27 / −0.30** (0/36, 0/39 papers) |
+| D on `rx_base` / `rx_r` | +0.012 / +0.006 | +0.016 / +0.011 | +0.01 / +0.06 |
+| D+E on `rx_base` / `rx_r` | +0.015 / −0.004 | +0.068 [+0.01, +0.12] / −0.006 | **−0.26 / −0.25** |
 
 - **The editor does what it is asked.** Unsupported numbers fell from 26% to 2% of interventions and from 40% to 3%
   of conditions, with length unchanged.
 - **It does not raise the score.** The judges that do not see the answer key read the edited hypotheses as vaguer.
 - **D barely changes the writer.**
-- **D+E's DeepSeek gain** on one base is not replicated on the other.
-- **Interim verdict:** adopt neither.
+- **D+E's DeepSeek gain** on one base is not confirmed by GPT-5.6, nor replicated on the other base.
+- **Verdict:** adopt neither.
 
 ## 5. The recommended method on every held-out comparison
 
@@ -935,10 +935,10 @@ GPT-5.6 completes).
 - **A literature map with a broad-reasoning prompt** (experiment 44, interim): −0.06.
 - **A multi-critic refinement loop** (experiment 44, interim): four candidates, critiques by o1, gpt-4o and Llama-3.3,
   critique-driven re-retrieval and revision. Reconstruction −0.15 and pairwise quality −0.27 against the base writer.
-- **A lever-preserving editor** (experiment 45, interim). It removes unsupported numbers, names
-  multi-principal-element effects and states the causal link. Reconstruction ±0.02 (DeepSeek); target-free pairwise
-  quality −0.27 and −0.30.
-- **A domain sentence** on the questions that do not name the alloy class (experiment 45, interim): within ±0.06.
+- **A lever-preserving editor** (experiment 45). It removes unsupported numbers, names
+  multi-principal-element effects and states the causal link. Reconstruction within ±0.02 on both judges;
+  target-free pairwise quality −0.27 and −0.30 (DeepSeek).
+- **A domain sentence** on the questions that do not name the alloy class (experiment 45): GPT-5.6 +0.012 and +0.006.
 - **Changes from six stage reviews** (experiment 42):
   - retrieval ranking without the question template's words;
   - a writing block that locks the question's facts and bans invented numbers. It lowers the score: −0.055 on

@@ -6,38 +6,38 @@ Pre-registered in loop.md 26.1. GPT-5.6 reconstruction decides (CI above 0 and D
 
 | arm | ok | failed | failed attempts | DeepSeek judged | GPT-5.6 judged | audits | calls incl. stage 1 |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| domain_rx_base | 88 | 0 | 0 | 88 | 17 | 0 | 1.00 |
-| domain_rx_r | 88 | 0 | 0 | 88 | 8 | 0 | 1.00 |
-| edit_rx_base | 270 | 0 | 0 | 270 | 45 | 0 | 2.04 |
-| edit_rx_r | 270 | 0 | 0 | 270 | 50 | 0 | 2.04 |
-| domain_edit_rx_base | 88 | 0 | 0 | 88 | 16 | 0 | 2.09 |
-| domain_edit_rx_r | 88 | 0 | 0 | 88 | 14 | 0 | 2.01 |
+| domain_rx_base | 88 | 0 | 0 | 88 | 88 | 0 | 1.00 |
+| domain_rx_r | 88 | 0 | 0 | 88 | 88 | 0 | 1.00 |
+| edit_rx_base | 270 | 0 | 0 | 270 | 270 | 0 | 2.04 |
+| edit_rx_r | 270 | 0 | 0 | 270 | 270 | 0 | 2.04 |
+| domain_edit_rx_base | 88 | 0 | 0 | 88 | 88 | 0 | 2.09 |
+| domain_edit_rx_r | 88 | 0 | 0 | 88 | 88 | 0 | 2.01 |
 
 ## Base `rx_base` (primary)
 
 | variant | GPT-5.6 mean | DeepSeek mean | RQ (3 calls) | GPT-5.6 vs base | DeepSeek vs base | RQ vs base | decision |
 |---|---:|---:|---:|---|---|---|---|
-| base | 0.629 | 0.630 | 3.051 | – | – | – | – |
-| E | 0.610 | 0.645 | 3.043 | -0.132 [-0.24, -0.03], 3/9 papers, p 0.146, Holm 0.438 | +0.016 [-0.03, +0.06], 19/18 papers, p 1.0, Holm 1.0 | -0.008 [-0.06, +0.05], 17/27 papers, p 0.1742, Holm 0.3484 | no detectable difference |
-| D | 0.701 | 0.645 | 3.051 | -0.001 [-0.04, +0.04], 2/3 papers, p 1.0, Holm 1.0 | +0.016 [-0.02, +0.05], 11/7 papers, p 0.4807, Holm 0.9614 | +0.000 [-0.03, +0.03], 11/12 papers, p 1.0, Holm 1.0 | no detectable difference |
-| DE | 0.620 | 0.697 | 3.016 | -0.086 [-0.20, +0.04], 3/8 papers, p 0.2266, Holm 0.4532 | +0.068 [+0.01, +0.12], 24/14 papers, p 0.1433, Holm 0.4299 | -0.035 [-0.10, +0.03], 15/29 papers, p 0.0488, Holm 0.1464 | no detectable difference |
+| base | 0.623 | 0.630 | 3.051 | – | – | – | – |
+| E | 0.613 | 0.645 | 3.043 | -0.010 [-0.04, +0.02], 14/20 papers, p 0.3915, Holm 1.0 | +0.016 [-0.03, +0.06], 19/18 papers, p 1.0, Holm 1.0 | -0.008 [-0.06, +0.05], 17/27 papers, p 0.1742, Holm 0.3484 | no detectable difference |
+| D | 0.635 | 0.645 | 3.051 | +0.012 [-0.01, +0.03], 8/7 papers, p 1.0, Holm 1.0 | +0.016 [-0.02, +0.05], 11/7 papers, p 0.4807, Holm 0.9614 | +0.000 [-0.03, +0.03], 11/12 papers, p 1.0, Holm 1.0 | no detectable difference |
+| DE | 0.638 | 0.697 | 3.016 | +0.015 [-0.02, +0.04], 19/17 papers, p 0.8679, Holm 1.0 | +0.068 [+0.01, +0.12], 24/14 papers, p 0.1433, Holm 0.4299 | -0.035 [-0.10, +0.03], 15/29 papers, p 0.0488, Holm 0.1464 | no detectable difference |
 
 On the questions that do not name the alloy class:
 
 | contrast | GPT-5.6 | DeepSeek |
 |---|---|---|
-| D_vs_base | -0.089 [-0.38, +0.20], 2/3 papers, p 1.0 | +0.022 [-0.10, +0.14], 11/7 papers, p 0.4807 |
-| DE_vs_base | +0.000 [-0.38, +0.38], 1/1 papers, p 1.0 | +0.113 [-0.01, +0.24], 13/6 papers, p 0.1671 |
-| DE_vs_E | +0.000 [-0.25, +0.25], 1/1 papers, p 1.0 | +0.103 [-0.02, +0.22], 14/5 papers, p 0.0636 |
+| D_vs_base | +0.015 [-0.03, +0.06], 8/7 papers, p 1.0 | +0.022 [-0.10, +0.14], 11/7 papers, p 0.4807 |
+| DE_vs_base | +0.054 [+0.02, +0.09], 13/4 papers, p 0.049 | +0.113 [-0.01, +0.24], 13/6 papers, p 0.1671 |
+| DE_vs_E | +0.062 [+0.02, +0.10], 13/4 papers, p 0.049 | +0.103 [-0.02, +0.22], 14/5 papers, p 0.0636 |
 
 Dimensions (GPT-5.6 / DeepSeek):
 
 | variant | intervention | conditions | mechanism | outcome |
 |---|---|---|---|---|
-| base | 0.25 / 0.48 | 0.63 / 0.73 | 0.67 / 0.60 | 0.95 / 0.70 |
-| E | 0.36 / 0.53 | 0.56 / 0.72 | 0.78 / 0.61 | 0.98 / 0.73 |
-| D | 0.30 / 0.51 | 0.69 / 0.74 | 0.72 / 0.62 | 0.95 / 0.71 |
-| DE | 0.33 / 0.58 | 0.57 / 0.76 | 0.76 / 0.66 | 0.96 / 0.79 |
+| base | 0.28 / 0.48 | 0.64 / 0.73 | 0.69 / 0.60 | 0.88 / 0.70 |
+| E | 0.32 / 0.53 | 0.61 / 0.72 | 0.67 / 0.61 | 0.84 / 0.73 |
+| D | 0.28 / 0.51 | 0.67 / 0.74 | 0.71 / 0.62 | 0.87 / 0.71 |
+| DE | 0.34 / 0.58 | 0.63 / 0.76 | 0.71 / 0.66 | 0.87 / 0.79 |
 
 Edit diagnostics:
 
@@ -194,27 +194,27 @@ Domain diagnostics:
 
 | variant | GPT-5.6 mean | DeepSeek mean | RQ (3 calls) | GPT-5.6 vs base | DeepSeek vs base | RQ vs base | decision |
 |---|---:|---:|---:|---|---|---|---|
-| base | 0.620 | 0.662 | 3.034 | – | – | – | – |
-| E | 0.538 | 0.645 | 2.976 | +0.016 [-0.10, +0.10], 7/3 papers, p 0.3438, Holm 1.0 | -0.017 [-0.07, +0.03], 17/19 papers, p 0.8679, Holm 1.0 | -0.058 [-0.11, -0.00], 18/27 papers, p 0.2327, Holm 0.4654 | no detectable difference |
-| D | 0.632 | 0.673 | 3.039 | -0.011 [-0.03, +0.00], 1/3 papers, p 0.625, Holm 1.0 | +0.011 [-0.03, +0.05], 9/10 papers, p 1.0, Holm 1.0 | +0.005 [-0.04, +0.05], 12/11 papers, p 1.0, Holm 1.0 | no detectable difference |
-| DE | 0.525 | 0.656 | 2.960 | +0.039 [-0.04, +0.11], 8/4 papers, p 0.3877, Holm 1.0 | -0.006 [-0.07, +0.05], 18/20 papers, p 0.8714, Holm 1.0 | -0.074 [-0.14, -0.01], 17/28 papers, p 0.1352, Holm 0.4056 | no detectable difference |
+| base | 0.625 | 0.662 | 3.034 | – | – | – | – |
+| E | 0.621 | 0.645 | 2.976 | -0.004 [-0.03, +0.02], 17/17 papers, p 1.0, Holm 1.0 | -0.017 [-0.07, +0.03], 17/19 papers, p 0.8679, Holm 1.0 | -0.058 [-0.11, -0.00], 18/27 papers, p 0.2327, Holm 0.4654 | no detectable difference |
+| D | 0.631 | 0.673 | 3.039 | +0.006 [-0.01, +0.02], 8/7 papers, p 1.0, Holm 1.0 | +0.011 [-0.03, +0.05], 9/10 papers, p 1.0, Holm 1.0 | +0.005 [-0.04, +0.05], 12/11 papers, p 1.0, Holm 1.0 | no detectable difference |
+| DE | 0.621 | 0.656 | 2.960 | -0.004 [-0.03, +0.03], 20/17 papers, p 0.7428, Holm 1.0 | -0.006 [-0.07, +0.05], 18/20 papers, p 0.8714, Holm 1.0 | -0.074 [-0.14, -0.01], 17/28 papers, p 0.1352, Holm 0.4056 | no detectable difference |
 
 On the questions that do not name the alloy class:
 
 | contrast | GPT-5.6 | DeepSeek |
 |---|---|---|
-| D_vs_base | -0.250 [-0.62, +0.12], 1/3 papers, p 0.625 | +0.057 [-0.06, +0.18], 9/10 papers, p 1.0 |
-| DE_vs_base | +0.042 [-0.12, +0.21], 3/2 papers, p 1.0 | +0.065 [-0.04, +0.17], 10/6 papers, p 0.4545 |
-| DE_vs_E | +0.000 [-0.19, +0.19], 1/1 papers, p 1.0 | -0.005 [-0.09, +0.09], 8/8 papers, p 1.0 |
+| D_vs_base | +0.020 [-0.04, +0.09], 8/7 papers, p 1.0 | +0.057 [-0.06, +0.18], 9/10 papers, p 1.0 |
+| DE_vs_base | +0.005 [-0.06, +0.07], 11/9 papers, p 0.8238 | +0.065 [-0.04, +0.17], 10/6 papers, p 0.4545 |
+| DE_vs_E | -0.011 [-0.08, +0.06], 8/9 papers, p 1.0 | -0.005 [-0.09, +0.09], 8/8 papers, p 1.0 |
 
 Dimensions (GPT-5.6 / DeepSeek):
 
 | variant | intervention | conditions | mechanism | outcome |
 |---|---|---|---|---|
-| base | 0.26 / 0.51 | 0.68 / 0.78 | 0.68 / 0.64 | 0.92 / 0.72 |
-| E | 0.14 / 0.50 | 0.66 / 0.79 | 0.64 / 0.57 | 0.80 / 0.72 |
-| D | 0.31 / 0.54 | 0.70 / 0.79 | 0.68 / 0.65 | 0.89 / 0.72 |
-| DE | 0.17 / 0.53 | 0.65 / 0.77 | 0.62 / 0.60 | 0.75 / 0.72 |
+| base | 0.26 / 0.51 | 0.67 / 0.78 | 0.71 / 0.64 | 0.87 / 0.72 |
+| E | 0.25 / 0.50 | 0.65 / 0.79 | 0.71 / 0.57 | 0.88 / 0.72 |
+| D | 0.28 / 0.54 | 0.68 / 0.79 | 0.68 / 0.65 | 0.89 / 0.72 |
+| DE | 0.27 / 0.53 | 0.64 / 0.77 | 0.69 / 0.60 | 0.88 / 0.72 |
 
 Edit diagnostics:
 
@@ -376,7 +376,10 @@ Domain diagnostics:
 - deepseek, DE vs rx_r: -0.248 [-0.31, -0.19], 1/35 papers, p 0.0, Holm 0.0; pairs 270, variant wins 0.03, base wins 0.278
 - o1, E vs rx_base: -0.037 [-0.10, +0.02], 10/20 papers, p 0.0987, Holm 0.2961; pairs 270, variant wins 0.07, base wins 0.107
 - o1, D vs rx_base: +0.036 [-0.14, +0.22], 7/8 papers, p 1.0, Holm 1.0; pairs 88, variant wins 0.205, base wins 0.227
-- o1, DE vs rx_base: -0.053 [-0.12, +0.01], 10/20 papers, p 0.0987, Holm 0.2961; pairs 256, variant wins 0.102, base wins 0.148
+- o1, DE vs rx_base: -0.033 [-0.10, +0.04], 11/20 papers, p 0.1496, Holm 0.2992; pairs 270, variant wins 0.115, base wins 0.148
+- o1, E vs rx_r: -0.078 [-0.12, -0.03], 5/20 papers, p 0.0041, Holm 0.0123; pairs 270, variant wins 0.052, base wins 0.13
+- o1, D vs rx_r: +0.076 [-0.07, +0.23], 8/7 papers, p 1.0, Holm 1.0; pairs 88, variant wins 0.182, base wins 0.148
+- o1, DE vs rx_r: -0.044 [-0.10, +0.01], 11/17 papers, p 0.3449, Holm 0.6898; pairs 270, variant wins 0.085, base wins 0.13
 
 ## Leakage
 
