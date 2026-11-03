@@ -5464,7 +5464,7 @@ from 31% to 34% (`rx_base` pack) and from 24% to 35% (`rx_r`).
 - All 1,432 runs of the six arms and their two bases have GPT-5.6 judgments.
 - Same-session GPT-5.6 base means: `rx_base` 0.623, `rx_r` 0.625.
 - `must_obey_check.py --loop` passes on all eight. Its only warnings are the target-free audits, which run after
-  experiment 44's remaining GPT-5.6 judgments (runner `x45_gpt`).
+  experiment 44's remaining GPT-5.6 judgments (runner `x45_gpt`, paused at the user's request at 22:30 on 2026-11-02 (loop.md 26.5)).
 - o1 pairwise is complete for all six comparisons.
 
 **Decision (the pre-registered rule): no variant changes the score.**
@@ -5545,7 +5545,7 @@ across methods within a question are not effects (as with the selection checks o
 - [x] Spent papers only; exploratory. Paired against the same stage-1 hypotheses.
 - [x] Same packs and writer; the extra editor call declared.
 - [x] GPT-5.6 judge on every run; DeepSeek, RQ ×3 and pairwise (DeepSeek, o1) complete.
-- [ ] Target-free audits: still running (warnings in the gate).
+- [ ] Target-free audits: not yet done; the runner is paused (26.5). The gate treats them as warnings.
 - [x] Same-session baselines, with the restricted check above (6.10).
 - [x] Paired statistics with CIs and Holm; negative results recorded.
 - [x] `must_obey_check.py --loop` passes on all eight arms.
@@ -5586,3 +5586,21 @@ Chen et al., 2021, https://arxiv.org/abs/2107.03374.
     mechanism family), with no credit for what the question already states, would credit these related proposals.
   - It would change what the benchmark measures, and it can only be validated against the expert's ratings. Left to
     the user (asked 2026-11-02; not yet answered).
+
+### 26.5 Operations: the GPT-5.6 runner paused (2026-11-02, 22:30)
+
+- **At the user's request,** every process of this project was stopped:
+  - the GPT-5.6 runner (`loop/run_x45_gpt.sh`, tmux `x45_gpt`): its two loops and two `hypo_loop.py judge` workers;
+  - three idle tmux shells from 2026-10-21/22 (`mathg-eval-v3`, `mathg-eval-kg`, `mathg-eval-critique`).
+- **Nothing was lost.**
+  - Evaluation outputs are written whole or not at all (`hypo_loop.write_once`). No temporary file was left.
+  - At most the six judgments in flight were dropped. They will be redone.
+- **Left to do.**
+  - 565 GPT-5.6 judgments of experiment 44: `rx_u` 96, `rx_c` 110, `rx_ruc` 110, `rx_ru` 131, `rx_ruc_select`
+    118.
+  - 2,782 target-free audits: 1,432 for experiment 45 and its bases, and 1,350 for the rest of experiment 44.
+  - Experiment 45's GPT-5.6 judgments are complete; its result (26.3) does not depend on what remains.
+- **To resume** (from the repository root): `tmux new-session -d -s x45_gpt "bash
+  experiments/high_temperature_hea_qwen35b/loop/run_x45_gpt.sh"`.
+  - Every stage skips outputs that already exist, so it continues where it stopped.
+  - Experiment 44 stays interim until its 565 judgments are done.

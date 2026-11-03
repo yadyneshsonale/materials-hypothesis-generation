@@ -2014,14 +2014,14 @@ results in 26.2, final in 26.3 ([loop_rx/](./loop_rx/README.md)).
   - The same holds against only the base runs judged in the same session.
 - **Leakage:** none detected (40,718 seen-record reads re-dated).
 
-**Conclusion** (GPT-5.6 complete; `must_obey_check.py` passes; the audits are still running).
+**Conclusion** (GPT-5.6 complete; `must_obey_check.py` passes; the audits are paused, loop.md 26.5).
 - Adopt neither.
 - The regression's feature effects did not survive a test on the same hypotheses.
 - The target-free ceiling of about 0.62–0.63 (GPT-5.6) stands.
 
 ## Comparability and limits, experiments 8 to 45
 
-- Experiment 45's GPT-5.6 judgments are complete; its audits are still running. Its edit arms add one o3-mini call to
+- Experiment 45's GPT-5.6 judgments are complete; its audits are paused (loop.md 26.5). Its edit arms add one o3-mini call to
   experiment 44's runs (stage 1 unchanged), and its domain arms differ from their base by one sentence on 44 of the
   135 questions, as declared in loop.md 26.1.
 - Experiment 44 is interim until its GPT-5.6 judgments and audits complete: DeepSeek decides meanwhile. Its arms

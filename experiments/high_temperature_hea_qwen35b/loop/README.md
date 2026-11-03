@@ -303,9 +303,9 @@
   - [run_x45_eval.sh](./run_x45_eval.sh) runs DeepSeek, RQ ×3, pairwise (DeepSeek, o1) and the report.
   - [run_x45_gpt.sh](./run_x45_gpt.sh) waited for generation, stopped experiment 44's GPT-5.6 runner and runs the
     GPT-5.6 judge and audits on both instances (3 workers each): the experiment-45 arms with their bases first, then
-    the rest of experiment 44.
+    the rest of experiment 44. It was paused at the user's request at 22:30 on 2026-11-02 (loop.md 26.5); rerunning it resumes where it stopped.
 - **Outputs.** [../loop_rx/](../loop_rx/README.md) (`analysis_edit.md`).
-- **Result** (GPT-5.6 complete; the audits are still running).
+- **Result** (GPT-5.6 complete; the audits are paused).
   - The editor does not raise reconstruction (GPT-5.6 −0.010 and −0.004; DeepSeek ±0.02), and the judges that do not
     see the answer key prefer the original hypotheses (pairwise −0.25 to −0.30).
   - The domain sentence is neutral (GPT-5.6 +0.012 and +0.006).
