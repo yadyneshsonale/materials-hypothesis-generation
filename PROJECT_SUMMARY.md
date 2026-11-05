@@ -19,8 +19,17 @@ judges' values, and differences come with paper-clustered 95% confidence interva
     the strong-proposal score, combines plausibility, testability, usefulness and grounding in the cited earlier work.
   - **How decisions are made**: by pairwise preference, with DeepSeek for development and GPT-5.6 held out to confirm.
   - **Reconstruction (agreement with the paper's own study) is retired.** Everything below about it is history.
-  - Phase 1 is scoring the 50 configurations that already exist; [loop_quality/](./experiments/high_temperature_hea_qwen35b/loop_quality/README.md)
-    will hold the leaderboard.
+  - **The best agent on this objective: focused retrieval with the conservative writer** (`rx_r`, experiment 44).
+    - SP 2.65, against 2.33 for the closed-book writer.
+    - Grounding 2.52, against 1.00.
+    - Preferred over the closed-book writer by DeepSeek, +0.50 (41 vs 2 papers), and by GPT-5.6, held out, +0.54
+      (40 vs 3).
+  - Every evidence-based configuration beats the closed-book writer. The add-ons of experiments 44–45 (literature map,
+    critique loop, editor) do not improve on focused retrieval.
+  - **Caveat:** the AI judges prefer the AI writer to the authors' own studies, so the expert's ratings must confirm
+    before any claim.
+  - Phase 1b (35 more configurations) is running; the leaderboard is in
+    [loop_quality/](./experiments/high_temperature_hea_qwen35b/loop_quality/README.md) (loop.md 27.3).
 
 - **Goal.** Given a research question about high-temperature high-entropy alloys (HEAs), an AI model proposes a
   testable hypothesis: what to change (the intervention), the mechanism, the predicted outcome, its limits and a
@@ -72,7 +81,7 @@ judges' values, and differences come with paper-clustered 95% confidence interva
     - nor the changes six stage reviews suggested; their writing block lowered the score (experiment 42).
   - Its lead is in overall closeness. On a strict checklist of each paper's specific facts, it and the baseline both
     match only about 6–15% (experiments 33, 35).
-- **Recommended agent for generating hypotheses: the same writer with web evidence** (`web_text_64k_b_o3mini`, 64,000
+- **Recommended agent through experiment 45: the same writer with web evidence** (`web_text_64k_b_o3mini`, 64,000
   characters of the question's date-filtered web corpus).
   - On the spent papers it ties the closed-book writer on reconstruction when both are judged in the same session
     (0.620 vs 0.621; DeepSeek 0.656 vs 0.575).
@@ -80,10 +89,12 @@ judges' values, and differences come with paper-clustered 95% confidence interva
     papers.
   - It also beats the evidence-choosing agent of experiment 40 on quality.
   - The closed-book writer keeps the held-out reconstruction results above.
-  - **Candidate replacement: the same writer with focused retrieval** (`rx_r`, experiment 44; interim, DeepSeek).
-    - It reaches the highest reconstruction of the seven arms (0.662 vs 0.630; +0.03, not detectable).
-    - Its hypotheses are preferred without the answer key in 26 of 45 papers (+0.16).
-    - It is pending GPT-5.6 confirmation.
+  - **Replaced on 2026-11-05 by the same writer with focused retrieval** (`rx_r`, experiment 44), the incumbent on
+    the new objective. It is preferred over the closed-book writer by DeepSeek (+0.50) and by GPT-5.6, held out
+    (+0.54) (experiment 46, loop.md 27.3).
+    - On reconstruction (history) it reached the highest score of the seven experiment-44 arms (0.662 vs 0.630;
+      +0.03, not detectable).
+    - Its hypotheses were preferred over the old-corpus writer without the answer key in 26 of 45 papers (+0.16).
 - **The absolute level is low.** About 0.6 out of 4, while the paper's actual study, rewritten as a proposal, scores
   3.83. Choosing the paper's specific intervention is the unsolved part.
   - **2.5 on this score is out of reach without leakage** (experiment 43). Told the paper's exact lever, the writer

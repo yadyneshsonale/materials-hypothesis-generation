@@ -5764,3 +5764,76 @@ enters SP.
 - **Operations.** To stay within 6 DeepSeek workers, the runner was stopped at 01:14 (its grounding stage was
   under way) and restarted at 01:15 as `loop/run_x46b.sh`: the controls with three calls, then as before. Every stage
   is resumable, and no output was lost or duplicated.
+
+### 27.3 Phase 1a results and the incumbent (2026-11-05, about 04:20; phase 1b, the o1 view and the second GPT-5.6 round still running)
+
+**Complete.** For the 15 configurations already scored on RQ, and the reference:
+- grounding: 4,320 calls;
+- DeepSeek pairwise against the closed-book writer: 8,100 judgments, both orders;
+- GPT-5.6 confirmation for the top three: 1,620 judgments, 03:11–04:18.
+
+The o1 view is partial (2,737 of 8,100).
+
+**Leaderboard on the new objective** (SP 0–4; pairwise = net preference over the closed-book writer, paired by paper;
+"papers" counts the papers in which each side is preferred).
+
+| Configuration (experiment) | SP | RQ | Grounding | Words | Pairwise, DeepSeek | Pairwise, GPT-5.6 |
+|---|---:|---:|---:|---:|---|---|
+| **`rx_r`: focused retrieval + conservative writer (44)** | **2.65** | 3.03 | 2.52 | 548 | **+0.50 [+0.41, +0.58]**, 41 vs 2 papers | **+0.54 [+0.43, +0.65]**, 40 vs 3 |
+| `edit_rx_r`: + the editor (45) | 2.62 | 2.98 | 2.54 | 549 | +0.42 [+0.33, +0.50], 40 vs 1 | +0.54 [+0.42, +0.65], 40 vs 3 |
+| `rx_ru`: + literature map and broad prompt (44) | 2.59 | 3.00 | 2.38 | 579 | +0.43 [+0.35, +0.52], 39 vs 0 | +0.43 [+0.33, +0.52], 38 vs 2 |
+| `rx_ruc`: + critique loop (44) | 2.59 | 2.98 | 2.42 | 414 | +0.24 [+0.16, +0.32], 31 vs 4 | – |
+| `rx_base`: old web corpus + writer (44) | 2.54 | 3.05 | 2.00 | 535 | +0.40 [+0.32, +0.49], 39 vs 1 | – |
+| `web64k_v2` (42) | 2.53 | 3.06 | 1.94 | 530 | +0.32 [+0.24, +0.40], 35 vs 2 | – |
+| `edit_rx_base` (45) | 2.52 | 3.04 | 1.97 | 535 | +0.30 [+0.20, +0.40], 34 vs 8 | – |
+| `rx_ruc_select` (44) | 2.50 | 2.86 | 2.42 | 371 | +0.18 [+0.09, +0.27], 28 vs 5 | – |
+| `rx_c`: old corpus + critique loop (44) | 2.50 | 3.06 | 1.83 | 412 | +0.11 [+0.03, +0.20], 24 vs 11 | – |
+| `rx_u` (44) | 2.48 | 2.97 | 2.01 | 572 | +0.33 [+0.24, +0.41], 34 vs 1 | – |
+| `web_text_64k` (36) | 2.48 | 3.03 | 1.85 | 525 | +0.29 [+0.20, +0.38], 35 vs 5 | – |
+| `writer_study` (41) | 2.35 | 3.13 | 1.00 | 529 | +0.22 [+0.14, +0.30], 30 vs 7 | – |
+| `writer_only_b_o3mini`: closed-book writer (21–35) | 2.33 | 3.10 | 1.00 | 488 | (reference point) | (reference point) |
+| `closed_book_o3mini` (21) | 2.23 | 2.97 | 1.00 | 473 | −0.34 [−0.41, −0.27], 2 vs 41 | – |
+| `closed_book`: Llama-3.3 baseline (21) | 1.05 | 1.40 | 1.00 | 226 | −1.00, 0 vs 45 | – |
+| *Reference: the authors' own study as a proposal* | *2.04* | *2.71* | *1.00* | – | *−0.17 [−0.30, −0.05], 12 vs 22* | – |
+
+Every DeepSeek comparison above is Holm-significant (p ≤ 0.041). The o1 view agrees where complete:
+`web_text_64k` +0.41, `web64k_v2` +0.41, `writer_study` +0.21, `closed_book_o3mini` −0.21, Llama −0.98.
+
+**Incumbent (the rule of 27.1): `rx_r`, focused retrieval with the conservative writer.**
+- It has the highest DeepSeek lower bound (+0.41).
+- Its SP is above the writer's: +0.33 [+0.23, +0.42].
+- Its grounding is the best of the 15 configurations, with `edit_rx_r`'s: 2.52 against 1.00.
+- **GPT-5.6, held out, confirms it**: +0.54 [+0.43, +0.65]. GPT-5.6 prefers it in both orders in 72% of the pairs
+  and prefers the writer in 17%.
+- `rx_r` is the baseline of the method rounds (phase 3).
+
+**What phase 1a shows.**
+- **Evidence is what separates methods on the new objective.**
+  - Every evidence-based configuration is preferred to the closed-book writer.
+  - On RQ alone they are indistinguishable (2.86–3.13).
+  - The difference comes through grounding, and through the pairwise judges, which see the evidence.
+- **Relevance matters.** Focused retrieval is better grounded than the old web corpus (2.52 against 2.00) and more
+  preferred (+0.50 against +0.40).
+- **The additions of experiments 44–45 do not help on top of focused retrieval:**
+  - the literature map and broad prompt: +0.43 against +0.50;
+  - the critique loop: +0.24;
+  - the editor: +0.42 on DeepSeek, although GPT-5.6 ties it with `rx_r` (+0.54).
+- **The critique-loop arms are shorter** (371–414 words) and less preferred. No configuration is more than 20%
+  longer than the writer (the longest, `rx_ru`, is +19%). Across configurations SP correlates with length
+  (Spearman 0.58), so phase 3 must check length-matched pairs for any gain.
+- **The judges prefer the AI writer to the authors' own studies** (−0.17 pairwise; SP 2.04). This is a warning about
+  the AI judges' taste, not a finding about the studies. It is the first thing the expert's ratings must check.
+
+**Expectations** (27.1).
+- Grounding: closed-book about 1 (right); evidence-based 1.5–2.5 (right: 1.83–2.54); focused retrieval above the old
+  corpus (right).
+- Pairwise: evidence-based writers +0.2 to +0.45 (right, and focused retrieval exceeded it at +0.50).
+- The critique loop and the editor not preferred over their bases (right).
+- The authors' study about even with the writer (wrong: −0.17).
+- The incumbent an evidence-based writer (right: `rx_r`).
+
+**Still running.**
+- Phase 1b: 35 configurations, RQ ×3 and grounding; about 11 minutes each, until about 10:00. Then pairwise for the
+  five with the highest SP, and diagnostics.
+- The o1 view.
+- The second GPT-5.6 round after phase 1b.

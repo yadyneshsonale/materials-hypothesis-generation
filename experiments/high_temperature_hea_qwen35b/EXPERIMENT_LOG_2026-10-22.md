@@ -2019,8 +2019,56 @@ results in 26.2, final in 26.3 ([loop_rx/](./loop_rx/README.md)).
 - The regression's feature effects did not survive a test on the same hypotheses.
 - The target-free ceiling of about 0.62–0.63 (GPT-5.6) stands.
 
-## Comparability and limits, experiments 8 to 45
+## Experiment 46: strong research proposals as the only objective (interim: phases 0–1a)
 
+**Request.** The agent should only propose strong research proposals, and that is the only thing to evaluate. How
+should the experiments be structured, and what should change where? Plan and results in loop.md 27
+([loop_quality/](./loop_quality/README.md)). The user's open choices took the recommended defaults (loop.md 27.1).
+
+**What changed.**
+- **The objective** (must_obey.md 6.2, amended). SP, the strong-proposal score (0–4), is the mean of plausibility,
+  testability, usefulness and grounding minus 1.
+  - The first three are the expert's blind scales, from three DeepSeek calls.
+  - Grounding asks whether the key premises are supported by the cited earlier work. It is new, from one DeepSeek
+    call.
+- **Decisions** are made on pairwise preference. DeepSeek decides; GPT-5.6 is held out and confirms.
+- **Reconstruction is retired.** A new rule (6.12) guards against optimising the judge.
+
+**Phase 0: the measure works.**
+- **Grounding passes all four checks:**
+  - other papers' passages swapped in: −0.83;
+  - no citations: 1.00;
+  - re-test: ρ 0.82;
+  - evidence-based vs closed-book writer: +0.87.
+- **The sanity controls pass with three calls.** One call missed one threshold by 0.05; this is reported as a
+  deviation.
+
+**Phase 1a: the 15 configurations already scored, ranked on the new objective.**
+
+| Configuration | SP | Grounding | Pairwise vs closed-book writer, DeepSeek / GPT-5.6 |
+|---|---:|---:|---|
+| **Focused retrieval + conservative writer (`rx_r`)** | **2.65** | **2.52** | **+0.50 (41 vs 2 papers) / +0.54 (40 vs 3)** |
+| Old web corpus + writer (`rx_base`) | 2.54 | 2.00 | +0.40 / – |
+| Focused retrieval + literature map | 2.59 | 2.38 | +0.43 / +0.43 |
+| Focused retrieval + critique loop | 2.59 | 2.42 | +0.24 / – |
+| Closed-book writer (`writer_only_b_o3mini`) | 2.33 | 1.00 | (reference point) |
+| Llama-3.3 baseline | 1.05 | 1.00 | −1.00 / – |
+
+- **The incumbent is `rx_r`: focused retrieval with the conservative writer**, confirmed by GPT-5.6. It is the
+  baseline of all later method rounds.
+- **Evidence separates the methods.** On RQ alone they were indistinguishable; grounding and the pairwise judges,
+  who see the cited evidence, separate them. The additions of experiments 44–45 do not help on top of focused
+  retrieval.
+- **Caveat: the AI judges prefer the AI writer to the authors' own studies** (−0.17 pairwise). The expert's ratings
+  must check this before any claim.
+
+**Still running:** phase 1b (35 more configurations), the o1 view, and the second GPT-5.6 round.
+
+## Comparability and limits, experiments 8 to 46
+
+- From experiment 46 the objective is research-proposal quality (SP and pairwise preference), not reconstruction.
+  Scores from the two eras are not comparable. SP of earlier configurations was computed from their stored
+  hypotheses, without new generation.
 - Experiment 45's GPT-5.6 judgments are complete; its audits are paused (loop.md 26.5). Its edit arms add one o3-mini call to
   experiment 44's runs (stage 1 unchanged), and its domain arms differ from their base by one sentence on 44 of the
   135 questions, as declared in loop.md 26.1.
