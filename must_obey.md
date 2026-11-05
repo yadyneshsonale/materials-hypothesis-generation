@@ -198,13 +198,27 @@ preferred future option.
 1. **Hold everything else fixed.** Compared arms use the same generator, temperature, evidence budget (16,000
    characters, ≤ 24 records), output cap and number of samples (≥ 2 per unit) unless the variable under test is
    one of these. If it is, say so.
-2. **Units and metric.** The unit is a paper × level, with samples averaged. The primary metric is the GPT-5.6
-   reconstruction score: the mean of intervention, condition, mechanism and outcome agreement, 0–4.
+2. **Units and metric.** The unit is a paper × level, with samples averaged.
+   - **From experiment 46 (2026-11-05, at the user's request) the only objective is the quality of the research
+     proposal**, judged without the answer key (loop.md 27.1):
+     - **SP, the strong-proposal score (0–4)**: the mean of four 1–5 scales minus 1. Plausibility, testability and
+       usefulness are the expert's blind scales (`rq_judge.py`, the mean of three DeepSeek-V4-Pro calls). Grounding
+       asks whether the key premises are supported by the cited earlier work (`quality_eval.py`, one DeepSeek call).
+       Grounding counts only once validated (loop.md 27.1); until then SP is RQ, the first three scales.
+     - **Decisions** use the target-free pairwise preference over the incumbent, in both orders (a win needs both),
+       paired by paper. DeepSeek decides during development; GPT-5.6 confirms every adopted change.
+     - **Final claims** need the expert's ratings: the AI judges are trusted only if they agree with the expert
+       (item-level Spearman ≥ 0.60 on the expert-package items).
+   - **Reconstruction is retired.** The GPT-5.6 reconstruction score (agreement of intervention, conditions,
+     mechanism and outcome with the paper's answer key, 0–4) was the primary metric through experiment 45. It is no
+     longer computed for new runs and no longer decides anything. The answer keys remain only to build and
+     leak-check questions.
 3. **Secondary metrics.**
-   - DeepSeek-V4-Pro cross-judge;
-   - all 10 judge dimensions and the classification;
-   - target-free audit (chain completeness, specificity, mechanism source);
-   - novelty, failures, cost (calls and tokens) and latency.
+   - the four scales separately, and words per hypothesis;
+   - the DeepSeek and o1 pairwise views alongside the decisive one;
+   - target-free audit (chain completeness, specificity, mechanism source), when run;
+   - novelty, failures, cost (calls and tokens) and latency;
+   - reconstruction judgments of experiments 1–45, as history only.
 4. **Statistics.**
    - Paired differences per unit against a named baseline.
    - Paper-clustered bootstrap 95% CI (10,000 resamples, fixed seed, sorted keys).
@@ -226,12 +240,16 @@ preferred future option.
 6. **Failures.** Never drop failed runs. Retry once, keep the first attempt in `failed_attempts/`, and report
    failures per arm.
 7. **Integrity gate.** Expected runs are present, judged and audited; leakage counts are zero; one generator
-   identity per arm.
+   identity per arm. From experiment 46: `must_obey_check.py --quality`, which requires the three DeepSeek
+   research-quality judgments of every run, and flags missing grounding judgments and audits.
 8. **Judge caveats.**
    - The judge is not calibrated against experts. It rewards closeness to one paper, not truth.
    - Exact values in the targets cap outcome scores.
    - Check that score does not simply track length, hedging or style. Report novelty separately. Do not optimise
      for judge quirks.
+   - The research-quality judge rated the authors' own studies, written as proposals, below the AI writer's (2.71
+     against 3.10, loop.md 24.3): until the expert's ratings arrive, its absolute level is not evidence of expert
+     quality.
 9. **Honest scale.** 12 papers (8 dev units ×3, 4 test units ×3) give wide intervals; treat results as
    indicative. Record negative results as fully as positive ones.
 10. **Judge drift.** GPT-5.6 scored the same runs +0.04 [+0.004, +0.07] higher when it judged them again three to
@@ -239,11 +257,19 @@ preferred future option.
     - When compared runs were judged on different days, judge the baseline again in the same session, or report
       the drift.
     - A difference within about ±0.05 needs the same-session check.
-11. **Reconstruction is not quality.** The primary metric measures how closely a hypothesis reconstructs one paper's
-    study. In experiment 39, three judges without the answer key preferred the hypotheses written with evidence,
-    while reconstruction did not move (loop.md 20.3).
-    - For any claim about evidence, information or reasoning steps, also report the target-free pairwise quality
-      judge (`diag_analysis.py pairwise`): both orders; GPT-5.6, DeepSeek and o1, which cannot know the papers.
+11. **Reconstruction is not quality.** The reconstruction metric measured how closely a hypothesis reconstructs one
+    paper's study. In experiment 39, three judges without the answer key preferred the hypotheses written with
+    evidence, while reconstruction did not move (loop.md 20.3). From experiment 46, quality is the objective (6.2).
+    - Pairwise quality judgments use `quality_eval.py pairwise` (earlier: `diag_analysis.py pairwise`): both orders;
+      DeepSeek, o1 and GPT-5.6.
+12. **Do not optimise the judge** (experiment 46).
+    - A method's own critics, selectors or rankers may aim at the same qualities, but must not be the evaluating
+      judges (DeepSeek-V4-Pro, GPT-5.6) or reuse their prompts verbatim.
+    - GPT-5.6 is held out: no development decision is made on it, and every adopted change must be confirmed by its
+      pairwise preference in the same direction.
+    - Every evaluation session scores the sanity controls again; the judge must still separate them.
+    - Report words per hypothesis. A gain that comes with hypotheses more than 20% longer must also hold on
+      length-matched pairs.
 
 ## 7. Reproducibility and records
 
@@ -286,8 +312,11 @@ Ablate before combining. Combine only components that helped or that address dif
 - [ ] Payloads are target-free (asserted in code); judging is blinded; pairwise judgments run in both orders.
 - [ ] Dev only during development; test only for pre-registered finals.
 - [ ] Same budgets and samples as the baselines, or the difference is declared.
-- [ ] GPT-5.6 judge, DeepSeek cross-judge and target-free audit all done; integrity gate passes; failures
-  reported.
+- [ ] Research-quality judgments complete (three DeepSeek RQ calls and grounding per run; pairwise against the
+  incumbent in both orders; GPT-5.6 confirmation for an adopted change); sanity controls scored this session;
+  `must_obey_check.py --quality` passes; failures reported. (Through experiment 45: GPT-5.6 judge, DeepSeek
+  cross-judge and target-free audit.)
+- [ ] No method's critic or selector is an evaluating judge; length checked (6.12).
 - [ ] Paired statistics with CIs and Holm; negative results recorded.
 - [ ] Baselines judged in the same session as the compared runs, or the drift reported (6.10).
 - [ ] Oracle diagnostics declared and checked with `--oracle`, never compared as methods (5.4).
@@ -395,3 +424,10 @@ Ablate before combining. Combine only components that helped or that address dif
     results, like BM25; it uses no present-day signal.
   - 5.2: screeners and graders are also blinded (shuffled order, neutral numbers); the payload guard forbids the
     case paper's PMCID, DOI and title.
+- 2026-11-05 (experiment 46, loop.md 27.1), at the user's request ("we only want the agent to propose a strong research
+  proposal/hypothesis and this is the only metric we should evaluate on"):
+  - 6.2: the objective is the quality of the research proposal (SP: plausibility, testability, usefulness and,
+    once validated, grounding); decisions by pairwise preference with GPT-5.6 held out; reconstruction retired.
+  - 6.3, 6.7, 6.8, 6.11 and the checklist follow; new 6.12 against optimising the judge.
+  - Unchanged: the benchmark questions, the pre-cutoff rule for query-facing models, the evidence date filters,
+    blinding and the statistics.

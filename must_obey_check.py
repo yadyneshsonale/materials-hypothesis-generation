@@ -7,7 +7,9 @@ A run directory has `runs/*.json` (any of this repository's run formats) and, op
 - query-facing model not on the pre-cutoff list, or its cutoff not before the case date (section 2);
 - query text differs from the frozen benchmark query (v3.1 by default; test2 cases are checked with v3.1) (section 3);
 - non-zero leakage counters in a run's audit (section 4);
-- missing GPT-5.6 / DeepSeek judgments or target-free audits for successful runs (section 6);
+- missing GPT-5.6 / DeepSeek judgments or target-free audits for successful runs (section 6); with --quality (the
+  research-quality objective, 6.2 as amended 2026-11-05), missing DeepSeek research-quality judgments instead (a failure
+  unless all three calls exist) and missing grounding judgments (a warning);
 - with --loop: held-out (test or test2) runs not marked final, or no proof that the payload was asserted target-free
   (5, 6.5).
 - with --oracle: target-aware diagnostic runs (loop.md 20.1) are accepted instead of failing the target-free rule, but
@@ -94,8 +96,21 @@ def judged(run_dir: Path, run_id: str) -> dict[str, bool]:
             "audit": (run_dir / "audit" / f"{run_id}.json").exists()}
 
 
+QUALITY_RQ_DIR = ROOT / "experiments" / "high_temperature_hea_qwen35b" / "loop_rq" / "rq"
+QUALITY_GROUND_DIR = ROOT / "experiments" / "high_temperature_hea_qwen35b" / "loop_quality" / "grounding"
+RQ_CALLS = ("runs", "runs_rep2", "runs_rep3")
+
+
+def quality_judged(method: str, run_id: str, rq_dir: Path = QUALITY_RQ_DIR,
+                   ground_dir: Path = QUALITY_GROUND_DIR) -> dict[str, bool]:
+    """The research-quality evaluations of must_obey.md 6.2 (amended 2026-11-05): the three DeepSeek RQ calls and the
+    grounding judgment of a run."""
+    return {"rq3": all((rq_dir / kind / method / "deepseek" / f"{run_id}.json").exists() for kind in RQ_CALLS),
+            "grounding": (ground_dir / "runs" / method / "deepseek" / f"{run_id}.json").exists()}
+
+
 def check(run_dir: Path, loop: bool = False, require_cross: bool = True, bench: str = CURRENT,
-          oracle: bool = False) -> dict[str, Any]:
+          oracle: bool = False, quality: bool = False) -> dict[str, Any]:
     sets = {name: frozen_queries(BENCHMARKS[name], EXTRA_CASES.get(name, ())) for name in sorted(BENCHMARKS)
             if BENCHMARKS[name].exists()}
     failures: list[str] = []
@@ -144,6 +159,15 @@ def check(run_dir: Path, loop: bool = False, require_cross: bool = True, bench: 
                     failures.append(f"{rid}: no proof that query-facing payloads were asserted target-free")
         if run.get("status") == "ok":
             counts["ok"] += 1
+            if quality:  # the research-quality objective (must_obey.md 6.2, amended 2026-11-05)
+                have_q = quality_judged(run_dir.name, rid)
+                if not have_q["rq3"]:
+                    failures.append(f"{rid}: missing one of the three DeepSeek research-quality judgments")
+                if not have_q["grounding"]:
+                    warnings.append(f"{rid}: missing grounding judgment")
+                if require_cross and not judged(run_dir, rid)["audit"]:
+                    warnings.append(f"{rid}: missing target-free audit")
+                continue
             have = judged(run_dir, rid)
             if not have["gpt56"]:
                 failures.append(f"{rid}: missing GPT-5.6 judgment")
@@ -168,10 +192,14 @@ def main() -> None:
     parser.add_argument("--no-cross", action="store_true", help="do not require DeepSeek judgments and audits")
     parser.add_argument("--oracle", action="store_true", help="accept target-aware oracle diagnostics in oracle_* dirs")
     parser.add_argument("--bench", choices=sorted(BENCHMARKS), default=CURRENT, help="frozen query version")
+    parser.add_argument("--quality", action="store_true",
+                        help="research-quality objective (6.2 as amended 2026-11-05): require the three DeepSeek RQ "
+                             "judgments instead of reconstruction judgments")
     args = parser.parse_args()
     all_passed = True
     for run_dir in args.run_dirs:
-        result = check(run_dir, loop=args.loop, require_cross=not args.no_cross, bench=args.bench, oracle=args.oracle)
+        result = check(run_dir, loop=args.loop, require_cross=not args.no_cross, bench=args.bench, oracle=args.oracle,
+                       quality=args.quality)
         all_passed &= result["passed"]
         status = "PASS" if result["passed"] else "FAIL"
         print(f"[{status}] {run_dir}: {result['runs']} runs, {result['ok']} ok, {result['failed']} failed")

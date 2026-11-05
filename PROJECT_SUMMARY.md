@@ -1,6 +1,6 @@
 # Project summary: AI hypothesis generation for high-temperature high-entropy alloys
 
-**Status.** 2026-11-02, after experiment 45. This file gathers everything done so far and every main result in one
+**Status.** 2026-11-05, experiment 46 running. This file gathers everything done so far and every main result in one
 place.
 
 **Details.**
@@ -13,6 +13,14 @@ Scores are on the judges' 0–4 scale (section 2). Unless stated otherwise, "GPT
 judges' values, and differences come with paper-clustered 95% confidence intervals.
 
 ## 1. In short
+
+- **The objective changed on 2026-11-05** (experiment 46, loop.md 27; must_obey.md 6.2 as amended).
+  - **What we evaluate now**: only how strong the agent's research proposal is, judged without the answer key. SP,
+    the strong-proposal score, combines plausibility, testability, usefulness and grounding in the cited earlier work.
+  - **How decisions are made**: by pairwise preference, with DeepSeek for development and GPT-5.6 held out to confirm.
+  - **Reconstruction (agreement with the paper's own study) is retired.** Everything below about it is history.
+  - Phase 1 is scoring the 50 configurations that already exist; [loop_quality/](./experiments/high_temperature_hea_qwen35b/loop_quality/README.md)
+    will hold the leaderboard.
 
 - **Goal.** Given a research question about high-temperature high-entropy alloys (HEAs), an AI model proposes a
   testable hypothesis: what to change (the intervention), the mechanism, the predicted outcome, its limits and a

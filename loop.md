@@ -5604,3 +5604,163 @@ Chen et al., 2021, https://arxiv.org/abs/2107.03374.
   experiments/high_temperature_hea_qwen35b/loop/run_x45_gpt.sh"`.
   - Every stage skips outputs that already exist, so it continues where it stopped.
   - Experiment 44 stays interim until its 565 judgments are done.
+
+## 27. Strong research proposals as the only objective (experiment 46)
+
+### 27.1 Decision, instrument and pre-registered plan for phases 0–1 (written 2026-11-05 at about 01:00, before any experiment-46 judgment)
+
+**Request.** "We only want the agent to propose a strong research proposal/hypothesis, and this is the only metric we
+should evaluate on. Now how do we structure our experiments, and what changes do we make where?"
+
+**Decisions taken for the user.** Asked at about 00:50; the user was not available, so the recommended defaults
+apply:
+- "Strong" is the expert's three blind scales plus grounding in the cited earlier work (the questions ask for
+  supporting prior evidence). Novelty is not scored yet.
+- Writers stay pre-cutoff models (must_obey.md 2): proposals are made "before the paper".
+- Development uses the AI judges; the expert's 60 ratings (not yet returned) confirm at the end.
+- Phases 0–1 start now. The paused GPT-5.6 reconstruction work of experiment 44 (565 judgments, 2,782 audits) is
+  cancelled. Experiment 44's reconstruction stays interim on GPT-5.6 and complete on DeepSeek; it is history.
+
+**What the existing quality data say** (RQ, mean of three DeepSeek calls; 16 configurations of experiments 21–45).
+- **Every o3-mini variant lies between 2.86 and 3.13.** The best, the complete-study writer (3.13), is not
+  distinguishable from the closed-book writer (3.10): +0.03 [−0.05, +0.11].
+- **The scale is near its ceiling.** Testability is 4.16 of 5 and usefulness 4.43; plausibility (3.71) is the
+  weakest.
+- **The pairwise judges, which also see the cited passages, disagree with it.**
+  - They prefer the complete-study writer by +0.32 (GPT-5.6; 34 papers for it, 6 against).
+  - They prefer the evidence-based writers by +0.29 to +0.44 (DeepSeek, o1; 38–39 of 45 papers).
+  - On RQ, the same writers are −0.04 to −0.07.
+- **It rates the authors' own studies, written as proposals, at 2.71**: below the writer.
+
+So the absolute scale alone cannot choose between competent methods, and it ignores whether a proposal rests on
+evidence. The instrument therefore adds grounding and decides by pairwise preference.
+
+**The instrument** (must_obey.md 6.2 and 6.12, as amended).
+- **RQ**: unchanged (`rq_judge.py`, the expert's anchors, DeepSeek, three calls).
+- **Grounding** (`quality_eval.GROUNDING_SYSTEM`). DeepSeek reads the question, the hypothesis (evidence IDs relabelled
+  E1, E2, ...) and the cited passages.
+  - It lists at most five key premises, then rates 1–5 whether they are supported by accurately represented prior
+    evidence.
+  - Textbook knowledge needs no citation; citing more is not better in itself.
+- **SP** = (plausibility + testability + usefulness + grounding) / 4 − 1 if grounding passes validation; otherwise
+  SP = RQ.
+- **Pairwise preference over the closed-book writer** (`writer_only_b_o3mini`, the RQ leader so far).
+  `QUALITY_PAIR_SYSTEM`, both orders; a win needs both.
+  - DeepSeek: development.
+  - o1: alongside. It was a critic in `rx_c` and `rx_ruc`, so its view of those arms may be favourable.
+  - GPT-5.6: held out; confirms only.
+
+**Validation before use (phase 0).**
+- **Sanity controls this session.** The 216 controls of experiment 33, one DeepSeek call each. The checks of 24.1
+  must still hold:
+  - C1: usefulness, positive minus random, ≥ 1;
+  - C2: RQ, positive minus generic, ≥ 1;
+  - C3: plausibility, positive minus each swap, ≥ 0.5.
+- **Grounding**, on the 135 sample-1 runs of `web_text_64k_b_o3mini` (evidence-based) and of the writer
+  (closed-book):
+  - **G1**: swapping in another paper's passages (same level, same number) lowers grounding: paired CI above 0, and
+    at most 10% of swaps score higher;
+  - **G2**: with every citation removed, mean grounding ≤ 1.5;
+  - **G3**: re-test Spearman ≥ 0.70 for one call;
+  - **G4**: the evidence-based writer is better grounded than the closed-book writer (paired CI above 0).
+  - Relative thresholds, because the smoke test found the originals near the floor, where drops of a full point
+    cannot occur.
+  - If grounding fails, it is reported as unvalidated and SP = RQ; decisions then rest on pairwise preference, which
+    sees the evidence.
+- **The writer's RQ is judged again in this session** (three calls) for the comparisons with phase-1b configurations
+  (must_obey.md 6.10).
+
+**Phase 1: score what exists** (no generation; 270 runs per configuration).
+- **1a.** The 15 configurations already scored on RQ (experiments 21–45), and the authors' study as a reference:
+  - grounding;
+  - pairwise against the writer, DeepSeek and o1.
+- **1b.** The other 35 configurations with all 270 runs, one per family first, then the rest.
+  - The family representatives: `writer_v2`, `web64k_r2`, `web_study_64k`, `agent_choose_ground`, `pcd_PCD`,
+    `synth_crowd`, `web_agent_b`, `read_web_chunks`, `web_text_chunks_b` and the writer replicate `r5`.
+  - RQ ×3 and grounding, configuration by configuration.
+  - Then pairwise (DeepSeek, o1) for the five with the highest SP.
+- **Diagnostics** (references only, never methods): RQ ×3 for the class and lever hints of experiment 39.
+- **GPT-5.6 confirmation.** Pairwise for the three configurations with the highest lower CI bound of DeepSeek's
+  preference, after 1a and again after 1b. Both instances, 3 workers each.
+
+**Incumbent rule (the output of phase 1).**
+- Take the configuration with the highest lower CI bound of DeepSeek's pairwise preference over the writer, if that
+  bound is above 0. It must also satisfy all of these:
+  - its SP is not significantly below the writer's;
+  - its grounding is not below the writer's;
+  - once judged, GPT-5.6's preference for it is above 0.
+- Otherwise the writer stays.
+- The incumbent is the baseline of every later method round.
+
+**Statistics.**
+- Paired by paper: paper-clustered bootstrap (10,000 resamples) and sign test. Holm across the configurations, per
+  judge.
+- Exploratory: all 45 papers are development data under the new objective. Claims need fresh papers (test5) and the
+  expert.
+
+**Expectations, recorded before any judgment.**
+- **RQ.** Phase-1b configurations between 2.8 and 3.2; Llama-written ones lower (1.4–2.2).
+- **Grounding.** Closed-book about 1; evidence-based 1.5–2.5; focused retrieval above the old corpus.
+- **Pairwise.**
+  - Evidence-based writers preferred over the closed-book writer by +0.2 to +0.45 (experiments 39, 42).
+  - The critique loop (`rx_c`, `rx_ruc`) and the editor not preferred over their bases.
+  - The authors' study about even with the writer.
+- **Incumbent.** An evidence-based writer: `web64k_v2`, `web_text_64k`, `rx_r` or `web_study_64k`.
+
+**Phases 2–4** (each pre-registered when it starts).
+- **2. Failure analysis on SP**: where points are lost, by scale, level and question type.
+- **3. Method rounds against the incumbent** (ablate, then combine). Candidates:
+  - focused retrieval with the complete-study writer;
+  - trade-off-aware claims (plausibility is the weakest scale);
+  - a composition sanity tool (density, VEC, atomic-size mismatch);
+  - single-draft critique and revision, with critics that are not the judges (6.12).
+- **4.** The frozen method on fresh papers (test5), with blind expert ratings.
+
+**Smoke test** (about 00:55, scratch folder, nothing kept).
+- 9 grounding calls on three sample-1 runs of `web_text_64k_b_o3mini`, all valid JSON with premises:
+  - originals 2, 1, 1;
+  - swaps 1, 1, 1;
+  - removals 1, 1, 1.
+- The judge's reasons point to cited passages that do not support the specific premises. For example, a Cr–Al
+  coating hypothesis cites a passage that only lists CrAl among other coatings.
+- The validation checks were made relative after this (above).
+
+**Operations.**
+- `loop/run_x46.sh`: DeepSeek; sequential stages; 6 workers.
+- `loop/run_x46_o1.sh`: o1 pairwise; 6 workers.
+- `loop/run_x46_gpt.sh`: GPT-5.6 confirmation, after the DeepSeek pairwise stages.
+- Outputs: `loop_quality/` (grounding, pairwise, `analysis_quality.md`); RQ in `loop_rq/rq/`.
+
+### 27.2 Phase 0 results and one deviation (2026-11-05, about 01:20)
+
+**Grounding passes all four checks** (`quality_eval.py ground_validate`, 674 DeepSeek calls, 01:01–01:10), so it
+enters SP.
+
+| Check | Result | Threshold |
+|---|---|---|
+| G1: another paper's passages swapped in | 1.86 → 1.02; drop +0.83 [+0.65, +1.02] by paper (39 papers lower, 0 higher); no swap scored higher | CI above 0, ≤ 10% higher |
+| G2: every citation removed | mean 1.00 | ≤ 1.5 |
+| G3: re-test, one call | Spearman 0.82 (mean absolute difference 0.31) | ≥ 0.70 |
+| G4: evidence-based writer vs closed-book writer | 1.87 vs 1.00: +0.87 [+0.68, +1.07] (40 papers higher, 0 lower) | CI above 0 |
+
+- **A finding in itself.** The evidence-based writer is poorly grounded: its premises are mostly not supported by the
+  passages it cites.
+  - Mean 1.86 of 5.
+  - Distribution over its 135 sample-1 runs: 61 score 1, 40 score 2, 26 score 3, 7 score 4, 1 scores 5.
+  - The closed-book writer scores 1 on every run, because it cites nothing.
+
+**The sanity controls missed one threshold with one call, and passed with three.**
+
+| Check | One call (pre-registered) | Three calls | Experiment 43 (one call / three) |
+|---|---:|---:|---:|
+| C1 usefulness, positive − random (≥ 1) | 1.39 | 1.55 | 1.36 / 1.45 |
+| C2 RQ, positive − generic (≥ 1) | **0.95** | 1.10 | 1.01 / 1.12 |
+| C3 plausibility, positive − swaps (≥ 0.5) | 0.86 / 1.45 | 0.75 / 1.44 | 0.64 and 1.33 / 0.68 and 1.37 |
+
+- **Deviation (01:15, after seeing the single-call result).** The plan scored the controls with one call. RQ itself
+  is the mean of three calls, so two more control calls were added (432 DeepSeek calls). Both views are reported.
+- **Conclusion.** The RQ judge behaves as in experiment 43. The single-call C2 miss (0.95 against 1.01 then) is
+  within call-to-call noise.
+- **Operations.** To stay within 6 DeepSeek workers, the runner was stopped at 01:14 (its grounding stage was
+  under way) and restarted at 01:15 as `loop/run_x46b.sh`: the controls with three calls, then as before. Every stage
+  is resumable, and no output was lost or duplicated.

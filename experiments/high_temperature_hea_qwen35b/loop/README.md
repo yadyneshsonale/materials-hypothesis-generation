@@ -310,3 +310,14 @@
     see the answer key prefer the original hypotheses (pairwise −0.25 to −0.30).
   - The domain sentence is neutral (GPT-5.6 +0.012 and +0.006).
 
+
+## Experiment 46: strong research proposals as the only objective (loop.md section 27)
+
+- **Runners.**
+  - [run_x46.sh](./run_x46.sh), then [run_x46b.sh](./run_x46b.sh) from 01:15 on 2026-11-05 (the sanity controls also
+    with three calls), score on DeepSeek. Phase 0: sanity controls and the grounding checks. Phase 1a: grounding and
+    pairwise for the 15 configurations already scored on research quality. Phase 1b: research quality ×3 and
+    grounding for 35 more, then pairwise for the five best.
+  - [run_x46_o1.sh](./run_x46_o1.sh) runs the o1 pairwise view.
+  - [run_x46_gpt.sh](./run_x46_gpt.sh) runs the GPT-5.6 confirmation of the top three, on both instances.
+- **Outputs.** [../loop_quality/](../loop_quality/README.md) (`analysis_quality.md`).

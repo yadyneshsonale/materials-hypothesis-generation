@@ -23,6 +23,7 @@ os.environ.setdefault("MATHG_CASES_DIR", os.path.join(_E, "benchmark_v3_1", "cas
 os.environ.setdefault("MATHG_LOOP_ROOT", os.path.join(_E, "loop_rq"))
 
 import argparse  # noqa: E402
+import functools  # noqa: E402
 import json  # noqa: E402
 import random  # noqa: E402
 import statistics  # noqa: E402
@@ -162,8 +163,36 @@ def judge(judge_name: str, query: str, generation: dict[str, Any], attempts: int
 
 # ---------------------------------------------------------------- items
 
+def discovered_roots(base: Path | None = None) -> dict[str, str]:
+    """Configuration name -> its run root, for every `loop*/<name>/runs` folder. Names must be unique across roots,
+    otherwise a score could be filed under the wrong runs (experiment 46, loop.md 27.1)."""
+    return dict(_discover(str(base or E)))
+
+
+# Roots of other benchmark versions reuse configuration names on different inputs (v4: SciMON-style, loop.md 14.1);
+# runs_of() keeps only v3.1-procedure runs, so these roots are never the home of a scored configuration.
+OTHER_BENCHMARK_ROOTS = frozenset({"loop_v4_scimon"})
+
+
+@functools.lru_cache(maxsize=None)
+def _discover(base: str) -> tuple[tuple[str, str], ...]:
+    found: dict[str, list[str]] = defaultdict(list)
+    for root in sorted(Path(base).glob("loop*")):
+        if root.is_dir() and root.name not in OTHER_BENCHMARK_ROOTS:
+            for method_dir in sorted(root.iterdir()):
+                if (method_dir / "runs").is_dir():
+                    found[method_dir.name].append(root.name)
+    duplicates = {name: roots for name, roots in found.items() if len(roots) > 1}
+    if duplicates:
+        raise RuntimeError(f"configuration names found in several run roots: {duplicates}")
+    return tuple((name, roots[0]) for name, roots in sorted(found.items()))
+
+
 def root_of(method: str) -> Path:
-    return E / ROOTS[method] if method in ROOTS else OUT
+    if method in ROOTS:
+        return E / ROOTS[method]
+    root = discovered_roots().get(method)
+    return E / root if root else OUT
 
 
 def runs_of(method: str) -> list[dict[str, Any]]:
