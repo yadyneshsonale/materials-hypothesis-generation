@@ -2019,7 +2019,7 @@ results in 26.2, final in 26.3 ([loop_rx/](./loop_rx/README.md)).
 - The regression's feature effects did not survive a test on the same hypotheses.
 - The target-free ceiling of about 0.62–0.63 (GPT-5.6) stands.
 
-## Experiment 46: strong research proposals as the only objective (interim: phases 0–1a)
+## Experiment 46: strong research proposals as the only objective (phases 0–1)
 
 **Request.** The agent should only propose strong research proposals, and that is the only thing to evaluate. How
 should the experiments be structured, and what should change where? Plan and results in loop.md 27
@@ -2062,7 +2062,15 @@ should the experiments be structured, and what should change where? Plan and res
 - **Caveat: the AI judges prefer the AI writer to the authors' own studies** (−0.17 pairwise). The expert's ratings
   must check this before any claim.
 
-**Still running:** phase 1b (35 more configurations), the o1 view, and the second GPT-5.6 round.
+**Final (phase 1, 2026-11-09; loop.md 27.4).** All 50 configurations scored; every judgment complete.
+- **`rx_r` stays the incumbent.** SP 2.65, confirmed by all three judges against the closed-book writer:
+  - DeepSeek +0.50 (41 vs 2 papers);
+  - o1 +0.59 (44 vs 1);
+  - GPT-5.6 +0.54 (40 vs 3).
+- None of the 35 phase-1b configurations beats it. Best: the evidence-choosing agent of experiment 40, at 2.57.
+- The weakest scale is grounding (2.52 of 5), then plausibility (3.56): the targets of the next phase.
+- The integrity gate passes (quality mode). The target-free audits were not run (cancelled; reported).
+- The expert's ratings are still needed before any claim.
 
 ## Comparability and limits, experiments 8 to 46
 

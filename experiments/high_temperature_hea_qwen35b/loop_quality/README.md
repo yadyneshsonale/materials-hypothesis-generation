@@ -47,3 +47,14 @@ pre-registered plan for phases 0–1.
   - The full table is in loop.md 27.3 and `analysis_quality.md`.
 - **Still running:** phase 1b (35 configurations), the o1 view, and the second GPT-5.6 round.
 
+## Final results of phase 1 (2026-11-09; loop.md 27.4)
+
+- **All 50 configurations scored.** Every judgment is complete: grounding 13,770; pairwise DeepSeek 10,800, o1
+  10,800, GPT-5.6 1,620.
+- **The incumbent stays `rx_r`.**
+  - SP 2.65 of 4 (plausibility 3.56, testability 4.19, usefulness 4.35, grounding 2.52, on 1–5).
+  - Preferred over the closed-book writer (SP 2.33) by DeepSeek +0.50 (41 vs 2 papers), o1 +0.59 (44 vs 1) and
+    GPT-5.6 +0.54 (40 vs 3).
+- **None of the 35 phase-1b configurations beats it** (best 2.57).
+- The integrity gate passes in quality mode; the target-free audits were not run. The expert's ratings are pending.
+

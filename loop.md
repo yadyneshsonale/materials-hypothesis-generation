@@ -5837,3 +5837,81 @@ Every DeepSeek comparison above is Holm-significant (p ≤ 0.041). The o1 view a
   five with the highest SP, and diagnostics.
 - The o1 view.
 - The second GPT-5.6 round after phase 1b.
+
+### 27.4 Phase 1 final results (2026-11-09, about 02:20; every evaluation complete; exploratory, all 45 papers are development data)
+
+**Complete** (runners finished on 2026-11-05: DeepSeek at 10:45, GPT-5.6 at 10:31, o1 at 14:10).
+- RQ ×3 and grounding for all 50 configurations: 13,770 grounding calls.
+- Pairwise against the closed-book writer for the 20 compared configurations, both orders:
+  - DeepSeek 10,800;
+  - o1 10,800;
+  - GPT-5.6 1,620.
+- After phase 1b the top three by DeepSeek's lower bound were unchanged (`rx_r`, `rx_ru`, `edit_rx_r`), so the
+  second GPT-5.6 round had no new work.
+- `must_obey_check.py --loop --quality` passes on the incumbent, the writer, `rx_ru` and `edit_rx_r`.
+- The target-free audits were not run: they were cancelled with the reconstruction work (27.1). The gate reports
+  them as warnings.
+- **The disk filled up during the run** (shared machine; `No space left on device` on 2026-11-05).
+  - Five DeepSeek jobs and four o1 jobs failed.
+  - A failed write leaves no final file (`hypo_loop.write_once` links only a complete temporary file), and the
+    runners' later passes redid those jobs.
+  - Checked on 2026-11-09: all 84,903 judgment files parse, and every expected judgment exists.
+  - 13 orphaned temporary files were deleted; each one's final file exists.
+- **Same-session writer.** The writer's RQ judged again in this session is +0.05 [+0.00, +0.10] above experiment 43's.
+  Phase-1b configurations are compared with the same-session set (must_obey.md 6.10).
+
+**Decision: the incumbent is `rx_r`, focused retrieval with the conservative writer, confirmed by all three
+judges.**
+
+| | SP (0–4) | RQ | Plausibility | Testability | Usefulness | Grounding | Pairwise vs closed-book writer: DeepSeek / o1 / GPT-5.6 |
+|---|---:|---:|---:|---:|---:|---:|---|
+| **`rx_r`** | **2.65** | 3.03 | 3.56 | 4.19 | 4.35 | 2.52 | **+0.50 [+0.41, +0.58]** 41 vs 2 / **+0.59 [+0.51, +0.66]** 44 vs 1 / **+0.54 [+0.43, +0.65]** 40 vs 3 |
+| `writer_only_b_o3mini` (closed-book writer) | 2.33 | 3.10 | 3.71 | 4.16 | 4.43 | 1.00 | (the reference) |
+| `closed_book` (Llama-3.3 baseline) | 1.05 | 1.40 | 2.35 | 2.64 | 2.21 | 1.00 | −1.00 / −0.98 / – |
+| *Reference: the authors' own study as a proposal* | *2.04* | *2.71* | – | – | – | *1.00* | *−0.17 [−0.30, −0.05] 12 vs 22 / – / –* |
+
+The scales are 1–5. "Papers" counts the papers in which each side is preferred.
+
+**Phase 1b** (35 more configurations): none beats `rx_r`.
+- Best SP:
+  - `agent_draft_ground` 2.57 (grounding 1.80);
+  - `agent_choose_ground` 2.56 (grounding 2.43);
+  - `web_text_chunks_b` 2.53;
+  - `web64k_r2` 2.51;
+  - `pcd_nocritic_PCD` 2.50.
+- Their pairwise preference over the writer is +0.16 to +0.31 (DeepSeek) and +0.25 to +0.46 (o1); `rx_r` has +0.50
+  and +0.59.
+- Every closed-book o3-mini variant is 2.10–2.35: synthesis, propose–critique–decide without evidence, prompt guides.
+  RQ cannot tell them apart; grounding is 1.00 for all of them.
+- Configurations written by Llama-3.3 are 1.05–1.34, even with evidence (grounding 2.22–2.45; RQ 1.01–1.64).
+
+**What the final ranking shows.**
+1. **Relevant evidence, used by a careful writer, is what makes proposals stronger.**
+   - Among o3-mini configurations, all 25 that cite evidence (grounding above 1.5) score SP ≥ 2.37, and all 18
+     closed-book ones score ≤ 2.37 (the two groups meet at 2.37).
+   - Evidence alone is not enough: the Llama-3.3-written configurations are well grounded (2.22–2.45) but score
+     1.10–1.34.
+2. **The extra machinery tested in experiments 37–45 adds nothing on top of focused retrieval:**
+   - agents that choose their approach;
+   - propose–critique–decide;
+   - critique loops;
+   - a literature map;
+   - an editor.
+3. **The weakest scale is grounding** (2.52 of 5 for the best). About half of the key premises are not supported by
+   the passages cited. Next comes plausibility (3.56). These are the targets of phase 2.
+4. **Length.**
+   - Across configurations SP correlates with words (Spearman 0.56).
+   - `rx_r` is 12% longer than the writer (548 against 488 words), below the 20% threshold of must_obey.md 6.12.
+   - Within the closed-book group, length does not separate configurations (2.10–2.35 at 420–568 words).
+5. **Caveat.** The AI judges prefer the AI writer to the authors' own studies. Until the expert's ratings agree
+   (item-level Spearman ≥ 0.60, must_obey.md 6.2), these are AI-judged results only.
+
+**Expectations** (27.1).
+- Phase-1b RQ 2.8–3.2: right for o3-mini (2.81–3.16).
+- Llama-written configurations lower: right, but lower than expected (1.01–1.64 against 1.4–2.2).
+- The incumbent an evidence-based writer: right (`rx_r`).
+
+**Next** (phases 2–4, each pre-registered when it starts).
+- Failure analysis of `rx_r` on grounding and plausibility.
+- Method rounds against `rx_r`.
+- Fresh papers (test5) with the expert's blind ratings.
