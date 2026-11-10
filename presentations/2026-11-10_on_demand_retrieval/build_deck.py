@@ -30,12 +30,66 @@ CD, R = DI["cost_draft"], DI["results"]
 EX = json.loads((HERE / "draft_example.json").read_text())
 OUT = HERE / "on_demand_hypothesis_generation_2026-11-10.pptx"
 base.FOOTER = "Hypothesis generation without an extraction corpus · high-temperature HEAs · 10 Nov 2026"
+# Simple theme: white slides, near-black text, one accent colour, thin grey borders, square corners. The shared helpers
+# read these colours at call time, so they are set on the base module before use.
+ACCENT = base.RGBColor(0x1F, 0x4E, 0x79)
+BORDER = base.RGBColor(0xD4, 0xD4, 0xD4)
+base.NAVY, base.TEXT, base.GRAY = base.RGBColor(0x1A, 0x1A, 0x1A), base.RGBColor(0x26, 0x26, 0x26), \
+    base.RGBColor(0x6B, 0x6B, 0x6B)
+base.LIGHT = base.RGBColor(0xF5, 0xF5, 0xF5)
+base.TEAL = base.GREEN = base.RED = base.AMBER = ACCENT
+base.PALE_GREEN = base.RGBColor(0xE8, 0xEF, 0xF6)
+base.PALE_RED = base.PALE_AMBER = base.PALE_TEAL = base.WHITE
 NAVY, TEAL, GREEN, RED, AMBER, GRAY = base.NAVY, base.TEAL, base.GREEN, base.RED, base.AMBER, base.GRAY
 LIGHT, WHITE, TEXT = base.LIGHT, base.WHITE, base.TEXT
 PALE_GREEN, PALE_RED, PALE_TEAL, PALE_AMBER = base.PALE_GREEN, base.PALE_RED, base.PALE_TEAL, base.PALE_AMBER
-textbox, rect, card, arrow, table, clip, new_slide = (base.textbox, base.rect, base.card, base.arrow, base.table,
-                                                       base.clip, base.new_slide)
+textbox, clip = base.textbox, base.clip
 MONO = base.MONO
+
+
+def flat(shape):
+    """Drop the shape style's theme effect (a drop shadow in LibreOffice and some PowerPoint themes)."""
+    for ref in shape._element.iter("{http://schemas.openxmlformats.org/drawingml/2006/main}effectRef"):
+        ref.set("idx", "0")
+    return shape
+
+
+def rect(slide, x, y, w, h, fill, line=None, shape=MSO_SHAPE.RECTANGLE):
+    return flat(base.rect(slide, x, y, w, h, fill, line,
+                          MSO_SHAPE.RECTANGLE if shape == MSO_SHAPE.ROUNDED_RECTANGLE else shape))
+
+
+def card(slide, x, y, w, h, title: str, body, fill=None, accent=None, title_size: float = 15, body_size: float = 13,
+         space: float = 5):
+    rect(slide, x, y, w, h, WHITE, line=BORDER)
+    textbox(slide, x + Inches(0.15), y + Inches(0.08), w - Inches(0.3), Inches(0.42), title, size=title_size,
+            color=ACCENT, space=0).text_frame.paragraphs[0].runs[0].font.bold = True
+    return textbox(slide, x + Inches(0.15), y + Inches(0.5), w - Inches(0.3), h - Inches(0.58), body,
+                   size=body_size, space=space)
+
+
+def arrow(slide, x, y, w, h, color=None):
+    base.arrow(slide, x, y, w, h, GRAY)
+    flat(slide.shapes[-1])
+
+
+def table(*args, **kwargs):
+    kwargs.setdefault("header_fill", ACCENT)
+    return base.table(*args, **kwargs)
+
+
+def new_slide(prs, section: str, title: str, notes: str = "", section_color=None):
+    slide = prs.slides.add_slide(prs.slide_layouts[6])
+    textbox(slide, Inches(0.55), Inches(0.25), Inches(9), Inches(0.3), section, size=11, color=GRAY, space=0)
+    textbox(slide, Inches(0.55), Inches(0.5), Inches(12.3), Inches(0.65), title, size=26, color=NAVY, space=0
+            ).text_frame.paragraphs[0].runs[0].font.bold = True
+    rect(slide, Inches(0.55), Inches(1.17), Inches(12.25), Inches(0.015), BORDER)
+    textbox(slide, Inches(0.55), Inches(7.08), Inches(9), Inches(0.3), base.FOOTER, size=9, color=GRAY, space=0)
+    textbox(slide, Inches(12.0), Inches(7.08), Inches(0.8), Inches(0.3), str(len(prs.slides)), size=9, color=GRAY,
+            space=0, align=PP_ALIGN.RIGHT)
+    if notes:
+        slide.notes_slide.notes_text_frame.text = notes
+    return slide
 
 
 def prompt_box(slide, x, y, w, h, title: str, text: str, size: float = 9.0) -> None:
@@ -57,19 +111,17 @@ def strip_tags(text: str) -> str:
 
 def title_slide(prs) -> None:
     slide = prs.slides.add_slide(prs.slide_layouts[6])
-    rect(slide, 0, 0, base.W, base.H, NAVY)
-    rect(slide, Inches(0.8), Inches(1.9), Inches(0.12), Inches(2.5), TEAL)
-    textbox(slide, Inches(1.15), Inches(1.75), Inches(11.4), Inches(1.7),
-            "Hypothesis generation without an extraction corpus", size=40, color=WHITE, space=0
+    textbox(slide, Inches(1.0), Inches(2.0), Inches(11.3), Inches(1.0),
+            "Hypothesis generation without an extraction corpus", size=34, color=NAVY, space=0
             ).text_frame.paragraphs[0].runs[0].font.bold = True
-    textbox(slide, Inches(1.15), Inches(2.85), Inches(11.2), Inches(1.6),
+    rect(slide, Inches(1.0), Inches(3.1), Inches(1.4), Inches(0.05), ACCENT)
+    textbox(slide, Inches(1.0), Inches(3.35), Inches(11.2), Inches(1.2),
             ["Retrieve and read the literature on demand, per research question",
-             "Case study: high-temperature high-entropy alloys"], size=21, color=base.RGBColor(0xCB, 0xD5, 0xE1),
-            space=4)
-    textbox(slide, Inches(1.15), Inches(5.6), Inches(11), Inches(0.9),
+             "Case study: high-temperature high-entropy alloys"], size=21, color=GRAY, space=4)
+    textbox(slide, Inches(1.0), Inches(5.6), Inches(11), Inches(0.9),
             ["The problem with extract-first pipelines · our agent, step by step, with its prompts · evaluation and "
              "results", "10 November 2026 · repository materials-hypothesis-generation (loop.md section 27)"],
-            size=14, color=base.RGBColor(0x94, 0xA3, 0xB8), space=4)
+            size=14, color=GRAY, space=4)
     slide.notes_slide.notes_text_frame.text = (
         "Part 1 (slides 2-3): extract-first pipelines and why they do not scale. Part 2 (slides 4-9): our agent "
         "(draft-then-ground: o3-mini drafts an idea, then reads on-demand retrieved passages and rewrites it), one "
