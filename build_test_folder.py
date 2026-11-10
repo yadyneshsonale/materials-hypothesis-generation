@@ -100,6 +100,8 @@ def build(row: dict) -> dict:
         "gap": case.get("gap"),
         "how_written": {"source": case.get("query_source"), "writer": case.get("query_writer"),
                         "leakage_checker": case.get("leakage_checker"),
+                        "rewrite_rounds": case.get("rounds"),
+                        "passed_leakage_check": {lvl: bool(case["queries"][lvl].get("passed_gate")) for lvl in LEVELS},
                         "answer_word_overlap": {lvl: case["queries"][lvl].get("overlap") for lvl in LEVELS}},
     }
     (folder / "question.json").write_text(json.dumps(question, indent=2, ensure_ascii=False) + "\n")
@@ -121,6 +123,47 @@ def main() -> None:
              "contribution removed (levels `broad`, `problem_constrained`, `expert_context`), the knowledge cutoff "
              "(the paper's publication date: methods may only use evidence published before it), the gap the "
              "introduction states, and how the questions were written and leak-checked. The answer key is not included.",
+             "", "## Keys of question.json", "",
+             "| Key | Meaning |", "|---|---|",
+             "| `number` | The folder number (1–45). |",
+             "| `paper_id` | The paper's PubMed Central ID. |",
+             "| `title`, `doi` | The paper's title and DOI, from its XML. |",
+             "| `retracted` | `true` if the paper has since been retracted. |",
+             "| `publication_date` | The paper's publication date, as used by the benchmark. |",
+             "| `knowledge_cutoff` | The date the methods must respect (here, the publication date): they may only use "
+             "evidence published strictly before it, so they cannot have seen the paper. |",
+             "| `split` | The batch the paper belongs to. `dev` was used to develop methods; `test`, `test2`, `test3` and "
+             "`test4` were held out and each used once for pre-registered final runs. All are now used up, so results on "
+             "them are development results. |",
+             "| `questions` | The three research questions given to the methods, one at a time, with the knowledge cutoff. "
+             "Each is written from the paper's introduction only, never from its results. |",
+             "| `questions.broad` | Names only the problem area and goal (e.g. an alloy family and application). |",
+             "| `questions.problem_constrained` | Adds the specific starting material, its limitation and the constraints. |",
+             "| `questions.expert_context` | Adds the background an expert would know: earlier results and why they fall "
+             "short. |",
+             "| `levels` | Short descriptions of the three question levels. |",
+             "| `gap` | The limitation or open question the introduction states, which the questions ask to address. |",
+             "| `gap.gap_type` | `design` (a property to improve; 22 papers), `understanding` (a behaviour or mechanism to "
+             "explain; 20) or `method` (a better method, model or measurement; 3). |",
+             "| `gap.evidence` | The sentence from the introduction that states the gap. |",
+             "| `gap.reason` | Why that sentence was read as this kind of gap. |",
+             "| `gap.classifier` | The model that classified the gap. |",
+             "| `how_written` | How the questions were made and checked for leakage. |",
+             "| `how_written.source` | `introduction_without_own_contribution`: the introduction, cut at the first sentence "
+             "about the paper's own work (\"in this work…\"), so the questions never describe the paper's answer. |",
+             "| `how_written.writer` | The model that wrote the questions (`trapi:` = accessed through Microsoft's TRAPI "
+             "service). |",
+             "| `how_written.leakage_checker` | The model that saw both the question and the paper's answer and flagged any "
+             "phrase that gives the answer away (or steers towards it). |",
+             "| `how_written.rewrite_rounds` | How many write-and-check rounds the paper's questions took: a flagged question "
+             "was rewritten without the flagged phrases, up to 4 rounds. For papers whose gap is not `design`, the questions "
+             "were then rewritten with a prompt for that gap type, up to 4 more rounds (so up to 8 in total). |",
+             "| `how_written.passed_leakage_check` | Per question: `true` if it passed both the checker and the word-overlap "
+             "limit. 127 of the 135 questions passed; 8 still had a checker flag after the last round and were kept "
+             "and marked `false` (papers 7, 16, 17, 25, 40, 41, 43; all within the overlap limit). |",
+             "| `how_written.answer_word_overlap` | Per question: the share of the answer's content words (intervention, "
+             "mechanism, outcome…) that appear in the question, ignoring words that describe the allowed context such as "
+             "the starting material. Must be ≤ 0.10. |",
              "", "Note: paper 25 (PMC10920630, Scientific Reports 2024) has since been retracted; it is kept so that the "
              "set matches every reported result (`retracted: true` in its question.json).",
              "", "Built by `build_test_folder.py`; source cases in `experiments/high_temperature_hea_qwen35b/benchmark_*`.",
