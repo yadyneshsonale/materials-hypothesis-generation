@@ -1,0 +1,2654 @@
+{
+ "prompts": {
+  "RQ_SYSTEM": "You are an experienced materials scientist rating research hypotheses on high-temperature high-entropy alloys.\n\nWhat the AI systems were asked to do: each system saw only the research question, not the paper. It had to propose one hypothesis that answers the question, in a fixed structure:\n- Main hypothesis: the proposal in one or two sentences.\n- Starting material: the alloy or material and its state before the change (as cast, annealed, coating, ...).\n- What is changed or studied: the intervention: a composition change, a process, a heat treatment, a coating, or, for some questions, the study or simulation to be done.\n- Conditions: processing, test or simulation conditions (temperature, time, atmosphere, loading, ...).\n- Structure through which it acts: the microstructural or structural feature that mediates the effect (phases, precipitates, grain boundaries, defects, ordering, ...).\n- Mechanism: why the change should produce the effect.\n- Predicted outcome: what should happen to the property, compared with the baseline.\n- Compared with (baseline): the reference condition the prediction is compared with.\n- Where it should hold (boundary): the range of materials or conditions where the prediction should apply.\n- Main uncertainty: what could make the hypothesis wrong.\n- Test that would falsify it: an experiment or simulation, and the result that would prove the hypothesis wrong.\nA field shown as \"—\" was left empty by its author. Rate the hypothesis on what is there.\n\nRate the hypothesis on three separate aspects. They are independent: a hypothesis can be plausible but hard to test, or testable but not useful.\n\nPlausibility (1-5): is it scientifically sound for this material and these conditions?\n1 = Physically wrong, or contradicts well-established knowledge\n2 = Doubtful: major scientific problems\n3 = Possible, but with notable gaps or questionable steps\n4 = Sound, with minor issues\n5 = Fully sound and convincing\n\nTestability (1-5): could it be clearly tested, and would the proposed test decide it?\n1 = Cannot be tested as written, or too vague to test\n2 = A test is mentioned, but it would not really decide the question\n3 = Testable, but the test is weak, incomplete or impractical\n4 = Clear, feasible test with minor gaps\n5 = Clear, feasible test with a decisive criterion for proving it wrong\n\nUsefulness (1-5): would it help a researcher working on exactly this question?\n1 = Not useful: off-topic, trivial or wrong\n2 = Of little use\n3 = Moderately useful\n4 = Useful: worth testing\n5 = Very useful: I would want to see it tested\n\nLength or the number of details does not make a hypothesis better in itself.\n\nReturn JSON: {\"plausibility_reason\": \"one sentence\", \"plausibility\": integer 1-5, \"testability_reason\": \"one sentence\", \"testability\": integer 1-5, \"usefulness_reason\": \"one sentence\", \"usefulness\": integer 1-5}. Give each reason before its score.",
+  "GROUNDING_SYSTEM": "You are an experienced materials scientist checking how well a research hypothesis on high-temperature high-entropy alloys is grounded in prior evidence. You see the research question, the hypothesis (as JSON; its evidence IDs refer to the cited passages) and the passages from earlier papers that it cites, labelled E1, E2, and so on. A hypothesis may cite no passages.\n\nFirst list the key premises of the hypothesis: the specific claims about earlier results, material behaviour or mechanisms on which the proposal relies (at most five). Then rate:\n\nGrounding (1-5): are these premises supported by specific prior evidence, accurately represented?\n1 = No specific prior evidence for the key premises, or the cited evidence is misrepresented or contradicts them\n2 = Little support: most key premises are unsupported, or the cited evidence is only loosely related to them\n3 = Partly supported: some key premises are supported by the cited evidence, others are not\n4 = Mostly supported: the key premises are supported by accurately represented evidence, with minor gaps or overstatements\n5 = Fully supported: every key premise is supported by accurately represented cited evidence\n\nRate only the support for the premises, not whether the proposal is a good idea. Standard textbook knowledge needs no citation; specific claims about earlier results do. Citing more passages is not better in itself.\n\nReturn JSON: {\"premises\": [\"each premise in a few words\"], \"grounding_reason\": \"one or two sentences\", \"grounding\": integer 1-5}. Give the reason before the score.",
+  "QUALITY_PAIR_SYSTEM": "You are an experienced materials scientist reviewing two research hypotheses written, before the work is done, for the same research question on high-temperature high-entropy alloys. Decide which one is the better research proposal to pursue. Consider: (1) does it address the limitation the question states, within its constraints; (2) is the mechanism physically sound for this material and regime; (3) is it specific and testable: a clear intervention, conditions, a measurable predicted outcome against a baseline, and a decisive experiment; (4) is it well grounded: claims consistent with established knowledge and with any cited evidence, and no invented precise values presented as fact; (5) is it a substantive, non-trivial contribution. Do not prefer a hypothesis for being longer or for citing more evidence as such. Return JSON {\"winner\": \"A\" | \"B\" | \"tie\", \"confidence\": number from 0 to 1, \"reason\": \"one or two sentences\"}."
+ },
+ "cost": {
+  "questions": 135,
+  "calls_per_question": {
+   "search_planner": 1.0,
+   "screener": 5.4,
+   "screener_expansion": 0.7,
+   "passage_grader": 8.5
+  },
+  "retrieval_calls_per_question": 15.7,
+  "retrieval_chars_in_per_question": 381253.5,
+  "searches_per_question": 7.6,
+  "search_hits_per_question": 106.7,
+  "earlier_corpus_papers_per_question": 66.3,
+  "admitted_per_question": 154.5,
+  "screened_per_question": 103.1,
+  "papers_kept_per_question": 27.2,
+  "passages_graded_per_question": 163.0,
+  "pack_passages_per_question": 45.4,
+  "pack_chars_per_question": 57929.7,
+  "screen_grades": {
+   "3": 1301,
+   "1": 5568,
+   "2": 3713,
+   "0": 3340
+  },
+  "passage_grades": {
+   "2": 9639,
+   "3": 7292,
+   "1": 4682,
+   "0": 395
+  },
+  "distinct_papers_used": 1262,
+  "writer_chars_in_per_run": 71040.0,
+  "writer_seconds_per_run": 40.2
+ },
+ "results": {
+  "incumbent": {
+   "incumbent": "rx_r",
+   "deepseek_lower_bound": 0.415,
+   "gpt56": "confirmed",
+   "eligible": [
+    "rx_r",
+    "rx_ru",
+    "edit_rx_r",
+    "rx_base",
+    "web64k_v2_b_o3mini",
+    "rx_u",
+    "web64k_r2_b_o3mini",
+    "agent_draft_ground_b_o3mini",
+    "pcd_nocritic_PCD_o3mini",
+    "edit_rx_base",
+    "web_text_64k_b_o3mini",
+    "web_text_chunks_b_o3mini",
+    "rx_ruc",
+    "writer_study_b_o3mini",
+    "rx_ruc_select",
+    "agent_choose_ground_b_o3mini",
+    "rx_c"
+   ]
+  },
+  "grounding_validation": {
+   "checks": {
+    "G1_swap_lowers": true,
+    "G2_no_citation_mean_le_1.5": true,
+    "G3_retest_rho_ge_0.70": true,
+    "G4_evidence_writer_above_closed_book": true
+   },
+   "valid": true,
+   "G3_retest": {
+    "pairs": 135,
+    "rho": 0.82,
+    "mean_abs_diff": 0.311
+   }
+  },
+  "g1": {
+   "pairs": 134,
+   "original_mean": 1.858,
+   "control_mean": 1.022,
+   "control_higher_share": 0.0,
+   "drop_by_paper": {
+    "papers": 45,
+    "a_mean": 1.852,
+    "b_mean": 1.022,
+    "diff": 0.83,
+    "ci95": [
+     0.652,
+     1.022
+    ],
+    "up": 39,
+    "down": 0,
+    "p": 0.0
+   }
+  },
+  "g2": {
+   "pairs": 135,
+   "original_mean": 1.867,
+   "control_mean": 1.0,
+   "control_higher_share": 0.0,
+   "drop_by_paper": {
+    "papers": 45,
+    "a_mean": 1.867,
+    "b_mean": 1.0,
+    "diff": 0.867,
+    "ci95": [
+     0.681,
+     1.067
+    ],
+    "up": 40,
+    "down": 0,
+    "p": 0.0
+   }
+  },
+  "g4": {
+   "papers": 45,
+   "a_mean": 1.867,
+   "b_mean": 1.0,
+   "diff": 0.867,
+   "ci95": [
+    0.681,
+    1.067
+   ],
+   "up": 40,
+   "down": 0,
+   "p": 0.0
+  },
+  "controls": {
+   "items": 216,
+   "means": {
+    "positive": {
+     "rq": 1.528,
+     "n": 36
+    },
+    "hard_negative": {
+     "rq": 0.503,
+     "n": 36
+    },
+    "random_negative": {
+     "rq": 0.244,
+     "n": 36
+    },
+    "intervention_swap": {
+     "rq": 0.957,
+     "n": 36
+    },
+    "mechanism_swap": {
+     "rq": 0.336,
+     "n": 36
+    },
+    "generic": {
+     "rq": 0.429,
+     "n": 36
+    }
+   },
+   "gaps": {
+    "usefulness_positive_minus_random": 1.547,
+    "rq_positive_minus_generic": 1.099,
+    "plausibility_positive_minus_intervention_swap": 0.75,
+    "plausibility_positive_minus_mechanism_swap": 1.435
+   },
+   "checks": {
+    "C1_usefulness_positive_minus_random_ge_1": true,
+    "C2_rq_positive_minus_generic_ge_1": true,
+    "C3_plausibility_positive_minus_swaps_ge_0.5": true
+   },
+   "passed": true
+  },
+  "rows": {
+   "writer_only_b_o3mini": {
+    "sp": 2.326,
+    "rq": 3.102,
+    "scales": {
+     "plausibility": 3.714,
+     "testability": 4.163,
+     "usefulness": 4.428
+    },
+    "grounding": 1.0,
+    "words": 487.7,
+    "pairwise": {},
+    "experiment": "21-35",
+    "sp_vs_writer": {}
+   },
+   "closed_book": {
+    "sp": 1.049,
+    "rq": 1.399,
+    "scales": {
+     "plausibility": 2.348,
+     "testability": 2.643,
+     "usefulness": 2.205
+    },
+    "grounding": 1.0,
+    "words": 226.2,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.0,
+      "base_wins": 1.0,
+      "papers": 45,
+      "a_mean": -1.0,
+      "b_mean": 0.0,
+      "diff": -1.0,
+      "ci95": [
+       -1.0,
+       -1.0
+      ],
+      "up": 0,
+      "down": 45,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.0,
+      "base_wins": 0.985,
+      "papers": 45,
+      "a_mean": -0.985,
+      "b_mean": 0.0,
+      "diff": -0.985,
+      "ci95": [
+       -0.996,
+       -0.97
+      ],
+      "up": 0,
+      "down": 45,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "21-35",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 1.049,
+     "b_mean": 2.326,
+     "diff": -1.277,
+     "ci95": [
+      -1.367,
+      -1.187
+     ],
+     "up": 0,
+     "down": 45,
+     "p": 0.0
+    }
+   },
+   "closed_book_o3mini": {
+    "sp": 2.229,
+    "rq": 2.972,
+    "scales": {
+     "plausibility": 3.52,
+     "testability": 4.184,
+     "usefulness": 4.211
+    },
+    "grounding": 1.0,
+    "words": 473.1,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.07,
+      "base_wins": 0.415,
+      "papers": 45,
+      "a_mean": -0.344,
+      "b_mean": 0.0,
+      "diff": -0.344,
+      "ci95": [
+       -0.411,
+       -0.274
+      ],
+      "up": 2,
+      "down": 41,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.189,
+      "base_wins": 0.396,
+      "papers": 45,
+      "a_mean": -0.207,
+      "b_mean": 0.0,
+      "diff": -0.207,
+      "ci95": [
+       -0.281,
+       -0.13
+      ],
+      "up": 6,
+      "down": 33,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "21-35",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 2.229,
+     "b_mean": 2.326,
+     "diff": -0.098,
+     "ci95": [
+      -0.157,
+      -0.038
+     ],
+     "up": 14,
+     "down": 31,
+     "p": 0.0161
+    }
+   },
+   "writer_study_b_o3mini": {
+    "sp": 2.348,
+    "rq": 3.131,
+    "scales": {
+     "plausibility": 3.707,
+     "testability": 4.254,
+     "usefulness": 4.432
+    },
+    "grounding": 1.0,
+    "words": 529.2,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.33,
+      "base_wins": 0.107,
+      "papers": 45,
+      "a_mean": 0.222,
+      "b_mean": 0.0,
+      "diff": 0.222,
+      "ci95": [
+       0.144,
+       0.3
+      ],
+      "up": 30,
+      "down": 7,
+      "p": 0.0002,
+      "holm_p": 0.0006
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.374,
+      "base_wins": 0.159,
+      "papers": 45,
+      "a_mean": 0.215,
+      "b_mean": 0.0,
+      "diff": 0.215,
+      "ci95": [
+       0.141,
+       0.293
+      ],
+      "up": 31,
+      "down": 8,
+      "p": 0.0003,
+      "holm_p": 0.0006
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "41",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 2.348,
+     "b_mean": 2.326,
+     "diff": 0.022,
+     "ci95": [
+      -0.035,
+      0.083
+     ],
+     "up": 20,
+     "down": 24,
+     "p": 0.6516
+    }
+   },
+   "web_text_64k_b_o3mini": {
+    "sp": 2.483,
+    "rq": 3.026,
+    "scales": {
+     "plausibility": 3.56,
+     "testability": 4.152,
+     "usefulness": 4.367
+    },
+    "grounding": 1.852,
+    "words": 525.1,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.322,
+      "base_wins": 0.033,
+      "papers": 45,
+      "a_mean": 0.289,
+      "b_mean": 0.0,
+      "diff": 0.289,
+      "ci95": [
+       0.2,
+       0.381
+      ],
+      "up": 35,
+      "down": 5,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.489,
+      "base_wins": 0.074,
+      "papers": 45,
+      "a_mean": 0.415,
+      "b_mean": 0.0,
+      "diff": 0.415,
+      "ci95": [
+       0.322,
+       0.507
+      ],
+      "up": 38,
+      "down": 4,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "36",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 2.483,
+     "b_mean": 2.326,
+     "diff": 0.156,
+     "ci95": [
+      0.063,
+      0.25
+     ],
+     "up": 32,
+     "down": 13,
+     "p": 0.0066
+    }
+   },
+   "web64k_v2_b_o3mini": {
+    "sp": 2.532,
+    "rq": 3.062,
+    "scales": {
+     "plausibility": 3.616,
+     "testability": 4.272,
+     "usefulness": 4.299
+    },
+    "grounding": 1.941,
+    "words": 530.4,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.356,
+      "base_wins": 0.033,
+      "papers": 45,
+      "a_mean": 0.322,
+      "b_mean": 0.0,
+      "diff": 0.322,
+      "ci95": [
+       0.244,
+       0.4
+      ],
+      "up": 35,
+      "down": 2,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.489,
+      "base_wins": 0.081,
+      "papers": 45,
+      "a_mean": 0.407,
+      "b_mean": 0.0,
+      "diff": 0.407,
+      "ci95": [
+       0.3,
+       0.511
+      ],
+      "up": 38,
+      "down": 3,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "42",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 2.532,
+     "b_mean": 2.326,
+     "diff": 0.206,
+     "ci95": [
+      0.128,
+      0.285
+     ],
+     "up": 36,
+     "down": 9,
+     "p": 0.0001
+    }
+   },
+   "rx_base": {
+    "sp": 2.538,
+    "rq": 3.051,
+    "scales": {
+     "plausibility": 3.586,
+     "testability": 4.172,
+     "usefulness": 4.394
+    },
+    "grounding": 2.0,
+    "words": 535.0,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.422,
+      "base_wins": 0.019,
+      "papers": 45,
+      "a_mean": 0.404,
+      "b_mean": 0.0,
+      "diff": 0.404,
+      "ci95": [
+       0.319,
+       0.493
+      ],
+      "up": 39,
+      "down": 1,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.526,
+      "base_wins": 0.052,
+      "papers": 45,
+      "a_mean": 0.474,
+      "b_mean": 0.0,
+      "diff": 0.474,
+      "ci95": [
+       0.378,
+       0.567
+      ],
+      "up": 38,
+      "down": 3,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "44-45",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 2.538,
+     "b_mean": 2.326,
+     "diff": 0.212,
+     "ci95": [
+      0.111,
+      0.308
+     ],
+     "up": 35,
+     "down": 9,
+     "p": 0.0001
+    }
+   },
+   "rx_r": {
+    "sp": 2.654,
+    "rq": 3.034,
+    "scales": {
+     "plausibility": 3.564,
+     "testability": 4.188,
+     "usefulness": 4.349
+    },
+    "grounding": 2.515,
+    "words": 548.1,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.515,
+      "base_wins": 0.015,
+      "papers": 45,
+      "a_mean": 0.5,
+      "b_mean": 0.0,
+      "diff": 0.5,
+      "ci95": [
+       0.415,
+       0.585
+      ],
+      "up": 41,
+      "down": 2,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.63,
+      "base_wins": 0.041,
+      "papers": 45,
+      "a_mean": 0.589,
+      "b_mean": 0.0,
+      "diff": 0.589,
+      "ci95": [
+       0.507,
+       0.663
+      ],
+      "up": 44,
+      "down": 1,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 270,
+      "new_wins": 0.715,
+      "base_wins": 0.174,
+      "papers": 45,
+      "a_mean": 0.541,
+      "b_mean": 0.0,
+      "diff": 0.541,
+      "ci95": [
+       0.426,
+       0.648
+      ],
+      "up": 40,
+      "down": 3,
+      "p": 0.0,
+      "holm_p": 0.0
+     }
+    },
+    "experiment": "44-45",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 2.654,
+     "b_mean": 2.326,
+     "diff": 0.328,
+     "ci95": [
+      0.233,
+      0.425
+     ],
+     "up": 39,
+     "down": 6,
+     "p": 0.0
+    }
+   },
+   "rx_u": {
+    "sp": 2.484,
+    "rq": 2.974,
+    "scales": {
+     "plausibility": 3.409,
+     "testability": 4.223,
+     "usefulness": 4.291
+    },
+    "grounding": 2.011,
+    "words": 571.5,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.344,
+      "base_wins": 0.015,
+      "papers": 45,
+      "a_mean": 0.33,
+      "b_mean": 0.0,
+      "diff": 0.33,
+      "ci95": [
+       0.244,
+       0.415
+      ],
+      "up": 34,
+      "down": 1,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.53,
+      "base_wins": 0.033,
+      "papers": 45,
+      "a_mean": 0.496,
+      "b_mean": 0.0,
+      "diff": 0.496,
+      "ci95": [
+       0.404,
+       0.585
+      ],
+      "up": 40,
+      "down": 1,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "44-45",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 2.484,
+     "b_mean": 2.326,
+     "diff": 0.157,
+     "ci95": [
+      0.048,
+      0.26
+     ],
+     "up": 34,
+     "down": 11,
+     "p": 0.0008
+    }
+   },
+   "rx_ru": {
+    "sp": 2.593,
+    "rq": 2.995,
+    "scales": {
+     "plausibility": 3.43,
+     "testability": 4.22,
+     "usefulness": 4.336
+    },
+    "grounding": 2.385,
+    "words": 579.1,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.456,
+      "base_wins": 0.022,
+      "papers": 45,
+      "a_mean": 0.433,
+      "b_mean": 0.0,
+      "diff": 0.433,
+      "ci95": [
+       0.352,
+       0.519
+      ],
+      "up": 39,
+      "down": 0,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.559,
+      "base_wins": 0.03,
+      "papers": 45,
+      "a_mean": 0.53,
+      "b_mean": 0.0,
+      "diff": 0.53,
+      "ci95": [
+       0.463,
+       0.593
+      ],
+      "up": 44,
+      "down": 0,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 270,
+      "new_wins": 0.604,
+      "base_wins": 0.178,
+      "papers": 45,
+      "a_mean": 0.426,
+      "b_mean": 0.0,
+      "diff": 0.426,
+      "ci95": [
+       0.33,
+       0.522
+      ],
+      "up": 38,
+      "down": 2,
+      "p": 0.0,
+      "holm_p": 0.0
+     }
+    },
+    "experiment": "44-45",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 2.593,
+     "b_mean": 2.326,
+     "diff": 0.266,
+     "ci95": [
+      0.171,
+      0.365
+     ],
+     "up": 35,
+     "down": 10,
+     "p": 0.0002
+    }
+   },
+   "rx_c": {
+    "sp": 2.499,
+    "rq": 3.056,
+    "scales": {
+     "plausibility": 3.657,
+     "testability": 4.147,
+     "usefulness": 4.364
+    },
+    "grounding": 1.83,
+    "words": 411.7,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.222,
+      "base_wins": 0.111,
+      "papers": 45,
+      "a_mean": 0.111,
+      "b_mean": 0.0,
+      "diff": 0.111,
+      "ci95": [
+       0.026,
+       0.196
+      ],
+      "up": 24,
+      "down": 11,
+      "p": 0.041,
+      "holm_p": 0.041
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.367,
+      "base_wins": 0.067,
+      "papers": 45,
+      "a_mean": 0.3,
+      "b_mean": 0.0,
+      "diff": 0.3,
+      "ci95": [
+       0.219,
+       0.378
+      ],
+      "up": 35,
+      "down": 5,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "44-45",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 2.499,
+     "b_mean": 2.326,
+     "diff": 0.173,
+     "ci95": [
+      0.099,
+      0.247
+     ],
+     "up": 35,
+     "down": 10,
+     "p": 0.0002
+    }
+   },
+   "rx_ruc_select": {
+    "sp": 2.501,
+    "rq": 2.863,
+    "scales": {
+     "plausibility": 3.384,
+     "testability": 4.162,
+     "usefulness": 4.042
+    },
+    "grounding": 2.415,
+    "words": 371.0,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.252,
+      "base_wins": 0.074,
+      "papers": 45,
+      "a_mean": 0.178,
+      "b_mean": 0.0,
+      "diff": 0.178,
+      "ci95": [
+       0.093,
+       0.267
+      ],
+      "up": 28,
+      "down": 5,
+      "p": 0.0001,
+      "holm_p": 0.0005
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.3,
+      "base_wins": 0.156,
+      "papers": 45,
+      "a_mean": 0.144,
+      "b_mean": 0.0,
+      "diff": 0.144,
+      "ci95": [
+       0.044,
+       0.248
+      ],
+      "up": 24,
+      "down": 15,
+      "p": 0.1996,
+      "holm_p": 0.1996
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "44-45",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 2.501,
+     "b_mean": 2.326,
+     "diff": 0.174,
+     "ci95": [
+      0.049,
+      0.299
+     ],
+     "up": 29,
+     "down": 16,
+     "p": 0.0725
+    }
+   },
+   "rx_ruc": {
+    "sp": 2.586,
+    "rq": 2.977,
+    "scales": {
+     "plausibility": 3.477,
+     "testability": 4.185,
+     "usefulness": 4.268
+    },
+    "grounding": 2.415,
+    "words": 413.6,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.3,
+      "base_wins": 0.063,
+      "papers": 45,
+      "a_mean": 0.237,
+      "b_mean": 0.0,
+      "diff": 0.237,
+      "ci95": [
+       0.159,
+       0.315
+      ],
+      "up": 31,
+      "down": 4,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.433,
+      "base_wins": 0.096,
+      "papers": 45,
+      "a_mean": 0.337,
+      "b_mean": 0.0,
+      "diff": 0.337,
+      "ci95": [
+       0.244,
+       0.43
+      ],
+      "up": 36,
+      "down": 5,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "44-45",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 2.586,
+     "b_mean": 2.326,
+     "diff": 0.26,
+     "ci95": [
+      0.152,
+      0.364
+     ],
+     "up": 33,
+     "down": 12,
+     "p": 0.0025
+    }
+   },
+   "edit_rx_base": {
+    "sp": 2.524,
+    "rq": 3.043,
+    "scales": {
+     "plausibility": 3.547,
+     "testability": 4.195,
+     "usefulness": 4.386
+    },
+    "grounding": 1.967,
+    "words": 535.4,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.348,
+      "base_wins": 0.048,
+      "papers": 45,
+      "a_mean": 0.3,
+      "b_mean": 0.0,
+      "diff": 0.3,
+      "ci95": [
+       0.204,
+       0.396
+      ],
+      "up": 34,
+      "down": 8,
+      "p": 0.0001,
+      "holm_p": 0.0005
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.504,
+      "base_wins": 0.07,
+      "papers": 45,
+      "a_mean": 0.433,
+      "b_mean": 0.0,
+      "diff": 0.433,
+      "ci95": [
+       0.341,
+       0.522
+      ],
+      "up": 38,
+      "down": 3,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "44-45",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 2.524,
+     "b_mean": 2.326,
+     "diff": 0.198,
+     "ci95": [
+      0.107,
+      0.286
+     ],
+     "up": 32,
+     "down": 13,
+     "p": 0.0066
+    }
+   },
+   "edit_rx_r": {
+    "sp": 2.617,
+    "rq": 2.976,
+    "scales": {
+     "plausibility": 3.501,
+     "testability": 4.18,
+     "usefulness": 4.246
+    },
+    "grounding": 2.541,
+    "words": 548.8,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.441,
+      "base_wins": 0.022,
+      "papers": 45,
+      "a_mean": 0.419,
+      "b_mean": 0.0,
+      "diff": 0.419,
+      "ci95": [
+       0.333,
+       0.504
+      ],
+      "up": 40,
+      "down": 1,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.6,
+      "base_wins": 0.041,
+      "papers": 45,
+      "a_mean": 0.559,
+      "b_mean": 0.0,
+      "diff": 0.559,
+      "ci95": [
+       0.478,
+       0.637
+      ],
+      "up": 42,
+      "down": 1,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 270,
+      "new_wins": 0.704,
+      "base_wins": 0.163,
+      "papers": 45,
+      "a_mean": 0.541,
+      "b_mean": 0.0,
+      "diff": 0.541,
+      "ci95": [
+       0.422,
+       0.652
+      ],
+      "up": 40,
+      "down": 3,
+      "p": 0.0,
+      "holm_p": 0.0
+     }
+    },
+    "experiment": "44-45",
+    "sp_vs_writer": {
+     "writer_set": "experiments 43-45",
+     "papers": 45,
+     "a_mean": 2.617,
+     "b_mean": 2.326,
+     "diff": 0.291,
+     "ci95": [
+      0.195,
+      0.39
+     ],
+     "up": 38,
+     "down": 7,
+     "p": 0.0
+    }
+   },
+   "writer_v2_b_o3mini": {
+    "sp": 2.346,
+    "rq": 3.128,
+    "scales": {
+     "plausibility": 3.767,
+     "testability": 4.288,
+     "usefulness": 4.328
+    },
+    "grounding": 1.0,
+    "words": 477.0,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "42",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.346,
+     "b_mean": 2.363,
+     "diff": -0.017,
+     "ci95": [
+      -0.076,
+      0.041
+     ],
+     "up": 19,
+     "down": 24,
+     "p": 0.5424
+    }
+   },
+   "web64k_r2_b_o3mini": {
+    "sp": 2.507,
+    "rq": 3.029,
+    "scales": {
+     "plausibility": 3.572,
+     "testability": 4.164,
+     "usefulness": 4.351
+    },
+    "grounding": 1.941,
+    "words": 536.0,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.356,
+      "base_wins": 0.044,
+      "papers": 45,
+      "a_mean": 0.311,
+      "b_mean": 0.0,
+      "diff": 0.311,
+      "ci95": [
+       0.226,
+       0.4
+      ],
+      "up": 33,
+      "down": 2,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.507,
+      "base_wins": 0.052,
+      "papers": 45,
+      "a_mean": 0.456,
+      "b_mean": 0.0,
+      "diff": 0.456,
+      "ci95": [
+       0.363,
+       0.541
+      ],
+      "up": 37,
+      "down": 3,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "42",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.507,
+     "b_mean": 2.363,
+     "diff": 0.144,
+     "ci95": [
+      0.051,
+      0.241
+     ],
+     "up": 30,
+     "down": 15,
+     "p": 0.0357
+    }
+   },
+   "web_study_64k_b_o3mini": {
+    "sp": 2.493,
+    "rq": 3.06,
+    "scales": {
+     "plausibility": 3.628,
+     "testability": 4.159,
+     "usefulness": 4.394
+    },
+    "grounding": 1.789,
+    "words": 559.5,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "41",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.493,
+     "b_mean": 2.363,
+     "diff": 0.13,
+     "ci95": [
+      0.048,
+      0.215
+     ],
+     "up": 27,
+     "down": 15,
+     "p": 0.0884
+    }
+   },
+   "agent_choose_ground_b_o3mini": {
+    "sp": 2.558,
+    "rq": 2.933,
+    "scales": {
+     "plausibility": 3.477,
+     "testability": 4.146,
+     "usefulness": 4.178
+    },
+    "grounding": 2.433,
+    "words": 510.3,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.237,
+      "base_wins": 0.074,
+      "papers": 45,
+      "a_mean": 0.163,
+      "b_mean": 0.0,
+      "diff": 0.163,
+      "ci95": [
+       0.074,
+       0.248
+      ],
+      "up": 28,
+      "down": 8,
+      "p": 0.0012,
+      "holm_p": 0.0024
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.352,
+      "base_wins": 0.1,
+      "papers": 45,
+      "a_mean": 0.252,
+      "b_mean": 0.0,
+      "diff": 0.252,
+      "ci95": [
+       0.156,
+       0.352
+      ],
+      "up": 33,
+      "down": 8,
+      "p": 0.0001,
+      "holm_p": 0.0003
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "40",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.558,
+     "b_mean": 2.363,
+     "diff": 0.195,
+     "ci95": [
+      0.098,
+      0.294
+     ],
+     "up": 34,
+     "down": 11,
+     "p": 0.0008
+    }
+   },
+   "pcd_PCD_o3mini": {
+    "sp": 2.465,
+    "rq": 3.053,
+    "scales": {
+     "plausibility": 3.562,
+     "testability": 4.19,
+     "usefulness": 4.406
+    },
+    "grounding": 1.7,
+    "words": 520.9,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.465,
+     "b_mean": 2.363,
+     "diff": 0.102,
+     "ci95": [
+      0.027,
+      0.176
+     ],
+     "up": 29,
+     "down": 15,
+     "p": 0.0488
+    }
+   },
+   "synth_crowd_b_o3mini": {
+    "sp": 2.27,
+    "rq": 3.026,
+    "scales": {
+     "plausibility": 3.694,
+     "testability": 4.202,
+     "usefulness": 4.183
+    },
+    "grounding": 1.0,
+    "words": 419.7,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "38",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.27,
+     "b_mean": 2.363,
+     "diff": -0.093,
+     "ci95": [
+      -0.16,
+      -0.027
+     ],
+     "up": 14,
+     "down": 30,
+     "p": 0.0226
+    }
+   },
+   "web_agent_b_o3mini": {
+    "sp": 2.46,
+    "rq": 2.937,
+    "scales": {
+     "plausibility": 3.467,
+     "testability": 4.181,
+     "usefulness": 4.164
+    },
+    "grounding": 2.03,
+    "words": 507.3,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "36",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.46,
+     "b_mean": 2.363,
+     "diff": 0.098,
+     "ci95": [
+      0.017,
+      0.177
+     ],
+     "up": 31,
+     "down": 14,
+     "p": 0.0161
+    }
+   },
+   "read_web_chunks_b_o3mini": {
+    "sp": 2.372,
+    "rq": 2.847,
+    "scales": {
+     "plausibility": 3.354,
+     "testability": 4.152,
+     "usefulness": 4.033
+    },
+    "grounding": 1.948,
+    "words": 476.8,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "39",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.372,
+     "b_mean": 2.363,
+     "diff": 0.009,
+     "ci95": [
+      -0.079,
+      0.096
+     ],
+     "up": 24,
+     "down": 20,
+     "p": 0.6516
+    }
+   },
+   "web_text_chunks_b_o3mini": {
+    "sp": 2.527,
+    "rq": 3.043,
+    "scales": {
+     "plausibility": 3.581,
+     "testability": 4.198,
+     "usefulness": 4.349
+    },
+    "grounding": 1.981,
+    "words": 514.0,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.319,
+      "base_wins": 0.056,
+      "papers": 45,
+      "a_mean": 0.263,
+      "b_mean": 0.0,
+      "diff": 0.263,
+      "ci95": [
+       0.189,
+       0.341
+      ],
+      "up": 33,
+      "down": 6,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.485,
+      "base_wins": 0.033,
+      "papers": 45,
+      "a_mean": 0.452,
+      "b_mean": 0.0,
+      "diff": 0.452,
+      "ci95": [
+       0.378,
+       0.526
+      ],
+      "up": 41,
+      "down": 1,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "36",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.527,
+     "b_mean": 2.363,
+     "diff": 0.165,
+     "ci95": [
+      0.081,
+      0.252
+     ],
+     "up": 33,
+     "down": 11,
+     "p": 0.0013
+    }
+   },
+   "writer_only_b_o3mini_r5": {
+    "sp": 2.352,
+    "rq": 3.136,
+    "scales": {
+     "plausibility": 3.746,
+     "testability": 4.227,
+     "usefulness": 4.436
+    },
+    "grounding": 1.0,
+    "words": 486.8,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "38",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.352,
+     "b_mean": 2.363,
+     "diff": -0.011,
+     "ci95": [
+      -0.073,
+      0.054
+     ],
+     "up": 19,
+     "down": 26,
+     "p": 0.3713
+    }
+   },
+   "writer_design_b_o3mini": {
+    "sp": 2.285,
+    "rq": 3.047,
+    "scales": {
+     "plausibility": 3.63,
+     "testability": 4.21,
+     "usefulness": 4.301
+    },
+    "grounding": 1.0,
+    "words": 541.3,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "41",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.285,
+     "b_mean": 2.363,
+     "diff": -0.078,
+     "ci95": [
+      -0.147,
+      -0.011
+     ],
+     "up": 16,
+     "down": 28,
+     "p": 0.0961
+    }
+   },
+   "writer_types_b_o3mini": {
+    "sp": 2.353,
+    "rq": 3.137,
+    "scales": {
+     "plausibility": 3.742,
+     "testability": 4.227,
+     "usefulness": 4.443
+    },
+    "grounding": 1.0,
+    "words": 492.5,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "41",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.353,
+     "b_mean": 2.363,
+     "diff": -0.01,
+     "ci95": [
+      -0.057,
+      0.039
+     ],
+     "up": 20,
+     "down": 24,
+     "p": 0.6516
+    }
+   },
+   "agent_choose_only_b_o3mini": {
+    "sp": 2.105,
+    "rq": 2.807,
+    "scales": {
+     "plausibility": 3.441,
+     "testability": 4.128,
+     "usefulness": 3.852
+    },
+    "grounding": 1.0,
+    "words": 454.6,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "40",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.105,
+     "b_mean": 2.363,
+     "diff": -0.258,
+     "ci95": [
+      -0.333,
+      -0.177
+     ],
+     "up": 8,
+     "down": 37,
+     "p": 0.0
+    }
+   },
+   "agent_draft_ground_b_o3mini": {
+    "sp": 2.566,
+    "rq": 3.156,
+    "scales": {
+     "plausibility": 3.719,
+     "testability": 4.262,
+     "usefulness": 4.486
+    },
+    "grounding": 1.796,
+    "words": 509.4,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.307,
+      "base_wins": 0.037,
+      "papers": 45,
+      "a_mean": 0.27,
+      "b_mean": 0.0,
+      "diff": 0.27,
+      "ci95": [
+       0.219,
+       0.322
+      ],
+      "up": 39,
+      "down": 1,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.4,
+      "base_wins": 0.067,
+      "papers": 45,
+      "a_mean": 0.333,
+      "b_mean": 0.0,
+      "diff": 0.333,
+      "ci95": [
+       0.252,
+       0.419
+      ],
+      "up": 35,
+      "down": 2,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "40",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.566,
+     "b_mean": 2.363,
+     "diff": 0.203,
+     "ci95": [
+      0.141,
+      0.265
+     ],
+     "up": 38,
+     "down": 7,
+     "p": 0.0
+    }
+   },
+   "pcd_none_o3mini": {
+    "sp": 2.305,
+    "rq": 3.073,
+    "scales": {
+     "plausibility": 3.59,
+     "testability": 4.231,
+     "usefulness": 4.398
+    },
+    "grounding": 1.0,
+    "words": 507.7,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.305,
+     "b_mean": 2.363,
+     "diff": -0.058,
+     "ci95": [
+      -0.13,
+      0.015
+     ],
+     "up": 17,
+     "down": 27,
+     "p": 0.1742
+    }
+   },
+   "pcd_P_o3mini": {
+    "sp": 2.313,
+    "rq": 3.084,
+    "scales": {
+     "plausibility": 3.578,
+     "testability": 4.216,
+     "usefulness": 4.457
+    },
+    "grounding": 1.0,
+    "words": 511.9,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.313,
+     "b_mean": 2.363,
+     "diff": -0.05,
+     "ci95": [
+      -0.114,
+      0.018
+     ],
+     "up": 13,
+     "down": 32,
+     "p": 0.0066
+    }
+   },
+   "pcd_C_o3mini": {
+    "sp": 2.309,
+    "rq": 3.078,
+    "scales": {
+     "plausibility": 3.653,
+     "testability": 4.167,
+     "usefulness": 4.415
+    },
+    "grounding": 1.0,
+    "words": 485.6,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.309,
+     "b_mean": 2.363,
+     "diff": -0.054,
+     "ci95": [
+      -0.126,
+      0.015
+     ],
+     "up": 17,
+     "down": 26,
+     "p": 0.2221
+    }
+   },
+   "pcd_D_o3mini": {
+    "sp": 2.406,
+    "rq": 3.093,
+    "scales": {
+     "plausibility": 3.604,
+     "testability": 4.237,
+     "usefulness": 4.44
+    },
+    "grounding": 1.344,
+    "words": 524.7,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.406,
+     "b_mean": 2.363,
+     "diff": 0.043,
+     "ci95": [
+      -0.019,
+      0.107
+     ],
+     "up": 24,
+     "down": 17,
+     "p": 0.3489
+    }
+   },
+   "pcd_PC_o3mini": {
+    "sp": 2.192,
+    "rq": 2.923,
+    "scales": {
+     "plausibility": 3.389,
+     "testability": 4.198,
+     "usefulness": 4.183
+    },
+    "grounding": 1.0,
+    "words": 484.8,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.192,
+     "b_mean": 2.363,
+     "diff": -0.171,
+     "ci95": [
+      -0.255,
+      -0.088
+     ],
+     "up": 15,
+     "down": 30,
+     "p": 0.0357
+    }
+   },
+   "pcd_PD_o3mini": {
+    "sp": 2.39,
+    "rq": 2.965,
+    "scales": {
+     "plausibility": 3.456,
+     "testability": 4.144,
+     "usefulness": 4.296
+    },
+    "grounding": 1.663,
+    "words": 525.8,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.39,
+     "b_mean": 2.363,
+     "diff": 0.027,
+     "ci95": [
+      -0.06,
+      0.12
+     ],
+     "up": 22,
+     "down": 22,
+     "p": 1.0
+    }
+   },
+   "pcd_CD_o3mini": {
+    "sp": 2.429,
+    "rq": 3.127,
+    "scales": {
+     "plausibility": 3.644,
+     "testability": 4.267,
+     "usefulness": 4.47
+    },
+    "grounding": 1.333,
+    "words": 516.8,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.429,
+     "b_mean": 2.363,
+     "diff": 0.066,
+     "ci95": [
+      -0.002,
+      0.132
+     ],
+     "up": 29,
+     "down": 15,
+     "p": 0.0488
+    }
+   },
+   "pcd_k1_PCD_o3mini": {
+    "sp": 2.394,
+    "rq": 2.935,
+    "scales": {
+     "plausibility": 3.402,
+     "testability": 4.099,
+     "usefulness": 4.302
+    },
+    "grounding": 1.77,
+    "words": 568.1,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.394,
+     "b_mean": 2.363,
+     "diff": 0.031,
+     "ci95": [
+      -0.053,
+      0.118
+     ],
+     "up": 24,
+     "down": 21,
+     "p": 0.766
+    }
+   },
+   "pcd_k1_none_o3mini": {
+    "sp": 2.299,
+    "rq": 3.065,
+    "scales": {
+     "plausibility": 3.601,
+     "testability": 4.094,
+     "usefulness": 4.5
+    },
+    "grounding": 1.0,
+    "words": 557.1,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.299,
+     "b_mean": 2.363,
+     "diff": -0.064,
+     "ci95": [
+      -0.12,
+      -0.009
+     ],
+     "up": 18,
+     "down": 27,
+     "p": 0.2327
+    }
+   },
+   "pcd_nocritic_PCD_o3mini": {
+    "sp": 2.501,
+    "rq": 3.064,
+    "scales": {
+     "plausibility": 3.549,
+     "testability": 4.274,
+     "usefulness": 4.369
+    },
+    "grounding": 1.811,
+    "words": 512.3,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.315,
+      "base_wins": 0.03,
+      "papers": 45,
+      "a_mean": 0.285,
+      "b_mean": 0.0,
+      "diff": 0.285,
+      "ci95": [
+       0.215,
+       0.359
+      ],
+      "up": 35,
+      "down": 2,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.474,
+      "base_wins": 0.044,
+      "papers": 45,
+      "a_mean": 0.43,
+      "b_mean": 0.0,
+      "diff": 0.43,
+      "ci95": [
+       0.352,
+       0.507
+      ],
+      "up": 38,
+      "down": 0,
+      "p": 0.0,
+      "holm_p": 0.0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.501,
+     "b_mean": 2.363,
+     "diff": 0.138,
+     "ci95": [
+      0.069,
+      0.207
+     ],
+     "up": 27,
+     "down": 17,
+     "p": 0.1742
+    }
+   },
+   "pcd_nocritic_none_o3mini": {
+    "sp": 2.325,
+    "rq": 3.1,
+    "scales": {
+     "plausibility": 3.63,
+     "testability": 4.225,
+     "usefulness": 4.446
+    },
+    "grounding": 1.0,
+    "words": 493.4,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.325,
+     "b_mean": 2.363,
+     "diff": -0.038,
+     "ci95": [
+      -0.102,
+      0.025
+     ],
+     "up": 16,
+     "down": 28,
+     "p": 0.0961
+    }
+   },
+   "pcd_nodecider_PCD_o3mini": {
+    "sp": 2.401,
+    "rq": 2.967,
+    "scales": {
+     "plausibility": 3.451,
+     "testability": 4.212,
+     "usefulness": 4.238
+    },
+    "grounding": 1.704,
+    "words": 479.9,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.401,
+     "b_mean": 2.363,
+     "diff": 0.038,
+     "ci95": [
+      -0.04,
+      0.119
+     ],
+     "up": 27,
+     "down": 18,
+     "p": 0.2327
+    }
+   },
+   "pcd_nodecider_none_o3mini": {
+    "sp": 2.311,
+    "rq": 3.081,
+    "scales": {
+     "plausibility": 3.615,
+     "testability": 4.258,
+     "usefulness": 4.37
+    },
+    "grounding": 1.0,
+    "words": 464.3,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.311,
+     "b_mean": 2.363,
+     "diff": -0.052,
+     "ci95": [
+      -0.106,
+      0.005
+     ],
+     "up": 18,
+     "down": 27,
+     "p": 0.2327
+    }
+   },
+   "pcd_PCD_llama": {
+    "sp": 1.097,
+    "rq": 1.009,
+    "scales": {
+     "plausibility": 1.957,
+     "testability": 2.243,
+     "usefulness": 1.826
+    },
+    "grounding": 2.363,
+    "words": 222.6,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 1.097,
+     "b_mean": 2.363,
+     "diff": -1.266,
+     "ci95": [
+      -1.356,
+      -1.177
+     ],
+     "up": 0,
+     "down": 45,
+     "p": 0.0
+    }
+   },
+   "pcd_none_llama": {
+    "sp": 1.227,
+    "rq": 1.636,
+    "scales": {
+     "plausibility": 2.538,
+     "testability": 2.804,
+     "usefulness": 2.567
+    },
+    "grounding": 1.0,
+    "words": 282.5,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "37",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 1.227,
+     "b_mean": 2.363,
+     "diff": -1.136,
+     "ci95": [
+      -1.223,
+      -1.05
+     ],
+     "up": 0,
+     "down": 45,
+     "p": 0.0
+    }
+   },
+   "synth_k1_b_o3mini": {
+    "sp": 2.297,
+    "rq": 3.063,
+    "scales": {
+     "plausibility": 3.665,
+     "testability": 4.206,
+     "usefulness": 4.317
+    },
+    "grounding": 1.0,
+    "words": 433.3,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "38",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.297,
+     "b_mean": 2.363,
+     "diff": -0.066,
+     "ci95": [
+      -0.121,
+      -0.011
+     ],
+     "up": 16,
+     "down": 27,
+     "p": 0.1263
+    }
+   },
+   "synth_k4_b_o3mini": {
+    "sp": 2.37,
+    "rq": 3.157,
+    "scales": {
+     "plausibility": 3.817,
+     "testability": 4.244,
+     "usefulness": 4.41
+    },
+    "grounding": 1.007,
+    "words": 460.1,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "38",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.37,
+     "b_mean": 2.363,
+     "diff": 0.007,
+     "ci95": [
+      -0.043,
+      0.058
+     ],
+     "up": 22,
+     "down": 21,
+     "p": 1.0
+    }
+   },
+   "synth_mixed_b_o3mini": {
+    "sp": 2.47,
+    "rq": 3.075,
+    "scales": {
+     "plausibility": 3.643,
+     "testability": 4.241,
+     "usefulness": 4.341
+    },
+    "grounding": 1.656,
+    "words": 479.8,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "38",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.47,
+     "b_mean": 2.363,
+     "diff": 0.107,
+     "ci95": [
+      0.035,
+      0.181
+     ],
+     "up": 28,
+     "down": 16,
+     "p": 0.0961
+    }
+   },
+   "web_agent": {
+    "sp": 1.336,
+    "rq": 1.299,
+    "scales": {
+     "plausibility": 2.196,
+     "testability": 2.6,
+     "usefulness": 2.1
+    },
+    "grounding": 2.448,
+    "words": 237.9,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "36",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 1.336,
+     "b_mean": 2.363,
+     "diff": -1.027,
+     "ci95": [
+      -1.146,
+      -0.903
+     ],
+     "up": 0,
+     "down": 45,
+     "p": 0.0
+    }
+   },
+   "web_agent_o3mini": {
+    "sp": 2.46,
+    "rq": 2.88,
+    "scales": {
+     "plausibility": 3.367,
+     "testability": 4.135,
+     "usefulness": 4.138
+    },
+    "grounding": 2.2,
+    "words": 494.6,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "36",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 2.46,
+     "b_mean": 2.363,
+     "diff": 0.097,
+     "ci95": [
+      0.0,
+      0.196
+     ],
+     "up": 26,
+     "down": 18,
+     "p": 0.2912
+    }
+   },
+   "web_text_chunks": {
+    "sp": 1.14,
+    "rq": 1.112,
+    "scales": {
+     "plausibility": 2.121,
+     "testability": 2.284,
+     "usefulness": 1.931
+    },
+    "grounding": 2.222,
+    "words": 234.6,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    },
+    "experiment": "36",
+    "sp_vs_writer": {
+     "writer_set": "this session",
+     "papers": 45,
+     "a_mean": 1.14,
+     "b_mean": 2.363,
+     "diff": -1.223,
+     "ci95": [
+      -1.306,
+      -1.138
+     ],
+     "up": 0,
+     "down": 45,
+     "p": 0.0
+    }
+   }
+  },
+  "references": {
+   "oracle_hint_full_b_o3mini": {
+    "sp": 2.035,
+    "rq": 2.713,
+    "grounding": 1.0,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 270,
+      "new_wins": 0.107,
+      "base_wins": 0.278,
+      "papers": 45,
+      "a_mean": -0.17,
+      "b_mean": 0.0,
+      "diff": -0.17,
+      "ci95": [
+       -0.3,
+       -0.048
+      ],
+      "up": 12,
+      "down": 22,
+      "p": 0.1214
+     },
+     "o1": {
+      "pairs": 270,
+      "new_wins": 0.089,
+      "base_wins": 0.419,
+      "papers": 45,
+      "a_mean": -0.33,
+      "b_mean": 0.0,
+      "diff": -0.33,
+      "ci95": [
+       -0.456,
+       -0.2
+      ],
+      "up": 8,
+      "down": 32,
+      "p": 0.0002
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    }
+   },
+   "oracle_hint_lever_b_o3mini": {
+    "sp": null,
+    "rq": 2.591,
+    "grounding": null,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    }
+   },
+   "oracle_hint_class_b_o3mini": {
+    "sp": null,
+    "rq": 2.954,
+    "grounding": null,
+    "pairwise": {
+     "deepseek": {
+      "pairs": 0
+     },
+     "o1": {
+      "pairs": 0
+     },
+     "gpt56": {
+      "pairs": 0
+     }
+    }
+   }
+  },
+  "configurations": 50
+ }
+}
