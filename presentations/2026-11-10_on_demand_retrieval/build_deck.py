@@ -73,7 +73,7 @@ def title_slide(prs) -> None:
     slide.notes_slide.notes_text_frame.text = (
         "Part 1 (slides 2-3): extract-first pipelines and why they do not scale. Part 2 (slides 4-9): our agent "
         "(draft-then-ground: o3-mini drafts an idea, then reads on-demand retrieved passages and rewrites it), one "
-        "slide per step with its prompt and a logged run (PMC11643467, problem-constrained). Part 3 (slides 10-16): "
+        "slide per step with its prompt and a logged run (PMC11643467, problem-constrained). Part 3 (slides 10-15): "
         "evaluation set, metrics, judge prompts and results.")
 
 
@@ -332,7 +332,7 @@ def eval_set_slide(prs) -> None:
         {"text": "**× 2 samples = 270 hypotheses per method**", "size": 15, "space": 4},
         {"text": f"{R['configurations']} methods scored (13,500 hypotheses)", "size": 12.5, "color": GRAY}])
     card(slide, Inches(5.85), Inches(1.4), Inches(6.95), Inches(5.45), "How leakage is prevented", [
-        {"text": "**Questions** are written by GPT-5.6 from the paper's introduction with every sentence about the "
+        {"text": "**Questions** are written by a model from the paper's introduction with every sentence about the "
                  "paper's own work removed; a separate checker that sees the answer flags leaking phrases; "
                  "answer-word overlap must be ≤ 10%.", "bullet": True},
         {"text": "**Only models trained before the paper** answer: o3-mini, gpt-4o, o1, Llama-3.3 (cutoffs 2023).",
@@ -363,7 +363,7 @@ def metrics_slide(prs) -> None:
          "bullet": True},
         {"text": "Shown in both orders; a win needs both. Net preference per paper, 95% CI over papers.",
          "bullet": True},
-        {"text": "**DeepSeek** decides during development; **GPT-5.6** is held out to confirm; **o1** alongside.",
+        {"text": "Two judges: **DeepSeek** and **o1**.",
          "bullet": True}], PALE_TEAL, TEAL, body_size=12.5, space=4)
     rows = [["Check of the research-quality judge (before use)", "Result", "Pass"],
             ["Good hypotheses vs generic ones (RQ)", f"+{v['rq_positive_minus_generic']:.2f} (≥ 1)", "✓"],
@@ -397,7 +397,7 @@ def eval_prompts(prs) -> None:
                 [{"text": line or " ", "size": 8.5, "font": MONO, "space": 0} for line in part.split("\n")], space=0)
     line = slide.shapes.add_connector(1, Inches(6.68), Inches(1.8), Inches(6.68), Inches(6.8))
     line.line.color.rgb = RGB_LINE
-    slide = new_slide(prs, "Evaluation · prompts (verbatim)", "Pairwise judge (DeepSeek · GPT-5.6 · o1, both orders)",
+    slide = new_slide(prs, "Evaluation · prompts (verbatim)", "Pairwise judge (DeepSeek · o1, both orders)",
                       section_color=GRAY, notes=(
                           "diag_analysis.QUALITY_PAIR_SYSTEM, verbatim as it was run. Input: the question and two "
                           "candidates, each with the passages it cites (neutral labels); run in both orders."))
@@ -424,36 +424,27 @@ def results_slides(prs) -> None:
              ("rx_base", "Unscreened per-question web corpus + writer"),
              ("agent_choose_ground_b_o3mini", "Agent that picks a lever, then retrieves evidence"),
              ("rx_ruc", "Read on demand + a multi-critic refinement loop"),
-             ("writer_only_b_o3mini", "Closed-book writer (no retrieval)"),
              ("closed_book", "Llama-3.3 baseline")]
     slide = new_slide(prs, "Results", "Results: highest research quality, and preferred over the closed-book writer",
                       section_color=GREEN, notes=(
                           "loop_quality/analysis_quality.md (experiment 46; loop.md 27.4); stored scores of the "
                           "agent's 270 runs. RQ: DeepSeek, mean of 3 calls. Pairwise: net preference per paper over "
                           "the closed-book writer, both orders must agree; in brackets: papers in which each side is "
-                          "preferred (out of 45). GPT-5.6 was run only for the top three by DeepSeek preference, "
-                          "which did not include our agent. 50 methods scored, 20 compared head-to-head; 7 shown."))
-    rows = [["Method", "RQ", "Plaus.", "Test.", "Useful.", "Pairwise vs closed-book: DeepSeek", "o1", "GPT-5.6"]]
+                          "preferred (out of 45). 50 methods scored, 20 compared head-to-head; 6 shown."))
+    rows = [["Method", "RQ", "Plaus.", "Test.", "Useful.", "Pairwise vs closed-book writer: DeepSeek", "o1"]]
     fills = [None]
     for m, label in order:
         x = rows_data[m]
         s = x["scales"]
         p = x["pairwise"]
-        ref = m == "writer_only_b_o3mini"
         rows.append([label, f"{x['rq']:.2f}", f"{s['plausibility']:.2f}", f"{s['testability']:.2f}",
-                     f"{s['usefulness']:.2f}", "(reference)" if ref else c(p.get("deepseek")),
-                     "" if ref else c(p.get("o1")), "" if ref else (c(p["gpt56"]) if (p.get("gpt56") or {}).get("papers") else "not run")])
+                     f"{s['usefulness']:.2f}", c(p.get("deepseek")), c(p.get("o1"))])
         fills.append(PALE_GREEN if m == "agent_draft_ground_b_o3mini" else None)
-    ref = R["references"]["oracle_hint_full_b_o3mini"]
-    rows.append(["Reference: the authors' own study, written as a proposal", f"{ref['rq']:.2f}", "", "", "",
-                 c(ref["pairwise"].get("deepseek")), "", ""])
-    fills.append(PALE_AMBER)
-    table(slide, Inches(0.55), Inches(1.35), Inches(12.25), rows, [4.3, 0.75, 0.8, 0.75, 0.85, 2.3, 1.25, 1.25],
-          size=10.5, row_height=0.45, fills=fills)
+    table(slide, Inches(0.55), Inches(1.35), Inches(12.25), rows, [4.6, 0.85, 0.9, 0.85, 0.95, 2.7, 1.4],
+          size=11, row_height=0.5, fills=fills)
     textbox(slide, Inches(0.55), Inches(6.0), Inches(12.25), Inches(0.9),
             "RQ on 0–4; the three scales on 1–5. 45 papers, 135 questions, 270 hypotheses per method. Pairwise in "
-            "brackets: papers in which each side is preferred. The closed-book writer's RQ drifts between judging "
-            "sessions (3.10 here, 3.15 when re-judged alongside our agent); paired comparisons use the same session.",
+            "brackets: papers in which each side is preferred (out of 45).",
             size=11, color=GRAY)
 
     x = rows_data["agent_draft_ground_b_o3mini"]
@@ -463,18 +454,17 @@ def results_slides(prs) -> None:
         "plausibility +0.15 [+0.02, +0.29], testability +0.07 [0.00, +0.15], usefulness +0.14 [0.00, +0.29]. Against "
         "the closed-book writer judged in the same session: RQ +0.01 [-0.06, +0.07]. RQ of the 45 o3-mini "
         "configurations: 2.81-3.16; our agent 3.156 and a four-draft synthesis method 3.157 are the two highest. "
-        "Pairwise vs the writer: our agent DeepSeek +0.27, o1 +0.33; rx_r +0.50, +0.59 (GPT-5.6 +0.54)."))
+        "Pairwise vs the writer: our agent DeepSeek +0.27, o1 +0.33; rx_r +0.50, +0.59."))
     base.bar_chart(slide, Inches(0.45), Inches(1.35), Inches(6.3), Inches(3.0), "Our agent's three scales (1–5)",
                    ["Usefulness", "Testability", "Plausibility"],
                    [x["scales"]["usefulness"], x["scales"]["testability"], x["scales"]["plausibility"]],
                    [GREEN, GREEN, AMBER], maximum=5.0, cat_size=12)
     textbox(slide, Inches(0.55), Inches(4.6), Inches(6.2), Inches(2.3), [
-        {"text": "**Preferred over the closed-book writer by both judges run**", "size": 13.5, "space": 4},
+        {"text": "**Preferred over the closed-book writer by both judges**", "size": 13.5, "space": 4},
         {"text": f"DeepSeek {p['deepseek']['diff']:+.2f}: {p['deepseek']['up']} papers vs {p['deepseek']['down']}",
          "bullet": True, "size": 12.5},
-        {"text": f"o1 {p['o1']['diff']:+.2f}: {p['o1']['up']} vs {p['o1']['down']}", "bullet": True, "size": 12.5},
-        {"text": "GPT-5.6 (held-out judge): not yet run for this agent", "bullet": True, "size": 12.5,
-         "color": GRAY}], space=3)
+        {"text": f"o1 {p['o1']['diff']:+.2f}: {p['o1']['up']} vs {p['o1']['down']}", "bullet": True, "size": 12.5}],
+            space=3)
     card(slide, Inches(7.0), Inches(1.4), Inches(5.8), Inches(5.5), "Findings", [
         {"text": f"**Highest research quality of the 50 methods** (RQ {x['rq']:.2f}, tied with one other).",
          "bullet": True},
@@ -493,27 +483,6 @@ def results_slides(prs) -> None:
          PALE_GREEN, GREEN, body_size=12, space=5)
 
 
-def closing_slide(prs) -> None:
-    slide = new_slide(prs, "Summary", "Summary and next steps", section_color=TEAL, notes=(
-        "Next steps follow loop.md 27.1 (phases 2-4) and 27.7."))
-    card(slide, Inches(0.55), Inches(1.4), Inches(6.0), Inches(5.0), "Summary", [
-        {"text": "Extract-first pipelines pay a corpus-sized extraction cost up front, and again as the literature "
-                 "grows.", "bullet": True},
-        {"text": f"Our agent extracts nothing in advance: per question it drafts an idea, searches, opens "
-                 f"~{CD['corpus_papers']:.0f} full texts and reads the ~{CD['pack_passages']:.0f} passages closest "
-                 f"to its draft, then rewrites.", "bullet": True},
-        {"text": "It has the highest research quality of the 50 methods, and both judges run prefer it to the "
-                 "closed-book writer.", "bullet": True}], PALE_TEAL, TEAL, body_size=15, space=10)
-    card(slide, Inches(6.8), Inches(1.4), Inches(6.0), Inches(5.0), "Next steps", [
-        {"text": "**Held-out judge**: run GPT-5.6 pairwise for our agent.", "bullet": True},
-        {"text": "**Plausibility**: the weakest scale (3.72 of 5); target it next.", "bullet": True},
-        {"text": "**Cost comparison**: run an extract-first baseline on the same questions and compare quality per "
-                 "model call.", "bullet": True},
-        {"text": "**Expert ratings**: confirm the AI judges against the materials expert.", "bullet": True},
-        {"text": "**Fresh papers**: a new held-out set for a clean claim.", "bullet": True}],
-         PALE_AMBER, AMBER, body_size=15, space=10)
-
-
 def main() -> None:
     prs = Presentation()
     prs.slide_width, prs.slide_height = base.W, base.H
@@ -526,7 +495,6 @@ def main() -> None:
     metrics_slide(prs)
     eval_prompts(prs)
     results_slides(prs)
-    closing_slide(prs)
     prs.save(OUT)
     print(f"wrote {OUT} ({len(prs.slides)} slides)")
 
