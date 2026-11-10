@@ -386,9 +386,17 @@ def eval_prompts(prs) -> None:
                           "rq_judge.RQ_SYSTEM: the expert package's instructions and scales, verbatim (loop.md 24.1). "
                           "Input: {research_question, hypothesis rendered as the expert sees it}; no citations, no "
                           "evidence, no answer key."))
-    prompt_box(slide, Inches(0.55), Inches(1.35), Inches(6.05), Inches(5.6), "RQ judge (1/2)", rq[:cut].rstrip(),
-               size=8.5)
-    prompt_box(slide, Inches(6.75), Inches(1.35), Inches(6.05), Inches(5.6), "RQ judge (2/2)", rq[cut:], size=8.5)
+    # One prompt, laid out in two columns inside a single box because it is too long for one column.
+    rect(slide, Inches(0.55), Inches(1.35), Inches(12.25), Inches(5.6), LIGHT, line=RGB_LINE,
+         shape=MSO_SHAPE.ROUNDED_RECTANGLE)
+    textbox(slide, Inches(0.67), Inches(1.43), Inches(12.0), Inches(0.3),
+            "The research-quality judge's prompt (one prompt, one judge: DeepSeek), shown in two columns",
+            size=11.5, color=TEAL, space=0).text_frame.paragraphs[0].runs[0].font.bold = True
+    for x, part in ((0.67, rq[:cut].rstrip()), (6.8, rq[cut:])):
+        textbox(slide, Inches(x), Inches(1.78), Inches(5.9), Inches(5.1),
+                [{"text": line or " ", "size": 8.5, "font": MONO, "space": 0} for line in part.split("\n")], space=0)
+    line = slide.shapes.add_connector(1, Inches(6.68), Inches(1.8), Inches(6.68), Inches(6.8))
+    line.line.color.rgb = RGB_LINE
     slide = new_slide(prs, "Evaluation · prompts (verbatim)", "Pairwise judge (DeepSeek · GPT-5.6 · o1, both orders)",
                       section_color=GRAY, notes=(
                           "diag_analysis.QUALITY_PAIR_SYSTEM, verbatim as it was run. Input: the question and two "
