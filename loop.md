@@ -5915,3 +5915,113 @@ The scales are 1–5. "Papers" counts the papers in which each side is preferred
 - Failure analysis of `rx_r` on grounding and plausibility.
 - Method rounds against `rx_r`.
 - Fresh papers (test5) with the expert's blind ratings.
+
+### 27.5 Experiment 47: non-copying replaces grounding (pre-registered 2026-11-09 at about 21:40, before any scored run)
+
+**Request.** Drop grounding. Instead, the judge should check whether the hypothesis is copied from the evidence: a
+strong hypothesis should not just repeat the text, but combine or go beyond it.
+
+**The user's choices** (asked in two forms; the second went unanswered, so the defaults marked * apply).
+- **Name:** non-copying.
+- **Evidence the judge compares against:** every passage the focused-retrieval writer was given for the question
+  (about 45 passages, 72,000 characters per judgment).
+- **Closed-book hypotheses** are judged against the same question's passages, so the check is whether the idea is
+  already in the literature. The judge is not told whether the author saw the passages.
+- **Copying:**
+  - restating a passage's result as a prediction;
+  - proposing what a passage already proposes as future work;
+  - taking a passage's mechanism word for word;
+  - proposing the same intervention on the same alloy as a passage*;
+  - a textbook idea;
+  - a trivial one*.
+- **Going beyond:**
+  - combining two or more papers;
+  - a justified transfer to a new alloy or regime;
+  - a new mechanistic link;
+  - resolving a conflict or gap;
+  - a non-trivial idea outside the evidence, which also scores high.
+- **Scoring:** 1–5 with anchors. The judge first traces the provenance of each part (intervention, mechanism,
+  outcome, falsification test, overall idea). Plausibility and quality are ignored, and there are no worked
+  examples. DeepSeek, one call.
+- **SP2** = mean(plausibility, testability, usefulness, non-copying) − 1, replacing grounding in SP.
+- **Pairwise:** criterion (4) "well grounded" is replaced by "goes beyond the earlier work (not a restated cited
+  result, what a cited paper already did or proposed, or a textbook or trivial idea)"*. The judge still sees only the
+  cited passages*.
+- **Scope:**
+  - non-copying for the best method, `rx_r`, and for the closed-book writer as the reference* (540 calls);
+  - pairwise v2 of `rx_r` against the writer, both orders, DeepSeek and GPT-5.6 (1,080 each).
+- **No validation controls** (the user's choice). The metric is reported as **unvalidated**, against must_obey.md
+  6.2's validation rule; this deviation is recorded.
+
+**Prompt.** `noncopy_eval.NONCOPY_SYSTEM`, fixed now.
+
+**Smoke test** (about 21:38, 4 calls, nothing kept).
+- All four sample-1 hypotheses of PMC10759803 and PMC11643467 (problem-constrained), from `rx_r` and the writer,
+  score 1. The provenance is traced to specific passages.
+- Example: `rx_r`'s Y/Hf co-doping is the cited coating paper's own intervention, on the same alloy.
+- No prompt change.
+
+**Expectations, recorded before the run.**
+- Most hypotheses score 1–2 against focused evidence, because the writer tends to pick the leading idea of a
+  passage.
+- `rx_r` scores at or below the closed-book writer: it saw the passages and often follows them, while the writer's
+  ideas are often textbook ideas, which also count as copying.
+- So SP2 narrows or reverses `rx_r`'s lead (SP 2.65 against 2.33 with grounding), and pairwise v2 is smaller than v1
+  (+0.50 DeepSeek).
+- If so, the next round targets synthesis: a writer that must combine several papers or extend them, not follow one.
+
+**Runners.**
+- `loop/run_x47.sh`: DeepSeek; non-copying, then pairwise v2, then the report.
+- `loop/run_x47_gpt.sh`: GPT-5.6 pairwise v2, on both instances.
+
+### 27.6 Experiment 47 results (2026-11-09, about 22:25; every judgment complete; the metric is unvalidated; exploratory)
+
+**Complete** (21:41–22:18).
+- Non-copying: 540 of 540 (DeepSeek).
+- Pairwise v2: DeepSeek 540 and GPT-5.6 540 (270 pairs each, both orders).
+- No errors.
+
+| | Non-copying (1–5) | Scores 1/2/3/4/5 | Overall idea traced to: passages / general knowledge / new | SP2 (0–4) | SP with grounding (27.4) |
+|---|---:|---|---|---:|---:|
+| `rx_r` (focused retrieval + writer) | **1.89** | 150/57/12/45/6 | 237 / 7 / 26 | 2.50 | 2.65 |
+| `writer_only_b_o3mini` (closed-book) | **3.12** | 93/10/8/91/68 | 73 / 40 / 157 | **2.85** | 2.33 |
+
+- **Non-copying:** `rx_r` minus the writer is −1.23 [−1.49, −0.96]; `rx_r` is lower in 41 papers and higher in 3.
+- **SP2:** `rx_r` minus the writer is −0.36 [−0.47, −0.25] (8 papers higher, 37 lower).
+- **So the ranking reverses.** With non-copying in place of grounding, the closed-book writer has the higher SP2.
+- **`rx_r` mostly copies.** For 237 of 270 hypotheses the overall idea is traced to the passages it was given, and
+  56% score 1. Typical case: the leading result of one retrieved paper restated as a prediction, for example trace
+  boron for grain-boundary strengthening, as P1 reports for MoNbTaW.
+
+**Pairwise v2** (criterion 4 = goes beyond the earlier work; the judges see only the cited passages).
+
+| Judge | v2 (this prompt) | v1 (experiment 46, "well grounded") |
+|---|---|---|
+| DeepSeek | +0.56 [+0.48, +0.64], 42 vs 1 papers | +0.50 [+0.41, +0.58], 41 vs 2 |
+| GPT-5.6 | +0.34 [+0.20, +0.47], 35 vs 8 | +0.54 [+0.43, +0.65], 40 vs 3 |
+
+- The pairwise judges still prefer `rx_r` overall, although GPT-5.6 by less than before.
+- They weigh all five criteria together (problem, soundness, specificity, going beyond, contribution). The
+  non-copying judge weighs only one, and sees all 45 passages rather than only the 1–5 cited.
+
+**Caveat for the closed-book writer's score** (a design limit of the user's choice to compare it with the same
+question's passages).
+- "New" means not in these ~45 passages and not textbook knowledge. The judge cannot see the rest of the
+  literature.
+- `rx_r`'s ideas come from those passages by construction. The writer's ideas may exist in papers outside the pack,
+  so its non-copying score is likely an overestimate.
+- A fair comparison needs the judge to search the literature for each hypothesis. That is a possible next step.
+
+**Expectations** (27.5).
+- Most hypotheses 1–2: right for `rx_r` (77%), wrong for the writer (38%).
+- `rx_r` at or below the writer: right (−1.23).
+- SP2 narrows or reverses `rx_r`'s lead: right, it reverses (−0.36).
+- Pairwise v2 smaller than v1: right for GPT-5.6 (+0.34 against +0.54), wrong for DeepSeek (+0.56 against +0.50).
+
+**What it means.**
+- Retrieval made the writer more specific and better supported, but it now tends to adopt one retrieved paper's
+  result rather than build on several.
+- The next method round should target synthesis on top of `rx_r`. For example, require the hypothesis to combine at
+  least two papers, or to extend a passage's result to a new alloy or regime, and forbid restating a passage's
+  reported result.
+- It should be judged on both non-copying and pairwise.

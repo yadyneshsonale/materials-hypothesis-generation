@@ -1,6 +1,6 @@
 # Project summary: AI hypothesis generation for high-temperature high-entropy alloys
 
-**Status.** 2026-11-09, after experiment 46 (phases 0–1). This file gathers everything done so far and every main result in one
+**Status.** 2026-11-09, after experiment 47. This file gathers everything done so far and every main result in one
 place.
 
 **Details.**
@@ -28,6 +28,13 @@ judges' values, and differences come with paper-clustered 95% confidence interva
     critique loop, editor) do not improve on focused retrieval.
   - **Caveat:** the AI judges prefer the AI writer to the authors' own studies, so the expert's ratings must confirm
     before any claim.
+  - **Experiment 47 (2026-11-09): non-copying replaces grounding, at the user's request** (loop.md 27.6;
+    unvalidated).
+    - `rx_r` mostly restates a retrieved paper's result: non-copying 1.89 of 5, against 3.12 for the closed-book
+      writer.
+    - SP2 reverses the ranking: writer 2.85, `rx_r` 2.50.
+    - The pairwise judges still prefer `rx_r` (DeepSeek +0.56, GPT-5.6 +0.34).
+    - Next: make the writer combine or extend several papers.
   - **Final for phase 1 (all 50 existing configurations):** `rx_r` stays best. SP 2.65 of 4; preferred over the
     closed-book writer by all three judges: DeepSeek +0.50, o1 +0.59, GPT-5.6 +0.54. The weakest scale is grounding
     (2.52 of 5). Leaderboard in

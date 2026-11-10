@@ -209,6 +209,11 @@ preferred future option.
        paired by paper. DeepSeek decides during development; GPT-5.6 confirms every adopted change.
      - **Final claims** need the expert's ratings: the AI judges are trusted only if they agree with the expert
        (item-level Spearman ≥ 0.60 on the expert-package items).
+   - **From experiment 47 (2026-11-09, at the user's request) non-copying replaces grounding** (loop.md 27.5;
+     `noncopy_eval.py`). It asks whether the hypothesis goes beyond the earlier literature (combines, transfers or
+     extends it) or copies it (a passage's result, study, proposed work or mechanism, or a textbook or trivial
+     idea). SP2 = mean(plausibility, testability, usefulness, non-copying) − 1. At the user's choice it was not
+     validated, and is reported as unvalidated.
    - **Reconstruction is retired.** The GPT-5.6 reconstruction score (agreement of intervention, conditions,
      mechanism and outcome with the paper's answer key, 0–4) was the primary metric through experiment 45. It is no
      longer computed for new runs and no longer decides anything. The answer keys remain only to build and
@@ -431,3 +436,6 @@ Ablate before combining. Combine only components that helped or that address dif
   - 6.3, 6.7, 6.8, 6.11 and the checklist follow; new 6.12 against optimising the judge.
   - Unchanged: the benchmark questions, the pre-cutoff rule for query-facing models, the evidence date filters,
     blinding and the statistics.
+- 2026-11-09 (experiment 47, loop.md 27.5), at the user's request ("drop the grounding metric and run the evals with
+  this new metric"): 6.2 non-copying replaces grounding in SP (SP2); the pairwise criterion "well grounded" is
+  replaced by "goes beyond the earlier work". The metric is unvalidated: the user chose no controls.

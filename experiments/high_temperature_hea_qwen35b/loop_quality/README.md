@@ -58,3 +58,16 @@ pre-registered plan for phases 0–1.
 - **None of the 35 phase-1b configurations beats it** (best 2.57).
 - The integrity gate passes in quality mode; the target-free audits were not run. The expert's ratings are pending.
 
+## Experiment 47: non-copying replaces grounding (2026-11-09; loop.md 27.5–27.6; unvalidated)
+
+- **Non-copying (1–5).** Does the hypothesis go beyond the ~45 passages the focused-retrieval writer saw, or copy
+  them? Code: [noncopy_eval.py](../../../noncopy_eval.py); report `analysis_noncopy.md`.
+- **Scores.**
+  - `rx_r` 1.89: 56% of its hypotheses copy a retrieved result.
+  - The closed-book writer 3.12.
+  - SP2 (the three expert scales + non-copying): writer 2.85 against `rx_r` 2.50. **The ranking reverses.**
+- **The pairwise judges, with "goes beyond the earlier work" in place of "well grounded", still prefer `rx_r`:**
+  DeepSeek +0.56, GPT-5.6 +0.34.
+- **Caveat:** the closed-book writer is compared only with those ~45 passages, so its score is likely an
+  overestimate.
+

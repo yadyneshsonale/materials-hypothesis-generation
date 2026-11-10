@@ -2072,7 +2072,24 @@ should the experiments be structured, and what should change where? Plan and res
 - The integrity gate passes (quality mode). The target-free audits were not run (cancelled; reported).
 - The expert's ratings are still needed before any claim.
 
-## Comparability and limits, experiments 8 to 46
+## Experiment 47: non-copying replaces grounding (unvalidated)
+
+**Request.** Drop grounding. The judge should instead check whether the hypothesis is copied from the evidence; a
+good one should combine or go beyond it. The user chose the prompt's content in a form (loop.md 27.5).
+
+**Results** (`rx_r` and the closed-book writer; DeepSeek; loop.md 27.6).
+- **Non-copying (1–5):** `rx_r` 1.89, the writer 3.12 (−1.23, 41 vs 3 papers).
+  - For 237 of 270 `rx_r` hypotheses the overall idea is traced to a retrieved passage.
+- **SP2:** the writer 2.85, `rx_r` 2.50. The ranking of experiment 46 reverses.
+- **Pairwise v2** ("goes beyond the earlier work" in place of "well grounded"): `rx_r` is still preferred, DeepSeek
+  +0.56 and GPT-5.6 +0.34 (was +0.54).
+- **Caveats:**
+  - The metric is unvalidated.
+  - The closed-book writer is compared only with the ~45 retrieved passages, which flatters it.
+
+**Next.** A writer that combines or extends several papers instead of restating one.
+
+## Comparability and limits, experiments 8 to 47
 
 - From experiment 46 the objective is research-proposal quality (SP and pairwise preference), not reconstruction.
   Scores from the two eras are not comparable. SP of earlier configurations was computed from their stored

@@ -230,11 +230,27 @@ def ground_load(kind: str, name: str, judge: str = DEV) -> dict[str, dict[str, A
 
 # ---------------------------------------------------------------- pairwise preference against the writer
 
-def pair_path(new: str, base: str, judge: str, key: tuple[str, str, int], order: str) -> Path:
-    return PAIR_DIR / f"{new}__vs__{base}" / judge / f"{key[0]}__{key[1]}__s{key[2]}__{order}.json"
+def pair_path(new: str, base: str, judge: str, key: tuple[str, str, int], order: str, root: Path | None = None
+              ) -> Path:
+    return (root or PAIR_DIR) / f"{new}__vs__{base}" / judge / f"{key[0]}__{key[1]}__s{key[2]}__{order}.json"
 
 
-def pairwise_stage(methods: list[str], judge: str, workers: int, base: str = WRITER) -> dict[str, int]:
+def pair_call(judge: str, user: str, system: str | None = None) -> Any:
+    """diag_analysis.pair_call with a choice of prompt (experiment 47 uses a revised one)."""
+    if system is None or system == D.QUALITY_PAIR_SYSTEM:
+        return D.pair_call(judge, user)
+    if judge == "gpt56":
+        return lc.judge_chat_json(system, user, max_tokens=8000)
+    if judge == "deepseek":
+        return lc.trapi_chat_json(CROSS_JUDGE["deployment"], system, user, max_tokens=4000,
+                                  token_field=CROSS_JUDGE["token_field"], temperature=CROSS_JUDGE["temperature"],
+                                  retries=8)
+    return lc.trapi_chat_json(D.O1, system, user, max_tokens=16000, token_field="max_completion_tokens",
+                              temperature=None, retries=8)
+
+
+def pairwise_stage(methods: list[str], judge: str, workers: int, base: str = WRITER, system: str | None = None,
+                   root: Path | None = None) -> dict[str, int]:
     base_runs = {D.key_of(r): r for r in RQ.runs_of(base)}
     jobs = []
     for new in methods:
@@ -242,7 +258,7 @@ def pairwise_stage(methods: list[str], judge: str, workers: int, base: str = WRI
             key = D.key_of(run)
             if key in base_runs:
                 for order in ("baseline_first", "new_first"):
-                    path = pair_path(new, base, judge, key, order)
+                    path = pair_path(new, base, judge, key, order, root)
                     if not path.exists():
                         jobs.append((order, base_runs[key], run, path))
 
@@ -257,7 +273,7 @@ def pairwise_stage(methods: list[str], judge: str, workers: int, base: str = WRI
                            "candidate_B": {"hypothesis": gb, "cited_evidence": eb}}, ensure_ascii=False)
         if "hidden_target" in user:
             raise H.TargetLeak("pairwise payload must not contain the answer key")
-        raw = D.pair_call(judge, user)
+        raw = pair_call(judge, user, system)
         raw = raw if isinstance(raw, dict) else {}
         winner = str(raw.get("winner", "tie")).strip().upper()
         winner = winner if winner in ("A", "B", "TIE") else "TIE"
@@ -268,9 +284,9 @@ def pairwise_stage(methods: list[str], judge: str, workers: int, base: str = WRI
     return _run(_order(jobs), job, workers, f"pairwise-{judge}")
 
 
-def pair_outcomes(new: str, base: str, judge: str) -> dict[tuple[str, str, int], float]:
+def pair_outcomes(new: str, base: str, judge: str, root: Path | None = None) -> dict[tuple[str, str, int], float]:
     """Per question and sample: +1 when the new method wins in both orders, -1 when the base does, else 0."""
-    folder = PAIR_DIR / f"{new}__vs__{base}" / judge
+    folder = (root or PAIR_DIR) / f"{new}__vs__{base}" / judge
     by: dict[str, dict[str, Any]] = defaultdict(dict)
     for path in sorted(folder.glob("*.json")) if folder.exists() else []:
         stem, order = path.stem.rsplit("__", 1)
@@ -292,8 +308,8 @@ def per_paper(values: dict[tuple[str, str, int], float]) -> dict[str, float]:
     return {p: statistics.fmean(statistics.fmean(v) for v in lv.values()) for p, lv in by.items()}
 
 
-def pair_result(new: str, base: str, judge: str) -> dict[str, Any]:
-    outcomes = pair_outcomes(new, base, judge)
+def pair_result(new: str, base: str, judge: str, root: Path | None = None) -> dict[str, Any]:
+    outcomes = pair_outcomes(new, base, judge, root)
     if not outcomes:
         return {"pairs": 0}
     values = list(outcomes.values())
