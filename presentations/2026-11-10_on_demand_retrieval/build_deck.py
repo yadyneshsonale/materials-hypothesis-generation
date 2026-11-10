@@ -71,7 +71,7 @@ def title_slide(prs) -> None:
     slide.notes_slide.notes_text_frame.text = (
         "Part 1 (slides 2-4): extract-first pipelines and why they do not scale. Part 2 (slides 5-12): our best agent "
         "(rx_r: focused retrieval + conservative writer), one slide per step with its prompt and a real run "
-        "(PMC11643467, problem-constrained). Part 3 (slides 13-19): evaluation set, metrics, judge prompts and "
+        "(PMC11643467, problem-constrained). Part 3 (slides 14-19): evaluation set, metrics, judge prompts and "
         "results.")
 
 
@@ -149,10 +149,10 @@ def ours_slide(prs) -> None:
                       section_color=GREEN, notes=(
                           "Averages over the 135 questions of experiment 44's focused corpora (websearch/focused/"
                           "*/*.json) and the 270 rx_r runs. Papers are parsed from their open-access XML by rules "
-                          "(sections into passages); no model reads a paper until a question needs it. The earlier "
-                          "per-question corpus (experiment 36) is itself built by search, not extraction."))
+                          "(sections into passages); no model reads a paper until a question needs it. 'About 17 "
+                          "calls' = 1 search plan + 1 keyword-phrase call + about 6 screening + about 8.5 grading calls."))
     steps = [("1", "Question", "+ knowledge cutoff"), ("2", "Plan searches", "o3-mini · 1 call"),
-             ("3", "Search", "literature index ·\nno model"), ("4", "Screen papers", f"gpt-4o · ≈{C['calls_per_question']['screener'] + C['calls_per_question'].get('screener_expansion', 0):.1f} calls"),
+             ("3", "Search", "Europe PMC ·\n+ 1 Llama-3.3 call"), ("4", "Screen papers", f"gpt-4o · ≈{C['calls_per_question']['screener'] + C['calls_per_question'].get('screener_expansion', 0):.1f} calls"),
              ("5", "Read full texts", "rules · no model"), ("6", "Grade passages",
                                                              f"gpt-4o · ≈{C['calls_per_question']['passage_grader']:.1f} calls"),
              ("7", "Write hypothesis", "o3-mini · 1 call")]
@@ -167,27 +167,131 @@ def ours_slide(prs) -> None:
                 align=PP_ALIGN.CENTER)
         if n < 6:
             arrow(slide, x + bw + Inches(0.02), y0 + bh / 2 - Inches(0.08), gap - Inches(0.04), Inches(0.16))
-    funnel = [["Per question (average of 135)", "Count"],
-              ["Search hits + papers from an earlier per-question search", f"{C['search_hits_per_question']:.0f} + "
-                                                                           f"{C['earlier_corpus_papers_per_question']:.0f}"],
-              ["Admitted (dated before the paper, open access, research article)", f"{C['admitted_per_question']:.0f}"],
-              ["Titles and abstracts screened by gpt-4o", f"{C['screened_per_question']:.0f}"],
-              ["Papers kept (relevant), full text parsed", f"{C['papers_kept_per_question']:.0f}"],
-              ["Passages graded by gpt-4o", f"{C['passages_graded_per_question']:.0f}"],
-              ["Passages given to the writer", f"{C['pack_passages_per_question']:.0f} "
-                                               f"({C['pack_chars_per_question'] / 1000:.0f}k characters)"]]
-    table(slide, Inches(0.55), Inches(2.85), Inches(6.6), funnel, [5.0, 1.6], size=11.5, row_height=0.42)
+    funnel_slide_body(slide)
     card(slide, Inches(7.45), Inches(2.85), Inches(5.35), Inches(3.95), "Why this scales",
          [{"text": "**No offline pass.** Nothing is extracted before a question is asked; a new paper is usable as "
                    "soon as the search index has it.", "bullet": True},
-          {"text": f"**Bounded cost per question:** about {C['retrieval_calls_per_question']:.0f} small model calls "
-                   "(mostly titles, abstracts and passages) and one writer call, whatever the size of the "
-                   "literature.", "bullet": True},
+          {"text": f"**Bounded cost per question:** about {C['retrieval_calls_per_question'] + 1:.0f} small model "
+                   "calls (search phrases, titles and abstracts, passages) and one writer call, whatever the size "
+                   "of the literature.", "bullet": True},
           {"text": "**The model reads the source text,** not a lossy extraction made for a schema chosen in "
                    "advance.", "bullet": True},
           {"text": f"**Leakage-safe by construction:** every search is filtered to papers dated before the target "
                    f"paper. Over 135 questions, {C['distinct_papers_used']:,} distinct papers were used.",
            "bullet": True}], PALE_GREEN, GREEN, body_size=13, space=8)
+
+
+def funnel_slide_body(slide) -> None:
+    """Slide 4's funnel: what happens to one question, in plain words, as shrinking bars."""
+    textbox(slide, Inches(0.55), Inches(2.72), Inches(6.7), Inches(0.35),
+            "**What happens to one question** (average over our 135 test questions)", size=13, color=NAVY, space=0)
+    stages = [
+        (f"{C['search_hits_per_question'] + C['earlier_corpus_papers_per_question']:.0f}", "papers found",
+         "by the planned searches and a broad keyword search (a few twice)", GRAY),
+        (f"{C['admitted_per_question']:.0f}", "pass the rules",
+         "published before the cutoff, open access, a research article", GRAY),
+        (f"{C['screened_per_question']:.0f}", "titles + abstracts read",
+         "by gpt-4o, which grades each 0–3 for relevance", TEAL),
+        (f"{C['papers_kept_per_question']:.0f}", "papers kept",
+         "graded relevant; only these are opened in full", TEAL),
+        (f"{C['passages_graded_per_question']:.0f}", "passages read",
+         "the 6 best sections of each kept paper, graded by gpt-4o", TEAL),
+        (f"{C['pack_passages_per_question']:.0f}", "passages to the writer",
+         f"the most relevant ones, ≈ {C['pack_chars_per_question'] / 1000:.0f}k characters (≈ 15 pages)", GREEN),
+    ]
+    top = float(stages[0][0])
+    y = Inches(3.12)
+    for count, head, body, color in stages:
+        width = Inches(0.55 + 1.65 * (float(count) / top) ** 0.5)
+        rect(slide, Inches(0.55), y, width, Inches(0.5), color, shape=MSO_SHAPE.ROUNDED_RECTANGLE)
+        textbox(slide, Inches(0.55), y + Inches(0.06), width, Inches(0.4), f"**{count}**", size=15, color=WHITE,
+                align=PP_ALIGN.CENTER, space=0)
+        textbox(slide, Inches(2.85), y + Inches(0.0), Inches(4.45), Inches(0.55),
+                [{"text": f"**{head}**", "size": 12.5, "space": 0},
+                 {"text": body, "size": 10.5, "color": GRAY, "space": 0}], space=0)
+        y += Inches(0.6)
+
+
+def search_slides(prs, s1: dict, s2: dict) -> None:
+    """Step 3 on two slides: the planned searches (3a) and the broad keyword search with the rule checks (3b)."""
+    groups = s1["output_parsed"]["groups"]
+    searches = s2["searches"]
+    slide = new_slide(prs, "Our agent · step 3a of 7", "Search Europe PMC with the planned searches (no model)",
+                      section_color=GREEN, notes=(
+                          "focused_search.query_for builds each query; focused_search.run_searches runs it on Europe "
+                          "PMC (titles and abstracts, TITLE_ABS) and, for a three-group search with fewer than 3 "
+                          "results, retries with the first two groups. websearch.filters adds the access and date "
+                          "filters. No model is called in this step."))
+    textbox(slide, Inches(0.55), Inches(1.32), Inches(6.0), Inches(2.75), [
+        {"text": "**How one search is built**", "size": 13.5, "color": GREEN, "space": 4},
+        {"text": "Each **group** from step 2 is a list of synonyms, joined with **OR** (any of them may appear).",
+         "bullet": True, "size": 12.5},
+        {"text": "A **search** joins 2 or 3 groups with **AND** (each group must be matched), in the title or "
+                 "abstract.", "bullet": True, "size": 12.5},
+        {"text": "Every search adds the same filters: open access, full text available, not a preprint, published "
+                 "before the cutoff (2024-11-30 here).", "bullet": True, "size": 12.5},
+        {"text": "No model is involved: these are plain database queries.", "bullet": True, "size": 12.5}],
+        space=4)
+    first = searches[0]
+    example = ("(" + " OR ".join(groups[first["groups"][0]]) + ")\n  AND\n(" + " OR ".join(groups[first["groups"][1]])
+               + ")\n  AND open access, full text, published before 2024-11-30")
+    prompt_box(slide, Inches(6.8), Inches(1.32), Inches(6.0), Inches(2.75),
+               f"Example: the search “{first['groups'][0]} AND {first['groups'][1]}” → {first['hit_count']} papers",
+               example, size=11)
+    back = next(x for x in searches if len(x["requested"]) == 3)
+    card(slide, Inches(0.55), Inches(4.25), Inches(6.0), Inches(2.65), "What a “3-group search” is, and the back-off",
+         [{"text": f"A 3-group search requires all three groups at once, e.g. **{' AND '.join(back['requested'])}**.",
+           "bullet": True},
+          {"text": "Three conditions together are often too narrow. **If it finds fewer than 3 papers, the third group "
+                   "is dropped** and the search is rerun with the first two.", "bullet": True},
+          {"text": f"In this run: {' AND '.join(back['requested'])} → rerun as {' AND '.join(back['groups'])} → "
+                   f"{back['hit_count']} papers.", "bullet": True}], PALE_TEAL, TEAL, body_size=12, space=4)
+    rows = [["The 8 searches of this run", "Papers"]]
+    for x in searches:
+        label = " AND ".join(x["groups"]) + (" (dropped " + x["requested"][-1] + ")" if x["requested"] != x["groups"]
+                                              else "")
+        rows.append([label, f"{x['hit_count']}" + (f" (first {x['fetched']} used)" if x["fetched"] < x["hit_count"]
+                                                     else "")])
+    table(slide, Inches(6.8), Inches(4.25), Inches(6.0), rows, [4.35, 1.65], size=10, row_height=0.27,
+          header_height=0.3)
+
+    oc = s2["old_corpus_channel"]
+    slide = new_slide(prs, "Our agent · step 3b of 7", "A second, broad keyword search, then the rule checks",
+                      section_color=GREEN, notes=(
+                          "websearch.phrases_for (Llama-3.3, one call per question; temperature 0) and "
+                          "websearch.build_corpus: each phrase becomes an OR of its words in the abstract, combined "
+                          "with high-entropy-alloy terms; the matches are ranked by word overlap with the question; "
+                          "the first 50 with full text are kept, plus up to 50 references cited by at least two of "
+                          "them. Rule checks: websearch.admit (Europe PMC and Crossref records)."))
+    textbox(slide, Inches(0.55), Inches(1.32), Inches(6.0), Inches(3.0), [
+        {"text": "**Why a second search?**", "size": 13.5, "color": GREEN, "space": 4},
+        {"text": "The planned searches are precise but can miss papers: here 4 of the 8 found 0 or 1 paper.",
+         "bullet": True, "size": 12.5},
+        {"text": "So the agent also runs a broad keyword search, which casts a wider net.", "bullet": True,
+         "size": 12.5},
+        {"text": "**This is where the prompt comes in:** a model (Llama-3.3, 1 call) writes the three keyword "
+                 "phrases from the question. Everything after that is plain database search.", "bullet": True,
+         "size": 12.5},
+        {"text": "Each phrase finds papers whose abstract mentions any of its words and is about high-entropy "
+                 "alloys. The best-matching 50 papers are kept, plus papers often cited by them.", "bullet": True,
+         "size": 12.5}], space=4)
+    prompt_box(slide, Inches(6.8), Inches(1.32), Inches(6.0), Inches(3.0),
+               "Prompt: keyword phrases (Llama-3.3, 1 call, verbatim)",
+               oc["system"] + "\n\nOutput for this question:\n" + "\n".join(f"• {x}" for x in oc["output"]["phrases"]),
+               size=10.5)
+    card(slide, Inches(0.55), Inches(4.5), Inches(6.0), Inches(2.4), "Rule checks on every paper (code, no model)",
+         [{"text": "Published before the cutoff, by two date sources (Europe PMC and Crossref).", "bullet": True},
+          {"text": "A research article (not a review, editorial or preprint), with open-access full text.",
+           "bullet": True},
+          {"text": "Not the hidden paper itself, nor a closely related paper by the same authors.", "bullet": True}],
+         PALE_TEAL, TEAL, body_size=12, space=4)
+    both = s2["channels"].get("both", 0)
+    card(slide, Inches(6.8), Inches(4.5), Inches(6.0), Inches(2.4), "Real run (the zirconium paper)",
+         [f"Planned searches: **{s2['unique_hits']}** papers. Broad keyword search: **{oc['papers']}** papers "
+          f"(about {both} found by both).",
+          f"After the rule checks: **{s2['admitted']}** papers ({', '.join(f'{v} {k.replace(chr(95), chr(32))}' for k, v in s2['rejected'].items())}).",
+          "These go to step 4, where gpt-4o reads their titles and abstracts."],
+         PALE_TEAL, TEAL, body_size=12.5, space=5)
 
 
 # ---------------------------------------------------------------- part 2: the agent, step by step
@@ -237,25 +341,7 @@ def agent_steps(prs) -> None:
         [f"… {len(groups)} groups, {len(s1['output_parsed']['searches'])} searches."],
         notes="Output shown as parsed by focused_search.parse_plan (stored in the question's manifest).",
         prompt_size=9.5)
-    hits = ", ".join(f"{' + '.join(s['groups'])}: {s['hit_count']}" for s in s2["searches"][:6])
-    oc = s2["old_corpus_channel"]
-    step_slide(prs, 3, "Search the literature index (no model)", [
-        "Each search is an AND of OR-groups over titles and abstracts in Europe PMC, run live.",
-        "Filters on every query: open access, full text, no preprints, first published before the cutoff.",
-        "A 3-group search with fewer than 3 hits backs off to its first two groups.",
-        "Second channel: the question's earlier per-question search (Llama-3.3 phrases, prompt on the right).",
-        "Admission checks: research article, dated before the cutoff by Europe PMC and Crossref, not the held-out "
-        "paper or its family."],
-        "Prompt: search phrases of the second channel (Llama-3.3, verbatim)",
-        oc["system"] + "\n\nOutput for this question:\n" + json.dumps(oc["output"], ensure_ascii=False) +
-        "\n\nThe first planned search, as sent to Europe PMC:\n" + s2["searches"][0]["query"],
-        [f"Hits per search: {hits} …",
-         f"{s2['unique_hits']} unique search hits + {oc['papers']} papers from the second channel → "
-         f"{s2['admitted']} admitted (rejected: {', '.join(f'{v} {k}' for k, v in s2['rejected'].items())}).",
-         "The micro-alloying search found 0 open-access papers: the index, not the model, limits recall."],
-        notes="websearch.filters adds the date and access filters; focused_search.run_searches backs off from 3 to 2 "
-              "groups below 3 hits. The second channel is experiment 36's per-question corpus (first 50 search "
-              "results plus co-cited references), also built by search, not extraction.", prompt_size=9.5)
+    search_slides(prs, s1, s2)
     graded = [(g["grade"], g["why"], p["title"]) for b in s3["batches"]
               for p, g in zip(b["input"]["papers"], b["output_parsed"]["grades"])]
     counts = {k: sum(1 for g in graded if g[0] == k) for k in (3, 2, 1, 0)}
