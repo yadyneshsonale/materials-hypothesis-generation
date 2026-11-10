@@ -59,6 +59,31 @@ def retrieval_cost() -> dict:
     }
 
 
+def draft_cost() -> dict:
+    """The draft-then-ground agent (agent_draft_ground_b_o3mini): its per-question web corpus (experiment 36, built by
+    search) and its 270 stored runs."""
+    import hypo_loop as H
+    import websearch as ws
+    hits, admitted, seeds, expansion, papers, passages = [], [], [], [], [], []
+    for case, level in H.units("all36") + H.units("test4"):
+        manifest = json.loads(Path(f"{ws.corpus_stem(case['paper_id'], level)}.json").read_text())
+        hits.append(manifest["unique_hits"])
+        admitted.append(manifest["candidates_after_filters"])
+        seeds.append(len(manifest["seeds"]))
+        expansion.append(len(manifest.get("expansion", [])))
+        records = ws.case_records(case["paper_id"], level, "text_chunks")
+        passages.append(len(records))
+        papers.append(len({r.paper_id for r in records}))
+    runs = RQ.runs_of("agent_draft_ground_b_o3mini")
+    packs = [r["notes"]["focused_pack"] for r in runs]
+    return {"questions": len(hits), "search_hits": mean(hits), "admitted": mean(admitted), "seeds": mean(seeds),
+            "expansion": mean(expansion), "corpus_papers": mean(papers), "corpus_passages": mean(passages),
+            "pack_passages": mean([x["records"] for x in packs]), "pack_papers": mean([x["papers"] for x in packs]),
+            "pack_chars": mean([x["chars"] for x in packs]), "calls_per_run": mean([r["llm_calls"] for r in runs]),
+            "chars_in": mean([r["chars_in"] for r in runs]), "seconds": mean([r["elapsed_seconds"] for r in runs]),
+            "cited": mean([len(r["cited_ids"]) for r in runs])}
+
+
 def main() -> None:
     analysis = json.loads((E / "loop_quality" / "analysis_quality.json").read_text())
     rows = analysis["rows"]
@@ -66,6 +91,7 @@ def main() -> None:
         "prompts": {"RQ_SYSTEM": RQ.RQ_SYSTEM, "GROUNDING_SYSTEM": Q.GROUNDING_SYSTEM,
                     "QUALITY_PAIR_SYSTEM": D.QUALITY_PAIR_SYSTEM},
         "cost": retrieval_cost(),
+        "cost_draft": draft_cost(),
         "results": {
             "incumbent": analysis["incumbent"],
             "grounding_validation": {k: analysis["grounding_validation"][k] for k in
