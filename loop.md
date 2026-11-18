@@ -6240,3 +6240,43 @@ and 3, problem-constrained, 2 papers, at most 3 rounds).
 5. Wikipedia rate-limits parallel clients (HTTP 429): its download is sequential with `Retry-After`.
 
 The critic's acceptance rule, N, K, R and the evaluation are unchanged from 28.1.
+
+### 28.2 Pilot results (2026-11-18, about 10:30; 48 of 48 runs, none failed; exploratory, 8 dev papers)
+
+Source: `loop_quality/analysis_perpaper.{json,md}` (`perpaper_eval.py report`). Generation 06:55–09:58; judging
+until 10:24. The first report crashed because the shared leakage re-check sent MatKG IDs to Europe PMC as paper IDs;
+the arm's re-check now skips teaching-text and graph IDs (they have their own check). No result changed.
+
+| Method (8 dev papers) | RQ | Plaus. | Test. | Useful. | Non-copying |
+|---|---:|---:|---:|---:|---:|
+| `perpaper` (rank 1) | 3.15 | 3.65 | 4.17 | 4.64 | 3.81 |
+| draft-then-ground | 2.94 | 3.40 | 4.17 | 4.25 | 2.81 |
+| closed-book writer | 3.05 | 3.69 | 4.01 | 4.45 | 2.88 |
+| `rx_r` | 2.73 | 3.11 | 4.19 | 3.89 | 1.85 |
+
+Paired over the 8 papers (95% CI; papers for vs against):
+
+| `perpaper` against | RQ | Plausibility | Usefulness | Non-copying | Pairwise v2: DeepSeek | Pairwise v2: o1 |
+|---|---|---|---|---|---|---|
+| draft-then-ground | +0.21 [+0.07, +0.35] | +0.26 [+0.01, +0.44] | +0.39 [+0.18, +0.57] | +1.00 [+0.42, +1.58] | −0.04 [−0.19, +0.08], 3 vs 3 | +0.40 [+0.23, +0.56], 7 vs 0 |
+| closed-book writer | +0.11 [−0.13, +0.37] | −0.04 [−0.38, +0.27] | +0.19 [−0.13, +0.51] | +0.94 [+0.29, +1.62] | +0.35 [+0.19, +0.52], 7 vs 0 | +0.58 [+0.38, +0.77], 7 vs 0 |
+
+- Non-copying of the rank-1 hypothesis against its own source paper's full text: 4.15 of 5 (diagnostic).
+- **Decision rule (28.1): no-go.** It requires both judges to prefer `perpaper` to the draft-then-ground agent; o1
+  does (+0.40, 7 of 8 papers), DeepSeek does not (−0.04, 3 vs 3). RQ (+0.21) and the critic check pass.
+- Process: 135 calls per run (max 226), 22 minutes; 9.8 of 10 papers produced an accepted hypothesis (0.8% dropped);
+  52.5% accepted in round 1 (rubber-stamp limit 80%), mean 2.4 rounds, up to 18. The critic's filter is almost
+  entirely soundness (round-1 pass rates: sound 29%, beyond_paper 84%, testable 98%): testability barely
+  discriminates. 14 hypotheses per tournament after merging; **rank 1 was tied in 37.5% of runs**, so the narrowing
+  step often cannot separate its top candidates. The rank-1 hypotheses came from 38 different source papers in 48 runs.
+- Leakage: every counter zero; 10,442 paper passages re-checked by date; 1,066 teaching passages seen, none mentions
+  an HEA or post-dates a cutoff; 2,464 graph facts seen (all from years before the cutoff year).
+- `must_obey_check.py --loop --quality`: PASS (warnings: no grounding judgment, retired in experiment 47; no GPT-5.6
+  target-free audit, not part of this pilot's plan).
+
+**Reading.** On research quality and originality this is the best method measured on these 8 papers: higher RQ than
+the draft-then-ground agent (+0.21, mainly usefulness and plausibility), far less copying than every other method (also
+against its own source paper), and both judges prefer it to the closed-book writer in 7 of 8 papers. The only failed
+condition is DeepSeek's head-to-head against the draft-then-ground agent, a tie. Eight papers give wide intervals, and
+the dev subset is harder than the full set (the draft agent's RQ is 2.94 here, 3.16 on all 45). It costs about 45
+times the draft agent's calls. By the pre-registered rule the full run waits for the user's decision.

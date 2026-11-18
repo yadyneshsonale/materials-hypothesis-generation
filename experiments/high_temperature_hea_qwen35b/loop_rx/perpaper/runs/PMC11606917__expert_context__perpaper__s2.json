@@ -1,0 +1,2448 @@
+{
+  "run_id": "PMC11606917__expert_context__perpaper__s2",
+  "paper_id": "PMC11606917",
+  "query_level": "expert_context",
+  "method": "perpaper",
+  "sample": 2,
+  "split": "dev",
+  "final": false,
+  "benchmark": "v3.1",
+  "query": "Earlier empirical-potential and first-principles studies primarily targeted phase-transition temperature, while other fusion properties remain difficult because they require free energies on both sides of the transition with vibrational entropy, anharmonicity, and electron–vibration coupling retained. Explicit ab initio free-energy evaluation is highly accurate but depends on costly molecular dynamics. TOR-TILD increased throughput for elemental and binary systems, yet slows substantially for multicomponent high-entropy systems. Under the constraint that the free energies of both solid and fluid states and the relevant entropy terms remain faithful, what single testable methodological hypothesis could substantially reduce the cost of obtaining fusion and high-temperature thermodynamic properties? State the proposed intervention and why it should work, predict its speed and fidelity relative to explicit ab initio molecular-dynamics workflows and TOR-TILD, define composition and temperature boundaries, cite supporting evidence from prior elemental or binary results, and specify a decisive benchmark of phase free energies and derived observables that would falsify the hypothesis.",
+  "publication_date": "2024-11-29",
+  "models": {
+    "focused_search_planner": "trapi:o3-mini_2025-01-31",
+    "focused_screener": "trapi:gpt-4o_2024-11-20",
+    "focused_screener_expansion": "trapi:gpt-4o_2024-11-20",
+    "focused_passage_grader": "trapi:gpt-4o_2024-11-20",
+    "generator": "trapi:o3-mini_2025-01-31",
+    "critic": "trapi:o3-mini_2025-01-31",
+    "generator_revise": "trapi:o3-mini_2025-01-31",
+    "narrow": "trapi:o3-mini_2025-01-31"
+  },
+  "status": "ok",
+  "error": null,
+  "evidence_source": "web",
+  "generation": {
+    "hypothesis": "A multi-fidelity free-energy integration strategy that dynamically couples coarse-grained classical MD with selective high-fidelity ab initio corrections by using physically informed ML to capture the complex anharmonic and electron–vibration effects in both phases.",
+    "material_initial_state": "Multicomponent HEAs (e.g., FeNiCrCoCu) modeled in both the ordered solid regime and the disordered liquid regime near the melting transition.",
+    "intervention": "Perform extensive low-fidelity classical MD simulations (using well-parameterized interatomic potentials that capture basic vibrational behavior) over the entire free-energy landscape in both solid and liquid phases. Augment these with sparse high-fidelity ab initio MD simulations that are selectively triggered based on regions of high uncertainty in an ensemble ML model. Use the ML model to learn correction terms that account for anharmonic contributions and electron–vibration coupling, thereby providing a multi-fidelity fusion of data for accurate free-energy integration.",
+    "conditions": "The approach is applicable over the temperature range near fusion, especially where standard potentials miss subtle anharmonic effects. It is best suited to systems with compositional complexity (like five-element HEAs) where full high-fidelity sampling is prohibitively expensive.",
+    "structural_mediator": "The ensemble ML model mediates the linkage between low- and high-fidelity datasets, flagging and correcting regions where coarse-grained MD discrepancies are significant due to complex local behavior.",
+    "mechanism": "The coarse-grained MD captures the broad free-energy landscape at low computational cost, while the ML model, trained on the discrepancies between classical MD and selective ab initio MD data, learns the missing physics (anharmonic and electron–vibration effects). Thermodynamic integration then uses the corrected free energies, leading to an overall reliable and computationally efficient method. The method biases high-fidelity sampling to configurations that involve rare events or strong electron coupling, ensuring that the multi-fidelity data represent the true free-energy surface.",
+    "predicted_outcome": "Fusion free-energy differences, melting temperatures, and latent heats should be predicted within ~10% of full ab initio results, with computational costs reduced by a factor between 5 and 10 compared to full TOR-TILD workflows.",
+    "baseline": "Uniform, full high-fidelity ab initio MD free-energy computations (TOR-TILD) without multi-fidelity coupling or active sampling.",
+    "boundary": "Most effective for HEAs near melting, especially for complex alloys like FeNiCrCoCu, and over temperature intervals where anharmonic and electron–vibration effects become dominant.",
+    "uncertainty": "The success relies on the ML model’s ability to accurately identify and correct high-uncertainty regions. If the ensemble does not adequately capture all rare but important events, certain anharmonic contributions might be misrepresented.",
+    "supporting_evidence_ids": [
+      "TXT::wikipedia::Molecular_dynamics::000",
+      "KG::deformations::653cbc2217"
+    ],
+    "conflicting_evidence_ids": [],
+    "falsification_experiment": {
+      "design": "Implement the multi-fidelity integration on a known HEA system. Compare the free-energy landscape (solid vs liquid) produced by the combined low-fidelity MD and ML-corrected ab initio points with that from full ab initio MD integration. Measure both the fusion free energy and derived thermodynamic observables.",
+      "measurements": [
+        "Free-energy difference between phases",
+        "Melting temperature and latent heat",
+        "Total CPU time relative to full ab initio MD"
+      ],
+      "falsification_rule": "The hypothesis is falsified if the predicted free-energy difference or melting temperature deviates by more than 10% from full AIMD results, or if cost reduction is less than a factor of 5."
+    },
+    "citation_validation": {
+      "status": "valid",
+      "removed_unknown_ids": []
+    }
+  },
+  "seen_ids": [
+    "KG::alloying::7c808b88d0",
+    "KG::aluminum::004896ab83",
+    "KG::aluminum::0cdcc0681d",
+    "KG::bcc::44fa01b5ca",
+    "KG::bcc::a62842c302",
+    "KG::binary_alloys::9a2e55f178",
+    "KG::bulk::da6ec6998e",
+    "KG::carbide::0f623d73fe",
+    "KG::carbon::f4c741808d",
+    "KG::configurational::334c8ed3c9",
+    "KG::configurational_entropy::c8c8adb4ef",
+    "KG::cooling::6a38dee9c6",
+    "KG::current_density::e542ee7778",
+    "KG::cutting::5ec017ba45",
+    "KG::deformations::653cbc2217",
+    "KG::drx::fe4d2e4a96",
+    "KG::electronic::0f2df187e9",
+    "KG::fcc::633b2ba524",
+    "KG::fcc::9a404a4f50",
+    "KG::fcc::f6ae4558de",
+    "KG::grain_size::67e21de780",
+    "KG::hardness::1a89393e61",
+    "KG::heat_capacity::5b80a5d6c3",
+    "KG::hydrogen::fc7f315eee",
+    "KG::imc::09aa939e06",
+    "KG::interface::acbde595b8",
+    "KG::intermetallic::243170d24f",
+    "KG::intermetallic::346eb1f114",
+    "KG::intermetallic::44c2f2ec1b",
+    "KG::intermetallic::615318e46c",
+    "KG::intermetallic::c03f970313",
+    "KG::layers::27f1263992",
+    "KG::layers::5c46281192",
+    "KG::machining::835584f9be",
+    "KG::matrix::42aec15bda",
+    "KG::metallic::ff11cd4860",
+    "KG::metallic_glass::ac7357d3b4",
+    "KG::metals::35c99e081a",
+    "KG::metals::acae73f3da",
+    "KG::metals::c427fbf5cc",
+    "KG::microstructural::b3f27707bb",
+    "KG::nacl::b9a872f502",
+    "KG::phase_diagram::9f89c94b31",
+    "KG::phase_diagram::e91070d76b",
+    "KG::precipitates::5142fea975",
+    "KG::precipitates::6884495322",
+    "KG::recrystallisation::6c41073a58",
+    "KG::solid_solution::a54586c359",
+    "KG::solidification::26db84bcde",
+    "KG::structures::e01ec21df1",
+    "KG::substrate::920a72d73b",
+    "KG::surface_integrity::ce4cbc863d",
+    "KG::surface_roughness::fa7efb5267",
+    "KG::thin_foil::9fa9042f83",
+    "KG::total_energy::eb114fa644",
+    "PMC10058552::web::000::abstract",
+    "PMC10058552::web::001::abstract",
+    "PMC10058552::web::002::1_introduction",
+    "PMC10058552::web::003::1_introduction",
+    "PMC10058552::web::004::1_introduction",
+    "PMC10058552::web::005::1_introduction",
+    "PMC10058552::web::006::1_introduction",
+    "PMC10058552::web::007::2_models_and_methods",
+    "PMC10058552::web::008::2_models_and_methods",
+    "PMC10058552::web::009::3_1_effect_of_principal_element_content_",
+    "PMC10058552::web::010::3_2_ml_prediction_of_the_component_ratio",
+    "PMC10058552::web::011::3_2_ml_prediction_of_the_component_ratio",
+    "PMC10058552::web::012::3_3_tension_compression_asymmetry_of_fen",
+    "PMC10058552::web::013::3_3_tension_compression_asymmetry_of_fen",
+    "PMC10058552::web::014::3_4_microstructural_evolution_mechanism_",
+    "PMC10058552::web::015::3_4_microstructural_evolution_mechanism_",
+    "PMC10058552::web::016::3_5_influence_of_element_content_on_tens",
+    "PMC10058552::web::017::3_6_tension_compression_asymmetry_of_pol",
+    "PMC10058552::web::018::3_6_tension_compression_asymmetry_of_pol",
+    "PMC10058552::web::019::3_6_tension_compression_asymmetry_of_pol",
+    "PMC10058552::web::020::3_6_tension_compression_asymmetry_of_pol",
+    "PMC10058552::web::021::3_7_influence_and_mechanism_of_hea_coati",
+    "PMC10058552::web::022::3_7_influence_and_mechanism_of_hea_coati",
+    "PMC10058552::web::023::3_7_influence_and_mechanism_of_hea_coati",
+    "PMC10058552::web::024::4_conclusions",
+    "PMC10569033::web::000::abstract",
+    "PMC10569033::web::001::introduction",
+    "PMC10569033::web::002::introduction",
+    "PMC10569033::web::003::introduction",
+    "PMC10569033::web::004::introduction",
+    "PMC10569033::web::005::umbrella_integration",
+    "PMC10569033::web::006::umbrella_integration",
+    "PMC10569033::web::007::gaussian_approximation_potentials",
+    "PMC10569033::web::008::density_functional_theory",
+    "PMC10569033::web::009::density_functional_theory",
+    "PMC10569033::web::010::minimum_energy_path_and_collective_varia",
+    "PMC10569033::web::011::minimum_energy_path_and_collective_varia",
+    "PMC10569033::web::012::potential_training_and_validation",
+    "PMC10569033::web::013::potential_training_and_validation",
+    "PMC10569033::web::014::free_energy_calculations",
+    "PMC10569033::web::015::rate_constants",
+    "PMC10569033::web::016::rate_constants",
+    "PMC10569033::web::017::rate_constants",
+    "PMC10569033::web::018::harmonic_free_energy_corrections",
+    "PMC10569033::web::019::harmonic_free_energy_corrections",
+    "PMC10569033::web::020::density_functional_comparison",
+    "PMC10569033::web::021::density_functional_comparison",
+    "PMC10569033::web::022::limitations",
+    "PMC10569033::web::023::limitations",
+    "PMC10569033::web::024::limitations",
+    "PMC10855459::web::000::abstract",
+    "PMC10855459::web::001::1_introduction",
+    "PMC10855459::web::002::1_introduction",
+    "PMC10855459::web::003::1_introduction",
+    "PMC10855459::web::004::1_introduction",
+    "PMC10855459::web::005::1_introduction",
+    "PMC10855459::web::006::1_introduction",
+    "PMC10855459::web::007::1_introduction",
+    "PMC10855459::web::008::1_introduction",
+    "PMC10855459::web::009::2_1_1_general_architecture",
+    "PMC10855459::web::010::2_1_2_python_class_deeppotentialmodel",
+    "PMC10855459::web::011::2_1_2_python_class_deeppotentialmodel",
+    "PMC10855459::web::012::2_1_2_python_class_deeppotentialmodel",
+    "PMC10855459::web::013::2_1_2_python_class_deeppotentialmodel",
+    "PMC10855459::web::014::2_2_validation_of_the_openmm_deepmd_plug",
+    "PMC10855459::web::015::2_2_1_energy_conservation_in_nve_simulat",
+    "PMC10855459::web::016::2_2_1_energy_conservation_in_nve_simulat",
+    "PMC10855459::web::017::2_2_2_thermodynamic_validation_for_canon",
+    "PMC10855459::web::018::2_2_2_thermodynamic_validation_for_canon",
+    "PMC10855459::web::019::2_2_3_structural_property_of_bulk_water",
+    "PMC10855459::web::020::2_2_3_structural_property_of_bulk_water",
+    "PMC10855459::web::021::2_2_3_structural_property_of_bulk_water",
+    "PMC10855459::web::022::2_2_4_diffusion_coefficients_of_water",
+    "PMC10855459::web::023::2_2_4_diffusion_coefficients_of_water",
+    "PMC10855459::web::024::2_2_5_hydration_free_energy_of_water",
+    "PMC11275555::web::000::abstract",
+    "PMC11275555::web::001::introduction",
+    "PMC11275555::web::002::introduction",
+    "PMC11275555::web::003::introduction",
+    "PMC11275555::web::004::introduction",
+    "PMC11275555::web::005::introduction",
+    "PMC11275555::web::006::introduction",
+    "PMC11275555::web::007::introduction",
+    "PMC11275555::web::008::multi_objective_optimization_of_strength",
+    "PMC11275555::web::009::multi_objective_optimization_of_strength",
+    "PMC11275555::web::010::multi_objective_optimization_of_strength",
+    "PMC11275555::web::011::multi_objective_optimization_of_strength",
+    "PMC11275555::web::012::multi_objective_optimization_of_strength",
+    "PMC11275555::web::013::search_for_pareto_optimal_alloys",
+    "PMC11275555::web::014::search_for_pareto_optimal_alloys",
+    "PMC11275555::web::015::search_for_pareto_optimal_alloys",
+    "PMC11275555::web::016::search_for_pareto_optimal_alloys",
+    "PMC11275555::web::017::search_for_pareto_optimal_alloys",
+    "PMC11275555::web::018::search_for_pareto_optimal_alloys",
+    "PMC11275555::web::019::virtual_bond_approximation_model",
+    "PMC11275555::web::020::virtual_bond_approximation_model",
+    "PMC11275555::web::021::virtual_bond_approximation_model",
+    "PMC11275555::web::022::virtual_bond_approximation_model",
+    "PMC11275555::web::023::virtual_bond_approximation_model",
+    "PMC11701358::web::000::abstract",
+    "PMC11701358::web::001::abstract",
+    "PMC11701358::web::002::introduction",
+    "PMC11701358::web::003::introduction",
+    "PMC11701358::web::004::introduction",
+    "PMC11701358::web::005::introduction",
+    "PMC11701358::web::006::introduction",
+    "PMC11701358::web::007::introduction",
+    "PMC11701358::web::008::results_and_discussion",
+    "PMC11701358::web::009::results_and_discussion",
+    "PMC11701358::web::010::results_and_discussion",
+    "PMC11701358::web::011::results_and_discussion",
+    "PMC11701358::web::012::results_and_discussion",
+    "PMC11701358::web::013::results_and_discussion",
+    "PMC11701358::web::014::results_and_discussion",
+    "PMC11701358::web::015::results_and_discussion",
+    "PMC11701358::web::016::results_and_discussion",
+    "PMC11701358::web::017::results_and_discussion",
+    "PMC11701358::web::018::results_and_discussion",
+    "PMC11701358::web::019::conclusions",
+    "PMC11701358::web::020::conclusions",
+    "PMC11701358::web::021::conclusions",
+    "PMC6820750::web::000::abstract",
+    "PMC6820750::web::001::introduction",
+    "PMC6820750::web::002::introduction",
+    "PMC6820750::web::003::introduction",
+    "PMC6820750::web::004::introduction",
+    "PMC6820750::web::005::database_partitioning",
+    "PMC6820750::web::006::hea_phase_formation_parameters",
+    "PMC6820750::web::007::hea_phase_formation_parameters",
+    "PMC6820750::web::008::hea_phase_formation_parameters",
+    "PMC6820750::web::009::visualisation_of_phase_regions_in_parame",
+    "PMC6820750::web::010::visualisation_of_phase_regions_in_parame",
+    "PMC6820750::web::011::visualisation_of_phase_regions_in_parame",
+    "PMC6820750::web::012::hea_phases_prediction_using_machine_lear",
+    "PMC6820750::web::013::hea_phases_prediction_using_machine_lear",
+    "PMC6820750::web::014::model_validation",
+    "PMC6820750::web::015::discussion",
+    "PMC6820750::web::016::discussion",
+    "PMC6820750::web::017::discussion",
+    "PMC6820750::web::018::discussion",
+    "PMC6820750::web::019::discussion",
+    "PMC6820750::web::020::melting_temperature",
+    "PMC6820750::web::021::calculating_pfpx",
+    "PMC6820750::web::022::calculating_psp",
+    "PMC6820750::web::023::phase_formation_temperature",
+    "PMC6820750::web::024::machine_learning",
+    "PMC6820750::web::025::alloy_validation_experiment",
+    "PMC6820750::web::026::database_description",
+    "PMC7512484::web::000::abstract",
+    "PMC7512484::web::001::abstract",
+    "PMC7512484::web::002::1_introduction",
+    "PMC7512484::web::003::1_introduction",
+    "PMC7512484::web::004::1_introduction",
+    "PMC7512484::web::005::1_introduction",
+    "PMC7512484::web::006::2_methods",
+    "PMC7512484::web::007::2_methods",
+    "PMC7512484::web::008::2_methods",
+    "PMC7512484::web::009::2_methods",
+    "PMC7512484::web::010::2_methods",
+    "PMC7512484::web::011::3_results_and_discussion",
+    "PMC7512484::web::012::3_results_and_discussion",
+    "PMC7512484::web::013::3_results_and_discussion",
+    "PMC7512484::web::014::3_results_and_discussion",
+    "PMC7512484::web::015::3_results_and_discussion",
+    "PMC7512484::web::016::3_results_and_discussion",
+    "PMC7512484::web::017::4_conclusions",
+    "PMC7512484::web::018::4_conclusions",
+    "PMC7704029::web::000::abstract",
+    "PMC7704029::web::001::introduction",
+    "PMC7704029::web::002::introduction",
+    "PMC7704029::web::003::introduction",
+    "PMC7704029::web::004::introduction",
+    "PMC7704029::web::005::introduction",
+    "PMC7704029::web::006::overview",
+    "PMC7704029::web::007::quantum_chemical_potentials_targets_and_",
+    "PMC7704029::web::008::machine_learning_models",
+    "PMC7704029::web::009::machine_learning_models",
+    "PMC7704029::web::010::hamiltonian_reservoir_replica_exchange",
+    "PMC7704029::web::011::hamiltonian_reservoir_replica_exchange",
+    "PMC7704029::web::012::hamiltonian_reservoir_replica_exchange",
+    "PMC7704029::web::013::hamiltonian_reservoir_replica_exchange",
+    "PMC7704029::web::014::hamiltonian_reservoir_replica_exchange",
+    "PMC7704029::web::015::technical_details",
+    "PMC7704029::web::016::technical_details",
+    "PMC7704029::web::017::dithiacyclophane",
+    "PMC7704029::web::018::dithiacyclophane",
+    "PMC7704029::web::019::dithiacyclophane",
+    "PMC7704029::web::020::dithiacyclophane",
+    "PMC7704029::web::021::cinchona_alkaloid",
+    "PMC7704029::web::022::cinchona_alkaloid",
+    "PMC7704029::web::023::cinchona_alkaloid",
+    "PMC7704029::web::024::conclusions",
+    "PMC7704029::web::025::conclusions",
+    "PMC8367938::web::000::abstract",
+    "PMC8367938::web::001::introduction",
+    "PMC8367938::web::002::introduction",
+    "PMC8367938::web::003::introduction",
+    "PMC8367938::web::004::introduction",
+    "PMC8367938::web::005::introduction",
+    "PMC8367938::web::006::introduction",
+    "PMC8367938::web::007::free_energy_theory",
+    "PMC8367938::web::008::molecular_entropy",
+    "PMC8367938::web::009::entropy_for_each_level_and_motion",
+    "PMC8367938::web::010::vibrational_entropy",
+    "PMC8367938::web::011::topographical_entropy",
+    "PMC8367938::web::012::topographical_entropy",
+    "PMC8367938::web::013::system_preparation",
+    "PMC8367938::web::014::molecular_dynamics_simulation_protocol",
+    "PMC8367938::web::015::error_analysis",
+    "PMC8367938::web::016::results_and_discussion",
+    "PMC8367938::web::017::entropy_components_with_mcc",
+    "PMC8367938::web::018::entropy_components_with_mcc",
+    "PMC8367938::web::019::entropy_components_with_mcc",
+    "PMC8367938::web::020::entropy_components_with_mcc",
+    "PMC8367938::web::021::conclusions",
+    "PMC9141984::web::000::abstract",
+    "PMC9141984::web::001::1_introduction",
+    "PMC9141984::web::002::1_introduction",
+    "PMC9141984::web::003::1_introduction",
+    "PMC9141984::web::004::1_introduction",
+    "PMC9141984::web::005::2_1_probability_density_function",
+    "PMC9141984::web::006::2_1_probability_density_function",
+    "PMC9141984::web::007::2_1_probability_density_function",
+    "PMC9141984::web::008::2_2_relation_to_force_constant_matrix",
+    "PMC9141984::web::009::2_3_quantum_harmonic_entropy",
+    "PMC9141984::web::010::2_3_quantum_harmonic_entropy",
+    "PMC9141984::web::011::2_4_ab_initio_methods",
+    "PMC9141984::web::012::2_4_ab_initio_methods",
+    "PMC9141984::web::013::3_1_test_cases_fcc_al_and_bcc_na",
+    "PMC9141984::web::014::3_1_test_cases_fcc_al_and_bcc_na",
+    "PMC9141984::web::015::3_1_test_cases_fcc_al_and_bcc_na",
+    "PMC9141984::web::016::3_2_high_entropy_alloy_vibrational_entro",
+    "PMC9141984::web::017::3_2_high_entropy_alloy_vibrational_entro",
+    "PMC9141984::web::018::3_2_high_entropy_alloy_vibrational_entro",
+    "PMC9141984::web::019::3_3_bcc_to_hcp_phase_transition_in_titan",
+    "PMC9141984::web::020::3_3_bcc_to_hcp_phase_transition_in_titan",
+    "PMC9141984::web::021::3_3_bcc_to_hcp_phase_transition_in_titan",
+    "PMC9141984::web::022::3_3_bcc_to_hcp_phase_transition_in_titan",
+    "PMC9141984::web::023::3_3_1_anharmonicity",
+    "PMC9141984::web::024::3_3_1_anharmonicity",
+    "PMC9141984::web::025::4_conclusions",
+    "TXT::doitpoms::phase3_diagrams/represent::001",
+    "TXT::mit_ocw::3-012-fundamentals-of-materials-science-fall-2005/lec16t::003",
+    "TXT::mit_ocw::3-012-fundamentals-of-materials-science-fall-2005/lec17t::004",
+    "TXT::mit_ocw::3-012-fundamentals-of-materials-science-fall-2005/lec21t::008",
+    "TXT::wikipedia::CALPHAD::000",
+    "TXT::wikipedia::Density_functional_theory::002",
+    "TXT::wikipedia::Density_functional_theory::009",
+    "TXT::wikipedia::Density_functional_theory::018",
+    "TXT::wikipedia::Hume-Rothery_rules::003",
+    "TXT::wikipedia::Molecular_dynamics::000",
+    "TXT::wikipedia::Molecular_dynamics::018",
+    "TXT::wikipedia::Molecular_dynamics::023",
+    "TXT::wikipedia::Phase_transition::007",
+    "TXT::wikipedia::Thermal_conductivity_and_resistivity::017",
+    "TXT::wikipedia::Thermal_conductivity_and_resistivity::029",
+    "TXT::wikipedia::Thermal_conductivity_and_resistivity::030"
+  ],
+  "cited_ids": [
+    "KG::deformations::653cbc2217",
+    "TXT::wikipedia::Molecular_dynamics::000"
+  ],
+  "cited_evidence": [
+    {
+      "record_id": "KG::deformations::653cbc2217",
+      "paper_id": "KG",
+      "publication_date": "2020-12-31",
+      "kind": "kg:cooccurrence",
+      "text": "Materials knowledge graph (MatKG, alloy abstracts before 2024): of the 254 most recent abstracts mentioning 'dynamics' and an alloy, 45 (18%) also mention 'deformations' (latest 2020)."
+    },
+    {
+      "record_id": "TXT::wikipedia::Molecular_dynamics::000",
+      "paper_id": "TXT::wikipedia::Molecular_dynamics",
+      "publication_date": "2023-12-21",
+      "kind": "text:wikipedia",
+      "text": "Molecular dynamics (MD) is a computer simulation method for analyzing the physical movements of atoms and molecules. The atoms and molecules are allowed to interact for a fixed period of time, giving a view of the dynamic \"evolution\" of the system. In the most common version, the trajectories of atoms and molecules are determined by numerically solving Newton's equations of motion for a system of interacting particles, where forces between the particles and their potential energies are often calculated using interatomic potentials or molecular mechanical force fields. The method is applied mostly in chemical physics, materials science, and biophysics. Because molecular systems typically consist of a vast number of particles, it is impossible to determine the properties of such complex systems analytically; MD simulation circumvents this problem by using numerical methods. However, long MD simulations are mathematically ill-conditioned, generating cumulative errors in numerical integration that can be minimized with proper selection of algorithms and parameters, but not eliminated. For systems that obey the ergodic hypothesis, the evolution of one molecular dynamics simulation may b"
+    }
+  ],
+  "audit": {
+    "temporal_violations": 0,
+    "test_paper_leaks": 0,
+    "family_leaks": 0,
+    "target_doi_or_title_leaks": 0,
+    "invalid_citations": 0
+  },
+  "target_free_asserted": true,
+  "trace": [
+    {
+      "role": "generator",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 38754,
+      "chars_out": 12258,
+      "seconds": 25.27
+    },
+    {
+      "role": "generator",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 45161,
+      "chars_out": 10745,
+      "seconds": 26.69
+    },
+    {
+      "role": "generator",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 48525,
+      "chars_out": 11786,
+      "seconds": 29.61
+    },
+    {
+      "role": "generator",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 49098,
+      "chars_out": 12107,
+      "seconds": 32.41
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 58460,
+      "chars_out": 5742,
+      "seconds": 28.48,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 59400,
+      "chars_out": 5762,
+      "seconds": 31.22,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 49251,
+      "chars_out": 6309,
+      "seconds": 41.62,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 54193,
+      "chars_out": 5583,
+      "seconds": 39.6,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "generator_revise",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 64400,
+      "chars_out": 12747,
+      "seconds": 36.87
+    },
+    {
+      "role": "generator",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 44015,
+      "chars_out": 12818,
+      "seconds": 32.95
+    },
+    {
+      "role": "generator_revise",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 60049,
+      "chars_out": 13296,
+      "seconds": 35.25
+    },
+    {
+      "role": "generator",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 50420,
+      "chars_out": 11691,
+      "seconds": 35.99
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 59489,
+      "chars_out": 5587,
+      "seconds": 58.0,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 55120,
+      "chars_out": 6073,
+      "seconds": 61.5,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 60300,
+      "chars_out": 5305,
+      "seconds": 60.84,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 56744,
+      "chars_out": 6147,
+      "seconds": 68.44,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "generator_revise",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 65036,
+      "chars_out": 12482,
+      "seconds": 29.17
+    },
+    {
+      "role": "generator_revise",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 61052,
+      "chars_out": 14330,
+      "seconds": 28.34
+    },
+    {
+      "role": "generator_revise",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 65696,
+      "chars_out": 13237,
+      "seconds": 32.13
+    },
+    {
+      "role": "generator",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 46924,
+      "chars_out": 11110,
+      "seconds": 35.69
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 59174,
+      "chars_out": 5833,
+      "seconds": 61.69,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 56321,
+      "chars_out": 6173,
+      "seconds": 38.57,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 56632,
+      "chars_out": 6331,
+      "seconds": 59.49,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 61944,
+      "chars_out": 6263,
+      "seconds": 58.83,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "generator_revise",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 62606,
+      "chars_out": 13280,
+      "seconds": 31.81
+    },
+    {
+      "role": "generator",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 49251,
+      "chars_out": 11491,
+      "seconds": 38.61
+    },
+    {
+      "role": "generator_revise",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 62857,
+      "chars_out": 14007,
+      "seconds": 39.08
+    },
+    {
+      "role": "generator",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 49743,
+      "chars_out": 10504,
+      "seconds": 27.27
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 58491,
+      "chars_out": 6277,
+      "seconds": 43.01,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 58879,
+      "chars_out": 6250,
+      "seconds": 49.87,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 58534,
+      "chars_out": 6051,
+      "seconds": 63.31,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 56309,
+      "chars_out": 6531,
+      "seconds": 68.95,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "generator_revise",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 64484,
+      "chars_out": 13138,
+      "seconds": 43.14
+    },
+    {
+      "role": "generator",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 52257,
+      "chars_out": 11115,
+      "seconds": 35.24
+    },
+    {
+      "role": "generator_revise",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 62420,
+      "chars_out": 11930,
+      "seconds": 28.36
+    },
+    {
+      "role": "generator_revise",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 62502,
+      "chars_out": 13312,
+      "seconds": 32.05
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 58349,
+      "chars_out": 5748,
+      "seconds": 38.06,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 61659,
+      "chars_out": 5877,
+      "seconds": 55.37,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 59960,
+      "chars_out": 5519,
+      "seconds": 55.66,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 55614,
+      "chars_out": 5768,
+      "seconds": 58.94,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "generator_revise",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 67683,
+      "chars_out": 13012,
+      "seconds": 43.98
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 63556,
+      "chars_out": 5734,
+      "seconds": 38.08,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "generator_revise",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 68939,
+      "chars_out": 14119,
+      "seconds": 26.26
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 64663,
+      "chars_out": 5649,
+      "seconds": 46.06,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "generator_revise",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 70498,
+      "chars_out": 13474,
+      "seconds": 21.47
+    },
+    {
+      "role": "critic",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 64018,
+      "chars_out": 5200,
+      "seconds": 31.08,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9089,
+      "chars_out": 1093,
+      "seconds": 12.65,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8392,
+      "chars_out": 1158,
+      "seconds": 17.54,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8951,
+      "chars_out": 1303,
+      "seconds": 21.99,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8210,
+      "chars_out": 1244,
+      "seconds": 31.43,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9089,
+      "chars_out": 1111,
+      "seconds": 21.2,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8392,
+      "chars_out": 1421,
+      "seconds": 25.99,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8951,
+      "chars_out": 1251,
+      "seconds": 22.05,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8210,
+      "chars_out": 1272,
+      "seconds": 14.66,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8357,
+      "chars_out": 1496,
+      "seconds": 42.97,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8971,
+      "chars_out": 1323,
+      "seconds": 31.77,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8611,
+      "chars_out": 1358,
+      "seconds": 37.42,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 7881,
+      "chars_out": 1337,
+      "seconds": 39.21,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8357,
+      "chars_out": 1234,
+      "seconds": 18.68,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8611,
+      "chars_out": 1260,
+      "seconds": 22.84,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8971,
+      "chars_out": 1268,
+      "seconds": 29.7,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 7881,
+      "chars_out": 1704,
+      "seconds": 30.58,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8628,
+      "chars_out": 1343,
+      "seconds": 15.63,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8539,
+      "chars_out": 1178,
+      "seconds": 26.5,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8972,
+      "chars_out": 1431,
+      "seconds": 27.7,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8972,
+      "chars_out": 1329,
+      "seconds": 12.28,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8628,
+      "chars_out": 1402,
+      "seconds": 26.94,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8539,
+      "chars_out": 1282,
+      "seconds": 16.99,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8581,
+      "chars_out": 1059,
+      "seconds": 65.67,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 7767,
+      "chars_out": 1564,
+      "seconds": 24.61,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9090,
+      "chars_out": 1150,
+      "seconds": 30.44,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8203,
+      "chars_out": 1274,
+      "seconds": 32.26,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8581,
+      "chars_out": 1208,
+      "seconds": 21.56,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 7767,
+      "chars_out": 1292,
+      "seconds": 24.97,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9090,
+      "chars_out": 1131,
+      "seconds": 26.73,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8682,
+      "chars_out": 1330,
+      "seconds": 25.86,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8203,
+      "chars_out": 1321,
+      "seconds": 43.84,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8682,
+      "chars_out": 988,
+      "seconds": 10.62,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 7819,
+      "chars_out": 1330,
+      "seconds": 10.82,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8583,
+      "chars_out": 1410,
+      "seconds": 14.34,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9008,
+      "chars_out": 1075,
+      "seconds": 14.87,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8529,
+      "chars_out": 1327,
+      "seconds": 18.32,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9008,
+      "chars_out": 1465,
+      "seconds": 17.54,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 7819,
+      "chars_out": 835,
+      "seconds": 21.89,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8529,
+      "chars_out": 1463,
+      "seconds": 15.68,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8583,
+      "chars_out": 1053,
+      "seconds": 23.13,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9026,
+      "chars_out": 1237,
+      "seconds": 17.05,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8500,
+      "chars_out": 1260,
+      "seconds": 16.85,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8622,
+      "chars_out": 1449,
+      "seconds": 21.4,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8375,
+      "chars_out": 1082,
+      "seconds": 23.8,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9026,
+      "chars_out": 1166,
+      "seconds": 15.65,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8622,
+      "chars_out": 1110,
+      "seconds": 17.77,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8375,
+      "chars_out": 1397,
+      "seconds": 15.73,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8500,
+      "chars_out": 1463,
+      "seconds": 46.88,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8660,
+      "chars_out": 1123,
+      "seconds": 18.09,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9012,
+      "chars_out": 1167,
+      "seconds": 21.97,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8931,
+      "chars_out": 1116,
+      "seconds": 23.74,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8325,
+      "chars_out": 1201,
+      "seconds": 28.36,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9012,
+      "chars_out": 1391,
+      "seconds": 19.78,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8931,
+      "chars_out": 1077,
+      "seconds": 22.05,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8660,
+      "chars_out": 1137,
+      "seconds": 28.29,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8325,
+      "chars_out": 1257,
+      "seconds": 25.01,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8023,
+      "chars_out": 1087,
+      "seconds": 16.22,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9068,
+      "chars_out": 1262,
+      "seconds": 13.94,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8068,
+      "chars_out": 1141,
+      "seconds": 20.11,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8375,
+      "chars_out": 1243,
+      "seconds": 15.72,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8023,
+      "chars_out": 1528,
+      "seconds": 22.24,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9068,
+      "chars_out": 1185,
+      "seconds": 24.99,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8375,
+      "chars_out": 999,
+      "seconds": 27.14,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8068,
+      "chars_out": 1352,
+      "seconds": 36.17,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8419,
+      "chars_out": 1530,
+      "seconds": 21.58,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8659,
+      "chars_out": 1267,
+      "seconds": 24.81,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9016,
+      "chars_out": 1471,
+      "seconds": 24.96,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8280,
+      "chars_out": 1374,
+      "seconds": 28.02,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9016,
+      "chars_out": 1594,
+      "seconds": 20.12,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8419,
+      "chars_out": 1198,
+      "seconds": 24.33,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8280,
+      "chars_out": 1166,
+      "seconds": 19.4,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8659,
+      "chars_out": 1342,
+      "seconds": 23.88,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8822,
+      "chars_out": 1225,
+      "seconds": 16.23,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8449,
+      "chars_out": 1270,
+      "seconds": 20.06,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8525,
+      "chars_out": 1239,
+      "seconds": 20.25,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8292,
+      "chars_out": 1285,
+      "seconds": 25.95,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8822,
+      "chars_out": 1144,
+      "seconds": 14.65,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8525,
+      "chars_out": 1094,
+      "seconds": 19.73,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8449,
+      "chars_out": 1253,
+      "seconds": 26.45,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8292,
+      "chars_out": 1198,
+      "seconds": 27.16,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8932,
+      "chars_out": 1000,
+      "seconds": 15.05,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8900,
+      "chars_out": 1209,
+      "seconds": 16.96,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8971,
+      "chars_out": 1515,
+      "seconds": 17.16,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8583,
+      "chars_out": 1335,
+      "seconds": 24.98,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8932,
+      "chars_out": 1182,
+      "seconds": 29.51,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8900,
+      "chars_out": 1530,
+      "seconds": 27.92,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8971,
+      "chars_out": 1144,
+      "seconds": 29.13,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8583,
+      "chars_out": 1139,
+      "seconds": 26.16,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8660,
+      "chars_out": 1212,
+      "seconds": 22.7,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8628,
+      "chars_out": 1394,
+      "seconds": 23.93,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8699,
+      "chars_out": 1736,
+      "seconds": 25.12,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8977,
+      "chars_out": 1336,
+      "seconds": 23.76,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8628,
+      "chars_out": 1294,
+      "seconds": 14.71,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8699,
+      "chars_out": 1334,
+      "seconds": 18.56,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8977,
+      "chars_out": 1380,
+      "seconds": 15.28,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 8660,
+      "chars_out": 1207,
+      "seconds": 23.34,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9048,
+      "chars_out": 1281,
+      "seconds": 17.07,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9016,
+      "chars_out": 1153,
+      "seconds": 19.28,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9048,
+      "chars_out": 1021,
+      "seconds": 14.47,
+      "reasoning_effort": "high"
+    },
+    {
+      "role": "narrow",
+      "model": "o3-mini_2025-01-31",
+      "chars_in": 9016,
+      "chars_out": 1207,
+      "seconds": 15.2,
+      "reasoning_effort": "high"
+    }
+  ],
+  "llm_calls": 146,
+  "notes": {
+    "papers": [
+      {
+        "paper": "PMC9141984",
+        "title": "Vibrational Entropy of Crystalline Solids from Covariance of Atomic Displacements.",
+        "grade": 3,
+        "paper_chars": 29467,
+        "background": {
+          "texts": 6,
+          "kg_facts": 8
+        },
+        "rounds": [
+          {
+            "round": 1,
+            "verdicts": [
+              {
+                "intervention": "Replace full, long AIMD trajectory sampling with a protocol that uses shorter trajectories to compute covariance matrices and then reconstructs the full many-bo",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "To address the flaw, include a requirement that the shortened trajectory length must be calibrated so that convergence of low-frequency modes (and hence covariance eigenvalues) is explicitly verified against full-length simulations."
+              },
+              {
+                "intervention": "Perform full AIMD (or covariance-based) free-energy calculations at a sparse set of temperatures near the fusion regime to extract effective vibrational frequen",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "It would help to qualify the method further by specifying that additional sampling near any non‐monotonic or phase‐change regions is required to ensure the interpolation remains accurate."
+              },
+              {
+                "intervention": "Develop and train a machine learning (ML) potential using a small set of AIMD trajectories that captures atomic displacements, vibrational correlations, and ele",
+                "sound": false,
+                "testable": false,
+                "beyond_paper": false,
+                "fix": ""
+              }
+            ]
+          }
+        ],
+        "n_rounds": 1,
+        "n_accepted": 1
+      },
+      {
+        "paper": "PMC7512484",
+        "title": "About the Reliability of CALPHAD Predictions in Multicomponent Systems.",
+        "grade": 3,
+        "paper_chars": 23239,
+        "background": {
+          "texts": 6,
+          "kg_facts": 4
+        },
+        "rounds": [
+          {
+            "round": 1,
+            "verdicts": [
+              {
+                "intervention": "Develop an ML potential trained on DFT data for both solid and liquid phases augmented by periodic recalibration steps that explicitly compute electron–vibratio",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "To address this flaw, the design should incorporate larger calibration cells or a multi‐scale coupling scheme that ensures non‐local electron–vibration interactions are adequately represented in the ML corrections."
+              },
+              {
+                "intervention": "Introduce a metadynamics bias along a suitable order parameter (for example, a measure of long-range order or coordination environment) that discriminates betwe",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "No major fix is needed; however, the hypothesis should explicitly justify the selection of its collective variable in the context of capturing any subtle vibrational entropy or electron–vibration coupling effects."
+              },
+              {
+                "intervention": "Partition the overall system into smaller, statistically representative clusters. For each cluster, perform accurate free-energy calculations using explicit ab ",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "A more robust version should include an explicit treatment of inter-cluster couplings or corrections to capture long-range interactions, possibly by validating the additivity assumption in benchmark systems."
+              }
+            ]
+          }
+        ],
+        "n_rounds": 1,
+        "n_accepted": 1
+      },
+      {
+        "paper": "PMC7704029",
+        "title": "Hamiltonian-Reservoir Replica Exchange and Machine Learning Potentials for Computational Organic Chemistry.",
+        "grade": 2,
+        "paper_chars": 28884,
+        "background": {
+          "texts": 6,
+          "kg_facts": 8
+        },
+        "rounds": [
+          {
+            "round": 1,
+            "verdicts": [
+              {
+                "intervention": "Adopt a methodological framework where a low-cost semiempirical potential is corrected by a Δ-ML model (trained to reproduce ab initio energies) and used within",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Adapt the approach by addressing periodic boundary conditions, electronic structure peculiar to metals, and provide a clear rationale (and preliminary validation) for partitioning the reservoir into solid and fluid basins in high-entropy alloys."
+              },
+              {
+                "intervention": "Develop and deploy a metadynamics simulation where the underlying potential is a semiempirical Hamiltonian corrected by a Δ-ML model. Use dynamically updated bi",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Include preliminary validation studies for choosing robust collective variables in metallic systems and explicitly justify how the adaptive bias will capture the complex electron–vibration and anharmonic effects during solid–liquid transitions."
+              },
+              {
+                "intervention": "Divide the free energy calculation into two regimes by constructing two tailored reservoirs: one for the solid phase (with emphasis on capturing low-frequency a",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Provide a clear protocol for defining order parameters that distinctly classify solid and liquid states, validate the reliability of phase partitioning, and outline the reweighting methodology to ensure a continuous and accurate free energy reconstruction across phases."
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "verdicts": [
+              {
+                "intervention": "Replace the standard organic-molecule Δ-ML correction with one developed using local, periodic descriptors (e.g., graph-based or atom-centered symmetry function",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Incorporate descriptors and potential formulations that explicitly account for long-range electronic effects and delocalized bonding typical of metallic systems, possibly drawing on literature for ML potentials in metals."
+              },
+              {
+                "intervention": "Begin with a low-cost semiempirical MD simulation and an initial Δ-ML correction trained on a modest dataset. During the MD run, monitor the prediction uncertai",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Adopt an ML framework that inherently quantifies uncertainty—such as Gaussian process regression or ensemble methods—and validate this approach on simpler systems before applying it to high-entropy alloys."
+              },
+              {
+                "intervention": "Train a differentiable neural network potential on a semiempirical baseline corrected by Δ-ML data which is designed to output accurate forces. Use this ML pote",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Develop and validate a quantitative mapping between transport properties (derived from VDOS and Green–Kubo analysis) and free energy differences, preferably starting with simpler systems to establish the required thermodynamic relationships before applying it to complex alloys."
+              }
+            ]
+          },
+          {
+            "round": 3,
+            "verdicts": [
+              {
+                "intervention": "Replace the baseline semiempirical potential by augmenting it with an MPNN-based Δ-ML correction that uses descriptors incorporating distance-dependent message ",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Explicitly detail how the MPNN architecture will incorporate metallic-specific descriptors (e.g., Fourier or embedded-atom features) and periodic boundary conditions to capture long-range interactions and delocalized electron effects before applying it to HEAs."
+              },
+              {
+                "intervention": "Begin simulations with a low-cost semiempirical MD and an initial Δ‐ML correction based on a Gaussian process regression model. Continuously monitor the predict",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Provide a detailed calibration strategy for setting the GPR uncertainty threshold—possibly starting with simpler benchmark systems—to ensure that no critical phase transition regions are overlooked during the adaptive updates."
+              },
+              {
+                "intervention": "Train an ML potential using Δ‐ML corrections (derived from a semiempirical baseline to ab initio target energies) that is enhanced with local vibrational mode i",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Consider adopting or developing an ML potential that directly learns forces (for example, via gradient-domain machine learning) instead of relying on potentially unreliable local mode decomposition, and validate this approach on simpler systems before its application to the complex environment of HE"
+              }
+            ]
+          }
+        ],
+        "n_rounds": 3,
+        "n_accepted": 1
+      },
+      {
+        "paper": "PMC8367938",
+        "title": "Energy-entropy method using multiscale cell correlation to calculate binding free energies in the SAMPL8 host-guest challenge.",
+        "grade": 2,
+        "paper_chars": 26058,
+        "background": {
+          "texts": 6,
+          "kg_facts": 8
+        },
+        "rounds": [
+          {
+            "round": 1,
+            "verdicts": [
+              {
+                "intervention": "Augment explicit ab initio MD with a machine-learning model trained on a limited set of ab initio or EE-MCC computed free-energy components, and use the surroga",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Revise the hypothesis to either target solution-phase binding scenarios similar to the paper or provide rigorous theoretical and preliminary empirical support for extending the EE-MCC framework (and its ML surrogate) to model fusion free energies and incorporate electron–vibration coupling."
+              },
+              {
+                "intervention": "Begin with a coarse-grained representation (e.g., united-atom or bead-spring model inspired by the multiscale partitioning in EE-MCC) to sample large configurat",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Either align the targeted material system with the host–guest solvation context of the paper or provide explicit rationale and supporting preliminary data for applying a coarse-grained plus ab initio correction scheme to elemental/binary alloys near their melting points."
+              },
+              {
+                "intervention": "Perform density functional theory (DFT)-based quasi-harmonic free energy evaluations at a series of temperatures below the fusion point. Then, apply perturbativ",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Incorporate intermediate validation steps at temperatures approaching the melting point and bolster the calibration procedure to verify that the low-temperature scaling laws can reliably capture the highly anharmonic behavior near fusion."
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "verdicts": [
+              {
+                "intervention": "Integrate a vibrational mode classifier into the EE-MCC methodology that uses, for example, variance thresholds or low-cost static calculations to partition vib",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Explicitly define and validate the criteria (such as variance or fluctuation thresholds) for classifying vibrational modes as harmonic versus anharmonic to ensure robust application."
+              },
+              {
+                "intervention": "Replace extensive MD sampling for the solid with static DFT-based phonon calculations (to obtain the harmonic free energy) and apply targeted MCC corrections on",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Include detailed validation procedures for the sparse MD corrections in the solid state and clarify the perturbative matching scheme between phases to ensure consistency especially close to the melting point."
+              },
+              {
+                "intervention": "A two-step approach: First, perform static DFT calculations to determine force constants and electron–vibration coupling constants for key vibrational modes in ",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Instead of relying on a single, interpolated correction factor, incorporate dynamic DFT sampling over multiple temperatures or configurations to capture the complex, temperature-dependent behavior of electron–vibration interactions more accurately."
+              }
+            ]
+          }
+        ],
+        "n_rounds": 2,
+        "n_accepted": 2
+      },
+      {
+        "paper": "PMC10569033",
+        "title": "Estimating Free Energy Barriers for Heterogeneous Catalytic Reactions with Machine Learning Potentials and Umbrella Integration.",
+        "grade": 2,
+        "paper_chars": 29200,
+        "background": {
+          "texts": 6,
+          "kg_facts": 8
+        },
+        "rounds": [
+          {
+            "round": 1,
+            "verdicts": [
+              {
+                "intervention": "Develop a machine-learning interatomic potential initially trained on lower-complexity (elemental/binary) systems and then refined on a sparse set of ab initio ",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Incorporate direct ab initio sampling from the high‐entropy alloy system into the training regimen to capture its unique configurational complexity rather than relying solely on transfer learning from simpler elemental or binary systems."
+              },
+              {
+                "intervention": "Employ an iterative ML framework to predict the derivative of the free energy (dF/dξ) with respect to a carefully chosen low-dimensional collective variable (ξ)",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Introduce a preliminary analysis to verify the smoothness and unimodality of the free energy landscape in the fusion regime, or adapt the ML method to handle potential discontinuities and multimodal features."
+              },
+              {
+                "intervention": "Compute the free energy of the solid state using a quasi-harmonic approximation based on vibrational mode analysis (which is computationally efficient), and eva",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Either validate the applicability of QHA for the specific solid under near-fusion conditions or incorporate anharmonic corrections (possibly via short ML-driven MD sampling) for the solid phase as well."
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "verdicts": [
+              {
+                "intervention": "Develop an ML potential training scheme that does not rely solely on transfer learning from elemental or binary systems. Instead, initiate training with a modes",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Include preliminary AIMD studies on simpler high‐entropy alloy systems at elevated temperatures to validate that the active learning strategy captures the required configurational diversity, and adjust the training protocol to account for the much larger phase space and potential sampling limitation"
+              },
+              {
+                "intervention": "Implement an ML model that uses a mixture density network (MDN) to predict the probability distribution of free energy derivatives along a chosen low-dimensiona",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Strengthen the proposal by incorporating an explicit clustering or branch-identification method to robustly segment the CV space, ensuring that the multi-branch framework is grounded on clear structural distinctions."
+              },
+              {
+                "intervention": "For the solid phase, apply a low-order anharmonic phonon perturbation theory (capturing third-order effects) rather than a pure quasi-harmonic approximation. Fo",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Augment the approach with systematic benchmarking of anharmonic phonon perturbation theory on simpler known systems near melting, and consider incorporating higher-order corrections or alternative methods to ensure that the solid free energy is accurately captured before integrating with the liquid-"
+              }
+            ]
+          }
+        ],
+        "n_rounds": 2,
+        "n_accepted": 1
+      },
+      {
+        "paper": "PMC11701358",
+        "title": "The Operando Nature of Isobutene Adsorbed in Zeolite H-SSZ-13 Unraveled by Machine Learning Potentials Beyond DFT Accuracy.",
+        "grade": 2,
+        "paper_chars": 26438,
+        "background": {
+          "texts": 6,
+          "kg_facts": 0
+        },
+        "rounds": [
+          {
+            "round": 1,
+            "verdicts": [
+              {
+                "intervention": "Train a graph neural network (GNN) potential on extensive low-level DFT data for both phases and then augment it using delta (ΔE) corrections learned from a lim",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Remove or adequately justify the explicit inclusion of electron–vibration coupling in the delta‐learning scheme for fusion processes, and provide preliminary evidence or theoretical support that the approach can reliably extend to the bulk solid–liquid transition in multicomponent systems."
+              },
+              {
+                "intervention": "Implement an active learning scheme that identifies and focuses on the regions of phase space with strongly anharmonic vibrational modes, using a pretrained ML ",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Provide preliminary demonstrations or a more detailed theoretical rationale that active learning can selectively target anharmonic vibrational modes near melting, or narrow the scope to systems where such targeted sampling has been previously validated."
+              },
+              {
+                "intervention": "Couple a state-of-the-art ML potential (trained on low-level DFT data) with a perturbative correction module that, during MD sampling, computes electron–vibrati",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Before integrating on‐the‐fly electron–vibration corrections, include benchmark studies that demonstrate the ML approach’s ability to capture electron–vibration interactions in simpler systems, or scale back the claim to systems where such corrections have already shown promise."
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "verdicts": [
+              {
+                "intervention": "Train a graph neural network potential on large-scale low-level DFT (PBE-D3) data for both the solid and liquid states and then augment its predictions with a d",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Include a detailed sensitivity analysis to determine the number of high‐level evaluations needed to capture anharmonic vibrations across the full phonon spectrum in bulk systems and consider mode‐selective corrections rather than assuming a similar sparse sampling will suffice."
+              },
+              {
+                "intervention": "Implement an active-learning algorithm that monitors the vibrational density of states (or other suitable vibrational descriptors) during low-level MD simulatio",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Clarify and specify the criteria or descriptors (e.g., deviations in the vibrational density of states via Fourier analysis of velocity autocorrelations) that will be used to flag anharmonic modes, and provide preliminary validation on simpler systems to support this approach."
+              },
+              {
+                "intervention": "Develop an ML-based free energy workflow where a pretrained ML potential (initially trained on low-level DFT data) is enhanced by on-the-fly sparse evaluations ",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Replace direct high-level curvature evaluations with an indirect estimation method, such as finite difference approximations derived from ML-predicted forces, or train an auxiliary surrogate model to approximate curvature corrections without requiring explicit second derivative calculations at the h"
+              }
+            ]
+          },
+          {
+            "round": 3,
+            "verdicts": [
+              {
+                "intervention": "Perform a Fourier transform analysis of velocity autocorrelation functions (or other vibrational diagnostics) from low-level AIMD or ML potential trajectories t",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Tie the pre‐screening more explicitly to system‐specific anharmonic behavior by calibrating the harmonicity threshold using benchmark studies on the target alloy systems, ensuring that the correction is linked to known vibrational anomalies in fusion processes."
+              },
+              {
+                "intervention": "Integrate an anharmonicity descriptor—such as deviations in instantaneous vibrational frequencies obtained from a wavelet or Fourier analysis of velocity autoco",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Provide a justification for the choice of the anharmonicity descriptor by including preliminary data or literature support for its effectiveness in isolating critical anharmonic regions, and refine the threshold based on system‐specific vibrational studies rather than generic Fourier analysis alone."
+              },
+              {
+                "intervention": "Construct a two-tiered ML framework in which the primary ML potential is trained on low-level DFT data, and a secondary surrogate model is simultaneously traine",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Enhance the proposal by incorporating system-specific calibration studies that verify the correlation between low-level finite-difference Hessians and the desired high-level curvature corrections, ensuring that the surrogate is valid in the targeted anharmonic fusion regime."
+              }
+            ]
+          },
+          {
+            "round": 4,
+            "verdicts": [
+              {
+                "intervention": "Run low-level AIMD/ML potential simulations to sample the full phase space over a wide temperature range and identify configurations with high uncertainty and u",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Clarify and validate the specific criteria and algorithms for reliably identifying interfacial configurations in multicomponent alloy systems so that the selective high-level sampling is robust."
+              },
+              {
+                "intervention": "Divide the temperature range into clusters (e.g., below, near, and above the melting point) based on preliminary low-level AIMD/ML potential simulations. Within",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Include a sensitivity analysis for the choice and number of temperature clusters and provide additional justification for the model’s applicability in systems where the free energy deviates abruptly due to melting."
+              },
+              {
+                "intervention": "Decompose the total free energy obtained from low-level MD or ML potential simulations into distinct contributions: a harmonic vibrational part (which can be re",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Perform a preliminary validation to ensure that deviations in the vibrational DOS correlate quantitatively with anharmonic free energy contributions and consider potential non-additive effects between harmonic and anharmonic parts."
+              }
+            ]
+          }
+        ],
+        "n_rounds": 4,
+        "n_accepted": 2
+      },
+      {
+        "paper": "PMC6820750",
+        "title": "High Entropy Alloys Mined From Binary Phase Diagrams.",
+        "grade": 2,
+        "paper_chars": 29284,
+        "background": {
+          "texts": 6,
+          "kg_facts": 4
+        },
+        "rounds": [
+          {
+            "round": 1,
+            "verdicts": [
+              {
+                "intervention": "Replace explicit ab initio molecular dynamics free energy evaluations with a surrogate potential whose pairwise interactions (e.g. effective potentials) are der",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "To improve this hypothesis, include a dedicated calibration step showing that binary phase diagram descriptors quantitatively correlate with free energy surfaces (e.g., through a pilot study), and explicitly outline how many‐body interactions and vibrational effects are incorporated into the ML corr"
+              },
+              {
+                "intervention": "Replace long-timescale AIMD by (1) performing static DFT calculations at Tpf approximately 0.8 Tm to capture the electronic free energy, and (2) incorporating v",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Clarify and justify the connection between binary phase diagram features and anharmonic vibrational corrections by providing preliminary data or theoretical reasoning, or alternatively, separate the calibration of static DFT free energies from that of vibrational contributions."
+              },
+              {
+                "intervention": "Train a regression ML model using descriptors such as binary phase field percentages (PFPX), phase separation parameters (PSP), and other binary interaction met",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Incorporate additional descriptors that account for vibrational, anharmonic, and electronic free energy contributions, or provide evidence that the binary descriptors correlate strongly with fusion free energy data before relying on them exclusively for regression."
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "verdicts": [
+              {
+                "intervention": "Replace costly AIMD free energy evaluations with a surrogate force field built from effective pair potentials initially guided by binary phase field percentages",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Provide preliminary studies or literature evidence that static DFT free energy curvature evaluations can reliably capture vibrational, anharmonic, and electron–vibration effects to justify their use in calibrating surrogate potentials."
+              },
+              {
+                "intervention": "Implement a two-step free energy method: first, compute static free energies using quasi-harmonic approximations (QHA) from DFT-calculated phonon spectra at Tpf",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Include either preliminary correlation data or theoretical justification linking features from binary phase diagrams to the parameters governing anharmonic corrections, or propose additional measurements to validate this connection."
+              },
+              {
+                "intervention": "Develop and train an ML regression framework that uses a concatenated descriptor set: (1) binary phase diagram–derived descriptors (e.g., PFPX, PSP) for qualita",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "To strengthen the hypothesis, incorporate additional dynamical descriptors or adjust the temperature range to regions where the quasi-harmonic approximation remains valid, ensuring that the model accounts for the missing anharmonicity effects."
+              }
+            ]
+          },
+          {
+            "round": 3,
+            "verdicts": [
+              {
+                "intervention": "Run long-timescale classical MD simulations using a well‐parameterized empirical potential. At adaptive intervals, identify key snapshots for which free energy ",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Include a theoretical justification or preliminary benchmark studies that demonstrate a correlation between the binary phase diagram parameters and the necessary AIMD corrections for vibrational entropy, anharmonicity, and electron–vibration coupling near fusion."
+              },
+              {
+                "intervention": "Perform static DFT calculations to compute the vibrational density of states (DOS) for representative alloy compositions in both solid and liquid states. From t",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Incorporate quasi‐harmonic or explicit anharmonic corrections into the vibrational DOS analysis and provide benchmark validations showing that the extracted DOS moments reliably correlate with the full dynamic free energy evaluations near fusion."
+              },
+              {
+                "intervention": "Generate a large dataset of free energy values via fast classical MD simulations using an empirical potential, which, though lower in fidelity, captures broad t",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Clarify the methodology by detailing how binary phase diagram descriptors will be integrated within the GP model and provide initial performance benchmarks across a diverse set of alloys to reinforce the model’s generality."
+              }
+            ]
+          }
+        ],
+        "n_rounds": 3,
+        "n_accepted": 1
+      },
+      {
+        "paper": "PMC11275555",
+        "title": "Ab initio framework for deciphering trade-off relationships in multi-component alloys.",
+        "grade": 2,
+        "paper_chars": 29419,
+        "background": {
+          "texts": 6,
+          "kg_facts": 4
+        },
+        "rounds": [
+          {
+            "round": 1,
+            "verdicts": [
+              {
+                "intervention": "Develop a hybrid free-energy evaluation workflow that uses active-learning trained moment tensor potentials (MLIPs) with stratified (temperature-windowed) sampl",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Include validation of MLIP performance in high-temperature, anharmonic regimes by extending the training set to include configurations near the melting point and directly comparing free-energy integration results with high-fidelity AIMD benchmarks."
+              },
+              {
+                "intervention": "Run long MLIP-based molecular dynamics to map the free energy landscape and then perform short, strategically timed AIMD simulations at representative state poi",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Clarify the expected magnitude of the perturbative corrections and specify the regime where these corrections are indeed small, potentially by including preliminary studies that quantify the deviation of MLIP predictions from full AIMD results in representative systems."
+              },
+              {
+                "intervention": "Integrate a VBA model fitted to elemental and binary alloy data (as described in the paper) with MLIP simulations. Use the VBA to provide analytic estimates of ",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Provide theoretical justification or pilot study results that demonstrate the feasibility of extending VBA to compute vibrational entropy and anharmonic corrections, or consider a hybrid model that combines conventional phonon calculations with VBA insights."
+              }
+            ]
+          }
+        ],
+        "n_rounds": 1,
+        "n_accepted": 1
+      },
+      {
+        "paper": "PMC10855459",
+        "title": "Implementation and Validation of an OpenMM Plugin for the Deep Potential Representation of Potential Energy.",
+        "grade": 2,
+        "paper_chars": 29757,
+        "background": {
+          "texts": 6,
+          "kg_facts": 8
+        },
+        "rounds": [
+          {
+            "round": 1,
+            "verdicts": [
+              {
+                "intervention": "Augment the training data of the DP model by including targeted high-temperature ab initio MD snapshots from both solid and liquid phases near fusion conditions",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Include preliminary validation experiments over systems near the melting point to ascertain that transfer learning with a modest high-temperature AIMD dataset reliably captures anharmonic and entropy contributions, and clarify the range of validity for the modified DP model."
+              },
+              {
+                "intervention": "Combine the deep potential (DP) model with an enhanced sampling method (e.g., metadynamics or umbrella sampling) to rapidly traverse the free-energy landscape a",
+                "sound": false,
+                "testable": false,
+                "beyond_paper": false,
+                "fix": ""
+              },
+              {
+                "intervention": "Utilize the DP model to perform MD simulations at a set of strategically chosen temperatures along the fusion path, and apply thermodynamic integration (TI) to ",
+                "sound": false,
+                "testable": false,
+                "beyond_paper": false,
+                "fix": ""
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "verdicts": [
+              {
+                "intervention": "Augment the deep potential (DP) model training dataset with a dense collection of high-temperature AIMD snapshots specifically sampled near the fusion point. Th",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Clarify the specific modifications to the neural network descriptors that will be implemented to capture anharmonic vibrational features uniquely near the fusion point."
+              },
+              {
+                "intervention": "Perform DP-based MD simulations to sample the free energy landscape extensively and, in parallel, carry out a limited number of high-fidelity AIMD simulations a",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Provide additional justification or preliminary data to support that the DP model’s errors in the high-energy, phase-transition region behave in a sufficiently systematic and smooth manner for sparse Bayesian correction to be effective."
+              },
+              {
+                "intervention": "Employ thermodynamic integration (TI) along an adiabatic temperature path using DP-based MD simulations at a minimal number of strategically chosen temperature ",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Detail the methodology for the rapid vibrational analysis and specify which descriptors or algorithms will be used to compute the adaptive corrections during the thermodynamic integration process."
+              }
+            ]
+          }
+        ],
+        "n_rounds": 2,
+        "n_accepted": 3
+      },
+      {
+        "paper": "PMC10058552",
+        "title": "Combining Machine Learning and Molecular Dynamics to Predict Mechanical Properties and Microstructural Evolution of FeNiCrCoCu High-Entropy Alloys.",
+        "grade": 2,
+        "paper_chars": 29913,
+        "background": {
+          "texts": 6,
+          "kg_facts": 8
+        },
+        "rounds": [
+          {
+            "round": 1,
+            "verdicts": [
+              {
+                "intervention": "Develop and train a machine learning interatomic potential using a sparse set of high-fidelity ab initio MD calculations (at selected temperatures and critical ",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Refine the hypothesis by limiting the claim to reproducing vibrational and anharmonic free‐energy contributions, or include a plan to explicitly validate the inclusion of electron–vibration effects against known ab initio benchmarks."
+              },
+              {
+                "intervention": "Replace continuous AIMD sampling with a two-stage approach: (1) calculate a baseline free-energy for the solid and liquid phases using static DFT methods with h",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Either restrict the application of the static-perturbative method to the solid phase or modify the approach to employ a more appropriate reference state for liquids, such as using a thermodynamic integration starting from a liquid reference system."
+              },
+              {
+                "intervention": "Implement a data-driven reduction of the vibrational phase space: (1) perform short ab initio MD runs to collect vibrational mode data; (2) apply PCA or similar",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Restrict the dimensionality reduction strategy to the ordered solid phase where vibrational modes are better defined, or develop a tailored method for handling the disordered vibrational spectra of liquids to ensure critical free-energy contributions are not lost."
+              }
+            ]
+          },
+          {
+            "round": 2,
+            "verdicts": [
+              {
+                "intervention": "Perform static DFT calculations on the solid phase using a QHA to obtain baseline vibrational free energy, and then gather a limited set of ab initio MD snapsho",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Incorporate anharmonic corrections or restrict the QHA application to temperature regimes where harmonic behavior remains valid; validate the QHA for the solid phase near fusion with benchmark tests."
+              },
+              {
+                "intervention": "Deploy an active learning algorithm to monitor a short ab initio MD (or AIMD) trajectory. The active learning model flags high-information configurations (for e",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Include a detailed sensitivity analysis of the active learning criteria and cross-validation with full sampling to ensure that rare yet impactful configurations are not overlooked."
+              },
+              {
+                "intervention": "For the solid, extract dominant vibrational modes using standard normal mode analysis or PCA on a short ab initio MD run where the vibrational modes are well de",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Provide benchmark tests and theoretical justification that demonstrate the dominant vibrational modes in the solid and the adequacy of stochastic sampling in the liquid to ensure that key free‐energy contributions are not omitted."
+              }
+            ]
+          },
+          {
+            "round": 3,
+            "verdicts": [
+              {
+                "intervention": "Replace the quasi‐harmonic approximation (QHA) in the solid with a self‐consistent anharmonic phonon method (e.g. using the self-consistent harmonic approximati",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "To improve the hypothesis, explicitly incorporate how the local chemical disorder in HEAs affects anharmonic phonon behavior and electron–vibration coupling, thereby tailoring the SCHA and ML surrogate specifically to the complex energy landscape of FeNiCrCoCu."
+              },
+              {
+                "intervention": "Implement an ensemble active learning algorithm integrated with uncertainty quantification across multiple ML models. Run short ab initio MD simulations that in",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Refine the hypothesis by providing a rationale for how the active learning ensemble will specifically capture the diverse and rare high-uncertainty configurations arising from the chemical complexity of HEAs."
+              },
+              {
+                "intervention": "Develop a two-stage free-energy integration approach: (1) In the solid phase, perform a principal component analysis (PCA) or normal mode decomposition on short",
+                "sound": false,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "Strengthen the hypothesis by explicitly linking the reduced-order methods to known challenges in HEAs—such as non-uniform vibrational modes due to chemical disorder—and by detailing how the ML force-matching will capture electron–vibration effects that are particularly critical in such complex alloy"
+              }
+            ]
+          },
+          {
+            "round": 4,
+            "verdicts": [
+              {
+                "intervention": "Extend the self‐consistent harmonic approximation (SCHA) by integrating a local cluster expansion that explicitly averages over the disordered chemical environm",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "N/A"
+              },
+              {
+                "intervention": "Perform extensive low-fidelity classical MD simulations (using well-parameterized interatomic potentials that capture basic vibrational behavior) over the entir",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "N/A"
+              },
+              {
+                "intervention": "Run extensive classical MD simulations to obtain baseline free-energy estimates for both phases. Simultaneously, compute a sparse dataset of short ab initio MD ",
+                "sound": true,
+                "testable": true,
+                "beyond_paper": true,
+                "fix": "N/A"
+              }
+            ]
+          }
+        ],
+        "n_rounds": 4,
+        "n_accepted": 3
+      }
+    ],
+    "summary": {
+      "papers": 10,
+      "papers_with_accepted": 10,
+      "accepted": 16,
+      "pool_after_dedupe": 16,
+      "rounds": [
+        1,
+        1,
+        3,
+        2,
+        2,
+        4,
+        3,
+        1,
+        2,
+        4
+      ],
+      "accepted_round_1": 3
+    },
+    "tournament": {
+      "format": "swiss+round_robin",
+      "swiss_points": [
+        0.5,
+        2.0,
+        3.5,
+        1.5,
+        2.0,
+        2.0,
+        2.5,
+        2.0,
+        3.5,
+        3.0,
+        2.0,
+        2.5,
+        2.0,
+        3.5,
+        4.0,
+        3.5
+      ],
+      "final_points": [
+        3.0,
+        2.5,
+        2.0,
+        1.5,
+        1.0
+      ],
+      "rank1_tied": false
+    },
+    "top3": [
+      {
+        "paper": "PMC10058552",
+        "round": 4,
+        "builds_on": "the paper’s demonstration of ML’s ability to accelerate materials property predictions, extending it to a multi-fidelity free-energy integration framework that specifically captures complex anharmonic and electron–vibration effects.",
+        "what_is_new": "This approach uniquely blends large-scale classical MD with targeted high-fidelity ab initio corrections via an uncertainty-aware ML model, focusing on the complex free-energy contributions in HEAs—a strategy not explored in the original work.",
+        "fields": {
+          "hypothesis": "A multi-fidelity free-energy integration strategy that dynamically couples coarse-grained classical MD with selective high-fidelity ab initio corrections by using physically informed ML to capture the complex anharmonic and electron–vibration effects in both phases.",
+          "material_initial_state": "Multicomponent HEAs (e.g., FeNiCrCoCu) modeled in both the ordered solid regime and the disordered liquid regime near the melting transition.",
+          "intervention": "Perform extensive low-fidelity classical MD simulations (using well-parameterized interatomic potentials that capture basic vibrational behavior) over the entire free-energy landscape in both solid and liquid phases. Augment these with sparse high-fidelity ab initio MD simulations that are selectively triggered based on regions of high uncertainty in an ensemble ML model. Use the ML model to learn correction terms that account for anharmonic contributions and electron–vibration coupling, thereby providing a multi-fidelity fusion of data for accurate free-energy integration.",
+          "conditions": "The approach is applicable over the temperature range near fusion, especially where standard potentials miss subtle anharmonic effects. It is best suited to systems with compositional complexity (like five-element HEAs) where full high-fidelity sampling is prohibitively expensive.",
+          "structural_mediator": "The ensemble ML model mediates the linkage between low- and high-fidelity datasets, flagging and correcting regions where coarse-grained MD discrepancies are significant due to complex local behavior.",
+          "mechanism": "The coarse-grained MD captures the broad free-energy landscape at low computational cost, while the ML model, trained on the discrepancies between classical MD and selective ab initio MD data, learns the missing physics (anharmonic and electron–vibration effects). Thermodynamic integration then uses the corrected free energies, leading to an overall reliable and computationally efficient method. The method biases high-fidelity sampling to configurations that involve rare events or strong electron coupling, ensuring that the multi-fidelity data represent the true free-energy surface.",
+          "predicted_outcome": "Fusion free-energy differences, melting temperatures, and latent heats should be predicted within ~10% of full ab initio results, with computational costs reduced by a factor between 5 and 10 compared to full TOR-TILD workflows.",
+          "baseline": "Uniform, full high-fidelity ab initio MD free-energy computations (TOR-TILD) without multi-fidelity coupling or active sampling.",
+          "boundary": "Most effective for HEAs near melting, especially for complex alloys like FeNiCrCoCu, and over temperature intervals where anharmonic and electron–vibration effects become dominant.",
+          "uncertainty": "The success relies on the ML model’s ability to accurately identify and correct high-uncertainty regions. If the ensemble does not adequately capture all rare but important events, certain anharmonic contributions might be misrepresented.",
+          "supporting_evidence_ids": [
+            "TXT::wikipedia::Molecular_dynamics::000",
+            "KG::deformations::653cbc2217"
+          ],
+          "conflicting_evidence_ids": [],
+          "falsification_experiment": {
+            "design": "Implement the multi-fidelity integration on a known HEA system. Compare the free-energy landscape (solid vs liquid) produced by the combined low-fidelity MD and ML-corrected ab initio points with that from full ab initio MD integration. Measure both the fusion free energy and derived thermodynamic observables.",
+            "measurements": [
+              "Free-energy difference between phases",
+              "Melting temperature and latent heat",
+              "Total CPU time relative to full ab initio MD"
+            ],
+            "falsification_rule": "The hypothesis is falsified if the predicted free-energy difference or melting temperature deviates by more than 10% from full AIMD results, or if cost reduction is less than a factor of 5."
+          },
+          "citation_validation": {
+            "status": "valid",
+            "removed_unknown_ids": []
+          }
+        }
+      },
+      {
+        "paper": "PMC10058552",
+        "round": 4,
+        "builds_on": "the finding in the original paper that ML and MD can effectively predict properties of HEAs, extending the approach to free-energy evaluation by incorporating explicit treatment of local chemical disorder effects.",
+        "what_is_new": "This hypothesis uniquely tailors the SCHA to account for configurational averaging in chemically disordered HEAs and couples it with an ML surrogate that stratifies liquid-phase sampling based on local motifs—a level of disorder-specific correction not addressed in the original paper.",
+        "fields": {
+          "hypothesis": "An enhanced self‐consistent anharmonic phonon framework that explicitly incorporates local chemical disorder effects in the solid phase via configurational averaging, paired with an ML‐accelerated free‐energy estimator for the liquid phase that accounts for disorder-driven anharmonic fluctuations.",
+          "material_initial_state": "A multicomponent high‐entropy alloy (e.g., FeNiCrCoCu) in its low-temperature solid state with significant local chemical disorder and in its high-temperature liquid state where anharmonic dynamics and electron–vibration coupling are prominent.",
+          "intervention": "Extend the self‐consistent harmonic approximation (SCHA) by integrating a local cluster expansion that explicitly averages over the disordered chemical environment. In the liquid phase, develop an ML surrogate trained on high-fidelity ab initio MD snapshots that are stratified by local compositional motifs to capture the wide variation of anharmonicity and electron–vibration coupling originating from chemical disorder.",
+          "conditions": "The approach should be applied over a temperature range that spans the melting region (e.g., within ±100 K of the melting point), where the solid's vibrational spectra are strongly modulated by local disorder and the liquid exhibits strong anharmonic fluctuations.",
+          "structural_mediator": "In the solid phase, the enhanced SCHA is mediated through a cluster-expansion framework that weights different local chemical configurations. In the liquid, the ML surrogate acts as the mediator by learning free-energy corrections for distinct local structural environments.",
+          "mechanism": "Local chemical disorder in HEAs significantly perturbs vibrational modes. By incorporating a cluster expansion into SCHA, the method captures configuration-specific anharmonic contributions. Concurrently, training an ML model on chemically stratified ab initio MD data ensures that the free-energy landscape of the liquid phase faithfully reproduces fluctuations from excitations and electron–vibration interactions. The integration of these phase-specific models via thermodynamic integration should yield accurate overall fusion free energies at reduced cost.",
+          "predicted_outcome": "Fusion free energies (and derived properties such as melting temperature and latent heat) should fall within about a 10% error margin relative to full AIMD/TOR-TILD, while computational cost is expected to be reduced by roughly an order of magnitude.",
+          "baseline": "Full ab initio MD free-energy evaluations (e.g., TOR-TILD) that perform uniform sampling without explicit treatment of local chemical disorder.",
+          "boundary": "Valid primarily for multicomponent HEAs such as FeNiCrCoCu near their melting region, where chemical disorder plays a decisive role in modulating vibrational entropy and anharmonicity.",
+          "uncertainty": "While the cluster expansion should capture key disorder effects, extreme local fluctuations or rare configuration events might still be under-represented, particularly if the distribution of motifs is very broad.",
+          "supporting_evidence_ids": [
+            "TXT::wikipedia::Molecular_dynamics::023",
+            "TXT::wikipedia::Density_functional_theory::002"
+          ],
+          "conflicting_evidence_ids": [],
+          "falsification_experiment": {
+            "design": "Apply the enhanced SCHA with cluster averaging and the ML surrogate on a benchmark FeNiCrCoCu system. Compute the free-energy difference between the solid and liquid phases over a temperature range near melting. Compare the predicted melting temperature and latent heat with those obtained from full ab initio MD/TOR-TILD studies.",
+            "measurements": [
+              "Free-energy difference between solid and liquid phases",
+              "Melting temperature",
+              "Latent heat"
+            ],
+            "falsification_rule": "If the fusion free energies or melting temperature deviate by more than 10% from full AIMD/TOR-TILD results, or if computational cost reduction is less than a factor of 5, the hypothesis is falsified."
+          },
+          "citation_validation": {
+            "status": "valid",
+            "removed_unknown_ids": []
+          }
+        }
+      },
+      {
+        "paper": "PMC7704029",
+        "round": 3,
+        "builds_on": "the Δ‐ML correction strategy from PMC7704029 with the novel integration of on‐the‐fly uncertainty quantification, shifting from a static to an adaptive framework using GPR.",
+        "what_is_new": "It introduces dynamic, uncertainty-driven on‐the‐fly ab initio updates to the ML correction, ensuring that critical regions are correctly sampled with minimal additional cost—a significant improvement over the pre-trained static Δ‐ML corrections in the original study.",
+        "fields": {
+          "hypothesis": "Implement an on‐the‐fly adaptive Δ‐ML correction framework using Gaussian process regression (GPR) to quantify uncertainty reliably, thereby triggering additional ab initio calculations only when needed in critical regions for high-temperature phase transitions in high-entropy alloys.",
+          "material_initial_state": "A periodic, multicomponent high-entropy alloy poised near its fusion temperature.",
+          "intervention": "Begin simulations with a low-cost semiempirical MD and an initial Δ‐ML correction based on a Gaussian process regression model. Continuously monitor the prediction uncertainty during MD runs. When uncertainty exceeds a predefined threshold in regions relevant to phase transition (e.g., where anharmonicity and electron–vibration coupling are significant), trigger sparse ab initio evaluations to update the GPR model on‐the‐fly.",
+          "conditions": "Applicable for high-entropy alloys with significant anharmonic effects near melting (within ±20% of fusion temperature), provided that reliable uncertainty quantification via GPR is achievable.",
+          "structural_mediator": "Local atomic arrangements and their vibrational modes that exhibit high uncertainty and signal strong electron–vibration interactions during phase transitions.",
+          "mechanism": "Gaussian process regression naturally provides uncertainty estimates along with predictions. The on‐the‐fly updating ensures that regions with pronounced anharmonicity or unexpected electron–vibration coupling are corrected by new ab initio data. This adaptive strategy minimizes expensive calculations in well-behaved regions while ensuring high fidelity where needed, thus maintaining the correct free energy landscape.",
+          "predicted_outcome": "A dramatic cost reduction (potentially an order-of-magnitude reduction compared to full AIMD), with free energy estimates and predicted fusion temperatures falling within ~1–2 kcal/mol of benchmark values, and successfully capturing critical phase transitions.",
+          "baseline": "Full AIMD free-energy calculations and static Δ-ML corrections without uncertainty-driven updates.",
+          "boundary": "Effective for high-entropy alloys exhibiting large local fluctuations near the melting point and for which the GPR uncertainty estimates are well calibrated; may be limited if uncertainty quantification proves unreliable in extreme dynamic regimes.",
+          "uncertainty": "The main challenge lies in properly calibrating the uncertainty threshold so that no critical transition is missed; performance might vary across different alloy compositions.",
+          "supporting_evidence_ids": [
+            "TXT::wikipedia::Molecular_dynamics::023"
+          ],
+          "conflicting_evidence_ids": [],
+          "falsification_experiment": {
+            "design": "Apply the on‐the‐fly adaptive GPR-based Δ‐ML method to a chosen high-entropy alloy near its melting point. Record the spatial and temporal distribution of uncertainties, the frequency of on-the-fly ab initio corrections, and compare the resulting free energy landscape and fusion temperature to those from conventional AIMD.",
+            "measurements": [
+              "Evolution of free energy profiles across the phase transition",
+              "Number and localization of on-the-fly ab initio corrections",
+              "Overall wall-clock / computational time savings"
+            ],
+            "falsification_rule": "If the final free energy estimates deviate by more than ~2 kcal/mol from benchmarks, if critical phase transition features (e.g., accurate melting point) are missed, or if the computational savings are marginal compared to static Δ‐ML methods, the hypothesis is falsified."
+          },
+          "citation_validation": {
+            "status": "filtered_unknown_ids",
+            "removed_unknown_ids": [
+              "PMC7704029::web::009"
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "chars_in": 3520878,
+  "elapsed_seconds": 1300.64
+}

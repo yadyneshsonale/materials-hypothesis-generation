@@ -203,6 +203,28 @@ def background_leakage() -> dict[str, int]:
     return dict(out)
 
 
+def paper_leakage() -> dict[str, Any]:
+    """rx_experiment.leakage for this arm's paper passages only: teaching-text and graph IDs are not Europe PMC records
+    (they are re-checked by background_leakage)."""
+    totals: Counter[str] = Counter()
+    checked = violations = 0
+    evidence = X.W.Evidence()
+    for run in dev_runs(ARM):
+        for key, value in (run.get("audit") or {}).items():
+            totals[key] += int(value or 0)
+        cutoff = X.ws.CaseFilter(run["paper_id"]).cutoff
+        for rid in run["seen_ids"]:
+            if rid.startswith(("TXT::", "KG::")):
+                continue
+            record = evidence.web(rid)
+            if record is None:
+                continue
+            checked += 1
+            dates = [d for d in (record.structured or {}).get("dates", {}).values() if d]
+            violations += any(str(d) >= cutoff for d in dates + [record.publication_date])
+    return {"counters": dict(totals), "records_rechecked": checked, "date_violations": violations}
+
+
 def report() -> dict[str, Any]:
     d = diagnostics()
     d["rubber_stamp_flag"] = d["accepted_in_round_1_share"] > 0.8
@@ -223,7 +245,7 @@ def report() -> dict[str, Any]:
     decision = ("go: run all 45 papers" if both and rq_ok and not d["rubber_stamp_flag"] else
                 "fix the critic first (rubber-stamping)" if d["rubber_stamp_flag"] else "no-go")
     return {"diagnostics": d, "rows": rows, "contrasts": contrasts, "decision": decision,
-            "leakage": {**X.leakage([ARM]), "background": background_leakage()}, "note": "pilot on 8 dev papers; exploratory (loop.md 28.1)"}
+            "leakage": {**paper_leakage(), "background": background_leakage()}, "note": "pilot on 8 dev papers; exploratory (loop.md 28.1)"}
 
 
 def _c(x: dict[str, Any]) -> str:
