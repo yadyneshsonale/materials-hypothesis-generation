@@ -6146,3 +6146,97 @@ Pairwise v1 (the experiment-46 prompt) against `rx_r`: `synth_a` +0.05 [+0.00, +
 - Non-copying is still unvalidated (27.5), so the "more original" readings rest on one judge prompt.
 - Housekeeping: 5 orphaned `.tmp` files from the 01:46 disk-full interruption were removed (their final JSON files
   exist); nothing was lost.
+
+## 28. Per-paper generate → critique → narrow (experiment 49)
+
+### 28.1 Design and pre-registered pilot (written 2026-11-18, before any experiment-49 run)
+
+**Request** (the user, 2026-11-18): "instead of collecting papers and merging them ... when we retrieve N papers we take
+each paper, we try to make some hypothesis from that paper ... using the paper and the user prompt and general materials
+data (from matkg or some textbooks etc) ... generate K hypotheses, then give it to a critique agent (with access to the
+paper and materials knowledge, not the prompt) ... this loop will happen till at least one hypothesis is accepted ...
+when we get at least N hypotheses, we give them to a narrowing agent which gives the best hypothesis according to the
+user input." Formalised with the user through two forms; the user's choices: acceptance = sound and testable and goes
+beyond the paper; at most 20 rounds; a paper without an accepted hypothesis is dropped; knowledge = the model's own,
+MatKG and open teaching texts (DoITPoMS, MIT OpenCourseWare, LibreTexts, Wikipedia); narrowing by a pairwise
+tournament; output a ranked top 3; pilot on the 8 dev papers first. N and K were left to us.
+
+**Method** (`perpaper_loop.py`, registered `perpaper`; every agent o3-mini, pre-cutoff).
+1. **Retrieve** N = 10 papers: the question's experiment-44 focused corpus (Europe PMC searches and the experiment-36
+   corpus, admitted by websearch's date, type and family rules, screened 0–3 for relevance by gpt-4o), ordered by
+   screen grade, at most one paper per first author. Each paper's full text (reference-like sections removed) up to
+   30,000 characters.
+2. **Per paper, in parallel.**
+   - Background M_i: the 6 teaching-text passages that best match the question plus the paper's title (BM25, at most
+     2 per document), and up to 8 MatKG co-occurrence facts (`matkg_index.TemporalKG`: abstracts from years before the
+     cutoff year; the case paper and its work family excluded).
+   - Generator: question + paper + background → K = 3 hypotheses in the shared schema, each with "builds_on" and
+     "what_is_new" (seen by the critic, never by the evaluating judges).
+   - Critic (never sees the question): paper + background + hypotheses → for each, pass/fail on sound, testable and
+     beyond_paper with reasons, a quote and a fix. Accepted only if all three pass.
+   - Loop: stop at the first round with an accepted hypothesis (all accepted ones in that round are kept); otherwise
+     the generator revises from the critique; after 20 rounds the paper is dropped.
+3. **Narrow:** accepted hypotheses of all papers, near-duplicates merged (word Jaccard of intervention + structural
+   mediator ≥ 0.6); a tournament on the question with a narrowing prompt of the method's own (both orders; a win needs
+   both): round robin for ≤ 6 candidates, else 5 Swiss rounds then a round robin of the top 5. The method's output is
+   the rank-1 hypothesis; the ranked top 3 is kept in the run's notes.
+
+**Teaching texts** (`materials_texts.py`; cache in `materials_texts/passages_<source>.jsonl`, not committed; `sources.json`
+committed). Leakage rule: Wikipedia is pinned to its last revision on or before 2023-12-31 and the OCW courses are from
+2005–2013, so both predate every test paper (earliest 2024-01-01). DoITPoMS and LibreTexts are undated, so every
+passage of every source that mentions high-entropy, medium-entropy, multi-principal-element, complex-concentrated or
+compositionally complex alloys (or HEA/MPEA/RHEA/CCA, the Cantor alloy or AlCoCrFeNi) is dropped at build time and
+re-checked at use and in the report. Copyrighted textbooks are not used.
+
+**Pilot evaluation** (`perpaper_eval.py`). 8 dev papers × 3 levels × 2 samples = 48 runs; all 45 papers are
+development data, so this is exploratory.
+- Scored output: the rank-1 hypothesis only (never best-of-3).
+- RQ (DeepSeek, mean of 3 calls); non-copying (DeepSeek, the shared focused passages); pairwise v2 (DeepSeek and o1,
+  both orders) against the draft-then-ground agent (`agent_draft_ground_b_o3mini`) and the closed-book writer.
+- Diagnostic: non-copying of the rank-1 hypothesis against its own source paper's text.
+- Process diagnostics: calls and minutes per run, papers dropped, rounds to acceptance, round-1 acceptance share,
+  per-criterion pass rates, the rank-1 hypothesis's source paper.
+- **Critic check:** if more than 80% of papers have a hypothesis accepted in round 1, the critic is rubber-stamping
+  (experiment 37's failure) and must be fixed before any further run.
+- **Go / no-go for all 45 papers:** go if both judges' pairwise v2 preference over the draft-then-ground agent is
+  above 0, RQ is not lower than that agent's by more than 0.10, and the critic check passes. Eight papers give wide
+  intervals: this is a pilot signal, not a claim.
+
+**Expectations, recorded before any run.**
+- Cost about 70 o3-mini calls for the per-paper loops plus about 30–80 for the tournament (worst case about 500).
+- Copying: the shared-passage non-copying should be at or above the draft agent's (3.0); against the source paper it
+  may be lower, since each hypothesis starts from one paper.
+- Plausibility may fall (experiment 48: moving the writer off the evidence cost 0.14–0.24).
+- Earlier critic loops (experiments 37 and 44) did not help; the difference here is a paper-grounded critic with an
+  explicit "goes beyond the paper" criterion and a tournament over many papers' ideas.
+
+**Workers:** at most 6 o3-mini requests at once per TRAPI instance (must_obey.md 7), enforced in-process with
+`MATHG_MAX_PER_DEPLOYMENT=6`; evaluation judges on their own limits.
+
+**Smoke tests and changes before the pilot** (2026-11-18; scratch root `/tmp/x49_smoke`, nothing kept; dev cases 1
+and 3, problem-constrained, 2 papers, at most 3 rounds).
+1. First smoke (dev case 3): the pipeline worked end to end (80 s, 24 calls, every leakage counter zero), but **the
+   critic rubber-stamped**: 5 of 6 hypotheses passed every criterion in round 1 and both papers finished in round 1.
+   This is the pre-registered failure, so the critic was fixed before the pilot rather than after it:
+   - it first lists what the paper did, reported and proposed, then checks each hypothesis against that list;
+   - explicit failure conditions: a generic mechanism that would read the same for any alloy, a prediction that does
+     not follow from the mechanism, a falsification rule without a threshold or control, a textbook remedy with no
+     reason from the paper;
+   - "most first drafts have a real flaw; pass a criterion only when you can state why it holds";
+   - o3-mini with high reasoning effort (`o3mini_high`, the same pre-cutoff model).
+2. Second smoke (dev case 3): no paper accepted in round 1; accepted after 2 and 3 rounds with specific fixes;
+   background present (6 teaching passages, 8 graph facts per paper); the rank-1 hypothesis cited an MIT 3.40J
+   lecture. But **the narrowing tournament was all ties**: the default-effort judge picked differently in the two
+   orders for every pair (position bias), so rank 1 fell back to list order. The narrowing judge now uses
+   `o3mini_high` too.
+3. Third smoke (dev case 1): one paper accepted in round 1, one in round 3; the tournament separated the candidates
+   (1.5 / 1.5 / 0), with a tie for first. A rank-1-tie share is added to the diagnostics.
+4. **MatKG** needed three filters before its facts were on topic (the raw index matches stopwords such as "but" and
+   "has" as entities and is dominated by chemistry abstracts): anchors from the source paper's title only, established
+   entities (≥ 30 abstracts, one dominant type, not ultra-generic), no characterization-method or generic neighbours,
+   only abstracts that also mention an alloy, neighbours ranked by share × log(N / document frequency). The facts are
+   now on topic but generic (e.g. Zr with "precipitates", Ni with "superalloy"); HEA alloy names are absent from MatKG.
+   It is a minor input.
+5. Wikipedia rate-limits parallel clients (HTTP 429): its download is sequential with `Retry-After`.
+
+The critic's acceptance rule, N, K, R and the evaluation are unchanged from 28.1.
