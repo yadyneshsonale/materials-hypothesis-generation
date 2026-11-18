@@ -1989,3 +1989,7 @@ import refine_loop  # noqa: E402,F401
 # ================================================================ experiment 45 (loop.md 26.1): a lever-preserving editor and
 # the programme's domain on questions that do not name the alloy class (edit_loop.py registers edit_* and domain_*).
 import edit_loop  # noqa: E402,F401
+
+# ================================================================ experiment 48 (loop.md 27.7): writers that combine or
+# extend several papers instead of restating one (synth_loop.py registers synth_a and synth_b).
+import synth_loop  # noqa: E402,F401

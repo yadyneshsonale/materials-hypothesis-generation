@@ -288,7 +288,7 @@ preferred future option.
 - **Never commit** other sessions' uncommitted files, secrets, raw downloaded papers or large caches.
 - **API discipline (TRAPI).** Experiment 42 (loop.md 23.1) got the shared identity blocked ("retry-flood"): about
   38 parallel workers each retried rate limits up to 20 times, and the client never read the `Retry-After` header.
-  - Run at most 6 parallel workers per model across all processes.
+  - Run at most 6 parallel workers per model per TRAPI instance, across all processes (amended 2026-11-10 at the user's request "parallelize as much as possible"; until then 6 per model in total). Different models, and the same model on different instances, may run at once; each process honours its instance's `Retry-After` gate.
   - Never raise retries to survive rate limits.
   - Honour `Retry-After` on every 429: `llm_client.py` closes a process-wide gate for the deployment until it has
     elapsed, so no thread re-fires early, and paces request starts after rate limits. Never retry non-transient
@@ -439,3 +439,6 @@ Ablate before combining. Combine only components that helped or that address dif
 - 2026-11-09 (experiment 47, loop.md 27.5), at the user's request ("drop the grounding metric and run the evals with
   this new metric"): 6.2 non-copying replaces grounding in SP (SP2); the pairwise criterion "well grounded" is
   replaced by "goes beyond the earlier work". The metric is unvalidated: the user chose no controls.
+- 2026-11-10 (experiment 48, loop.md 27.7), at the user's request ("parallelize as much as possible"): section 7's limit
+  is now 6 workers per model per TRAPI instance (both instances serve o3-mini, DeepSeek and GPT-5.6), and evaluation
+  stages may run while generation is still producing runs.

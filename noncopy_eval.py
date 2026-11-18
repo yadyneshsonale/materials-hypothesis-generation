@@ -47,6 +47,7 @@ PAIR_DIR = OUT / "pairwise_v2"
 DEV = Q.DEV
 BEST, WRITER = "rx_r", Q.WRITER
 METHODS = (BEST, WRITER)
+FOCUSED = frozenset({BEST, "synth_a", "synth_b"})  # writers given exactly this pack (27.7)
 SCALES = Q.SCALES
 PARTS = ("intervention", "mechanism", "predicted_outcome", "falsification_test", "overall_idea")
 
@@ -100,7 +101,7 @@ def view(run: dict[str, Any]) -> dict[str, Any]:
     """The question, the hypothesis with evidence IDs relabelled to the passages' labels, and the passages."""
     records = pack(run["paper_id"], run["query_level"])
     labels = {r.record_id: f"P{n + 1}" for n, r in enumerate(records)}
-    if run["method"] == BEST and sorted(labels) != sorted(run["seen_ids"]):
+    if run["method"] in FOCUSED and sorted(labels) != sorted(run["seen_ids"]):
         raise RuntimeError(f"{run['run_id']}: the rebuilt evidence differs from what the writer saw")
     generation = {k: v for k, v in run["generation"].items() if k != "citation_validation"}
     for field in ("supporting_evidence_ids", "conflicting_evidence_ids"):

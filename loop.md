@@ -6025,3 +6025,124 @@ question's passages).
   least two papers, or to extend a passage's result to a new alloy or regime, and forbid restating a passage's
   reported result.
 - It should be judged on both non-copying and pairwise.
+
+### 27.7 Experiment 48: writers that combine or extend several papers (pre-registered 2026-11-10 at about 01:05, before any scored run; runs started at 01:06)
+
+**Request.** The agent mostly restates one retrieved paper's result (27.6). "How do I change this?" The two
+cheapest options were proposed and run.
+
+**Failure targeted.**
+- `rx_r`'s writer prompt (WRITER_B) only says "use the evidence, do not invent". With 45 passages in front of it, it
+  restates the strongest single result: non-copying 1.89, and 237 of 270 overall ideas traced to the passages.
+- `rx_ru`'s literature map invited this directly: it listed "future work the authors propose" as opportunities.
+
+**Arms** (o3-mini; the same focused-retrieval pack as `rx_r`; 135 questions × 2 samples).
+- **`synth_a`** (one call): WRITER_B's conservative rules plus synthesis rules.
+  - Build on at least two papers, or carry a result to a new material or regime with a reason.
+  - Never restate a passage's result, repeat a study already done on the same material, or propose a paper's own
+    future work.
+  - No textbook or generic approach.
+  - Name the passages combined in the uncertainty field.
+- **`synth_b`** (two calls).
+  - o3-mini first maps what the passages have done and proposed, and their gaps and conflicts.
+  - The writer must propose a study that is on neither the "done" nor the "proposed" list, targets a gap or
+    conflict, and follows the same synthesis rules.
+- **Prompts:** `synth_loop.SYNTH_A`, `MAP_SYSTEM` and `SYNTH_B`, fixed now. None is an evaluating judge's prompt, and
+  no judge model is called during generation (must_obey.md 6.12).
+
+**Sources.**
+- **SciMON** (Wang et al., ACL 2024, https://arxiv.org/abs/2305.14259): iterative novelty boosting against the
+  retrieved literature.
+- **Scideator** (Radensky et al., 2024, https://arxiv.org/abs/2409.14634): recombining facets of several papers.
+- Integrated as writing rules (A) and an explicit "already done or proposed" exclusion list (B), not as an
+  iterative loop.
+
+**Evaluation** (against `rx_r`, paired by paper).
+- Non-copying: DeepSeek, unvalidated (27.5).
+- RQ: three DeepSeek calls.
+- Pairwise in both orders:
+  - v2 ("goes beyond the earlier work"): DeepSeek decides, GPT-5.6 confirms;
+  - v1 (the experiment-46 prompt): DeepSeek alongside.
+- Leakage re-check.
+
+**Decision rule.** An arm improves on `rx_r` only if all three hold:
+- its non-copying is higher (CI above 0);
+- its RQ is not lower (CI not entirely below 0);
+- DeepSeek's pairwise v2 is not against it (CI not entirely below 0).
+
+If non-copying rises but quality falls, the result is reported as a trade-off.
+
+**Expectations, recorded before any run.**
+- Non-copying rises to about 2.5–3.0 (B more than A).
+- Plausibility falls slightly (−0.1 to −0.3): earlier experiments found that moving the writer off its first
+  instinct costs plausibility.
+- Pairwise v2 about even or favourable; v1 slightly against.
+
+**Smoke test** (about 01:00, scratch root, 4 runs, nothing kept).
+- All OK, every leakage counter zero.
+- `synth_b`'s maps listed 3–7 studies done, 1–2 proposed, 4 gaps and 1–2 conflicts.
+- Both arms cited 2–3 different papers, against usually 1 for `rx_r`.
+- No prompt change.
+
+**Runner.** `loop/run_x48.sh`:
+1. generation, at most 6 o3-mini calls at once over both instances;
+2. non-copying;
+3. RQ ×3;
+4. pairwise v2 DeepSeek;
+5. pairwise v1 DeepSeek;
+6. the report.
+
+GPT-5.6 pairwise v2 runs in parallel (`run_x48_gpt.sh`, after generation).
+- **Parallel runner (01:18, at the user's request "parallelize as much as possible").** `loop/run_x48_par.sh` replaced
+  `run_x48.sh` and `run_x48_gpt.sh`. Generation had 79 + 76 runs and no failures when it was stopped; outputs are
+  atomic, so nothing was lost or duplicated.
+  - Every stage now starts at once and re-runs over the runs that exist, so scoring follows generation.
+  - At most 6 workers per model per instance (must_obey.md 7, amended):
+    - synth_a generation on gcr/shared and synth_b generation on redmond/interactive (o3-mini, 6 each);
+    - DeepSeek non-copying and pairwise on gcr/shared (6);
+    - DeepSeek RQ on redmond/interactive (6);
+    - GPT-5.6 pairwise on both instances (3 + 3).
+  - After 2.5 minutes: 289 requests, about 6% refused with 429, none blocked (403).
+
+- **Addition (01:37, before any experiment-48 result was seen).** The draft-then-ground agent of experiment 40
+  (`agent_draft_ground_b_o3mini`) is added as an evaluation-only arm, scored the same way: non-copying, and pairwise v2
+  against `rx_r` on DeepSeek and GPT-5.6.
+  - It writes its idea closed-book, then grounds it in retrieved evidence. That design should resist copying.
+  - It also has the highest RQ of the 50 configurations (3.16; +0.12 [+0.02, +0.23] over `rx_r`).
+  - Its existing runs are used (no generation), with `loop/run_x48_draft.sh`, after `run_x48_par.sh`, so the
+    per-instance limit holds.
+
+### 27.8 Experiment 48 results (written 2026-11-18; runs finished 2026-11-10 02:32; exploratory, all 45 papers are development data)
+
+Source: `loop_quality/analysis_synth.{json,md}` (`synth_eval.py report`, extended to include the draft-then-ground
+agent's row and contrasts). 270 runs per arm, none failed. Every leakage counter zero (24,496 records re-checked).
+
+| Arm | Calls | Papers cited | Non-copying (1–5) | RQ | Plaus. | Test. | Useful. |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| `synth_a` (synthesis rules, 1 call) | 1.00 | 1.93 | 2.60 | 2.99 | 3.43 | 4.18 | 4.37 |
+| `synth_b` (map, then write; 2 calls) | 2.00 | 2.40 | 3.47 | 2.97 | 3.33 | 4.24 | 4.35 |
+| `agent_draft_ground_b_o3mini` | 2.16 | 2.20 | 3.03 | 3.16 | 3.72 | 4.26 | 4.49 |
+| `rx_r` (incumbent) | 1.00 | 1.76 | 1.89 | 3.03 | 3.56 | 4.19 | 4.35 |
+| closed-book writer | 1.03 | 0 | 3.12 | 3.10 | 3.71 | 4.16 | 4.43 |
+
+Against `rx_r`, paired over the 45 papers (95% CI):
+
+| Arm | Non-copying | RQ | Plausibility | Pairwise v2: DeepSeek | Pairwise v2: GPT-5.6 | Rule (27.7) |
+|---|---|---|---|---|---|---|
+| `synth_a` | +0.71 [+0.53, +0.89] | −0.04 [−0.13, +0.04] | −0.14 [−0.25, −0.03] | +0.17 [+0.12, +0.22] | +0.27 [+0.17, +0.37] | improves |
+| `synth_b` | +1.58 [+1.35, +1.80] | −0.06 [−0.16, +0.04] | −0.24 [−0.36, −0.11] | +0.18 [+0.10, +0.26] | +0.41 [+0.29, +0.53] | improves |
+| draft-then-ground (evaluation only) | +1.14 [+0.92, +1.37] | +0.12 [+0.02, +0.23] | +0.15 [+0.02, +0.29] | −0.32 [−0.41, −0.24] | −0.03 [−0.15, +0.08] | more original, worse head-to-head |
+
+Pairwise v1 (the experiment-46 prompt) against `rx_r`: `synth_a` +0.05 [+0.00, +0.10]; `synth_b` −0.01 [−0.07, +0.04].
+
+**Reading.**
+- The expectations of 27.7 held: synthesis prompts move the writer off restating one passage (non-copying 1.89 →
+  3.47 for `synth_b`, above the closed-book writer's 3.12) at a cost in plausibility (−0.24), with RQ unchanged.
+- Both synthesis arms pass the pre-registered rule; `synth_b` is the stronger. GPT-5.6 (held out) agrees.
+- The draft-then-ground agent is more original than `rx_r` and has the higher RQ, but under the v2 pairwise prompt
+  ("goes beyond the earlier work") DeepSeek prefers `rx_r` to it in 35 of 45 papers, and GPT-5.6 has them level.
+  The 2026-11-10 deck presents this agent as the main method on its RQ and its pairwise result against the closed-book
+  writer; this head-to-head result against `rx_r` is not in the deck.
+- Non-copying is still unvalidated (27.5), so the "more original" readings rest on one judge prompt.
+- Housekeeping: 5 orphaned `.tmp` files from the 01:46 disk-full interruption were removed (their final JSON files
+  exist); nothing was lost.
