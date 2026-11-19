@@ -6338,3 +6338,50 @@ faster parallel attempt; no fetch was finally skipped): 5,964 unique passages, e
 | MIT OCW | 550 | capture of the old-URL PDFs, 2011–2016 |
 
 Identical passages (mostly DoITPoMS "print all" pages repeating a package's other pages) are kept once.
+
+### 28.5 Results on the dated corpus (2026-11-19, about 16:00; 159 of 159 runs ok; exploratory)
+
+Generation 04:34–14:36 (135 runs for all 45 papers, sample 1; then 24 for the dev papers' sample 2); judging until
+15:46. Source: `loop_quality/analysis_perpaper_dated.{json,md}`. Every leakage counter zero; 1,074 teaching passages
+seen in the dev runs, none undated, none dated at or after a cutoff, none mentions an HEA.
+
+**Report fix before reading.** The judges compared every `perpaper_dated` run, not only the 8 dev papers (the pilot's
+runs all were dev runs, so 28.2 was not affected), and the first report counted the pairwise outcomes of all 45 papers
+and listed the 111 non-dev runs as failed. The pilot's pairwise numbers are now restricted to the dev papers, as
+pre-registered; the all-paper numbers are reported separately below as exploratory.
+
+**Pilot (pre-registered, 8 dev papers × 3 levels × 2 samples).**
+
+| Method | RQ | Plaus. | Test. | Useful. | Non-copying |
+|---|---:|---:|---:|---:|---:|
+| `perpaper_dated` | 3.15 | 3.67 | 4.17 | 4.62 | 3.85 |
+| draft-then-ground | 2.94 | 3.40 | 4.17 | 4.25 | 2.81 |
+| closed-book writer | 3.05 | 3.69 | 4.01 | 4.45 | 2.88 |
+
+| `perpaper_dated` against | RQ | Non-copying | Pairwise v2: DeepSeek | Pairwise v2: o1 |
+|---|---|---|---|---|
+| draft-then-ground | +0.21 [+0.02, +0.38] | +1.04 [+0.40, +1.65] | +0.02 [−0.15, +0.23], 2 vs 3 papers | +0.42 [+0.25, +0.56], 7 vs 0 |
+| closed-book writer | +0.10 [−0.14, +0.41] | +0.98 [+0.19, +1.81] | +0.44 [+0.31, +0.62], 8 vs 0 | +0.50 [+0.21, +0.73], 7 vs 1 |
+
+- **Decision rule: go**, on DeepSeek's point estimate of +0.02 over the draft-then-ground agent (the rule asks for
+  both judges above 0). That is a tie (2 vs 3 papers, interval across 0), so the rule passes narrowly; o1's
+  preference is clear. On the undated corpus (28.2) the same comparison was −0.04 (no-go): the decision turns on noise.
+- The numbers match 28.2 closely (RQ 3.15 both times; non-copying 3.85 vs 3.81): the dated corpus changed nothing
+  material. Critic: 53.6% accepted in round 1 (limit 80%), 0.4% of papers dropped; rank 1 tied in 50% of runs.
+
+**All 45 papers (exploratory, not pre-registered; sample 1; paired over 45 papers).**
+
+| `perpaper_dated` against | RQ | Plausibility | Usefulness | Non-copying | DeepSeek | o1 |
+|---|---|---|---|---|---|---|
+| draft-then-ground | +0.09 [−0.02, +0.19] | +0.08 [−0.06, +0.21] | +0.22 [+0.06, +0.36] | +0.59 [+0.28, +0.89] | −0.09 [−0.20, +0.01], 13 vs 19 | +0.35 [+0.23, +0.46], 32 vs 6 |
+| closed-book writer | +0.12 [+0.02, +0.22] | +0.07 [−0.06, +0.21] | +0.24 [+0.10, +0.38] | +0.50 [+0.14, +0.85] | +0.32 [+0.21, +0.42], 32 vs 5 | +0.44 [+0.34, +0.53], 35 vs 1 |
+
+RQ means over the 45 papers: `perpaper_dated` 3.21, draft-then-ground 3.12, closed-book writer 3.09 (the baselines
+were judged in earlier sessions; the writer's RQ drifted by up to +0.05 between sessions, 27.4).
+
+**Reading.** Across all 45 papers the per-paper method is more original than every earlier method (non-copying 3.59
+vs 3.00) and more useful (+0.22), and both judges prefer it to the closed-book writer. Against the draft-then-ground
+agent, o1 prefers it in 32 of 45 papers but DeepSeek leans the other way (13 vs 19), so the two judges disagree on
+that comparison; its RQ lead (+0.09) is within noise. It costs about 130 o3-mini calls and 22 minutes per question.
+
+**Outputs:** `hypotheses/1`–`45` (135 question runs, sample 1) exported by `build_hypothesis_folder.py`.

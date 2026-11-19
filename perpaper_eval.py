@@ -138,8 +138,9 @@ def mean(method: str, fn: Any) -> float | None:
     return Q.mean_of(Q.per_paper(values)) if values else None
 
 
-def pair(base: str, judge: str) -> dict[str, Any]:
-    outcomes = {k: v for k, v in Q.pair_outcomes(ARM, base, judge, N.PAIR_DIR).items()}
+def pair(base: str, judge: str, scope: str = "dev") -> dict[str, Any]:
+    papers = {c["paper_id"] for c, _ in (units() if scope == "dev" else X.units())}
+    outcomes = {k: v for k, v in Q.pair_outcomes(ARM, base, judge, N.PAIR_DIR).items() if k[0] in papers}
     if not outcomes:
         return {"pairs": 0}
     pp = Q.per_paper(outcomes)
@@ -150,7 +151,8 @@ def pair(base: str, judge: str) -> dict[str, Any]:
 
 def diagnostics() -> dict[str, Any]:
     runs = dev_runs(ARM)
-    every = list((H.OUT / ARM / "runs").glob("PMC*.json"))
+    papers = {c["paper_id"] for c, _ in units()}
+    every = [p for p in (H.OUT / ARM / "runs").glob("PMC*.json") if p.name.split("__")[0] in papers]
     papers = [p for r in runs for p in r["notes"]["papers"]]
     rounds = [p["n_rounds"] for p in papers if p.get("n_rounds")]
     verdicts = [v for p in papers for rd in p.get("rounds", []) for v in rd.get("verdicts", [])]
