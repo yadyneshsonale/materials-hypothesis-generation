@@ -78,6 +78,17 @@ class PerPaperTests(unittest.TestCase):
                 self.assertNotIn("the research question", str(payload))
                 self.assertNotIn("research_question", payload)
 
+    def test_full_log_keeps_every_hypothesis_and_review(self) -> None:
+        h = FakeHarness([[review(beyond=False)] * 3, [review(), review(sound=False), review()]])
+        h.full_log = True
+        log = run_paper(h, max_rounds=20)
+        self.assertEqual([len(r["hypotheses"]) for r in log["rounds"]], [P.K, P.K])
+        self.assertEqual([[rv["accepted"] for rv in r["reviews"]] for r in log["rounds"]],
+                         [[False] * 3, [True, False, True]])
+        self.assertIn("background_items", log)
+        plain = run_paper(FakeHarness([[review()] * 3]), max_rounds=20)
+        self.assertNotIn("hypotheses", plain["rounds"][0])
+
     def test_paper_is_dropped_after_max_rounds(self) -> None:
         h = FakeHarness([[review(testable=False)] * 3] * 4)
         log = run_paper(h, max_rounds=4)

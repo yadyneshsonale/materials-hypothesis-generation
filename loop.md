@@ -6280,3 +6280,20 @@ against its own source paper), and both judges prefer it to the closed-book writ
 condition is DeepSeek's head-to-head against the draft-then-ground agent, a tie. Eight papers give wide intervals, and
 the dev subset is harder than the full set (the draft agent's RQ is 2.94 here, 3.16 on all 45). It costs about 45
 times the draft agent's calls. By the pre-registered rule the full run waits for the user's decision.
+
+### 28.3 Per-paper outputs for all 45 papers (written 2026-11-18 at about 22:24, before the runs; started 22:25)
+
+**Request** (the user, 2026-11-18 22:20): "make a directory in github; for each paper in the /number file keep the pdf
+and a question.json and a internal reasoning.json and a hypothesis.json and a final hypothesis.json". The pilot (28.2)
+covered only the 8 dev papers and its runs keep neither every candidate nor the critiques, so this request is read as
+the user's decision on the pending full run (28.2), for producing the outputs:
+- Arm `perpaper_full`: the `perpaper` method unchanged, with every intermediate step kept in the run's notes (the
+  selected papers, each paper's background passages, every round's hypotheses, the critic's list of what the paper
+  did, reported and proposed, its reviews, the merged pool, every tournament match with both orders' reasons).
+- 45 papers × 3 question levels × **one sample** (s1) = 135 runs (about 135 o3-mini calls each), on both TRAPI
+  instances, at most 6 o3-mini requests in flight per instance (must_obey.md 7). Smoke-tested on 2 papers.
+- Export (`build_hypothesis_folder.py`): `hypotheses/N/` for N = 1–45 (the numbering of `test/`), each with
+  `paper.pdf`, `question.json`, `internal_reasoning.json`, `hypotheses.json` (every accepted hypothesis) and
+  `final_hypothesis.json` (rank 1 and the ranked top 3), per question level.
+- No new evaluation is pre-registered here; these runs are not scored. "Internal reasoning" is the agents' written
+  outputs (critiques, verdicts, match reasons); o3-mini's hidden reasoning tokens are not available.

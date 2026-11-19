@@ -42,20 +42,23 @@ def units() -> list[tuple[dict[str, Any], str]]:
     return H.units("dev")
 
 
-def generate(workers: int, part: int = 0, parts: int = 1) -> dict[str, int]:
-    """This process's share of the runs (every parts-th unit, from part), so two processes can use both instances."""
+def generate(workers: int, part: int = 0, parts: int = 1, arm: str = ARM, scope: str = "dev",
+             samples: tuple[int, ...] = tuple(H.SAMPLES)) -> dict[str, int]:
+    """This process's share of the runs (every parts-th unit, from part), so two processes can use both instances.
+    scope "all45" = every benchmark paper (loop.md 28.3)."""
     jobs = []
-    for n, (case, level, sample) in enumerate((c, l, s) for c, l in units() for s in H.SAMPLES):
+    chosen = X.units() if scope == "all45" else units()
+    for n, (case, level, sample) in enumerate((c, l, s) for c, l in chosen for s in samples):
         if n % parts != part:
             continue
-        path = H.OUT / ARM / "runs" / f"{H.run_id(case['paper_id'], level, ARM, sample)}.json"
+        path = H.OUT / arm / "runs" / f"{H.run_id(case['paper_id'], level, arm, sample)}.json"
         if path.exists() and _read_json(path)["status"] == "ok":
             continue
         if path.exists():
-            kept = H.OUT / ARM / "failed_attempts" / path.name
+            kept = H.OUT / arm / "failed_attempts" / path.name
             kept.parent.mkdir(parents=True, exist_ok=True)
             kept.write_text(path.read_text())
-        jobs.append((ARM, case, level, sample, False))
+        jobs.append((arm, case, level, sample, False))
     counts: Counter[str] = Counter()
     with ThreadPoolExecutor(workers) as pool:
         for future in as_completed([pool.submit(H.generate_one, *j) for j in jobs]):
@@ -287,9 +290,12 @@ def main() -> None:
     parser.add_argument("--base", default="draft", choices=tuple(BASES))
     parser.add_argument("--part", type=int, default=0)
     parser.add_argument("--parts", type=int, default=1)
+    parser.add_argument("--arm", default=ARM, choices=PP.ARMS)
+    parser.add_argument("--scope", default="dev", choices=("dev", "all45"))
+    parser.add_argument("--samples", type=int, nargs="+", default=list(H.SAMPLES))
     args = parser.parse_args()
     if args.stage == "generate":
-        print(generate(args.workers, args.part, args.parts))
+        print(generate(args.workers, args.part, args.parts, args.arm, args.scope, tuple(args.samples)))
     elif args.stage == "rq":
         items = RQ.run_items([ARM])
         if args.rep > 1:

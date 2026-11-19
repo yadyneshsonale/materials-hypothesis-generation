@@ -398,9 +398,14 @@ def parse_reviews(raw: Any, n: int) -> list[dict[str, Any]]:
 
 
 def critique(h: Harness, paper_items: list[dict[str, Any]], background: list[dict[str, Any]],
-             hyps: list[dict[str, Any]]) -> list[dict[str, Any]]:
+             hyps: list[dict[str, Any]], summary: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    """The critic's reviews; with a summary dict, also its list of what the paper did, reported and proposed."""
     payload = {"paper": paper_items, "background": background, "hypotheses": shown(hyps)}  # never the question
-    return parse_reviews(h.ask("critic", CRITIC_MODEL, CRITIC_SYSTEM, payload), len(hyps))
+    raw = h.ask("critic", CRITIC_MODEL, CRITIC_SYSTEM, payload)
+    if summary is not None and isinstance(raw, dict):
+        for key in ("paper_did", "paper_reported", "paper_proposed"):
+            summary[key] = [str(x)[:400] for x in (raw.get(key) or []) if isinstance(raw.get(key), list)][:12]
+    return parse_reviews(raw, len(hyps))
 
 
 def per_paper(h: Harness, paper: dict[str, Any], max_rounds: int = MAX_ROUNDS) -> dict[str, Any]:
@@ -417,15 +422,22 @@ def per_paper(h: Harness, paper: dict[str, Any], max_rounds: int = MAX_ROUNDS) -
                            "background": {"texts": sum(1 for r in background if r.paper_id.startswith("TXT")),
                                           "kg_facts": sum(1 for r in background if r.paper_id == "KG")},
                            "rounds": [], "accepted": []}
+    full = getattr(h, "full_log", False)
+    if full:
+        log["background_items"] = [{"record_id": b["record_id"], "source": b["source"], "section": b["section"],
+                                    "text": b["text"][:400]} for b in bg_items]
     hyps = generate(h, paper_items, bg_items, allowed)
     for round_no in range(1, max_rounds + 1):
         if not hyps:
             log["rounds"].append({"round": round_no, "error": "no valid hypotheses"})
             break
-        reviews = critique(h, paper_items, bg_items, hyps)
+        summary: dict[str, Any] = {}
+        reviews = critique(h, paper_items, bg_items, hyps, summary if full else None)
         log["rounds"].append({"round": round_no, "verdicts": [
             {"intervention": str(hy["fields"].get("intervention", ""))[:160],
              **{c: rv[c]["pass"] for c in CRITERIA}, "fix": rv["fix"][:300]} for hy, rv in zip(hyps, reviews)]})
+        if full:
+            log["rounds"][-1].update({"critic_summary": summary, "hypotheses": shown(hyps), "reviews": reviews})
         accepted = [{**hy, "paper": paper["pmcid"], "round": round_no} for hy, rv in zip(hyps, reviews)
                     if rv["accepted"]]
         if accepted:
@@ -464,17 +476,24 @@ def dedupe(pool: list[dict[str, Any]], threshold: float = 0.6) -> list[dict[str,
 
 def match(h: Harness, a: dict[str, Any], b: dict[str, Any]) -> float:
     """1.0 if a wins in both orders, 0.0 if b does, else 0.5."""
-    picks = []
+    picks: list[Any] = []
+    reasons: list[dict[str, Any]] = []
     for first, second in ((a, b), (b, a)):
         payload = {"research_question": h.query, "knowledge_cutoff": h.cutoff,
                    "candidate_A": LM.hypothesis_fields(first["fields"]),
                    "candidate_B": LM.hypothesis_fields(second["fields"])}
         raw = h.ask("narrow", NARROW_MODEL, NARROW_SYSTEM, payload, max_out=2500)
         pick = str(raw.get("winner", "")).strip().upper() if isinstance(raw, dict) else ""
+        reasons.append({"a_first": first is a, "winner": pick,
+                        "reason": str(raw.get("reason", ""))[:500] if isinstance(raw, dict) else ""})
         picks.append(first if pick == "A" else second if pick == "B" else None)
-    if picks[0] is not None and picks[0] is picks[1]:
-        return 1.0 if picks[0] is a else 0.0
-    return 0.5
+    result = 1.0 if picks[0] is not None and picks[0] is picks[1] and picks[0] is a else \
+        0.0 if picks[0] is not None and picks[0] is picks[1] else 0.5
+    if getattr(h, "full_log", False):
+        with _seen_lock(h):
+            h.notes.setdefault("matches", []).append({"a": a.get("label"), "b": b.get("label"), "result": result,
+                                                      "reasons": reasons})
+    return result
 
 
 def round_robin(h: Harness, pool: list[dict[str, Any]]) -> list[float]:
@@ -550,14 +569,32 @@ def m_perpaper(h: Harness, n_papers: int = N_PAPERS, max_rounds: int = MAX_ROUND
                           "accepted_round_1": sum(bool(lg["accepted"]) and lg["n_rounds"] == 1 for lg in logs)}
     if not pool:
         raise ValueError(f"no hypothesis was accepted for any of {len(papers)} papers")
+    for n, hy in enumerate(pool):
+        hy["label"] = f"C{n + 1}"
+    if getattr(h, "full_log", False):
+        h.notes["selected_papers"] = [{"pmcid": p["pmcid"], "title": re.sub(r"<[^>]+>", "", str(p.get("title", ""))),
+                                       "doi": p.get("doi"), "date": p.get("date"), "grade": p.get("grade"),
+                                       "why_relevant": p.get("why")} for p in papers]
+        h.notes["pool"] = [{"label": hy["label"], "paper": hy["paper"], "round": hy["round"],
+                            "builds_on": hy["builds_on"], "what_is_new": hy["what_is_new"], "fields": hy["fields"]}
+                           for hy in pool]
+        h.notes["accepted_before_dedupe"] = sum(len(lg["accepted"]) for lg in logs)
     ranked, tournament = narrow(h, pool)
     points = tournament.get("final_points") or tournament.get("points") or []
     tournament["rank1_tied"] = len(points) > 1 and points[0] == points[1]
     h.notes["tournament"] = tournament
-    h.notes["top3"] = [{"paper": hy["paper"], "round": hy["round"], "builds_on": hy["builds_on"],
+    h.notes["ranking"] = [hy["label"] for hy in ranked]
+    h.notes["top3"] = [{"label": hy["label"], "paper": hy["paper"], "round": hy["round"], "builds_on": hy["builds_on"],
                         "what_is_new": hy["what_is_new"], "fields": hy["fields"]} for hy in ranked[:3]]
     return ranked[0]["fields"]
 
 
+def m_perpaper_full(h: Harness) -> dict[str, Any]:
+    """perpaper with every intermediate step kept in the run's notes (loop.md 28.3); the method is unchanged."""
+    h.full_log = True
+    return m_perpaper(h)
+
+
 register("perpaper")(m_perpaper)
-ARMS = ("perpaper",)
+register("perpaper_full")(m_perpaper_full)
+ARMS = ("perpaper", "perpaper_full")
