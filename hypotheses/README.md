@@ -1,6 +1,6 @@
 # Hypotheses for the 45 test papers
 
-Outputs of the per-paper generate → critique → narrow method (loop.md sections 28.1–28.3) for every paper in [`test/`](../test/), with the same numbering. One run (sample 1) per research question; each paper has three questions (levels `broad`, `problem_constrained`, `expert_context`). No agent ever saw the target paper: all evidence was published before the knowledge cutoff, and every run's leakage audit is stored.
+Outputs of the per-paper generate → critique → narrow method (loop.md sections 28.1–28.4) for every paper in [`test/`](../test/), with the same numbering. One run (sample 1) per research question; each paper has three questions (levels `broad`, `problem_constrained`, `expert_context`). No agent ever saw the target paper: all evidence was published before the knowledge cutoff, every background passage (teaching texts, Wikipedia) is the version dated on or before 2023-12-31, and every run's leakage audit is stored.
 
 ## Files in each folder
 
@@ -14,12 +14,12 @@ Outputs of the per-paper generate → critique → narrow method (loop.md sectio
 
 Each hypothesis has the shared fields: `hypothesis`, `material_initial_state`, `intervention`, `conditions`, `structural_mediator`, `mechanism`, `predicted_outcome`, `baseline`, `boundary`, `uncertainty`, `supporting_evidence_ids`, `conflicting_evidence_ids` and `falsification_experiment` (`design`, `measurements`, `falsification_rule`). Evidence IDs: `PMC…::web::…` = a passage of a retrieved paper, `TXT::…` = a teaching-text passage, `KG::…` = a MatKG fact.
 
-Status: 5 of 135 question runs complete, 130 pending. These runs are not scored; the method's pilot evaluation is in loop.md 28.2. Built by `build_hypothesis_folder.py`.
+Status: 0 of 135 question runs complete, 135 pending. These runs are not scored; the method's pilot evaluation is in loop.md 28.2. Built by `build_hypothesis_folder.py`.
 
 | # | Split | Paper | Title | Levels done | Final hypothesis (problem-constrained question) |
 |---:|---|---|---|---|---|
-| [1](1/) | dev | PMC10759803 | Synergy of strength–ductility in HfMoTaTiZr refractory high entropy alloy through Cr addit | 2/3 | Partially substitute Ta with Nb (50 at.% replacement) in HfMoTaTiZr to reduce the alloy’s density while retaining its high-temperature BCC-strengthened framework. |
-| [2](2/) | dev | PMC11077685 | Ink‐Extrusion 3D Printing and Silicide Coating of HfNbTaTiZr Refractory High‐Entropy Alloy | 3/3 | Apply a pack aluminizing surface treatment to the as‐cast HfNbTaTiZr alloy to form an external, thin Al-rich layer that oxidizes preferentially at high temperature to form a protective, adherent Al2O3 scale. |
+| [1](1/) | dev | PMC10759803 | Synergy of strength–ductility in HfMoTaTiZr refractory high entropy alloy through Cr addit | 0/3 |  |
+| [2](2/) | dev | PMC11077685 | Ink‐Extrusion 3D Printing and Silicide Coating of HfNbTaTiZr Refractory High‐Entropy Alloy | 0/3 |  |
 | [3](3/) | dev | PMC11087546 | Overcoming strength-ductility tradeoff with high pressure thermal treatment | 0/3 |  |
 | [4](4/) | dev | PMC11355469 | Molecular Dynamics Study on Wear Resistance of High Entropy Alloy Coatings Considering the | 0/3 |  |
 | [5](5/) | dev | PMC11375216 | Chemical short-range order increases the phonon heat conductivity in a refractory high-ent | 0/3 |  |

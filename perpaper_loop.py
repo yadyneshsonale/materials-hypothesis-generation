@@ -198,11 +198,13 @@ class _TextIndex:
         return out
 
 
-def text_records(question: str, paper: dict[str, Any], n: int = TEXT_PASSAGES) -> list[RetrievalRecord]:
+def text_records(question: str, paper: dict[str, Any], cutoff: str, n: int = TEXT_PASSAGES) -> list[RetrievalRecord]:
     hits = _TextIndex.get().top(f"{question} {paper.get('title', '')}", n)
     out = []
     for r in hits:
         if MT.HEA.search(r["text"]):  # the build-time rule, re-checked at use (loop.md 28.1)
+            continue
+        if not r.get("date") or str(r["date"]) >= cutoff:  # only dated content from before the cutoff (loop.md 28.4)
             continue
         out.append(RetrievalRecord(r["record_id"], f"TXT::{r['source']}::{r['doc']}", r.get("date") or "",
                                    f"text:{r['source']}", r["text"],
@@ -410,7 +412,7 @@ def critique(h: Harness, paper_items: list[dict[str, Any]], background: list[dic
 
 def per_paper(h: Harness, paper: dict[str, Any], max_rounds: int = MAX_ROUNDS) -> dict[str, Any]:
     text = paper_text(paper)
-    background = text_records(h.query, paper) + kg_records(h, paper)
+    background = text_records(h.query, paper, h.cutoff) + kg_records(h, paper)
     records = text + background
     with _seen_lock(h):
         for r in records:
@@ -597,4 +599,6 @@ def m_perpaper_full(h: Harness) -> dict[str, Any]:
 
 register("perpaper")(m_perpaper)
 register("perpaper_full")(m_perpaper_full)
-ARMS = ("perpaper", "perpaper_full")
+# loop.md 28.4: the same method and full log on the dated teaching corpus (every passage dated on or before 2023-12-31)
+register("perpaper_dated")(m_perpaper_full)
+ARMS = ("perpaper", "perpaper_full", "perpaper_dated")

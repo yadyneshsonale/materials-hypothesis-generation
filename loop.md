@@ -6297,3 +6297,44 @@ the user's decision on the pending full run (28.2), for producing the outputs:
   `final_hypothesis.json` (rank 1 and the ranked top 3), per question level.
 - No new evaluation is pre-registered here; these runs are not scored. "Internal reasoning" is the agents' written
   outputs (critiques, verdicts, match reasons); o3-mini's hidden reasoning tokens are not available.
+
+### 28.4 Only dated background content; the pilot and the 45-paper outputs are re-run (written 2026-11-19 at about 02:45, before any run on the dated corpus)
+
+**Problem** (raised by the user's question, 2026-11-19 02:17). The teaching corpus of 28.1 was only partly dated:
+Wikipedia revisions were pinned to 2023-12-31 and the OCW courses were taught 2005–2013, but **DoITPoMS (1,844
+passages) and LibreTexts (785) were today's undated pages**, and the OCW PDFs were today's files. They were filtered by
+topic (no HEA passages) but not by date, and the pilot report's "0 date violations" skipped undated passages. Fundamentals
+pages are unlikely to carry a target paper's finding, but the experimental condition (no evidence after the cutoff) was
+not strictly met. The user: "only use dated content to keep the experimental conditions perfect. either date them or
+drop them".
+
+**Fix.**
+- Every DoITPoMS, LibreTexts and MIT OCW passage is now taken from the page's (or PDF's) latest Internet Archive
+  capture on or before 2023-12-31 and dated by that capture; a page without such a capture is dropped. Wikipedia is
+  unchanged (revisions on or before 2023-12-31). The build fails if any passage lacks a date on or before 2023-12-31;
+  every test paper is from 2024-01-01 or later.
+- At use, a passage is skipped unless it has a date before the question's cutoff; the report counts undated passages.
+- The 45-paper run of 28.3 was stopped at 02:22 after 57 of 135 runs; those runs (arm `perpaper_full`) and the pilot's
+  runs (`perpaper`, 28.2) used the undated corpus and are **superseded**. The pilot's numbers in 28.2 stay on record but
+  are no longer the method's result.
+
+**Re-run** (arm `perpaper_dated`: the `perpaper` method with the full log of 28.3, on the dated corpus; nothing else
+changes):
+1. all 45 papers × 3 levels × sample 1 (135 runs), exported to `hypotheses/` as in 28.3;
+2. the 8 dev papers × 3 levels × sample 2 (24 runs), so the dev papers have both samples;
+3. the pilot evaluation of 28.1 repeated unchanged on the 48 dev runs (RQ ×3, non-copying, source-paper non-copying,
+   pairwise v2 against the draft-then-ground agent and the closed-book writer with DeepSeek and o1), with the same
+   go / no-go rule. Expectation: results close to 28.2, since background passages were a small part of each input.
+
+**Dated corpus built** (2026-11-19 02:31–04:30; sequential, about 15 requests a minute, after the archive refused a
+faster parallel attempt; no fetch was finally skipped): 5,964 unique passages, every one dated on or before 2023-12-31
+(range 2005-05-02 to 2023-12-31), none mentions an HEA, none from a live page.
+
+| Source | Passages (unique) | Dated by |
+|---|---:|---|
+| DoITPoMS | 2,123 (74 of 82 packages archived; 8 dropped) | capture, 2015–2023 |
+| Wikipedia | 2,559 | revision on or before 2023-12-31 |
+| LibreTexts | 732 | capture |
+| MIT OCW | 550 | capture of the old-URL PDFs, 2011–2016 |
+
+Identical passages (mostly DoITPoMS "print all" pages repeating a package's other pages) are kept once.

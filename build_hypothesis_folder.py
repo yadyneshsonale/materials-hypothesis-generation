@@ -8,7 +8,7 @@ Each folder holds, for the paper's three research questions (levels broad, probl
   hypotheses.json           every accepted hypothesis (after merging near-duplicates), in tournament order
   final_hypothesis.json     the method's answer: the rank-1 hypothesis, plus the ranked top 3
 
-Runs come from loop_rx/perpaper_full (sample 1). A level whose run has not finished is marked "pending".
+Runs come from loop_rx/perpaper_dated (sample 1). A level whose run has not finished is marked "pending".
 
     ./.venv/bin/python build_hypothesis_folder.py
 """
@@ -24,8 +24,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent
 TEST = ROOT / "test"
 OUT = ROOT / "hypotheses"
-RUNS = ROOT / "experiments" / "high_temperature_hea_qwen35b" / "loop_rx" / "perpaper_full" / "runs"
-ARM, SAMPLE = "perpaper_full", 1
+ARM, SAMPLE = "perpaper_dated", 1  # loop.md 28.4: the dated teaching corpus
+RUNS = ROOT / "experiments" / "high_temperature_hea_qwen35b" / "loop_rx" / ARM / "runs"
 LEVELS = ("broad", "problem_constrained", "expert_context")
 METHOD = ("Per-paper generate -> critique -> narrow (loop.md 28.1, 28.3). For the research question, the 10 most "
           "relevant papers published before the knowledge cutoff are retrieved. For each paper, o3-mini writes 3 "
@@ -154,10 +154,11 @@ def build() -> dict[str, Any]:
 def readme(rows: list[tuple], status: dict[str, int]) -> None:
     lines = [
         "# Hypotheses for the 45 test papers", "",
-        "Outputs of the per-paper generate → critique → narrow method (loop.md sections 28.1–28.3) for every paper in "
+        "Outputs of the per-paper generate → critique → narrow method (loop.md sections 28.1–28.4) for every paper in "
         "[`test/`](../test/), with the same numbering. One run (sample 1) per research question; each paper has three "
         "questions (levels `broad`, `problem_constrained`, `expert_context`). No agent ever saw the target paper: "
-        "all evidence was published before the knowledge cutoff, and every run's leakage audit is stored.", "",
+        "all evidence was published before the knowledge cutoff, every background passage (teaching texts, "
+        "Wikipedia) is the version dated on or before 2023-12-31, and every run's leakage audit is stored.", "",
         "## Files in each folder", "",
         "| File | Content |", "|---|---|",
         "| `paper.pdf` | The target paper (for reading; never shown to any agent). |",

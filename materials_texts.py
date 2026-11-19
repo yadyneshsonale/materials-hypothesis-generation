@@ -1,18 +1,19 @@
-"""Experiment 49 (loop.md 28.1): an open materials-science teaching corpus for retrieval ("textbook RAG").
+"""Experiment 49 (loop.md 28.1, 28.4): a dated, open materials-science teaching corpus for retrieval ("textbook RAG").
 
-Sources (all openly licensed; each passage keeps its source, URL and licence):
-  doitpoms    DoITPoMS teaching and learning packages, University of Cambridge (CC BY-NC-SA 2.0 UK); undated
-  mit_ocw     MIT OpenCourseWare lecture notes of materials courses taught 2005-2013 (CC BY-NC-SA 4.0); dated
-  libretexts  LibreTexts "Supplemental Modules (Materials Science)" (CC BY-NC-SA); undated
-  wikipedia   materials-science articles as of their last revision on or before 2023-12-31 (CC BY-SA 4.0); dated
+Every passage is dated on or before 2023-12-31 (every test paper is from 2024-01-01 or later), and its text is the
+dated version itself, not today's page:
+  doitpoms    DoITPoMS teaching and learning packages, University of Cambridge (CC BY-NC-SA 2.0 UK): each page's
+              latest Internet Archive (Wayback Machine) capture on or before 2023-12-31, dated by the capture
+  mit_ocw     MIT OpenCourseWare lecture notes of materials courses taught 2005-2013 (CC BY-NC-SA 4.0): the PDFs as
+              archived on or before 2023-12-31 (the old OCW URL layout), dated by the capture
+  libretexts  LibreTexts "Supplemental Modules (Materials Science)" (CC BY-NC-SA): captures as for DoITPoMS
+  wikipedia   materials-science articles at their last revision on or before 2023-12-31 (CC BY-SA 4.0)
+A page without such a capture or revision is dropped; a build fails if any passage lacks a date on or before
+2023-12-31. In addition, every passage that mentions high-entropy, medium-entropy, multi-principal-element or
+compositionally complex alloys is dropped, so the corpus supplies fundamentals only.
 
-Leakage rule (loop.md 28.1): the earliest test paper is from 2024-01-01, so Wikipedia (pinned to 2023-12-31) and the
-OCW courses (2005-2013) predate every test paper. DoITPoMS and LibreTexts are undated, so every passage, from every
-source, that mentions high-entropy, medium-entropy, multi-principal-element or compositionally complex alloys is
-dropped: the corpus supplies fundamentals only and cannot carry a recent HEA result.
-
-The downloaded corpus is a cache (not committed); sources.json (URLs, revision IDs, licences, counts) is committed so
-the corpus can be rebuilt.
+The downloaded corpus is a cache (not committed); sources.json (URLs, captures, revision IDs, licences, counts) is
+committed so the corpus can be rebuilt.
 
     ./.venv/bin/python materials_texts.py build [--source S ...]
     ./.venv/bin/python materials_texts.py stats
@@ -47,7 +48,8 @@ HEA = re.compile(r"high[\s-]*entropy|medium[\s-]*entropy|multi[\s-]*principal|mu
                  r"|FeCoNiCrMn|AlCoCrFeNi", re.I)
 LICENCES = {"doitpoms": "CC BY-NC-SA 2.0 UK", "mit_ocw": "CC BY-NC-SA 4.0", "libretexts": "CC BY-NC-SA 3.0 US",
             "wikipedia": "CC BY-SA 4.0"}
-DOITPOMS_SKIP = {"aims", "prereqs", "questions", "links", "credits", "index_old", "further", "references", "feedback"}
+DOITPOMS_SKIP = {"aims", "prereqs", "questions", "links", "credits", "index_old", "further", "references", "feedback",
+                 "printall"}
 OCW_COURSES = ("3-40j-physical-metallurgy-fall-2009", "3-032-mechanical-behavior-of-materials-fall-2007",
                "3-205-thermodynamics-and-kinetics-of-materials-fall-2006",
                "3-012-fundamentals-of-materials-science-fall-2005", "3-044-materials-processing-spring-2013",
@@ -106,8 +108,13 @@ _LOCK = threading.Lock()
 _LAST: dict[str, float] = {}
 
 
+ARCHIVE_DELAY = 4.0  # web.archive.org refuses connections from clients faster than about 15 requests a minute
+
+
 def fetch(url: str, binary: bool = False, delay: float = 0.4, retries: int = 4) -> Any:
     host = urllib.parse.urlsplit(url).netloc
+    if host == "web.archive.org":
+        delay, retries = max(delay, ARCHIVE_DELAY), max(retries, 6)
     for attempt in range(retries):
         with _LOCK:  # polite: at most one request per host every `delay` seconds
             wait = _LAST.get(host, 0) + delay - time.time()
@@ -120,7 +127,8 @@ def fetch(url: str, binary: bool = False, delay: float = 0.4, retries: int = 4) 
             return data if binary else data.decode("utf-8", errors="replace")
         except Exception as error:  # noqa: BLE001 - transient network errors are retried, then the page is skipped
             retry_after = getattr(error, "headers", None) and error.headers.get("Retry-After")
-            if getattr(error, "code", None) == 429 and attempt < retries - 1:
+            refused = "Connection refused" in str(error) or "timed out" in str(error)
+            if (getattr(error, "code", None) == 429 or refused) and attempt < retries - 1:
                 time.sleep(min(120, int(retry_after) if str(retry_after or "").isdigit() else 30 * (attempt + 1)))
                 continue
             if attempt == retries - 1:
@@ -236,48 +244,92 @@ def passages(source: str, doc_id: str, title: str, url: str, date: str | None, p
 
 # ---------------------------------------------------------------- sources
 
+# ---------------------------------------------------------------- dated snapshots (loop.md 28.4)
+
+SNAPSHOT_BEFORE = "20231231"  # the latest Wayback Machine capture on or before 2023-12-31 (every test paper is later)
+CDX = "https://web.archive.org/cdx/search/cdx?"
+
+
+def _norm_url(url: str) -> str:
+    parts = urllib.parse.urlsplit(url)
+    host = parts.netloc.lower().split(":")[0].removeprefix("www.")
+    return f"{host}{urllib.parse.unquote(parts.path)}".rstrip("/")
+
+
+def snapshots(prefix: str) -> dict[str, tuple[str, str]]:
+    """Normalised URL -> (timestamp, original URL) of its latest HTTP-200 capture on or before SNAPSHOT_BEFORE, for
+    every archived URL under the prefix; URLs with a query string are skipped."""
+    q = urllib.parse.urlencode({"url": f"{prefix}*", "to": SNAPSHOT_BEFORE, "output": "json",
+                                "filter": "statuscode:200", "fl": "timestamp,original"})
+    raw = fetch(CDX + q, delay=1.5, retries=6)
+    rows = json.loads(raw)[1:] if raw and raw.strip().startswith("[") else []
+    out: dict[str, tuple[str, str]] = {}
+    for ts, original in rows:
+        if "?" in original:
+            continue
+        key = _norm_url(original)
+        if key not in out or ts > out[key][0]:
+            out[key] = (ts, original)
+    return out
+
+
+def snapshot_url(ts: str, original: str) -> str:
+    return f"https://web.archive.org/web/{ts}id_/{original}"  # id_: the archived bytes, without the Wayback frame
+
+
+def snapshot_date(ts: str) -> str:
+    return f"{ts[:4]}-{ts[4:6]}-{ts[6:8]}"
+
+
 def doitpoms(counts: dict[str, int]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    index = fetch("https://www.doitpoms.ac.uk/tlplib/index.php") or ""
+    """Every teaching package's pages as archived on or before 2023-12-31 (packages without captures are dropped)."""
+    index = fetch("https://www.doitpoms.ac.uk/tlplib/index.php") or ""  # discovery only; no text is taken from it
     tlps = sorted(set(re.findall(r'href="/tlplib/([^"/]+)/index\.php"', index)))
     docs, recs = [], []
 
-    def one(tlp: str) -> tuple[dict[str, Any], list[dict[str, Any]]]:
-        base = f"https://www.doitpoms.ac.uk/tlplib/{tlp}/"
-        first = fetch(base + "index.php") or ""
-        title = _title(first, tlp).split("|")[0].replace("DoITPoMS - TLP Library", "").strip(" -") or tlp
-        pages = [p for p in dict.fromkeys(re.findall(r'href="([a-z0-9_\-]+)\.php"', first))
-                 if p not in DOITPOMS_SKIP][:40]
-        out = []
-        for page in pages:
-            raw = fetch(base + page + ".php")
+    def one(tlp: str) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+        snaps = snapshots(f"doitpoms.ac.uk/tlplib/{tlp}/")
+        pages = {}
+        for key, (ts, original) in snaps.items():
+            m = re.search(rf"/tlplib/{re.escape(tlp)}/([a-z0-9_\-]+)\.php$", key)
+            if m and m.group(1) not in DOITPOMS_SKIP:
+                pages[m.group(1)] = (ts, original)
+        if not pages:
+            counts["undated_dropped_documents"] += 1
+            return None, []
+        out, title = [], tlp
+        for page, (ts, original) in sorted(pages.items())[:40]:
+            raw = fetch(snapshot_url(ts, original), delay=1.0)
             if not raw:
                 continue
-            out += passages("doitpoms", f"{tlp}/{page}", title, base + page + ".php", None,
+            if page == "index":
+                title = _title(raw, tlp).split("|")[0].replace("DoITPoMS - TLP Library", "").strip(" -") or tlp
+            out += passages("doitpoms", f"{tlp}/{page}", tlp, snapshot_url(ts, original), snapshot_date(ts),
                             chunk(blocks(between(raw, 'class="col-lg-9', 'class="footer'))), counts)
-        print(f"  doitpoms {tlp}: {len(pages)} pages, {len(out)} passages", flush=True)
-        return {"doc": tlp, "title": title, "url": base, "pages": len(pages), "passages": len(out)}, out
+        for r in out:
+            r["title"] = title
+        print(f"  doitpoms {tlp}: {len(pages)} archived pages, {len(out)} passages", flush=True)
+        return {"doc": tlp, "title": title, "pages": len(pages), "passages": len(out),
+                "snapshots": sorted({snapshot_date(ts) for ts, _ in pages.values()})}, out
 
-    with ThreadPoolExecutor(3) as pool:
+    with ThreadPoolExecutor(1) as pool:  # sequential: the archive throttles parallel clients
         for doc, out in pool.map(one, tlps):
-            docs.append(doc)
-            recs += out
+            if doc:
+                docs.append(doc)
+                recs += out
     return docs, recs
 
 
 def mit_ocw(counts: dict[str, int]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Lecture-note PDFs as archived (old OCW URL layout) on or before 2023-12-31."""
     docs, recs = [], []
     for course in OCW_COURSES:
         year = re.search(r"(\d{4})$", course).group(1)
-        page = fetch(f"https://ocw.mit.edu/courses/{course}/pages/lecture-notes/") or ""
-        resources = list(dict.fromkeys(re.findall(rf'href="(/courses/{re.escape(course)}/resources/[^"]+/)"', page)))
+        snaps = snapshots(f"ocw.mit.edu/courses/materials-science-and-engineering/{course}/")
+        pdfs = {k: v for k, v in snaps.items() if k.lower().endswith(".pdf") and "lecture" in k.lower()}
         n_pdf = 0
-        for res in resources:
-            rpage = fetch("https://ocw.mit.edu" + res) or ""
-            m = re.search(rf'href="(/courses/{re.escape(course)}/[^"/]+\.pdf)"', rpage)
-            title = re.search(r"<title>([^<|]+)", rpage)
-            if not m:
-                continue
-            data = fetch("https://ocw.mit.edu" + m.group(1), binary=True)
+        for key, (ts, original) in sorted(pdfs.items()):
+            data = fetch(snapshot_url(ts, original), binary=True, delay=1.0)
             if not data or not data.startswith(b"%PDF"):
                 continue
             with tempfile.NamedTemporaryFile(suffix=".pdf") as tmp:
@@ -286,37 +338,35 @@ def mit_ocw(counts: dict[str, int]) -> tuple[list[dict[str, Any]], list[dict[str
                 text = subprocess.run(["pdftotext", "-layout", tmp.name, "-"], capture_output=True, text=True,
                                       timeout=120).stdout
             paras = [" ".join(p.split()) for p in re.split(r"\n\s*\n", text)]
-            name = (title.group(1).strip() if title else res.rstrip("/").split("/")[-1])
+            name = key.rsplit("/", 1)[-1]
             pieces = chunk([("h", name)] + [("p", p) for p in paras if len(p) > 40])
-            recs += passages("mit_ocw", f"{course}/{res.rstrip('/').split('/')[-1]}", f"MIT {course}: {name}",
-                             "https://ocw.mit.edu" + m.group(1), year, pieces, counts)
+            recs += passages("mit_ocw", f"{course}/{name}", f"MIT {course}: {name}", snapshot_url(ts, original),
+                             snapshot_date(ts), pieces, counts)
             n_pdf += 1
-        docs.append({"doc": course, "year": year, "pdfs": n_pdf})
-        print(f"  mit_ocw {course}: {n_pdf} PDFs", flush=True)
+        docs.append({"doc": course, "course_year": year, "archived_lecture_pdfs": len(pdfs), "pdfs": n_pdf})
+        print(f"  mit_ocw {course}: {len(pdfs)} archived lecture PDFs, {n_pdf} read", flush=True)
     return docs, recs
 
 
 def libretexts(counts: dict[str, int], limit: int = 400) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-    seen, queue, docs, recs = set(), [LIBRETEXTS_ROOT], [], []
-    while queue and len(seen) < limit:
-        url = queue.pop(0)
-        if url in seen:
+    """The Materials Science supplemental modules as archived on or before 2023-12-31."""
+    prefix = "eng.libretexts.org/Bookshelves/Materials_Science/Supplemental_Modules_(Materials_Science)/"
+    snaps = snapshots(prefix)
+    docs, recs = [], []
+    for key, (ts, original) in sorted(snaps.items())[:limit]:
+        if re.search(r"\.(png|jpe?g|gif|svg|pdf|css|js)$", key, re.I):
             continue
-        seen.add(url)
-        raw = fetch(url, delay=0.8)
+        raw = fetch(snapshot_url(ts, original), delay=1.0)
         if not raw:
             continue
-        for link in re.findall(r'href="(https://eng\.libretexts\.org/Bookshelves/Materials_Science/'
-                               r'Supplemental_Modules_\(Materials_Science\)/[^"#?]+)"', raw):
-            if link not in seen:
-                queue.append(link)
-        title = _title(raw, url).split(" - ")[0]
-        pieces = chunk(blocks(between(raw, "mt-content-container", "mt-content-footer")))
-        out = passages("libretexts", url.split("Supplemental_Modules_(Materials_Science)/")[-1][:120], title, url,
-                       None, pieces, counts)
+        title = _title(raw, key).split(" - ")[0]
+        out = passages("libretexts", key.split("Supplemental_Modules_(Materials_Science)/")[-1][:120], title,
+                       snapshot_url(ts, original), snapshot_date(ts),
+                       chunk(blocks(between(raw, "mt-content-container", "mt-content-footer"))), counts)
         if out:
-            docs.append({"doc": title, "url": url, "passages": len(out)})
+            docs.append({"doc": title, "snapshot": snapshot_date(ts), "passages": len(out)})
             recs += out
+    print(f"  libretexts: {len(snaps)} archived URLs, {len(docs)} pages with passages", flush=True)
     return docs, recs
 
 
@@ -363,8 +413,11 @@ BUILDERS = {"doitpoms": doitpoms, "mit_ocw": mit_ocw, "libretexts": libretexts, 
 def build_one(name: str) -> dict[str, Any]:
     """One source into passages_<source>.jsonl and sources_<source>.json (sources can be built in parallel)."""
     OUT.mkdir(parents=True, exist_ok=True)
-    counts: dict[str, int] = {"dropped_hea": 0, "wikipedia_missing": 0}
+    counts: dict[str, int] = {"dropped_hea": 0, "wikipedia_missing": 0, "undated_dropped_documents": 0}
     docs, recs = BUILDERS[name](counts)
+    undated = [r for r in recs if not r.get("date") or r["date"] > "2023-12-31"]
+    if undated:
+        raise RuntimeError(f"{name}: {len(undated)} passages without a date on or before 2023-12-31")
     path = OUT / f"passages_{name}.jsonl"
     tmp = path.with_suffix(".jsonl.tmp")
     tmp.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in recs))
@@ -380,9 +433,10 @@ def build_one(name: str) -> dict[str, Any]:
 
 def merge() -> dict[str, Any]:
     """sources.json (committed) from the per-source manifests."""
-    sources = {"rules": ("loop.md 28.1: passages mentioning high-entropy / medium-entropy / multi-principal-element / "
-                         "compositionally complex alloys are dropped from every source; Wikipedia is pinned to "
-                         f"{WIKI_PIN}; OCW courses are from 2005-2013."), "hea_pattern": HEA.pattern,
+    sources = {"rules": ("loop.md 28.1 and 28.4: every passage is the version dated on or before 2023-12-31 (Wikipedia "
+                         f"revisions pinned to {WIKI_PIN}; DoITPoMS, LibreTexts and MIT OCW from Wayback Machine "
+                         "captures on or before 2023-12-31); passages mentioning high-entropy / medium-entropy / "
+                         "multi-principal-element / compositionally complex alloys are dropped."), "hea_pattern": HEA.pattern,
                "sources": {n: json.loads((OUT / f"sources_{n}.json").read_text()) for n in BUILDERS
                            if (OUT / f"sources_{n}.json").exists()}}
     SOURCES.write_text(json.dumps(sources, indent=1, ensure_ascii=False) + "\n")
@@ -395,8 +449,15 @@ _CACHE: list[dict[str, Any]] | None = None
 def load() -> list[dict[str, Any]]:
     global _CACHE
     if _CACHE is None:
-        _CACHE = [json.loads(line) for n in BUILDERS if (OUT / f"passages_{n}.jsonl").exists()
-                  for line in (OUT / f"passages_{n}.jsonl").read_text().splitlines()]
+        seen: set[str] = set()
+        _CACHE = []
+        for n in BUILDERS:  # identical passages (e.g. DoITPoMS "print all" pages) are kept once
+            path = OUT / f"passages_{n}.jsonl"
+            for line in path.read_text().splitlines() if path.exists() else []:
+                record = json.loads(line)
+                if record["text"] not in seen:
+                    seen.add(record["text"])
+                    _CACHE.append(record)
     return _CACHE
 
 

@@ -200,6 +200,7 @@ def background_leakage() -> dict[str, int]:
                 out["text_unknown_ids"] += r is None
                 if r is not None:
                     out["text_hea_mentions"] += bool(PP.MT.HEA.search(r["text"]))
+                    out["text_undated"] += not r.get("date")
                     out["text_date_violations"] += bool(r.get("date")) and str(r["date"]) >= run["publication_date"]
             elif rid.startswith("KG::"):
                 out["kg_facts_seen"] += 1
@@ -282,6 +283,7 @@ def render(r: dict[str, Any]) -> str:
 
 
 def main() -> None:
+    global ARM
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("stage", choices=("generate", "rq", "noncopy", "noncopy_source", "pairwise", "report"))
     parser.add_argument("--workers", type=int, default=6)
@@ -290,12 +292,14 @@ def main() -> None:
     parser.add_argument("--base", default="draft", choices=tuple(BASES))
     parser.add_argument("--part", type=int, default=0)
     parser.add_argument("--parts", type=int, default=1)
-    parser.add_argument("--arm", default=ARM, choices=PP.ARMS)
+    parser.add_argument("--arm", default=ARM, choices=PP.ARMS,
+                        help="the arm to generate or evaluate (loop.md 28.4: perpaper_dated)")
     parser.add_argument("--scope", default="dev", choices=("dev", "all45"))
     parser.add_argument("--samples", type=int, nargs="+", default=list(H.SAMPLES))
     args = parser.parse_args()
+    ARM = args.arm
     if args.stage == "generate":
-        print(generate(args.workers, args.part, args.parts, args.arm, args.scope, tuple(args.samples)))
+        print(generate(args.workers, args.part, args.parts, ARM, args.scope, tuple(args.samples)))
     elif args.stage == "rq":
         items = RQ.run_items([ARM])
         if args.rep > 1:
@@ -309,8 +313,9 @@ def main() -> None:
         print(Q.pairwise_stage([ARM], args.judge, args.workers, BASES[args.base], N.PAIR_SYSTEM_V2, N.PAIR_DIR))
     else:
         result = report()
-        atomic_json(OUT / "analysis_perpaper.json", result)
-        (OUT / "analysis_perpaper.md").write_text(render(result))
+        name = "analysis_perpaper" if ARM == "perpaper" else f"analysis_{ARM}"
+        atomic_json(OUT / f"{name}.json", result)
+        (OUT / f"{name}.md").write_text(render(result))
         print(render(result))
 
 

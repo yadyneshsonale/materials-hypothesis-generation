@@ -51,7 +51,7 @@ class FakeHarness:
 
 
 def run_paper(h: FakeHarness, max_rounds: int) -> dict[str, Any]:
-    with patch.object(P, "paper_text", lambda paper: TEXT), patch.object(P, "text_records", lambda q, p: []), \
+    with patch.object(P, "paper_text", lambda paper: TEXT), patch.object(P, "text_records", lambda q, p, c: []), \
             patch.object(P, "kg_records", lambda h_, p: []):
         return P.per_paper(h, PAPER, max_rounds)
 
@@ -131,6 +131,19 @@ class PerPaperTests(unittest.TestCase):
                            ("RHEA", "Refractory HEAs such as NbMoTaW. " + long)], counts)
         self.assertEqual([p["section"] for p in out], ["Creep"])
         self.assertEqual(counts["dropped_hea"], 2)
+
+    def test_text_records_use_only_passages_dated_before_the_cutoff(self) -> None:
+        rec = {"record_id": "TXT::x", "source": "wikipedia", "doc": "d", "title": "t", "section": "s",
+               "licence": "l", "url": "u", "text": "creep"}
+
+        class Index:
+            def top(self, text: str, n: int) -> list[dict[str, Any]]:
+                return [{**rec, "record_id": "a", "date": "2023-12-31"}, {**rec, "record_id": "b", "date": None},
+                        {**rec, "record_id": "c", "date": "2024-05-01"}]
+
+        with patch.object(P._TextIndex, "get", classmethod(lambda cls: Index())):
+            got = P.text_records("q", {"title": "t"}, "2024-03-01")
+        self.assertEqual([r.record_id for r in got], ["a"])
 
     def test_generator_prompt_is_not_a_judge_prompt(self) -> None:
         import diag_analysis as D
